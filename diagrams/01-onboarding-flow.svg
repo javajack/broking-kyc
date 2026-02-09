@@ -1,0 +1,291 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 2400" font-family="Inter, -apple-system, sans-serif">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#475569"/>
+    </marker>
+    <marker id="arrowhead-green" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#16a34a"/>
+    </marker>
+    <marker id="arrowhead-orange" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#ea580c"/>
+    </marker>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1e293b"/>
+      <stop offset="100%" style="stop-color:#334155"/>
+    </linearGradient>
+    <filter id="shadow" x="-2%" y="-2%" width="104%" height="104%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.1"/>
+    </filter>
+  </defs>
+
+  <!-- Title -->
+  <rect x="0" y="0" width="1200" height="80" fill="url(#headerGrad)"/>
+  <text x="600" y="35" text-anchor="middle" fill="white" font-size="22" font-weight="700">KYC Onboarding Flow — Optimized for Minimal User Input</text>
+  <text x="600" y="60" text-anchor="middle" fill="#94a3b8" font-size="13">DigiLocker-first, Aadhaar-forced login, async verification, batch submission</text>
+
+  <!-- Legend -->
+  <rect x="30" y="95" width="1140" height="50" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+  <circle cx="60" cy="120" r="8" fill="#3b82f6"/> <text x="75" y="125" font-size="12" fill="#475569">User Screen</text>
+  <circle cx="200" cy="120" r="8" fill="#16a34a"/> <text x="215" y="125" font-size="12" fill="#475569">Async/Parallel</text>
+  <circle cx="350" cy="120" r="8" fill="#ea580c"/> <text x="365" y="125" font-size="12" fill="#475569">Blocking Check</text>
+  <circle cx="510" cy="120" r="8" fill="#8b5cf6"/> <text x="525" y="125" font-size="12" fill="#475569">Vendor API</text>
+  <circle cx="660" cy="120" r="8" fill="#64748b"/> <text x="675" y="125" font-size="12" fill="#475569">Batch/Offline</text>
+  <rect x="810" y="112" width="40" height="16" rx="3" fill="#fef3c7" stroke="#f59e0b"/>
+  <text x="858" y="124" font-size="12" fill="#475569">User Input Fields</text>
+  <rect x="1000" y="112" width="40" height="16" rx="3" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="1048" y="124" font-size="12" fill="#475569">Pre-filled</text>
+
+  <!-- ===== SCREEN 1: Enter Aadhaar + PAN ===== -->
+  <rect x="80" y="170" width="440" height="140" rx="12" fill="white" stroke="#3b82f6" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="80" y="170" width="440" height="36" rx="12" fill="#3b82f6"/>
+  <rect x="80" y="194" width="440" height="12" fill="#3b82f6"/>
+  <text x="100" y="194" fill="white" font-size="14" font-weight="700">SCREEN 1 — Start</text>
+  <text x="100" y="228" font-size="13" fill="#334155" font-weight="600">User enters only 2 fields:</text>
+  <rect x="110" y="240" width="160" height="26" rx="4" fill="#fef3c7" stroke="#f59e0b"/>
+  <text x="120" y="258" font-size="12" fill="#92400e">Aadhaar Number</text>
+  <rect x="280" y="240" width="160" height="26" rx="4" fill="#fef3c7" stroke="#f59e0b"/>
+  <text x="290" y="258" font-size="12" fill="#92400e">PAN Number</text>
+  <text x="100" y="292" font-size="11" fill="#64748b">Mobile OTP sent for Aadhaar verification</text>
+
+  <!-- Async triggers from Screen 1 -->
+  <rect x="620" y="170" width="280" height="140" rx="12" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="640" y="195" fill="#16a34a" font-size="13" font-weight="700">PARALLEL ASYNC (while user on Screen 2)</text>
+  <rect x="640" y="208" width="240" height="22" rx="4" fill="white" stroke="#8b5cf6"/>
+  <text x="650" y="224" font-size="11" fill="#6d28d9">V1: PAN Verify [Decentro]</text>
+  <rect x="640" y="236" width="240" height="22" rx="4" fill="white" stroke="#8b5cf6"/>
+  <text x="650" y="252" font-size="11" fill="#6d28d9">V4: KRA Lookup [Digio]</text>
+  <rect x="640" y="264" width="240" height="22" rx="4" fill="white" stroke="#8b5cf6"/>
+  <text x="650" y="280" font-size="11" fill="#6d28d9">V5: CKYC Search [Decentro]</text>
+  <rect x="640" y="292" width="240" height="22" rx="4" fill="white" stroke="#8b5cf6"/>
+  <text x="650" y="308" font-size="11" fill="#6d28d9">V10: AML/PEP Screen [TrackWizz]</text>
+
+  <line x1="520" y1="240" x2="620" y2="240" stroke="#16a34a" stroke-width="1.5" marker-end="url(#arrowhead-green)"/>
+  <text x="535" y="235" font-size="10" fill="#16a34a">fire &amp; forget</text>
+
+  <!-- Arrow down -->
+  <line x1="300" y1="310" x2="300" y2="345" stroke="#475569" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- ===== SCREEN 2: DigiLocker Consent ===== -->
+  <rect x="80" y="345" width="440" height="130" rx="12" fill="white" stroke="#3b82f6" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="80" y="345" width="440" height="36" rx="12" fill="#3b82f6"/>
+  <rect x="80" y="369" width="440" height="12" fill="#3b82f6"/>
+  <text x="100" y="369" fill="white" font-size="14" font-weight="700">SCREEN 2 — DigiLocker Consent (Redirect)</text>
+  <text x="100" y="403" font-size="13" fill="#334155" font-weight="600">User logs into DigiLocker with Aadhaar</text>
+  <text x="100" y="423" font-size="12" fill="#64748b">Consent to fetch: Aadhaar XML + PAN Card doc</text>
+  <text x="100" y="443" font-size="12" fill="#16a34a" font-weight="600">Returns: name, DOB, gender, photo, full address,</text>
+  <text x="100" y="458" font-size="12" fill="#16a34a" font-weight="600">father's name, PAN details — ALL AUTO-FILLED</text>
+
+  <!-- What DigiLocker gives us -->
+  <rect x="620" y="345" width="280" height="130" rx="12" fill="#eff6ff" stroke="#3b82f6" stroke-width="1"/>
+  <text x="640" y="370" fill="#1e40af" font-size="13" font-weight="700">DATA HARVESTED (0 user effort)</text>
+  <text x="640" y="390" font-size="11" fill="#334155">A05-A08: Name (first/middle/last/full)</text>
+  <text x="640" y="405" font-size="11" fill="#334155">A15: Father's name (from PAN doc)</text>
+  <text x="640" y="420" font-size="11" fill="#334155">A18: Gender, A20: DOB</text>
+  <text x="640" y="435" font-size="11" fill="#334155">B01-B08: Full address (all fields)</text>
+  <text x="640" y="450" font-size="11" fill="#334155">Q01: Photo, D01-D07: POI auto-set</text>
+  <text x="640" y="465" font-size="11" fill="#334155">E01-E07: POA auto-set (Aadhaar)</text>
+
+  <line x1="520" y1="410" x2="620" y2="410" stroke="#3b82f6" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+
+  <!-- Arrow down -->
+  <line x1="300" y1="475" x2="300" y2="510" stroke="#475569" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- ===== SCREEN 3: Confirm Identity ===== -->
+  <rect x="80" y="510" width="440" height="170" rx="12" fill="white" stroke="#3b82f6" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="80" y="510" width="440" height="36" rx="12" fill="#3b82f6"/>
+  <rect x="80" y="534" width="440" height="12" fill="#3b82f6"/>
+  <text x="100" y="534" fill="white" font-size="14" font-weight="700">SCREEN 3 — Confirm Identity (mostly pre-filled)</text>
+  <text x="100" y="564" font-size="12" fill="#334155" font-weight="600">Pre-filled (read-only, user confirms):</text>
+  <text x="110" y="582" font-size="11" fill="#64748b">Name, DOB, Gender, Father's Name, Address, Photo, PAN</text>
+  <text x="100" y="604" font-size="12" fill="#334155" font-weight="600">User enters only 4 new fields:</text>
+  <rect x="110" y="614" width="100" height="22" rx="4" fill="#fef3c7" stroke="#f59e0b"/>
+  <text x="118" y="630" font-size="11" fill="#92400e">Mobile</text>
+  <rect x="218" y="614" width="100" height="22" rx="4" fill="#fef3c7" stroke="#f59e0b"/>
+  <text x="226" y="630" font-size="11" fill="#92400e">Email</text>
+  <rect x="326" y="614" width="100" height="22" rx="4" fill="#fef3c7" stroke="#f59e0b"/>
+  <text x="334" y="630" font-size="11" fill="#92400e">Marital Status</text>
+  <text x="100" y="662" font-size="11" fill="#64748b">Occupation, Mother's Name — optional, can ask or skip</text>
+
+  <!-- KRA/CKYC prefill indicator -->
+  <rect x="620" y="510" width="280" height="80" rx="12" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+  <text x="640" y="535" fill="#166534" font-size="13" font-weight="700">KRA/CKYC PREFILL (if found)</text>
+  <text x="640" y="555" font-size="11" fill="#334155">Occupation, Income Range, Net Worth</text>
+  <text x="640" y="570" font-size="11" fill="#334155">CKYC Number, KRA Status, Signature</text>
+  <text x="640" y="585" font-size="11" fill="#334155">FATCA data (if previously submitted)</text>
+
+  <line x1="520" y1="550" x2="620" y2="550" stroke="#16a34a" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arrowhead-green)"/>
+  <text x="535" y="545" font-size="10" fill="#16a34a">if available</text>
+
+  <!-- Arrow down -->
+  <line x1="300" y1="680" x2="300" y2="715" stroke="#475569" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- ===== SCREEN 4: Bank Account ===== -->
+  <rect x="80" y="715" width="440" height="130" rx="12" fill="white" stroke="#3b82f6" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="80" y="715" width="440" height="36" rx="12" fill="#3b82f6"/>
+  <rect x="80" y="739" width="440" height="12" fill="#3b82f6"/>
+  <text x="100" y="739" fill="white" font-size="14" font-weight="700">SCREEN 4 — Bank Account (3 fields)</text>
+  <rect x="110" y="762" width="120" height="22" rx="4" fill="#fef3c7" stroke="#f59e0b"/>
+  <text x="118" y="778" font-size="11" fill="#92400e">Account Number</text>
+  <rect x="238" y="762" width="80" height="22" rx="4" fill="#fef3c7" stroke="#f59e0b"/>
+  <text x="246" y="778" font-size="11" fill="#92400e">IFSC Code</text>
+  <rect x="326" y="762" width="80" height="22" rx="4" fill="#fef3c7" stroke="#f59e0b"/>
+  <text x="334" y="778" font-size="11" fill="#92400e">Acc Type</text>
+  <text x="100" y="810" font-size="11" fill="#16a34a">Bank name, branch auto-populated from IFSC</text>
+  <text x="100" y="828" font-size="11" fill="#64748b">Upload: Cancelled cheque or bank statement image</text>
+
+  <!-- Penny drop async -->
+  <rect x="620" y="715" width="280" height="56" rx="12" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="640" y="740" fill="#16a34a" font-size="12" font-weight="600">ASYNC: Penny Drop [Decentro]</text>
+  <text x="640" y="758" font-size="11" fill="#334155">Rs.1 IMPS → Name match score</text>
+  <line x1="520" y1="745" x2="620" y2="745" stroke="#16a34a" stroke-width="1.5" marker-end="url(#arrowhead-green)"/>
+
+  <!-- Arrow down -->
+  <line x1="300" y1="845" x2="300" y2="880" stroke="#475569" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- ===== SCREEN 5: Segments + Preferences ===== -->
+  <rect x="80" y="880" width="440" height="150" rx="12" fill="white" stroke="#3b82f6" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="80" y="880" width="440" height="36" rx="12" fill="#3b82f6"/>
+  <rect x="80" y="904" width="440" height="12" fill="#3b82f6"/>
+  <text x="100" y="904" fill="white" font-size="14" font-weight="700">SCREEN 5 — Trading Preferences (checkboxes)</text>
+  <text x="100" y="936" font-size="12" fill="#334155" font-weight="600">Segments (toggle):</text>
+  <rect x="110" y="945" width="80" height="22" rx="4" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="120" y="960" font-size="11" fill="#1e40af">✓ Equity</text>
+  <rect x="198" y="945" width="60" height="22" rx="4" fill="#f1f5f9" stroke="#cbd5e1"/>
+  <text x="208" y="960" font-size="11" fill="#64748b">F&amp;O</text>
+  <rect x="266" y="945" width="80" height="22" rx="4" fill="#f1f5f9" stroke="#cbd5e1"/>
+  <text x="276" y="960" font-size="11" fill="#64748b">Currency</text>
+  <rect x="354" y="945" width="90" height="22" rx="4" fill="#f1f5f9" stroke="#cbd5e1"/>
+  <text x="364" y="960" font-size="11" fill="#64748b">Commodity</text>
+  <text x="100" y="990" font-size="12" fill="#ea580c" font-weight="600">If F&amp;O or Commodity selected:</text>
+  <rect x="110" y="998" width="180" height="22" rx="4" fill="#fef3c7" stroke="#f59e0b"/>
+  <text x="120" y="1014" font-size="11" fill="#92400e">Upload Income Proof</text>
+
+  <!-- Arrow down -->
+  <line x1="300" y1="1030" x2="300" y2="1065" stroke="#475569" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- ===== SCREEN 6: Quick Nominations ===== -->
+  <rect x="80" y="1065" width="440" height="130" rx="12" fill="white" stroke="#3b82f6" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="80" y="1065" width="440" height="36" rx="12" fill="#3b82f6"/>
+  <rect x="80" y="1089" width="440" height="12" fill="#3b82f6"/>
+  <text x="100" y="1089" fill="white" font-size="14" font-weight="700">SCREEN 6 — Nominations (quick)</text>
+  <text x="100" y="1120" font-size="12" fill="#334155">Option A: Add nominee (name, relation, DOB, %)</text>
+  <text x="100" y="1140" font-size="12" fill="#334155">Option B: "I opt out of nomination"</text>
+  <text x="100" y="1160" font-size="11" fill="#ea580c">Opt-out requires video declaration (async, post-sign)</text>
+  <text x="100" y="1180" font-size="11" fill="#64748b">Can add more nominees later from profile settings</text>
+
+  <!-- Arrow down -->
+  <line x1="300" y1="1195" x2="300" y2="1230" stroke="#475569" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- ===== SCREEN 7: Declarations ===== -->
+  <rect x="80" y="1230" width="440" height="160" rx="12" fill="white" stroke="#3b82f6" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="80" y="1230" width="440" height="36" rx="12" fill="#3b82f6"/>
+  <rect x="80" y="1254" width="440" height="12" fill="#3b82f6"/>
+  <text x="100" y="1254" fill="white" font-size="14" font-weight="700">SCREEN 7 — Declarations (mostly checkboxes)</text>
+  <text x="100" y="1286" font-size="12" fill="#334155">☐ I am a tax resident of India only (FATCA — Y/N)</text>
+  <text x="100" y="1306" font-size="12" fill="#334155">☐ I am NOT a PEP / related to a PEP</text>
+  <text x="100" y="1326" font-size="12" fill="#334155">☐ I have read Risk Disclosure Document</text>
+  <text x="100" y="1346" font-size="12" fill="#334155">☐ I accept Terms &amp; Conditions</text>
+  <text x="100" y="1366" font-size="12" fill="#334155">☐ I authorize quarterly running account settlement</text>
+  <text x="100" y="1378" font-size="11" fill="#64748b">DDPI opt-in toggle (optional)</text>
+
+  <!-- Blocking checks -->
+  <rect x="620" y="1230" width="280" height="130" rx="12" fill="#fff7ed" stroke="#ea580c" stroke-width="1.5"/>
+  <text x="640" y="1255" fill="#ea580c" font-size="13" font-weight="700">BLOCKING GATE (before e-Sign)</text>
+  <text x="640" y="1278" font-size="11" fill="#334155">✓ PAN status = Valid (E)</text>
+  <text x="640" y="1296" font-size="11" fill="#334155">✓ PAN-Aadhaar linked</text>
+  <text x="640" y="1314" font-size="11" fill="#334155">✓ AML/PEP screening = Clean</text>
+  <text x="640" y="1332" font-size="11" fill="#334155">✓ Bank penny drop = Success</text>
+  <text x="640" y="1350" font-size="11" fill="#ea580c" font-weight="600">ALL must pass → enable e-Sign</text>
+
+  <!-- Arrow down -->
+  <line x1="300" y1="1390" x2="300" y2="1425" stroke="#475569" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- ===== SCREEN 8: Review + Face Match + e-Sign ===== -->
+  <rect x="80" y="1425" width="440" height="170" rx="12" fill="white" stroke="#16a34a" stroke-width="3" filter="url(#shadow)"/>
+  <rect x="80" y="1425" width="440" height="36" rx="12" fill="#16a34a"/>
+  <rect x="80" y="1449" width="440" height="12" fill="#16a34a"/>
+  <text x="100" y="1449" fill="white" font-size="14" font-weight="700">SCREEN 8 — Review + e-Sign (final)</text>
+  <text x="100" y="1480" font-size="12" fill="#334155" font-weight="600">1. Review pre-filled application (scroll through)</text>
+  <text x="100" y="1500" font-size="12" fill="#334155" font-weight="600">2. Take selfie → face match vs Aadhaar photo</text>
+  <text x="110" y="1518" font-size="11" fill="#16a34a">[V9: HyperVerge] Score ≥ 80% + Liveness pass</text>
+  <text x="100" y="1540" font-size="12" fill="#334155" font-weight="600">3. Aadhaar OTP e-Sign on complete application</text>
+  <text x="110" y="1558" font-size="11" fill="#16a34a">[V6: Digio] Generate PDF → SHA-256 hash → DSC applied</text>
+  <text x="100" y="1582" font-size="13" fill="#16a34a" font-weight="700">✓ IPV/VIPV EXEMPTED (Aadhaar eKYC used)</text>
+
+  <!-- Arrow down to async zone -->
+  <line x1="300" y1="1595" x2="300" y2="1640" stroke="#475569" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="310" y="1625" font-size="13" fill="#16a34a" font-weight="700">USER DONE! ~5 min total</text>
+
+  <!-- ===== ASYNC ZONE ===== -->
+  <rect x="40" y="1640" width="1120" height="330" rx="16" fill="#f8fafc" stroke="#64748b" stroke-width="1" stroke-dasharray="8,4"/>
+  <text x="60" y="1670" fill="#64748b" font-size="16" font-weight="700">ASYNC BATCH PROCESSING (No User Involvement)</text>
+  <text x="60" y="1690" fill="#94a3b8" font-size="12">Runs in background job queues. User sees "Application under review" status.</text>
+
+  <!-- Batch row 1 -->
+  <rect x="80" y="1710" width="230" height="55" rx="8" fill="white" stroke="#8b5cf6"/>
+  <text x="95" y="1732" font-size="12" fill="#6d28d9" font-weight="600">V4: KRA Submit [Digio]</text>
+  <text x="95" y="1752" font-size="10" fill="#64748b">Upload KYC to KRA (3 working days)</text>
+
+  <rect x="330" y="1710" width="230" height="55" rx="8" fill="white" stroke="#8b5cf6"/>
+  <text x="345" y="1732" font-size="12" fill="#6d28d9" font-weight="600">V5: CKYC Upload [Decentro]</text>
+  <text x="345" y="1752" font-size="10" fill="#64748b">Submit to CERSAI → 14-digit KIN</text>
+
+  <rect x="580" y="1710" width="230" height="55" rx="8" fill="white" stroke="#8b5cf6"/>
+  <text x="595" y="1732" font-size="12" fill="#6d28d9" font-weight="600">Admin Review Queue</text>
+  <text x="595" y="1752" font-size="10" fill="#64748b">Maker-checker validation workflow</text>
+
+  <rect x="830" y="1710" width="230" height="55" rx="8" fill="white" stroke="#8b5cf6"/>
+  <text x="845" y="1732" font-size="12" fill="#6d28d9" font-weight="600">Income Proof Review</text>
+  <text x="845" y="1752" font-size="10" fill="#64748b">V11: Perfios (if F&amp;O selected)</text>
+
+  <!-- Batch row 2 -->
+  <rect x="80" y="1780" width="230" height="55" rx="8" fill="white" stroke="#8b5cf6"/>
+  <text x="95" y="1802" font-size="12" fill="#6d28d9" font-weight="600">NSE UCC Registration</text>
+  <text x="95" y="1822" font-size="10" fill="#64748b">API/batch upload to NSE</text>
+
+  <rect x="330" y="1780" width="230" height="55" rx="8" fill="white" stroke="#8b5cf6"/>
+  <text x="345" y="1802" font-size="12" fill="#6d28d9" font-weight="600">BSE UCC Registration</text>
+  <text x="345" y="1822" font-size="10" fill="#64748b">PAN+Name+DOB 3-param verify</text>
+
+  <rect x="580" y="1780" width="230" height="55" rx="8" fill="white" stroke="#8b5cf6"/>
+  <text x="595" y="1802" font-size="12" fill="#6d28d9" font-weight="600">CDSL BO Account</text>
+  <text x="595" y="1822" font-size="10" fill="#64748b">BO Setup API → DP ID + Client ID</text>
+
+  <rect x="830" y="1780" width="230" height="55" rx="8" fill="white" stroke="#8b5cf6"/>
+  <text x="845" y="1802" font-size="12" fill="#6d28d9" font-weight="600">MCX Registration</text>
+  <text x="845" y="1822" font-size="10" fill="#64748b">If commodity segment selected</text>
+
+  <!-- Batch row 3 -->
+  <rect x="80" y="1850" width="230" height="55" rx="8" fill="white" stroke="#8b5cf6"/>
+  <text x="95" y="1872" font-size="12" fill="#6d28d9" font-weight="600">Segment Activation</text>
+  <text x="95" y="1892" font-size="10" fill="#64748b">CM/F&amp;O/CD/COM per exchange</text>
+
+  <rect x="330" y="1850" width="230" height="55" rx="8" fill="white" stroke="#8b5cf6"/>
+  <text x="345" y="1872" font-size="12" fill="#6d28d9" font-weight="600">DDPI Setup (if opted)</text>
+  <text x="345" y="1892" font-size="10" fill="#64748b">Register with CDSL/NSDL</text>
+
+  <rect x="580" y="1850" width="230" height="55" rx="8" fill="white" stroke="#8b5cf6"/>
+  <text x="595" y="1872" font-size="12" fill="#6d28d9" font-weight="600">Welcome Kit</text>
+  <text x="595" y="1892" font-size="10" fill="#64748b">Email + SMS with credentials</text>
+
+  <rect x="830" y="1850" width="230" height="55" rx="8" fill="white" stroke="#8b5cf6"/>
+  <text x="845" y="1872" font-size="12" fill="#6d28d9" font-weight="600">Nominee Video (if opt-out)</text>
+  <text x="845" y="1892" font-size="10" fill="#64748b">Schedule async VIPV for opt-out</text>
+
+  <!-- Final: Active -->
+  <rect x="80" y="1930" width="1080" height="30" rx="8" fill="#16a34a"/>
+  <text x="600" y="1950" text-anchor="middle" fill="white" font-size="14" font-weight="700">CLIENT ACTIVE → Ready to Trade (typically within 24-48 hours)</text>
+
+  <!-- Stats bar -->
+  <rect x="40" y="1990" width="1120" height="70" rx="12" fill="#1e293b"/>
+  <text x="150" y="2015" text-anchor="middle" fill="#fbbf24" font-size="28" font-weight="700">8</text>
+  <text x="150" y="2040" text-anchor="middle" fill="#94a3b8" font-size="12">User Screens</text>
+  <text x="350" y="2015" text-anchor="middle" fill="#fbbf24" font-size="28" font-weight="700">~12</text>
+  <text x="350" y="2040" text-anchor="middle" fill="#94a3b8" font-size="12">Fields User Types</text>
+  <text x="550" y="2015" text-anchor="middle" fill="#fbbf24" font-size="28" font-weight="700">~5 min</text>
+  <text x="550" y="2040" text-anchor="middle" fill="#94a3b8" font-size="12">Total User Time</text>
+  <text x="750" y="2015" text-anchor="middle" fill="#fbbf24" font-size="28" font-weight="700">~440</text>
+  <text x="750" y="2040" text-anchor="middle" fill="#94a3b8" font-size="12">Fields Auto-Filled</text>
+  <text x="950" y="2015" text-anchor="middle" fill="#fbbf24" font-size="28" font-weight="700">97%</text>
+  <text x="950" y="2040" text-anchor="middle" fill="#94a3b8" font-size="12">Data Pre-Filled</text>
+</svg>

@@ -1,0 +1,269 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1600" font-family="Inter, -apple-system, sans-serif">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#475569"/>
+    </marker>
+    <marker id="arrowhead-green" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#16a34a"/>
+    </marker>
+    <marker id="arrowhead-red" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#dc2626"/>
+    </marker>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1e293b"/>
+      <stop offset="100%" style="stop-color:#334155"/>
+    </linearGradient>
+    <filter id="shadow" x="-2%" y="-2%" width="104%" height="104%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.1"/>
+    </filter>
+  </defs>
+
+  <!-- Title -->
+  <rect x="0" y="0" width="1400" height="80" fill="url(#headerGrad)"/>
+  <text x="700" y="35" text-anchor="middle" fill="white" font-size="22" font-weight="700">Async Batch Processing — Post e-Sign Pipeline</text>
+  <text x="700" y="60" text-anchor="middle" fill="#94a3b8" font-size="13">All submissions happen in background job queues. User sees "Application under review" until activation.</text>
+
+  <!-- Legend -->
+  <rect x="30" y="95" width="1340" height="50" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+  <circle cx="60" cy="120" r="8" fill="#16a34a"/> <text x="78" y="125" font-size="12" fill="#475569">Success Path</text>
+  <circle cx="200" cy="120" r="8" fill="#dc2626"/> <text x="218" y="125" font-size="12" fill="#475569">Failure / Retry Path</text>
+  <circle cx="370" cy="120" r="8" fill="#f59e0b"/> <text x="388" y="125" font-size="12" fill="#475569">Manual Review Queue</text>
+  <circle cx="550" cy="120" r="8" fill="#8b5cf6"/> <text x="568" y="125" font-size="12" fill="#475569">External API Call</text>
+  <rect x="700" y="112" width="40" height="16" rx="3" fill="#f1f5f9" stroke="#64748b" stroke-dasharray="4,2"/>
+  <text x="748" y="124" font-size="12" fill="#475569">Job Queue</text>
+  <circle cx="870" cy="120" r="8" fill="#3b82f6"/> <text x="888" y="125" font-size="12" fill="#475569">Dependency Gate</text>
+
+  <!-- ===== TRIGGER: e-Sign Complete ===== -->
+  <rect x="500" y="170" width="400" height="50" rx="25" fill="#16a34a" filter="url(#shadow)"/>
+  <text x="700" y="201" text-anchor="middle" fill="white" font-size="16" font-weight="700">e-Sign Complete (Trigger Event)</text>
+
+  <!-- Fan out arrows -->
+  <line x1="580" y1="220" x2="200" y2="290" stroke="#475569" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="650" y1="220" x2="480" y2="290" stroke="#475569" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="750" y1="220" x2="750" y2="290" stroke="#475569" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="820" y1="220" x2="1020" y2="290" stroke="#475569" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- ===== LANE 1: Admin Review ===== -->
+  <rect x="60" y="290" width="280" height="130" rx="12" fill="white" stroke="#f59e0b" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="60" y="290" width="280" height="32" rx="12" fill="#f59e0b"/>
+  <rect x="60" y="310" width="280" height="12" fill="#f59e0b"/>
+  <text x="80" y="312" fill="white" font-size="13" font-weight="700">JOB 1: Admin Review Queue</text>
+  <text x="80" y="346" font-size="11" fill="#334155">Maker: Auto-verify checks</text>
+  <text x="80" y="364" font-size="11" fill="#334155">- PAN verify match &#x2265; 80%</text>
+  <text x="80" y="382" font-size="11" fill="#334155">- Penny drop name match &#x2265; 70%</text>
+  <text x="80" y="400" font-size="11" fill="#334155">- Face match &#x2265; 80% + liveness</text>
+  <text x="80" y="414" font-size="11" fill="#64748b">SLA: Within 30 minutes</text>
+
+  <!-- Maker pass/fail -->
+  <line x1="200" y1="420" x2="200" y2="460" stroke="#475569" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+
+  <rect x="60" y="460" width="280" height="80" rx="12" fill="white" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="80" y="485" font-size="12" fill="#b45309" font-weight="600">Checker: Supervisor Approval</text>
+  <text x="80" y="505" font-size="11" fill="#334155">Review flagged items + approve/reject</text>
+  <text x="80" y="523" font-size="11" fill="#334155">Auto-approve if all checks passed</text>
+
+  <!-- Pass -->
+  <line x1="200" y1="540" x2="200" y2="580" stroke="#16a34a" stroke-width="2" marker-end="url(#arrowhead-green)"/>
+  <rect x="110" y="580" width="180" height="35" rx="8" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="200" y="603" text-anchor="middle" font-size="12" fill="#166534" font-weight="600">APPROVED</text>
+
+  <!-- Fail path -->
+  <rect x="30" y="460" width="25" height="80" rx="4" fill="#fef2f2"/>
+  <line x1="60" y1="500" x2="30" y2="500" stroke="#dc2626" stroke-width="1" marker-end="url(#arrowhead-red)"/>
+  <text x="15" y="530" font-size="9" fill="#dc2626" transform="rotate(-90, 15, 530)">Reject → Resubmit / Close</text>
+
+  <!-- ===== LANE 2: KRA Submit ===== -->
+  <rect x="380" y="290" width="280" height="130" rx="12" fill="white" stroke="#8b5cf6" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="380" y="290" width="280" height="32" rx="12" fill="#8b5cf6"/>
+  <rect x="380" y="310" width="280" height="12" fill="#8b5cf6"/>
+  <text x="400" y="312" fill="white" font-size="13" font-weight="700">JOB 2: KRA Submit [Digio]</text>
+  <text x="400" y="346" font-size="11" fill="#334155">1. Build tilde-delimited KRA file</text>
+  <text x="400" y="364" font-size="11" fill="#334155">2. Submit via Digio API</text>
+  <text x="400" y="382" font-size="11" fill="#334155">3. Poll for ack (App ref number)</text>
+  <text x="400" y="400" font-size="11" fill="#334155">4. Store KRA status: Registered</text>
+  <text x="400" y="414" font-size="11" fill="#64748b">SLA: Ack in 1-3 working days</text>
+
+  <line x1="520" y1="420" x2="520" y2="470" stroke="#475569" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+
+  <rect x="380" y="470" width="280" height="65" rx="12" fill="#f1f5f9" stroke="#64748b" stroke-dasharray="4,2"/>
+  <text x="400" y="495" font-size="11" fill="#64748b" font-weight="600">RETRY QUEUE (if failed)</text>
+  <text x="400" y="513" font-size="10" fill="#64748b">Retry 3x with exponential backoff</text>
+  <text x="400" y="527" font-size="10" fill="#64748b">After 3 fails → manual queue</text>
+
+  <line x1="520" y1="535" x2="520" y2="580" stroke="#16a34a" stroke-width="2" marker-end="url(#arrowhead-green)"/>
+  <rect x="430" y="580" width="180" height="35" rx="8" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="520" y="603" text-anchor="middle" font-size="12" fill="#166534" font-weight="600">KRA REGISTERED</text>
+
+  <!-- ===== LANE 3: CKYC Upload ===== -->
+  <rect x="700" y="290" width="280" height="130" rx="12" fill="white" stroke="#8b5cf6" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="700" y="290" width="280" height="32" rx="12" fill="#8b5cf6"/>
+  <rect x="700" y="310" width="280" height="12" fill="#8b5cf6"/>
+  <text x="720" y="312" fill="white" font-size="13" font-weight="700">JOB 3: CKYC Upload [Decentro]</text>
+  <text x="720" y="346" font-size="11" fill="#334155">1. Build CERSAI JSON payload</text>
+  <text x="720" y="364" font-size="11" fill="#334155">2. Upload via Decentro API</text>
+  <text x="720" y="382" font-size="11" fill="#334155">3. Get 14-digit KIN on success</text>
+  <text x="720" y="400" font-size="11" fill="#334155">4. Store CKYC number in DB</text>
+  <text x="720" y="414" font-size="11" fill="#64748b">SLA: KIN within 1-2 working days</text>
+
+  <line x1="840" y1="420" x2="840" y2="470" stroke="#475569" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+
+  <rect x="700" y="470" width="280" height="65" rx="12" fill="#f1f5f9" stroke="#64748b" stroke-dasharray="4,2"/>
+  <text x="720" y="495" font-size="11" fill="#64748b" font-weight="600">RETRY QUEUE (if failed)</text>
+  <text x="720" y="513" font-size="10" fill="#64748b">CKYC rejects → fix data → resubmit</text>
+  <text x="720" y="527" font-size="10" fill="#64748b">Common: Duplicate KIN, Name mismatch</text>
+
+  <line x1="840" y1="535" x2="840" y2="580" stroke="#16a34a" stroke-width="2" marker-end="url(#arrowhead-green)"/>
+  <rect x="750" y="580" width="180" height="35" rx="8" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="840" y="603" text-anchor="middle" font-size="12" fill="#166534" font-weight="600">CKYC KIN ASSIGNED</text>
+
+  <!-- ===== LANE 4: Income Proof (Conditional) ===== -->
+  <rect x="1020" y="290" width="280" height="130" rx="12" fill="white" stroke="#ec4899" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="1020" y="290" width="280" height="32" rx="12" fill="#ec4899"/>
+  <rect x="1020" y="310" width="280" height="12" fill="#ec4899"/>
+  <text x="1040" y="312" fill="white" font-size="13" font-weight="700">JOB 4: Income Verify (if F&amp;O)</text>
+  <text x="1040" y="346" font-size="11" fill="#334155">1. Upload to Perfios API</text>
+  <text x="1040" y="364" font-size="11" fill="#334155">2. Get ITR/bank stmt analysis</text>
+  <text x="1040" y="382" font-size="11" fill="#334155">3. Validate income &#x2265; threshold</text>
+  <text x="1040" y="400" font-size="11" fill="#334155">4. Store verification result</text>
+  <text x="1040" y="414" font-size="11" fill="#64748b">Only if F&amp;O / Commodity selected</text>
+
+  <line x1="1160" y1="420" x2="1160" y2="580" stroke="#16a34a" stroke-width="2" marker-end="url(#arrowhead-green)"/>
+  <rect x="1070" y="580" width="180" height="35" rx="8" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="1160" y="603" text-anchor="middle" font-size="12" fill="#166534" font-weight="600">INCOME VERIFIED</text>
+
+  <!-- ===== DEPENDENCY GATE ===== -->
+  <rect x="200" y="650" width="1000" height="55" rx="12" fill="#dbeafe" stroke="#3b82f6" stroke-width="2" filter="url(#shadow)"/>
+  <text x="700" y="675" text-anchor="middle" font-size="15" fill="#1e40af" font-weight="700">DEPENDENCY GATE: Admin Approved + KRA Registered + CKYC Uploaded + Income Verified (if needed)</text>
+  <text x="700" y="695" text-anchor="middle" font-size="11" fill="#3b82f6">All four must complete before exchange registration. Typical wait: 1-3 working days.</text>
+
+  <!-- Arrow down -->
+  <line x1="700" y1="705" x2="700" y2="750" stroke="#475569" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- ===== PHASE 2: Exchange + Depository Registration ===== -->
+  <rect x="40" y="750" width="1320" height="45" rx="8" fill="#334155"/>
+  <text x="700" y="778" text-anchor="middle" fill="white" font-size="16" font-weight="700">Phase 2: Exchange &amp; Depository Registration (Parallel)</text>
+
+  <!-- Exchange jobs -->
+  <rect x="60" y="820" width="250" height="120" rx="12" fill="white" stroke="#8b5cf6" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="60" y="820" width="250" height="30" rx="12" fill="#8b5cf6"/>
+  <rect x="60" y="838" width="250" height="12" fill="#8b5cf6"/>
+  <text x="80" y="843" fill="white" font-size="12" font-weight="700">JOB 5: NSE UCC</text>
+  <text x="80" y="873" font-size="11" fill="#334155">API: NSE UCC Registration</text>
+  <text x="80" y="891" font-size="11" fill="#334155">Input: PAN, Name, DOB, Segments</text>
+  <text x="80" y="909" font-size="11" fill="#334155">Output: UCC Code (NSE)</text>
+  <text x="80" y="927" font-size="10" fill="#64748b">SLA: Same day (batch cutoff 5PM)</text>
+
+  <rect x="340" y="820" width="250" height="120" rx="12" fill="white" stroke="#8b5cf6" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="340" y="820" width="250" height="30" rx="12" fill="#8b5cf6"/>
+  <rect x="340" y="838" width="250" height="12" fill="#8b5cf6"/>
+  <text x="360" y="843" fill="white" font-size="12" font-weight="700">JOB 6: BSE UCC</text>
+  <text x="360" y="873" font-size="11" fill="#334155">API: BSE UCC Registration</text>
+  <text x="360" y="891" font-size="11" fill="#334155">3-param verify: PAN+Name+DOB</text>
+  <text x="360" y="909" font-size="11" fill="#334155">Output: UCC Code (BSE)</text>
+  <text x="360" y="927" font-size="10" fill="#64748b">SLA: Same day</text>
+
+  <rect x="620" y="820" width="250" height="120" rx="12" fill="white" stroke="#8b5cf6" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="620" y="820" width="250" height="30" rx="12" fill="#8b5cf6"/>
+  <rect x="620" y="838" width="250" height="12" fill="#8b5cf6"/>
+  <text x="640" y="843" fill="white" font-size="12" font-weight="700">JOB 7: CDSL BO Account</text>
+  <text x="640" y="873" font-size="11" fill="#334155">API: CDSL DP Module</text>
+  <text x="640" y="891" font-size="11" fill="#334155">Input: Full KYC record</text>
+  <text x="640" y="909" font-size="11" fill="#334155">Output: DP ID + Client ID</text>
+  <text x="640" y="927" font-size="10" fill="#64748b">SLA: 1-2 hours (online mode)</text>
+
+  <rect x="900" y="820" width="250" height="120" rx="12" fill="white" stroke="#ec4899" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="900" y="820" width="250" height="30" rx="12" fill="#ec4899"/>
+  <rect x="900" y="838" width="250" height="12" fill="#ec4899"/>
+  <text x="920" y="843" fill="white" font-size="12" font-weight="700">JOB 8: MCX UCC (if commodity)</text>
+  <text x="920" y="873" font-size="11" fill="#334155">API: MCX Member Portal</text>
+  <text x="920" y="891" font-size="11" fill="#334155">Only if commodity segment</text>
+  <text x="920" y="909" font-size="11" fill="#334155">Output: UCC Code (MCX)</text>
+  <text x="920" y="927" font-size="10" fill="#64748b">SLA: Next working day</text>
+
+  <rect x="1180" y="820" width="160" height="120" rx="12" fill="white" stroke="#ec4899" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="1180" y="820" width="160" height="30" rx="12" fill="#ec4899"/>
+  <rect x="1180" y="838" width="160" height="12" fill="#ec4899"/>
+  <text x="1200" y="843" fill="white" font-size="12" font-weight="700">JOB 9: DDPI</text>
+  <text x="1200" y="873" font-size="11" fill="#334155">If client opted in</text>
+  <text x="1200" y="891" font-size="11" fill="#334155">Register with</text>
+  <text x="1200" y="909" font-size="11" fill="#334155">CDSL/NSDL</text>
+  <text x="1200" y="927" font-size="10" fill="#64748b">SLA: 1 day</text>
+
+  <!-- Phase 2 gate -->
+  <line x1="700" y1="940" x2="700" y2="980" stroke="#475569" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- ===== PHASE 3: Segment Activation ===== -->
+  <rect x="200" y="980" width="1000" height="55" rx="12" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <text x="700" y="1005" text-anchor="middle" font-size="15" fill="#1e40af" font-weight="700">DEPENDENCY GATE: All UCC registered + BO account created</text>
+  <text x="700" y="1025" text-anchor="middle" font-size="11" fill="#3b82f6">Exchange registrations and BO account must complete before segment activation</text>
+
+  <line x1="700" y1="1035" x2="700" y2="1070" stroke="#475569" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <rect x="300" y="1070" width="800" height="100" rx="12" fill="white" stroke="#16a34a" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="300" y="1070" width="800" height="32" rx="12" fill="#16a34a"/>
+  <rect x="300" y="1090" width="800" height="12" fill="#16a34a"/>
+  <text x="700" y="1095" text-anchor="middle" fill="white" font-size="14" font-weight="700">JOB 10: Segment Activation (per exchange per segment)</text>
+  <text x="320" y="1130" font-size="12" fill="#334155">NSE: CM / F&amp;O / CD segments</text>
+  <text x="620" y="1130" font-size="12" fill="#334155">BSE: CM / F&amp;O / CD segments</text>
+  <text x="920" y="1130" font-size="12" fill="#334155">MCX: COM segment</text>
+  <text x="320" y="1152" font-size="11" fill="#64748b">Each segment activated individually via exchange API. Batch mode preferred.</text>
+
+  <!-- Arrow down -->
+  <line x1="700" y1="1170" x2="700" y2="1210" stroke="#475569" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- ===== PHASE 4: Post-Activation ===== -->
+  <rect x="40" y="1210" width="1320" height="45" rx="8" fill="#334155"/>
+  <text x="700" y="1238" text-anchor="middle" fill="white" font-size="16" font-weight="700">Phase 3: Post-Activation (Parallel)</text>
+
+  <rect x="100" y="1280" width="250" height="90" rx="12" fill="white" stroke="#16a34a" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="100" y="1280" width="250" height="28" rx="12" fill="#16a34a"/>
+  <rect x="100" y="1296" width="250" height="12" fill="#16a34a"/>
+  <text x="120" y="1300" fill="white" font-size="12" font-weight="700">Welcome Kit</text>
+  <text x="120" y="1332" font-size="11" fill="#334155">Email: Client code, DP ID, UCC</text>
+  <text x="120" y="1350" font-size="11" fill="#334155">SMS: Login credentials</text>
+  <text x="120" y="1365" font-size="10" fill="#64748b">Via Kaleyra + AWS SES</text>
+
+  <rect x="380" y="1280" width="250" height="90" rx="12" fill="white" stroke="#ec4899" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="380" y="1280" width="250" height="28" rx="12" fill="#ec4899"/>
+  <rect x="380" y="1296" width="250" height="12" fill="#ec4899"/>
+  <text x="400" y="1300" fill="white" font-size="12" font-weight="700">Nominee Video (if opt-out)</text>
+  <text x="400" y="1332" font-size="11" fill="#334155">Schedule VIPV video call</text>
+  <text x="400" y="1350" font-size="11" fill="#334155">HyperVerge video KYC</text>
+  <text x="400" y="1365" font-size="10" fill="#64748b">SEBI: Must record within 30 days</text>
+
+  <rect x="660" y="1280" width="250" height="90" rx="12" fill="white" stroke="#16a34a" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="660" y="1280" width="250" height="28" rx="12" fill="#16a34a"/>
+  <rect x="660" y="1296" width="250" height="12" fill="#16a34a"/>
+  <text x="680" y="1300" fill="white" font-size="12" font-weight="700">Back-Office Sync</text>
+  <text x="680" y="1332" font-size="11" fill="#334155">Push to 63 Moons ODIN</text>
+  <text x="680" y="1350" font-size="11" fill="#334155">Create client master record</text>
+  <text x="680" y="1365" font-size="10" fill="#64748b">Enable margin/trading limits</text>
+
+  <rect x="940" y="1280" width="250" height="90" rx="12" fill="white" stroke="#16a34a" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="940" y="1280" width="250" height="28" rx="12" fill="#16a34a"/>
+  <rect x="940" y="1296" width="250" height="12" fill="#16a34a"/>
+  <text x="960" y="1300" fill="white" font-size="12" font-weight="700">Running Acct Settlement</text>
+  <text x="960" y="1332" font-size="11" fill="#334155">Set RAS preference (Q/M)</text>
+  <text x="960" y="1350" font-size="11" fill="#334155">Initialize ledger + first date</text>
+  <text x="960" y="1365" font-size="10" fill="#64748b">SEBI: Quarterly by default</text>
+
+  <!-- Final status -->
+  <line x1="700" y1="1375" x2="700" y2="1410" stroke="#475569" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <rect x="300" y="1410" width="800" height="50" rx="25" fill="#16a34a" filter="url(#shadow)"/>
+  <text x="700" y="1440" text-anchor="middle" fill="white" font-size="18" font-weight="700">CLIENT ACTIVE — Ready to Trade</text>
+
+  <!-- Timeline -->
+  <rect x="40" y="1490" width="1320" height="80" rx="12" fill="#1e293b"/>
+  <text x="700" y="1515" text-anchor="middle" fill="white" font-size="15" font-weight="700">Typical End-to-End Timeline</text>
+  <rect x="80" y="1530" width="200" height="28" rx="6" fill="#16a34a"/>
+  <text x="180" y="1549" text-anchor="middle" fill="white" font-size="11" font-weight="600">User: ~5 min</text>
+  <rect x="290" y="1530" width="350" height="28" rx="6" fill="#f59e0b"/>
+  <text x="465" y="1549" text-anchor="middle" fill="white" font-size="11" font-weight="600">Admin + KRA + CKYC: 1-3 working days</text>
+  <rect x="650" y="1530" width="260" height="28" rx="6" fill="#8b5cf6"/>
+  <text x="780" y="1549" text-anchor="middle" fill="white" font-size="11" font-weight="600">Exchange + BO: 1-2 hours</text>
+  <rect x="920" y="1530" width="200" height="28" rx="6" fill="#3b82f6"/>
+  <text x="1020" y="1549" text-anchor="middle" fill="white" font-size="11" font-weight="600">Activation: Same day</text>
+  <rect x="1130" y="1530" width="200" height="28" rx="6" fill="#16a34a"/>
+  <text x="1230" y="1549" text-anchor="middle" fill="white" font-size="11" font-weight="600">Total: 24-72 hours</text>
+</svg>

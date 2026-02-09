@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KYC Onboarding — Complete Reference | Stock Broking Firm</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #1e40af;
+  --primary-light: #dbeafe;
+  --primary-dark: #1e3a8a;
+  --green: #16a34a;
+  --green-light: #dcfce7;
+  --orange: #ea580c;
+  --orange-light: #fff7ed;
+  --purple: #7c3aed;
+  --purple-light: #f3e8ff;
+  --red: #dc2626;
+  --red-light: #fef2f2;
+  --pink: #db2777;
+  --pink-light: #fce7f3;
+  --cyan: #0891b2;
+  --cyan-light: #e0f2fe;
+  --slate-50: #f8fafc;
+  --slate-100: #f1f5f9;
+  --slate-200: #e2e8f0;
+  --slate-300: #cbd5e1;
+  --slate-400: #94a3b8;
+  --slate-500: #64748b;
+  --slate-600: #475569;
+  --slate-700: #334155;
+  --slate-800: #1e293b;
+  --slate-900: #0f172a;
+  --sidebar-width: 280px;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; font-size: 15px; }
+body {
+  font-family: var(--font-sans);
+  color: var(--slate-800);
+  background: var(--slate-50);
+  line-height: 1.7;
+}
+/* Sidebar */
+.sidebar {
+  position: fixed; top: 0; left: 0;
+  width: var(--sidebar-width); height: 100vh;
+  background: var(--slate-900);
+  overflow-y: auto; z-index: 100;
+  padding: 24px 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--slate-600) transparent;
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--slate-600); border-radius: 2px; }
+.sidebar-brand {
+  padding: 0 20px 20px;
+  border-bottom: 1px solid var(--slate-700);
+  margin-bottom: 16px;
+}
+.sidebar-brand h1 {
+  color: white; font-size: 1.15rem; font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.sidebar-brand p { color: var(--slate-400); font-size: 0.72rem; margin-top: 4px; }
+.sidebar-section { padding: 0 12px; margin-bottom: 12px; }
+.sidebar-section-title {
+  color: var(--slate-400); font-size: 0.65rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  padding: 0 8px; margin-bottom: 6px;
+}
+.sidebar a {
+  display: block; color: var(--slate-300);
+  text-decoration: none; font-size: 0.8rem;
+  padding: 5px 8px; border-radius: 6px;
+  transition: all 0.15s;
+  line-height: 1.4;
+}
+.sidebar a:hover { color: white; background: var(--slate-700); }
+.sidebar a.active { color: white; background: var(--primary); font-weight: 600; }
+.sidebar a .badge {
+  display: inline-block; background: var(--slate-700);
+  color: var(--slate-300); font-size: 0.6rem;
+  padding: 1px 6px; border-radius: 10px; margin-left: 4px;
+  font-weight: 600;
+}
+/* Main content */
+.main {
+  margin-left: var(--sidebar-width);
+  padding: 0;
+  max-width: 1100px;
+}
+/* Hero */
+.hero {
+  background: linear-gradient(135deg, var(--slate-900) 0%, var(--primary-dark) 100%);
+  padding: 60px 48px;
+  color: white;
+}
+.hero h1 { font-size: 2.2rem; font-weight: 900; letter-spacing: -0.03em; line-height: 1.2; }
+.hero .subtitle { color: var(--slate-300); font-size: 1rem; margin-top: 12px; max-width: 700px; }
+.hero-stats {
+  display: flex; gap: 32px; margin-top: 32px; flex-wrap: wrap;
+}
+.hero-stat {
+  text-align: center;
+}
+.hero-stat .num {
+  font-size: 2rem; font-weight: 900; color: #fbbf24;
+  display: block; line-height: 1;
+}
+.hero-stat .label { font-size: 0.72rem; color: var(--slate-400); margin-top: 4px; }
+/* Content sections */
+.content { padding: 40px 48px; }
+section { margin-bottom: 48px; }
+section[id] { scroll-margin-top: 20px; }
+h2 {
+  font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em;
+  color: var(--slate-900); margin-bottom: 20px;
+  padding-bottom: 12px; border-bottom: 3px solid var(--primary);
+  display: flex; align-items: center; gap: 10px;
+}
+h2 .section-num {
+  background: var(--primary); color: white;
+  font-size: 0.75rem; font-weight: 700;
+  padding: 3px 10px; border-radius: 12px;
+  display: inline-block;
+}
+h3 {
+  font-size: 1.15rem; font-weight: 700; color: var(--slate-800);
+  margin: 24px 0 12px; padding-left: 12px;
+  border-left: 4px solid var(--primary);
+}
+h4 {
+  font-size: 0.95rem; font-weight: 700; color: var(--slate-700);
+  margin: 16px 0 8px;
+}
+p { margin-bottom: 12px; }
+/* Tables */
+table {
+  width: 100%; border-collapse: collapse;
+  margin: 16px 0 24px; font-size: 0.82rem;
+}
+th {
+  background: var(--slate-800); color: white;
+  padding: 10px 14px; text-align: left; font-weight: 600;
+  font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em;
+}
+td {
+  padding: 9px 14px; border-bottom: 1px solid var(--slate-200);
+  vertical-align: top;
+}
+tr:hover td { background: var(--slate-50); }
+tbody tr:nth-child(even) td { background: #fafbfc; }
+tbody tr:nth-child(even):hover td { background: var(--slate-100); }
+/* Vendor comparison table */
+.vendor-table { border: 2px solid var(--purple); border-radius: 12px; overflow: hidden; margin: 20px 0 28px; }
+.vendor-table-title {
+  background: var(--purple); color: white; padding: 10px 16px;
+  font-weight: 700; font-size: 0.85rem;
+  display: flex; align-items: center; gap: 8px;
+}
+.vendor-table table { margin: 0; }
+.vendor-table th { background: var(--purple-light); color: var(--purple); }
+.vendor-table .recommended { background: var(--green-light) !important; font-weight: 600; }
+.vendor-table .badge-rec {
+  background: var(--green); color: white; font-size: 0.6rem;
+  padding: 2px 8px; border-radius: 10px; font-weight: 700;
+  display: inline-block; margin-left: 4px;
+}
+.vendor-table .badge-alt {
+  background: var(--slate-400); color: white; font-size: 0.6rem;
+  padding: 2px 8px; border-radius: 10px; font-weight: 700;
+  display: inline-block; margin-left: 4px;
+}
+.vendor-table .badge-new {
+  background: var(--cyan); color: white; font-size: 0.6rem;
+  padding: 2px 8px; border-radius: 10px; font-weight: 700;
+  display: inline-block; margin-left: 4px;
+}
+/* Info boxes */
+.info-box {
+  border-radius: 10px; padding: 16px 20px; margin: 16px 0;
+  font-size: 0.85rem;
+}
+.info-box.blue { background: var(--primary-light); border-left: 4px solid var(--primary); }
+.info-box.green { background: var(--green-light); border-left: 4px solid var(--green); }
+.info-box.orange { background: var(--orange-light); border-left: 4px solid var(--orange); }
+.info-box.purple { background: var(--purple-light); border-left: 4px solid var(--purple); }
+.info-box.red { background: var(--red-light); border-left: 4px solid var(--red); }
+.info-box.cyan { background: var(--cyan-light); border-left: 4px solid var(--cyan); }
+.info-box strong { font-weight: 700; }
+/* Code blocks */
+pre {
+  background: var(--slate-800); color: #e2e8f0;
+  padding: 16px 20px; border-radius: 10px;
+  overflow-x: auto; font-family: var(--font-mono);
+  font-size: 0.78rem; line-height: 1.6;
+  margin: 12px 0 20px;
+}
+code {
+  font-family: var(--font-mono); font-size: 0.82em;
+  background: var(--slate-100); padding: 1px 5px;
+  border-radius: 4px; color: var(--primary);
+}
+pre code { background: none; padding: 0; color: inherit; }
+/* Screen cards */
+.screen-card {
+  background: white; border-radius: 12px; padding: 24px;
+  margin: 16px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  border: 1px solid var(--slate-200);
+}
+.screen-card.active { border-color: var(--green); border-width: 2px; }
+.screen-card-header {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
+}
+.screen-num {
+  background: var(--primary); color: white;
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 0.9rem; flex-shrink: 0;
+}
+.screen-card-header h4 {
+  margin: 0; font-size: 1.05rem; font-weight: 700;
+}
+.field-tag {
+  display: inline-block; padding: 3px 10px;
+  border-radius: 6px; font-size: 0.72rem; font-weight: 600;
+  margin: 2px 3px;
+}
+.field-tag.user { background: #fef3c7; color: #92400e; border: 1px solid #f59e0b; }
+.field-tag.auto { background: var(--green-light); color: #166534; border: 1px solid var(--green); }
+.field-tag.system { background: var(--slate-100); color: var(--slate-600); border: 1px solid var(--slate-300); }
+.field-tag.conditional { background: var(--pink-light); color: #9d174d; border: 1px solid var(--pink); }
+.field-tag.api { background: var(--purple-light); color: #6d28d9; border: 1px solid var(--purple); }
+/* Async indicator */
+.async-bar {
+  background: var(--green-light); border: 1px solid var(--green);
+  border-radius: 8px; padding: 10px 16px; margin: 8px 0;
+  font-size: 0.8rem; color: #166534;
+  display: flex; align-items: center; gap: 8px;
+}
+.async-bar::before { content: "⚡"; }
+/* Blocking gate */
+.gate-box {
+  background: var(--orange-light); border: 2px solid var(--orange);
+  border-radius: 10px; padding: 16px 20px; margin: 20px 0;
+}
+.gate-box h4 { color: var(--orange); margin: 0 0 10px; border: none; padding: 0; }
+.gate-check { display: flex; align-items: center; gap: 8px; margin: 4px 0; font-size: 0.82rem; }
+.gate-check.pass::before { content: "✓"; color: var(--green); font-weight: 700; }
+.gate-check.fail::before { content: "✗"; color: var(--red); font-weight: 700; }
+/* SVG container */
+.svg-container {
+  background: white; border-radius: 12px; overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin: 24px 0;
+  border: 1px solid var(--slate-200);
+}
+.svg-container svg { width: 100%; height: auto; display: block; }
+.svg-label {
+  background: var(--slate-800); color: white; padding: 10px 20px;
+  font-size: 0.78rem; font-weight: 600;
+}
+/* Cross-reference */
+a.xref {
+  color: var(--primary); text-decoration: none;
+  border-bottom: 1px dashed var(--primary);
+  font-weight: 500;
+}
+a.xref:hover { background: var(--primary-light); }
+/* Status machine */
+.status-flow {
+  display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0;
+  align-items: center;
+}
+.status-node {
+  padding: 6px 14px; border-radius: 20px;
+  font-size: 0.75rem; font-weight: 700;
+}
+.status-node.active { background: var(--green); color: white; }
+.status-node.pending { background: var(--orange-light); color: var(--orange); border: 1px solid var(--orange); }
+.status-node.blocked { background: var(--red-light); color: var(--red); border: 1px solid var(--red); }
+.status-arrow { color: var(--slate-400); font-weight: 700; }
+/* Footer */
+.footer {
+  background: var(--slate-800); color: var(--slate-400);
+  padding: 32px 48px; font-size: 0.78rem; margin-top: 48px;
+}
+/* Print */
+@media print {
+  .sidebar { display: none; }
+  .main { margin-left: 0; }
+  .hero { padding: 20px; }
+  .content { padding: 20px; }
+  pre { white-space: pre-wrap; }
+  .svg-container { page-break-inside: avoid; }
+}
+/* Responsive */
+@media (max-width: 900px) {
+  .sidebar { display: none; }
+  .main { margin-left: 0; }
+  .content { padding: 20px; }
+  .hero { padding: 32px 20px; }
+  .hero h1 { font-size: 1.5rem; }
+  .hero-stats { gap: 16px; }
+}
+/* Dark mode toggle */
+.dark-toggle {
+  position: fixed; bottom: 20px; right: 20px;
+  background: var(--slate-800); color: white;
+  border: none; border-radius: 50%; width: 44px; height: 44px;
+  cursor: pointer; font-size: 1.2rem; z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  display: flex; align-items: center; justify-content: center;
+}
+.dark-toggle:hover { background: var(--primary); }
+/* Collapsible */
+details { margin: 12px 0; }
+details summary {
+  cursor: pointer; font-weight: 600; color: var(--primary);
+  padding: 8px 0; font-size: 0.88rem;
+}
+details summary:hover { color: var(--primary-dark); }
+details[open] summary { margin-bottom: 8px; }
+/* Scroll to top */
+.scroll-top {
+  position: fixed; bottom: 72px; right: 20px;
+  background: var(--slate-700); color: white;
+  border: none; border-radius: 50%; width: 40px; height: 40px;
+  cursor: pointer; font-size: 1rem; z-index: 1000;
+  display: none; align-items: center; justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+.scroll-top:hover { background: var(--primary); }
+</style>
+</head>
+<body>
+
+<!-- Sidebar Navigation -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <h1>KYC Reference</h1>
+    <p>Stock Broking Onboarding</p>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Overview</div>
+    <a href="#hero">Dashboard</a>
+    <a href="#design-principles">Design Principles</a>
+    <a href="#flow-summary">Flow Summary</a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">User Journey (8 Screens)</div>
+    <a href="#screen-1">1. Aadhaar + PAN Entry</a>
+    <a href="#screen-2">2. DigiLocker Consent</a>
+    <a href="#screen-3">3. Confirm Identity</a>
+    <a href="#screen-4">4. Bank Account</a>
+    <a href="#screen-5">5. Trading Preferences</a>
+    <a href="#screen-6">6. Nominations</a>
+    <a href="#screen-7">7. Declarations + Gate</a>
+    <a href="#screen-8">8. Review + e-Sign</a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Vendor Comparisons</div>
+    <a href="#v-pan">PAN Verification <span class="badge">6</span></a>
+    <a href="#v-aadhaar">Aadhaar / DigiLocker <span class="badge">5</span></a>
+    <a href="#v-bank">Bank Verification <span class="badge">5</span></a>
+    <a href="#v-kra">KRA Integration <span class="badge">3</span></a>
+    <a href="#v-ckyc">CKYC Integration <span class="badge">4</span></a>
+    <a href="#v-esign">e-Sign <span class="badge">4</span></a>
+    <a href="#v-vkyc">Video KYC / VIPV <span class="badge">4</span></a>
+    <a href="#v-ocr">OCR / Doc Verify <span class="badge">4</span></a>
+    <a href="#v-face">Face Match / Liveness <span class="badge">4</span></a>
+    <a href="#v-aml">AML / PEP Screening <span class="badge">4</span></a>
+    <a href="#v-income">Income Verification <span class="badge">4</span></a>
+    <a href="#v-aa">Account Aggregator <span class="badge">NEW</span></a>
+    <a href="#v-comms">Communications <span class="badge">4</span></a>
+    <a href="#v-backoffice">Back-Office / RMS <span class="badge">4</span></a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Vendor Deep Dives</div>
+    <a href="#setu-deep-dive">Setu Product Portfolio <span class="badge">NEW</span></a>
+    <a href="#aa-framework">Account Aggregator Framework <span class="badge">NEW</span></a>
+    <a href="#payment-mandates">Payment Mandates <span class="badge">NEW</span></a>
+    <a href="#vendor-strategy">Strategic Vendor Matrix <span class="badge">NEW</span></a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Data Architecture</div>
+    <a href="#data-sources">Data Source Mapping</a>
+    <a href="#field-summary">Field Summary <span class="badge">454</span></a>
+    <a href="#master-dataset">Master Dataset Sections</a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Async Pipeline</div>
+    <a href="#batch-pipeline">Batch Processing</a>
+    <a href="#admin-workflow">KYC Admin Workflow</a>
+    <a href="#status-machine">Status Machine</a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Reference</div>
+    <a href="#error-handling">Error Handling</a>
+    <a href="#regulatory">Regulatory Circulars</a>
+    <a href="#code-tables">Code Tables</a>
+    <a href="#cost-analysis">Cost Analysis</a>
+    <a href="#security">Security Requirements</a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Diagrams</div>
+    <a href="#diagram-flow">Onboarding Flow</a>
+    <a href="#diagram-sources">Data Source Map</a>
+    <a href="#diagram-batch">Batch Processing</a>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<div class="main">
+
+<!-- Hero -->
+<div class="hero" id="hero">
+  <h1>KYC Onboarding Reference</h1>
+  <p class="subtitle">Complete specification for individual customer onboarding in an Indian stock broking firm. DigiLocker-first, async verification, batch submission. User types ~12 fields, everything else is auto-sourced.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><span class="num">8</span><span class="label">User Screens</span></div>
+    <div class="hero-stat"><span class="num">~12</span><span class="label">Fields User Types</span></div>
+    <div class="hero-stat"><span class="num">~5 min</span><span class="label">Total User Time</span></div>
+    <div class="hero-stat"><span class="num">~454</span><span class="label">Total Fields</span></div>
+    <div class="hero-stat"><span class="num">97%</span><span class="label">Pre-Filled</span></div>
+    <div class="hero-stat"><span class="num">25+</span><span class="label">Vendors Evaluated</span></div>
+    <div class="hero-stat"><span class="num">24-72h</span><span class="label">Activation Time</span></div>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- ============================================================ -->
+<!-- SECTION 1: DESIGN PRINCIPLES -->
+<!-- ============================================================ -->
+<section id="design-principles">
+  <h2><span class="section-num">1</span> Design Principles</h2>
+  <table>
+    <thead><tr><th>#</th><th>Principle</th><th>Implementation</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td><strong>DigiLocker-first</strong></td><td>Force Aadhaar + PAN fetch via DigiLocker consent. Harvests ~25 identity fields with zero typing.</td></tr>
+      <tr><td>2</td><td><strong>Aadhaar-number login only</strong></td><td>No phone/email login for DigiLocker. Aadhaar number ensures the strongest identity anchor.</td></tr>
+      <tr><td>3</td><td><strong>Pre-fill everything</strong></td><td>DigiLocker + KRA + CKYC cover ~90 identity/financial fields. User only confirms.</td></tr>
+      <tr><td>4</td><td><strong>Async verification</strong></td><td>PAN verify, KRA lookup, CKYC search, AML screening fire in parallel while user is on DigiLocker.</td></tr>
+      <tr><td>5</td><td><strong>Minimal user typing</strong></td><td>~12 fields: Aadhaar, PAN, mobile, email, marital status, bank a/c, IFSC, a/c type + toggles.</td></tr>
+      <tr><td>6</td><td><strong>e-Sign everything</strong></td><td>Single Aadhaar OTP e-Sign on the complete application. No physical signatures.</td></tr>
+      <tr><td>7</td><td><strong>Batch submission</strong></td><td>KRA, CKYC, UCC, BO account submitted async after e-Sign. User never waits.</td></tr>
+      <tr><td>8</td><td><strong>IPV exemption</strong></td><td>Aadhaar eKYC (DigiLocker) exempts IPV/VIPV per SEBI circular. Saves one step.</td></tr>
+      <tr><td>9</td><td><strong>Progressive disclosure</strong></td><td>Only show fields relevant to choices (F&amp;O income proof, FATCA, PEP).</td></tr>
+      <tr><td>10</td><td><strong>Fail fast, fail gracefully</strong></td><td>If blocking check fails, stop user before e-Sign. Don't waste their time.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 2: FLOW SUMMARY -->
+<!-- ============================================================ -->
+<section id="flow-summary">
+  <h2><span class="section-num">2</span> Flow Summary</h2>
+<pre>
+USER JOURNEY (8 screens, ~5 minutes)
+
+Screen 1: Enter Aadhaar + PAN (2 fields)
+    |--&gt; ASYNC: PAN Verify, KRA Lookup, CKYC Search, AML Screen
+
+Screen 2: DigiLocker Consent (redirect, 0 fields)
+    |--&gt; Harvests: Name, DOB, Gender, Photo, Address, Father's Name, PAN
+
+Screen 3: Confirm Identity (3 fields: mobile, email, marital status)
+
+Screen 4: Bank Account (3 fields: account no, IFSC, type)
+    |--&gt; ASYNC: Penny Drop
+
+Screen 5: Trading Preferences (segment toggles)
+
+Screen 6: Nominations (add nominee or opt-out)
+
+Screen 7: Declarations (checkboxes) + BLOCKING GATE
+
+Screen 8: Review + Face Match + Aadhaar OTP e-Sign
+
+--- USER DONE (~5 minutes) ---
+
+BATCH ZONE (async, 24-72 hours):
+    KRA Submit, CKYC Upload, Admin Review, Exchange UCC,
+    CDSL BO Account, Segment Activation, Welcome Kit
+</pre>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 3: SCREEN-BY-SCREEN WITH VENDOR COMPARISONS -->
+<!-- ============================================================ -->
+<section id="screens">
+  <h2><span class="section-num">3</span> Screen-by-Screen Specification</h2>
+
+  <!-- SCREEN 1 -->
+  <div class="screen-card" id="screen-1">
+    <div class="screen-card-header">
+      <div class="screen-num">1</div>
+      <h4>Start &mdash; Aadhaar + PAN Entry</h4>
+    </div>
+    <p><strong>Purpose:</strong> Capture the two identity anchors that unlock all downstream data.</p>
+    <p><strong>User types:</strong>
+      <span class="field-tag user">Aadhaar Number (12 digits)</span>
+      <span class="field-tag user">PAN (ABCDE1234F)</span>
+    </p>
+    <p><strong>Validation:</strong> Aadhaar: Verhoeff checksum. PAN: <code>[A-Z]{5}[0-9]{4}[A-Z]</code>, 4th char P=Individual.</p>
+    <p><strong>OTP:</strong> Aadhaar OTP sent immediately (reused for DigiLocker login on Screen 2).</p>
+    <p><strong>Time:</strong> ~30 seconds</p>
+
+    <div class="async-bar">
+      On submit, 4 parallel API calls fire (results ready by Screen 3):
+      <strong>PAN Verify</strong> | <strong>KRA Lookup</strong> | <strong>CKYC Search</strong> | <strong>AML/PEP Screen</strong>
+    </div>
+
+    <!-- PAN Verification Vendors -->
+    <div class="vendor-table" id="v-pan">
+      <div class="vendor-table-title">Vendor Comparison: PAN Verification</div>
+      <table>
+        <thead><tr><th>Vendor</th><th>Type</th><th>Key Features</th><th>Cost/txn</th><th>Integration</th></tr></thead>
+        <tbody>
+          <tr class="recommended"><td><strong>Decentro</strong> <span class="badge-rec">Recommended</span></td><td>REST API</td><td>PAN status (E/F/X/D/N), name match, PAN-Aadhaar link check, DOB match. PAN_DETAILED variant returns father name, email, mobile.</td><td>Rs.1-3</td><td>API key, 1-2 weeks</td></tr>
+          <tr><td>Setu <span class="badge-new">New Option</span></td><td>REST API</td><td>Direct NSDL connection. Returns <code>aadhaar_seeding_status</code>, <code>category</code>, <code>full_name</code>. Consent+reason params for audit. Part of unified KYC bundle (PAN+Aadhaar+bank+eSign). Sandbox available.</td><td>Rs.3</td><td>API key, 1 week</td></tr>
+          <tr><td>Karza Technologies <span class="badge-alt">Alternate</span></td><td>REST API</td><td>PAN verify + PAN-Aadhaar link + form 26AS fetch. Govt database authentication. Under Perfios umbrella.</td><td>Rs.2-4</td><td>API key, 1-2 weeks</td></tr>
+          <tr><td>Sandbox.co.in <span class="badge-alt">Alternate</span></td><td>REST API</td><td>JWT + API key auth. Wallet-based pricing with calculator. Multiple document verification.</td><td>Rs.1-2</td><td>JWT token, 1 week</td></tr>
+          <tr><td>Protean (NSDL Direct) <span class="badge-alt">Alternate</span></td><td>HTTPS</td><td>Direct ITD-authorized. Bulk verification. Requires AUA authorization.</td><td>Contact</td><td>3+ weeks (registration)</td></tr>
+          <tr><td>Gridlines <span class="badge-new">New Option</span></td><td>REST API</td><td>PAN verify + cross-verification with other IDs. Modern API design. Startup-friendly pricing.</td><td>Rs.1-3</td><td>API key, 1 week</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- AML Screening Vendors -->
+    <div class="vendor-table" id="v-aml">
+      <div class="vendor-table-title">Vendor Comparison: AML / PEP / Sanctions Screening</div>
+      <table>
+        <thead><tr><th>Vendor</th><th>Key Features</th><th>Watchlists</th><th>Cost/txn</th></tr></thead>
+        <tbody>
+          <tr class="recommended"><td><strong>TrackWizz</strong> <span class="badge-rec">Recommended</span></td><td>India-specific: SEBI debarred, RBI defaulters, MHA lists. Fuzzy matching. Ongoing monitoring with webhooks. CKYC solution also available.</td><td>120+</td><td>Rs.5-15</td></tr>
+          <tr><td>ComplyAdvantage <span class="badge-alt">Alternate</span></td><td>Global coverage. EU/US/APAC endpoints. 600 calls/min. Real-time + batch screening.</td><td>100+</td><td>Rs.10-25</td></tr>
+          <tr><td>IDfy AML <span class="badge-alt">Alternate</span></td><td>150+ entity types. OFAC, SDN, UN, MHA. Background verification bundle.</td><td>150+</td><td>Rs.8-20</td></tr>
+          <tr><td>Bureau.id <span class="badge-new">New Option</span></td><td>Device fingerprint (99.7% persistence, survives factory resets). 200+ real-time risk signals per device. Detects emulators, rooting, coordinated fraud rings, synthetic identities. KYC/KYB/AML across 195+ markets.</td><td>Global + India</td><td>Contact</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SCREEN 2 -->
+  <div class="screen-card" id="screen-2">
+    <div class="screen-card-header">
+      <div class="screen-num">2</div>
+      <h4>DigiLocker Consent (Redirect)</h4>
+    </div>
+    <p><strong>Purpose:</strong> Consent-based fetch of Aadhaar XML + PAN document.</p>
+    <p><strong>User types:</strong> 0 fields (logs into DigiLocker with Aadhaar number + OTP from Screen 1).</p>
+    <p><strong>Data harvested (~25 fields with zero effort):</strong></p>
+    <p>
+      <span class="field-tag auto">Name (first/middle/last/full)</span>
+      <span class="field-tag auto">DOB</span>
+      <span class="field-tag auto">Gender</span>
+      <span class="field-tag auto">Photo</span>
+      <span class="field-tag auto">Father's Name</span>
+      <span class="field-tag auto">Full Address (8 fields)</span>
+      <span class="field-tag auto">POI auto-set (Aadhaar)</span>
+      <span class="field-tag auto">POA auto-set (Aadhaar)</span>
+    </p>
+    <div class="info-box green"><strong>IPV Exemption:</strong> Aadhaar eKYC via DigiLocker = IPV/VIPV exempted per SEBI circular. Saves an entire video call step.</div>
+    <p><strong>Time:</strong> ~60 seconds (redirect + consent + return). This 60s buffer is exactly the time needed for all 4 async API calls to complete.</p>
+
+    <!-- DigiLocker / Aadhaar Vendors -->
+    <div class="vendor-table" id="v-aadhaar">
+      <div class="vendor-table-title">Vendor Comparison: Aadhaar / DigiLocker</div>
+      <table>
+        <thead><tr><th>Vendor</th><th>Product</th><th>Key Features</th><th>Unique Differentiator</th></tr></thead>
+        <tbody>
+          <tr class="recommended"><td><strong>Digio</strong> <span class="badge-rec">Recommended</span></td><td>DigiKYC + DigiLocker</td><td>MeitY-approved partner. DigiLocker OAuth 2.0 consent flow. Aadhaar Offline XML. Built-in face match. SEBI/RBI/IRDAI compliant.</td><td>Full-stack KYC orchestration. One SDK for DigiLocker + eSign + Video KYC + KRA + CKYC.</td></tr>
+          <tr><td>Decentro <span class="badge-alt">Alternate</span></td><td>DigiLocker Suite + SSO</td><td>DigiLocker APIs: Initiate Session, Get Issued Files, Download e-Aadhaar. UIStreams for guided workflows.</td><td>Unified API across PAN + bank + DigiLocker + CKYC. Single vendor for multiple use cases.</td></tr>
+          <tr><td>Setu <span class="badge-new">New Option</span></td><td>KYC Data Bundle + OKYC</td><td>DigiLocker gateway (70+ doc types, OAuth consent). OKYC: OTP-based offline Aadhaar XML. <strong>Aadhaar Redundancy API</strong>: auto-failover between supply partners for higher success rates.</td><td>Unified platform: Aadhaar+PAN+bank+DigiLocker+eSign from one vendor. AA market leader. Acquired by Pine Labs ($70-75M).</td></tr>
+          <tr><td>NPCI e-KYC Setu <span class="badge-new">New Option</span></td><td>e-KYC Setu System</td><td>Aadhaar e-KYC via NPCI without sharing Aadhaar number. Gazette Notification S.O.5684(E) legal basis. SEBI allowed for intermediaries Jun 2025. Biometric + OTP auth supported.</td><td>No AUA/KUA license needed. Privacy-first: broker gets masked Aadhaar + demographics only. Simplest regulatory path for Aadhaar eKYC.</td></tr>
+          <tr><td>HyperVerge <span class="badge-alt">Alternate</span></td><td>Aadhaar Suite</td><td>Aadhaar OCR, Aadhaar XML parsing, face match against Aadhaar photo. SDK for Android/iOS/Web.</td><td>Best-in-class OCR (99.8%) + face match in a single call. Good for fallback if DigiLocker is down.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SCREEN 3 -->
+  <div class="screen-card" id="screen-3">
+    <div class="screen-card-header">
+      <div class="screen-num">3</div>
+      <h4>Confirm Identity</h4>
+    </div>
+    <p><strong>Pre-filled (read-only):</strong>
+      <span class="field-tag auto">Name</span>
+      <span class="field-tag auto">DOB</span>
+      <span class="field-tag auto">Gender</span>
+      <span class="field-tag auto">Father's Name</span>
+      <span class="field-tag auto">Full Address</span>
+      <span class="field-tag auto">Photo</span>
+      <span class="field-tag auto">PAN</span>
+    </p>
+    <p><strong>Pre-filled from KRA/CKYC (if found):</strong>
+      <span class="field-tag auto">Occupation</span>
+      <span class="field-tag auto">Income Range</span>
+      <span class="field-tag auto">Net Worth</span>
+      <span class="field-tag auto">CKYC Number</span>
+    </p>
+    <p><strong>User types:</strong>
+      <span class="field-tag user">Mobile (C01)</span>
+      <span class="field-tag user">Email (C03)</span>
+      <span class="field-tag user">Marital Status (A19)</span>
+    </p>
+    <p><strong>Time:</strong> ~45 seconds</p>
+
+    <!-- KRA Vendors -->
+    <div class="vendor-table" id="v-kra">
+      <div class="vendor-table-title">Vendor Comparison: KRA Integration</div>
+      <table>
+        <thead><tr><th>Vendor</th><th>APIs</th><th>KRA Coverage</th><th>Key Features</th><th>Cost/txn</th></tr></thead>
+        <tbody>
+          <tr class="recommended"><td><strong>Digio</strong> <span class="badge-rec">Recommended</span></td><td>REST/JSON</td><td>All 5 KRAs via interoperability</td><td>PAN Status Check, Fetch Details, Upload/Update, Download Docs. IP whitelisting. 2-day integration.</td><td>Rs.3-5</td></tr>
+          <tr><td>CVL KRA Direct <span class="badge-alt">Alternate</span></td><td>SOAP/XML</td><td>All 5 via interop</td><td>GetPanStatus, InsertUpdateKYCRecord, bulk tilde-delimited files. Legacy but stable.</td><td>Rs.2-3</td></tr>
+          <tr><td>TrackWizz <span class="badge-new">New Option</span></td><td>REST/JSON</td><td>CVL + NDML</td><td>KRA submission + CKYC upload + AML screening in one platform. Regulatory reporting bundle.</td><td>Rs.3-5</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- CKYC Vendors -->
+    <div class="vendor-table" id="v-ckyc">
+      <div class="vendor-table-title">Vendor Comparison: CKYC Integration</div>
+      <table>
+        <thead><tr><th>Vendor</th><th>APIs</th><th>Key Features</th><th>Note</th><th>Cost/txn</th></tr></thead>
+        <tbody>
+          <tr class="recommended"><td><strong>Decentro</strong> <span class="badge-rec">Recommended</span></td><td>Search + Download + Upload</td><td>REST API. Masked CKYC search (Jan 2025). Full download with identity match. Bulk upload.</td><td>Handles masked CKYC number correctly</td><td>Rs.3-10</td></tr>
+          <tr><td>Digio <span class="badge-alt">Alternate</span></td><td>Search + Download + Upload</td><td>FI code config, CKYC public key, keystore. Java 17 / Docker. GitHub SDK available.</td><td>More complex setup</td><td>Rs.3-10</td></tr>
+          <tr><td>TrackWizz <span class="badge-new">New Option</span></td><td>Search + Upload</td><td>CKYC solution for reporting entities. Combined with AML screening.</td><td>Good if already using TrackWizz for AML</td><td>Rs.5-10</td></tr>
+          <tr><td>Protean Direct <span class="badge-alt">Alternate</span></td><td>SFTP + API</td><td>Direct CERSAI integration. Batch and real-time. Official registry operator.</td><td>Requires FI registration with CERSAI</td><td>Contact</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SCREEN 4 -->
+  <div class="screen-card" id="screen-4">
+    <div class="screen-card-header">
+      <div class="screen-num">4</div>
+      <h4>Bank Account</h4>
+    </div>
+    <p><strong>User types:</strong>
+      <span class="field-tag user">Account Number (G01)</span>
+      <span class="field-tag user">IFSC Code (G03)</span>
+      <span class="field-tag user">Account Type (G07)</span>
+    </p>
+    <p><strong>Auto-filled from IFSC (RBI master):</strong>
+      <span class="field-tag auto">Bank Name</span>
+      <span class="field-tag auto">Branch Name</span>
+      <span class="field-tag auto">Branch City</span>
+      <span class="field-tag auto">MICR Code</span>
+    </p>
+    <div class="async-bar">ASYNC: Penny Drop verification fires on submit &mdash; Rs.1 IMPS credit + name match scoring</div>
+    <p><strong>Time:</strong> ~45 seconds</p>
+
+    <!-- Bank Verification Vendors -->
+    <div class="vendor-table" id="v-bank">
+      <div class="vendor-table-title">Vendor Comparison: Bank Account Verification</div>
+      <table>
+        <thead><tr><th>Vendor</th><th>Methods</th><th>Name Match</th><th>Key Features</th><th>Cost/txn</th></tr></thead>
+        <tbody>
+          <tr class="recommended"><td><strong>Decentro</strong> <span class="badge-rec">Recommended</span></td><td>Penny drop, Penniless, Reverse penny drop (UPI)</td><td>Score 0-100 + FULL/PARTIAL/NO match</td><td>Rs.1 IMPS credit. 3 verification types. &lt;2 sec response.</td><td>Rs.2-5</td></tr>
+          <tr><td>Setu <span class="badge-new">New Option</span></td><td>Penny drop, <strong>Reverse penny drop (pioneer)</strong>, PennyLess</td><td>Yes (name match)</td><td>Industry-first reverse penny drop: customer pays Rs.1 via UPI, Setu extracts account+name+IFSC. Data cannot be spoofed. Kissht reported 5x conversion uplift. Webhook with 5 exponential retries. Also offers UPI AutoPay (Rs.1L for securities).</td><td>Rs.2-4</td></tr>
+          <tr><td>Cashfree <span class="badge-alt">Alternate</span></td><td>Penny drop (async webhook)</td><td>Yes</td><td>Webhook-based. Free trial Rs.100 credits. Does NOT support Deutsche Bank and Paytm Payments Bank.</td><td>Rs.2-4</td></tr>
+          <tr><td>Razorpay <span class="badge-alt">Alternate</span></td><td>Penny drop</td><td>Yes</td><td>Two-step: Create Fund Account then Validation. RazorpayX Lite only.</td><td>Rs.3-5</td></tr>
+          <tr><td>Karza <span class="badge-new">New Option</span></td><td>Penny drop + IFSC lookup</td><td>Yes</td><td>Bank verification + IFSC master lookup in one. Under Perfios umbrella.</td><td>Rs.2-4</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SCREEN 5 -->
+  <div class="screen-card" id="screen-5">
+    <div class="screen-card-header">
+      <div class="screen-num">5</div>
+      <h4>Trading Preferences</h4>
+    </div>
+    <p><strong>Segment toggles:</strong>
+      <span class="field-tag user">Equity/Cash (default ON)</span>
+      <span class="field-tag user">F&amp;O</span>
+      <span class="field-tag user">Currency Derivatives</span>
+      <span class="field-tag user">Commodity</span>
+    </p>
+    <p><strong>Conditional:</strong>
+      <span class="field-tag conditional">Income proof upload (if F&amp;O or Commodity)</span>
+    </p>
+    <div class="info-box orange"><strong>SEBI Requirement:</strong> F&amp;O/Commodity segments require income verification. Bank statement must show credit of at least Rs.10,000 in last 6 months. Annual income threshold is broker-specific (typically Rs.1-10 lakh).</div>
+
+    <!-- Income Verification Vendors -->
+    <div class="vendor-table" id="v-income">
+      <div class="vendor-table-title">Vendor Comparison: Income / ITR Verification</div>
+      <table>
+        <thead><tr><th>Vendor</th><th>Products</th><th>Key Features</th><th>Unique Value</th><th>Cost</th></tr></thead>
+        <tbody>
+          <tr class="recommended"><td><strong>Perfios</strong> <span class="badge-rec">Recommended</span></td><td>ITR Analyser, Bank Statement Analyser, Account Aggregator</td><td>4000+ bank statement formats. ITR-V, Form 26AS, AIS. AI/ML fraud detection. Sahamati-empaneled TSP.</td><td>Full-stack income verification. AA integration for consent-based fetch. Rs.5-25/fetch via AA.</td><td>Contact (volume-based)</td></tr>
+          <tr><td>Setu (via AA) <span class="badge-new">New Option</span></td><td>Account Aggregator FIU</td><td>Consent-based bank statement fetch. No PDF upload needed. Real-time from FIP. RBI-licensed AA.</td><td>Eliminates manual income proof upload entirely. User just consents. Most seamless UX.</td><td>Rs.5-25/fetch</td></tr>
+          <tr><td>Finbox (BankConnect) <span class="badge-alt">Alternate</span></td><td>Bank statement analysis</td><td>500+ predictors. PDF upload + netbanking + AA. Income, expenses, obligations extraction.</td><td>Best for thin-file analysis with alternate data signals.</td><td>Contact</td></tr>
+          <tr><td>Karza Technologies <span class="badge-alt">Alternate</span></td><td>ITR Portal Access + GST Analytics</td><td>Direct ITR portal access. Form 26AS, GST-R. 100+ APIs, 8 crore monthly calls. Under Perfios (OneView brand). Risk scoring + income profiling beyond raw verification.</td><td>Deep analytics layer: not just "is this valid?" but GST trend analysis, income profiling.</td><td>Contact</td></tr>
+          <tr><td>Tartan <span class="badge-new">New Option</span></td><td>Payroll/HRMS Sync</td><td>30+ HRMS integrations covering 80% of organized market. Real-time salary + employment data with user consent. Payslip OCR. EPFO/UAN employment history. 60 data points per user.</td><td>Deepest payroll verification in India. Direct HRMS integrations, not just document analysis. Relevant for margin trading eligibility.</td><td>Contact</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Account Aggregator (NEW) -->
+    <div class="vendor-table" id="v-aa">
+      <div class="vendor-table-title">NEW: Account Aggregator Framework (RBI-licensed)</div>
+      <table>
+        <thead><tr><th>AA Operator</th><th>Role</th><th>Key Features</th><th>Relevance for KYC</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Setu (Onemoney)</strong></td><td>AA + FIU tech</td><td>Leading AA tech provider. Consent Manager UI. FIU APIs for data fetch. Sandbox available.</td><td>Can replace income proof upload: user consents, bank statement fetched automatically from bank FIP. Also fetch demat holdings via CDSL/NSDL FIP.</td></tr>
+          <tr><td><strong>Perfios (Anumati)</strong></td><td>AA Operator</td><td>Sahamati-empaneled. FIU + FIP capabilities. Rs.5-25/fetch pricing. 4000+ format analysis.</td><td>Income verification without manual upload. ITR + bank statement via consent.</td></tr>
+          <tr><td>Finvu</td><td>AA Operator</td><td>RBI-licensed. 40+ FIP integrations. Web + mobile SDK.</td><td>Bank statement fetch for F&amp;O income proof.</td></tr>
+          <tr><td>CAMS Finserv</td><td>AA Operator</td><td>Backed by CAMS (RTA). MF + demat data via AA.</td><td>Mutual fund holdings data for net worth verification.</td></tr>
+        </tbody>
+      </table>
+      <div class="info-box cyan" style="margin:16px; border-radius:8px;">
+        <strong>Account Aggregator for KYC:</strong> SEBI circular Aug 2022 allowed depositories (CDSL/NSDL) as FIPs in the AA ecosystem. This means brokers can fetch demat holdings, bank statements, and ITR data via consent-based AA flow instead of manual document upload. UPI AutoPay mandates for securities brokers now support up to Rs.1 lakh (NPCI 2024 circular), enabling SIP and margin funding setup during onboarding.
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 6 -->
+  <div class="screen-card" id="screen-6">
+    <div class="screen-card-header">
+      <div class="screen-num">6</div>
+      <h4>Nominations</h4>
+    </div>
+    <p><strong>Option A:</strong> Add nominee &mdash;
+      <span class="field-tag user">Name</span>
+      <span class="field-tag user">Relationship</span>
+      <span class="field-tag user">DOB</span>
+      <span class="field-tag user">Allocation %</span>
+    </p>
+    <p><strong>Option B:</strong> "I choose to opt out of nomination" (requires async video declaration within 30 days).</p>
+    <p>Up to 10 nominees (SEBI Jan 2025). Total allocation must = 100%. Pre-fill from KRA/CKYC if data exists.</p>
+    <p><strong>Time:</strong> ~30 seconds (1 nominee) to ~2 min (multiple)</p>
+  </div>
+
+  <!-- SCREEN 7 -->
+  <div class="screen-card" id="screen-7">
+    <div class="screen-card-header">
+      <div class="screen-num">7</div>
+      <h4>Declarations + Blocking Gate</h4>
+    </div>
+    <p><strong>Checkboxes:</strong>
+      <span class="field-tag user">FATCA: India-only tax resident (Y/N)</span>
+      <span class="field-tag user">PEP: Not a PEP (Y/N)</span>
+      <span class="field-tag user">Risk Disclosure: Acknowledged</span>
+      <span class="field-tag user">T&amp;C: Accepted</span>
+      <span class="field-tag user">Running Account: Quarterly settlement</span>
+      <span class="field-tag user">DDPI: Opt-in (optional)</span>
+    </p>
+    <p><strong>Conditional:</strong>
+      <span class="field-tag conditional">FATCA details (if non-India tax resident)</span>
+      <span class="field-tag conditional">PEP details (if PEP = Yes)</span>
+    </p>
+
+    <div class="gate-box">
+      <h4>BLOCKING GATE &mdash; All must pass before e-Sign</h4>
+      <div class="gate-check pass"><strong>PAN Valid</strong> &mdash; Status = E (exists and valid)</div>
+      <div class="gate-check pass"><strong>PAN-Aadhaar Linked</strong> &mdash; Seeding status = Y</div>
+      <div class="gate-check pass"><strong>AML/PEP Clean</strong> &mdash; Risk level = LOW or MEDIUM</div>
+      <div class="gate-check pass"><strong>Penny Drop Success</strong> &mdash; Name match &ge; 70%</div>
+    </div>
+    <p><strong>Time:</strong> ~30 seconds</p>
+  </div>
+
+  <!-- SCREEN 8 -->
+  <div class="screen-card active" id="screen-8">
+    <div class="screen-card-header">
+      <div class="screen-num" style="background:var(--green)">8</div>
+      <h4>Review + Face Match + e-Sign (Final)</h4>
+    </div>
+    <p><strong>Step 1:</strong> Scroll-through review of complete pre-filled application.</p>
+    <p><strong>Step 2:</strong> Selfie capture &rarr; Face match against Aadhaar photo. Threshold: &ge;80% + liveness pass.</p>
+    <p><strong>Step 3:</strong> Aadhaar OTP e-Sign on complete application PDF. SHA-256 hash, CCA-compliant DSC.</p>
+    <div class="info-box green"><strong>IPV/VIPV: EXEMPTED</strong> &mdash; Aadhaar eKYC (DigiLocker) used. No video call needed.</div>
+    <p><strong>Time:</strong> ~60 seconds. <strong>USER DONE. Total: ~5 minutes.</strong></p>
+
+    <!-- e-Sign Vendors -->
+    <div class="vendor-table" id="v-esign">
+      <div class="vendor-table-title">Vendor Comparison: e-Sign</div>
+      <table>
+        <thead><tr><th>Vendor</th><th>Auth Modes</th><th>Key Features</th><th>CCA Licensed</th><th>Cost/sign</th></tr></thead>
+        <tbody>
+          <tr class="recommended"><td><strong>Digio</strong> <span class="badge-rec">Recommended</span></td><td>Aadhaar OTP, Biometric, Face</td><td>CADES-compliant DSC. White-label SDK. 2-day integration. Signed PDF with embedded cert.</td><td>Via licensed CA</td><td>Rs.15-25</td></tr>
+          <tr><td>Setu <span class="badge-new">New Option</span></td><td>Aadhaar OTP</td><td>Up to 25 signers. eStamp on-the-fly (state-specific stamp duty). Name match for Aadhaar eSign. Webhook notifications. ET Money saw 30% conversion surge.</td><td>Via licensed CA</td><td>Contact</td></tr>
+          <tr><td>Leegality <span class="badge-alt">Alternate</span></td><td>Aadhaar OTP</td><td>Zero license fee, pay-per-use. Smart API. 55M+ eSigns. &lt;2 day integration.</td><td>Via licensed CA</td><td>~Rs.25</td></tr>
+          <tr><td>eMudhra <span class="badge-alt">Alternate</span></td><td>Aadhaar OTP, Biometric, IRIS</td><td>Licensed CA by CCA. SAP/Oracle connectors. Volume pricing &gt;10L/year.</td><td>Yes (direct)</td><td>Volume-based</td></tr>
+          <tr><td>Protean (NSDL) <span class="badge-alt">Alternate</span></td><td>OTP, Biometric, IRIS</td><td>Licensed CA by CCA. Cheapest per-sign. Government-backed.</td><td>Yes (direct)</td><td>~Rs.5.90</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Face Match Vendors -->
+    <div class="vendor-table" id="v-face">
+      <div class="vendor-table-title">Vendor Comparison: Face Match &amp; Liveness Detection</div>
+      <table>
+        <thead><tr><th>Vendor</th><th>Accuracy</th><th>Liveness</th><th>Key Features</th><th>Cost/txn</th></tr></thead>
+        <tbody>
+          <tr class="recommended"><td><strong>HyperVerge</strong> <span class="badge-rec">Recommended</span></td><td>99.8%</td><td>ISO 30107 Level 2</td><td>Passive liveness (no gestures). Detects prints, screens, videos, 3D masks, deepfakes. Android/iOS/Web SDK.</td><td>Rs.1-2</td></tr>
+          <tr><td>IDfy <span class="badge-alt">Alternate</span></td><td>~99%</td><td>Active + passive</td><td>Face match + background verification bundle. Tampering detection.</td><td>Rs.1-2</td></tr>
+          <tr><td>Signzy <span class="badge-new">New Option</span></td><td>~99%</td><td>AI-based</td><td>200+ APIs. 14,000+ doc types from 180+ countries. Only Indian platform in Gartner Banking 2024 Market Guide. No-code workflow builder. SOC 2 + ISO 27001. 99M customers served.</td><td>Contact</td></tr>
+          <tr><td>Bureau.id <span class="badge-new">New Option</span></td><td>~98%</td><td>Device-based</td><td>Device intelligence layer adds anti-fraud. Detects emulators, rooted devices. Good secondary signal.</td><td>Contact</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Video KYC Vendors (for fallback / nomination opt-out) -->
+    <div class="vendor-table" id="v-vkyc">
+      <div class="vendor-table-title">Vendor Comparison: Video KYC / VIPV (for nomination opt-out / fallback)</div>
+      <table>
+        <thead><tr><th>Vendor</th><th>Compliance</th><th>Key Features</th><th>Speed</th><th>Cost/call</th></tr></thead>
+        <tbody>
+          <tr class="recommended"><td><strong>HyperVerge</strong> <span class="badge-rec">Recommended</span></td><td>SEBI VIPV + RBI V-CIP</td><td>Self-guided + agent-led. Random questions. Face match during video. 99.5% accuracy. 7-year recording storage.</td><td>&lt;1 min (self-guided)</td><td>Rs.30-50</td></tr>
+          <tr><td>Digio <span class="badge-alt">Alternate</span></td><td>SEBI VIPV + RBI V-CIP + IRDAI</td><td>DigiStudio no-code workflow. Android + iOS SDK. Auto-reconnect. 5-10 min auditor review.</td><td>3-5 min</td><td>Rs.30-50</td></tr>
+          <tr><td>IDfy <span class="badge-alt">Alternate</span></td><td>SEBI + RBI</td><td>Agent-assisted + self-serve. Language-based reviewer allocation. Low bandwidth support.</td><td>3-5 min</td><td>Rs.30-50</td></tr>
+          <tr><td>Signzy <span class="badge-new">New Option</span></td><td>SEBI + RBI</td><td>500K+ calls/month. Works at 75 kbps bandwidth (best for Tier 3/4). No-code AI platform for custom workflows. Gartner Banking 2024.</td><td>3-5 min</td><td>Contact</td></tr>
+          <tr><td>Veri5 Digital <span class="badge-new">New Option</span></td><td>SEBI + RBI</td><td>Aadhaar e-KYC + Video KYC integrated. NFC-based document reading. Offline SDK. 99.84% face match. Aadhaar Data Vault (RBI-compliant tokenized storage). SMS KYC for feature phones.</td><td>2-3 min</td><td>Contact</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- OCR Vendors -->
+    <div class="vendor-table" id="v-ocr">
+      <div class="vendor-table-title">Vendor Comparison: OCR &amp; Document Verification</div>
+      <table>
+        <thead><tr><th>Vendor</th><th>Accuracy</th><th>Docs Supported</th><th>Key Features</th><th>Cost/doc</th></tr></thead>
+        <tbody>
+          <tr class="recommended"><td><strong>HyperVerge</strong> <span class="badge-rec">Recommended</span></td><td>99.8%</td><td>PAN, Aadhaar, Passport, Voter ID, DL, Cheque</td><td>Confidence scores per field. Auto-detect document type. Min 800px width. Tampering detection.</td><td>Rs.1-3</td></tr>
+          <tr><td>IDfy <span class="badge-alt">Alternate</span></td><td>~99%</td><td>Wide range</td><td>3 modes: OCR-only, Verify-only, OCR+Verify. Government database cross-check.</td><td>Rs.1-3</td></tr>
+          <tr><td>Signzy <span class="badge-new">New Option</span></td><td>~99%</td><td>14,000+ from 180+ countries</td><td>SDK offline mode. SOC 2 + ISO 27001. Best for multi-country support if NRI flow needed.</td><td>Contact</td></tr>
+          <tr><td>Karza <span class="badge-new">New Option</span></td><td>~98%</td><td>Indian docs + GST</td><td>Under Perfios umbrella. Good combo with ITR verification. Govt database auth.</td><td>Rs.1-3</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 4: SETU DEEP DIVE -->
+<!-- ============================================================ -->
+<section id="setu-deep-dive">
+  <h2><span class="section-num">4</span> Setu Product Portfolio &mdash; Deep Dive</h2>
+  <div class="info-box purple"><strong>Why Setu matters:</strong> Acquired by Pine Labs for $70-75M (2022). Revenue nearly doubled to INR 35.2 crore in FY24. Setu can potentially consolidate Aadhaar + PAN + bank verification + DigiLocker + eSign into a single vendor, reducing integration overhead. Key gaps: no CKYC, no Video KYC, no face match/liveness, no OCR.</div>
+
+  <h3>Product-by-Product Breakdown</h3>
+  <table>
+    <thead><tr><th>Product</th><th>What It Does</th><th>API Pattern</th><th>Unique Feature</th><th>Pricing</th></tr></thead>
+    <tbody>
+      <tr><td><strong>eKYC Setu (via NPCI)</strong></td><td>Aadhaar e-KYC without AUA/KUA license. Routes through NPCI. Returns masked Aadhaar + demographics.</td><td><code>POST /api/verify/</code></td><td>No licensing burden. Legal basis: Gazette S.O.5684(E). Smart routing across supply partners.</td><td>Contact</td></tr>
+      <tr><td><strong>OKYC (Offline Aadhaar)</strong></td><td>OTP-based Aadhaar verification. Fetches XML with name, gender, DOB, address.</td><td><code>POST /api/verify/</code></td><td><strong>Aadhaar Redundancy API</strong>: auto-failover between 2 supply partners. Unique to Setu.</td><td>Contact</td></tr>
+      <tr><td><strong>DigiLocker Gateway</strong></td><td>Fetch 70+ document types. OAuth consent flow. Scope codes: ADHAR, PANCR, DRVLC.</td><td>OAuth + REST</td><td>Combined with OKYC for redundancy + higher success rates.</td><td>Contact</td></tr>
+      <tr><td><strong>PAN Verification</strong></td><td>Direct NSDL connection. Returns name, category, Aadhaar seeding status.</td><td><code>POST /api/verify/pan</code></td><td>Consent + reason params for audit. Returns <code>aadhaar_seeding_status</code>.</td><td>Rs.3/txn</td></tr>
+      <tr><td><strong>Reverse Penny Drop</strong></td><td>Customer pays Rs.1 via UPI. Setu extracts account, name, IFSC. Rs.1 refunded in 48h.</td><td><code>POST /api/verify/ban/reverse</code></td><td>Industry pioneer. Data cannot be spoofed. Webhook with 5 exponential retries. Kissht: 5x conversion.</td><td>Contact</td></tr>
+      <tr><td><strong>Penny Drop (IMPS)</strong></td><td>Deposits Rs.1 via IMPS. Sync + async modes.</td><td>REST + Webhook</td><td>Truncated account holder name in response.</td><td>Contact</td></tr>
+      <tr><td><strong>PennyLess</strong></td><td>Zero-balance account verification. No funds deposited.</td><td>REST + Webhook</td><td>Combined endpoint with Penny Drop.</td><td>Contact</td></tr>
+      <tr><td><strong>eSign</strong></td><td>Aadhaar OTP-based e-signatures. Up to 25 signers/doc.</td><td>Upload &rarr; Create &rarr; Download</td><td>eStamp on-the-fly (state-specific stamp duty). Name match feature. ET Money: 30% conversion surge.</td><td>Contact</td></tr>
+      <tr><td><strong>Account Aggregator</strong></td><td>India's first AA gateway. Consent-based financial data sharing. 5M daily requests.</td><td><code>POST /Consent</code> &rarr; <code>POST /FI/request</code></td><td>Market leader. Multi-consent: merge requests into single flow. Pre-built themeable consent screens.</td><td>Rs.5-25/fetch</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Setu vs Current Stack Comparison</h3>
+  <table>
+    <thead><tr><th>Capability</th><th>Current Vendor</th><th>Setu Alternative</th><th>Setu Advantage</th><th>Setu Limitation</th></tr></thead>
+    <tbody>
+      <tr><td>Aadhaar eKYC</td><td>Digio / Decentro</td><td>eKYC Setu (NPCI)</td><td>No AUA/KUA license needed</td><td>Newer product, less battle-tested</td></tr>
+      <tr><td>DigiLocker</td><td>Digio</td><td>DigiLocker Gateway</td><td>Unified platform</td><td>Digio has deeper KYC orchestration</td></tr>
+      <tr><td>PAN Verify</td><td>Decentro</td><td>PAN API</td><td>Same quality, unified billing</td><td>Comparable feature set</td></tr>
+      <tr><td>Bank Verify</td><td>Decentro</td><td>Reverse Penny Drop</td><td>Pioneer, most mature, spoof-proof</td><td>Others now offer similar</td></tr>
+      <tr><td>eSign</td><td>Digio</td><td>eSign + eStamp</td><td>Integrated eStamp</td><td>Digio has deeper doc workflow (DigiDocs)</td></tr>
+      <tr><td>CKYC</td><td>Decentro / TrackWizz</td><td>&mdash;</td><td>&mdash;</td><td style="color:var(--red);font-weight:600;">Not offered by Setu</td></tr>
+      <tr><td>Video KYC</td><td>HyperVerge</td><td>&mdash;</td><td>&mdash;</td><td style="color:var(--red);font-weight:600;">Not offered</td></tr>
+      <tr><td>Face Match / Liveness</td><td>HyperVerge</td><td>&mdash;</td><td>&mdash;</td><td style="color:var(--red);font-weight:600;">Not offered</td></tr>
+      <tr><td>OCR</td><td>HyperVerge</td><td>&mdash;</td><td>&mdash;</td><td style="color:var(--red);font-weight:600;">Not offered</td></tr>
+      <tr><td>Income (AA)</td><td>Perfios</td><td>Account Aggregator</td><td>Market leader, highest volumes</td><td>More relevant for lending than basic KYC</td></tr>
+    </tbody>
+  </table>
+  <div class="info-box blue"><strong>Decision Point:</strong> Setu can consolidate 5 vendors into 1 for identity+bank+eSign. But you still need HyperVerge (face/video/OCR), TrackWizz (CKYC/AML), and Digio (KRA). Net reduction: 2-3 fewer vendor contracts, simpler billing, one SDK for core identity flow.</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 5: ACCOUNT AGGREGATOR FRAMEWORK -->
+<!-- ============================================================ -->
+<section id="aa-framework">
+  <h2><span class="section-num">5</span> Account Aggregator Framework &mdash; Comprehensive Guide</h2>
+  <div class="info-box cyan"><strong>What is AA?</strong> An RBI-licensed NBFC that acts as a consent manager for financial data. AA does not store/view/process data &mdash; it facilitates encrypted transfer from Financial Information Provider (FIP) to Financial Information User (FIU). Governed by RBI Master Direction dated Sep 2, 2016. Inter-regulatory: RBI, SEBI, IRDAI, PFRDA, DoR. Industry body: Sahamati.</div>
+
+  <h3>Scale (Dec 2025)</h3>
+  <div class="hero-stats" style="margin:16px 0;">
+    <div class="hero-stat" style="background:var(--cyan-light);padding:12px 20px;border-radius:10px;"><span class="num" style="color:var(--cyan);font-size:1.5rem;">126</span><span class="label">FIs Live</span></div>
+    <div class="hero-stat" style="background:var(--cyan-light);padding:12px 20px;border-radius:10px;"><span class="num" style="color:var(--cyan);font-size:1.5rem;">2.61B</span><span class="label">Accounts Enabled</span></div>
+    <div class="hero-stat" style="background:var(--cyan-light);padding:12px 20px;border-radius:10px;"><span class="num" style="color:var(--cyan);font-size:1.5rem;">90+</span><span class="label">FIPs Integrated</span></div>
+    <div class="hero-stat" style="background:var(--cyan-light);padding:12px 20px;border-radius:10px;"><span class="num" style="color:var(--cyan);font-size:1.5rem;">16</span><span class="label">Licensed AAs</span></div>
+  </div>
+
+  <h3>RBI-Licensed Account Aggregator Operators</h3>
+  <table>
+    <thead><tr><th>Operator</th><th>Entity</th><th>Strength</th><th>Relevance for Broking</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Finvu</strong></td><td>Cookiejar Technologies</td><td>Earliest entrant, strong consumer app</td><td>Wide bank FIP coverage</td></tr>
+      <tr><td><strong>OneMoney</strong></td><td>FinSec AA Solutions</td><td>Consumer-focused, wide coverage</td><td>Good for retail onboarding</td></tr>
+      <tr><td><strong>CAMS Finserv</strong></td><td>CAMSFinServ</td><td>MF ecosystem (RTA backing)</td><td>Mutual fund holdings fetch</td></tr>
+      <tr><td><strong>Anumati</strong></td><td>Perfios AA Services</td><td>Analytics + AA combined (Perfios)</td><td>Income verification with analytics overlay</td></tr>
+      <tr><td><strong>PhonePe</strong></td><td>PhonePe Technology</td><td>Massive UPI consumer base</td><td>Highest consent conversion rates</td></tr>
+      <tr><td><strong>Digio</strong></td><td>Digio Internet</td><td>eSign + KYC + AA combined</td><td>Full-stack if already using Digio for eSign</td></tr>
+      <tr><td><strong>Protean SurakshAA</strong></td><td>Protean eGov</td><td>Government-backed</td><td>Regulatory trust signal</td></tr>
+      <tr><td><strong>CRIF Connect</strong></td><td>CRIF Connect</td><td>Credit bureau background</td><td>Credit + AA data combined</td></tr>
+      <tr><td>Saafe</td><td>Dashboard AA Services</td><td>Transparent consent UX</td><td>Consumer trust</td></tr>
+      <tr><td>Yodlee</td><td>Yodlee Finsoft</td><td>Global player (Envestnet)</td><td>Multi-country if NRI support needed</td></tr>
+      <tr><td>INK</td><td>Unacores AA Solutions</td><td>Growing platform</td><td>Competitive pricing</td></tr>
+      <tr><td>NADL</td><td>NESL Asset Data</td><td>NeSL backing</td><td>Asset data integration</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Integration Approach for Stock Brokers</h3>
+  <table>
+    <thead><tr><th>Approach</th><th>How</th><th>Pros</th><th>Cons</th></tr></thead>
+    <tbody>
+      <tr class="recommended"><td><strong>Multi-AA Gateway</strong> <span class="badge-rec">Recommended</span></td><td>Use Setu or Signzy gateway. Single integration, smart routing across AAs.</td><td>Higher conversion (AA fallback). One contract. Best UX.</td><td>Gateway margin on top of AA fees.</td></tr>
+      <tr><td>Direct AA Integration</td><td>Register as FIU with individual AAs. Implement ReBIT API spec.</td><td>No middleman. Direct pricing.</td><td>Multiple contracts. No smart routing. More engineering.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>API Flow</h3>
+<pre>
+CONSENT FLOW:
+  FIU (Broker) ──POST /Consent──▸ Account Aggregator
+      ▸ AA sends consent request to customer's AA app
+      ▸ Customer reviews: data type, purpose, duration, frequency
+      ▸ Customer approves via OTP/PIN
+      ▸ AA notifies FIU: consent_status = ACTIVE
+      ▸ FIU receives consent_id + consent_handle
+
+DATA FETCH FLOW:
+  FIU ──POST /FI/request (consent_id)──▸ AA ──▸ FIP (Bank/CDSL)
+      ▸ FIP encrypts + digitally signs data
+      ▸ FIP sends encrypted data → AA → FIU
+      ▸ FIU decrypts using Diffie-Hellman session keys
+      ▸ AA is "blind pipe" — cannot read data
+</pre>
+
+  <h3>Financial Information Types Available</h3>
+  <table>
+    <thead><tr><th>FI Type</th><th>Regulator</th><th>Status</th><th>Use for Broking</th></tr></thead>
+    <tbody>
+      <tr><td>Savings/Current Statements</td><td>RBI</td><td style="color:var(--green);font-weight:700;">Live</td><td>F&amp;O income proof (Rs.10K credit in 6 months)</td></tr>
+      <tr><td>Term/Recurring Deposits</td><td>RBI</td><td style="color:var(--green);font-weight:700;">Live</td><td>Net worth verification</td></tr>
+      <tr><td>Equity Shares (Demat)</td><td>SEBI</td><td style="color:var(--green);font-weight:700;">Live</td><td>Existing holdings for financial profile</td></tr>
+      <tr><td>Mutual Fund Units</td><td>SEBI</td><td style="color:var(--green);font-weight:700;">Live</td><td>Net worth + cross-sell</td></tr>
+      <tr><td>Insurance Policies</td><td>IRDAI</td><td style="color:var(--green);font-weight:700;">Live</td><td>Financial profile</td></tr>
+      <tr><td>NPS Balances</td><td>PFRDA</td><td style="color:var(--green);font-weight:700;">Live</td><td>Retirement corpus</td></tr>
+      <tr><td>GST Returns</td><td>DoR</td><td style="color:var(--orange);font-weight:700;">Coming Soon</td><td>Business income for proprietors</td></tr>
+    </tbody>
+  </table>
+
+  <h3>AA vs Perfios ITR &mdash; Head-to-Head</h3>
+  <table>
+    <thead><tr><th>Dimension</th><th>Account Aggregator</th><th>Perfios ITR Analysis</th></tr></thead>
+    <tbody>
+      <tr><td>Data Source</td><td>Direct from bank FIP (real-time)</td><td>ITR documents (PDF/XML from IT portal)</td></tr>
+      <tr><td>Consent</td><td>Customer OTP on AA app</td><td>Customer uploads document or IT portal creds</td></tr>
+      <tr><td>Speed</td><td>Seconds (near real-time)</td><td>Minutes (document parsing)</td></tr>
+      <tr><td>Depth</td><td>Transaction-level bank data; infers income from credits</td><td>Structured tax return data; declared income, deductions, tax paid</td></tr>
+      <tr><td>Cost</td><td>Rs.5-25/fetch</td><td>Rs.15-50/document (volume-dependent)</td></tr>
+      <tr><td>Best For</td><td>Quick F&amp;O activation via 6-month bank statement</td><td>Detailed income assessment, margin trading eligibility</td></tr>
+      <tr><td>UX Impact</td><td>Zero document upload &mdash; just consent</td><td>PDF upload or portal credential entry</td></tr>
+    </tbody>
+  </table>
+  <div class="info-box green"><strong>Complementary, not competing:</strong> Perfios operates Anumati (an AA) and its analytics platform can consume AA-fetched data. For F&amp;O activation (6-month bank statement), AA is sufficient and gives the best UX. For deeper underwriting (margin funding, loans against securities), Perfios ITR adds richer analysis.</div>
+
+  <h3>AA Adoption Status for Stock Broking</h3>
+  <div class="info-box orange"><strong>Currently optional.</strong> No SEBI circular mandates AA integration for stock brokers as of Feb 2026. However, SEBI allowed CDSL/NSDL as FIPs (Aug 2022), and the trend strongly favors digital data infrastructure. ICICI Direct already uses AA for F&amp;O income verification. Early adoption = competitive advantage in onboarding UX.</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 6: PAYMENT MANDATES -->
+<!-- ============================================================ -->
+<section id="payment-mandates">
+  <h2><span class="section-num">6</span> Payment Mandates &mdash; UPI AutoPay, e-NACH &amp; UPI Block</h2>
+
+  <h3>UPI AutoPay vs e-NACH</h3>
+  <table>
+    <thead><tr><th>Feature</th><th>UPI AutoPay</th><th>e-NACH (NPCI)</th></tr></thead>
+    <tbody>
+      <tr><td>Activation Speed</td><td style="color:var(--green);font-weight:700;">Instant</td><td>3 working days</td></tr>
+      <tr><td>UX</td><td>UPI app (PhonePe/GPay/BHIM)</td><td>Net banking / debit card / Aadhaar</td></tr>
+      <tr><td>Standard Limit</td><td>Rs.15,000/txn</td><td><strong>No upper cap</strong></td></tr>
+      <tr><td><strong>Securities Broker Limit</strong></td><td style="color:var(--green);font-weight:700;"><strong>Rs.1,00,000/txn</strong> (MCC 6211)</td><td>No cap</td></tr>
+      <tr><td>Regulatory Basis</td><td>RBI/2023-2024/88 (Dec 2023)</td><td>NPCI e-NACH guidelines</td></tr>
+      <tr><td>Best For</td><td>SIP up to Rs.1L, quick mandate setup during onboarding</td><td>Larger margin funding EMIs, no amount cap</td></tr>
+      <tr><td>Vendor</td><td>Setu, Razorpay, Cashfree, PhonePe</td><td>All banks via NPCI clearing</td></tr>
+    </tbody>
+  </table>
+
+  <h3>UPI Block Mechanism (ASBA-like for Secondary Market)</h3>
+  <div class="info-box red"><strong>Mandatory for QSBs from Feb 1, 2025.</strong> SEBI mandated that Qualified Stock Brokers must offer either UPI block mechanism (funds blocked in customer bank, debited only on trade execution) OR 3-in-1 trading account. This is separate from autopay &mdash; it applies to trade settlement where customer funds stay in their bank until needed. Reduces counterparty risk.</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 7: STRATEGIC VENDOR EVALUATION -->
+<!-- ============================================================ -->
+<section id="vendor-strategy">
+  <h2><span class="section-num">7</span> Strategic Vendor Evaluation Matrix</h2>
+
+  <h3>Vendors Worth Serious Evaluation (Beyond Current Stack)</h3>
+  <table>
+    <thead><tr><th>Vendor</th><th>Why Consider</th><th>Primary Use Case</th><th>Integration Effort</th></tr></thead>
+    <tbody>
+      <tr class="recommended"><td><strong>Setu</strong></td><td>Unified KYC APIs + eKYC Setu + reverse penny drop + AA market leader</td><td>Could replace parts of Decentro for identity APIs and add AA capability</td><td>1-2 weeks (API-first)</td></tr>
+      <tr class="recommended"><td><strong>Bureau.id</strong></td><td>Device intelligence and fraud prevention &mdash; layer no one else provides</td><td>Fraud overlay during onboarding: catches multi-accounting, synthetic identities, device spoofing</td><td>1 week (SDK)</td></tr>
+      <tr><td><strong>Signzy</strong></td><td>All-in-one with no-code platform; Gartner-recognized</td><td>Vendor consolidation priority; strongest low-bandwidth Video KYC (75 kbps for Tier 3/4)</td><td>2-3 weeks</td></tr>
+      <tr><td><strong>Karza/Perfios</strong></td><td>Deep analytics layer (GST, ITR, bank statement analysis)</td><td>Income/suitability verification for margin trading and F&amp;O. 4000+ bank statement formats.</td><td>2 weeks</td></tr>
+      <tr><td><strong>Tartan</strong></td><td>Deepest payroll/income verification in India</td><td>Real-time HRMS income data for eligibility. 30+ HRMS integrations. Relevant if F&amp;O/margin products offered.</td><td>1-2 weeks</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Vendors Likely Not Needed (Covered by Current Stack)</h3>
+  <table>
+    <thead><tr><th>Vendor</th><th>What They Offer</th><th>Why Skip</th></tr></thead>
+    <tbody>
+      <tr><td>Gridlines (OnGrid sister)</td><td>100+ identity APIs, face match, UPI reverse penny drop</td><td>Covered by Decentro + Setu. No unique advantage for broking KYC.</td></tr>
+      <tr><td>Veri5 Digital</td><td>Aadhaar eKYC, Video KYC, face match (99.84%), Aadhaar Data Vault</td><td>Covered by Setu (Aadhaar) + HyperVerge (face/video). Niche: SMS KYC for feature phones.</td></tr>
+      <tr><td>OnGrid</td><td>150+ APIs, background verification, eLockr platform</td><td>BGV-focused. Customer KYC needs met by other vendors. Useful only for employee BGV.</td></tr>
+      <tr><td>AuthBridge</td><td>Digital KYC, Video KYC, AML, LOS/LMS integrations</td><td>Enterprise-heavy, legacy LOS focus. Current stack is more modern and API-first.</td></tr>
+      <tr><td>IDfy</td><td>OCR + face match + NameMatch + background verification, SOC 2 Type II</td><td>Covered by HyperVerge for OCR/face match. BGV not a core need for customer KYC.</td></tr>
+      <tr><td>Razorpay (BAV only)</td><td>Penny drop, UPI/VPA validation, composite API</td><td>Bank verification covered by Setu/Decentro. Only relevant if already on RazorpayX.</td></tr>
+      <tr><td>Cashfree (BAV only)</td><td>Penny drop, reverse penny drop, 126+ co-op banks</td><td>Bank verification covered. Niche: widest co-operative bank coverage.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Recommended Final Stack</h3>
+  <table>
+    <thead><tr><th>Layer</th><th>Recommended</th><th>Role</th><th>Alternate</th></tr></thead>
+    <tbody>
+      <tr><td>Identity + DigiLocker</td><td><strong>Digio</strong> or <strong>Setu</strong></td><td>DigiLocker, Aadhaar eKYC, KRA</td><td>Decentro</td></tr>
+      <tr><td>PAN + Bank + eSign</td><td><strong>Setu</strong> (unified) or <strong>Decentro</strong> + <strong>Digio</strong></td><td>PAN verify, penny drop, eSign</td><td>Split across vendors</td></tr>
+      <tr><td>Face Match + Video + OCR</td><td><strong>HyperVerge</strong></td><td>Liveness, face match, OCR, VIPV fallback</td><td>Signzy (low bandwidth), IDfy</td></tr>
+      <tr><td>CKYC + AML</td><td><strong>TrackWizz</strong></td><td>CKYC search/upload, AML/PEP screening</td><td>Decentro (CKYC) + ComplyAdvantage (AML)</td></tr>
+      <tr><td>Income Verification</td><td><strong>Perfios</strong> (ITR) + <strong>Setu AA</strong> (bank statement)</td><td>F&amp;O activation, margin eligibility</td><td>Karza, Tartan (payroll)</td></tr>
+      <tr><td>Fraud Prevention</td><td><strong>Bureau.id</strong></td><td>Device intelligence, anti-fraud overlay</td><td>Signzy (embedded)</td></tr>
+      <tr><td>Back-Office</td><td><strong>63 Moons ODIN</strong></td><td>Multi-exchange trading + RMS</td><td>Symphony XTS, OmneNEST</td></tr>
+      <tr><td>Communications</td><td><strong>Kaleyra</strong> + <strong>AWS SES</strong></td><td>SMS (DLT), email, WhatsApp</td><td>MSG91, SendGrid</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 8: DATA SOURCE MAPPING (was Section 4) -->
+<!-- ============================================================ -->
+<section id="data-sources">
+  <h2><span class="section-num">8</span> Data Source Mapping</h2>
+
+  <h3>Resolution Priority (when multiple sources provide same field)</h3>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin:16px 0;align-items:center;">
+    <span style="background:var(--primary);color:white;padding:6px 16px;border-radius:20px;font-size:0.8rem;font-weight:700;">1. DigiLocker</span>
+    <span style="color:var(--slate-400);font-weight:700;">&gt;</span>
+    <span style="background:var(--green-light);color:var(--green);padding:6px 16px;border-radius:20px;font-size:0.8rem;font-weight:700;border:1px solid var(--green);">2. CKYC (CERSAI)</span>
+    <span style="color:var(--slate-400);font-weight:700;">&gt;</span>
+    <span style="background:var(--green-light);color:var(--green);padding:6px 16px;border-radius:20px;font-size:0.8rem;font-weight:700;border:1px solid var(--green);">3. KRA Fetch</span>
+    <span style="color:var(--slate-400);font-weight:700;">&gt;</span>
+    <span style="background:var(--purple-light);color:var(--purple);padding:6px 16px;border-radius:20px;font-size:0.8rem;font-weight:700;border:1px solid var(--purple);">4. Vendor API</span>
+    <span style="color:var(--slate-400);font-weight:700;">&gt;</span>
+    <span style="background:#fef3c7;color:#92400e;padding:6px 16px;border-radius:20px;font-size:0.8rem;font-weight:700;border:1px solid #f59e0b;">5. User Input</span>
+  </div>
+  <p><strong>Rule:</strong> DigiLocker wins for identity fields. KRA/CKYC win for financial profile. User input only for data no source can provide (mobile, email, segment choice).</p>
+
+  <h3>Field Distribution (~454 total)</h3>
+  <table>
+    <thead><tr><th>Source</th><th>Fields</th><th>%</th><th>Examples</th></tr></thead>
+    <tbody>
+      <tr><td><span class="field-tag system">System Generated</span></td><td>~350+</td><td>77%</td><td>Timestamps, IDs, status codes, audit logs, API responses, submission tracking</td></tr>
+      <tr><td><span class="field-tag auto">KRA/CKYC Prefill</span></td><td>~40</td><td>9%</td><td>Occupation, income, net worth, FATCA, PEP, signature, CKYC number</td></tr>
+      <tr><td><span class="field-tag auto">DigiLocker</span></td><td>~25</td><td>5.5%</td><td>Name, DOB, gender, photo, full address, father's name, POI/POA</td></tr>
+      <tr><td><span class="field-tag api">Vendor APIs</span></td><td>~25</td><td>5.5%</td><td>PAN status, bank name match, AML score, face match, e-Sign metadata</td></tr>
+      <tr><td><span class="field-tag user">User Types</span></td><td><strong>~12</strong></td><td><strong>3%</strong></td><td>Aadhaar, PAN, mobile, email, marital status, bank a/c, IFSC, segments</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 5: MASTER DATASET SUMMARY -->
+<!-- ============================================================ -->
+<section id="field-summary">
+  <h2><span class="section-num">9</span> Master Dataset &mdash; Field Summary</h2>
+
+  <div class="info-box blue"><strong>Full field-level specification:</strong> See <a class="xref" href="#master-dataset">Master Dataset Sections</a> below for complete field definitions with data types, sizes, validations, and regulatory sources.</div>
+
+  <table>
+    <thead><tr><th>Section</th><th>Description</th><th>Fields</th><th>Mandatory</th></tr></thead>
+    <tbody>
+      <tr><td>A</td><td>Personal Identity</td><td>32</td><td>16</td></tr>
+      <tr><td>B</td><td>Address Details</td><td>19</td><td>10</td></tr>
+      <tr><td>C</td><td>Contact Details</td><td>9</td><td>3</td></tr>
+      <tr><td>D</td><td>Identity Documents (POI)</td><td>7</td><td>5</td></tr>
+      <tr><td>E</td><td>Address Documents (POA)</td><td>7</td><td>5</td></tr>
+      <tr><td>F</td><td>Financial Profile</td><td>10</td><td>3</td></tr>
+      <tr><td>G</td><td>Bank Account Details (per account)</td><td>16</td><td>12</td></tr>
+      <tr><td>H</td><td>Demat Account Details</td><td>9</td><td>8</td></tr>
+      <tr><td>I</td><td>Nomination Details (per nominee)</td><td>22</td><td>12</td></tr>
+      <tr><td>J</td><td>FATCA/CRS Declaration</td><td>15</td><td>8</td></tr>
+      <tr><td>K</td><td>PEP &amp; AML Declaration</td><td>6</td><td>4</td></tr>
+      <tr><td>L</td><td>Trading Preferences &amp; Segments</td><td>12</td><td>7</td></tr>
+      <tr><td>M</td><td>Risk Profiling</td><td>6</td><td>4</td></tr>
+      <tr><td>N</td><td>IPV / VIPV</td><td>21</td><td>5+</td></tr>
+      <tr><td>O</td><td>DDPI Authorization</td><td>10</td><td>1</td></tr>
+      <tr><td>P</td><td>Consent &amp; Declarations</td><td>23</td><td>16</td></tr>
+      <tr><td>Q</td><td>Document Images &amp; Uploads</td><td>16</td><td>8</td></tr>
+      <tr><td>R</td><td>Third-Party Verification Results</td><td>42</td><td>system</td></tr>
+      <tr><td>S</td><td>KRA Submission Data</td><td>14</td><td>10</td></tr>
+      <tr><td>T</td><td>CKYC Submission Data</td><td>12</td><td>8</td></tr>
+      <tr><td>U</td><td>Exchange Registration (UCC)</td><td>15</td><td>5+</td></tr>
+      <tr><td>V</td><td>NRI-Specific Requirements</td><td>22</td><td>~12 (NRI)</td></tr>
+      <tr><td>W</td><td>Minor / Joint / POA Accounts</td><td>26</td><td>conditional</td></tr>
+      <tr><td>X</td><td>Margin Pledge &amp; Collateral</td><td>10</td><td>2</td></tr>
+      <tr><td>Y</td><td>Account Lifecycle &amp; Dormancy</td><td>20</td><td>5</td></tr>
+      <tr><td>Z</td><td>Audit Trail &amp; Modification</td><td>20</td><td>~10</td></tr>
+      <tr><td>AA</td><td>DPDP Consent Management</td><td>15</td><td>8</td></tr>
+      <tr><td>AB</td><td>Communication Preferences</td><td>9</td><td>4</td></tr>
+      <tr><td>AC</td><td>Running Account Settlement</td><td>9</td><td>5</td></tr>
+      <tr><td colspan="2"><strong>TOTAL</strong></td><td><strong>~454</strong></td><td><strong>~200</strong></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 6: BATCH PROCESSING -->
+<!-- ============================================================ -->
+<section id="batch-pipeline">
+  <h2><span class="section-num">10</span> Async Batch Processing Pipeline</h2>
+
+  <h3>Phase 1: Immediate (0-30 min after e-Sign)</h3>
+  <table>
+    <thead><tr><th>Job</th><th>Vendor</th><th>Output</th><th>Retry</th><th>SLA</th></tr></thead>
+    <tbody>
+      <tr><td>Admin Review</td><td>Internal (maker-checker)</td><td>Approved / Rejected</td><td>N/A</td><td>30 min (auto-approve if all pass)</td></tr>
+      <tr><td>KRA Submit</td><td>Digio</td><td>App ref number</td><td>3x exponential</td><td>1-3 working days</td></tr>
+      <tr><td>CKYC Upload</td><td>Decentro</td><td>14-digit KIN</td><td>3x exponential</td><td>1-2 working days</td></tr>
+      <tr><td>Income Verify (if F&amp;O)</td><td>Perfios</td><td>Verified income</td><td>2x</td><td>1-2 hours</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Phase 2: Post-Approval</h3>
+  <table>
+    <thead><tr><th>Job</th><th>Vendor</th><th>Output</th><th>SLA</th></tr></thead>
+    <tbody>
+      <tr><td>NSE UCC</td><td>NSE API/batch</td><td>UCC code</td><td>Same day (5PM cutoff)</td></tr>
+      <tr><td>BSE UCC</td><td>BSE API</td><td>UCC code</td><td>Same day</td></tr>
+      <tr><td>CDSL BO Account</td><td>CDSL DP Module</td><td>DP ID + Client ID</td><td>1-2 hours</td></tr>
+      <tr><td>MCX UCC (if commodity)</td><td>MCX Portal</td><td>UCC code</td><td>Next working day</td></tr>
+      <tr><td>DDPI Setup (if opted)</td><td>CDSL/NSDL</td><td>DDPI registered</td><td>1 day</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Phase 3: Post-Registration</h3>
+  <table>
+    <thead><tr><th>Job</th><th>Vendor</th><th>Output</th><th>SLA</th></tr></thead>
+    <tbody>
+      <tr><td>Segment Activation</td><td>NSE/BSE/MCX</td><td>Segments live</td><td>Same day</td></tr>
+      <tr><td>Back-Office Sync</td><td>63 Moons ODIN</td><td>Client master record</td><td>Immediate</td></tr>
+      <tr><td>Welcome Kit</td><td>Kaleyra + AWS SES</td><td>Email + SMS</td><td>On activation</td></tr>
+      <tr><td>Nominee Video (if opt-out)</td><td>HyperVerge</td><td>Video declaration</td><td>Within 30 days</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 7: ADMIN WORKFLOW -->
+<!-- ============================================================ -->
+<section id="admin-workflow">
+  <h2><span class="section-num">11</span> KYC Admin Workflow</h2>
+
+  <h3>Auto-Approve Criteria (no human touch)</h3>
+  <p>Application is auto-approved if ALL conditions are met:</p>
+  <table>
+    <thead><tr><th>Check</th><th>Threshold</th></tr></thead>
+    <tbody>
+      <tr><td>PAN status</td><td>= E (valid)</td></tr>
+      <tr><td>PAN-Aadhaar linked</td><td>= Y</td></tr>
+      <tr><td>PAN name vs DigiLocker name</td><td>&ge; 90% match</td></tr>
+      <tr><td>Penny drop name match</td><td>&ge; 80%</td></tr>
+      <tr><td>Face match score</td><td>&ge; 85%</td></tr>
+      <tr><td>Liveness detection</td><td>= Pass</td></tr>
+      <tr><td>AML risk</td><td>= LOW</td></tr>
+      <tr><td>PEP match</td><td>= None</td></tr>
+      <tr><td>Sanctions match</td><td>= None</td></tr>
+    </tbody>
+  </table>
+  <div class="info-box green"><strong>Expected auto-approve rate: 80-85%</strong> of applications need zero human intervention.</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 8: STATUS MACHINE -->
+<!-- ============================================================ -->
+<section id="status-machine">
+  <h2><span class="section-num">12</span> Application Status Machine</h2>
+  <div class="status-flow">
+    <span class="status-node pending">STARTED</span>
+    <span class="status-arrow">&rarr;</span>
+    <span class="status-node pending">DIGILOCKER_PENDING</span>
+    <span class="status-arrow">&rarr;</span>
+    <span class="status-node pending">FILLING</span>
+    <span class="status-arrow">&rarr;</span>
+    <span class="status-node pending">GATE_CHECK</span>
+    <span class="status-arrow">&rarr;</span>
+    <span class="status-node pending">e_SIGNED</span>
+    <span class="status-arrow">&rarr;</span>
+    <span class="status-node pending">UNDER_REVIEW</span>
+    <span class="status-arrow">&rarr;</span>
+    <span class="status-node pending">APPROVED</span>
+    <span class="status-arrow">&rarr;</span>
+    <span class="status-node pending">REGISTERING</span>
+    <span class="status-arrow">&rarr;</span>
+    <span class="status-node active">ACTIVE</span>
+  </div>
+  <p style="margin-top:8px;">
+    <span class="status-node blocked">GATE_FAILED</span> (any blocking check fails) &mdash;
+    <span class="status-node blocked">REJECTED</span> (admin rejection)
+  </p>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 9: COMMUNICATIONS -->
+<!-- ============================================================ -->
+<section id="v-comms">
+  <h2><span class="section-num">13</span> Communications &amp; Notifications</h2>
+  <div class="vendor-table">
+    <div class="vendor-table-title">Vendor Comparison: SMS / Email / WhatsApp</div>
+    <table>
+      <thead><tr><th>Channel</th><th>Vendor</th><th>Key Features</th><th>Regulatory</th></tr></thead>
+      <tbody>
+        <tr class="recommended"><td>SMS</td><td><strong>Kaleyra / MSG91</strong></td><td>DLT registered. Pre-approved templates. Delivery tracking. OTP, trade confirmations, margin calls.</td><td>TRAI DLT mandate. Distinct mobile per client (SEBI Dec 2024).</td></tr>
+        <tr class="recommended"><td>Email</td><td><strong>AWS SES / SendGrid</strong></td><td>SPF, DKIM, DMARC. Digitally signed contract notes. 5-year delivery logs.</td><td>IT Act 2000. Non-tamperable ECNs. Revised format Aug 2024.</td></tr>
+        <tr><td>WhatsApp</td><td>Gupshup / Infobip / Kaleyra</td><td>OTP delivery, trade confirmations (supplementary), customer service.</td><td>Cannot replace email for contract notes per SEBI.</td></tr>
+        <tr><td>Push</td><td>Firebase / OneSignal</td><td>Mobile app notifications. Real-time alerts.</td><td>Supplementary only.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 10: BACK-OFFICE -->
+<!-- ============================================================ -->
+<section id="v-backoffice">
+  <h2><span class="section-num">14</span> Back-Office / RMS Software</h2>
+  <div class="vendor-table">
+    <div class="vendor-table-title">Vendor Comparison: Back-Office &amp; RMS</div>
+    <table>
+      <thead><tr><th>Vendor</th><th>Product</th><th>Market Share</th><th>Key Features</th></tr></thead>
+      <tbody>
+        <tr class="recommended"><td><strong>63 Moons</strong> <span class="badge-rec">Recommended</span></td><td>ODIN</td><td>70-80%</td><td>Multi-exchange (NSE/BSE/MCX). Front + Mid + Back + RMS. 1M+ licensees. 600+ cities.</td></tr>
+        <tr><td>Symphony Fintech <span class="badge-alt">Alternate</span></td><td>XTS</td><td>Growing</td><td>OMS + RMS + Compliance. XTS OTIS (NSE NOTIS alternative). 10+ years.</td></tr>
+        <tr><td>TCS <span class="badge-alt">Alternate</span></td><td>BaNCS</td><td>~30% volume</td><td>Integrated trading, clearing, surveillance. 30+ brokerage orgs. ICICI Securities partnership.</td></tr>
+        <tr><td>OmneNEST <span class="badge-alt">Alternate</span></td><td>OmneNEST</td><td>200+ brokers</td><td>Powers Zerodha Kite, Upstox, Finvasia. BSE/NSE/MCX.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 11: ERROR HANDLING -->
+<!-- ============================================================ -->
+<section id="error-handling">
+  <h2><span class="section-num">15</span> Error Handling &amp; Edge Cases</h2>
+
+  <h3>DigiLocker Failures</h3>
+  <table>
+    <thead><tr><th>Scenario</th><th>Handling</th></tr></thead>
+    <tbody>
+      <tr><td>User cancels consent</td><td>Return to Screen 1. Allow retry. After 3 attempts, offer manual document upload fallback.</td></tr>
+      <tr><td>Service down</td><td>Show "DigiLocker is temporarily unavailable." Queue for retry.</td></tr>
+      <tr><td>Missing fields in XML</td><td>Flag for user to manually enter missing fields on Screen 3.</td></tr>
+      <tr><td>PAN doc not in DigiLocker</td><td>Fallback: PAN verify API + user enters father's name manually.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Verification Failures</h3>
+  <table>
+    <thead><tr><th>Check</th><th>Failure</th><th>User Message</th></tr></thead>
+    <tbody>
+      <tr><td>PAN Invalid</td><td>Status &ne; E</td><td>"Your PAN appears to be inactive. Contact nearest PAN center."</td></tr>
+      <tr><td>PAN-Aadhaar not linked</td><td>Not seeded</td><td>"PAN-Aadhaar linking is mandatory. Visit incometax.gov.in"</td></tr>
+      <tr><td>AML High Risk</td><td>Sanctions/PEP</td><td>"Your application requires additional review."</td></tr>
+      <tr><td>Penny Drop Failed</td><td>Wrong a/c</td><td>"Bank verification failed. Check account number and IFSC."</td></tr>
+      <tr><td>Face Match &lt; 80%</td><td>Poor selfie</td><td>"Face verification unsuccessful. Try again in good lighting."</td></tr>
+      <tr><td>e-Sign OTP failed</td><td>Wrong OTP</td><td>"OTP verification failed. Click to resend." (3 attempts)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Timeout Handling</h3>
+  <table>
+    <thead><tr><th>API</th><th>Expected</th><th>Timeout</th><th>Fallback</th></tr></thead>
+    <tbody>
+      <tr><td>DigiLocker</td><td>60s</td><td>120s</td><td>Retry button. After 3 fails, manual flow.</td></tr>
+      <tr><td>PAN Verify</td><td>3s</td><td>15s</td><td>Queue async. Don't block user.</td></tr>
+      <tr><td>KRA Lookup</td><td>5s</td><td>20s</td><td>Pre-fill without KRA. Submit fresh.</td></tr>
+      <tr><td>AML Screen</td><td>10s</td><td>30s</td><td>Mark "pending" in gate.</td></tr>
+      <tr><td>Penny Drop</td><td>20s</td><td>60s</td><td>Must resolve before gate.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 12: REGULATORY -->
+<!-- ============================================================ -->
+<section id="regulatory">
+  <h2><span class="section-num">16</span> Regulatory Circulars</h2>
+  <table>
+    <thead><tr><th>#</th><th>Topic</th><th>Circular</th><th>Date</th><th>Impact</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>KYC Master Circular</td><td>SEBI/HO/MIRSD/MIRSD-SEC-2/P/CIR/2023/168</td><td>Oct 2023</td><td>Consolidated KYC norms, CERSAI templates</td></tr>
+      <tr><td>2</td><td>AML/CFT Guidelines</td><td>SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78</td><td>Jun 2024</td><td>Anti-Money Laundering standards</td></tr>
+      <tr><td>3</td><td>FATCA/CRS at KRAs</td><td>SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12</td><td>Feb 2024</td><td>Mandatory FATCA upload to KRA from Jul 2024</td></tr>
+      <tr><td>4</td><td>KRA Upload to CKYC</td><td>SEBI/HO/MIRSD/SECFATF/P/CIR/2024/79</td><td>Jun 2024</td><td>Mandatory CKYC upload from Aug 2024</td></tr>
+      <tr><td>5</td><td>DDPI replacing POA</td><td>SEBI/HO/MIRSD/DoP/P/CIR/2022/44</td><td>Apr 2022</td><td>DDPI mandatory from Nov 2022</td></tr>
+      <tr><td>6</td><td>Nomination Revamp</td><td>SEBI circular</td><td>Jan 2025</td><td>Up to 10 nominees, video opt-out</td></tr>
+      <tr><td>7</td><td>DigiLocker for Assets</td><td>SEBI/HO/OIAE/OIAE_IAD-3/P/CIR/2025/32</td><td>Mar 2025</td><td>Demat statements in DigiLocker</td></tr>
+      <tr><td>8</td><td>Stock Brokers Master</td><td>SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90</td><td>Jun 2025</td><td>Consolidated broker operations</td></tr>
+      <tr><td>9</td><td>e-KYC Setu (NPCI)</td><td>SEBI press release</td><td>Jun 2025</td><td>Aadhaar e-KYC without sharing Aadhaar</td></tr>
+      <tr><td>10</td><td>AA for Depositories</td><td>SEBI/HO/MRD/DCAP/P/CIR/2022/110</td><td>Aug 2022</td><td>CDSL/NSDL as FIPs in AA ecosystem</td></tr>
+      <tr><td>11</td><td>DPDP Act 2023</td><td>DPDP Rules 2025</td><td>May 2027 deadline</td><td>Consent management, data rights</td></tr>
+      <tr><td>12</td><td>UPI AutoPay Rs.1L</td><td>RBI/2023-2024/88 (NPCI)</td><td>Dec 2023</td><td>Securities brokers (MCC 6211): Rs.1 lakh autopay limit (up from Rs.15K)</td></tr>
+      <tr><td>13</td><td>UPI Block (ASBA Secondary)</td><td>SEBI consultation paper</td><td>Feb 2025</td><td>QSBs must offer UPI block mechanism or 3-in-1 account. Funds stay in customer bank.</td></tr>
+      <tr><td>14</td><td>Stock Brokers Regulations 2026</td><td>SEBI Board Meeting (212th), notified Jan 7, 2026</td><td>Jan 2026</td><td>Replaces 1992 regulations entirely. Allows cross-regulatory activities (RBI, IRDAI, PFRDA). Integrated financial intermediary model.</td></tr>
+      <tr><td>15</td><td>DigiLocker for Holdings</td><td>SEBI/HO/OIAE/OIAE_IAD-3/P/CIR/2025/32</td><td>Mar 2025</td><td>Investors can fetch demat holdings + CAS via DigiLocker. AMCs/RTAs/depositories must register. Effective Apr 1, 2025.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 13: COST ANALYSIS -->
+<!-- ============================================================ -->
+<section id="cost-analysis">
+  <h2><span class="section-num">17</span> Cost Analysis</h2>
+  <table>
+    <thead><tr><th>Integration</th><th>Recommended</th><th>Cost/txn</th><th>Cheapest Alt</th><th>Cost</th></tr></thead>
+    <tbody>
+      <tr><td>PAN Verify</td><td>Decentro</td><td>Rs.1-3</td><td>Sandbox.co.in</td><td>Rs.1-2</td></tr>
+      <tr><td>Bank Verify (Penny Drop)</td><td>Decentro</td><td>Rs.2-5</td><td>Cashfree</td><td>Rs.2-4</td></tr>
+      <tr><td>KRA Lookup/Submit</td><td>Digio</td><td>Rs.3-5</td><td>CVL Direct</td><td>Rs.2-3</td></tr>
+      <tr><td>CKYC Search/Upload</td><td>Decentro</td><td>Rs.3-10</td><td>TrackWizz</td><td>Rs.5-10</td></tr>
+      <tr><td>e-Sign</td><td>Digio</td><td>Rs.15-25</td><td>Protean</td><td>Rs.5.90</td></tr>
+      <tr><td>OCR (per doc)</td><td>HyperVerge</td><td>Rs.1-3</td><td>IDfy</td><td>Rs.1-3</td></tr>
+      <tr><td>Face Match</td><td>HyperVerge</td><td>Rs.1-2</td><td>IDfy</td><td>Rs.1-2</td></tr>
+      <tr><td>AML Screening</td><td>TrackWizz</td><td>Rs.5-15</td><td>IDfy</td><td>Rs.8-20</td></tr>
+      <tr><td>Video KYC (if needed)</td><td>HyperVerge</td><td>Rs.30-50</td><td>Signzy</td><td>Contact</td></tr>
+      <tr><td>Income Verify (AA, if F&amp;O)</td><td>Setu AA</td><td>Rs.5-25</td><td>Perfios ITR</td><td>Rs.15-50</td></tr>
+      <tr><td>Device Intelligence (optional)</td><td>Bureau.id</td><td>Contact</td><td>&mdash;</td><td>&mdash;</td></tr>
+      <tr><td colspan="2"><strong>Total per onboarding (recommended)</strong></td><td colspan="3"><strong>Rs.85-175</strong> (with AA income verify for F&amp;O)</td></tr>
+      <tr><td colspan="2"><strong>Total per onboarding (cheapest)</strong></td><td colspan="3"><strong>Rs.50-100</strong> (equity-only, no F&amp;O)</td></tr>
+      <tr><td colspan="2"><strong>Total with Setu consolidation</strong></td><td colspan="3"><strong>Rs.70-130</strong> (unified PAN+bank+eSign pricing)</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 14: SECURITY -->
+<!-- ============================================================ -->
+<section id="security">
+  <h2><span class="section-num">18</span> Security &amp; Compliance Requirements</h2>
+  <table>
+    <thead><tr><th>Requirement</th><th>Standard</th></tr></thead>
+    <tbody>
+      <tr><td>Transport</td><td>TLS 1.2+ (HTTPS only)</td></tr>
+      <tr><td>Authentication</td><td>API keys rotated quarterly</td></tr>
+      <tr><td>IP Whitelisting</td><td>Required for KRA, recommended for all</td></tr>
+      <tr><td>Data Encryption</td><td>AES-256 for data at rest</td></tr>
+      <tr><td>PII Handling</td><td>Mask Aadhaar (XXXX-XXXX-1234), tokenize PAN</td></tr>
+      <tr><td>Data Retention</td><td>8 years (SEBI 2026 Regulations)</td></tr>
+      <tr><td>VIPV Recording</td><td>7 years minimum (tamper-proof)</td></tr>
+      <tr><td>DPDP Act 2023</td><td>Consent management, data principal rights</td></tr>
+      <tr><td>Vendor SLA</td><td>99.9% uptime, &lt;3s P95, India data center, SOC 2 / ISO 27001</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 15: MASTER DATASET DETAILS (Collapsible) -->
+<!-- ============================================================ -->
+<section id="master-dataset">
+  <h2><span class="section-num">19</span> Master Dataset &mdash; Detailed Sections</h2>
+  <p>Version 1.1 &mdash; ~454 fields across 30 sections. Regulatory basis: SEBI KYC Master Circular, Stock Brokers Master, AML/CFT Guidelines.</p>
+
+  <details>
+    <summary>Section A: Personal Identity (32 fields)</summary>
+    <table>
+      <thead><tr><th>#</th><th>Field</th><th>Type</th><th>Size</th><th>Req</th><th>Validation</th></tr></thead>
+      <tbody>
+        <tr><td>A01</td><td><code>pan</code></td><td>String</td><td>10</td><td>Y</td><td><code>[A-Z]{5}[0-9]{4}[A-Z]</code></td></tr>
+        <tr><td>A02</td><td><code>pan_exempt</code></td><td>Boolean</td><td>1</td><td>N</td><td>Y/N</td></tr>
+        <tr><td>A05</td><td><code>first_name</code></td><td>String</td><td>70</td><td>Y</td><td>Alpha + spaces, must match PAN</td></tr>
+        <tr><td>A07</td><td><code>last_name</code></td><td>String</td><td>70</td><td>Y</td><td>Alpha + spaces, must match PAN</td></tr>
+        <tr><td>A15</td><td><code>father_spouse_name</code></td><td>String</td><td>70</td><td>Y</td><td>Full name</td></tr>
+        <tr><td>A18</td><td><code>gender</code></td><td>String</td><td>1</td><td>Y</td><td>M/F/T</td></tr>
+        <tr><td>A20</td><td><code>date_of_birth</code></td><td>Date</td><td>10</td><td>Y</td><td>DD/MM/YYYY, age &ge; 18</td></tr>
+        <tr><td>A23</td><td><code>aadhaar_number</code></td><td>String</td><td>12</td><td>N</td><td>12 digits, Verhoeff. Masked: XXXX-XXXX-1234</td></tr>
+        <tr><td>A25</td><td><code>ckyc_number</code></td><td>String</td><td>14</td><td>N</td><td>14-digit KIN from CERSAI</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:0.78rem;color:var(--slate-500)">Showing key fields. Full 32-field specification in KYC_MASTER_DATASET.md Section A.</p>
+  </details>
+
+  <details>
+    <summary>Section B: Address Details (19 fields)</summary>
+    <p>Correspondence address (B01-B09) + Permanent address (B10-B19). Source: DigiLocker Aadhaar XML auto-fills correspondence. Permanent defaults to same.</p>
+  </details>
+
+  <details>
+    <summary>Section C: Contact Details (9 fields)</summary>
+    <p>Mobile (ISD + number), alternate mobile, email, alternate email, landline, fax. Mobile and email are user-typed (Screen 3). OTP verification required for mobile.</p>
+  </details>
+
+  <details>
+    <summary>Section D-E: POI &amp; POA (14 fields)</summary>
+    <p>Auto-set from DigiLocker. POI = Aadhaar (type E). POA = Aadhaar address (type D). No user input needed.</p>
+  </details>
+
+  <details>
+    <summary>Section F: Financial Profile (10 fields)</summary>
+    <p>Occupation, income range, net worth, source of wealth, income proof. Pre-filled from KRA/CKYC if record exists. Income proof upload only for F&amp;O/Commodity.</p>
+  </details>
+
+  <details>
+    <summary>Section G: Bank Account (16 fields per account, max 5)</summary>
+    <p>Account number, IFSC, bank name (auto from IFSC), branch, MICR, account type, holder name, proof document, penny drop results (status, name match, UTR).</p>
+  </details>
+
+  <details>
+    <summary>Sections H-AC: Remaining sections</summary>
+    <p>H: Demat (9) | I: Nominations (22 per nominee) | J: FATCA (15) | K: PEP/AML (6) | L: Trading (12) | M: Risk (6) | N: IPV/VIPV (21) | O: DDPI (10) | P: Consent (23) | Q: Documents (16) | R: Verification Results (42) | S: KRA Submission (14) | T: CKYC Submission (12) | U: Exchange UCC (15) | V: NRI (22) | W: Minor/Joint/POA (26) | X: Margin (10) | Y: Lifecycle (20) | Z: Audit (20) | AA: DPDP (15) | AB: Communications (9) | AC: Running Account (9)</p>
+  </details>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 16: CODE TABLES -->
+<!-- ============================================================ -->
+<section id="code-tables">
+  <h2><span class="section-num">20</span> Code Tables</h2>
+
+  <details>
+    <summary>Occupation Codes (KRA/CKYC)</summary>
+    <table>
+      <thead><tr><th>Code</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>01</td><td>Private Sector Service</td></tr>
+        <tr><td>02</td><td>Public Sector Service</td></tr>
+        <tr><td>03</td><td>Government Service</td></tr>
+        <tr><td>04</td><td>Business</td></tr>
+        <tr><td>05</td><td>Professional</td></tr>
+        <tr><td>06</td><td>Agriculturist</td></tr>
+        <tr><td>07</td><td>Retired</td></tr>
+        <tr><td>08</td><td>Housewife</td></tr>
+        <tr><td>09</td><td>Student</td></tr>
+        <tr><td>11</td><td>Self Employed</td></tr>
+        <tr><td>99</td><td>Others (specify)</td></tr>
+      </tbody>
+    </table>
+  </details>
+
+  <details>
+    <summary>KRA Status Codes</summary>
+    <table>
+      <thead><tr><th>Status</th><th>Trading</th><th>Action</th></tr></thead>
+      <tbody>
+        <tr><td>KYC Registered</td><td style="color:var(--green);font-weight:700;">Allowed</td><td>Fetch and prefill</td></tr>
+        <tr><td>KYC Validated</td><td style="color:var(--green);font-weight:700;">Allowed</td><td>Fetch and prefill</td></tr>
+        <tr><td>Under Process</td><td style="color:var(--red);font-weight:700;">Blocked</td><td>Wait for KRA validation</td></tr>
+        <tr><td>On Hold</td><td style="color:var(--red);font-weight:700;">Blocked</td><td>Resolve discrepancy</td></tr>
+        <tr><td>KYC Rejected</td><td style="color:var(--red);font-weight:700;">Blocked</td><td>Re-submit corrected KYC</td></tr>
+        <tr><td>Not Available</td><td>N/A</td><td>Fresh KYC required</td></tr>
+      </tbody>
+    </table>
+  </details>
+
+  <details>
+    <summary>PAN Status Codes</summary>
+    <table>
+      <thead><tr><th>Code</th><th>Description</th><th>Onboarding</th></tr></thead>
+      <tbody>
+        <tr><td>E / valid</td><td>Existing and Valid</td><td style="color:var(--green);">Proceed</td></tr>
+        <tr><td>F</td><td>Fake / Invalid</td><td style="color:var(--red);">Reject</td></tr>
+        <tr><td>X</td><td>Deactivated</td><td style="color:var(--red);">Reject</td></tr>
+        <tr><td>D</td><td>Deleted</td><td style="color:var(--red);">Reject</td></tr>
+        <tr><td>N</td><td>Not Found</td><td style="color:var(--red);">Reject</td></tr>
+      </tbody>
+    </table>
+  </details>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 17: DIAGRAMS -->
+<!-- ============================================================ -->
+<section id="diagrams">
+  <h2><span class="section-num">21</span> Architecture Diagrams</h2>
+
+  <div class="svg-container" id="diagram-flow">
+    <div class="svg-label">Diagram 1: Complete Onboarding Flow (8 Screens + Async + Batch)</div>
+    <object data="diagrams/01-onboarding-flow.svg" type="image/svg+xml" style="width:100%;"></object>
+  </div>
+
+  <div class="svg-container" id="diagram-sources">
+    <div class="svg-label">Diagram 2: Data Source Mapping &mdash; Where Each Field Comes From</div>
+    <object data="diagrams/02-data-source-mapping.svg" type="image/svg+xml" style="width:100%;"></object>
+  </div>
+
+  <div class="svg-container" id="diagram-batch">
+    <div class="svg-label">Diagram 3: Async Batch Processing Pipeline</div>
+    <object data="diagrams/03-async-batch-processing.svg" type="image/svg+xml" style="width:100%;"></object>
+  </div>
+</section>
+
+</div><!-- /content -->
+
+<!-- Footer -->
+<div class="footer">
+  <p><strong>KYC Onboarding Reference</strong> &mdash; Individual Customer, Indian Stock Broking Firm</p>
+  <p>Generated: 2026-02-09 | Version: 2.0 | Sections: 21 | Fields: ~454 | Vendors Evaluated: 25+ | AA Operators: 16 | Regulatory Circulars: 15</p>
+  <p>Regulatory basis: SEBI KYC Master Circular (Oct 2023) | SEBI Stock Brokers Master (Jun 2025) | AML/CFT Guidelines (Jun 2024) | DPDP Act 2023</p>
+  <p style="margin-top:12px;">Source documents: KYC_MASTER_DATASET.md (v1.1) | VENDOR_INTEGRATIONS.md (v1.0) | kyc-flow.md (v1.0)</p>
+</div>
+
+</div><!-- /main -->
+
+<!-- Scroll to top button -->
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">&#8593;</button>
+
+<script>
+// Scroll to top button visibility
+window.addEventListener('scroll', function() {
+  const btn = document.getElementById('scrollTop');
+  btn.style.display = window.scrollY > 500 ? 'flex' : 'none';
+});
+
+// Active sidebar link tracking
+const sections = document.querySelectorAll('section[id], div[id]');
+const navLinks = document.querySelectorAll('.sidebar a[href^="#"]');
+
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(section => {
+    const sectionTop = section.offsetTop;
+    if (window.scrollY >= sectionTop - 100) {
+      current = section.getAttribute('id');
+    }
+  });
+  navLinks.forEach(link => {
+    link.classList.remove('active');
+    if (link.getAttribute('href') === '#' + current) {
+      link.classList.add('active');
+    }
+  });
+});
+
+// Smooth scroll for sidebar links
+navLinks.forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    const target = document.querySelector(link.getAttribute('href'));
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
+</script>
+
+</body>
+</html>

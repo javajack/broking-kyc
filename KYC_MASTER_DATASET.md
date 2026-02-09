@@ -1,9 +1,10 @@
 # KYC Master Dataset Specification
 ## Individual Customer Onboarding - Indian Stock Broking Firm
 
-**Version**: 1.0
+**Version**: 1.1
 **Date**: 2026-02-09
 **Regulatory Basis**: SEBI Master Circular on KYC Norms (SEBI/HO/MIRSD/MIRSD-SEC-2/P/CIR/2023/168), SEBI Master Circular for Stock Brokers (SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90), AML/CFT Guidelines (SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78)
+**Companion Document**: [VENDOR_INTEGRATIONS.md](./VENDOR_INTEGRATIONS.md) - Third-party API specs, vendor selection, integration sequences
 
 ---
 
@@ -31,10 +32,18 @@
 20. [Section S: KRA Submission Data](#20-section-s-kra-submission-data)
 21. [Section T: CKYC Submission Data](#21-section-t-ckyc-submission-data)
 22. [Section U: Exchange Registration (UCC)](#22-section-u-exchange-registration-ucc)
-23. [Appendix A: Code Tables](#appendix-a-code-tables)
-24. [Appendix B: Regulatory Circular Reference](#appendix-b-regulatory-circular-reference)
-25. [Appendix C: Third-Party API Specifications](#appendix-c-third-party-api-specifications)
-26. [Appendix D: Onboarding Process Flow](#appendix-d-onboarding-process-flow)
+23. [Section V: NRI-Specific Requirements](#23-section-v-nri-specific-requirements)
+24. [Section W: Minor / Joint / POA Accounts](#24-section-w-minor--joint--poa-accounts)
+25. [Section X: Margin Pledge & Collateral](#25-section-x-margin-pledge--collateral)
+26. [Section Y: Account Lifecycle & Dormancy](#26-section-y-account-lifecycle--dormancy)
+27. [Section Z: Audit Trail & Modification Tracking](#27-section-z-audit-trail--modification-tracking)
+28. [Section AA: DPDP Act 2023 Consent Management](#28-section-aa-dpdp-act-2023-consent-management)
+29. [Section AB: Communication Preferences](#29-section-ab-communication-preferences)
+30. [Section AC: Running Account Settlement](#30-section-ac-running-account-settlement)
+31. [Appendix A: Code Tables](#appendix-a-code-tables)
+32. [Appendix B: Regulatory Circular Reference](#appendix-b-regulatory-circular-reference)
+33. [Appendix C: Third-Party API Specifications](#appendix-c-third-party-api-specifications)
+34. [Appendix D: Onboarding Process Flow](#appendix-d-onboarding-process-flow)
 
 ---
 
@@ -739,6 +748,245 @@ All Paths Lead To:
 
 ---
 
+## 23. Section V: NRI-Specific Requirements
+
+**Regulatory Basis**: RBI PIS (Portfolio Investment Scheme), FEMA regulations
+**When Applicable**: residential_status (A22) = NRI / FN / PIO
+
+| # | Field Name | Data Type | Size | Mandatory | Validation | Notes |
+|---|-----------|-----------|------|-----------|------------|-------|
+| V01 | `pis_permission_status` | Boolean | 1 | **Y** (NRI) | Y/N | RBI PIS permission obtained |
+| V02 | `pis_permission_letter` | BLOB | - | Cond. | PDF | RBI PIS permission document |
+| V03 | `pis_account_number` | String | 20 | Cond. | | Designated PIS bank account |
+| V04 | `pis_bank_name` | String | 100 | Cond. | | PIS designated bank |
+| V05 | `pis_bank_branch` | String | 100 | Cond. | | PIS designated branch |
+| V06 | `pis_permission_date` | Date | 10 | Cond. | DD/MM/YYYY | |
+| V07 | `pis_validity_date` | Date | 10 | Cond. | DD/MM/YYYY | |
+| V08 | `overseas_address_line1` | String | 100 | **Y** (NRI) | | Overseas residential address |
+| V09 | `overseas_address_line2` | String | 100 | N | | |
+| V10 | `overseas_city` | String | 50 | **Y** (NRI) | | |
+| V11 | `overseas_state` | String | 50 | N | | |
+| V12 | `overseas_zip` | String | 15 | **Y** (NRI) | | |
+| V13 | `overseas_country` | String | 2 | **Y** (NRI) | ISO code | |
+| V14 | `overseas_phone` | String | 20 | N | | With country code |
+| V15 | `nre_nro_account_type` | String | 3 | **Y** (NRI) | NRE/NRO | For fund settlement |
+| V16 | `nre_nro_bank_account` | String | 18 | **Y** (NRI) | | |
+| V17 | `nre_nro_ifsc` | String | 11 | **Y** (NRI) | | |
+| V18 | `nre_nro_swift_code` | String | 11 | N | | For international transfers |
+| V19 | `repatriation_status` | String | 2 | **Y** (NRI) | RP=Repatriable, NR=Non-repatriable | |
+| V20 | `tax_residency_certificate` | BLOB | - | Cond. | PDF | Country-specific TRC |
+| V21 | `nri_trading_route` | String | 2 | **Y** (NRI) | PI=PIS, NP=Non-PIS | PIS restricts intraday |
+| V22 | `investment_limit_current` | Decimal | 15,2 | N | | Current investment value |
+
+### NRI Trading Restrictions
+
+| Route | Intraday | Delivery | F&O | Currency | Commodity |
+|-------|----------|----------|-----|----------|-----------|
+| PIS | **No** | Yes | No | No | No |
+| Non-PIS | Yes | Yes | Yes | **No** | **No** |
+
+---
+
+## 24. Section W: Minor / Joint / POA Accounts
+
+### W1: Account Holding Pattern
+
+| # | Field Name | Data Type | Size | Mandatory | Validation |
+|---|-----------|-----------|------|-----------|------------|
+| W01 | `holding_type` | String | 2 | **Y** | SI=Single, J2=Joint(2), J3=Joint(3) |
+| W02 | `operation_mode` | String | 2 | Cond. | ES=Either or Survivor, AS=Anyone or Survivor, JO=Jointly |
+| W03 | `is_minor_account` | Boolean | 1 | **Y** | Derived from DOB < 18 years |
+
+### W2: Minor Account Fields (if W03=Y)
+
+| # | Field Name | Data Type | Size | Mandatory | Notes |
+|---|-----------|-----------|------|-----------|-------|
+| W04 | `guardian_name` | String | 100 | **Y** | |
+| W05 | `guardian_pan` | String | 10 | **Y** | |
+| W06 | `guardian_aadhaar` | String | 12 | N | |
+| W07 | `guardian_relationship` | String | 2 | **Y** | FA=Father, MO=Mother, CG=Court-appointed |
+| W08 | `guardian_address` | String | 255 | **Y** | |
+| W09 | `guardian_identity_proof` | BLOB | - | **Y** | |
+| W10 | `guardian_address_proof` | BLOB | - | **Y** | |
+| W11 | `court_order_document` | BLOB | - | Cond. | If W07=CG |
+| W12 | `date_of_majority` | Date | 10 | **Y** | DOB + 18 years (auto-calculated) |
+| W13 | `conversion_to_major_done` | Boolean | 1 | N | Must be done at age 18 |
+| W14 | `conversion_date` | Date | 10 | Cond. | |
+
+**Minor Restrictions**: Delivery trades only, no derivatives, max holding Rs.2 lakh across exchanges.
+
+### W3: Second/Third Holder (if W01=J2 or J3)
+
+Complete replication of Section A (Personal Identity), Section B (Address), Section C (Contact), Section D (POI), Section E (POA), Section K (PEP), Section J (FATCA) for each additional holder. Prefix fields with `holder2_` or `holder3_`.
+
+### W4: Power of Attorney (if someone else operates)
+
+| # | Field Name | Data Type | Size | Mandatory | Notes |
+|---|-----------|-----------|------|-----------|-------|
+| W15 | `poa_granted` | Boolean | 1 | **Y** | Y/N |
+| W16 | `poa_holder_name` | String | 100 | Cond. | |
+| W17 | `poa_holder_pan` | String | 10 | Cond. | Mandatory KYC per SEBI |
+| W18 | `poa_holder_aadhaar` | String | 12 | Cond. | |
+| W19 | `poa_holder_relationship` | String | 50 | Cond. | |
+| W20 | `poa_execution_date` | Date | 10 | Cond. | |
+| W21 | `poa_registration_number` | String | 30 | Cond. | |
+| W22 | `poa_validity_period` | String | 20 | Cond. | |
+| W23 | `poa_scope` | String | 2 | Cond. | TR=Trading, DM=Demat, BO=Both |
+| W24 | `poa_notarized` | Boolean | 1 | Cond. | |
+| W25 | `poa_document` | BLOB | - | Cond. | |
+| W26 | `poa_revocation_date` | Date | 10 | N | If POA revoked |
+
+---
+
+## 25. Section X: Margin Pledge & Collateral
+
+**Regulatory Basis**: SEBI peak margin norms, SEBI (Stock Brokers) Regulations 2026
+
+| # | Field Name | Data Type | Size | Mandatory | Notes |
+|---|-----------|-----------|------|-----------|-------|
+| X01 | `pledge_consent_obtained` | Boolean | 1 | **Y** | Consent for pledging securities as margin |
+| X02 | `pledge_agreement_date` | Date | 10 | Cond. | |
+| X03 | `online_pledge_activated` | Boolean | 1 | N | |
+| X04 | `mtf_enabled` | Boolean | 1 | **Y** | Margin Trading Facility |
+| X05 | `mtf_agreement_date` | Date | 10 | Cond. | |
+| X06 | `mtf_limit_sanctioned` | Decimal | 15,2 | Cond. | INR |
+| X07 | `mtf_interest_rate` | Decimal | 5,2 | Cond. | % per annum |
+| X08 | `collateral_type_preference` | String | 2 | N | CA=Cash, SE=Securities, FD=Fixed Deposit, ET=ETF |
+| X09 | `total_pledged_value` | Decimal | 15,2 | N | Current total (with haircut) |
+| X10 | `daily_margin_report_status` | String | 2 | N | CO=Compliant, NC=Non-Compliant |
+
+---
+
+## 26. Section Y: Account Lifecycle & Dormancy
+
+**Regulatory Basis**: SEBI framework for automated deactivation (Jul 2022), SEBI (Stock Brokers) Regulations 2026
+
+| # | Field Name | Data Type | Size | Mandatory | Notes |
+|---|-----------|-----------|------|-----------|-------|
+| Y01 | `account_status` | String | 2 | **Y** | AC=Active, IN=Inactive, DO=Dormant, SU=Suspended, CL=Closed |
+| Y02 | `account_status_date` | Date | 10 | **Y** | Last status change |
+| Y03 | `account_status_reason` | String | 100 | N | |
+| Y04 | `last_trade_date` | Date | 10 | N | |
+| Y05 | `days_inactive` | Number | 5 | N | Auto-calculated |
+| Y06 | `dormancy_declaration_date` | Date | 10 | N | Typically after 12 months inactive |
+| Y07 | `reactivation_request_date` | Date | 10 | N | |
+| Y08 | `reactivation_approval_date` | Date | 10 | N | |
+| Y09 | `reactivation_fresh_kyc` | Boolean | 1 | N | |
+| Y10 | `closure_request_date` | Date | 10 | N | |
+| Y11 | `closure_reason` | String | 100 | N | |
+| Y12 | `closure_securities_settled` | Boolean | 1 | N | |
+| Y13 | `closure_funds_settled` | Boolean | 1 | N | |
+| Y14 | `final_closure_date` | Date | 10 | N | |
+| Y15 | `kyc_validity_start` | Date | 10 | **Y** | |
+| Y16 | `kyc_validity_end` | Date | 10 | **Y** | 5-year cycle |
+| Y17 | `next_kyc_review_date` | Date | 10 | **Y** | |
+| Y18 | `ovd_expiry_date` | Date | 10 | N | For Passport/DL |
+| Y19 | `kyc_inadequacy_reason` | String | 50 | N | If auto-deactivated |
+| Y20 | `auto_deactivation_date` | Date | 10 | N | SEBI framework for inadequate KYC |
+
+---
+
+## 27. Section Z: Audit Trail & Modification Tracking
+
+**Regulatory Basis**: SEBI (Stock Brokers) Regulations 2026 - 8-year record retention
+
+### Z1: Modification Log (per change)
+
+| # | Field Name | Data Type | Size | Mandatory | Notes |
+|---|-----------|-----------|------|-----------|-------|
+| Z01 | `modification_id` | String | 20 | **Y** | Unique change ID |
+| Z02 | `field_name` | String | 50 | **Y** | Which field changed |
+| Z03 | `old_value` | String | 500 | **Y** | Previous value |
+| Z04 | `new_value` | String | 500 | **Y** | New value |
+| Z05 | `modification_date` | DateTime | - | **Y** | ISO 8601 |
+| Z06 | `modified_by_user` | String | 50 | **Y** | User ID |
+| Z07 | `modification_source` | String | 2 | **Y** | CR=Client Request, CO=Compliance, KR=KRA Update, SY=System |
+| Z08 | `modification_reason` | String | 200 | N | |
+
+### Z2: Maker-Checker Workflow
+
+| # | Field Name | Data Type | Size | Mandatory | Notes |
+|---|-----------|-----------|------|-----------|-------|
+| Z09 | `approval_status` | String | 2 | **Y** | PE=Pending, AP=Approved, RJ=Rejected |
+| Z10 | `maker_id` | String | 50 | **Y** | |
+| Z11 | `maker_timestamp` | DateTime | - | **Y** | |
+| Z12 | `checker_id` | String | 50 | Cond. | |
+| Z13 | `checker_timestamp` | DateTime | - | Cond. | |
+| Z14 | `approval_level` | String | 2 | N | L1/L2/L3 |
+| Z15 | `rejection_reason` | String | 200 | Cond. | |
+
+### Z3: Suspicious Activity Tracking
+
+| # | Field Name | Data Type | Size | Mandatory | Notes |
+|---|-----------|-----------|------|-----------|-------|
+| Z16 | `suspicious_activity_flagged` | Boolean | 1 | N | |
+| Z17 | `suspicious_activity_type` | String | 50 | Cond. | |
+| Z18 | `sar_filed` | Boolean | 1 | Cond. | Suspicious Activity Report |
+| Z19 | `sar_filing_date` | Date | 10 | Cond. | |
+| Z20 | `investigation_status` | String | 2 | Cond. | OP=Open, CL=Closed |
+
+---
+
+## 28. Section AA: DPDP Act 2023 Consent Management
+
+**Regulatory Basis**: Digital Personal Data Protection Act 2023, DPDP Rules 2025 (compliance deadline: May 13, 2027)
+
+| # | Field Name | Data Type | Size | Mandatory | Notes |
+|---|-----------|-----------|------|-----------|-------|
+| AA01 | `dpdp_consent_obtained` | Boolean | 1 | **Y** | |
+| AA02 | `dpdp_consent_date` | Date | 10 | **Y** | |
+| AA03 | `dpdp_consent_version` | String | 10 | **Y** | Version of consent text |
+| AA04 | `dpdp_consent_expiry` | Date | 10 | N | |
+| AA05 | `dpdp_marketing_consent` | Boolean | 1 | **Y** | Separate granular consent |
+| AA06 | `dpdp_third_party_sharing_consent` | Boolean | 1 | **Y** | |
+| AA07 | `dpdp_analytics_consent` | Boolean | 1 | **Y** | |
+| AA08 | `dpdp_cross_border_consent` | Boolean | 1 | **Y** | |
+| AA09 | `dpdp_consent_withdrawal_date` | Date | 10 | N | |
+| AA10 | `dpdp_right_to_access_request` | Date | 10 | N | |
+| AA11 | `dpdp_right_to_correction_request` | Date | 10 | N | |
+| AA12 | `dpdp_right_to_erasure_request` | Date | 10 | N | |
+| AA13 | `dpdp_breach_notification_sent` | Boolean | 1 | N | |
+| AA14 | `dpdp_breach_notification_date` | Date | 10 | N | |
+| AA15 | `data_retention_end_date` | Date | 10 | **Y** | 8 years per SEBI Regs |
+
+---
+
+## 29. Section AB: Communication Preferences
+
+**Regulatory Basis**: SEBI circular Dec 3, 2024 (SMS/Email alerts mandatory)
+
+| # | Field Name | Data Type | Size | Mandatory | Notes |
+|---|-----------|-----------|------|-----------|-------|
+| AB01 | `pref_email_notifications` | Boolean | 1 | **Y** | Cannot be N (mandatory per SEBI) |
+| AB02 | `pref_sms_notifications` | Boolean | 1 | **Y** | Cannot be N (mandatory per SEBI) |
+| AB03 | `pref_whatsapp_notifications` | Boolean | 1 | N | Optional |
+| AB04 | `pref_push_notifications` | Boolean | 1 | N | Mobile app |
+| AB05 | `pref_language` | String | 2 | **Y** | EN=English, HI=Hindi, regional codes |
+| AB06 | `pref_contract_note_mode` | String | 2 | **Y** | EM=Email (mandatory), PH=Physical+Email |
+| AB07 | `pref_statement_frequency` | String | 2 | N | DA=Daily, WK=Weekly, MN=Monthly |
+| AB08 | `dnd_registered` | Boolean | 1 | N | Do Not Disturb (TRAI) |
+| AB09 | `whatsapp_optin_date` | Date | 10 | Cond. | |
+
+---
+
+## 30. Section AC: Running Account Settlement
+
+**Regulatory Basis**: SEBI guidelines effective 2025, auto-settlement for inactive accounts within 30 days
+
+| # | Field Name | Data Type | Size | Mandatory | Notes |
+|---|-----------|-----------|------|-----------|-------|
+| AC01 | `ras_authorized` | Boolean | 1 | **Y** | Running Account Authorization |
+| AC02 | `ras_settlement_frequency` | String | 2 | **Y** | MN=Monthly, QR=Quarterly |
+| AC03 | `ras_next_settlement_date` | Date | 10 | **Y** | Auto-calculated |
+| AC04 | `ras_last_settlement_date` | Date | 10 | N | |
+| AC05 | `ras_settlement_bank_account` | String | 18 | **Y** | Primary bank for fund return |
+| AC06 | `ras_auto_settlement_trigger_days` | Number | 3 | **Y** | Default: 30 days inactive |
+| AC07 | `ras_last_transaction_date` | Date | 10 | N | |
+| AC08 | `ras_optin_date` | Date | 10 | **Y** | |
+| AC09 | `ras_optout_date` | Date | 10 | N | |
+
+---
+
 ## Appendix A: Code Tables
 
 ### A1: Occupation Codes (KRA/CKYC)
@@ -874,8 +1122,11 @@ All Paths Lead To:
 
 ## Appendix C: Third-Party API Specifications
 
+> **Detailed vendor comparison, recommended vendors, API endpoints, request/response formats, and complete integration sequence are in [VENDOR_INTEGRATIONS.md](./VENDOR_INTEGRATIONS.md)**
+
 ### C1: PAN Verification API (NSDL/Protean)
 
+**Recommended Vendor**: Decentro (see [VENDOR_INTEGRATIONS.md - V1](./VENDOR_INTEGRATIONS.md#3-v1-pan-verification))
 **Endpoint**: ITD-authorized service (Protean/NSDL)
 
 | Direction | Field | Type | Notes |
@@ -1062,7 +1313,15 @@ All Paths Lead To:
 | S | KRA Submission Data | 14 | 10 |
 | T | CKYC Submission Data | 12 | 8 |
 | U | Exchange Registration (UCC) | 15 | 5+ |
-| **TOTAL** | | **~323** | **~150** |
+| **V** | **NRI-Specific Requirements** | **22** | **~12 (NRI only)** |
+| **W** | **Minor / Joint / POA Accounts** | **26** | **conditional** |
+| **X** | **Margin Pledge & Collateral** | **10** | **2** |
+| **Y** | **Account Lifecycle & Dormancy** | **20** | **5** |
+| **Z** | **Audit Trail & Modification** | **20** | **~10 (system)** |
+| **AA** | **DPDP Consent Management** | **15** | **8** |
+| **AB** | **Communication Preferences** | **9** | **4** |
+| **AC** | **Running Account Settlement** | **9** | **5** |
+| **TOTAL** | | **~454** | **~200** |
 
 ---
 
@@ -1071,4 +1330,8 @@ All Paths Lead To:
 - *Segments selected (F&O/Commodity need income proof)*
 - *KYC method used (Aadhaar e-KYC exempts IPV)*
 - *DDPI and nomination choices*
-- *Residential status (NRI has additional requirements)*
+- *Residential status (NRI has additional requirements - see Section V)*
+- *Account type: Minor (Section W) / Joint (Section W) / POA (Section W)*
+- *Margin trading facility opted (Section X)*
+
+**For third-party API specifications, vendor selection, and integration sequences, see [VENDOR_INTEGRATIONS.md](./VENDOR_INTEGRATIONS.md)**
