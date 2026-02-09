@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>$title$ | Stock Broking Firm</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #2563eb;
+  --primary-light: #eff6ff;
+  --primary-dark: #1d4ed8;
+  --green: #059669;
+  --green-light: #ecfdf5;
+  --orange: #d97706;
+  --orange-light: #fffbeb;
+  --purple: #7c3aed;
+  --purple-light: #f5f3ff;
+  --red: #dc2626;
+  --red-light: #fef2f2;
+  --pink: #db2777;
+  --pink-light: #fdf2f8;
+  --cyan: #0891b2;
+  --cyan-light: #ecfeff;
+  --slate-50: #f8fafc;
+  --slate-100: #f1f5f9;
+  --slate-200: #e2e8f0;
+  --slate-300: #cbd5e1;
+  --slate-400: #94a3b8;
+  --slate-500: #64748b;
+  --slate-600: #475569;
+  --slate-700: #334155;
+  --slate-800: #1e293b;
+  --slate-900: #0f172a;
+  --sidebar-width: 272px;
+  --content-max: 1140px;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  --radius: 8px;
+  --radius-lg: 12px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  font-family: var(--font-sans);
+  color: var(--slate-700);
+  background: white;
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+/* Sidebar */
+.sidebar {
+  position: fixed; top: 0; left: 0;
+  width: var(--sidebar-width); height: 100vh;
+  background: var(--slate-900);
+  overflow-y: auto; z-index: 100;
+  padding: 28px 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--slate-600) transparent;
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--slate-600); border-radius: 2px; }
+.sidebar-brand {
+  padding: 0 20px 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  margin-bottom: 20px;
+}
+.sidebar-brand h1 {
+  color: white; font-size: 1.05rem; font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.sidebar-brand p { color: var(--slate-400); font-size: 0.75rem; margin-top: 6px; line-height: 1.5; }
+.sidebar-section { padding: 0 12px; margin-bottom: 16px; }
+.sidebar-section-title {
+  color: var(--slate-500); font-size: 0.65rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  padding: 0 8px; margin-bottom: 8px;
+}
+.sidebar a {
+  display: block; color: var(--slate-400);
+  text-decoration: none; font-size: 0.8rem;
+  padding: 6px 10px; border-radius: 6px;
+  transition: all 0.15s;
+  line-height: 1.5;
+}
+.sidebar a:hover { color: white; background: rgba(255,255,255,0.06); }
+.sidebar a.active { color: white; background: var(--primary); font-weight: 600; }
+.sidebar a .badge {
+  display: inline-block; background: rgba(255,255,255,0.08);
+  color: var(--slate-400); font-size: 0.6rem;
+  padding: 1px 7px; border-radius: 10px; margin-left: 4px;
+  font-weight: 600;
+}
+/* Main content */
+.main {
+  margin-left: var(--sidebar-width);
+  padding: 0;
+  max-width: var(--content-max);
+}
+/* Hero */
+.hero {
+  background: var(--slate-900);
+  padding: 56px 56px 52px;
+  color: white;
+}
+.hero h1 { font-size: 2rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.2; }
+.hero .subtitle { color: var(--slate-400); font-size: 0.95rem; margin-top: 14px; max-width: 700px; line-height: 1.7; }
+.hero-stats {
+  display: flex; gap: 36px; margin-top: 36px; flex-wrap: wrap;
+}
+.hero-stat {
+  text-align: center;
+}
+.hero-stat .num {
+  font-size: 1.75rem; font-weight: 800; color: #fbbf24;
+  display: block; line-height: 1;
+}
+.hero-stat .label { font-size: 0.7rem; color: var(--slate-500); margin-top: 6px; letter-spacing: 0.02em; }
+/* Content sections */
+.content { padding: 48px 56px; }
+section { margin-bottom: 56px; }
+section[id] { scroll-margin-top: 24px; }
+h2 {
+  font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em;
+  color: var(--slate-900); margin-bottom: 24px;
+  padding-bottom: 14px; border-bottom: 2px solid var(--slate-200);
+  display: flex; align-items: center; gap: 12px;
+}
+h2 .section-num {
+  background: var(--primary); color: white;
+  font-size: 0.7rem; font-weight: 700;
+  padding: 4px 11px; border-radius: 12px;
+  display: inline-block; flex-shrink: 0;
+}
+h3 {
+  font-size: 1.125rem; font-weight: 700; color: var(--slate-800);
+  margin: 32px 0 14px; padding-left: 14px;
+  border-left: 3px solid var(--primary);
+}
+h4 {
+  font-size: 1rem; font-weight: 700; color: var(--slate-700);
+  margin: 20px 0 10px;
+}
+p { margin-bottom: 14px; font-size: 0.95rem; }
+/* Tables */
+table {
+  width: 100%; border-collapse: collapse;
+  margin: 18px 0 28px; font-size: 0.875rem;
+}
+th {
+  background: var(--slate-50); color: var(--slate-600);
+  padding: 12px 16px; text-align: left; font-weight: 600;
+  font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;
+  border-bottom: 2px solid var(--slate-200);
+}
+td {
+  padding: 11px 16px; border-bottom: 1px solid var(--slate-100);
+  vertical-align: top; color: var(--slate-700);
+}
+tr:hover td { background: var(--slate-50); }
+tbody tr:nth-child(even) td { background: transparent; }
+tbody tr:nth-child(even):hover td { background: var(--slate-50); }
+/* Vendor comparison table */
+.vendor-table { border: 1px solid var(--purple); border-radius: var(--radius-lg); overflow: hidden; margin: 24px 0 32px; }
+.vendor-table-title {
+  background: var(--purple); color: white; padding: 12px 18px;
+  font-weight: 700; font-size: 0.875rem;
+  display: flex; align-items: center; gap: 8px;
+}
+.vendor-table table { margin: 0; }
+.vendor-table th { background: var(--purple-light); color: var(--purple); border-bottom-color: rgba(124,58,237,0.15); }
+.vendor-table .recommended { background: var(--green-light) !important; font-weight: 600; }
+.vendor-table .badge-rec {
+  background: var(--green); color: white; font-size: 0.6rem;
+  padding: 2px 8px; border-radius: 10px; font-weight: 700;
+  display: inline-block; margin-left: 4px;
+}
+.vendor-table .badge-alt {
+  background: var(--slate-400); color: white; font-size: 0.6rem;
+  padding: 2px 8px; border-radius: 10px; font-weight: 700;
+  display: inline-block; margin-left: 4px;
+}
+.vendor-table .badge-new {
+  background: var(--cyan); color: white; font-size: 0.6rem;
+  padding: 2px 8px; border-radius: 10px; font-weight: 700;
+  display: inline-block; margin-left: 4px;
+}
+/* Info boxes */
+.info-box {
+  border-radius: var(--radius); padding: 18px 22px; margin: 20px 0;
+  font-size: 0.9rem; line-height: 1.7;
+}
+.info-box.blue { background: var(--primary-light); border-left: 3px solid var(--primary); }
+.info-box.green { background: var(--green-light); border-left: 3px solid var(--green); }
+.info-box.orange { background: var(--orange-light); border-left: 3px solid var(--orange); }
+.info-box.purple { background: var(--purple-light); border-left: 3px solid var(--purple); }
+.info-box.red { background: var(--red-light); border-left: 3px solid var(--red); }
+.info-box.cyan { background: var(--cyan-light); border-left: 3px solid var(--cyan); }
+.info-box strong { font-weight: 700; }
+/* Code blocks */
+pre {
+  background: var(--slate-900); color: var(--slate-300);
+  padding: 22px 26px; border-radius: var(--radius);
+  overflow-x: auto; font-family: var(--font-mono);
+  font-size: 0.85rem; line-height: 1.7;
+  margin: 16px 0 24px;
+}
+code {
+  font-family: var(--font-mono); font-size: 0.85em;
+  background: var(--slate-100); padding: 2px 6px;
+  border-radius: 4px; color: var(--primary-dark);
+}
+pre code { background: none; padding: 0; color: inherit; }
+/* Screen cards */
+.screen-card {
+  background: white; border-radius: var(--radius-lg); padding: 28px;
+  margin: 20px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  border: 1px solid var(--slate-200);
+}
+.screen-card.active { border-color: var(--green); border-width: 2px; }
+.screen-card-header {
+  display: flex; align-items: center; gap: 14px; margin-bottom: 16px;
+}
+.screen-num {
+  background: var(--primary); color: white;
+  width: 40px; height: 40px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 0.95rem; flex-shrink: 0;
+}
+.screen-card-header h4 {
+  margin: 0; font-size: 1.1rem; font-weight: 700;
+}
+.field-tag {
+  display: inline-block; padding: 4px 12px;
+  border-radius: 6px; font-size: 0.75rem; font-weight: 600;
+  margin: 3px 3px;
+}
+.field-tag.user { background: #fef3c7; color: #92400e; border: 1px solid #fbbf24; }
+.field-tag.auto { background: var(--green-light); color: #065f46; border: 1px solid var(--green); }
+.field-tag.system { background: var(--slate-100); color: var(--slate-600); border: 1px solid var(--slate-300); }
+.field-tag.conditional { background: var(--pink-light); color: #9d174d; border: 1px solid var(--pink); }
+.field-tag.api { background: var(--purple-light); color: #6d28d9; border: 1px solid var(--purple); }
+/* Async indicator */
+.async-bar {
+  background: var(--green-light); border: 1px solid rgba(5,150,105,0.2);
+  border-radius: var(--radius); padding: 12px 18px; margin: 10px 0;
+  font-size: 0.85rem; color: #065f46;
+  display: flex; align-items: center; gap: 8px;
+}
+.async-bar::before { content: "\26A1"; }
+/* Blocking gate */
+.gate-box {
+  background: var(--orange-light); border: 1px solid var(--orange);
+  border-radius: var(--radius); padding: 20px 24px; margin: 24px 0;
+}
+.gate-box h4 { color: var(--orange); margin: 0 0 12px; border: none; padding: 0; }
+.gate-check { display: flex; align-items: center; gap: 8px; margin: 6px 0; font-size: 0.875rem; }
+.gate-check.pass::before { content: "\2713"; color: var(--green); font-weight: 700; }
+.gate-check.fail::before { content: "\2717"; color: var(--red); font-weight: 700; }
+/* SVG container */
+.svg-container {
+  background: white; border-radius: var(--radius-lg); overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin: 28px 0;
+  border: 1px solid var(--slate-200);
+}
+.svg-container object { width: 100%; height: auto; display: block; min-height: 400px; }
+.svg-container svg { width: 100%; height: auto; display: block; }
+.svg-label {
+  background: var(--slate-50); color: var(--slate-700); padding: 12px 22px;
+  font-size: 0.85rem; font-weight: 600; border-bottom: 1px solid var(--slate-200);
+}
+/* Cross-reference */
+a.xref {
+  color: var(--primary); text-decoration: none;
+  border-bottom: 1px dashed var(--primary);
+  font-weight: 500;
+}
+a.xref:hover { background: var(--primary-light); }
+/* Status machine */
+.status-flow {
+  display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0;
+  align-items: center;
+}
+.status-node {
+  padding: 8px 16px; border-radius: 20px;
+  font-size: 0.8rem; font-weight: 700;
+}
+.status-node.active { background: var(--green); color: white; }
+.status-node.pending { background: var(--orange-light); color: var(--orange); border: 1px solid var(--orange); }
+.status-node.blocked { background: var(--red-light); color: var(--red); border: 1px solid var(--red); }
+.status-arrow { color: var(--slate-300); font-weight: 700; font-size: 1.1rem; }
+/* Footer */
+.footer {
+  background: var(--slate-900); color: var(--slate-500);
+  padding: 36px 56px; font-size: 0.82rem; margin-top: 56px;
+  line-height: 1.8;
+}
+.footer strong { color: var(--slate-300); }
+/* Print */
+@media print {
+  .sidebar { display: none; }
+  .main { margin-left: 0; max-width: 100%; }
+  .hero { padding: 20px; }
+  .content { padding: 20px; }
+  pre { white-space: pre-wrap; }
+  .svg-container { page-break-inside: avoid; }
+  table { font-size: 0.8rem; }
+}
+/* Responsive */
+@media (max-width: 900px) {
+  .sidebar { display: none; }
+  .main { margin-left: 0; }
+  .content { padding: 24px 20px; }
+  .hero { padding: 36px 20px; }
+  .hero h1 { font-size: 1.5rem; }
+  .hero-stats { gap: 16px; }
+  table { font-size: 0.8rem; }
+  th, td { padding: 8px 10px; }
+}
+/* Dark mode toggle */
+.dark-toggle {
+  position: fixed; bottom: 20px; right: 20px;
+  background: var(--slate-800); color: white;
+  border: none; border-radius: 50%; width: 44px; height: 44px;
+  cursor: pointer; font-size: 1.2rem; z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  display: flex; align-items: center; justify-content: center;
+}
+.dark-toggle:hover { background: var(--primary); }
+/* Collapsible */
+details { margin: 16px 0; }
+details summary {
+  cursor: pointer; font-weight: 600; color: var(--primary);
+  padding: 10px 0; font-size: 0.95rem;
+}
+details summary:hover { color: var(--primary-dark); }
+details[open] summary { margin-bottom: 10px; }
+/* Scroll to top */
+.scroll-top {
+  position: fixed; bottom: 72px; right: 20px;
+  background: var(--slate-700); color: white;
+  border: none; border-radius: 50%; width: 42px; height: 42px;
+  cursor: pointer; font-size: 1.1rem; z-index: 1000;
+  display: none; align-items: center; justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+.scroll-top:hover { background: var(--primary); }
+</style>
+</head>
+<body>
+
+<!-- Sidebar Navigation -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <h1>KYC Reference</h1>
+    <p>Stock Broking Onboarding</p>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Overview</div>
+    <a href="#hero">Dashboard</a>
+    <a href="#design-principles">Design Principles</a>
+    <a href="#flow-summary">Flow Summary</a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">User Journey (8 Screens)</div>
+    <a href="#screen-1">1. Aadhaar + PAN Entry</a>
+    <a href="#screen-2">2. DigiLocker Consent</a>
+    <a href="#screen-3">3. Confirm Identity</a>
+    <a href="#screen-4">4. Bank Account</a>
+    <a href="#screen-5">5. Trading Preferences</a>
+    <a href="#screen-6">6. Nominations</a>
+    <a href="#screen-7">7. Declarations + Gate</a>
+    <a href="#screen-8">8. Review + e-Sign</a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Vendor Comparisons</div>
+    <a href="#v-pan">PAN Verification <span class="badge">6</span></a>
+    <a href="#v-aadhaar">Aadhaar / DigiLocker <span class="badge">5</span></a>
+    <a href="#v-bank">Bank Verification <span class="badge">5</span></a>
+    <a href="#v-kra">KRA Integration <span class="badge">3</span></a>
+    <a href="#v-ckyc">CKYC Integration <span class="badge">4</span></a>
+    <a href="#v-esign">e-Sign <span class="badge">4</span></a>
+    <a href="#v-vkyc">Video KYC / VIPV <span class="badge">4</span></a>
+    <a href="#v-ocr">OCR / Doc Verify <span class="badge">4</span></a>
+    <a href="#v-face">Face Match / Liveness <span class="badge">4</span></a>
+    <a href="#v-aml">AML / PEP Screening <span class="badge">4</span></a>
+    <a href="#v-income">Income Verification <span class="badge">4</span></a>
+    <a href="#v-aa">Account Aggregator <span class="badge">NEW</span></a>
+    <a href="#v-comms">Communications <span class="badge">4</span></a>
+    <a href="#v-backoffice">Back-Office / RMS <span class="badge">4</span></a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Vendor Deep Dives</div>
+    <a href="#setu-deep-dive">Setu Product Portfolio <span class="badge">NEW</span></a>
+    <a href="#aa-framework">Account Aggregator Framework <span class="badge">NEW</span></a>
+    <a href="#payment-mandates">Payment Mandates <span class="badge">NEW</span></a>
+    <a href="#vendor-strategy">Strategic Vendor Matrix <span class="badge">NEW</span></a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Data Architecture</div>
+    <a href="#data-sources">Data Source Mapping</a>
+    <a href="#field-summary">Field Summary <span class="badge">454</span></a>
+    <a href="#master-dataset">Master Dataset Sections</a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Async Pipeline</div>
+    <a href="#batch-pipeline">Batch Processing</a>
+    <a href="#exchange-depository">Exchange &amp; Depository <span class="badge">NEW</span></a>
+    <a href="#six-attribute">6-Attribute Matching <span class="badge">NEW</span></a>
+    <a href="#audit-compliance">Audit &amp; Compliance <span class="badge">NEW</span></a>
+    <a href="#admin-workflow">KYC Admin Workflow</a>
+    <a href="#status-machine">Status Machine</a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Reference</div>
+    <a href="#error-handling">Error Handling</a>
+    <a href="#regulatory">Regulatory Circulars</a>
+    <a href="#code-tables">Code Tables</a>
+    <a href="#cost-analysis">Cost Analysis</a>
+    <a href="#security">Security Requirements</a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Diagrams</div>
+    <a href="#diagram-flow">Onboarding Flow</a>
+    <a href="#diagram-sources">Data Source Map</a>
+    <a href="#diagram-batch">Batch Processing</a>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<div class="main">
+
+<!-- Hero -->
+<div class="hero" id="hero">
+  <h1>$title$</h1>
+  <p class="subtitle">Complete specification for individual customer onboarding in an Indian stock broking firm. DigiLocker-first, async verification, batch submission. User types ~12 fields, everything else is auto-sourced.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><span class="num">8</span><span class="label">User Screens</span></div>
+    <div class="hero-stat"><span class="num">~12</span><span class="label">Fields User Types</span></div>
+    <div class="hero-stat"><span class="num">~5 min</span><span class="label">Total User Time</span></div>
+    <div class="hero-stat"><span class="num">$total-fields$</span><span class="label">Total Fields</span></div>
+    <div class="hero-stat"><span class="num">97%</span><span class="label">Pre-Filled</span></div>
+    <div class="hero-stat"><span class="num">$vendors-evaluated$</span><span class="label">Vendors Evaluated</span></div>
+    <div class="hero-stat"><span class="num">24-72h</span><span class="label">Activation Time</span></div>
+  </div>
+</div>
+
+<div class="content">
+
+$body$
+
+</div><!-- /content -->
+
+<!-- Footer -->
+<div class="footer">
+  <p><strong>$title$</strong> &mdash; Individual Customer, Indian Stock Broking Firm</p>
+  <p>Generated: $date$ | Version: $version$ | Sections: $sections$ | Fields: $total-fields$ | Vendors Evaluated: $vendors-evaluated$ | AA Operators: 16 | Regulatory Circulars: 15+</p>
+  <p>Regulatory basis: SEBI KYC Master Circular (Oct 2023) | SEBI Stock Brokers Master (Jun 2025) | AML/CFT Guidelines (Jun 2024) | DPDP Act 2023</p>
+  <p style="margin-top:12px;">Source documents: KYC_MASTER_DATASET.md (v1.1) | VENDOR_INTEGRATIONS.md (v1.0) | kyc-flow.md (v1.0)</p>
+</div>
+
+</div><!-- /main -->
+
+<!-- Scroll to top button -->
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">&#8593;</button>
+
+<script>
+// Scroll to top button visibility
+window.addEventListener('scroll', function() {
+  const btn = document.getElementById('scrollTop');
+  btn.style.display = window.scrollY > 500 ? 'flex' : 'none';
+});
+
+// Active sidebar link tracking
+const sections = document.querySelectorAll('section[id], div[id]');
+const navLinks = document.querySelectorAll('.sidebar a[href^="#"]');
+
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(section => {
+    const sectionTop = section.offsetTop;
+    if (window.scrollY >= sectionTop - 100) {
+      current = section.getAttribute('id');
+    }
+  });
+  navLinks.forEach(link => {
+    link.classList.remove('active');
+    if (link.getAttribute('href') === '#' + current) {
+      link.classList.add('active');
+    }
+  });
+});
+
+// Smooth scroll for sidebar links
+navLinks.forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    const target = document.querySelector(link.getAttribute('href'));
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
+</script>
+
+</body>
+</html>
