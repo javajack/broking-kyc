@@ -4,14 +4,14 @@
 ### Resolution Priority (when multiple sources provide same field)
 
 <div style="display:flex;gap:8px;flex-wrap:wrap;margin:16px 0;align-items:center;">
-  <span style="background:var(--primary);color:white;padding:6px 16px;border-radius:20px;font-size:0.8rem;font-weight:700;">1. DigiLocker</span>
-  <span style="color:var(--slate-400);font-weight:700;">&gt;</span>
-  <span style="background:var(--green-light);color:var(--green);padding:6px 16px;border-radius:20px;font-size:0.8rem;font-weight:700;border:1px solid var(--green);">2. CKYC (CERSAI)</span>
-  <span style="color:var(--slate-400);font-weight:700;">&gt;</span>
-  <span style="background:var(--green-light);color:var(--green);padding:6px 16px;border-radius:20px;font-size:0.8rem;font-weight:700;border:1px solid var(--green);">3. KRA Fetch</span>
-  <span style="color:var(--slate-400);font-weight:700;">&gt;</span>
-  <span style="background:var(--purple-light);color:var(--purple);padding:6px 16px;border-radius:20px;font-size:0.8rem;font-weight:700;border:1px solid var(--purple);">4. Vendor API</span>
-  <span style="color:var(--slate-400);font-weight:700;">&gt;</span>
+  <span style="background:var(--accent);color:white;padding:6px 16px;border-radius:20px;font-size:0.8rem;font-weight:700;">1. DigiLocker</span>
+  <span style="color:var(--text-muted);font-weight:700;">&gt;</span>
+  <span style="background:var(--green-bg);color:var(--green);padding:6px 16px;border-radius:20px;font-size:0.8rem;font-weight:700;border:1px solid var(--green);">2. CKYC (CERSAI)</span>
+  <span style="color:var(--text-muted);font-weight:700;">&gt;</span>
+  <span style="background:var(--green-bg);color:var(--green);padding:6px 16px;border-radius:20px;font-size:0.8rem;font-weight:700;border:1px solid var(--green);">3. KRA Fetch</span>
+  <span style="color:var(--text-muted);font-weight:700;">&gt;</span>
+  <span style="background:var(--purple-bg);color:var(--purple);padding:6px 16px;border-radius:20px;font-size:0.8rem;font-weight:700;border:1px solid var(--purple);">4. Vendor API</span>
+  <span style="color:var(--text-muted);font-weight:700;">&gt;</span>
   <span style="background:#fef3c7;color:#92400e;padding:6px 16px;border-radius:20px;font-size:0.8rem;font-weight:700;border:1px solid #f59e0b;">5. User Input</span>
 </div>
 

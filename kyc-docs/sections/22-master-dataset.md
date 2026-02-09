@@ -19,7 +19,7 @@ Version 1.1 &mdash; ~454 fields across 30 sections. Regulatory basis: SEBI KYC M
       <tr><td>A25</td><td><code>ckyc_number</code></td><td>String</td><td>14</td><td>N</td><td>14-digit KIN from CERSAI</td></tr>
     </tbody>
   </table>
-  <p style="font-size:0.78rem;color:var(--slate-500)">Showing key fields. Full 32-field specification in KYC_MASTER_DATASET.md Section A.</p>
+  <p style="font-size:0.78rem;color:var(--text-muted)">Showing key fields. Full 32-field specification in KYC_MASTER_DATASET.md Section A.</p>
 </details>
 
 <details>
