@@ -1,6 +1,8 @@
 # 🏦 Broking KYC — Complete Onboarding Specification
 
 > 📋 Production-grade KYC specification for individual customer onboarding in an **Indian stock broking firm** — SEBI/KRA/CKYC compliant, DigiLocker-first, vendor-evaluated.
+>
+> 🔗 **[Browse the spec online →](https://javajack.github.io/broking-kyc/)**
 
 ---
 
