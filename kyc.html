@@ -280,6 +280,15 @@ tr:hover td { background: var(--bg-secondary); }
   display: inline-block; margin-left: 4px;
 }
 
+/* ── Section brief ── */
+.section-brief {
+  color: var(--text-secondary); font-size: 0.88rem; font-style: italic;
+  line-height: 1.65; margin: -8px 0 20px;
+  padding: 10px 16px; background: var(--bg-secondary);
+  border-radius: var(--radius); border-left: 3px solid var(--accent);
+}
+.section-brief strong { color: var(--text); font-style: normal; }
+
 /* ── Info boxes ── */
 .info-box {
   border-radius: var(--radius); padding: 14px 18px; margin: 16px 0;
@@ -502,15 +511,16 @@ body.sidebar-open { overflow: hidden; }
   </div>
 
   <div class="sidebar-section">
-    <div class="sidebar-section-title">User Journey (8 Screens)</div>
-    <a href="#screen-1">1. Aadhaar + PAN Entry</a>
-    <a href="#screen-2">2. DigiLocker Consent</a>
-    <a href="#screen-3">3. Confirm Identity</a>
-    <a href="#screen-4">4. Bank Account</a>
-    <a href="#screen-5">5. Trading Preferences</a>
-    <a href="#screen-6">6. Nominations</a>
-    <a href="#screen-7">7. Declarations + Gate</a>
-    <a href="#screen-8">8. Review + e-Sign</a>
+    <div class="sidebar-section-title">User Journey (9 Screens)</div>
+    <a href="#screen-1">1. Mobile Registration</a>
+    <a href="#screen-2">2. PAN + DOB</a>
+    <a href="#screen-3">3. DigiLocker Consent</a>
+    <a href="#screen-4">4. Confirm Identity</a>
+    <a href="#screen-5">5. Bank Account</a>
+    <a href="#screen-6">6. Trading Preferences</a>
+    <a href="#screen-7">7. Nominations</a>
+    <a href="#screen-8">8. Declarations + Gate</a>
+    <a href="#screen-9">9. Review + e-Sign</a>
   </div>
 
   <div class="sidebar-section">
@@ -579,7 +589,7 @@ body.sidebar-open { overflow: hidden; }
   <h1>KYC Onboarding Reference</h1>
   <p class="subtitle">Individual customer KYC onboarding &mdash; DigiLocker-first, async verification, batch submission.</p>
   <div class="hero-stats">
-    <div class="hero-stat"><span class="num">8</span><span class="label">Screens</span></div>
+    <div class="hero-stat"><span class="num">9</span><span class="label">Screens</span></div>
     <div class="hero-stat"><span class="num">~12</span><span class="label">User Fields</span></div>
     <div class="hero-stat"><span class="num">~5 min</span><span class="label">User Time</span></div>
     <div class="hero-stat"><span class="num">~454</span><span class="label">Total Fields</span></div>
@@ -593,6 +603,9 @@ body.sidebar-open { overflow: hidden; }
 
 <section id="design-principles">
 <h2><span class="section-num">1</span> Design Principles</h2>
+<p class="section-brief">
+<strong>The 11 architectural rules that shape every screen and API call</strong> — read this first to understand why the system works the way it does. Every design decision flows from these principles.
+</p>
 <table>
 <colgroup>
 <col style="width: 33%" />
@@ -609,51 +622,56 @@ body.sidebar-open { overflow: hidden; }
 <tbody>
 <tr>
 <td>1</td>
+<td><strong>Mobile-first registration</strong></td>
+<td>Start with mobile OTP verification before any KYC data. Establishes the identity anchor and communication channel used for all subsequent OTPs, KRA verification, and post-onboarding notifications.</td>
+</tr>
+<tr>
+<td>2</td>
 <td><strong>DigiLocker-first</strong></td>
 <td>Force Aadhaar + PAN fetch via DigiLocker consent. Harvests ~25 identity fields with zero typing.</td>
 </tr>
 <tr>
-<td>2</td>
-<td><strong>Aadhaar-number login only</strong></td>
-<td>No phone/email login for DigiLocker. Aadhaar number ensures the strongest identity anchor.</td>
+<td>3</td>
+<td><strong>Aadhaar via DigiLocker</strong></td>
+<td>DigiLocker consent flow provides Aadhaar eKYC without needing the user to type their Aadhaar number into our app. Strongest identity anchor with IPV exemption.</td>
 </tr>
 <tr>
-<td>3</td>
+<td>4</td>
 <td><strong>Pre-fill everything</strong></td>
 <td>DigiLocker + KRA + CKYC cover ~90 identity/financial fields. User only confirms.</td>
 </tr>
 <tr>
-<td>4</td>
+<td>5</td>
 <td><strong>Async verification</strong></td>
 <td>PAN verify, KRA lookup, CKYC search, AML screening fire in parallel while user is on DigiLocker.</td>
 </tr>
 <tr>
-<td>5</td>
+<td>6</td>
 <td><strong>Minimal user typing</strong></td>
-<td>~12 fields: Aadhaar, PAN, mobile, email, marital status, bank a/c, IFSC, a/c type + toggles.</td>
+<td>~12 fields: mobile, PAN, DOB, email, bank a/c, IFSC, a/c type + toggles.</td>
 </tr>
 <tr>
-<td>6</td>
+<td>7</td>
 <td><strong>e-Sign everything</strong></td>
 <td>Single Aadhaar OTP e-Sign on the complete application. No physical signatures.</td>
 </tr>
 <tr>
-<td>7</td>
+<td>8</td>
 <td><strong>Batch submission</strong></td>
-<td>KRA, CKYC, UCC, BO account submitted async after e-Sign. User never waits.</td>
+<td>KRA, CKYC, UCC, BO account submitted async after maker-checker approval. User never waits.</td>
 </tr>
 <tr>
-<td>8</td>
+<td>9</td>
 <td><strong>IPV exemption</strong></td>
 <td>Aadhaar eKYC (DigiLocker) exempts IPV/VIPV per SEBI circular. Saves one step.</td>
 </tr>
 <tr>
-<td>9</td>
+<td>10</td>
 <td><strong>Progressive disclosure</strong></td>
 <td>Only show fields relevant to choices (F&amp;O income proof, FATCA, PEP).</td>
 </tr>
 <tr>
-<td>10</td>
+<td>11</td>
 <td><strong>Fail fast, fail gracefully</strong></td>
 <td>If blocking check fails, stop user before e-Sign. Don’t waste their time.</td>
 </tr>
@@ -662,37 +680,61 @@ body.sidebar-open { overflow: hidden; }
 </section>
 <section id="flow-summary">
 <h2><span class="section-num">2</span> Flow Summary</h2>
-<pre><code>USER JOURNEY (8 screens, ~5 minutes)
+<p class="section-brief">
+<strong>The complete onboarding pipeline at a glance</strong> — from the user’s first mobile OTP to the moment they can trade. Shows the 9-screen user journey (~6 min), the maker-checker review, and the multi-agency batch processing that runs in parallel after approval.
+</p>
+<pre><code>USER JOURNEY (9 screens, ~6 minutes)
 
-Screen 1: Enter Aadhaar + PAN (2 fields)
+Screen 1: Mobile / Email Registration (1 field: mobile + OTP)
+    |--&gt; ASYNC: Device Fingerprint [Bureau.id]
+
+Screen 2: Enter PAN + DOB (2 fields)
     |--&gt; ASYNC: PAN Verify, KRA Lookup, CKYC Search, AML Screen
 
-Screen 2: DigiLocker Consent (redirect, 0 fields)
+Screen 3: DigiLocker Consent (redirect, 0 fields)
     |--&gt; Harvests: Name, DOB, Gender, Photo, Address, Father&#39;s Name, PAN
 
-Screen 3: Confirm Identity (3 fields: mobile, email, marital status)
+Screen 4: Confirm Identity (1 field: email)
+    |--&gt; Mobile already verified from Screen 1
 
-Screen 4: Bank Account (3 fields: account no, IFSC, type)
-    |--&gt; ASYNC: Penny Drop
+Screen 5: Bank Account (3 fields: account no, IFSC, type)
+    |--&gt; ASYNC: Penny Drop, IFSC Lookup, OCR
 
-Screen 5: Trading Preferences (segment toggles)
+Screen 6: Trading Preferences (segment toggles)
+    |--&gt; ASYNC: Income verify (if F&amp;O/Commodity)
 
-Screen 6: Nominations (add nominee or opt-out)
+Screen 7: Nominations (add nominee or opt-out)
 
-Screen 7: Declarations (checkboxes) + BLOCKING GATE
+Screen 8: Declarations (checkboxes) + BLOCKING GATE
 
-Screen 8: Review + Face Match + Aadhaar OTP e-Sign
+Screen 9: Review + Face Match + Aadhaar OTP e-Sign
 
---- USER DONE (~5 minutes) ---
+--- USER DONE (~6 minutes) ---
 
-BATCH ZONE (async, 24-72 hours):
-    KRA Submit, CKYC Upload, Admin Review, Exchange UCC,
-    CDSL BO Account, Segment Activation, Welcome Kit</code></pre>
+MAKER-CHECKER REVIEW:
+    Step 10: Maker (auto-approve if all checks pass; manual only for edge cases)
+    Step 11: Checker (final approval)
+
+BATCH ZONE (parallel agency pipelines, after checker approval):
+    ├─→ KRA Pipeline:   Submit → Under Process → Registered → Validated (2-3 days)
+    ├─→ CKYC Pipeline:  Upload → Queued → Validated → KIN Generated (4-5 days)
+    ├─→ NSE Pipeline:   UCC Submit → PAN Verify → Approved → Trading Active (same day)
+    ├─→ BSE Pipeline:   UCC Submit → 3-Param PAN Verify → Approved → Segments Live (same day)
+    ├─→ MCX Pipeline:   UCC Submit → Income Verify → Approved (next working day, if commodity)
+    ├─→ CDSL Pipeline:  BO File → KYC Check → Bank Valid → Active (1-2 hrs API)
+    ├─→ NSDL Pipeline:  UDiFF Submit → CDS Process → DPM Update → PAN Flag → Active (~15 days)
+    └─→ Income Pipeline: Perfios/AA verify → Confirmed (1-2 hrs, if F&amp;O)
+
+FINAL GATE: KRA Registered + BO Active + UCC Approved → ACTIVE (can trade)
+TOTAL: Client active in 24-72 hours</code></pre>
 </section>
 <section id="screens">
 <h2>
 <span class="section-num">3</span> Screen-by-Screen Specification
 </h2>
+<p class="section-brief">
+<strong>The 9-screen user journey</strong> — each screen has a single clear purpose. Mobile/email registration establishes the identity anchor and OTP channel before any KYC data enters the system. PAN+DOB fires async checks while the user completes DigiLocker consent. Total user time: ~6 minutes.
+</p>
 <!-- SCREEN 1 -->
 <div id="screen-1" class="screen-card">
 <div class="screen-card-header">
@@ -700,26 +742,55 @@ BATCH ZONE (async, 24-72 hours):
 1
 </div>
 <h4>
-Start — Aadhaar + PAN Entry
+Mobile / Email Registration
 </h4>
 </div>
 <p>
-<strong>Purpose:</strong> Capture the two identity anchors that unlock all downstream data.
+<strong>Purpose:</strong> Establish the identity anchor and OTP communication channel before any KYC data is captured.
 </p>
 <p>
-<strong>User types:</strong> <span class="field-tag user">Aadhaar Number (12 digits)</span> <span class="field-tag user">PAN (ABCDE1234F)</span>
+<strong>User types:</strong> <span class="field-tag user">Mobile Number (10 digits)</span>
 </p>
 <p>
-<strong>Validation:</strong> Aadhaar: Verhoeff checksum. PAN: <code>[A-Z]{5}[0-9]{4}[A-Z]</code>, 4th char P=Individual.
+<strong>Validation:</strong> Mobile: 10 digits starting with 6-9. OTP sent via SMS for verification.
 </p>
 <p>
-<strong>OTP:</strong> Aadhaar OTP sent immediately (reused for DigiLocker login on Screen 2).
+<strong>Fallback:</strong> Email registration if mobile OTP fails 3 times.
 </p>
 <p>
 <strong>Time:</strong> ~30 seconds
 </p>
 <div class="async-bar">
-<p>On submit, 4 parallel API calls fire (results ready by Screen 3): <strong>PAN Verify</strong> | <strong>KRA Lookup</strong> | <strong>CKYC Search</strong> | <strong>AML/PEP Screen</strong></p>
+<p>On registration, device fingerprinting fires: <strong>Bureau.id Device Intelligence</strong> — 200+ risk signals, emulator/root detection, synthetic identity check</p>
+</div>
+<div class="info-box blue">
+<strong>Why start with mobile?</strong> Mobile number is the universal communication channel for OTPs, KRA verification, CKYC, and all post-onboarding notifications. Establishing it first ensures every subsequent step has a verified contact channel.
+</div>
+</div>
+<!-- SCREEN 2 -->
+<div id="screen-2" class="screen-card">
+<div class="screen-card-header">
+<div class="screen-num">
+2
+</div>
+<h4>
+PAN + Date of Birth
+</h4>
+</div>
+<p>
+<strong>Purpose:</strong> Capture the two identity keys that unlock all downstream data lookups.
+</p>
+<p>
+<strong>User types:</strong> <span class="field-tag user">PAN (ABCDE1234F)</span> <span class="field-tag user">Date of Birth</span>
+</p>
+<p>
+<strong>Validation:</strong> PAN: <code>[A-Z]{5}[0-9]{4}[A-Z]</code>, 4th char P=Individual. DOB: valid date, age ≥ 18.
+</p>
+<p>
+<strong>Time:</strong> ~20 seconds
+</p>
+<div class="async-bar">
+<p>On submit, 4 parallel API calls fire (results ready by Screen 4): <strong>PAN Verify</strong> | <strong>KRA Lookup</strong> | <strong>CKYC Search</strong> | <strong>AML/PEP Screen</strong></p>
 </div>
 <!-- PAN Verification Vendors -->
 <div id="v-pan" class="vendor-table">
@@ -935,11 +1006,11 @@ Contact
 </table>
 </div>
 </div>
-<!-- SCREEN 2 -->
-<div id="screen-2" class="screen-card">
+<!-- SCREEN 3 -->
+<div id="screen-3" class="screen-card">
 <div class="screen-card-header">
 <div class="screen-num">
-2
+3
 </div>
 <h4>
 DigiLocker Consent (Redirect)
@@ -949,7 +1020,7 @@ DigiLocker Consent (Redirect)
 <strong>Purpose:</strong> Consent-based fetch of Aadhaar XML + PAN document.
 </p>
 <p>
-<strong>User types:</strong> 0 fields (logs into DigiLocker with Aadhaar number + OTP from Screen 1).
+<strong>User types:</strong> 0 fields (enters Aadhaar number + OTP on DigiLocker). Aadhaar OTP sent fresh here.
 </p>
 <p>
 <strong>Data harvested (~25 fields with zero effort):</strong>
@@ -961,7 +1032,7 @@ DigiLocker Consent (Redirect)
 <strong>IPV Exemption:</strong> Aadhaar eKYC via DigiLocker = IPV/VIPV exempted per SEBI circular. Saves an entire video call step.
 </div>
 <p>
-<strong>Time:</strong> ~60 seconds (redirect + consent + return). This 60s buffer is exactly the time needed for all 4 async API calls to complete.
+<strong>Time:</strong> ~60 seconds (redirect + consent + return). This 60s buffer is exactly the time needed for all 4 async API calls from Screen 2 to complete.
 </p>
 <!-- DigiLocker / Aadhaar Vendors -->
 <div id="v-aadhaar" class="vendor-table">
@@ -1060,11 +1131,11 @@ Best-in-class OCR (99.8%) + face match in a single call. Good for fallback if Di
 </table>
 </div>
 </div>
-<!-- SCREEN 3 -->
-<div id="screen-3" class="screen-card">
+<!-- SCREEN 4 -->
+<div id="screen-4" class="screen-card">
 <div class="screen-card-header">
 <div class="screen-num">
-3
+4
 </div>
 <h4>
 Confirm Identity
@@ -1077,10 +1148,13 @@ Confirm Identity
 <strong>Pre-filled from KRA/CKYC (if found):</strong> <span class="field-tag auto">Occupation</span> <span class="field-tag auto">Income Range</span> <span class="field-tag auto">Net Worth</span> <span class="field-tag auto">CKYC Number</span>
 </p>
 <p>
-<strong>User types:</strong> <span class="field-tag user">Mobile (C01)</span> <span class="field-tag user">Email (C03)</span> <span class="field-tag user">Marital Status (A19)</span>
+<strong>User types:</strong> <span class="field-tag user">Email (C03)</span>
 </p>
+<div class="info-box blue">
+<strong>Note:</strong> Mobile already verified on Screen 1. Only email needs to be entered here.
+</div>
 <p>
-<strong>Time:</strong> ~45 seconds
+<strong>Time:</strong> ~30 seconds
 </p>
 <!-- KRA Vendors -->
 <div id="v-kra" class="vendor-table">
@@ -1260,11 +1334,11 @@ Contact
 </table>
 </div>
 </div>
-<!-- SCREEN 4 -->
-<div id="screen-4" class="screen-card">
+<!-- SCREEN 5 -->
+<div id="screen-5" class="screen-card">
 <div class="screen-card-header">
 <div class="screen-num">
-4
+5
 </div>
 <h4>
 Bank Account
@@ -1277,7 +1351,7 @@ Bank Account
 <strong>Auto-filled from IFSC (RBI master):</strong> <span class="field-tag auto">Bank Name</span> <span class="field-tag auto">Branch Name</span> <span class="field-tag auto">Branch City</span> <span class="field-tag auto">MICR Code</span>
 </p>
 <div class="async-bar">
-ASYNC: Penny Drop verification fires on submit — Rs.1 IMPS credit + name match scoring
+ASYNC: Penny Drop verification fires on submit — Rs.1 IMPS credit + name match scoring. IFSC Lookup + cheque/statement OCR also fire.
 </div>
 <p>
 <strong>Time:</strong> ~45 seconds
@@ -1397,11 +1471,11 @@ Rs.2-4
 </table>
 </div>
 </div>
-<!-- SCREEN 5 -->
-<div id="screen-5" class="screen-card">
+<!-- SCREEN 6 -->
+<div id="screen-6" class="screen-card">
 <div class="screen-card-header">
 <div class="screen-num">
-5
+6
 </div>
 <h4>
 Trading Preferences
@@ -1415,6 +1489,9 @@ Trading Preferences
 </p>
 <div class="info-box orange">
 <strong>SEBI Requirement:</strong> F&amp;O/Commodity segments require income verification. Bank statement must show credit of at least Rs.10,000 in last 6 months. Annual income threshold is broker-specific (typically Rs.1-10 lakh).
+</div>
+<div class="async-bar">
+<p>If F&amp;O/Commodity selected, income verification fires: <strong>Perfios ITR Analyser</strong> or <strong>Setu Account Aggregator</strong></p>
 </div>
 <!-- Income Verification Vendors -->
 <div id="v-income" class="vendor-table">
@@ -1616,11 +1693,11 @@ Mutual fund holdings data for net worth verification.
 </div>
 </div>
 </div>
-<!-- SCREEN 6 -->
-<div id="screen-6" class="screen-card">
+<!-- SCREEN 7 -->
+<div id="screen-7" class="screen-card">
 <div class="screen-card-header">
 <div class="screen-num">
-6
+7
 </div>
 <h4>
 Nominations
@@ -1639,11 +1716,11 @@ Up to 10 nominees (SEBI Jan 2025). Total allocation must = 100%. Pre-fill from K
 <strong>Time:</strong> ~30 seconds (1 nominee) to ~2 min (multiple)
 </p>
 </div>
-<!-- SCREEN 7 -->
-<div id="screen-7" class="screen-card">
+<!-- SCREEN 8 -->
+<div id="screen-8" class="screen-card">
 <div class="screen-card-header">
 <div class="screen-num">
-7
+8
 </div>
 <h4>
 Declarations + Blocking Gate
@@ -1671,16 +1748,19 @@ BLOCKING GATE — All must pass before e-Sign
 <div class="gate-check pass">
 <strong>Penny Drop Success</strong> — Name match ≥ 70%
 </div>
+<div class="gate-check pass">
+<strong>PMLA Checks</strong> — Anti-money laundering compliance verified
+</div>
 </div>
 <p>
 <strong>Time:</strong> ~30 seconds
 </p>
 </div>
-<!-- SCREEN 8 -->
-<div id="screen-8" class="screen-card active">
+<!-- SCREEN 9 -->
+<div id="screen-9" class="screen-card active">
 <div class="screen-card-header">
 <div class="screen-num" style="background:var(--green)">
-8
+9
 </div>
 <h4>
 Review + Face Match + e-Sign (Final)
@@ -1699,7 +1779,7 @@ Review + Face Match + e-Sign (Final)
 <strong>IPV/VIPV: EXEMPTED</strong> — Aadhaar eKYC (DigiLocker) used. No video call needed.
 </div>
 <p>
-<strong>Time:</strong> ~60 seconds. <strong>USER DONE. Total: ~5 minutes.</strong>
+<strong>Time:</strong> ~60 seconds. <strong>USER DONE. Total: ~6 minutes.</strong>
 </p>
 <!-- e-Sign Vendors -->
 <div id="v-esign" class="vendor-table">
@@ -1735,7 +1815,7 @@ Cost/sign
 Aadhaar OTP, Biometric, Face
 </td>
 <td>
-CADES-compliant DSC. White-label SDK. 2-day integration. Signed PDF with embedded cert.
+CADES-compliant DSC. White-label SDK. 2-day integration. Signed PDF with embedded cert. KRA + DigiLocker + VIPV in one platform.
 </td>
 <td>
 Via licensed CA
@@ -1763,13 +1843,13 @@ Contact
 </tr>
 <tr>
 <td>
-Leegality <span class="badge-alt">Alternate</span>
+Leegality <span class="badge-new">New Option</span>
 </td>
 <td>
 Aadhaar OTP
 </td>
 <td>
-Zero license fee, pay-per-use. Smart API. 55M+ eSigns. &lt;2 day integration.
+Zero license fee, pay-per-use. Smart API. 55M+ eSigns. &lt;2 day integration. eStamping support for state-specific stamp duty.
 </td>
 <td>
 Via licensed CA
@@ -1814,6 +1894,9 @@ Yes (direct)
 </tr>
 </tbody>
 </table>
+</div>
+<div class="info-box purple">
+<strong>Leegality vs Digio:</strong> Leegality offers zero license fee and ~Rs.25/sign with eStamping support — ideal for cost-sensitive or pilot deployments. Digio remains recommended because its multi-product stack (KRA + DigiLocker + VIPV + eSign) reduces overall vendor count and integration overhead.
 </div>
 <!-- Face Match Vendors -->
 <div id="v-face" class="vendor-table">
@@ -2127,6 +2210,9 @@ Rs.1-3
 </section>
 <section id="setu-deep-dive">
 <h2><span class="section-num">4</span> Setu Product Portfolio — Deep Dive</h2>
+<p class="section-brief">
+<strong>Deep dive into Setu’s unified KYC platform</strong> — acquired by Pine Labs for $70-75M, Setu can consolidate Aadhaar, PAN, bank verification, DigiLocker, and eSign into a single vendor. Covers capabilities, gaps, and where it fits in the stack.
+</p>
 <div class="info-box purple">
 <p><strong>Why Setu matters:</strong> Acquired by Pine Labs for $70-75M (2022). Revenue nearly doubled to INR 35.2 crore in FY24. Setu can potentially consolidate Aadhaar + PAN + bank verification + DigiLocker + eSign into a single vendor, reducing integration overhead. Key gaps: no CKYC, no Video KYC, no face match/liveness, no OCR.</p>
 </div>
@@ -2311,6 +2397,9 @@ Rs.1-3
 </section>
 <section id="aa-framework">
 <h2><span class="section-num">5</span> Account Aggregator Framework — Comprehensive Guide</h2>
+<p class="section-brief">
+<strong>RBI’s consent-based financial data sharing network</strong> — how Account Aggregators let brokers fetch bank statements, ITR data, and demat holdings without manual document uploads. Covers the FIP/FIU/AA architecture, 16 licensed operators, and practical integration for KYC.
+</p>
 <div class="info-box cyan">
 <p><strong>What is AA?</strong> An RBI-licensed NBFC that acts as a consent manager for financial data. AA does not store/view/process data — it facilitates encrypted transfer from Financial Information Provider (FIP) to Financial Information User (FIU). Governed by RBI Master Direction dated Sep 2, 2016. Inter-regulatory: RBI, SEBI, IRDAI, PFRDA, DoR. Industry body: Sahamati.</p>
 </div>
@@ -2589,6 +2678,9 @@ DATA FETCH FLOW:
 </section>
 <section id="payment-mandates">
 <h2><span class="section-num">6</span> Payment Mandates — UPI AutoPay, e-NACH &amp; UPI Block</h2>
+<p class="section-brief">
+<strong>Setting up recurring payments during onboarding</strong> — compares UPI AutoPay, e-NACH, and the new UPI Block mechanism (mandatory for QSBs). Covers mandate limits, SIP setup, and margin funding integration.
+</p>
 <h3>UPI AutoPay vs e-NACH</h3>
 <table>
 <colgroup>
@@ -2648,6 +2740,9 @@ DATA FETCH FLOW:
 </section>
 <section id="vendor-strategy">
 <h2><span class="section-num">7</span> Strategic Vendor Evaluation Matrix</h2>
+<p class="section-brief">
+<strong>Which vendors to invest in and which to skip</strong> — a strategic assessment of 25+ vendors across identity, payments, compliance, and back-office layers. Includes the recommended final stack and alternates for every integration point.
+</p>
 <h3>Vendors Worth Serious Evaluation (Beyond Current Stack)</h3>
 <table>
 <colgroup>
@@ -2694,6 +2789,12 @@ DATA FETCH FLOW:
 <td>Deepest payroll/income verification in India</td>
 <td>Real-time HRMS income data for eligibility. 30+ HRMS integrations. Relevant if F&amp;O/margin products offered.</td>
 <td>1-2 weeks</td>
+</tr>
+<tr>
+<td><strong>Leegality</strong></td>
+<td>Zero license fee eSign + eStamping</td>
+<td>Cost-sensitive deployments, pilot phases, or states requiring eStamping. 55M+ eSigns. Smart API with &lt;2 day integration.</td>
+<td>&lt;2 days</td>
 </tr>
 </tbody>
 </table>
@@ -2776,7 +2877,7 @@ DATA FETCH FLOW:
 <td>PAN + Bank + eSign</td>
 <td><strong>Setu</strong> (unified) or <strong>Decentro</strong> + <strong>Digio</strong></td>
 <td>PAN verify, penny drop, eSign</td>
-<td>Split across vendors</td>
+<td>Leegality (eSign only, cost optimization)</td>
 </tr>
 <tr>
 <td>Face Match + Video + OCR</td>
@@ -2819,6 +2920,9 @@ DATA FETCH FLOW:
 </section>
 <section id="data-sources">
 <h2><span class="section-num">8</span> Data Source Mapping</h2>
+<p class="section-brief">
+<strong>Where each field comes from</strong> — the resolution priority when DigiLocker, KRA, CKYC, and vendor APIs all provide the same field. DigiLocker wins for identity, KRA wins for financial profile, vendor APIs win for real-time verification results.
+</p>
 <h3>Resolution Priority (when multiple sources provide same field)</h3>
 <div style="display:flex;gap:8px;flex-wrap:wrap;margin:16px 0;align-items:center;">
 <p><span style="background:var(--accent);color:white;padding:6px 16px;border-radius:20px;font-size:0.8rem;font-weight:700;">1. DigiLocker</span> <span style="color:var(--text-muted);font-weight:700;">&gt;</span> <span style="background:var(--green-bg);color:var(--green);padding:6px 16px;border-radius:20px;font-size:0.8rem;font-weight:700;border:1px solid var(--green);">2. CKYC (CERSAI)</span> <span style="color:var(--text-muted);font-weight:700;">&gt;</span> <span style="background:var(--green-bg);color:var(--green);padding:6px 16px;border-radius:20px;font-size:0.8rem;font-weight:700;border:1px solid var(--green);">3. KRA Fetch</span> <span style="color:var(--text-muted);font-weight:700;">&gt;</span> <span style="background:var(--purple-bg);color:var(--purple);padding:6px 16px;border-radius:20px;font-size:0.8rem;font-weight:700;border:1px solid var(--purple);">4. Vendor API</span> <span style="color:var(--text-muted);font-weight:700;">&gt;</span> <span style="background:#fef3c7;color:#92400e;padding:6px 16px;border-radius:20px;font-size:0.8rem;font-weight:700;border:1px solid #f59e0b;">5. User Input</span></p>
@@ -2876,6 +2980,9 @@ DATA FETCH FLOW:
 </section>
 <section id="field-summary">
 <h2><span class="section-num">9</span> Master Dataset — Field Summary</h2>
+<p class="section-brief">
+<strong>All ~454 fields at a glance</strong> — grouped by section (personal identity, address, contact, bank, trading, etc.) with field counts, data sources, and which screen captures each group. The full field-level specification is in the Master Dataset section below.
+</p>
 <div class="info-box blue">
 <p><strong>Full field-level specification:</strong> See <a class="xref" href="#master-dataset">Master Dataset Sections</a> below for complete field definitions with data types, sizes, validations, and regulatory sources.</p>
 </div>
@@ -3074,99 +3181,437 @@ DATA FETCH FLOW:
 </section>
 <section id="batch-pipeline">
 <h2><span class="section-num">10</span> Async Batch Processing Pipeline</h2>
-<h3>Phase 1: Immediate (0-30 min after e-Sign)</h3>
-<table>
+<p class="section-brief">
+<strong>What happens after the user is done</strong> — the multi-step, multi-agency batch pipeline that runs after maker-checker approval. Each agency has its own sequential pipeline, but all agencies run in parallel. Shows intermediate statuses, retry logic, and SLAs for every step.
+</p>
+<div class="info-box orange">
+<p><strong>Trigger:</strong> Batch processing begins <strong>only after checker approval</strong> (Step 11 in the flow). The maker auto-approves if all checks pass; the checker gives final sign-off. No batch job fires before checker approval.</p>
+</div>
+<h3>Parallel Agency Pipelines</h3>
+<pre><code>Checker Approved
+  │
+  ├─→ [KRA Pipeline]     Submit → Under Process → Registered → Validated (2-3 days)
+  ├─→ [CKYC Pipeline]    Upload → Queued → Validated → KIN Generated (4-5 days)
+  ├─→ [NSE Pipeline]     UCC Submit → PAN Verify → &quot;A&quot; Approved → Trading Active (same day, 5PM cutoff)
+  ├─→ [BSE Pipeline]     UCC Submit → 3-Param PAN Verify → Approved → Segments Live (same day)
+  ├─→ [MCX Pipeline]     UCC Submit → Income Verify → Approved (next working day, if commodity)
+  ├─→ [CDSL Pipeline]    BO File (Lines 01,02,05,07) → KYC Check → Bank Valid → Active (1-2 hrs API)
+  ├─→ [NSDL Pipeline]    UDiFF Submit → CDS Process → DPM Update → PAN Flag → Active (~15 days)
+  └─→ [Income Pipeline]  Perfios/AA verify → Confirmed (1-2 hrs, if F&amp;O)
+
+  Final Gate: KRA Registered + BO Active + UCC Approved → ACTIVE (can trade)</code></pre>
+<h3>KRA Pipeline (4 steps, 2-3 working days)</h3>
+<table style="width:100%;">
 <colgroup>
-<col style="width: 20%" />
-<col style="width: 20%" />
-<col style="width: 20%" />
-<col style="width: 20%" />
-<col style="width: 20%" />
+<col style="width: 12%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 27%" />
+<col style="width: 16%" />
+<col style="width: 10%" />
 </colgroup>
 <thead>
 <tr>
-<th>Job</th>
+<th>Step</th>
+<th>Action</th>
 <th>Vendor</th>
-<th>Output</th>
-<th>Retry</th>
+<th>Input/Output</th>
+<th>Status</th>
 <th>SLA</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Admin Review</td>
-<td>Internal (maker-checker)</td>
-<td>Approved / Rejected</td>
-<td>N/A</td>
-<td>30 min (auto-approve if all pass)</td>
+<td>1</td>
+<td>Submit KRA record</td>
+<td>Digio API / CVL SOAP / bulk TXT (tilde-delimited)</td>
+<td>Full KYC payload → App ref number</td>
+<td>SUBMITTED</td>
+<td>Immediate</td>
 </tr>
 <tr>
-<td>KRA Submit</td>
-<td>Digio</td>
-<td>App ref number</td>
-<td>3x exponential</td>
-<td>1-3 working days</td>
-</tr>
-<tr>
-<td>CKYC Upload</td>
-<td>Decentro</td>
-<td>14-digit KIN</td>
-<td>3x exponential</td>
+<td>2</td>
+<td>KRA receives and validates</td>
+<td>KRA (CVL/NDML)</td>
+<td>Cross-checks PAN format, name, DOB</td>
+<td>UNDER_PROCESS</td>
 <td>1-2 working days</td>
 </tr>
 <tr>
-<td>Income Verify (if F&amp;O)</td>
-<td>Perfios</td>
-<td>Verified income</td>
-<td>2x</td>
-<td>1-2 hours</td>
+<td>3</td>
+<td>Identity cross-checks</td>
+<td>KRA</td>
+<td>PAN-Aadhaar link, name consistency across databases</td>
+<td>REGISTERED</td>
+<td>Same batch cycle</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Email + mobile validation</td>
+<td>KRA</td>
+<td>Sends validation link to client email/mobile</td>
+<td>VALIDATED</td>
+<td>+1 working day</td>
 </tr>
 </tbody>
 </table>
-<h3>Phase 2: Post-Approval</h3>
-<table>
+<div class="info-box green">
+<p><strong>Trading is allowed at REGISTERED status.</strong> VALIDATED is the final state but REGISTERED is sufficient for exchange operations. Retry: 3x exponential backoff on submission failures.</p>
+</div>
+<h3>CKYC Pipeline (4 steps, 4-5 working days)</h3>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 27%" />
+<col style="width: 16%" />
+<col style="width: 10%" />
+</colgroup>
 <thead>
 <tr>
-<th>Job</th>
+<th>Step</th>
+<th>Action</th>
 <th>Vendor</th>
-<th>Output</th>
+<th>Input/Output</th>
+<th>Status</th>
 <th>SLA</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>NSE UCC</td>
-<td>NSE API/batch</td>
-<td>UCC code</td>
-<td>Same day (5PM cutoff)</td>
+<td>1</td>
+<td>Submit JSON payload</td>
+<td>Decentro API</td>
+<td>Photo, POA, contact, IDs → Acknowledgement</td>
+<td>UPLOADED</td>
+<td>Immediate</td>
 </tr>
 <tr>
-<td>BSE UCC</td>
-<td>BSE API</td>
-<td>UCC code</td>
-<td>Same day</td>
+<td>2</td>
+<td>CERSAI queues for processing</td>
+<td>CERSAI</td>
+<td>Record enters validation queue</td>
+<td>QUEUED</td>
+<td>1-2 working days</td>
 </tr>
 <tr>
-<td>CDSL BO Account</td>
-<td>CDSL DP Module</td>
-<td>DP ID + Client ID</td>
-<td>1-2 hours</td>
+<td>3</td>
+<td>Document OCR and verification</td>
+<td>CERSAI</td>
+<td>Auto-verification of submitted documents</td>
+<td>VALIDATED</td>
+<td>+1-2 working days</td>
 </tr>
 <tr>
-<td>MCX UCC (if commodity)</td>
-<td>MCX Portal</td>
-<td>UCC code</td>
-<td>Next working day</td>
-</tr>
-<tr>
-<td>DDPI Setup (if opted)</td>
-<td>CDSL/NSDL</td>
-<td>DDPI registered</td>
-<td>1 day</td>
+<td>4</td>
+<td>KIN generated</td>
+<td>CERSAI</td>
+<td>14-digit CKYC Identification Number → SMS/email to client</td>
+<td>KIN_GENERATED</td>
+<td>+1 working day</td>
 </tr>
 </tbody>
 </table>
-<h3>Phase 3: Post-Registration</h3>
+<h3>NSE Pipeline (3 steps, same day)</h3>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 27%" />
+<col style="width: 16%" />
+<col style="width: 10%" />
+</colgroup>
+<thead>
+<tr>
+<th>Step</th>
+<th>Action</th>
+<th>Format</th>
+<th>Input/Output</th>
+<th>Status</th>
+<th>SLA</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Submit UCC</td>
+<td>API (REST JSON) or batch (pipe-delimited, max 10K records)</td>
+<td>client_name, PAN, DOB, segments → submission ack</td>
+<td>SUBMITTED</td>
+<td>Immediate</td>
+</tr>
+<tr>
+<td>2</td>
+<td>PAN + Name + DOB verification</td>
+<td>NSE via Protean</td>
+<td>3-param check against ITD</td>
+<td>“A” (Approved) or “I” (Invalid)</td>
+<td>Same batch cycle</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Activation confirmation</td>
+<td>Response batch file or API callback</td>
+<td>UCC code + segment flags → trading permitted</td>
+<td>ACTIVE</td>
+<td>Same day (5PM cutoff)</td>
+</tr>
+</tbody>
+</table>
+<h3>BSE Pipeline (3 steps, same day)</h3>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 27%" />
+<col style="width: 16%" />
+<col style="width: 10%" />
+</colgroup>
+<thead>
+<tr>
+<th>Step</th>
+<th>Action</th>
+<th>Format</th>
+<th>Input/Output</th>
+<th>Status</th>
+<th>SLA</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Submit UCC</td>
+<td>ETI/API (fixed-length, max 30K records)</td>
+<td>Client master data</td>
+<td>SUBMITTED</td>
+<td>Immediate</td>
+</tr>
+<tr>
+<td>2</td>
+<td>3-parameter PAN verification</td>
+<td>BSE via Protean</td>
+<td>PAN + Client Name + DOB must all verify</td>
+<td>VERIFIED</td>
+<td>Same batch cycle</td>
+</tr>
+<tr>
+<td>3</td>
+<td>UCC approved + segment activation</td>
+<td>Segment activation batch (max 50K records)</td>
+<td>Equity/F&amp;O/Currency/Debt segments live</td>
+<td>ACTIVE</td>
+<td>Same day</td>
+</tr>
+</tbody>
+</table>
+<h3>MCX Pipeline (3 steps, next working day, if commodity)</h3>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 27%" />
+<col style="width: 16%" />
+<col style="width: 10%" />
+</colgroup>
+<thead>
+<tr>
+<th>Step</th>
+<th>Action</th>
+<th>Format</th>
+<th>Input/Output</th>
+<th>Status</th>
+<th>SLA</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Submit UCC</td>
+<td>MCX CONNECT / CTCL API</td>
+<td>Full KYC + income proof + client category (HE/SP/AR)</td>
+<td>SUBMITTED</td>
+<td>Immediate</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Income verification</td>
+<td>MCX</td>
+<td>Income proof validated for commodity eligibility</td>
+<td>VERIFIED</td>
+<td>Same day</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Approval</td>
+<td>MCX</td>
+<td>UCC approved for commodity trading</td>
+<td>ACTIVE</td>
+<td>Next working day</td>
+</tr>
+</tbody>
+</table>
+<h3>CDSL Pipeline (5 steps, 1-2 hours API / 1-3 days batch)</h3>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 27%" />
+<col style="width: 16%" />
+<col style="width: 10%" />
+</colgroup>
+<thead>
+<tr>
+<th>Step</th>
+<th>Action</th>
+<th>Format</th>
+<th>Input/Output</th>
+<th>Status</th>
+<th>SLA</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Submit BO file</td>
+<td>Fixed-length positional (Lines 01, 02, 05, 07 mandatory)</td>
+<td>DP ID + holder basics + contact + bank + nomination</td>
+<td>SUBMITTED</td>
+<td>Immediate</td>
+</tr>
+<tr>
+<td>2</td>
+<td>BO record creation + KYC check</td>
+<td>CDAS</td>
+<td>Cross-check KYC status, PAN validity</td>
+<td>CREATED</td>
+<td>Minutes (API)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Bank account validation</td>
+<td>CDAS (Line 05)</td>
+<td>Dividend/interest bank account verified</td>
+<td>BANK_VALID</td>
+<td>Minutes (API)</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Nomination acceptance</td>
+<td>CDAS (Line 07)</td>
+<td>Nominee details recorded or opt-out flagged</td>
+<td>NOM_ACCEPTED</td>
+<td>Minutes (API)</td>
+</tr>
+<tr>
+<td>5</td>
+<td>CDAS activation</td>
+<td>CDAS</td>
+<td>16-digit BO ID active; optional DDPI (24h online)</td>
+<td>ACTIVE</td>
+<td>1-2 hours (API)</td>
+</tr>
+</tbody>
+</table>
+<h3>NSDL Pipeline (5 steps, ~15 working days)</h3>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 27%" />
+<col style="width: 16%" />
+<col style="width: 10%" />
+</colgroup>
+<thead>
+<tr>
+<th>Step</th>
+<th>Action</th>
+<th>Format</th>
+<th>Input/Output</th>
+<th>Status</th>
+<th>SLA</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Submit via Insta Interface</td>
+<td>UDiFF format (ISO-tagged, since Mar 2024)</td>
+<td>Full KYC record</td>
+<td>SUBMITTED</td>
+<td>Immediate</td>
+</tr>
+<tr>
+<td>2</td>
+<td>CDS processing</td>
+<td>CDS</td>
+<td>Account ID + BO ID generated (“IN” + 14 chars)</td>
+<td>PROCESSING</td>
+<td>3-5 working days</td>
+</tr>
+<tr>
+<td>3</td>
+<td>“Out file” sent back to DPM</td>
+<td>DPM</td>
+<td>Client_IDs returned in response file</td>
+<td>DPM_UPDATED</td>
+<td>+2-3 working days</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Back-office client master created</td>
+<td>Internal</td>
+<td>Trading + margin limits set in ODIN</td>
+<td>CLIENT_CREATED</td>
+<td>+1 working day</td>
+</tr>
+<tr>
+<td>5</td>
+<td>PAN flag enablement</td>
+<td>DPM</td>
+<td>PAN flag enabled in DPM → trading enabled</td>
+<td>ACTIVE</td>
+<td>+5-7 working days</td>
+</tr>
+</tbody>
+</table>
+<h3>Income Pipeline (if F&amp;O, 1-2 hours)</h3>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 27%" />
+<col style="width: 16%" />
+<col style="width: 10%" />
+</colgroup>
+<thead>
+<tr>
+<th>Step</th>
+<th>Action</th>
+<th>Vendor</th>
+<th>Input/Output</th>
+<th>Status</th>
+<th>SLA</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Verify income</td>
+<td>Perfios ITR Analyser / Setu AA</td>
+<td>ITR/bank statement → verified income</td>
+<td>VERIFIED</td>
+<td>1-2 hours</td>
+</tr>
+</tbody>
+</table>
+<h3>Post-Activation Jobs</h3>
 <table>
 <colgroup>
 <col style="width: 25%" />
@@ -3207,13 +3652,50 @@ DATA FETCH FLOW:
 <td>Video declaration</td>
 <td>Within 30 days</td>
 </tr>
+<tr>
+<td>DDPI Setup (if opted)</td>
+<td>CDSL/NSDL</td>
+<td>DDPI registered</td>
+<td>1 day</td>
+</tr>
+</tbody>
+</table>
+<h3>Final Activation Gate</h3>
+<p>All three conditions must be met for the client to trade:</p>
+<table>
+<thead>
+<tr>
+<th>Condition</th>
+<th>Source</th>
+<th>Required Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>KRA Registered</td>
+<td>KRA (any of 5)</td>
+<td>REGISTERED or VALIDATED</td>
+</tr>
+<tr>
+<td>BO Account Active</td>
+<td>CDSL and/or NSDL</td>
+<td>ACTIVE</td>
+</tr>
+<tr>
+<td>UCC Approved</td>
+<td>NSE and/or BSE</td>
+<td>ACTIVE</td>
+</tr>
 </tbody>
 </table>
 </section>
 <section id="exchange-depository">
 <h2><span class="section-num">11</span> Exchange &amp; Depository Registration — Batch Integration</h2>
+<p class="section-brief">
+<strong>How client data flows to NSE, BSE, MCX, CDSL, and NSDL</strong> — file formats, field requirements, step-by-step submission sequences, and the intermediate statuses at each agency. PAN is the universal linking key across all systems.
+</p>
 <div class="info-box blue">
-<p><strong>Context:</strong> After e-Sign, the system submits client data to exchanges (NSE/BSE/MCX) for UCC registration and to depositories (CDSL/NSDL) for BO account opening. Each has different file formats, field requirements, and validation rules. PAN is the universal linking key across all systems.</p>
+<p><strong>Context:</strong> After checker approval, the system submits client data to exchanges (NSE/BSE/MCX) for UCC registration and to depositories (CDSL/NSDL) for BO account opening. Each agency has its own multi-step pipeline with intermediate statuses. All agencies run in parallel.</p>
 </div>
 <h3>NSE UCC Registration</h3>
 <table>
@@ -3446,6 +3928,43 @@ DATA FETCH FLOW:
 </tr>
 </tbody>
 </table>
+<h3>Step-by-Step Submission Sequences</h3>
+<h4>NSE UCC — 3 Steps (Same Day)</h4>
+<pre><code>Step 1: Submit UCC via API/batch (pipe-delimited, max 10K records)
+   ↓  Status: SUBMITTED
+Step 2: NSE runs PAN+Name+DOB verification against Protean
+   ↓  Status: &quot;A&quot; (Approved) or &quot;I&quot; (Invalid)
+Step 3: Activation confirmation in response batch file
+   ↓  Status: TRADING ACTIVE</code></pre>
+<h4>BSE UCC — 3 Steps (Same Day)</h4>
+<pre><code>Step 1: Submit UCC via ETI/API (fixed-length, max 30K records)
+   ↓  Status: SUBMITTED
+Step 2: 3-parameter PAN verification (PAN + Name + DOB) via Protean
+   ↓  Status: VERIFIED
+Step 3: UCC approved → segment activation (max 50K batch)
+   ↓  Status: SEGMENTS LIVE</code></pre>
+<h4>CDSL BO Account — 5 Steps (1-2 Hours API)</h4>
+<pre><code>Step 1: Submit BO file (Lines 01, 02, 05, 07 mandatory)
+   ↓  Status: SUBMITTED
+Step 2: BO record creation + KYC status cross-check
+   ↓  Status: CREATED
+Step 3: Bank account validation (Line 05 — dividend/interest account)
+   ↓  Status: BANK_VALID
+Step 4: Nomination acceptance (Line 07 — nominee or opt-out)
+   ↓  Status: NOM_ACCEPTED
+Step 5: CDAS activation → 16-digit BO ID active; optional DDPI (24h online)
+   ↓  Status: ACTIVE</code></pre>
+<h4>NSDL BO Account — 5 Steps (~15 Working Days)</h4>
+<pre><code>Step 1: Submit via Insta Interface (UDiFF format, ISO-tagged)
+   ↓  Status: SUBMITTED
+Step 2: CDS processing → Account ID + BO ID generated (&quot;IN&quot; + 14 chars)
+   ↓  Status: PROCESSING
+Step 3: &quot;Out file&quot; sent back to DPM with Client_IDs
+   ↓  Status: DPM_UPDATED
+Step 4: Back-office client master created in ODIN
+   ↓  Status: CLIENT_CREATED
+Step 5: PAN flag enablement in DPM → trading enabled
+   ↓  Status: ACTIVE</code></pre>
 <h3>CDSL vs NSDL — Key Differences</h3>
 <table>
 <colgroup>
@@ -3578,6 +4097,9 @@ DATA FETCH FLOW:
 </section>
 <section id="six-attribute">
 <h2><span class="section-num">12</span> 6-Attribute Matching &amp; Data Reconciliation</h2>
+<p class="section-brief">
+<strong>The 6 fields that must match everywhere</strong> — Name, PAN, Address, Mobile, Email, and Income Range must be consistent across KRA records, Exchange UCC, and Depository BO accounts. Mismatches block settlement and can freeze accounts.
+</p>
 <div class="info-box red">
 <p><strong>Critical SEBI Mandate:</strong> Six KYC attributes must be consistent across KRA records, Exchange UCC, and Depository BO accounts. PAN is the primary linkage key. Mismatches block settlement and can freeze accounts.</p>
 </div>
@@ -3806,6 +4328,9 @@ Exchange (NSE/BSE/MCX)          Depository (CDSL/NSDL)
 </section>
 <section id="audit-compliance">
 <h2><span class="section-num">13</span> Audit &amp; Compliance Framework</h2>
+<p class="section-brief">
+<strong>What to keep, how long, and who audits it</strong> — data retention requirements (5-8 years depending on type), audit trail specifications, and compliance reporting obligations under SEBI, PMLA, and DPDP Act 2023.
+</p>
 <h3>Data Retention Requirements</h3>
 <table>
 <colgroup>
@@ -4012,69 +4537,306 @@ Exchange (NSE/BSE/MCX)          Depository (CDSL/NSDL)
 </section>
 <section id="admin-workflow">
 <h2><span class="section-num">14</span> KYC Admin Workflow</h2>
-<h3>Auto-Approve Criteria (no human touch)</h3>
+<p class="section-brief">
+<strong>The maker-checker review process</strong> — how applications are auto-approved, when they need manual review, and the checker’s role as the final gate before batch processing begins. 80-85% of applications pass with zero human intervention.
+</p>
+<h3>Maker-Checker Flow</h3>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 27%" />
+<col style="width: 31%" />
+</colgroup>
+<thead>
+<tr>
+<th>Step</th>
+<th>Role</th>
+<th>Action</th>
+<th>Outcome</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10</td>
+<td><strong>Maker (System)</strong></td>
+<td>Auto-verify all checks against thresholds below. If ALL pass → auto-approve.</td>
+<td>Auto-approved (80-85% of cases)</td>
+</tr>
+<tr>
+<td>10</td>
+<td><strong>Maker (Ops)</strong></td>
+<td>If any check is marginal (e.g., name match 70-89%), manually review the flagged fields.</td>
+<td>Approved / Escalated / Rejected</td>
+</tr>
+<tr>
+<td>11</td>
+<td><strong>Checker (Supervisor)</strong></td>
+<td>Review maker’s decision. Final approval or rejection. Checker sign-off is mandatory — no batch processing fires without it.</td>
+<td><strong>Checker Approved</strong> → batch pipelines fire</td>
+</tr>
+<tr>
+<td>Esc</td>
+<td><strong>Compliance</strong></td>
+<td>AML HIGH risk, PEP matches, sanctions hits escalated from maker. Enhanced CDD required.</td>
+<td>Approved with conditions / Rejected</td>
+</tr>
+</tbody>
+</table>
+<h3>Auto-Approve Criteria (Maker — no human touch)</h3>
 <p>Application is auto-approved if ALL conditions are met:</p>
 <table>
 <thead>
 <tr>
 <th>Check</th>
 <th>Threshold</th>
+<th>Source</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>PAN status</td>
 <td>= E (valid)</td>
+<td>Decentro PAN API</td>
 </tr>
 <tr>
 <td>PAN-Aadhaar linked</td>
 <td>= Y</td>
+<td>Decentro PAN API</td>
 </tr>
 <tr>
 <td>PAN name vs DigiLocker name</td>
 <td>≥ 90% match</td>
+<td>Internal name matcher</td>
 </tr>
 <tr>
 <td>Penny drop name match</td>
 <td>≥ 80%</td>
+<td>Decentro Penny Drop</td>
 </tr>
 <tr>
 <td>Face match score</td>
 <td>≥ 85%</td>
+<td>HyperVerge</td>
 </tr>
 <tr>
 <td>Liveness detection</td>
 <td>= Pass</td>
+<td>HyperVerge</td>
 </tr>
 <tr>
 <td>AML risk</td>
 <td>= LOW</td>
+<td>TrackWizz</td>
 </tr>
 <tr>
 <td>PEP match</td>
 <td>= None</td>
+<td>TrackWizz</td>
 </tr>
 <tr>
 <td>Sanctions match</td>
 <td>= None</td>
+<td>TrackWizz</td>
 </tr>
 </tbody>
 </table>
 <div class="info-box green">
 <p><strong>Expected auto-approve rate: 80-85%</strong> of applications need zero human intervention.</p>
 </div>
+<h3>Manual Review Triggers (Maker must review)</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Trigger</th>
+<th>Condition</th>
+<th>Action Required</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Name mismatch</td>
+<td>PAN vs DigiLocker name match 70-89%</td>
+<td>Verify names visually, check for initials/abbreviations</td>
+</tr>
+<tr>
+<td>Penny drop marginal</td>
+<td>Name match 60-79%</td>
+<td>Check bank name vs Aadhaar name, allow common variations</td>
+</tr>
+<tr>
+<td>Face match marginal</td>
+<td>Score 70-84%</td>
+<td>Review selfie quality, request retake if needed</td>
+</tr>
+<tr>
+<td>AML MEDIUM risk</td>
+<td>Risk score above LOW threshold</td>
+<td>Review hit details, confirm false positive or escalate</td>
+</tr>
+<tr>
+<td>PEP declared</td>
+<td>User self-declared PEP = Yes</td>
+<td>Enhanced CDD: verify position, source of wealth</td>
+</tr>
+<tr>
+<td>Income mismatch</td>
+<td>Declared income vs verified income diverge &gt; 50%</td>
+<td>Review income proof documents</td>
+</tr>
+</tbody>
+</table>
+<h3>Checker Final Approval</h3>
+<p>The checker reviews the maker’s decision and gives final sign-off:</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Checker Action</th>
+<th>When</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Approve</strong></td>
+<td>Maker auto-approved or manually approved</td>
+<td>Batch pipelines fire (KRA, CKYC, UCC, BO)</td>
+</tr>
+<tr>
+<td><strong>Reject</strong></td>
+<td>Fraud indicators, compliance red flags</td>
+<td>Application rejected, client notified</td>
+</tr>
+<tr>
+<td><strong>Send Back</strong></td>
+<td>Missing information, unclear documentation</td>
+<td>Returns to maker for re-review</td>
+</tr>
+</tbody>
+</table>
+<div class="info-box orange">
+<p><strong>Critical:</strong> Batch processing (KRA submit, CKYC upload, UCC registration, BO account opening) begins <strong>only after checker approval</strong>. This ensures no regulatory submission happens without dual sign-off.</p>
+</div>
 </section>
 <section id="status-machine">
 <h2><span class="section-num">15</span> Application Status Machine</h2>
+<p class="section-brief">
+<strong>Every state an application can be in</strong> — from the first mobile OTP to trading-ready. Tracks the user journey (9 screens), maker-checker review, and batch registration across agencies. Use this to understand what triggers each transition.
+</p>
 <div class="status-flow">
-<p><span class="status-node pending">STARTED</span> <span class="status-arrow">→</span> <span class="status-node pending">DIGILOCKER_PENDING</span> <span class="status-arrow">→</span> <span class="status-node pending">FILLING</span> <span class="status-arrow">→</span> <span class="status-node pending">GATE_CHECK</span> <span class="status-arrow">→</span> <span class="status-node pending">e_SIGNED</span> <span class="status-arrow">→</span> <span class="status-node pending">UNDER_REVIEW</span> <span class="status-arrow">→</span> <span class="status-node pending">APPROVED</span> <span class="status-arrow">→</span> <span class="status-node pending">REGISTERING</span> <span class="status-arrow">→</span> <span class="status-node active">ACTIVE</span></p>
+<p><span class="status-node pending">REGISTERED</span> <span class="status-arrow">→</span> <span class="status-node pending">PAN_ENTERED</span> <span class="status-arrow">→</span> <span class="status-node pending">DIGILOCKER_PENDING</span> <span class="status-arrow">→</span> <span class="status-node pending">FILLING</span> <span class="status-arrow">→</span> <span class="status-node pending">GATE_CHECK</span> <span class="status-arrow">→</span> <span class="status-node pending">e_SIGNED</span> <span class="status-arrow">→</span> <span class="status-node pending">UNDER_REVIEW</span> <span class="status-arrow">→</span> <span class="status-node pending">APPROVED</span> <span class="status-arrow">→</span> <span class="status-node pending">REGISTERING</span> <span class="status-arrow">→</span> <span class="status-node active">ACTIVE</span></p>
 </div>
 <p style="margin-top:8px;">
 <span class="status-node blocked">GATE_FAILED</span> (any blocking check fails) — <span class="status-node blocked">REJECTED</span> (admin rejection)
 </p>
+<h3>Status Transitions</h3>
+<table>
+<colgroup>
+<col style="width: 31%" />
+<col style="width: 21%" />
+<col style="width: 47%" />
+</colgroup>
+<thead>
+<tr>
+<th>From</th>
+<th>To</th>
+<th>Trigger</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>—</td>
+<td>REGISTERED</td>
+<td>Mobile OTP verified (Screen 1 complete)</td>
+</tr>
+<tr>
+<td>REGISTERED</td>
+<td>PAN_ENTERED</td>
+<td>PAN + DOB submitted (Screen 2), async checks fire</td>
+</tr>
+<tr>
+<td>PAN_ENTERED</td>
+<td>DIGILOCKER_PENDING</td>
+<td>Redirected to DigiLocker (Screen 3)</td>
+</tr>
+<tr>
+<td>DIGILOCKER_PENDING</td>
+<td>FILLING</td>
+<td>DigiLocker consent complete, data harvested</td>
+</tr>
+<tr>
+<td>DIGILOCKER_PENDING</td>
+<td>PAN_ENTERED</td>
+<td>DigiLocker cancelled (retry)</td>
+</tr>
+<tr>
+<td>FILLING</td>
+<td>GATE_CHECK</td>
+<td>Screen 8 declarations submitted</td>
+</tr>
+<tr>
+<td>GATE_CHECK</td>
+<td>e_SIGNED</td>
+<td>Gate passed + e-Sign complete (Screen 9)</td>
+</tr>
+<tr>
+<td>GATE_CHECK</td>
+<td>GATE_FAILED</td>
+<td>Any blocking check failed</td>
+</tr>
+<tr>
+<td>GATE_FAILED</td>
+<td>FILLING</td>
+<td>User corrects issue + retries</td>
+</tr>
+<tr>
+<td>e_SIGNED</td>
+<td>UNDER_REVIEW</td>
+<td>Auto — enters maker-checker queue</td>
+</tr>
+<tr>
+<td>UNDER_REVIEW</td>
+<td>APPROVED</td>
+<td>Checker approval (after maker review)</td>
+</tr>
+<tr>
+<td>UNDER_REVIEW</td>
+<td>REJECTED</td>
+<td>Checker rejection</td>
+</tr>
+<tr>
+<td>REJECTED</td>
+<td>FILLING</td>
+<td>User resubmits with corrections</td>
+</tr>
+<tr>
+<td>APPROVED</td>
+<td>REGISTERING</td>
+<td>Batch pipelines fire (KRA, CKYC, UCC, BO)</td>
+</tr>
+<tr>
+<td>REGISTERING</td>
+<td>ACTIVE</td>
+<td>KRA Registered + UCC Approved + BO Active</td>
+</tr>
+</tbody>
+</table>
 </section>
 <section id="v-comms">
 <h2><span class="section-num">16</span> Communications &amp; Notifications</h2>
+<p class="section-brief">
+<strong>SMS, email, and WhatsApp vendor options</strong> — for OTP delivery, status updates, welcome kits, and regulatory notifications. Covers DLT registration, delivery rates, and pricing across 4 vendors.
+</p>
 <div class="vendor-table">
 <div class="vendor-table-title">
 Vendor Comparison: SMS / Email / WhatsApp
@@ -4159,6 +4921,9 @@ Supplementary only.
 </section>
 <section id="v-backoffice">
 <h2><span class="section-num">17</span> Back-Office / RMS Software</h2>
+<p class="section-brief">
+<strong>Trading systems and risk management</strong> — compares back-office software (63 Moons ODIN, Symphony XTS, OmneNEST) for multi-exchange trading, risk management, and client master record sync post-onboarding.
+</p>
 <div class="vendor-table">
 <div class="vendor-table-title">
 Vendor Comparison: Back-Office &amp; RMS
@@ -4243,6 +5008,9 @@ Powers Zerodha Kite, Upstox, Finvasia. BSE/NSE/MCX.
 </section>
 <section id="error-handling">
 <h2><span class="section-num">18</span> Error Handling &amp; Edge Cases</h2>
+<p class="section-brief">
+<strong>What happens when things go wrong</strong> — fallback flows for DigiLocker failures, verification timeouts, KRA/CKYC edge cases, and API errors. Every error has a user-facing message and a system action.
+</p>
 <h3>DigiLocker Failures</h3>
 <table>
 <colgroup>
@@ -4367,6 +5135,9 @@ Powers Zerodha Kite, Upstox, Finvasia. BSE/NSE/MCX.
 </section>
 <section id="regulatory">
 <h2><span class="section-num">19</span> Regulatory Circulars</h2>
+<p class="section-brief">
+<strong>Every SEBI, RBI, and NPCI circular that shapes this system</strong> — 15+ regulatory references with dates, circular numbers, and their specific impact on the onboarding flow. Essential reading for compliance teams.
+</p>
 <table>
 <colgroup>
 <col style="width: 20%" />
@@ -4495,6 +5266,9 @@ Powers Zerodha Kite, Upstox, Finvasia. BSE/NSE/MCX.
 </section>
 <section id="cost-analysis">
 <h2><span class="section-num">20</span> Cost Analysis</h2>
+<p class="section-brief">
+<strong>What each onboarding costs in vendor API fees</strong> — per-transaction costs for every integration point, recommended vs cheapest alternate pricing, and a total cost-per-onboarding estimate (Rs.80-150).
+</p>
 <table>
 <colgroup>
 <col style="width: 20%" />
@@ -4616,6 +5390,9 @@ Powers Zerodha Kite, Upstox, Finvasia. BSE/NSE/MCX.
 </section>
 <section id="security">
 <h2><span class="section-num">21</span> Security &amp; Compliance Requirements</h2>
+<p class="section-brief">
+<strong>Security standards the KYC system must meet</strong> — encryption, access control, API security, Aadhaar data vault requirements, and compliance with SEBI cybersecurity framework, DPDP Act 2023, and PCI DSS.
+</p>
 <table>
 <colgroup>
 <col style="width: 50%" />
@@ -4669,6 +5446,9 @@ Powers Zerodha Kite, Upstox, Finvasia. BSE/NSE/MCX.
 </section>
 <section id="master-dataset">
 <h2><span class="section-num">22</span> Master Dataset — Detailed Sections</h2>
+<p class="section-brief">
+<strong>The complete field-level specification</strong> — all ~454 fields across 30 sections with data types, sizes, validation rules, source systems, and regulatory references. This is the single source of truth for what data the KYC system captures.
+</p>
 <p>Version 1.1 — ~454 fields across 30 sections. Regulatory basis: SEBI KYC Master Circular, Stock Brokers Master, AML/CFT Guidelines.</p>
 <details>
 <summary>
@@ -4935,6 +5715,9 @@ H: Demat (9) | I: Nominations (22 per nominee) | J: FATCA (15) | K: PEP/AML (6) 
 </section>
 <section id="code-tables">
 <h2><span class="section-num">23</span> Code Tables</h2>
+<p class="section-brief">
+<strong>Lookup values for every dropdown and coded field</strong> — occupation codes, state codes, country codes, relationship types, income ranges, and other reference data used across KRA, CKYC, and exchange submissions.
+</p>
 <details>
 <summary>
 Occupation Codes (KRA/CKYC)
@@ -5094,9 +5877,12 @@ PAN Status Codes
 </section>
 <section id="diagrams">
 <h2><span class="section-num">24</span> Architecture Diagrams</h2>
+<p class="section-brief">
+<strong>Visual architecture of the onboarding system</strong> — three SVG diagrams showing the complete 9-screen flow, data source mapping, and batch processing pipeline. Click any diagram to view full size.
+</p>
 <div id="diagram-flow" class="svg-container">
 <div class="svg-label">
-Diagram 1: Complete Onboarding Flow (8 Screens + Async + Batch)
+Diagram 1: Complete Onboarding Flow (9 Screens + Maker-Checker + Batch)
 </div>
 <p><object data="diagrams/01-onboarding-flow.svg" type="image/svg+xml" style="width:100%; min-height:500px;"></object></p>
 </div>
@@ -5118,7 +5904,7 @@ Diagram 3: Async Batch Processing Pipeline
 
 <div class="footer">
   <p><strong>KYC Onboarding Reference</strong> &mdash; Individual Customer, Indian Stock Broking Firm</p>
-  <p>Generated: 2026-02-09 | v2.2 | 24 sections | ~454 fields | 25+ vendors | 16 AA operators | 15+ circulars</p>
+  <p>Generated: 2026-02-10 | v3.0 | 24 sections | ~454 fields | 25+ vendors | 16 AA operators | 15+ circulars</p>
   <p>SEBI KYC Master (Oct 2023) | Stock Brokers Master (Jun 2025) | AML/CFT (Jun 2024) | DPDP Act 2023</p>
 </div>
 

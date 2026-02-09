@@ -1,6 +1,8 @@
 <section id="setu-deep-dive">
 ## <span class="section-num">4</span> Setu Product Portfolio &mdash; Deep Dive
 
+<p class="section-brief"><strong>Deep dive into Setu's unified KYC platform</strong> &mdash; acquired by Pine Labs for $70-75M, Setu can consolidate Aadhaar, PAN, bank verification, DigiLocker, and eSign into a single vendor. Covers capabilities, gaps, and where it fits in the stack.</p>
+
 ::: {.info-box .purple}
 **Why Setu matters:** Acquired by Pine Labs for $70-75M (2022). Revenue nearly doubled to INR 35.2 crore in FY24. Setu can potentially consolidate Aadhaar + PAN + bank verification + DigiLocker + eSign into a single vendor, reducing integration overhead. Key gaps: no CKYC, no Video KYC, no face match/liveness, no OCR.
 :::

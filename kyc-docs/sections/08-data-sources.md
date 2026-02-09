@@ -1,6 +1,8 @@
 <section id="data-sources">
 ## <span class="section-num">8</span> Data Source Mapping
 
+<p class="section-brief"><strong>Where each field comes from</strong> &mdash; the resolution priority when DigiLocker, KRA, CKYC, and vendor APIs all provide the same field. DigiLocker wins for identity, KRA wins for financial profile, vendor APIs win for real-time verification results.</p>
+
 ### Resolution Priority (when multiple sources provide same field)
 
 <div style="display:flex;gap:8px;flex-wrap:wrap;margin:16px 0;align-items:center;">

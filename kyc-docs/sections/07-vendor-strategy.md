@@ -1,6 +1,8 @@
 <section id="vendor-strategy">
 ## <span class="section-num">7</span> Strategic Vendor Evaluation Matrix
 
+<p class="section-brief"><strong>Which vendors to invest in and which to skip</strong> &mdash; a strategic assessment of 25+ vendors across identity, payments, compliance, and back-office layers. Includes the recommended final stack and alternates for every integration point.</p>
+
 ### Vendors Worth Serious Evaluation (Beyond Current Stack)
 
 | Vendor | Why Consider | Primary Use Case | Integration Effort |
@@ -10,6 +12,7 @@
 | **Signzy** | All-in-one with no-code platform; Gartner-recognized | Vendor consolidation priority; strongest low-bandwidth Video KYC (75 kbps for Tier 3/4) | 2-3 weeks |
 | **Karza/Perfios** | Deep analytics layer (GST, ITR, bank statement analysis) | Income/suitability verification for margin trading and F&O. 4000+ bank statement formats. | 2 weeks |
 | **Tartan** | Deepest payroll/income verification in India | Real-time HRMS income data for eligibility. 30+ HRMS integrations. Relevant if F&O/margin products offered. | 1-2 weeks |
+| **Leegality** | Zero license fee eSign + eStamping | Cost-sensitive deployments, pilot phases, or states requiring eStamping. 55M+ eSigns. Smart API with &lt;2 day integration. | &lt;2 days |
 
 ### Vendors Likely Not Needed (Covered by Current Stack)
 
@@ -28,7 +31,7 @@
 | Layer | Recommended | Role | Alternate |
 |---|---|---|---|
 | Identity + DigiLocker | **Digio** or **Setu** | DigiLocker, Aadhaar eKYC, KRA | Decentro |
-| PAN + Bank + eSign | **Setu** (unified) or **Decentro** + **Digio** | PAN verify, penny drop, eSign | Split across vendors |
+| PAN + Bank + eSign | **Setu** (unified) or **Decentro** + **Digio** | PAN verify, penny drop, eSign | Leegality (eSign only, cost optimization) |
 | Face Match + Video + OCR | **HyperVerge** | Liveness, face match, OCR, VIPV fallback | Signzy (low bandwidth), IDfy |
 | CKYC + AML | **TrackWizz** | CKYC search/upload, AML/PEP screening | Decentro (CKYC) + ComplyAdvantage (AML) |
 | Income Verification | **Perfios** (ITR) + **Setu AA** (bank statement) | F&O activation, margin eligibility | Karza, Tartan (payroll) |

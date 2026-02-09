@@ -1,6 +1,8 @@
 <section id="error-handling">
 ## <span class="section-num">18</span> Error Handling &amp; Edge Cases
 
+<p class="section-brief"><strong>What happens when things go wrong</strong> &mdash; fallback flows for DigiLocker failures, verification timeouts, KRA/CKYC edge cases, and API errors. Every error has a user-facing message and a system action.</p>
+
 ### DigiLocker Failures
 
 | Scenario | Handling |

@@ -1,6 +1,8 @@
 <section id="master-dataset">
 ## <span class="section-num">22</span> Master Dataset &mdash; Detailed Sections
 
+<p class="section-brief"><strong>The complete field-level specification</strong> &mdash; all ~454 fields across 30 sections with data types, sizes, validation rules, source systems, and regulatory references. This is the single source of truth for what data the KYC system captures.</p>
+
 Version 1.1 &mdash; ~454 fields across 30 sections. Regulatory basis: SEBI KYC Master Circular, Stock Brokers Master, AML/CFT Guidelines.
 
 <details>

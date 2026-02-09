@@ -1,6 +1,8 @@
 <section id="security">
 ## <span class="section-num">21</span> Security &amp; Compliance Requirements
 
+<p class="section-brief"><strong>Security standards the KYC system must meet</strong> &mdash; encryption, access control, API security, Aadhaar data vault requirements, and compliance with SEBI cybersecurity framework, DPDP Act 2023, and PCI DSS.</p>
+
 | Requirement | Standard |
 |---|---|
 | Transport | TLS 1.2+ (HTTPS only) |

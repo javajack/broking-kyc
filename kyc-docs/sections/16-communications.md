@@ -1,6 +1,8 @@
 <section id="v-comms">
 ## <span class="section-num">16</span> Communications &amp; Notifications
 
+<p class="section-brief"><strong>SMS, email, and WhatsApp vendor options</strong> &mdash; for OTP delivery, status updates, welcome kits, and regulatory notifications. Covers DLT registration, delivery rates, and pricing across 4 vendors.</p>
+
 <div class="vendor-table">
   <div class="vendor-table-title">Vendor Comparison: SMS / Email / WhatsApp</div>
   <table>

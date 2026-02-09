@@ -1,17 +1,20 @@
 <section id="design-principles">
 ## <span class="section-num">1</span> Design Principles
 
+<p class="section-brief"><strong>The 11 architectural rules that shape every screen and API call</strong> &mdash; read this first to understand why the system works the way it does. Every design decision flows from these principles.</p>
+
 | # | Principle | Implementation |
 |---|---|---|
-| 1 | **DigiLocker-first** | Force Aadhaar + PAN fetch via DigiLocker consent. Harvests ~25 identity fields with zero typing. |
-| 2 | **Aadhaar-number login only** | No phone/email login for DigiLocker. Aadhaar number ensures the strongest identity anchor. |
-| 3 | **Pre-fill everything** | DigiLocker + KRA + CKYC cover ~90 identity/financial fields. User only confirms. |
-| 4 | **Async verification** | PAN verify, KRA lookup, CKYC search, AML screening fire in parallel while user is on DigiLocker. |
-| 5 | **Minimal user typing** | ~12 fields: Aadhaar, PAN, mobile, email, marital status, bank a/c, IFSC, a/c type + toggles. |
-| 6 | **e-Sign everything** | Single Aadhaar OTP e-Sign on the complete application. No physical signatures. |
-| 7 | **Batch submission** | KRA, CKYC, UCC, BO account submitted async after e-Sign. User never waits. |
-| 8 | **IPV exemption** | Aadhaar eKYC (DigiLocker) exempts IPV/VIPV per SEBI circular. Saves one step. |
-| 9 | **Progressive disclosure** | Only show fields relevant to choices (F&O income proof, FATCA, PEP). |
-| 10 | **Fail fast, fail gracefully** | If blocking check fails, stop user before e-Sign. Don't waste their time. |
+| 1 | **Mobile-first registration** | Start with mobile OTP verification before any KYC data. Establishes the identity anchor and communication channel used for all subsequent OTPs, KRA verification, and post-onboarding notifications. |
+| 2 | **DigiLocker-first** | Force Aadhaar + PAN fetch via DigiLocker consent. Harvests ~25 identity fields with zero typing. |
+| 3 | **Aadhaar via DigiLocker** | DigiLocker consent flow provides Aadhaar eKYC without needing the user to type their Aadhaar number into our app. Strongest identity anchor with IPV exemption. |
+| 4 | **Pre-fill everything** | DigiLocker + KRA + CKYC cover ~90 identity/financial fields. User only confirms. |
+| 5 | **Async verification** | PAN verify, KRA lookup, CKYC search, AML screening fire in parallel while user is on DigiLocker. |
+| 6 | **Minimal user typing** | ~12 fields: mobile, PAN, DOB, email, bank a/c, IFSC, a/c type + toggles. |
+| 7 | **e-Sign everything** | Single Aadhaar OTP e-Sign on the complete application. No physical signatures. |
+| 8 | **Batch submission** | KRA, CKYC, UCC, BO account submitted async after maker-checker approval. User never waits. |
+| 9 | **IPV exemption** | Aadhaar eKYC (DigiLocker) exempts IPV/VIPV per SEBI circular. Saves one step. |
+| 10 | **Progressive disclosure** | Only show fields relevant to choices (F&O income proof, FATCA, PEP). |
+| 11 | **Fail fast, fail gracefully** | If blocking check fails, stop user before e-Sign. Don't waste their time. |
 
 </section>

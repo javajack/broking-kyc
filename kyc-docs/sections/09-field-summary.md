@@ -1,6 +1,8 @@
 <section id="field-summary">
 ## <span class="section-num">9</span> Master Dataset &mdash; Field Summary
 
+<p class="section-brief"><strong>All ~454 fields at a glance</strong> &mdash; grouped by section (personal identity, address, contact, bank, trading, etc.) with field counts, data sources, and which screen captures each group. The full field-level specification is in the Master Dataset section below.</p>
+
 ::: {.info-box .blue}
 **Full field-level specification:** See <a class="xref" href="#master-dataset">Master Dataset Sections</a> below for complete field definitions with data types, sizes, validations, and regulatory sources.
 :::

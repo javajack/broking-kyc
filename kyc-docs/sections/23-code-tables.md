@@ -1,6 +1,8 @@
 <section id="code-tables">
 ## <span class="section-num">23</span> Code Tables
 
+<p class="section-brief"><strong>Lookup values for every dropdown and coded field</strong> &mdash; occupation codes, state codes, country codes, relationship types, income ranges, and other reference data used across KRA, CKYC, and exchange submissions.</p>
+
 <details>
   <summary>Occupation Codes (KRA/CKYC)</summary>
 

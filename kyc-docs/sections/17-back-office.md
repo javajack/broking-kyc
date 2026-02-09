@@ -1,6 +1,8 @@
 <section id="v-backoffice">
 ## <span class="section-num">17</span> Back-Office / RMS Software
 
+<p class="section-brief"><strong>Trading systems and risk management</strong> &mdash; compares back-office software (63 Moons ODIN, Symphony XTS, OmneNEST) for multi-exchange trading, risk management, and client master record sync post-onboarding.</p>
+
 <div class="vendor-table">
   <div class="vendor-table-title">Vendor Comparison: Back-Office &amp; RMS</div>
   <table>

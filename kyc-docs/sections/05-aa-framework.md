@@ -1,6 +1,8 @@
 <section id="aa-framework">
 ## <span class="section-num">5</span> Account Aggregator Framework &mdash; Comprehensive Guide
 
+<p class="section-brief"><strong>RBI's consent-based financial data sharing network</strong> &mdash; how Account Aggregators let brokers fetch bank statements, ITR data, and demat holdings without manual document uploads. Covers the FIP/FIU/AA architecture, 16 licensed operators, and practical integration for KYC.</p>
+
 ::: {.info-box .cyan}
 **What is AA?** An RBI-licensed NBFC that acts as a consent manager for financial data. AA does not store/view/process data &mdash; it facilitates encrypted transfer from Financial Information Provider (FIP) to Financial Information User (FIU). Governed by RBI Master Direction dated Sep 2, 2016. Inter-regulatory: RBI, SEBI, IRDAI, PFRDA, DoR. Industry body: Sahamati.
 :::

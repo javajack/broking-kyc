@@ -1,6 +1,8 @@
 <section id="six-attribute">
 ## <span class="section-num">12</span> 6-Attribute Matching &amp; Data Reconciliation
 
+<p class="section-brief"><strong>The 6 fields that must match everywhere</strong> &mdash; Name, PAN, Address, Mobile, Email, and Income Range must be consistent across KRA records, Exchange UCC, and Depository BO accounts. Mismatches block settlement and can freeze accounts.</p>
+
 ::: {.info-box .red}
 **Critical SEBI Mandate:** Six KYC attributes must be consistent across KRA records, Exchange UCC, and Depository BO accounts. PAN is the primary linkage key. Mismatches block settlement and can freeze accounts.
 :::

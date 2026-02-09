@@ -1,8 +1,10 @@
 <section id="exchange-depository">
 ## <span class="section-num">11</span> Exchange &amp; Depository Registration &mdash; Batch Integration
 
+<p class="section-brief"><strong>How client data flows to NSE, BSE, MCX, CDSL, and NSDL</strong> &mdash; file formats, field requirements, step-by-step submission sequences, and the intermediate statuses at each agency. PAN is the universal linking key across all systems.</p>
+
 ::: {.info-box .blue}
-**Context:** After e-Sign, the system submits client data to exchanges (NSE/BSE/MCX) for UCC registration and to depositories (CDSL/NSDL) for BO account opening. Each has different file formats, field requirements, and validation rules. PAN is the universal linking key across all systems.
+**Context:** After checker approval, the system submits client data to exchanges (NSE/BSE/MCX) for UCC registration and to depositories (CDSL/NSDL) for BO account opening. Each agency has its own multi-step pipeline with intermediate statuses. All agencies run in parallel.
 :::
 
 ### NSE UCC Registration
@@ -68,6 +70,60 @@
 | **Platforms** | **SPEED-e**: Online delivery instructions. **IDeAS**: View holdings/statements. **DPM Plus**: Enhanced DP operations (incl. online account closure). |
 | **DDPI** | Primarily offline at many DPs (physical form couriered). Some support online via Aadhaar eSign. Processing: 2-3 business days. |
 | **Activation SLA** | Most processing within 15 working days including verification. PAN flag must be enabled in DPM after verification. |
+
+### Step-by-Step Submission Sequences
+
+#### NSE UCC &mdash; 3 Steps (Same Day)
+
+```
+Step 1: Submit UCC via API/batch (pipe-delimited, max 10K records)
+   ↓  Status: SUBMITTED
+Step 2: NSE runs PAN+Name+DOB verification against Protean
+   ↓  Status: "A" (Approved) or "I" (Invalid)
+Step 3: Activation confirmation in response batch file
+   ↓  Status: TRADING ACTIVE
+```
+
+#### BSE UCC &mdash; 3 Steps (Same Day)
+
+```
+Step 1: Submit UCC via ETI/API (fixed-length, max 30K records)
+   ↓  Status: SUBMITTED
+Step 2: 3-parameter PAN verification (PAN + Name + DOB) via Protean
+   ↓  Status: VERIFIED
+Step 3: UCC approved → segment activation (max 50K batch)
+   ↓  Status: SEGMENTS LIVE
+```
+
+#### CDSL BO Account &mdash; 5 Steps (1-2 Hours API)
+
+```
+Step 1: Submit BO file (Lines 01, 02, 05, 07 mandatory)
+   ↓  Status: SUBMITTED
+Step 2: BO record creation + KYC status cross-check
+   ↓  Status: CREATED
+Step 3: Bank account validation (Line 05 — dividend/interest account)
+   ↓  Status: BANK_VALID
+Step 4: Nomination acceptance (Line 07 — nominee or opt-out)
+   ↓  Status: NOM_ACCEPTED
+Step 5: CDAS activation → 16-digit BO ID active; optional DDPI (24h online)
+   ↓  Status: ACTIVE
+```
+
+#### NSDL BO Account &mdash; 5 Steps (~15 Working Days)
+
+```
+Step 1: Submit via Insta Interface (UDiFF format, ISO-tagged)
+   ↓  Status: SUBMITTED
+Step 2: CDS processing → Account ID + BO ID generated ("IN" + 14 chars)
+   ↓  Status: PROCESSING
+Step 3: "Out file" sent back to DPM with Client_IDs
+   ↓  Status: DPM_UPDATED
+Step 4: Back-office client master created in ODIN
+   ↓  Status: CLIENT_CREATED
+Step 5: PAN flag enablement in DPM → trading enabled
+   ↓  Status: ACTIVE
+```
 
 ### CDSL vs NSDL &mdash; Key Differences
 

@@ -1,6 +1,8 @@
 <section id="cost-analysis">
 ## <span class="section-num">20</span> Cost Analysis
 
+<p class="section-brief"><strong>What each onboarding costs in vendor API fees</strong> &mdash; per-transaction costs for every integration point, recommended vs cheapest alternate pricing, and a total cost-per-onboarding estimate (Rs.80-150).</p>
+
 | Integration | Recommended | Cost/txn | Cheapest Alt | Cost |
 |---|---|---|---|---|
 | PAN Verify | Decentro | Rs.1-3 | Sandbox.co.in | Rs.1-2 |

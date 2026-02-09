@@ -1,6 +1,8 @@
 <section id="regulatory">
 ## <span class="section-num">19</span> Regulatory Circulars
 
+<p class="section-brief"><strong>Every SEBI, RBI, and NPCI circular that shapes this system</strong> &mdash; 15+ regulatory references with dates, circular numbers, and their specific impact on the onboarding flow. Essential reading for compliance teams.</p>
+
 | # | Topic | Circular | Date | Impact |
 |---|---|---|---|---|
 | 1 | KYC Master Circular | SEBI/HO/MIRSD/MIRSD-SEC-2/P/CIR/2023/168 | Oct 2023 | Consolidated KYC norms, CERSAI templates |

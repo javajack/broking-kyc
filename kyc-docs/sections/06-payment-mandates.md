@@ -1,6 +1,8 @@
 <section id="payment-mandates">
 ## <span class="section-num">6</span> Payment Mandates &mdash; UPI AutoPay, e-NACH &amp; UPI Block
 
+<p class="section-brief"><strong>Setting up recurring payments during onboarding</strong> &mdash; compares UPI AutoPay, e-NACH, and the new UPI Block mechanism (mandatory for QSBs). Covers mandate limits, SIP setup, and margin funding integration.</p>
+
 ### UPI AutoPay vs e-NACH
 
 | Feature | UPI AutoPay | e-NACH (NPCI) |

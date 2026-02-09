@@ -1,23 +1,46 @@
 <section id="screens">
 <h2><span class="section-num">3</span> Screen-by-Screen Specification</h2>
 
+<p class="section-brief"><strong>The 9-screen user journey</strong> &mdash; each screen has a single clear purpose. Mobile/email registration establishes the identity anchor and OTP channel before any KYC data enters the system. PAN+DOB fires async checks while the user completes DigiLocker consent. Total user time: ~6 minutes.</p>
+
 <!-- SCREEN 1 -->
 <div class="screen-card" id="screen-1">
 <div class="screen-card-header">
 <div class="screen-num">1</div>
-<h4>Start &mdash; Aadhaar + PAN Entry</h4>
+<h4>Mobile / Email Registration</h4>
 </div>
-<p><strong>Purpose:</strong> Capture the two identity anchors that unlock all downstream data.</p>
+<p><strong>Purpose:</strong> Establish the identity anchor and OTP communication channel before any KYC data is captured.</p>
 <p><strong>User types:</strong>
-<span class="field-tag user">Aadhaar Number (12 digits)</span>
-<span class="field-tag user">PAN (ABCDE1234F)</span>
+<span class="field-tag user">Mobile Number (10 digits)</span>
 </p>
-<p><strong>Validation:</strong> Aadhaar: Verhoeff checksum. PAN: <code>[A-Z]{5}[0-9]{4}[A-Z]</code>, 4th char P=Individual.</p>
-<p><strong>OTP:</strong> Aadhaar OTP sent immediately (reused for DigiLocker login on Screen 2).</p>
+<p><strong>Validation:</strong> Mobile: 10 digits starting with 6-9. OTP sent via SMS for verification.</p>
+<p><strong>Fallback:</strong> Email registration if mobile OTP fails 3 times.</p>
 <p><strong>Time:</strong> ~30 seconds</p>
 
 <div class="async-bar">
-On submit, 4 parallel API calls fire (results ready by Screen 3):
+On registration, device fingerprinting fires:
+<strong>Bureau.id Device Intelligence</strong> &mdash; 200+ risk signals, emulator/root detection, synthetic identity check
+</div>
+
+<div class="info-box blue"><strong>Why start with mobile?</strong> Mobile number is the universal communication channel for OTPs, KRA verification, CKYC, and all post-onboarding notifications. Establishing it first ensures every subsequent step has a verified contact channel.</div>
+</div>
+
+<!-- SCREEN 2 -->
+<div class="screen-card" id="screen-2">
+<div class="screen-card-header">
+<div class="screen-num">2</div>
+<h4>PAN + Date of Birth</h4>
+</div>
+<p><strong>Purpose:</strong> Capture the two identity keys that unlock all downstream data lookups.</p>
+<p><strong>User types:</strong>
+<span class="field-tag user">PAN (ABCDE1234F)</span>
+<span class="field-tag user">Date of Birth</span>
+</p>
+<p><strong>Validation:</strong> PAN: <code>[A-Z]{5}[0-9]{4}[A-Z]</code>, 4th char P=Individual. DOB: valid date, age &ge; 18.</p>
+<p><strong>Time:</strong> ~20 seconds</p>
+
+<div class="async-bar">
+On submit, 4 parallel API calls fire (results ready by Screen 4):
 <strong>PAN Verify</strong> | <strong>KRA Lookup</strong> | <strong>CKYC Search</strong> | <strong>AML/PEP Screen</strong>
 </div>
 
@@ -52,14 +75,14 @@ On submit, 4 parallel API calls fire (results ready by Screen 3):
 </div>
 </div>
 
-<!-- SCREEN 2 -->
-<div class="screen-card" id="screen-2">
+<!-- SCREEN 3 -->
+<div class="screen-card" id="screen-3">
 <div class="screen-card-header">
-<div class="screen-num">2</div>
+<div class="screen-num">3</div>
 <h4>DigiLocker Consent (Redirect)</h4>
 </div>
 <p><strong>Purpose:</strong> Consent-based fetch of Aadhaar XML + PAN document.</p>
-<p><strong>User types:</strong> 0 fields (logs into DigiLocker with Aadhaar number + OTP from Screen 1).</p>
+<p><strong>User types:</strong> 0 fields (enters Aadhaar number + OTP on DigiLocker). Aadhaar OTP sent fresh here.</p>
 <p><strong>Data harvested (~25 fields with zero effort):</strong></p>
 <p>
 <span class="field-tag auto">Name (first/middle/last/full)</span>
@@ -72,7 +95,7 @@ On submit, 4 parallel API calls fire (results ready by Screen 3):
 <span class="field-tag auto">POA auto-set (Aadhaar)</span>
 </p>
 <div class="info-box green"><strong>IPV Exemption:</strong> Aadhaar eKYC via DigiLocker = IPV/VIPV exempted per SEBI circular. Saves an entire video call step.</div>
-<p><strong>Time:</strong> ~60 seconds (redirect + consent + return). This 60s buffer is exactly the time needed for all 4 async API calls to complete.</p>
+<p><strong>Time:</strong> ~60 seconds (redirect + consent + return). This 60s buffer is exactly the time needed for all 4 async API calls from Screen 2 to complete.</p>
 
 <!-- DigiLocker / Aadhaar Vendors -->
 <div class="vendor-table" id="v-aadhaar">
@@ -90,10 +113,10 @@ On submit, 4 parallel API calls fire (results ready by Screen 3):
 </div>
 </div>
 
-<!-- SCREEN 3 -->
-<div class="screen-card" id="screen-3">
+<!-- SCREEN 4 -->
+<div class="screen-card" id="screen-4">
 <div class="screen-card-header">
-<div class="screen-num">3</div>
+<div class="screen-num">4</div>
 <h4>Confirm Identity</h4>
 </div>
 <p><strong>Pre-filled (read-only):</strong>
@@ -112,11 +135,10 @@ On submit, 4 parallel API calls fire (results ready by Screen 3):
 <span class="field-tag auto">CKYC Number</span>
 </p>
 <p><strong>User types:</strong>
-<span class="field-tag user">Mobile (C01)</span>
 <span class="field-tag user">Email (C03)</span>
-<span class="field-tag user">Marital Status (A19)</span>
 </p>
-<p><strong>Time:</strong> ~45 seconds</p>
+<div class="info-box blue"><strong>Note:</strong> Mobile already verified on Screen 1. Only email needs to be entered here.</div>
+<p><strong>Time:</strong> ~30 seconds</p>
 
 <!-- KRA Vendors -->
 <div class="vendor-table" id="v-kra">
@@ -146,10 +168,10 @@ On submit, 4 parallel API calls fire (results ready by Screen 3):
 </div>
 </div>
 
-<!-- SCREEN 4 -->
-<div class="screen-card" id="screen-4">
+<!-- SCREEN 5 -->
+<div class="screen-card" id="screen-5">
 <div class="screen-card-header">
-<div class="screen-num">4</div>
+<div class="screen-num">5</div>
 <h4>Bank Account</h4>
 </div>
 <p><strong>User types:</strong>
@@ -163,7 +185,7 @@ On submit, 4 parallel API calls fire (results ready by Screen 3):
 <span class="field-tag auto">Branch City</span>
 <span class="field-tag auto">MICR Code</span>
 </p>
-<div class="async-bar">ASYNC: Penny Drop verification fires on submit &mdash; Rs.1 IMPS credit + name match scoring</div>
+<div class="async-bar">ASYNC: Penny Drop verification fires on submit &mdash; Rs.1 IMPS credit + name match scoring. IFSC Lookup + cheque/statement OCR also fire.</div>
 <p><strong>Time:</strong> ~45 seconds</p>
 
 <!-- Bank Verification Vendors -->
@@ -182,10 +204,10 @@ On submit, 4 parallel API calls fire (results ready by Screen 3):
 </div>
 </div>
 
-<!-- SCREEN 5 -->
-<div class="screen-card" id="screen-5">
+<!-- SCREEN 6 -->
+<div class="screen-card" id="screen-6">
 <div class="screen-card-header">
-<div class="screen-num">5</div>
+<div class="screen-num">6</div>
 <h4>Trading Preferences</h4>
 </div>
 <p><strong>Segment toggles:</strong>
@@ -198,6 +220,11 @@ On submit, 4 parallel API calls fire (results ready by Screen 3):
 <span class="field-tag conditional">Income proof upload (if F&amp;O or Commodity)</span>
 </p>
 <div class="info-box orange"><strong>SEBI Requirement:</strong> F&amp;O/Commodity segments require income verification. Bank statement must show credit of at least Rs.10,000 in last 6 months. Annual income threshold is broker-specific (typically Rs.1-10 lakh).</div>
+
+<div class="async-bar">
+If F&amp;O/Commodity selected, income verification fires:
+<strong>Perfios ITR Analyser</strong> or <strong>Setu Account Aggregator</strong>
+</div>
 
 <!-- Income Verification Vendors -->
 <div class="vendor-table" id="v-income">
@@ -232,10 +259,10 @@ On submit, 4 parallel API calls fire (results ready by Screen 3):
 </div>
 </div>
 
-<!-- SCREEN 6 -->
-<div class="screen-card" id="screen-6">
+<!-- SCREEN 7 -->
+<div class="screen-card" id="screen-7">
 <div class="screen-card-header">
-<div class="screen-num">6</div>
+<div class="screen-num">7</div>
 <h4>Nominations</h4>
 </div>
 <p><strong>Option A:</strong> Add nominee &mdash;
@@ -249,10 +276,10 @@ On submit, 4 parallel API calls fire (results ready by Screen 3):
 <p><strong>Time:</strong> ~30 seconds (1 nominee) to ~2 min (multiple)</p>
 </div>
 
-<!-- SCREEN 7 -->
-<div class="screen-card" id="screen-7">
+<!-- SCREEN 8 -->
+<div class="screen-card" id="screen-8">
 <div class="screen-card-header">
-<div class="screen-num">7</div>
+<div class="screen-num">8</div>
 <h4>Declarations + Blocking Gate</h4>
 </div>
 <p><strong>Checkboxes:</strong>
@@ -274,21 +301,22 @@ On submit, 4 parallel API calls fire (results ready by Screen 3):
 <div class="gate-check pass"><strong>PAN-Aadhaar Linked</strong> &mdash; Seeding status = Y</div>
 <div class="gate-check pass"><strong>AML/PEP Clean</strong> &mdash; Risk level = LOW or MEDIUM</div>
 <div class="gate-check pass"><strong>Penny Drop Success</strong> &mdash; Name match &ge; 70%</div>
+<div class="gate-check pass"><strong>PMLA Checks</strong> &mdash; Anti-money laundering compliance verified</div>
 </div>
 <p><strong>Time:</strong> ~30 seconds</p>
 </div>
 
-<!-- SCREEN 8 -->
-<div class="screen-card active" id="screen-8">
+<!-- SCREEN 9 -->
+<div class="screen-card active" id="screen-9">
 <div class="screen-card-header">
-<div class="screen-num" style="background:var(--green)">8</div>
+<div class="screen-num" style="background:var(--green)">9</div>
 <h4>Review + Face Match + e-Sign (Final)</h4>
 </div>
 <p><strong>Step 1:</strong> Scroll-through review of complete pre-filled application.</p>
 <p><strong>Step 2:</strong> Selfie capture &rarr; Face match against Aadhaar photo. Threshold: &ge;80% + liveness pass.</p>
 <p><strong>Step 3:</strong> Aadhaar OTP e-Sign on complete application PDF. SHA-256 hash, CCA-compliant DSC.</p>
 <div class="info-box green"><strong>IPV/VIPV: EXEMPTED</strong> &mdash; Aadhaar eKYC (DigiLocker) used. No video call needed.</div>
-<p><strong>Time:</strong> ~60 seconds. <strong>USER DONE. Total: ~5 minutes.</strong></p>
+<p><strong>Time:</strong> ~60 seconds. <strong>USER DONE. Total: ~6 minutes.</strong></p>
 
 <!-- e-Sign Vendors -->
 <div class="vendor-table" id="v-esign">
@@ -296,14 +324,16 @@ On submit, 4 parallel API calls fire (results ready by Screen 3):
 <table>
 <thead><tr><th>Vendor</th><th>Auth Modes</th><th>Key Features</th><th>CCA Licensed</th><th>Cost/sign</th></tr></thead>
 <tbody>
-<tr class="recommended"><td><strong>Digio</strong> <span class="badge-rec">Recommended</span></td><td>Aadhaar OTP, Biometric, Face</td><td>CADES-compliant DSC. White-label SDK. 2-day integration. Signed PDF with embedded cert.</td><td>Via licensed CA</td><td>Rs.15-25</td></tr>
+<tr class="recommended"><td><strong>Digio</strong> <span class="badge-rec">Recommended</span></td><td>Aadhaar OTP, Biometric, Face</td><td>CADES-compliant DSC. White-label SDK. 2-day integration. Signed PDF with embedded cert. KRA + DigiLocker + VIPV in one platform.</td><td>Via licensed CA</td><td>Rs.15-25</td></tr>
 <tr><td>Setu <span class="badge-new">New Option</span></td><td>Aadhaar OTP</td><td>Up to 25 signers. eStamp on-the-fly (state-specific stamp duty). Name match for Aadhaar eSign. Webhook notifications. ET Money saw 30% conversion surge.</td><td>Via licensed CA</td><td>Contact</td></tr>
-<tr><td>Leegality <span class="badge-alt">Alternate</span></td><td>Aadhaar OTP</td><td>Zero license fee, pay-per-use. Smart API. 55M+ eSigns. &lt;2 day integration.</td><td>Via licensed CA</td><td>~Rs.25</td></tr>
+<tr><td>Leegality <span class="badge-new">New Option</span></td><td>Aadhaar OTP</td><td>Zero license fee, pay-per-use. Smart API. 55M+ eSigns. &lt;2 day integration. eStamping support for state-specific stamp duty.</td><td>Via licensed CA</td><td>~Rs.25</td></tr>
 <tr><td>eMudhra <span class="badge-alt">Alternate</span></td><td>Aadhaar OTP, Biometric, IRIS</td><td>Licensed CA by CCA. SAP/Oracle connectors. Volume pricing &gt;10L/year.</td><td>Yes (direct)</td><td>Volume-based</td></tr>
 <tr><td>Protean (NSDL) <span class="badge-alt">Alternate</span></td><td>OTP, Biometric, IRIS</td><td>Licensed CA by CCA. Cheapest per-sign. Government-backed.</td><td>Yes (direct)</td><td>~Rs.5.90</td></tr>
 </tbody>
 </table>
 </div>
+
+<div class="info-box purple"><strong>Leegality vs Digio:</strong> Leegality offers zero license fee and ~Rs.25/sign with eStamping support &mdash; ideal for cost-sensitive or pilot deployments. Digio remains recommended because its multi-product stack (KRA + DigiLocker + VIPV + eSign) reduces overall vendor count and integration overhead.</div>
 
 <!-- Face Match Vendors -->
 <div class="vendor-table" id="v-face">

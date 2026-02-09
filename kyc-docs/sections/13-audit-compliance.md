@@ -1,6 +1,8 @@
 <section id="audit-compliance">
 ## <span class="section-num">13</span> Audit &amp; Compliance Framework
 
+<p class="section-brief"><strong>What to keep, how long, and who audits it</strong> &mdash; data retention requirements (5-8 years depending on type), audit trail specifications, and compliance reporting obligations under SEBI, PMLA, and DPDP Act 2023.</p>
+
 ### Data Retention Requirements
 
 | Record Type | Min Retention | Regulation |
