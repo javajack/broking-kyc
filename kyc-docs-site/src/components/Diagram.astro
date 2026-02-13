@@ -5,9 +5,11 @@ interface Props {
 }
 
 const { src, label } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const resolvedSrc = src.startsWith('/') ? `${base}${src}` : src;
 ---
 
 <div class="diagram-container">
-	<img src={src} alt={label || 'Diagram'} loading="lazy" />
+	<img src={resolvedSrc} alt={label || 'Diagram'} loading="lazy" />
 	{label && <p class="diagram-label">{label}</p>}
 </div>
