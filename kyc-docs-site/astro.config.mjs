@@ -19,6 +19,8 @@ export default defineConfig({
 				SiteTitle: './src/components/overrides/SiteTitle.astro',
 			},
 			head: [
+				// Yandex Webmaster verification
+				{ tag: 'meta', attrs: { name: 'yandex-verification', content: '5281e40eca9463d2' } },
 				{ tag: 'meta', attrs: { property: 'og:image', content: 'https://javajack.github.io/broking-kyc/og-image.png' } },
 				{ tag: 'meta', attrs: { property: 'og:image:width', content: '1200' } },
 				{ tag: 'meta', attrs: { property: 'og:image:height', content: '630' } },
