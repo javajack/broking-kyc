@@ -1900,6 +1900,19 @@ Corporate account opening is more complex than individual:
 
 ---
 
+## Deep-Dive Guides
+
+For detailed coverage of specific CDSL topics, see these dedicated pages:
+
+| Guide | Topics Covered |
+|-------|---------------|
+| [DDPI Deep Dive](/broking-kyc/vendors/depositories/cdsl-ddpi/) | DDPI lifecycle, 4 authorization types, vs POA comparison, file format, revocation |
+| [MTF & Pledge Operations](/broking-kyc/vendors/depositories/cdsl-mtf-pledge/) | Margin pledge, re-pledge, MTF funding, eLAS, automated release, CUSPA, file formats |
+| [BO Modifications](/broking-kyc/vendors/depositories/cdsl-modifications/) | Address, bank, nominee, PAN, email/mobile changes, account closure, dormancy |
+| [Integration Guide](/broking-kyc/vendors/depositories/cdsl-integration-guide/) | UAT/production environments, request tracking, security architecture, SEBI circulars |
+
+---
+
 ## Appendix A: CDSL State Code Table
 
 | Code | State |

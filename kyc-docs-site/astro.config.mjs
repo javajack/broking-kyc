@@ -82,7 +82,16 @@ export default defineConfig({
 						{
 							label: 'Depositories',
 							items: [
-								{ label: 'CDSL', slug: 'vendors/depositories/cdsl' },
+								{
+							label: 'CDSL',
+							items: [
+								{ label: 'Overview', slug: 'vendors/depositories/cdsl' },
+								{ label: 'DDPI Deep Dive', slug: 'vendors/depositories/cdsl-ddpi' },
+								{ label: 'MTF & Pledge', slug: 'vendors/depositories/cdsl-mtf-pledge' },
+								{ label: 'Modifications', slug: 'vendors/depositories/cdsl-modifications' },
+								{ label: 'Integration Guide', slug: 'vendors/depositories/cdsl-integration-guide' },
+							],
+						},
 								{ label: 'NSDL', slug: 'vendors/depositories/nsdl' },
 							],
 						},
