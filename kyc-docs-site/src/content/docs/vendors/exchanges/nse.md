@@ -3,6 +3,19 @@ title: NSE UCC
 description: NSE Unique Client Code (UCC) registration — UCI Online portal, REST API, and batch file integration.
 ---
 
+:::tip[Quick Reference]
+
+| Attribute | Value |
+|-----------|-------|
+| Portal | UCI Online (NSE ENIT Member Portal) |
+| Integration | REST API + pipe-delimited batch |
+| Batch Limit | Max 10,000 records per file |
+| PAN Verification | 3-parameter (PAN + Name + DOB) |
+| Activation SLA | Same day (5PM cutoff) |
+| Key Circular | NSE/ISC/61817 (Apr 2024) |
+| New Format Since | July 15, 2024 |
+
+:::
 
 ## Table of Contents
 

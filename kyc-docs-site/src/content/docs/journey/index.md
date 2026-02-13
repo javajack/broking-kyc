@@ -1,6 +1,9 @@
 ---
 title: User Journey
 description: The 9-screen KYC onboarding journey — from mobile OTP to first trade in ~6 minutes.
+next:
+  link: /broking-kyc/journey/01-mobile-registration/
+  label: 'Screen 1: Mobile Registration →'
 ---
 
 The 9-screen user journey — each screen has a single clear purpose. Mobile/email registration establishes the identity anchor and OTP channel before any KYC data enters the system. PAN+DOB fires async checks while the user completes DigiLocker consent. Total user time: approximately 6 minutes.

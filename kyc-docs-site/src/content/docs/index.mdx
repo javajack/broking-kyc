@@ -15,6 +15,40 @@ hero:
 ---
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
+import Diagram from '../../components/Diagram.astro';
+
+## What Is This?
+
+A complete technical specification for **stock broking KYC onboarding** — covering a 9-screen mobile-first user journey, 25+ vendor integrations, 8 parallel batch pipelines, maker-checker admin workflow, and full SEBI/KRA/CKYC regulatory compliance. Built for an Indian stock broking firm enabling individual customers to go from mobile OTP to first trade in 24-72 hours.
+
+## Who Is This For?
+
+<CardGrid>
+	<Card title="Product Managers" icon="rocket">
+		Understand the end-to-end user experience: 9 screens, ~6 minutes, ~12 typed fields.
+
+		Start: [Journey Overview](/broking-kyc/journey/) → [9 Screens](/broking-kyc/journey/01-mobile-registration/) → [Design Principles](/broking-kyc/architecture/design-principles/)
+	</Card>
+	<Card title="Engineers" icon="document">
+		API specs, field mappings, async patterns, batch file formats, and error handling.
+
+		Start: [Flow Summary](/broking-kyc/architecture/flow-summary/) → [Vendor Integrations](/broking-kyc/vendors/) → [Batch Pipeline](/broking-kyc/operations/batch-pipeline/)
+	</Card>
+	<Card title="Compliance Teams" icon="list-format">
+		SEBI circulars, KRA/CKYC dual upload, 6-attribute matching, FATCA/CRS, audit trails.
+
+		Start: [Regulatory Circulars](/broking-kyc/reference/regulatory-circulars/) → [6-Attribute Matching](/broking-kyc/operations/six-attribute-matching/) → [Audit & Compliance](/broking-kyc/operations/audit-compliance/)
+	</Card>
+	<Card title="Vendor Integration" icon="puzzle">
+		Vendor comparison tables, recommended stack, pricing, and implementation checklists.
+
+		Start: [Vendor Strategy](/broking-kyc/vendors/) → [KRA](/broking-kyc/vendors/kra/) → [CKYC](/broking-kyc/vendors/identity/ckyc/) → [Exchanges](/broking-kyc/vendors/exchanges/nse/)
+	</Card>
+</CardGrid>
+
+## Onboarding Flow
+
+<Diagram src="/diagrams/01-onboarding-flow.svg" label="Complete Onboarding Flow — 9 Screens + Maker-Checker + Batch Pipelines" />
 
 ## At a Glance
 
@@ -22,7 +56,7 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 	<Card title="9 Screens, ~6 Minutes" icon="rocket">
 		Mobile-first user journey: mobile OTP → PAN → DigiLocker → identity confirm → bank → trading prefs → nominations → declarations → eSign.
 	</Card>
-	<Card title="~454 Fields, ~12 Typed" icon="document">
+	<Card title="~454 Fields, ~90% Prefilled" icon="document">
 		DigiLocker + KRA + CKYC prefill ~90% of identity/financial fields. User only types mobile, PAN, DOB, email, bank details, and segment toggles.
 	</Card>
 	<Card title="25+ Vendor Integrations" icon="puzzle">

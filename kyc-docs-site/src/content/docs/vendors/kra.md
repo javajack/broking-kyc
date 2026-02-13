@@ -22,6 +22,20 @@ description: KRA (KYC Registration Agency) integration — lookup, fetch, submit
 14. [Recent Regulatory Changes (2024-2026)](#14-recent-regulatory-changes-2024-2026)
 15. [Key Reference Documents](#15-key-reference-documents)
 
+:::tip[Quick Reference]
+
+| Attribute | Value |
+|-----------|-------|
+| 5 SEBI-Registered KRAs | CVL, NDML, CAMS, DOTEX, KFintech |
+| Recommended Integration | Digio REST API (unified access to all 5) |
+| Dual Upload Mandate | KRA + CKYC (since Aug 2024) |
+| Interoperability | Any KRA can access records from any other |
+| Trading Allowed At | REGISTERED status (VALIDATED not required) |
+| Primary Key | PAN |
+| Timeline | 2-3 working days to VALIDATED |
+
+:::
+
 ---
 
 ## 1. KRA Ecosystem Overview

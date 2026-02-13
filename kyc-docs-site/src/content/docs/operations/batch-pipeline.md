@@ -1,9 +1,16 @@
 ---
 title: Batch Pipeline
 description: What happens after the user is done — the multi-step, multi-agency batch pipeline that runs after maker-checker approval.
+prev:
+  link: /broking-kyc/journey/09-review-esign/
+  label: '← 9. Review + eSign'
 ---
 
 What happens after the user is done — the multi-step, multi-agency batch pipeline that runs after maker-checker approval. Each agency has its own sequential pipeline, but all agencies run in parallel. Shows intermediate statuses, retry logic, and SLAs for every step.
+
+:::note[Prerequisite: User Journey Complete]
+This page covers what happens **after** the user completes all 9 screens and the checker approves. Start with [Screen 9: Review + eSign](/broking-kyc/journey/09-review-esign/) for the user-facing journey.
+:::
 
 :::caution
 **Trigger:** Batch processing begins **only after checker approval** (Step 11 in the flow). The maker auto-approves if all checks pass; the checker gives final sign-off. No batch job fires before checker approval.

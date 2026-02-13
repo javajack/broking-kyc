@@ -1,6 +1,12 @@
 ---
 title: "Screen 9: Review + Face Match + e-Sign"
 description: "Final screen — application review, selfie face match, and Aadhaar OTP e-Sign. ~60 seconds. User done."
+prev:
+  link: /broking-kyc/journey/08-declarations-gate/
+  label: '← 8. Declarations + Gate'
+next:
+  link: /broking-kyc/operations/batch-pipeline/
+  label: 'What Happens Next: Batch Pipeline →'
 ---
 
 import ScreenCard from '../../../components/ScreenCard.astro';
@@ -109,5 +115,16 @@ VIPV is only needed in two scenarios: (1) the user opted out of nominations on S
 </VendorTable>
 
 Full spec: [HyperVerge Integration](/broking-kyc/vendors/verification/hyperverge)
+
+---
+
+## What Happens Next?
+
+:::note[User Is Done — Backend Takes Over]
+After e-Sign, the application enters **maker-checker review**. Once the checker approves, **8 parallel batch pipelines** fire:
+KRA (2-3 days), CKYC (4-5 days), NSE/BSE/MCX (same day), CDSL (1-2 hrs), NSDL (~15 days), Income (1-2 hrs if F&O).
+
+Full pipeline spec → [Batch Pipeline](/broking-kyc/operations/batch-pipeline/)
+:::
 
 </ScreenCard>

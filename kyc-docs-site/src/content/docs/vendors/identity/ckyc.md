@@ -19,6 +19,20 @@ description: Central KYC (CERSAI) integration — search, download, and upload f
 11. [Recent Changes (2024-2026)](#11-recent-changes-2024-2026)
 12. [Key References](#12-key-references)
 
+:::tip[Quick Reference]
+
+| Attribute | Value |
+|-----------|-------|
+| System | CERSAI Central KYC Registry (Protean) |
+| Unique Identifier | 14-digit KIN |
+| Integration | Decentro REST API |
+| Operations | Search, Download, Upload |
+| Masked Search | Since Jan 2025 — Download for full record |
+| Upload SLA | 4-5 working days for KIN generation |
+| Dual Upload | KRA + CKYC mandatory since Aug 2024 |
+
+:::
+
 ---
 
 ## 1. Overview
