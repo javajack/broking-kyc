@@ -26,42 +26,42 @@ The current KYC system focuses on **individual customer onboarding**. Non-indivi
 - Separate upload templates per entity type
 - Director/Partner/Trustee KYC as sub-records
 - FATCA/CRS declaration per authorized signatory
-- Full spec: [KRA Integration](/vendors/kra) Section 7
+- Full spec: [KRA Integration](/broking-kyc/vendors/kra) Section 7
 
 ### CKYC (via Decentro)
 - 7 constitution types supported
 - Authorized signatory photo and signature required
 - Ultimate Beneficial Owner (UBO) identification for companies
-- Full spec: [CKYC Integration](/vendors/identity/ckyc) Section 6
+- Full spec: [CKYC Integration](/broking-kyc/vendors/identity/ckyc) Section 6
 
 ### CDSL BO Account
 - Different file line formats per entity type
 - Joint holder support (Lines 03-04)
 - Guardian details for minor accounts
-- Full spec: [CDSL Integration](/vendors/depositories/cdsl) Section 9
+- Full spec: [CDSL Integration](/broking-kyc/vendors/depositories/cdsl) Section 9
 
 ### Exchange UCC (NSE/BSE/MCX)
 - Client type codes differ per entity
 - Director/Partner PAN verification required
 - Additional document requirements per exchange
-- Full specs: [NSE](/vendors/exchanges/nse), [BSE](/vendors/exchanges/bse), [MCX](/vendors/exchanges/mcx)
+- Full specs: [NSE](/broking-kyc/vendors/exchanges/nse), [BSE](/broking-kyc/vendors/exchanges/bse), [MCX](/broking-kyc/vendors/exchanges/mcx)
 
 ### eSign (Leegality)
 - Multi-signatory workflows for corporates
 - Board resolution verification before signing
 - Authorized signatory face match
-- Full spec: [Leegality Integration](/vendors/esign/leegality) Section 9
+- Full spec: [Leegality Integration](/broking-kyc/vendors/esign/leegality) Section 9
 
 ### AML Screening (TrackWizz)
 - Screening by entity type (different risk parameters)
 - UBO screening for corporates
 - Director/Partner screening
-- Full spec: [TrackWizz Integration](/vendors/fraud/trackwizz) Section 7
+- Full spec: [TrackWizz Integration](/broking-kyc/vendors/fraud/trackwizz) Section 7
 
 ### Face Match (HyperVerge)
 - Face match for authorized signatories
 - Multiple face matches for joint holders
-- Full spec: [HyperVerge Integration](/vendors/verification/hyperverge) Section 6
+- Full spec: [HyperVerge Integration](/broking-kyc/vendors/verification/hyperverge) Section 6
 
 ## Implementation Priority
 
@@ -71,4 +71,4 @@ Non-individual entity onboarding will be implemented after the individual KYC sy
 2. **Partnership/LLP** — Multiple partners, similar structure
 3. **Corporate** — Most complex (board resolution, directors, UBO)
 4. **Trust** — Requires trustee verification, deed analysis
-5. **NRI** — See [NRI Deep Dive](/appendix/nri-deep-dive)
+5. **NRI** — See [NRI Deep Dive](/broking-kyc/appendix/nri-deep-dive)

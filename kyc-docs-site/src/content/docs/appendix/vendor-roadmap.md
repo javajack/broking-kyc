@@ -13,7 +13,7 @@ Vendors not yet fully specified in the current phase. These integrations are pla
 | **Finbox** | Bank Statement Analysis | Income extraction from bank statements | API + SDK |
 | **Tartan** | Payroll/HRMS Verification | Real-time income from employer HRMS | 30+ HRMS integrations |
 
-**Status**: Required for F&O/Commodity segment activation. Can be partially replaced by [Account Aggregator](/vendors/account-aggregator) for bank statement-based income proof.
+**Status**: Required for F&O/Commodity segment activation. Can be partially replaced by [Account Aggregator](/broking-kyc/vendors/account-aggregator) for bank statement-based income proof.
 
 ## V14: Back-Office / RMS
 

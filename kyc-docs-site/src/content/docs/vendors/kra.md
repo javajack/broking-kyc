@@ -170,7 +170,7 @@ Headers:
 }
 ```
 
-**Data Mapping** (Response -> [Master Dataset](/reference/master-dataset)):
+**Data Mapping** (Response -> [Master Dataset](/broking-kyc/reference/master-dataset)):
 
 | API Response Field | Master Dataset Field | Section |
 |-------------------|---------------------|---------|
@@ -305,7 +305,7 @@ Headers:
 }
 ```
 
-**Data Mapping**: The fetched record populates the prefill layer of the onboarding form. Fields map to [Master Dataset](/reference/master-dataset) sections A (Personal), B (Identity), C (Address), D (Contact), E (Occupation), F (Financial), J (FATCA), K (PEP/AML), and R34 (full KRA record reference).
+**Data Mapping**: The fetched record populates the prefill layer of the onboarding form. Fields map to [Master Dataset](/broking-kyc/reference/master-dataset) sections A (Personal), B (Identity), C (Address), D (Contact), E (Occupation), F (Financial), J (FATCA), K (PEP/AML), and R34 (full KRA record reference).
 
 ---
 
@@ -1465,9 +1465,9 @@ Headers:
 
 | Document | Path | Relevance |
 |----------|------|-----------|
-| KYC Master Dataset | [Master Dataset](/reference/master-dataset) | Field-level specification. KRA fields map to sections R (Third-Party Results), S (Submission Records). |
-| Vendor Integrations | [Vendor Integrations](/vendors/) | Parent document. KRA is Section V4. |
-| KYC Flow | [KYC Flow](/journey/) | 9-screen user journey. KRA lookup in Screen 1, KRA upload in batch pipeline. |
+| KYC Master Dataset | [Master Dataset](/broking-kyc/reference/master-dataset) | Field-level specification. KRA fields map to sections R (Third-Party Results), S (Submission Records). |
+| Vendor Integrations | [Vendor Integrations](/broking-kyc/vendors/) | Parent document. KRA is Section V4. |
+| KYC Flow | [KYC Flow](/broking-kyc/journey/) | 9-screen user journey. KRA lookup in Screen 1, KRA upload in batch pipeline. |
 | CKYC Integration | `vendors/ckyc/CKYC.md` | CKYC integration spec (if created). Dual upload companion to KRA. |
 
 ---
@@ -1524,4 +1524,4 @@ Headers:
 
 ---
 
-*This document covers the KRA integration in detail for the broking KYC project. It should be read alongside [Master Dataset](/reference/master-dataset) for field-level mappings and [Vendor Integrations](/vendors/) for the broader vendor integration context.*
+*This document covers the KRA integration in detail for the broking KYC project. It should be read alongside [Master Dataset](/broking-kyc/reference/master-dataset) for field-level mappings and [Vendor Integrations](/broking-kyc/vendors/) for the broader vendor integration context.*

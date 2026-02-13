@@ -1078,11 +1078,11 @@ Complete replication of Section A (Personal Identity), Section B (Address), Sect
 
 ## Appendix C: Third-Party API Specifications
 
-> **Detailed vendor comparison, recommended vendors, API endpoints, request/response formats, and complete integration sequence are in [Vendor Integrations](/vendors/)**
+> **Detailed vendor comparison, recommended vendors, API endpoints, request/response formats, and complete integration sequence are in [Vendor Integrations](/broking-kyc/vendors/)**
 
 ### C1: PAN Verification API (NSDL/Protean)
 
-**Recommended Vendor**: Decentro (see [Vendor Integrations](/vendors/))
+**Recommended Vendor**: Decentro (see [Vendor Integrations](/broking-kyc/vendors/))
 **Endpoint**: ITD-authorized service (Protean/NSDL)
 
 | Direction | Field | Type | Notes |
@@ -1290,4 +1290,4 @@ Complete replication of Section A (Personal Identity), Section B (Address), Sect
 - *Account type: Minor (Section W) / Joint (Section W) / POA (Section W)*
 - *Margin trading facility opted (Section X)*
 
-**For third-party API specifications, vendor selection, and integration sequences, see [Vendor Integrations](/vendors/)**
+**For third-party API specifications, vendor selection, and integration sequences, see [Vendor Integrations](/broking-kyc/vendors/)**

@@ -6,7 +6,7 @@ description: Extended CDSL integration specification — detailed BO file format
 Extended CDSL integration specification covering detailed BO file format specifications, TPIN/OTP authorization flow, eDIS (Electronic Delivery Instruction Slip), corporate actions, and advanced CDAS operations.
 
 :::note
-This page contains extended CDSL documentation beyond what's needed for basic individual KYC onboarding. The core CDSL integration spec is at [CDSL BO Integration](/vendors/depositories/cdsl).
+This page contains extended CDSL documentation beyond what's needed for basic individual KYC onboarding. The core CDSL integration spec is at [CDSL BO Integration](/broking-kyc/vendors/depositories/cdsl).
 :::
 
 ## Source Document
@@ -63,6 +63,6 @@ DP initiates → CDSL API → Client enters 6-digit TPIN → OTP to email+mobile
 - NRI
 - Minor (with guardian)
 
-See [Non-Individual Entities](/appendix/non-individual-entities) for cross-vendor entity requirements.
+See [Non-Individual Entities](/broking-kyc/appendix/non-individual-entities) for cross-vendor entity requirements.
 
 For the complete specification, refer to `CDSL_INTEGRATION.md` in the source repository.

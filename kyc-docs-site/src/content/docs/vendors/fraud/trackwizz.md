@@ -1244,4 +1244,4 @@ Cron: 0 2 1 * *  (1st of every month at 2 AM)
 
 ---
 
-*This document should be read alongside [Vendor Integrations](/vendors/) (Section 12: V10) and [Master Dataset](/reference/master-dataset) (Section K: AML/Compliance) for the complete integration context.*
+*This document should be read alongside [Vendor Integrations](/broking-kyc/vendors/) (Section 12: V10) and [Master Dataset](/broking-kyc/reference/master-dataset) (Section K: AML/Compliance) for the complete integration context.*

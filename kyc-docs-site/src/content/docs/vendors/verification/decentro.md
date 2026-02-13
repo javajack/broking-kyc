@@ -970,7 +970,7 @@ If a customer provides an old IFSC, the penny drop may still work (banks maintai
 
 ### 11.1 Where Decentro Fits in the Onboarding Flow
 
-Referencing [KYC Flow](/journey/) (v2.0, 9-screen flow):
+Referencing [KYC Flow](/broking-kyc/journey/) (v2.0, 9-screen flow):
 
 | Step | Screen | Decentro API | When | Purpose |
 |------|--------|-------------|------|---------|
@@ -1084,4 +1084,4 @@ All Decentro APIs accept a `reference_id` field. Use this for idempotency:
 
 ---
 
-*This document is a detailed specification for Decentro integration within our KYC onboarding system. It should be read alongside [Vendor Integrations](/vendors/) for the full vendor landscape and [Master Dataset](/reference/master-dataset) for field-level data mapping.*
+*This document is a detailed specification for Decentro integration within our KYC onboarding system. It should be read alongside [Vendor Integrations](/broking-kyc/vendors/) for the full vendor landscape and [Master Dataset](/broking-kyc/reference/master-dataset) for field-level data mapping.*

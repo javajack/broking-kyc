@@ -595,7 +595,7 @@ SEBI_BROKER_20260213_002.jsonl
 
 ### Use Case in Our System
 
-The batch pipeline (defined in [KYC Flow](/journey/) v2.0) uses SFTP batch for CKYC uploads:
+The batch pipeline (defined in [KYC Flow](/broking-kyc/journey/) v2.0) uses SFTP batch for CKYC uploads:
 
 ```
 Batch Pipeline Step 6: CKYC Upload
@@ -1140,12 +1140,12 @@ Total                       : Rs. 8-13
 
 | Artifact | Section | Relevance |
 |----------|---------|-----------|
-| [Master Dataset](/reference/master-dataset) | Section A (Fields A25, A29) | CKYC number field, disability flag |
-| [Master Dataset](/reference/master-dataset) | Section T (Fields T01-T12) | CKYC submission data fields |
-| [Master Dataset](/reference/master-dataset) | Section R5 (Fields R36-R42) | CKYC search/download result fields |
-| [Master Dataset](/reference/master-dataset) | Appendix A7 | CKYC constitution type codes |
-| [Vendor Integrations](/vendors/) | Section 7 (V5) | Original CKYC vendor research |
-| [KYC Flow](/journey/) | Steps 4, 21, Batch Pipeline Step 6 | CKYC search in onboarding, CKYC upload in batch |
+| [Master Dataset](/broking-kyc/reference/master-dataset) | Section A (Fields A25, A29) | CKYC number field, disability flag |
+| [Master Dataset](/broking-kyc/reference/master-dataset) | Section T (Fields T01-T12) | CKYC submission data fields |
+| [Master Dataset](/broking-kyc/reference/master-dataset) | Section R5 (Fields R36-R42) | CKYC search/download result fields |
+| [Master Dataset](/broking-kyc/reference/master-dataset) | Appendix A7 | CKYC constitution type codes |
+| [Vendor Integrations](/broking-kyc/vendors/) | Section 7 (V5) | Original CKYC vendor research |
+| [KYC Flow](/broking-kyc/journey/) | Steps 4, 21, Batch Pipeline Step 6 | CKYC search in onboarding, CKYC upload in batch |
 
 ---
 
@@ -1202,7 +1202,7 @@ Total                       : Rs. 8-13
 
 ## Appendix A: Field Mapping -- CKYC Upload to Master Dataset
 
-Mapping between the CKYC upload payload and our internal [Master Dataset](/reference/master-dataset) fields:
+Mapping between the CKYC upload payload and our internal [Master Dataset](/broking-kyc/reference/master-dataset) fields:
 
 | CKYC Upload Field | Master Dataset Field | Section |
 |-------------------|---------------------|---------|

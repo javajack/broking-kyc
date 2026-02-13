@@ -21,7 +21,7 @@ After checker approval, the system submits client data to exchanges (NSE/BSE/MCX
 | **Segments** | CM (Cash/Equity), FNO (F&O), CD (Currency), COM (Commodity) |
 | **Activation SLA** | Same day (batch 5PM cutoff) |
 
-**Full spec:** [NSE Integration](/vendors/exchanges/nse)
+**Full spec:** [NSE Integration](/broking-kyc/vendors/exchanges/nse)
 
 ## BSE UCC Registration
 
@@ -34,7 +34,7 @@ After checker approval, the system submits client data to exchanges (NSE/BSE/MCX
 | **Segments** | Equity, F&O, Currency, Debt |
 | **Activation SLA** | Same day |
 
-**Full spec:** [BSE Integration](/vendors/exchanges/bse)
+**Full spec:** [BSE Integration](/broking-kyc/vendors/exchanges/bse)
 
 ## MCX UCC Registration
 
@@ -46,7 +46,7 @@ After checker approval, the system submits client data to exchanges (NSE/BSE/MCX
 | **Client Category** | HE=Hedger, SP=Speculator, AR=Arbitrageur |
 | **Activation SLA** | Next working day |
 
-**Full spec:** [MCX Integration](/vendors/exchanges/mcx)
+**Full spec:** [MCX Integration](/broking-kyc/vendors/exchanges/mcx)
 
 ## CDSL BO Account Opening
 
@@ -59,7 +59,7 @@ After checker approval, the system submits client data to exchanges (NSE/BSE/MCX
 | **DDPI** | Optional, replaces PoA. Activation within 24 hours (online). |
 | **Activation SLA** | 1-2 hours (API). 1-3 days (batch). |
 
-**Full spec:** [CDSL Integration](/vendors/depositories/cdsl)
+**Full spec:** [CDSL Integration](/broking-kyc/vendors/depositories/cdsl)
 
 ## NSDL BO Account Opening
 
@@ -72,7 +72,7 @@ After checker approval, the system submits client data to exchanges (NSE/BSE/MCX
 | **DDPI** | Primarily offline. Processing: 2-3 business days. |
 | **Activation SLA** | ~15 working days including PAN flag enablement |
 
-**Full spec:** [NSDL Integration](/vendors/depositories/nsdl)
+**Full spec:** [NSDL Integration](/broking-kyc/vendors/depositories/nsdl)
 
 ## CDSL vs NSDL — Key Differences
 

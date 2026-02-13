@@ -28,13 +28,13 @@ NRI onboarding is planned for a future phase after the individual resident KYC s
 - NRI client category in KRA upload
 - CP (Custodial Participant) code — **removed since Jul 2025**
 - FATCA/CRS declaration mandatory (non-India tax resident)
-- Full spec: [KRA Integration](/vendors/kra) Section 7
+- Full spec: [KRA Integration](/broking-kyc/vendors/kra) Section 7
 
 ### Exchanges
 - **NSE**: NRI client type in UCC registration
 - **BSE**: Same 3-param PAN verification applies
 - **MCX**: NRI commodity trading has additional restrictions
-- Full specs: [NSE](/vendors/exchanges/nse), [BSE](/vendors/exchanges/bse)
+- Full specs: [NSE](/broking-kyc/vendors/exchanges/nse), [BSE](/broking-kyc/vendors/exchanges/bse)
 
 ### Depositories
 - NRE/NRO linked BO account

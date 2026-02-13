@@ -502,7 +502,7 @@ SEPARATE ACKNOWLEDGEMENTS (QuickSign):
 | Nominee | Nominee name, relationship, share | L01-L15 |
 | DDPI | Client name, BO ID, broker TM code | Custom fields |
 
-> Cross-reference: See [Master Dataset](/reference/master-dataset) for complete field specifications.
+> Cross-reference: See [Master Dataset](/broking-kyc/reference/master-dataset) for complete field specifications.
 
 ---
 
@@ -992,7 +992,7 @@ After downloading from Leegality, store in our blob storage (S3 or equivalent) w
 
 ### 12.1 Where eSign Fits in the 9-Screen Journey
 
-Per [KYC Flow](/journey/):
+Per [KYC Flow](/broking-kyc/journey/):
 
 ```
 Screen 1: Mobile + OTP
@@ -1061,11 +1061,11 @@ Before reaching Screen 9 (eSign), the Blocking Gate (Screen 8) must verify:
 
 | # | Check | Vendor | Pass Criteria | Per |
 |---|-------|--------|---------------|-----|
-| 1 | PAN Verified | Decentro | Status = E (valid) | [Decentro.md](/vendors/verification/decentro) |
+| 1 | PAN Verified | Decentro | Status = E (valid) | [Decentro.md](/broking-kyc/vendors/verification/decentro) |
 | 2 | KRA Status | Digio | Not Rejected | KYC Flow Section 5 |
 | 3 | CKYC Downloaded | Decentro | Search successful | KYC Flow Section 5 |
 | 4 | AML Clear | TrackWizz | No matches / false positive cleared | KYC Flow Section 5 |
-| 5 | Bank Verified | Decentro | Penny drop success + name match >= 70% | [Decentro.md](/vendors/verification/decentro) |
+| 5 | Bank Verified | Decentro | Penny drop success + name match >= 70% | [Decentro.md](/broking-kyc/vendors/verification/decentro) |
 
 If any check fails, the customer cannot proceed to eSign. This follows the principle: "Fail fast, fail gracefully. If blocking check fails, stop user before e-Sign. Don't waste their time."
 
@@ -1546,4 +1546,4 @@ Common error scenarios based on Leegality support documentation:
 | Audit Trail PDF (binary) | Audit trail document | Q03 | Q: Documents |
 | `metadata.applicationId` | `application_id` | AA01 | AA: System |
 
-> Cross-reference: See [Master Dataset](/reference/master-dataset) for complete field specifications (field IDs R20-R28 should be added if not present).
+> Cross-reference: See [Master Dataset](/broking-kyc/reference/master-dataset) for complete field specifications (field IDs R20-R28 should be added if not present).

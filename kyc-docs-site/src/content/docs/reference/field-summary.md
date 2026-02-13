@@ -3,10 +3,10 @@ title: Field Summary
 description: All ~454 fields at a glance — grouped by section with field counts, data sources, and which screen captures each group.
 ---
 
-All ~454 fields at a glance — grouped by section (personal identity, address, contact, bank, trading, etc.) with field counts, data sources, and which screen captures each group. The full field-level specification is in the [Master Dataset](/reference/master-dataset).
+All ~454 fields at a glance — grouped by section (personal identity, address, contact, bank, trading, etc.) with field counts, data sources, and which screen captures each group. The full field-level specification is in the [Master Dataset](/broking-kyc/reference/master-dataset).
 
 :::note
-**Full field-level specification:** See [Master Dataset](/reference/master-dataset) for complete field definitions with data types, sizes, validations, and regulatory sources.
+**Full field-level specification:** See [Master Dataset](/broking-kyc/reference/master-dataset) for complete field definitions with data types, sizes, validations, and regulatory sources.
 :::
 
 ## Section Overview

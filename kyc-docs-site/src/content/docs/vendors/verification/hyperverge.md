@@ -1341,4 +1341,4 @@ common:
 
 ---
 
-*This document should be read alongside [Vendor Integrations](/vendors/) (Sections V7, V8, V9 for HyperVerge context) and [Master Dataset](/reference/master-dataset) for field-level data mappings.*
+*This document should be read alongside [Vendor Integrations](/broking-kyc/vendors/) (Sections V7, V8, V9 for HyperVerge context) and [Master Dataset](/broking-kyc/reference/master-dataset) for field-level data mappings.*

@@ -34,8 +34,8 @@ Which vendors to invest in and which to skip — a strategic assessment of 25+ v
 |-------|------------|------|-----------|
 | Identity + DigiLocker | **Digio** or **Setu** | DigiLocker, Aadhaar eKYC, KRA | Decentro |
 | PAN + Bank + eSign | **Setu** or **Decentro** + **Digio** | PAN verify, penny drop, eSign | Leegality (eSign, cost optimization) |
-| Face Match + Video + OCR | **[HyperVerge](/vendors/verification/hyperverge)** | Liveness, face match, OCR, VIPV fallback | Signzy (low bandwidth), IDfy |
-| CKYC + AML | **[TrackWizz](/vendors/fraud/trackwizz)** | CKYC search/upload, AML/PEP screening | Decentro (CKYC) + ComplyAdvantage (AML) |
+| Face Match + Video + OCR | **[HyperVerge](/broking-kyc/vendors/verification/hyperverge)** | Liveness, face match, OCR, VIPV fallback | Signzy (low bandwidth), IDfy |
+| CKYC + AML | **[TrackWizz](/broking-kyc/vendors/fraud/trackwizz)** | CKYC search/upload, AML/PEP screening | Decentro (CKYC) + ComplyAdvantage (AML) |
 | Income Verification | **Perfios** (ITR) + **Setu AA** (bank statement) | F&O activation, margin eligibility | Karza, Tartan (payroll) |
 | Fraud Prevention | **Bureau.id** | Device intelligence, anti-fraud overlay | Signzy (embedded) |
 | Back-Office | **63 Moons ODIN** | Multi-exchange trading + RMS | Symphony XTS, OmneNEST |
@@ -45,15 +45,15 @@ Which vendors to invest in and which to skip — a strategic assessment of 25+ v
 
 | Vendor | Category | Page |
 |--------|----------|------|
-| DigiLocker | Identity | [DigiLocker Integration](/vendors/identity/digilocker) |
-| CKYC | Identity | [CKYC Integration](/vendors/identity/ckyc) |
-| Decentro | Verification | [Decentro Integration](/vendors/verification/decentro) |
-| HyperVerge | Verification | [HyperVerge Integration](/vendors/verification/hyperverge) |
-| KRA | KYC Registration | [KRA Integration](/vendors/kra) |
-| Leegality | eSign | [Leegality Integration](/vendors/esign/leegality) |
-| TrackWizz | Fraud & AML | [TrackWizz Integration](/vendors/fraud/trackwizz) |
-| NSE | Exchange | [NSE UCC Integration](/vendors/exchanges/nse) |
-| BSE | Exchange | [BSE UCC Integration](/vendors/exchanges/bse) |
-| MCX | Exchange | [MCX UCC Integration](/vendors/exchanges/mcx) |
-| CDSL | Depository | [CDSL BO Integration](/vendors/depositories/cdsl) |
-| NSDL | Depository | [NSDL BO Integration](/vendors/depositories/nsdl) |
+| DigiLocker | Identity | [DigiLocker Integration](/broking-kyc/vendors/identity/digilocker) |
+| CKYC | Identity | [CKYC Integration](/broking-kyc/vendors/identity/ckyc) |
+| Decentro | Verification | [Decentro Integration](/broking-kyc/vendors/verification/decentro) |
+| HyperVerge | Verification | [HyperVerge Integration](/broking-kyc/vendors/verification/hyperverge) |
+| KRA | KYC Registration | [KRA Integration](/broking-kyc/vendors/kra) |
+| Leegality | eSign | [Leegality Integration](/broking-kyc/vendors/esign/leegality) |
+| TrackWizz | Fraud & AML | [TrackWizz Integration](/broking-kyc/vendors/fraud/trackwizz) |
+| NSE | Exchange | [NSE UCC Integration](/broking-kyc/vendors/exchanges/nse) |
+| BSE | Exchange | [BSE UCC Integration](/broking-kyc/vendors/exchanges/bse) |
+| MCX | Exchange | [MCX UCC Integration](/broking-kyc/vendors/exchanges/mcx) |
+| CDSL | Depository | [CDSL BO Integration](/broking-kyc/vendors/depositories/cdsl) |
+| NSDL | Depository | [NSDL BO Integration](/broking-kyc/vendors/depositories/nsdl) |

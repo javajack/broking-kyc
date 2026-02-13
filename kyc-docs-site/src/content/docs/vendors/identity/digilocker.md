@@ -1289,4 +1289,4 @@ At 10,000 onboardings/month, DigiLocker path saves approximately **Rs. 3-5 lakh/
 
 ---
 
-*This document should be read alongside [Vendor Integrations](/vendors/) for the complete vendor stack and [Master Dataset](/reference/master-dataset) for field-level data mapping. Each section references specific fields (R22-R26) from the master dataset.*
+*This document should be read alongside [Vendor Integrations](/broking-kyc/vendors/) for the complete vendor stack and [Master Dataset](/broking-kyc/reference/master-dataset) for field-level data mapping. Each section references specific fields (R22-R26) from the master dataset.*

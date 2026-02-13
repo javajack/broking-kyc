@@ -6,7 +6,7 @@ description: Extended DigiLocker specification — advanced OAuth flows, documen
 Extended DigiLocker specification covering advanced OAuth flows, document type catalog, XML schema details, NPCI e-KYC Setu integration, and detailed aggregator comparison.
 
 :::note
-This page contains extended DigiLocker documentation beyond what's needed for basic individual KYC onboarding. The core DigiLocker integration spec is at [DigiLocker Integration](/vendors/identity/digilocker).
+This page contains extended DigiLocker documentation beyond what's needed for basic individual KYC onboarding. The core DigiLocker integration spec is at [DigiLocker Integration](/broking-kyc/vendors/identity/digilocker).
 :::
 
 ## Source Document

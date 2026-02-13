@@ -1500,4 +1500,4 @@ Key differences between NSE and BSE UCC systems for implementation planning:
 
 ---
 
-*This document is a companion to [Vendor Integrations](/vendors/) Section V12 and should be read alongside [Master Dataset](/reference/master-dataset) for field-level data mapping. Client category codes, occupation codes, income range codes, and PAN verification rules are identical to BSE as they are SEBI-mandated standards.*
+*This document is a companion to [Vendor Integrations](/broking-kyc/vendors/) Section V12 and should be read alongside [Master Dataset](/broking-kyc/reference/master-dataset) for field-level data mapping. Client category codes, occupation codes, income range codes, and PAN verification rules are identical to BSE as they are SEBI-mandated standards.*

@@ -33,6 +33,6 @@ What each onboarding costs in vendor API fees — per-transaction costs for ever
 
 - **Setu consolidation**: Unified pricing for PAN + bank + eSign can reduce per-unit costs
 - **Leegality for eSign**: Zero license fee + pay-per-success model reduces eSign costs significantly
-- **DigiLocker path**: Saves Rs.30-50/customer vs manual upload + VIPV (see [DigiLocker cost comparison](/vendors/identity/digilocker))
+- **DigiLocker path**: Saves Rs.30-50/customer vs manual upload + VIPV (see [DigiLocker cost comparison](/broking-kyc/vendors/identity/digilocker))
 - **Account Aggregator**: Eliminates manual income proof upload for F&O activation
 - **Volume negotiations**: Most vendors offer slab-based pricing at 10K+ onboardings/month

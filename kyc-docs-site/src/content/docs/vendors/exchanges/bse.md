@@ -1352,4 +1352,4 @@ Any mismatch in the 6 attributes across these systems results in compliance flag
 
 ---
 
-*This document is a detailed companion to [Vendor Integrations](/vendors/) Section V12 (BSE). It should be read alongside [Master Dataset](/reference/master-dataset) for field-level data mapping.*
+*This document is a detailed companion to [Vendor Integrations](/broking-kyc/vendors/) Section V12 (BSE). It should be read alongside [Master Dataset](/broking-kyc/reference/master-dataset) for field-level data mapping.*
