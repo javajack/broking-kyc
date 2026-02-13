@@ -8,6 +8,52 @@ export default defineConfig({
 	integrations: [
 		starlight({
 			title: 'KYC Onboarding Spec',
+			description: 'Complete technical specification for individual customer KYC onboarding in an Indian stock broking firm. By Rakesh Waghela.',
+			social: [
+				{ icon: 'x.com', label: 'Rakesh on X', href: 'https://x.com/webiyo' },
+				{ icon: 'linkedin', label: 'Rakesh on LinkedIn', href: 'https://www.linkedin.com/in/rakeshwaghela' },
+				{ icon: 'external', label: 'Book a Consultation', href: 'https://topmate.io/rakeshwaghela' },
+			],
+			components: {
+				Footer: './src/components/overrides/Footer.astro',
+				SiteTitle: './src/components/overrides/SiteTitle.astro',
+			},
+			head: [
+				{ tag: 'meta', attrs: { property: 'og:image', content: 'https://javajack.github.io/broking-kyc/og-image.png' } },
+				{ tag: 'meta', attrs: { property: 'og:image:width', content: '1200' } },
+				{ tag: 'meta', attrs: { property: 'og:image:height', content: '630' } },
+				{ tag: 'meta', attrs: { name: 'twitter:image', content: 'https://javajack.github.io/broking-kyc/og-image.png' } },
+				// Cloudflare Web Analytics
+				{ tag: 'script', attrs: { defer: true, src: 'https://static.cloudflareinsights.com/beacon.min.js', 'data-cf-beacon': '{"token": "7ce325bb227e4b42a8406f369ff4e788"}' } },
+				{
+					tag: 'script',
+					attrs: { type: 'application/ld+json' },
+					content: JSON.stringify({
+						'@context': 'https://schema.org',
+						'@graph': [
+							{
+								'@type': 'WebSite',
+								name: 'KYC Onboarding Specification',
+								url: 'https://javajack.github.io/broking-kyc/',
+								description: 'Complete technical specification for individual customer KYC onboarding in an Indian stock broking firm.',
+								author: { '@id': '#rakesh' },
+							},
+							{
+								'@type': 'Person',
+								'@id': '#rakesh',
+								name: 'Rakesh Waghela',
+								url: 'https://www.linkedin.com/in/rakeshwaghela',
+								jobTitle: 'Tech & KYC Solutions Architect',
+								sameAs: [
+									'https://x.com/webiyo',
+									'https://www.linkedin.com/in/rakeshwaghela',
+									'https://topmate.io/rakeshwaghela',
+								],
+							},
+						],
+					}),
+				},
+			],
 			customCss: ['./src/styles/custom.css'],
 			sidebar: [
 				{
