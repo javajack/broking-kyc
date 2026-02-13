@@ -1,0 +1,66 @@
+---
+title: "Screen 8: Declarations + Blocking Gate"
+description: "FATCA, PEP, and T&C declarations followed by the blocking gate — all async checks must pass before e-Sign."
+---
+
+import ScreenCard from '../../../components/ScreenCard.astro';
+import GateBox from '../../../components/GateBox.astro';
+import { Aside } from '@astrojs/starlight/components';
+
+<ScreenCard number={8} title="Declarations + Blocking Gate" time="~30 seconds">
+
+**Purpose:** Collect regulatory declarations and enforce the blocking gate before e-Sign.
+
+## Declaration Checkboxes
+
+| Declaration | Default | Notes |
+|------------|---------|-------|
+| FATCA: India-only tax resident | Y/N | If non-India, conditional FATCA details form appears |
+| PEP: Not a Politically Exposed Person | Y/N | If PEP = Yes, conditional PEP details form appears |
+| Risk Disclosure: Acknowledged | Checkbox | Mandatory acknowledgement |
+| Terms & Conditions: Accepted | Checkbox | Mandatory acceptance |
+| Running Account: Quarterly settlement | Selected | Settlement preference |
+| DDPI: Opt-in | Optional | Replaced POA since Nov 2022 |
+
+## Conditional Fields
+
+| Condition | Additional Fields |
+|-----------|------------------|
+| Non-India tax resident | FATCA details: country, TIN, address abroad |
+| PEP = Yes | PEP details: designation, organization, relationship |
+
+<GateBox title="BLOCKING GATE — All must pass before e-Sign">
+
+- **PAN Valid** — Status = E (exists and valid)
+- **PAN-Aadhaar Linked** — Seeding status = Y
+- **AML/PEP Clean** — Risk level = LOW or MEDIUM
+- **Penny Drop Success** — Name match >= 70%
+- **PMLA Checks** — Anti-money laundering compliance verified
+
+</GateBox>
+
+<Aside type="danger" title="Gate Failure">
+If any gate check fails, the user cannot proceed to e-Sign. The system displays specific failure reasons and next steps:
+
+- **PAN invalid/inactive:** Direct user to NSDL for PAN correction
+- **PAN-Aadhaar not linked:** Direct user to Income Tax portal to link
+- **AML/PEP high risk:** Route to manual compliance review
+- **Penny drop failed:** Offer retry or alternate bank account
+- **PMLA check failed:** Route to compliance officer for review
+</Aside>
+
+## Gate Check Sources
+
+| Check | Fired At | Vendor | Result Ready By |
+|-------|---------|--------|----------------|
+| PAN Valid | Screen 2 | Decentro | Screen 4 |
+| PAN-Aadhaar Linked | Screen 2 | Decentro (PAN verify) | Screen 4 |
+| AML/PEP Clean | Screen 2 | TrackWizz | Screen 4 |
+| Penny Drop Success | Screen 5 | Decentro | Screen 6 |
+| PMLA Checks | Screen 2 | TrackWizz | Screen 4 |
+
+<Aside type="tip">
+All gate checks were fired asynchronously on earlier screens. By Screen 8, every result is already available. The gate is an evaluation step, not a waiting step — the user experiences zero additional latency here.
+</Aside>
+
+</ScreenCard>

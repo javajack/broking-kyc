@@ -1,0 +1,18 @@
+---
+interface Props {
+	number: number;
+	title: string;
+	time?: string;
+}
+
+const { number, title, time } = Astro.props;
+---
+
+<div class="screen-card">
+	<div class="screen-card-header">
+		<span class="screen-card-number">{number}</span>
+		<span class="screen-card-title">{title}</span>
+		{time && <span class="screen-card-time">{time}</span>}
+	</div>
+	<slot />
+</div>

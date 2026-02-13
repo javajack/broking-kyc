@@ -1,0 +1,66 @@
+---
+title: "Screen 5: Bank Account"
+description: "Bank account capture and penny drop verification — ~45 seconds, 3 fields."
+---
+
+import ScreenCard from '../../../components/ScreenCard.astro';
+import AsyncBar from '../../../components/AsyncBar.astro';
+import VendorTable from '../../../components/VendorTable.astro';
+import VendorBadge from '../../../components/VendorBadge.astro';
+import { Aside } from '@astrojs/starlight/components';
+
+<ScreenCard number={5} title="Bank Account" time="~45 seconds">
+
+**Purpose:** Capture bank account details and verify ownership via penny drop.
+
+## User Input
+
+| Field | Field Code | Validation |
+|-------|-----------|-----------|
+| Account Number | G01 | Numeric, bank-specific length |
+| IFSC Code | G03 | 11 chars: `[A-Z]{4}0[A-Z0-9]{6}` |
+| Account Type | G07 | Savings / Current |
+
+## Auto-filled from IFSC (RBI Master)
+
+| Field | Source |
+|-------|--------|
+| Bank Name | RBI IFSC Master |
+| Branch Name | RBI IFSC Master |
+| Branch City | RBI IFSC Master |
+| MICR Code | RBI IFSC Master |
+
+<AsyncBar>
+Penny Drop verification fires on submit — Rs.1 IMPS credit + name match scoring. IFSC Lookup + cheque/statement OCR also fire.
+</AsyncBar>
+
+## Vendor Comparison: Bank Account Verification
+
+<VendorTable title="Bank Account Verification">
+
+| Vendor | Methods | Name Match | Cost/txn |
+|--------|---------|-----------|----------|
+| **Decentro** <VendorBadge type="recommended" /> | Penny drop, Penniless, Reverse penny drop (UPI) | Score 0-100 + FULL/PARTIAL/NO match. Rs.1 IMPS credit. Less than 2 sec response. | Rs.2-5 |
+| Setu <VendorBadge type="new" /> | Penny drop, **Reverse penny drop (pioneer)**, PennyLess | Yes — customer pays Rs.1 via UPI, data cannot be spoofed. Webhook with 5 exponential retries. | Rs.2-4 |
+| Cashfree <VendorBadge type="alternate" /> | Penny drop (async webhook) | Yes. Free trial Rs.100 credits. Does NOT support Deutsche Bank and Paytm Payments Bank. | Rs.2-4 |
+| Karza <VendorBadge type="new" /> | Penny drop + IFSC lookup | Yes. Bank verification + IFSC master lookup in one. Under Perfios umbrella. | Rs.2-4 |
+
+</VendorTable>
+
+Full spec: [Decentro Integration](/vendors/verification/decentro)
+
+<Aside type="tip">
+Setu pioneered the **reverse penny drop** — customer pays Rs.1 via UPI, and the system extracts account + name + IFSC from the transaction. Data cannot be spoofed since it comes from the bank's UPI response. This is a strong alternative to traditional penny drop.
+</Aside>
+
+## Penny Drop Result
+
+The penny drop result feeds into the [Blocking Gate (Screen 8)](/journey/08-declarations-gate/). The gate requires a name match score of 70% or above.
+
+| Result | Action |
+|--------|--------|
+| Name match >= 70% | Pass — proceed to e-Sign |
+| Name match < 70% | Block — manual review required |
+| Transaction failed | Block — retry or alternate verification |
+
+</ScreenCard>

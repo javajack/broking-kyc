@@ -1,0 +1,59 @@
+---
+title: "Screen 3: DigiLocker Consent"
+description: "Consent-based fetch of Aadhaar XML + PAN document — ~60 seconds, 0 fields, harvests ~25 identity fields."
+---
+
+import ScreenCard from '../../../components/ScreenCard.astro';
+import VendorTable from '../../../components/VendorTable.astro';
+import VendorBadge from '../../../components/VendorBadge.astro';
+import { Aside } from '@astrojs/starlight/components';
+
+<ScreenCard number={3} title="DigiLocker Consent (Redirect)" time="~60 seconds">
+
+**Purpose:** Consent-based fetch of Aadhaar XML + PAN document.
+
+## User Input
+
+**0 fields** — the user enters their Aadhaar number + OTP on the DigiLocker portal (not our app). A fresh Aadhaar OTP is sent here.
+
+## Data Harvested (~25 fields with zero effort)
+
+| Field | Source |
+|-------|--------|
+| Name (first / middle / last / full) | Aadhaar XML |
+| Date of Birth | Aadhaar XML |
+| Gender | Aadhaar XML |
+| Photo | Aadhaar XML |
+| Father's Name | Aadhaar XML |
+| Full Address (8 fields) | Aadhaar XML |
+| POI auto-set (Aadhaar) | Derived |
+| POA auto-set (Aadhaar) | Derived |
+
+<Aside type="tip" title="IPV Exemption">
+Aadhaar eKYC via DigiLocker = IPV/VIPV exempted per SEBI circular. This saves an entire video call step from the onboarding flow.
+</Aside>
+
+## Timing is Deliberate
+
+This 60-second buffer (redirect + consent + return) is exactly the time needed for all 4 async API calls from [Screen 2](/journey/02-pan-dob/) to complete. By the time the user returns from DigiLocker, PAN verification, KRA lookup, CKYC search, and AML screening results are all available.
+
+## Vendor Comparison: Aadhaar / DigiLocker
+
+<VendorTable title="Aadhaar / DigiLocker">
+
+| Vendor | Product | Key Differentiator |
+|--------|---------|-------------------|
+| **Digio** <VendorBadge type="recommended" /> | DigiKYC + DigiLocker | Full-stack KYC orchestration. One SDK for DigiLocker + eSign + Video KYC + KRA + CKYC. MeitY-approved partner. |
+| Decentro <VendorBadge type="alternate" /> | DigiLocker Suite + SSO | Unified API across PAN + bank + DigiLocker + CKYC. Single vendor for multiple use cases. |
+| Setu <VendorBadge type="new" /> | KYC Data Bundle + OKYC | Aadhaar Redundancy API: auto-failover between supply partners for higher success rates. AA market leader. |
+| NPCI e-KYC Setu <VendorBadge type="new" /> | e-KYC Setu System | No AUA/KUA license needed. Privacy-first: broker gets masked Aadhaar + demographics only. SEBI allowed Jun 2025. |
+
+</VendorTable>
+
+Full spec: [DigiLocker Integration](/vendors/identity/digilocker)
+
+<Aside type="caution">
+If DigiLocker is down, fallback to HyperVerge Aadhaar OCR + manual document upload. This loses the IPV exemption and requires a VIPV (Video In-Person Verification) step.
+</Aside>
+
+</ScreenCard>

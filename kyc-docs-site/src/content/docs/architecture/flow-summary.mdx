@@ -1,0 +1,72 @@
+---
+title: Flow Summary
+description: The complete onboarding pipeline at a glance — from the user's first mobile OTP to the moment they can trade.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import Diagram from '../../../components/Diagram.astro';
+import StatusFlow from '../../../components/StatusFlow.astro';
+
+The complete onboarding pipeline at a glance — from the user's first mobile OTP to the moment they can trade. Shows the 9-screen user journey (~6 min), the maker-checker review, and the multi-agency batch processing.
+
+## User Journey (9 Screens, ~6 Minutes)
+
+```
+Screen 1: Mobile / Email Registration (1 field: mobile + OTP)
+    |--> ASYNC: Device Fingerprint [Bureau.id]
+
+Screen 2: Enter PAN + DOB (2 fields)
+    |--> ASYNC: PAN Verify, KRA Lookup, CKYC Search, AML Screen
+
+Screen 3: DigiLocker Consent (redirect, 0 fields)
+    |--> Harvests: Name, DOB, Gender, Photo, Address, Father's Name, PAN
+
+Screen 4: Confirm Identity (1 field: email)
+    |--> Mobile already verified from Screen 1
+
+Screen 5: Bank Account (3 fields: account no, IFSC, type)
+    |--> ASYNC: Penny Drop, IFSC Lookup, OCR
+
+Screen 6: Trading Preferences (segment toggles)
+    |--> ASYNC: Income verify (if F&O/Commodity)
+
+Screen 7: Nominations (add nominee or opt-out)
+
+Screen 8: Declarations (checkboxes) + BLOCKING GATE
+
+Screen 9: Review + Face Match + Aadhaar OTP e-Sign
+```
+
+<Aside type="note">
+User is done in ~6 minutes. Everything after Screen 9 is automatic.
+</Aside>
+
+## Maker-Checker Review
+
+<StatusFlow nodes={['User Submits', 'Maker Review', 'Checker Approval', 'Batch Zone']} />
+
+- **Maker** (Step 10): Auto-approve if all checks pass; manual only for edge cases
+- **Checker** (Step 11): Final approval before batch submission
+
+## Batch Zone (Parallel Agency Pipelines)
+
+After checker approval, 8 pipelines run in parallel:
+
+| Pipeline | Submission | Processing | Result | Timeline |
+|----------|-----------|------------|--------|----------|
+| **KRA** | Submit | Under Process | Registered → Validated | 2-3 days |
+| **CKYC** | Upload | Queued → Validated | KIN Generated | 4-5 days |
+| **NSE** | UCC Submit | PAN Verify | Approved → Trading Active | Same day |
+| **BSE** | UCC Submit | 3-Param PAN Verify | Approved → Segments Live | Same day |
+| **MCX** | UCC Submit | Income Verify | Approved | Next working day |
+| **CDSL** | BO File | KYC Check → Bank Valid | Active | 1-2 hrs (API) |
+| **NSDL** | UDiFF Submit | CDS Process → DPM Update | Active | ~15 days |
+| **Income** | Perfios/AA verify | - | Confirmed | 1-2 hrs |
+
+## Final Gate
+
+<StatusFlow nodes={['KRA Registered', 'BO Active', 'UCC Approved', 'ACTIVE (Can Trade)']} />
+
+**Total time to active**: 24-72 hours (limited by KRA/NSDL processing)
+
+<Diagram src="/diagrams/01-onboarding-flow.svg" label="Figure 1: Complete Onboarding Flow" />

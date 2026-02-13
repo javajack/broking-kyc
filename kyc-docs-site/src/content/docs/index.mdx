@@ -1,0 +1,56 @@
+---
+title: KYC Onboarding Specification
+description: Complete technical specification for individual customer KYC onboarding in an Indian stock broking firm.
+template: splash
+hero:
+  tagline: Individual customer onboarding — from mobile OTP to first trade in 24-72 hours
+  actions:
+    - text: Start with Architecture
+      link: /architecture/design-principles/
+      icon: right-arrow
+      variant: primary
+    - text: View User Journey
+      link: /journey/
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## At a Glance
+
+<CardGrid stagger>
+	<Card title="9 Screens, ~6 Minutes" icon="rocket">
+		Mobile-first user journey: mobile OTP → PAN → DigiLocker → identity confirm → bank → trading prefs → nominations → declarations → eSign.
+	</Card>
+	<Card title="~454 Fields, ~12 Typed" icon="document">
+		DigiLocker + KRA + CKYC prefill ~90% of identity/financial fields. User only types mobile, PAN, DOB, email, bank details, and segment toggles.
+	</Card>
+	<Card title="25+ Vendor Integrations" icon="puzzle">
+		Decentro, Digio, HyperVerge, Leegality, TrackWizz, and more — covering PAN, bank, KRA, CKYC, DigiLocker, eSign, AML, face match, exchanges, and depositories.
+	</Card>
+	<Card title="8 Parallel Batch Pipelines" icon="list-format">
+		KRA, CKYC, NSE, BSE, MCX, CDSL, NSDL, and Income pipelines run asynchronously after maker-checker approval.
+	</Card>
+</CardGrid>
+
+## Documentation Structure
+
+| Section | What You'll Find |
+|---------|-----------------|
+| **[Architecture](/architecture/design-principles/)** | 11 design principles, 9-screen flow overview, data source mapping, security requirements |
+| **[User Journey](/journey/)** | Detailed specification for each of the 9 onboarding screens with vendor integration points |
+| **[Vendor Integrations](/vendors/)** | Deep-dive specs for 12+ vendors: API details, field mappings, error handling, implementation checklists |
+| **[Operations](/operations/batch-pipeline/)** | Batch pipelines, exchange registration, 6-attribute matching, admin workflow, status machine |
+| **[Reference](/reference/master-dataset/)** | Full 454-field master dataset, code tables, regulatory circulars, cost analysis, architecture diagrams |
+| **[Appendix](/appendix/non-individual-entities/)** | Non-individual entities, NRI flows, minor/joint accounts, vendor roadmap, communications |
+
+## Key Regulatory References
+
+| Regulation | Reference |
+|-----------|-----------|
+| SEBI KYC Master Circular | SEBI/HO/MIRSD/MIRSD-SEC-2/P/CIR/2023/168 (Oct 2023) |
+| SEBI Stock Brokers Master | SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90 (Jun 2025) |
+| SEBI Stock Brokers Regulations 2026 | Notified Jan 7, 2026 — replaces 1992 regulations |
+| Dual KRA + CKYC Upload | Mandatory since Aug 2024 |
+| DDPI (replaces POA) | Since Nov 2022, optional |
+| Up to 10 Nominees | Since Jan 2025, opt-out needs video verification |

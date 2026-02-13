@@ -895,17 +895,590 @@ Body: {
 
 **Client Status Values**: Active / Inactive / Closed
 
-### 14b: BSE
+### 14b: BSE (Bombay Stock Exchange) - Comprehensive UCC Integration
 
-**Trading System**: BOLT Plus
+---
 
-**Connectivity**: ETI (Enhanced Trading Interface) via TCP/IP, IML (Intermediate Messaging Layer) API
+#### 14b.1: BOLT Plus System & Broker Connectivity
 
-**UCC Registration**:
-- Revised format effective Jan 22, 2024
-- PAN + Name + DOB 3-parameter verification mandatory
-- Max 30,000 records per batch file (Circular Jul 29, 2024)
-- Old format discontinued from Mar 28, 2024
+**Trading System**: BOLT Plus (BSE Online Trading - Plus)
+- Successor to original BOLT (launched 1995), now fully electronic
+- Supports: Equity Cash, Equity Derivatives, Currency Derivatives, Debt segments
+- BOLT Plus on Web (BOW): Browser-based trading terminal for members
+
+**Connectivity Options**:
+
+| Mode | Protocol | Use Case | Latency |
+|------|----------|----------|---------|
+| ETI (Enhanced Trading Interface) | TCP/IP, FIX V5.0 SP2 binary | High-frequency, low-latency DMA | Lowest (~microseconds) |
+| IML (Intermediate Messaging Layer) | TCP/IP via iml.ini config | Standard broker connectivity | Low (~milliseconds) |
+| BOLT Plus on Web (BOW) | HTTPS (browser) | Manual trading, small brokers | Higher |
+| Leased Line | Dedicated circuit | Production primary | Fixed |
+| MPLS VPN | IP-based WAN | Production alternate | Low |
+| VSAT | Satellite | Remote/disaster recovery | Higher |
+
+**ETI Technical Specifications**:
+- Asynchronous, message-based interface derived from FIX V5.0 SP2 semantics (including all officially approved extension packs)
+- Proprietary session layer with flat binary encoding over TCP/IP
+- Session-oriented: Exchange provides unique Session ID per member; only one active session per Session ID at any time
+- No built-in automatic failover (participant applications must implement their own)
+- Connects via Exchange Application Gateways hosting client sessions
+- Ref: ETI API Manual (latest v1.6.10 with encryption + activity timestamp changes)
+- Download: https://www.bseindia.com/downloads1/ETI_API_ManualV158.pdf
+
+**IML Configuration**:
+- Config file: `iml.ini` - defines Exchange-side IP and port
+- Each segment (Equity, F&O, Currency, Debt) requires a **separate IML instance**
+- Listener port defined as `PortL` in iml.ini
+- Both sides (member and exchange) require IP + port configuration
+- Installation guide: https://www.bseindia.com/downloads1/NTA-IML-Installation_Guide.pdf
+- IML API: https://www.bseindia.com/downloads1/BOLTPlus_IML_API_version_6.0.pdf
+- Connectivity Manual: https://www.bseindia.com/downloads1/BOLTPLUS_Connectivity_ManualV12.pdf (v1.4, Jul 2023)
+
+**Test Environment**:
+- BSE provides BOLT Plus simulation environment for testing
+- Members can connect using Exchange-provided terminal or build own applications
+- URL: https://www.bseindia.com/nta.aspx
+
+---
+
+#### 14b.2: UCC Registration Process
+
+**Methods of UCC Registration**:
+
+| Method | Capacity | Format | Interface |
+|--------|----------|--------|-----------|
+| Manual (BOLT Plus Web) | 1-by-1 | Web form | https://ucc.bseindia.com |
+| SOAP API (SaveUCC) | Automated | XML via SOAP 1.1/1.2 | ucc_api_service.asmx |
+| SOAP API (SaveUCC_V2) | Automated, 183 fields | XML via SOAP 1.1/1.2 | ucc_api_service.asmx |
+| Batch Upload (New Registration) | Max 30,000 records/file | Pipe-delimited TXT | UCC module upload |
+| Batch Upload (Bank Details) | Max 20,000 records/file | Pipe-delimited TXT | UCC module upload |
+| Batch Upload (Depository Details) | Max 30,000 records/file | Pipe-delimited TXT | UCC module upload |
+| Batch Upload (Segment Activation) | Max 50,000 records/file | Pipe-delimited TXT | UCC module upload |
+
+**UCC SOAP API Details**:
+
+Endpoint: `https://ucc.bseindia.com/newucc/ucc_api_webservice/ucc_api_service.asmx`
+
+| Operation | SOAPAction | Input | Output |
+|-----------|-----------|-------|--------|
+| SaveUCC | `http://tempuri.org/SaveUCC` | XmlUCCdata (string) | SaveUCCResult (string) |
+| SaveUCC_V2 | `http://tempuri.org/SaveUCC_V2` | XmlUCCdata (string) | SaveUCCResult (string) |
+
+SOAP 1.1 Request Envelope:
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <soap:Body>
+    <SaveUCC xmlns="http://tempuri.org/">
+      <XmlUCCdata>string</XmlUCCdata>
+    </SaveUCC>
+  </soap:Body>
+</soap:Envelope>
+```
+
+SOAP 1.2 Request Envelope:
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<soap12:Envelope xmlns:soap12="http://www.w3.org/2003/05/soap-envelope"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <soap12:Body>
+    <SaveUCC xmlns="http://tempuri.org/">
+      <XmlUCCdata>string</XmlUCCdata>
+    </SaveUCC>
+  </soap12:Body>
+</soap12:Envelope>
+```
+
+**UCC Field Structure Evolution**:
+
+| Version | Fields | Effective Date | Status |
+|---------|--------|---------------|--------|
+| Old Structure | 131 fields | Pre-2024 | Discontinued Aug 16, 2024 |
+| Revised Structure | 150 fields | Oct 4, 2024 | Active (existing UCC creation/modification) |
+| New Structure (SaveUCC_V2) | 183 fields | May 22, 2025 | Active (fresh UCC creation/modification) |
+| Additional Nominee API | 56 fields | May 2025 | Supplementary (nominees 4-10) |
+
+Key changes in 183-field structure:
+- Nominees increased from 3 to 10 (SEBI mandate effective Jan 2025)
+- Guardian relationship fields for minor clients
+- Standardized nominee relationship codes
+- Nominees 4-10 via separate Non-Financial Transaction API Webservice
+
+---
+
+#### 14b.3: 3-Parameter PAN Verification
+
+BSE mandates 3-parameter PAN verification against NSDL/Protean (Income Tax Department) records.
+
+**The Three Parameters**:
+
+| # | Parameter | Field | Mandatory |
+|---|-----------|-------|-----------|
+| 1 | PAN Number | 10-character alphanumeric (AAAAA9999A format) | Yes |
+| 2 | Client Name | Name as per PAN/ITD records | Yes |
+| 3 | DOB/DOI/DOR | Date of Birth (individuals) / Date of Incorporation (companies) / Date of Registration | Yes - for all holders including Guardian |
+
+**Verification Result Codes**:
+
+| Code | Status | Meaning | Trading Impact |
+|------|--------|---------|----------------|
+| A | Approved | All 3 parameters match ITD records | Eligible for PTT |
+| I | Incorrect | One or more parameters do not match | NOT eligible for PTT |
+| P | Pending | Verification in progress | NOT eligible for PTT |
+
+**Rules**:
+- DOB/DOI is mandatory for ALL holders including Guardian in case of Minor Client
+- If Client Name or DOB differs from ITD records, must be corrected at ITD BEFORE submission
+- Once PAN marked "I" (Incorrect), record cannot be marked "Permitted to Trade" (PTT)
+- PAN value "AAAAA8888A" used for Central Govt / State Govt / Court-appointed officials
+- PAN-Aadhaar seeding is NO LONGER a parameter for PTT status (per NSE circular NSE/ISC/62244, May 30, 2024 - BSE follows same)
+
+---
+
+#### 14b.4: Batch File Format Specification
+
+**File Format**: Pipe (`|`) delimited text file, two rows per client record.
+
+**Row Structure**:
+- **Row 1**: General client information applicable to ALL client types
+- **Row 2**: Director details (applicable ONLY for Corporate/Partnership/Body Corporate entities)
+
+**Batch Upload Limits**:
+
+| Operation | Max Records per File | Circular Date |
+|-----------|---------------------|--------------|
+| New Registration / Modification | 30,000 | Feb 23, 2024 |
+| Bank Details Update | 20,000 | Feb 23, 2024 |
+| Depository Details Update | 30,000 | Jul 29, 2024 |
+| Segment Activation | 50,000 | Jul 29, 2024 |
+
+**Key Fields in Batch File (Revised Format, effective Apr 19, 2024)**:
+
+Row 1 - General Information (pipe-delimited):
+
+| # | Field Name | Type | Length | Mandatory | Valid Values / Notes |
+|---|-----------|------|--------|-----------|---------------------|
+| 1 | Trading Member ID | Alphanumeric | 6 | M | BSE member code |
+| 2 | Client Code | Alphanumeric | 10 | M | Unique per member |
+| 3 | Client Name (First) | Alpha | 70 | M | As per PAN |
+| 4 | Client Name (Middle) | Alpha | 35 | O | |
+| 5 | Client Name (Last) | Alpha | 35 | M | As per PAN |
+| 6 | PAN | Alphanumeric | 10 | M | AAAAA9999A format |
+| 7 | Date of Birth / DOI | Date | 10 | M | DD/MM/YYYY |
+| 8 | Gender | Alpha | 1 | M (Indiv.) | M/F/T |
+| 9 | Client Category | Numeric | 2 | M | See code table below |
+| 10 | Occupation Code | Numeric | 2 | M | See code table below |
+| 11 | Address Line 1 | Alphanumeric | 100 | M | Cannot start with client name |
+| 12 | Address Line 2 | Alphanumeric | 100 | O | Cannot equal Addr Line 1 or 3 |
+| 13 | Address Line 3 | Alphanumeric | 100 | O | Cannot equal Addr Line 1 or 2 |
+| 14 | City | Alpha | 35 | M | |
+| 15 | State | Alpha | 2 | M | State code |
+| 16 | Pincode | Numeric | 6 | M | Valid Indian pincode |
+| 17 | Country | Alpha | 2 | M | IN for India |
+| 18 | Mobile Number | Numeric | 10 | M | Must be verified |
+| 19 | Email ID | Alphanumeric | 100 | M | Must be verified |
+| 20 | Income Range | Numeric | 2 | M | See code table below |
+| 21 | Bank Account Number | Alphanumeric | 20 | M | |
+| 22 | Bank IFSC Code | Alphanumeric | 11 | M | |
+| 23 | Bank Account Type | Alpha | 2 | M | SB=Savings, CA=Current |
+| 24 | DP ID | Alphanumeric | 8/16 | M | NSDL: IN+6, CDSL: 8 digits |
+| 25 | DP Client ID | Alphanumeric | 8/16 | M | NSDL: 8 chars, CDSL: 8 digits |
+| 26 | Depository | Alpha | 4 | M | CDSL / NSDL |
+| 27 | KYC Status | Alpha | 1 | M | Y/N |
+| 28 | Aadhaar Number (masked) | Numeric | 12 | O | Last 4 digits visible |
+| 29 | FATCA Declaration | Alpha | 1 | M | Y/N |
+| 30 | Nominee 1 Name | Alpha | 70 | M* | *Mandatory if opt-in |
+| 31 | Nominee 1 Relationship | Alpha | 20 | M* | |
+| 32 | Nominee 1 PAN | Alphanumeric | 10 | O | |
+| 33 | Nominee 1 Percentage | Numeric | 3 | M* | 1-100, total must = 100 |
+| ... | (Nominees 2-3 follow same pattern) | | | | |
+| 34-42 | Nominee 2 & 3 Details | Various | Various | O | Same as Nominee 1 |
+| 43 | POA for Funds | Alpha | 1 | O | Y/N (DDPI replaced POA since Nov 2022) |
+| 44 | POA for Securities | Alpha | 1 | O | Y/N |
+| 45 | Equity Segment | Alpha | 1 | M | Y/N |
+| 46 | Equity Derivatives Segment | Alpha | 1 | O | Y/N |
+| 47 | Currency Derivatives Segment | Alpha | 1 | O | Y/N |
+| 48 | Debt Segment | Alpha | 1 | O | Y/N |
+| 49 | Client Status by Member | Alpha | 1 | M | A=Active, I=Inactive, C=Closed |
+| 50 | Guardian Name | Alpha | 70 | M (minor) | Required if client category = 02 |
+| 51 | Guardian PAN | Alphanumeric | 10 | M (minor) | |
+| 52 | Guardian DOB | Date | 10 | M (minor) | DD/MM/YYYY |
+| ... | (Additional fields up to ~150 for revised format) | | | | |
+
+Row 2 - Director Details (for non-individual entities only):
+
+| # | Field Name | Type | Length | Mandatory | Notes |
+|---|-----------|------|--------|-----------|-------|
+| 1 | Action | Alpha | 3 | M | NEW (add) / DEL (remove) |
+| 2 | Client Code | Alphanumeric | 10 | M | Same as Row 1 |
+| 3 | Director Name | Alpha | 70 | M | Full name |
+| 4 | DIN (Director Identification Number) | Numeric | 8 | M | For companies |
+| 5 | Whether Foreign Resident | Alpha | 1 | M | Y/N |
+| 6 | Director PAN | Alphanumeric | 10 | M | |
+
+**Address Validation Rules**:
+- Address Line 1 must NOT start with Client Name
+- Address Line 1 and Line 2 must NOT be identical
+- Address Line 1 and Line 3 must NOT be identical
+- Address Line 2 and Line 3 must NOT be identical
+- Address must match documents submitted (Passport, Aadhaar, etc.)
+
+---
+
+#### 14b.5: Segment Activation
+
+**Segments Available on BSE**:
+
+| Segment | Code | Income Proof Required | Additional Requirements |
+|---------|------|----------------------|------------------------|
+| Equity Cash | EQ | No | Basic KYC sufficient |
+| Equity Derivatives (F&O) | EQD | Yes (income >= 10L or net worth) | SEBI F&O eligibility criteria |
+| Currency Derivatives | CUR | No specific income req | |
+| Debt Segment | DEBT | No | |
+
+**Segment Activation Batch**: Max 50,000 records per file. Fields include Client Code, segments to activate (Y/N per segment).
+
+**Segment-Specific Differences**:
+- F&O: Requires income proof, risk disclosure, and SEBI eligibility check (SEBI/HO/MRD/TPD-1/P/CIR/2025/33 - enhanced criteria)
+- Currency: Available for all client categories
+- Debt: Separate segment activation, minimal additional requirements
+- UPI Block Mechanism: Mandatory for QSBs from Feb 1, 2025 for secondary market (ASBA-like)
+
+---
+
+#### 14b.6: Client Category Codes (BSE)
+
+| Code | Category | Entity Type |
+|------|----------|-------------|
+| 01 | Individual | Person |
+| 02 | On behalf of Minor | Person (Guardian acting) |
+| 03 | HUF (Hindu Undivided Family) | Non-individual |
+| 04 | Company | Non-individual |
+| 05 | AOP (Association of Persons) | Non-individual |
+| 06 | Partnership Firm | Non-individual |
+| 07 | Body Corporate | Non-individual |
+| 08 | Trust | Non-individual |
+| 09 | Society | Non-individual |
+| 10 | Others | Miscellaneous |
+| 11 | NRI - Others | NRI |
+| 12 | DFI (Dev. Financial Institution) | Institutional |
+| 13 | Sole Proprietorship | Non-individual |
+| 21 | NRI - Repatriable (NRE) | NRI |
+| 22 | OCB (Overseas Corporate Body) | Foreign |
+| 23 | FII (Foreign Institutional Investor) | Foreign |
+| 24 | NRI - Repatriable (NRO) | NRI |
+| 25 | Overseas Corp. Body - Others | Foreign |
+| 26 | NRI Child | NRI |
+| 27 | NRI - HUF (NRO) | NRI |
+| 28 | NRI - Minor (NRO) | NRI |
+| 29 | NRI - HUF (NRE) | NRI |
+| 31 | Provident Fund | Institutional |
+| 32 | Super Annuation Fund | Institutional |
+| 33 | Gratuity Fund | Institutional |
+| 34 | Pension Fund | Institutional |
+| 36 | Mutual Funds FOF Schemes | Institutional |
+| 37 | NPS Trust | Institutional |
+| 38 | Global Development Network | Institutional |
+| 39 | FCRA | Institutional |
+| 41 | QFI - Individual | Foreign (QFI) |
+| 42 | QFI - Minors | Foreign (QFI) |
+| 43 | QFI - Corporate | Foreign (QFI) |
+| 44 | QFI - Pension Funds | Foreign (QFI) |
+| 45 | QFI - Hedge Funds | Foreign (QFI) |
+| 46 | QFI - Mutual Funds | Foreign (QFI) |
+
+UPI applicability: Client categories 01 (Individual) and 03 (HUF) only, Cash segment only.
+
+#### 14b.7: Occupation Codes (BSE)
+
+| Code | Occupation |
+|------|-----------|
+| 01 | Business |
+| 02 | Services (Salaried) |
+| 03 | Professional |
+| 04 | Agriculture |
+| 05 | Retired |
+| 06 | Housewife |
+| 07 | Student |
+| 08 | Others |
+
+#### 14b.8: Income Range Codes (BSE/SEBI Standard)
+
+| Code | Income Range (Annual, INR) |
+|------|---------------------------|
+| 01 | Below 1 Lakh |
+| 02 | 1 Lakh - 5 Lakh |
+| 03 | 5 Lakh - 10 Lakh |
+| 04 | 10 Lakh - 25 Lakh |
+| 05 | 25 Lakh - 1 Crore |
+| 06 | Above 1 Crore |
+
+Note: Income range is one of the 6 mandatory KYC attributes (Name, PAN, Address, Mobile, Email, Income Range) required for UCC compliance.
+
+#### 14b.9: Tax Status / Holding Codes (BSE StAR MF)
+
+Tax Status Codes align with Client Category Codes above (01-46).
+
+**Holding Nature Codes**:
+
+| Code | Holding Nature |
+|------|---------------|
+| SI | Single |
+| JO | Joint |
+| AS | Anyone or Survivor |
+
+---
+
+#### 14b.10: Status Codes and Responses
+
+**Client Verification Statuses**:
+
+| Status | Code | Description | Can Trade? |
+|--------|------|-------------|-----------|
+| PAN Approved | A | All 3 parameters verified against ITD | Prerequisite |
+| PAN Incorrect | I | PAN/Name/DOB mismatch with ITD | No |
+| PAN Pending | P | Verification in progress | No |
+| Permitted to Trade (PTT) | PTT | UCC fully compliant, active | Yes |
+| Not Permitted to Trade | NPTT | Missing KYC, inactive, or PAN issues | No |
+| Active | A | Client actively trading | Yes (if PTT) |
+| Inactive | I | Member-deactivated or non-compliant | No |
+| Closed | C | Account closed by member | No |
+
+**Common Rejection Reasons**:
+
+| Rejection Type | Cause | Resolution |
+|----------------|-------|-----------|
+| PAN Incorrect | Name/DOB mismatch with ITD | Client to correct at ITD, then resubmit |
+| Address validation fail | Addr1 starts with name, or Addr lines duplicated | Fix address formatting |
+| Mobile/Email unverified | Mobile or email not verified | Complete verification before submission |
+| Duplicate UCC | Same PAN already registered under another code | Merge or close duplicate |
+| Missing mandatory fields | Required fields blank/invalid | Complete all mandatory fields |
+| KYC non-compliant | 6 KYC attributes not all valid | Update all 6 attributes |
+| Bank details invalid | IFSC/Account not validated | Correct bank details |
+| Demat details invalid | DP ID / Client ID mismatch | Verify with depository |
+| PAN-Aadhaar not linked | PAN inoperative at ITD | Client links Aadhaar at ITD (exception: NRI with "Not applicable" status) |
+| Income range missing | No income declaration | Client provides income range |
+
+---
+
+#### 14b.11: Non-Individual Entity Requirements
+
+**Additional Fields by Entity Type**:
+
+| Entity | Extra Mandatory Fields |
+|--------|----------------------|
+| HUF (03) | Karta name, Karta PAN, Karta DOB, HUF PAN |
+| Company (04) | DOI, CIN, Director details (Name, DIN, PAN, Foreign Resident flag), Authorized signatory |
+| Partnership (06) | Partnership PAN, Partner details, Authorized signatory |
+| Body Corporate (07) | DOI, CIN/Registration No., Director details |
+| Trust (08) | Trust deed registration, Trustee details |
+| NRI (21/24) | PIS permission letter (RBI), NRE/NRO bank account, Country of residence |
+
+**NRI-Specific Requirements**:
+- RBI PIS (Portfolio Investment Scheme) permission letter required for equity trading
+- NRE account for repatriable, NRO for non-repatriable
+- CP (Custodial Participant) code requirement REMOVED by SEBI (July 2025)
+- NRI PANs must be either "PAN-Aadhaar linked" or marked "Not applicable" per ITD records
+- Bank account types: Both Current and Savings permissible for HUF/Trust/Society tax status
+- Seafarer NRIs: Some fields relaxed
+
+**Director Details (Row 2 of batch file)**:
+- Required for Companies (04), Body Corporate (07), Partnership (06)
+- Fields: Action (NEW/DEL), Client Code, Director Name, DIN, Foreign Resident (Y/N), Director PAN
+- Director changes via batch: add new or delete existing directors
+
+---
+
+#### 14b.12: Modification and Closure Process
+
+**Modification**:
+- Members login to UCC portal at https://ucc.bseindia.com and select "Modify" option
+- Batch modification follows same file format as registration
+- Changes in PAN verification methodology effective Apr 30, 2024
+- Non-financial modifications (address, mobile, email, bank, demat) can be done via batch upload
+- Financial modifications (segment change) require separate segment activation batch
+
+**Client Status Changes**:
+
+| From Status | To Status | Action Required |
+|-------------|-----------|----------------|
+| Active | Inactive | Member updates via UCC portal or batch; client cannot trade |
+| Active | Closed | Member closes account; update UCC status; final settlement |
+| Inactive | Active | Re-verification of 6 KYC attributes; may take T+2 working days |
+| Closed | Active | New UCC registration required (closed accounts cannot be reopened) |
+
+**Closure Process**:
+1. Complete all pending settlements
+2. Transfer/close all open positions
+3. Update client status to "Closed" in UCC database
+4. UCC marked as "Not Permitted to Trade"
+5. Inform exchanges (BSE/NSE) of closure
+6. Retain records per SEBI retention policy (min 5-8 years)
+
+---
+
+#### 14b.13: Timeline and SLA
+
+| Operation | SLA | Notes |
+|-----------|-----|-------|
+| New UCC to PTT | T+1 (next trading day) | UCCs compliant by 22:00 hrs on T are PTT on T+1 |
+| Emergency PTT Processing | Same day (T) if by 14:30 hrs | Exigency provision; PTT by next session |
+| UPI-based UCC activation | Same day if by 16:00 hrs | Must have validated PAN, bank, demat by 4 PM |
+| Account Reactivation | T+2 working days | T = day confirmation provided |
+| Batch Upload Processing | Overnight (T+1 morning) | Uploaded files processed in batch cycles |
+| PAN Verification | Real-time to T+1 | Depends on ITD system availability |
+| Segment Activation | T+1 | Subject to income/eligibility validation |
+
+---
+
+#### 14b.14: BSE ICCL (Indian Clearing Corporation Limited)
+
+**Role**: ICCL is the clearing corporation subsidiary of BSE, handling clearing and settlement for all BSE trades.
+
+**UCC-ICCL Linkage**:
+- Every trade on BSE requires valid UCC; ICCL generates obligations per UCC
+- UCC-Demat mapping mandatory: SEBI/HO/MIRSD/DOP/CIR/P/2019/136
+- Normal/Early Pay-in transactions require mandatory UCC details
+- Clearing members settle all obligations (margins, penalties, levies) for their trading members
+
+**Margin at Client Level**:
+- ICCL requires clearing members to upload collateral data **daily**
+- SEBI circular Jul 20, 2021: Client-level collateral segregation mandatory
+- Web portal for clients to view disaggregated (segment-wise, asset-type) collateral
+- 50% of margins and collateral in cash/cash equivalents
+- Initial margins at 99.99% confidence interval
+- Haircuts applied on real-time basis
+
+**Settlement**:
+- ICCL settles all BSE trades including equity, derivatives, MF units (via StAR MF)
+- T+1 settlement for equity cash (since Jan 27, 2023)
+- Clearing members must maintain clear balance in depository account + funds in clearing bank
+- Acceptable collateral: Equity securities with impact cost <= 0.1% for Rs 1L order, traded >= 99% of days in previous 6 months
+
+---
+
+#### 14b.15: BSE StAR MF Integration
+
+**Platform**: BSE StAR MF (Stock Exchange Aggregation and Reporting - Mutual Funds)
+
+**SOAP 1.2 Web Services API**:
+
+| Item | Details |
+|------|---------|
+| Production Endpoint | `https://www.bsestarmf.in/StarMFWebService/StarMFWebService.svc` |
+| WSDL / Help | `https://www.bsestarmf.in/StarMFWebService/StarMFWebService.svc/help` |
+| API Doc (v3.1) | https://www.bsestarmf.in/APIFileStructure.pdf |
+| Web File Structures | https://bsestarmf.in/WEBFileStructure.pdf (Apr 10, 2024) |
+| Protocol | SOAP 1.2 (recommended), SOAP 1.1 supported |
+| Testing Tool | SOAPUI (open-source) recommended; POSTMAN requires manual XML crafting |
+| Test Environment | Request via navaneetha.krishnan@bsetech.in or aqsa.shaikh@bsetech.in |
+
+**Authentication**:
+- Web Service ID + Password provided by BSE to each member
+- Pass Key: Alphanumeric, no special characters, required at every login
+- Session management via getPassword / authentication methods
+
+**Key SOAP Methods**:
+
+| Method | Purpose | Related to KYC |
+|--------|---------|---------------|
+| getPassword | Session authentication | Pre-requisite for all calls |
+| MFAPI (UCC Registration) | Create/modify UCC for MF platform | Yes - requires KYC + bank details |
+| MFAPI (Client Master Upload) | Upload client details for MFI/MFD/RFD/RFI/RIA | Yes |
+| MFAPI (Order Entry) | Purchase/Redeem/SIP/STP/SWP transactions | No |
+| MFAPI (Client Order Payment Status) | Query payment and order status | No |
+| MFAPI (Mandate Registration) | Register auto-debit mandate (pre-req for SIP) | Partial |
+
+**KYC Relationship with StAR MF**:
+- Before executing MF transactions, UCC must be created with KYC + demat + bank details
+- PAN entered => system checks KYC status of primary holder
+- If KYC not done, Video KYC link can be initiated after initial UCC form section
+- Individuals, HUF, and Corporate Body can participate subject to KYC compliance
+- For minors, guardian must be KYC compliant
+- Client Master Structure on StAR MF: 150 fields (existing) or 183 fields (new, from May 2025)
+
+---
+
+#### 14b.16: Reconciliation and Reports
+
+**Reports Available to Brokers from BSE**:
+
+| Report | Frequency | Access Method |
+|--------|-----------|--------------|
+| UCC Client Master Report | On-demand | BSE StAR MF: Admin >> Admin Reports >> Client Master Reports (TXT download) |
+| PAN Verification Status | Daily | UCC portal download |
+| UCC Compliance Report | Daily | Lists PTT / NPTT status per client |
+| Trade Confirmation | Daily (T+0) | BOLT Plus / BOW trade logs |
+| Obligation Report | Settlement day | ICCL portal |
+| Margin Report | Daily | ICCL - segment-wise, client-level |
+| Collateral Report | Daily | ICCL web portal (client disaggregation) |
+| Rejection/Error Report | Per batch upload | Available after batch processing |
+| 6 KYC Attribute Compliance | Periodic | Exchange-level compliance monitoring |
+
+---
+
+#### 14b.17: Recent SEBI/BSE Circulars (2024-2026)
+
+| Date | Circular/Notice | Subject |
+|------|----------------|---------|
+| Jan 22, 2024 | BSE Notice | New UCC format effective; old format coexists |
+| Feb 23, 2024 | BSE Circular | Batch upload file format for bank account details (max 20K records) |
+| Feb 23, 2024 | BSE Circular | Revised file formats in UCC system |
+| Mar 20, 2024 | BSE Reminder | Implementation deadline reminder for revised formats |
+| Mar 27, 2024 | BSE Notice | Final reminder; old format discontinued Mar 28, 2024 EOD |
+| Mar 28, 2024 | BSE Effective | Old format no longer accepted |
+| Apr 18, 2024 | BSE Notice | Revised file formats effective Apr 19, 2024 EOD |
+| Apr 30, 2024 | BSE Notice | PAN verification methodology changes effective |
+| May 30, 2024 | NSE/ISC/62244 (BSE follows) | PAN-Aadhaar seeding no longer required for PTT |
+| Jul 29, 2024 | BSE Circular | Batch upload for Depository details (max 30K); Segment activation (max 50K) |
+| Aug 7, 2024 | BSE Notice | Client Master Structure revision to 150 fields |
+| Aug 16, 2024 | BSE Effective | Old 131-field UCC structure fully discontinued |
+| Oct 4, 2024 | BSE Effective | 150-field revised structure goes live |
+| Jan 10, 2025 | BSE Notice | Modification of Client Codes enhancement in RTRMS and BEFS modules |
+| Mar 1, 2025 | SEBI Effective | Nomination opt-out/opt-in deadline for demat accounts; up to 10 nominees |
+| May 22, 2025 | BSE Notice | New 183-field UCC Registration API Structure (SaveUCC_V2) effective |
+| May 29, 2025 | BSE Circular | 183-field structure document published for members |
+| Jul 2025 | SEBI | CP (Custodial Participant) code requirement removed for NRIs |
+| Dec 10, 2025 | SEBI Circular | NRI KYC relaxation for re-KYC process |
+| Jan 7, 2026 | SEBI | New Stock Brokers Regulations 2026 notified (replaces 1992 regs) |
+
+---
+
+#### 14b.18: Error Handling & Correction
+
+**Common Validation Rules (Batch Upload)**:
+1. All mandatory fields must be populated; blank mandatory = rejection
+2. PAN format: exactly AAAAA9999A (5 alpha + 4 numeric + 1 alpha)
+3. DOB format: DD/MM/YYYY strictly
+4. Mobile: exactly 10 digits, must be pre-verified
+5. Email: valid format, must be pre-verified
+6. Pincode: exactly 6 digits
+7. IFSC: exactly 11 characters (4 alpha + 0 + 6 alphanumeric)
+8. Address Lines 1, 2, 3 must all be distinct; Line 1 cannot start with client name
+9. Total nominee percentage must equal exactly 100 if nominees present
+10. Client Code: max 10 alphanumeric characters, unique per member
+11. Income Range: mandatory for all client types
+
+**Correction/Resubmission Process**:
+1. Download rejection report from UCC portal after batch processing
+2. Identify rejection reason codes per record
+3. Correct the data in source system
+4. Resubmit only the corrected records in a new batch file
+5. Do NOT resubmit already-accepted records (will cause duplicate errors)
+6. For PAN-related rejections: client must first correct at ITD, then resubmit
+
+**6 KYC Attributes (Mandatory for Compliance)**:
+Must match across KRA, Exchange (BSE/NSE), and Depository (CDSL/NSDL):
+1. Name (as per PAN)
+2. PAN (valid, non-inoperative)
+3. Address (complete with pincode for India addresses)
+4. Mobile Number (valid, verified)
+5. Email ID (valid, verified)
+6. Income Range (gross annual income code)
 
 **BSE StAR MF**: SOAP 1.2 Web Services for mutual fund orders. API Structure: https://www.bsestarmf.in/APIFileStructure.pdf (v3.1)
 

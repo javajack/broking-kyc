@@ -1,0 +1,65 @@
+---
+title: Status Machine
+description: Every state an application can be in — from the first mobile OTP to trading-ready, with triggers for each transition.
+---
+
+Every state an application can be in — from the first mobile OTP to trading-ready. Tracks the user journey (9 screens), maker-checker review, and batch registration across agencies.
+
+## Application Status Flow
+
+```
+REGISTERED → PAN_ENTERED → DIGILOCKER_PENDING → FILLING → GATE_CHECK → e_SIGNED → UNDER_REVIEW → APPROVED → REGISTERING → ACTIVE
+```
+
+**Terminal/blocked states:** GATE_FAILED (any blocking check fails), REJECTED (admin rejection)
+
+## Status Transitions
+
+| From | To | Trigger |
+|------|----|---------|
+| — | REGISTERED | Mobile OTP verified (Screen 1 complete) |
+| REGISTERED | PAN_ENTERED | PAN + DOB submitted (Screen 2), async checks fire |
+| PAN_ENTERED | DIGILOCKER_PENDING | Redirected to DigiLocker (Screen 3) |
+| DIGILOCKER_PENDING | FILLING | DigiLocker consent complete, data harvested |
+| DIGILOCKER_PENDING | PAN_ENTERED | DigiLocker cancelled (retry) |
+| FILLING | GATE_CHECK | Screen 8 declarations submitted |
+| GATE_CHECK | e_SIGNED | Gate passed + e-Sign complete (Screen 9) |
+| GATE_CHECK | GATE_FAILED | Any blocking check failed |
+| GATE_FAILED | FILLING | User corrects issue + retries |
+| e_SIGNED | UNDER_REVIEW | Auto — enters maker-checker queue |
+| UNDER_REVIEW | APPROVED | Checker approval (after maker review) |
+| UNDER_REVIEW | REJECTED | Checker rejection |
+| REJECTED | FILLING | User resubmits with corrections |
+| APPROVED | REGISTERING | Batch pipelines fire (KRA, CKYC, UCC, BO) |
+| REGISTERING | ACTIVE | KRA Registered + UCC Approved + BO Active |
+
+## Status Descriptions
+
+| Status | Phase | Description |
+|--------|-------|-------------|
+| REGISTERED | User Journey | Mobile verified, PAN not yet entered |
+| PAN_ENTERED | User Journey | Async checks (PAN, KRA, CKYC, AML) in flight |
+| DIGILOCKER_PENDING | User Journey | Waiting for DigiLocker consent redirect |
+| FILLING | User Journey | User completing Screens 4-8 |
+| GATE_CHECK | User Journey | Blocking gate evaluation (Screen 8) |
+| GATE_FAILED | User Journey | A blocking check failed — user must fix |
+| e_SIGNED | Submitted | Aadhaar OTP e-Sign complete |
+| UNDER_REVIEW | Admin | In maker-checker queue |
+| APPROVED | Admin | Checker signed off |
+| REJECTED | Admin | Checker rejected |
+| REGISTERING | Batch | Agency pipelines running (KRA/CKYC/UCC/BO) |
+| ACTIVE | Complete | All gates passed — can trade |
+
+## Blocking Gate Checks (Screen 8)
+
+The gate evaluates these checks before allowing e-Sign:
+
+| Check | Required Status | Source |
+|-------|----------------|--------|
+| PAN verification | Status = E (valid) | Decentro |
+| PAN-Aadhaar linkage | Linked | Decentro |
+| AML/PEP screening | Completed (any result) | TrackWizz |
+| Bank verification | Penny drop complete | Decentro |
+| DigiLocker consent | Data harvested | DigiLocker |
+
+If any check hasn't completed (timeout/error), it blocks with a specific message telling the user what needs resolution.

@@ -1,0 +1,250 @@
+/* KYC Onboarding Spec — Custom Starlight Theme */
+
+/* Accent color: Blue */
+:root {
+	--sl-color-accent-low: #1e3a5f;
+	--sl-color-accent: #3B82F6;
+	--sl-color-accent-high: #bfdbfe;
+	--sl-font-system-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Code', 'Segoe UI Mono', 'Liberation Mono', Menlo, Monaco, Consolas, monospace;
+}
+
+:root[data-theme='light'] {
+	--sl-color-accent-low: #dbeafe;
+	--sl-color-accent: #2563eb;
+	--sl-color-accent-high: #1e3a5f;
+}
+
+/* Table header styling */
+table thead th {
+	text-transform: uppercase;
+	font-size: 0.75rem;
+	letter-spacing: 0.05em;
+	font-weight: 600;
+}
+
+/* Vendor table purple border */
+.vendor-table {
+	border-left: 4px solid #8b5cf6;
+	padding-left: 1rem;
+	margin: 1.5rem 0;
+}
+
+.vendor-table table {
+	width: 100%;
+}
+
+/* Screen card component */
+.screen-card {
+	border: 1px solid var(--sl-color-gray-5);
+	border-radius: 0.5rem;
+	padding: 1.5rem;
+	margin: 1.5rem 0;
+	background: var(--sl-color-gray-7, var(--sl-color-bg));
+}
+
+.screen-card-header {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	margin-bottom: 1rem;
+	padding-bottom: 0.75rem;
+	border-bottom: 2px solid var(--sl-color-accent);
+}
+
+.screen-card-number {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.25rem;
+	height: 2.25rem;
+	border-radius: 50%;
+	background: var(--sl-color-accent);
+	color: white;
+	font-weight: 700;
+	font-size: 1rem;
+	flex-shrink: 0;
+}
+
+.screen-card-title {
+	font-size: 1.25rem;
+	font-weight: 700;
+	flex-grow: 1;
+}
+
+.screen-card-time {
+	font-size: 0.8rem;
+	color: var(--sl-color-gray-3);
+	white-space: nowrap;
+}
+
+/* Async bar */
+.async-bar {
+	background: linear-gradient(90deg, #3b82f610 0%, #8b5cf610 100%);
+	border: 1px dashed #8b5cf6;
+	border-radius: 0.375rem;
+	padding: 0.75rem 1rem;
+	margin: 1rem 0;
+	font-size: 0.875rem;
+}
+
+.async-bar::before {
+	content: 'ASYNC';
+	display: inline-block;
+	background: #8b5cf6;
+	color: white;
+	font-size: 0.65rem;
+	font-weight: 700;
+	letter-spacing: 0.05em;
+	padding: 0.1rem 0.4rem;
+	border-radius: 0.2rem;
+	margin-right: 0.5rem;
+	vertical-align: middle;
+}
+
+/* Gate box */
+.gate-box {
+	border: 2px solid #ef4444;
+	border-radius: 0.5rem;
+	padding: 1rem 1.25rem;
+	margin: 1.5rem 0;
+	background: #ef444408;
+}
+
+.gate-box-title {
+	font-weight: 700;
+	color: #ef4444;
+	margin-bottom: 0.5rem;
+	font-size: 0.9rem;
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+}
+
+/* Field tags */
+.field-tag {
+	display: inline-block;
+	font-size: 0.7rem;
+	font-weight: 600;
+	padding: 0.1rem 0.45rem;
+	border-radius: 0.2rem;
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+	vertical-align: middle;
+}
+
+.field-tag-user {
+	background: #dbeafe;
+	color: #1e40af;
+}
+
+.field-tag-auto {
+	background: #dcfce7;
+	color: #166534;
+}
+
+.field-tag-system {
+	background: #fef3c7;
+	color: #92400e;
+}
+
+.field-tag-api {
+	background: #ede9fe;
+	color: #5b21b6;
+}
+
+/* Vendor badges */
+.vendor-badge {
+	display: inline-block;
+	font-size: 0.7rem;
+	font-weight: 700;
+	padding: 0.15rem 0.5rem;
+	border-radius: 1rem;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+
+.vendor-badge-recommended {
+	background: #dcfce7;
+	color: #166534;
+	border: 1px solid #86efac;
+}
+
+.vendor-badge-alternate {
+	background: #dbeafe;
+	color: #1e40af;
+	border: 1px solid #93c5fd;
+}
+
+.vendor-badge-new {
+	background: #fef3c7;
+	color: #92400e;
+	border: 1px solid #fcd34d;
+}
+
+/* Info box variants (purple and cyan — other colors use Starlight Aside) */
+.info-box-purple {
+	border-left: 4px solid #8b5cf6;
+	background: #8b5cf608;
+	padding: 0.75rem 1rem;
+	border-radius: 0 0.375rem 0.375rem 0;
+	margin: 1rem 0;
+}
+
+.info-box-cyan {
+	border-left: 4px solid #06b6d4;
+	background: #06b6d408;
+	padding: 0.75rem 1rem;
+	border-radius: 0 0.375rem 0.375rem 0;
+	margin: 1rem 0;
+}
+
+/* Status flow */
+.status-flow {
+	display: flex;
+	align-items: center;
+	gap: 0.25rem;
+	flex-wrap: wrap;
+	margin: 1rem 0;
+	font-size: 0.85rem;
+}
+
+.status-flow-node {
+	display: inline-block;
+	padding: 0.35rem 0.75rem;
+	border-radius: 0.375rem;
+	background: var(--sl-color-gray-6);
+	border: 1px solid var(--sl-color-gray-5);
+	font-weight: 500;
+	white-space: nowrap;
+}
+
+.status-flow-arrow {
+	color: var(--sl-color-gray-3);
+	font-size: 1rem;
+}
+
+/* Diagram container */
+.diagram-container {
+	margin: 1.5rem 0;
+	text-align: center;
+}
+
+.diagram-container img {
+	max-width: 100%;
+	height: auto;
+}
+
+.diagram-label {
+	font-size: 0.8rem;
+	color: var(--sl-color-gray-3);
+	margin-top: 0.5rem;
+	font-style: italic;
+}
+
+/* Table horizontal scroll on mobile */
+@media (max-width: 768px) {
+	table {
+		display: block;
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+	}
+}

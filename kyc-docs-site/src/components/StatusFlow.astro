@@ -1,0 +1,16 @@
+---
+interface Props {
+	nodes: string[];
+}
+
+const { nodes } = Astro.props;
+---
+
+<div class="status-flow">
+	{nodes.map((node, i) => (
+		<>
+			<span class="status-flow-node">{node}</span>
+			{i < nodes.length - 1 && <span class="status-flow-arrow">&rarr;</span>}
+		</>
+	))}
+</div>

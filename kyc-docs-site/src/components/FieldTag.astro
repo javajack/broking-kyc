@@ -1,0 +1,16 @@
+---
+interface Props {
+	type: 'user' | 'auto' | 'system' | 'api';
+}
+
+const { type } = Astro.props;
+
+const labels = {
+	user: 'User Input',
+	auto: 'Auto-filled',
+	system: 'System',
+	api: 'API',
+};
+---
+
+<span class={`field-tag field-tag-${type}`}>{labels[type]}</span>

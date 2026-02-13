@@ -1,0 +1,79 @@
+---
+title: "Screen 4: Confirm Identity"
+description: "Pre-filled identity review with KRA and CKYC data — ~30 seconds, 1 field (email)."
+---
+
+import ScreenCard from '../../../components/ScreenCard.astro';
+import VendorTable from '../../../components/VendorTable.astro';
+import VendorBadge from '../../../components/VendorBadge.astro';
+import { Aside } from '@astrojs/starlight/components';
+
+<ScreenCard number={4} title="Confirm Identity" time="~30 seconds">
+
+**Purpose:** Present the pre-filled identity data for user confirmation. Only email needs to be entered.
+
+## Pre-filled Fields (Read-Only)
+
+| Field | Source |
+|-------|--------|
+| Name | DigiLocker (Aadhaar XML) |
+| Date of Birth | DigiLocker (Aadhaar XML) |
+| Gender | DigiLocker (Aadhaar XML) |
+| Father's Name | DigiLocker (Aadhaar XML) |
+| Full Address | DigiLocker (Aadhaar XML) |
+| Photo | DigiLocker (Aadhaar XML) |
+| PAN | User input (Screen 2) |
+
+## Pre-filled from KRA / CKYC (if found)
+
+| Field | Source |
+|-------|--------|
+| Occupation | KRA record |
+| Income Range | KRA / CKYC record |
+| Net Worth | KRA / CKYC record |
+| CKYC Number | CKYC Search result |
+
+## User Input
+
+| Field | Validation | Notes |
+|-------|-----------|-------|
+| Email | Valid email format | Mobile already verified on Screen 1 |
+
+<Aside type="note">
+Mobile was already verified on Screen 1. Only email needs to be entered here. If KRA/CKYC returned an email, it can be pre-filled for the user to confirm.
+</Aside>
+
+## Vendor Comparison: KRA Integration
+
+<VendorTable title="KRA Integration">
+
+| Vendor | APIs | Key Features | Cost/txn |
+|--------|------|-------------|----------|
+| **Digio** <VendorBadge type="recommended" /> | REST/JSON | All 5 KRAs via interoperability. PAN Status Check, Fetch Details, Upload/Update. IP whitelisting. 2-day integration. | Rs.3-5 |
+| CVL KRA Direct <VendorBadge type="alternate" /> | SOAP/XML | GetPanStatus, InsertUpdateKYCRecord, bulk tilde-delimited files. Legacy but stable. | Rs.2-3 |
+| TrackWizz <VendorBadge type="new" /> | REST/JSON | KRA submission + CKYC upload + AML screening in one platform. Regulatory reporting bundle. | Rs.3-5 |
+
+</VendorTable>
+
+Full spec: [KRA Integration](/vendors/kra)
+
+## Vendor Comparison: CKYC Integration
+
+<VendorTable title="CKYC Integration">
+
+| Vendor | APIs | Key Features | Cost/txn |
+|--------|------|-------------|----------|
+| **Decentro** <VendorBadge type="recommended" /> | Search + Download + Upload | REST API. Masked CKYC search (Jan 2025). Full download with identity match. Bulk upload. | Rs.3-10 |
+| Digio <VendorBadge type="alternate" /> | Search + Download + Upload | FI code config, CKYC public key, keystore. Java 17 / Docker. GitHub SDK available. | Rs.3-10 |
+| TrackWizz <VendorBadge type="new" /> | Search + Upload | CKYC solution for reporting entities. Combined with AML screening. | Rs.5-10 |
+| Protean Direct <VendorBadge type="alternate" /> | SFTP + API | Direct CERSAI integration. Batch and real-time. Official registry operator. | Contact |
+
+</VendorTable>
+
+Full spec: [CKYC Integration](/vendors/identity/ckyc)
+
+<Aside type="caution">
+CKYC Search now returns a masked CKYC number (since Jan 2025). A full Download call is needed to get the complete record for identity matching.
+</Aside>
+
+</ScreenCard>

@@ -1,0 +1,15 @@
+---
+interface Props {
+	type: 'recommended' | 'alternate' | 'new';
+}
+
+const { type } = Astro.props;
+
+const labels = {
+	recommended: 'Recommended',
+	alternate: 'Alternate',
+	new: 'New',
+};
+---
+
+<span class={`vendor-badge vendor-badge-${type}`}>{labels[type]}</span>

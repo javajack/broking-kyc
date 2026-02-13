@@ -1,0 +1,45 @@
+---
+title: "Screen 1: Mobile / Email Registration"
+description: "Establish the identity anchor and OTP communication channel — ~30 seconds, 1 field."
+---
+
+import ScreenCard from '../../../components/ScreenCard.astro';
+import AsyncBar from '../../../components/AsyncBar.astro';
+import { Aside } from '@astrojs/starlight/components';
+
+<ScreenCard number={1} title="Mobile / Email Registration" time="~30 seconds">
+
+**Purpose:** Establish the identity anchor and OTP communication channel before any KYC data is captured.
+
+## User Input
+
+| Field | Validation | Notes |
+|-------|-----------|-------|
+| Mobile Number (10 digits) | 10 digits starting with 6-9 | OTP sent via SMS for verification |
+
+**Fallback:** Email registration if mobile OTP fails 3 times.
+
+<AsyncBar>
+On registration, device fingerprinting fires: **Bureau.id Device Intelligence** — 200+ risk signals, emulator/root detection, synthetic identity check.
+</AsyncBar>
+
+<Aside type="tip" title="Why start with mobile?">
+Mobile number is the universal communication channel for OTPs, KRA verification, CKYC, and all post-onboarding notifications. Establishing it first ensures every subsequent step has a verified contact channel.
+</Aside>
+
+## What Fires Async
+
+| Service | Vendor | What It Does |
+|---------|--------|-------------|
+| Device Fingerprint | Bureau.id | 200+ risk signals per device. Detects emulators, rooted devices, synthetic identities, coordinated fraud rings. 99.7% persistence — survives factory resets. |
+
+This device intelligence layer runs silently in the background. No user interaction required. Results feed into the AML/fraud evaluation at the [Blocking Gate (Screen 8)](/journey/08-declarations-gate/).
+
+## Data Captured
+
+After this screen, the system has:
+- Verified mobile number (OTP-confirmed)
+- Device fingerprint and risk score
+- Session identifier for all subsequent API calls
+
+</ScreenCard>

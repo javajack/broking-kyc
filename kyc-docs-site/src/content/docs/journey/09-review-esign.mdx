@@ -1,0 +1,113 @@
+---
+title: "Screen 9: Review + Face Match + e-Sign"
+description: "Final screen — application review, selfie face match, and Aadhaar OTP e-Sign. ~60 seconds. User done."
+---
+
+import ScreenCard from '../../../components/ScreenCard.astro';
+import StatusFlow from '../../../components/StatusFlow.astro';
+import VendorTable from '../../../components/VendorTable.astro';
+import VendorBadge from '../../../components/VendorBadge.astro';
+import { Aside } from '@astrojs/starlight/components';
+
+<ScreenCard number={9} title="Review + Face Match + e-Sign (Final)" time="~60 seconds">
+
+**Purpose:** Final review, biometric verification, and legally binding e-Sign. User is done after this screen.
+
+## 3-Step Process
+
+<StatusFlow nodes={["Review Application", "Selfie Face Match", "Aadhaar OTP e-Sign"]} />
+
+### Step 1: Review Application
+Scroll-through review of the complete pre-filled application. All data from Screens 1-8 is presented in a read-only summary. User confirms everything is correct.
+
+### Step 2: Face Match
+Selfie capture compared against the Aadhaar photo from DigiLocker.
+
+| Parameter | Requirement |
+|-----------|------------|
+| Match threshold | >= 80% similarity |
+| Liveness check | Must pass (anti-spoof) |
+| Photo quality | Minimum 800px width |
+
+### Step 3: Aadhaar OTP e-Sign
+Digital signature on the complete application PDF.
+
+| Parameter | Detail |
+|-----------|--------|
+| Auth mode | Aadhaar OTP |
+| Hash | SHA-256 |
+| Certificate | CCA-compliant DSC |
+| Output | Signed PDF with embedded certificate |
+
+<Aside type="tip" title="IPV/VIPV: EXEMPTED">
+Aadhaar eKYC (DigiLocker) was used on Screen 3. No video call needed per SEBI circular.
+</Aside>
+
+**USER DONE. Total journey: ~6 minutes.**
+
+---
+
+## Vendor Comparison: e-Sign
+
+<VendorTable title="e-Sign">
+
+| Vendor | Auth Modes | Key Features | Cost/sign |
+|--------|-----------|-------------|-----------|
+| **Digio** <VendorBadge type="recommended" /> | Aadhaar OTP, Biometric, Face | CADES-compliant DSC. White-label SDK. KRA + DigiLocker + VIPV in one platform. 2-day integration. | Rs.15-25 |
+| Setu <VendorBadge type="new" /> | Aadhaar OTP | Up to 25 signers. eStamp on-the-fly. Name match for Aadhaar eSign. Webhook notifications. | Contact |
+| Leegality <VendorBadge type="new" /> | Aadhaar OTP | Zero license fee, pay-per-use. 55M+ eSigns. eStamping support. Less than 2-day integration. | ~Rs.25 |
+| eMudhra <VendorBadge type="alternate" /> | Aadhaar OTP, Biometric, IRIS | Licensed CA by CCA. SAP/Oracle connectors. Volume pricing >10L/year. | Volume-based |
+
+</VendorTable>
+
+Full spec: [Leegality Integration](/vendors/esign/leegality)
+
+<Aside type="note">
+Leegality offers zero license fee and ~Rs.25/sign with eStamping — ideal for cost-sensitive or pilot deployments. Digio remains recommended because its multi-product stack (KRA + DigiLocker + VIPV + eSign) reduces overall vendor count and integration overhead.
+</Aside>
+
+## Vendor Comparison: Face Match and Liveness Detection
+
+<VendorTable title="Face Match & Liveness Detection">
+
+| Vendor | Accuracy | Liveness | Cost/txn |
+|--------|---------|---------|----------|
+| **HyperVerge** <VendorBadge type="recommended" /> | 99.8% | ISO 30107 Level 2 — passive liveness, detects prints, screens, videos, 3D masks, deepfakes | Rs.1-2 |
+| IDfy <VendorBadge type="alternate" /> | ~99% | Active + passive | Rs.1-2 |
+| Signzy <VendorBadge type="new" /> | ~99% | AI-based. Only Indian platform in Gartner Banking 2024 Market Guide. No-code workflow builder. | Contact |
+
+</VendorTable>
+
+Full spec: [HyperVerge Integration](/vendors/verification/hyperverge)
+
+## Vendor Comparison: Video KYC / VIPV (Fallback)
+
+<VendorTable title="Video KYC / VIPV (for nomination opt-out / DigiLocker fallback)">
+
+| Vendor | Compliance | Speed | Cost/call |
+|--------|-----------|-------|-----------|
+| **HyperVerge** <VendorBadge type="recommended" /> | SEBI VIPV + RBI V-CIP | Less than 1 min (self-guided). 99.5% accuracy. 7-year recording storage. | Rs.30-50 |
+| Digio <VendorBadge type="alternate" /> | SEBI VIPV + RBI V-CIP + IRDAI | 3-5 min. DigiStudio no-code workflow. Auto-reconnect. | Rs.30-50 |
+| Signzy <VendorBadge type="new" /> | SEBI + RBI | 3-5 min. Works at 75 kbps bandwidth (best for Tier 3/4 coverage). 500K+ calls/month. | Contact |
+
+</VendorTable>
+
+<Aside type="caution">
+VIPV is only needed in two scenarios: (1) the user opted out of nominations on Screen 7 and needs a video declaration, or (2) DigiLocker was unavailable and manual Aadhaar verification was used, which does not qualify for the IPV exemption.
+</Aside>
+
+## Vendor Comparison: OCR and Document Verification
+
+<VendorTable title="OCR & Document Verification">
+
+| Vendor | Accuracy | Docs Supported | Cost/doc |
+|--------|---------|---------------|----------|
+| **HyperVerge** <VendorBadge type="recommended" /> | 99.8% | PAN, Aadhaar, Passport, Voter ID, DL, Cheque. Confidence scores per field. Tampering detection. | Rs.1-3 |
+| IDfy <VendorBadge type="alternate" /> | ~99% | Wide range. 3 modes: OCR-only, Verify-only, OCR+Verify. Government database cross-check. | Rs.1-3 |
+| Signzy <VendorBadge type="new" /> | ~99% | 14,000+ doc types from 180+ countries. SDK offline mode. SOC 2 + ISO 27001. | Contact |
+
+</VendorTable>
+
+Full spec: [HyperVerge Integration](/vendors/verification/hyperverge)
+
+</ScreenCard>

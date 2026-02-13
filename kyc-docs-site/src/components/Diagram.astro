@@ -1,0 +1,13 @@
+---
+interface Props {
+	src: string;
+	label?: string;
+}
+
+const { src, label } = Astro.props;
+---
+
+<div class="diagram-container">
+	<img src={src} alt={label || 'Diagram'} loading="lazy" />
+	{label && <p class="diagram-label">{label}</p>}
+</div>
