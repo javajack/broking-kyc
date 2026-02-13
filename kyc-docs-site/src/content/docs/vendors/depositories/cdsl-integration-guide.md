@@ -77,12 +77,17 @@ Phase 4: UAT Sign-Off (1 week)
 
 Phase 5: Production Onboarding (1-2 weeks)
    ├─ Production DP ID + API key provisioned
+   ├─ Client ID range pre-allocation requested (for BO ID on eSigned forms)
    ├─ IP whitelisting configured for production servers
    ├─ DSC mapping completed for all authorized signatories
    ├─ Leased line / MPLS / Internet connectivity certified
    ├─ Production security configuration verified
    └─ Go-Live approval issued by CDSL
 ```
+
+:::tip[Pre-Allocated BO IDs]
+During Phase 5, request a **Client ID range pre-allocation** from CDSL. This allows you to assign BO IDs before eSign, so the account opening form displays the demat account number when the client signs it. See [CDSL Overview — Section 5.4](/broking-kyc/vendors/depositories/cdsl/#54-pre-allocated-client-id-bo-id-range-reservation) for the full mechanism, implementation requirements, and eSign workflow.
+:::
 
 ### 1.4 CDSL Innovation Sandbox (Extended)
 

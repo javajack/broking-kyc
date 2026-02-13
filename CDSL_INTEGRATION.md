@@ -220,7 +220,7 @@ Based on CDSL communiques DP-119, DP-408, and the account opening form, Line 01 
 |-------|------|-------------|-------------|-----------|
 | Record Type | AN | 2 | "01" - Line identifier | Y |
 | DP ID | N | 8 | 8-digit Depository Participant ID | Y |
-| Client ID | N | 8 | 8-digit Client ID (auto-assigned or pre-assigned) | Y |
+| Client ID | N | 8 | 8-digit Client ID — blank for CDSL auto-assignment, or populated from DP's pre-allocated range (see Section 4.3) | Y |
 | Account Category | AN | 2 | IND=Individual, HUF, BDC=Body Corporate, TRU=Trust, etc. | Y |
 | Account Status | AN | 2 | Active, Closed, Suspended, Frozen | Y |
 | Sub-Status Code | N | 2-3 | Numeric code for account sub-type (e.g., 01=Ind Resident, 03=NRI Repatriable) | Y |
@@ -323,7 +323,7 @@ Full BO ID: 1234567800012345
 | **First 8 digits** | DP ID - unique identifier for the Depository Participant |
 | **Last 8 digits** | Client ID - unique identifier for the BO within that DP |
 | **DP ID Assignment** | Assigned by CDSL when DP is registered (Master Creation Form) |
-| **Client ID Assignment** | Auto-generated sequentially by CDAS system during BO account creation |
+| **Client ID Assignment** | Auto-generated sequentially by CDAS, OR pre-assigned from a DP-requested range (see Section 4.3) |
 | **Permanence** | BO ID is fixed once created; cannot be changed |
 | **Example** | DP ID `12049200` + Client ID `01830421` = BO ID `1204920001830421` |
 
@@ -338,6 +338,32 @@ Full BO ID: 1234567800012345
 | 12033500 | Kotak Securities |
 
 > **Note**: DP IDs are published on CDSL website at https://www.cdslindia.com/dp/dplist.aspx
+
+### 4.3 Pre-Allocated Client ID Ranges
+
+By default, CDAS auto-assigns Client IDs sequentially when a BO Setup file/API is processed. However, CDSL supports **pre-allocation of Client ID ranges** to DPs. This is critical for the eSign workflow — the account opening form that the client eSigns should display the BO ID, but CDSL would normally assign it only after submission.
+
+**How it works**:
+1. DP requests a contiguous block of Client IDs from CDSL during DP registration or production onboarding (contact: dprtasupport@cdslindia.com)
+2. CDSL reserves a range (e.g., `00100001` to `00200000`) for the DP
+3. DP maintains a local atomic counter and assigns the next available Client ID before eSign
+4. The full BO ID (DP ID + pre-assigned Client ID) is printed on the account opening form
+5. Client eSigns the form with the BO ID displayed
+6. DP submits BO Setup to CDSL with the Client ID populated in Line 01 (Position 3)
+7. CDSL validates the ID is within the pre-allocated range and creates the account
+
+**File format**: In the BO Setup file, Line 01 Position 3 (Client ID, 8 digits):
+- **Blank** → CDSL auto-assigns the next sequential Client ID
+- **Populated** → CDSL uses the DP-supplied value (must be within pre-allocated range)
+
+**Implementation requirements**:
+- Thread-safe centralized counter (database sequence or Redis INCR)
+- Never reuse a Client ID even if the BO Setup is rejected
+- Low-watermark alerting when pool is near exhaustion
+- DR/failover must share the counter or use a separate sub-range
+- Audit trail: log every Client ID assignment with PAN and timestamp
+
+> See [CDSL.md Section 5.4](/vendors/depositories/CDSL.md#54-pre-allocated-client-id-bo-id-range-reservation) for the full specification including eSign workflow diagrams.
 
 ---
 
@@ -1507,15 +1533,26 @@ Step 5: Photograph capture with:
    ↓
 Step 6: Bank account verification (Penny Drop / RPD)
    ↓
-Step 7: Client signs digitally (Aadhaar eSign via CVL/Leegality)
+Step 7: Assign Client ID from pre-allocated pool (see Section 4.3)
+   - Atomic increment of pool counter → Client ID (e.g., 00100042)
+   - Construct full BO ID: {DP_ID}00100042
    ↓
-Step 8: DP generates BO Setup file (Lines 01, 02, 05, 07 minimum)
+Step 8: Generate account opening document with BO ID printed
+   - KYC form, Rights & Obligations, Risk Disclosure, DDPI (if opted)
+   - "Your Demat Account No: {DP_ID}-00100042" displayed on form
    ↓
-Step 9: Upload via BO Setup API or batch file upload to CDAS
+Step 9: Client signs digitally (Aadhaar eSign via Leegality/Digio)
+   - eSigned document contains BO ID as legally binding reference
    ↓
-Step 10: CDSL assigns Client ID → 16-digit BO ID generated
+Step 10: DP generates BO Setup file (Lines 01, 02, 05, 07 minimum)
+   - Line 01 Position 3: Client ID = 00100042 (pre-assigned)
    ↓
-Step 11: Client receives demat account credentials
+Step 11: Upload via BO Setup API or batch file upload to CDAS
+   ↓
+Step 12: CDSL validates Client ID within pre-allocated range → Account created
+   - BO ID on eSigned form matches CDSL record exactly
+   ↓
+Step 13: Client receives demat account credentials (welcome kit)
 ```
 
 ### 29.3 KRA Data Integration During BO Opening

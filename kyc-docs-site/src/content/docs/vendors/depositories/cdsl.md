@@ -599,7 +599,122 @@ Example:
 | Example | `1234567800001234` | `IN30012345678901` |
 | Prefix | None | Always starts with "IN" |
 
-### 5.4 Storage in Our System
+### 5.4 Pre-Allocated Client ID (BO ID Range Reservation)
+
+By default, CDSL auto-assigns Client IDs sequentially when a BO Setup request is processed. However, CDSL also supports **pre-allocation of Client ID ranges** to DPs — this is critical for printing the BO ID on the account opening form before eSign.
+
+#### 5.4.1 The Problem
+
+```
+Standard flow (auto-assignment):
+   Client completes KYC → eSign account opening form → Submit BO Setup to CDSL → CDSL assigns Client ID
+                                   ↑
+                         Form does NOT contain BO ID
+                         (because it doesn't exist yet)
+```
+
+The account opening form — which includes Rights & Obligations, KYC details, nominee declarations, and DDPI consent — needs to be eSigned by the client. Ideally, this form should display the client's **demat account number (BO ID)** as it is the legal document of record. But CDSL assigns the Client ID only when the BO Setup file/API is processed, which happens **after** eSign.
+
+#### 5.4.2 The Mechanism
+
+CDSL allows DPs to request a **contiguous block of Client IDs** in advance. The DP maintains a local pool and assigns from it before submitting to CDSL.
+
+```
+Pre-allocation flow:
+   DP requests Client ID range from CDSL (one-time setup)
+         ↓
+   CDSL reserves range: e.g., 00100001 to 00200000
+         ↓
+   For each new client:
+     1. DP picks next available Client ID from pool (e.g., 00100042)
+     2. Constructs full BO ID: {DP_ID}00100042
+     3. Prints BO ID on account opening form
+     4. Client eSigns form WITH BO ID displayed
+     5. DP submits BO Setup to CDSL with Client ID = 00100042 (Line 01, Position 3)
+     6. CDSL validates ID is within pre-allocated range → Account created
+     7. BO ID on eSigned form matches CDSL record exactly
+```
+
+#### 5.4.3 How to Request
+
+| Aspect | Details |
+|--------|---------|
+| **Contact** | CDSL DP Relations (dprtasupport@cdslindia.com) |
+| **When** | During DP registration or production onboarding |
+| **What to Request** | "Client ID range pre-allocation for BO account opening" |
+| **Specify** | Expected volume (e.g., 100K IDs), growth projections |
+| **CDSL Assigns** | Contiguous range (e.g., `00100001` to `00200000`) |
+| **File Format** | Line 01, Position 3 (Client ID field, 8 digits) populated with pre-assigned value |
+| **API** | Include `client_id` in the BO Setup request payload |
+| **Replenishment** | Request additional range before exhaustion; CDSL assigns next contiguous block |
+
+#### 5.4.4 Implementation Requirements
+
+| Requirement | Details |
+|-------------|---------|
+| **Thread-Safe Counter** | Centralized atomic counter (database sequence or Redis INCR) — must prevent duplicate assignment under concurrent load |
+| **Persistence** | Counter must survive application restarts; persist in database |
+| **Multi-Instance Safety** | If multiple app servers, use centralized counter or partitioned sub-ranges per instance |
+| **DR / Failover** | DR system must either share the same counter or use a separate pre-allocated sub-range to avoid collisions |
+| **Never Reuse** | A Client ID consumed from the pool is permanently used, even if BO Setup fails or is rejected |
+| **Low-Watermark Alert** | Alert operations team when remaining pool falls below threshold (e.g., 10% remaining) |
+| **Audit Trail** | Log every Client ID assignment: timestamp, applicant PAN, form generation ID |
+
+#### 5.4.5 eSign Workflow with Pre-Allocated BO ID
+
+```
+┌────────────────────────────────────────────────────────────────┐
+│                    ACCOUNT OPENING FLOW                        │
+├────────────────────────────────────────────────────────────────┤
+│                                                                │
+│  1. Client completes KYC journey (screens 1-8)                 │
+│     - PAN verified, DigiLocker done, bank verified             │
+│     - Nominations captured, declarations accepted              │
+│                                                                │
+│  2. System assigns next Client ID from pre-allocated pool      │
+│     - Atomic increment of pool counter                         │
+│     - Client ID = 00100042                                     │
+│     - Full BO ID = {DP_ID}00100042                             │
+│     - Persist assignment: (PAN, Client ID, timestamp)          │
+│                                                                │
+│  3. Generate account opening PDF/document                      │
+│     - KYC Part I + Part II                                     │
+│     - Rights & Obligations                                     │
+│     - Risk Disclosure                                          │
+│     - BO ID printed: "Your Demat Account: XXXXXXXX-00100042"  │
+│     - DDPI consent (if opted)                                  │
+│     - Nominee details                                          │
+│                                                                │
+│  4. Client eSigns via Aadhaar OTP (Leegality/Digio)           │
+│     - Document contains BO ID → legally binding reference      │
+│                                                                │
+│  5. DP submits BO Setup to CDSL                                │
+│     - Client ID = 00100042 in Line 01 / API request            │
+│     - CDSL validates within pre-allocated range                 │
+│     - Account created with exact BO ID                         │
+│                                                                │
+│  6. Welcome communication to client                            │
+│     - BO ID matches what was on eSigned form ✓                 │
+│     - No re-signing required                                   │
+│                                                                │
+└────────────────────────────────────────────────────────────────┘
+```
+
+#### 5.4.6 Fallback: Auto-Assignment Mode
+
+If pre-allocated range is exhausted or unavailable:
+
+| Scenario | Handling |
+|----------|----------|
+| **Range exhausted** | Submit BO Setup without Client ID → CDSL auto-assigns → BO ID printed on Client Master Report (not on eSigned form) |
+| **Pre-assigned ID rejected** | Generate new BO Setup with next ID from pool; if persistent failure, fall back to auto-assignment |
+| **Form re-signing** | If auto-assignment is used, the eSigned form will not contain BO ID; BO ID communicated separately via welcome email/SMS |
+
+:::note
+The pre-allocation mechanism must be confirmed with CDSL during DP registration. The exact process (CDAS module vs email request vs API) varies and is communicated during onboarding. The Line 01 file format field at Position 3 (Client ID) supports both modes — auto-assigned (left blank) or pre-assigned (populated by DP).
+:::
+
+### 5.5 Storage in Our System
 
 Per Master Dataset Section H:
 
@@ -607,10 +722,11 @@ Per Master Dataset Section H:
 |-------|-------|-------|
 | `depository` (H01) | `CDSL` | Fixed for our primary depository |
 | `dp_id` (H03) | `{our_8_digit_dp_id}` | Our DP ID |
-| `client_id` (H04) | `{8_digit_client_id}` | From CDSL response |
+| `client_id` (H04) | `{8_digit_client_id}` | From pre-allocated pool or CDSL response |
 | `bo_id` (H05) | `{dp_id}{client_id}` | Concatenation; 16 digits |
 | `account_type` (H06) | `IN` / `JO` / `MN` etc. | Account classification |
 | `account_status` (H07) | `AC` / `FR` / `CL` | Current status |
+| `client_id_source` (H08) | `PRE_ALLOCATED` / `AUTO_ASSIGNED` | Tracks assignment mode |
 
 ---
 
