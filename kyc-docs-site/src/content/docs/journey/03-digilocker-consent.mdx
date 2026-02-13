@@ -14,13 +14,23 @@ import VendorTable from '../../../components/VendorTable.astro';
 import VendorBadge from '../../../components/VendorBadge.astro';
 import { Aside } from '@astrojs/starlight/components';
 
+The customer has entered their PAN (Permanent Account Number) and DOB (Date of Birth), and tapped submit. Now the app redirects them to DigiLocker (Government of India's digital document platform) -- a government portal where they will authenticate with their Aadhaar number and a fresh OTP (One-Time Password). From the customer's perspective, they are simply granting consent to share their documents. From the system's perspective, this is the single most productive step in the entire journey: zero fields typed by the customer, yet approximately 25 identity fields harvested in one shot. Meanwhile, the four API calls fired on Screen 2 are completing in the background.
+
 <ScreenCard number={3} title="DigiLocker Consent (Redirect)" time="~60 seconds">
 
 **Purpose:** Consent-based fetch of Aadhaar XML + PAN document.
 
+This is the only screen where the customer leaves your app. They are redirected to the DigiLocker portal, where they enter their Aadhaar number and verify with an OTP sent to their Aadhaar-linked mobile. Once they grant consent, DigiLocker returns them to your app with a rich payload of identity data.
+
 ## User Input
 
-**0 fields** — the user enters their Aadhaar number + OTP on the DigiLocker portal (not our app). A fresh Aadhaar OTP is sent here.
+**0 fields** -- the user enters their Aadhaar number + OTP on the DigiLocker portal (not our app). A fresh Aadhaar OTP is sent here.
+
+:::tip[Zero-effort data harvest]
+This screen requires zero typing within your app. The customer authenticates directly with the government's DigiLocker portal. Yet it yields more data than any other screen in the journey -- approximately 25 pre-verified fields that would otherwise require manual entry and separate document uploads.
+:::
+
+The table below shows exactly what comes back from DigiLocker. Every one of these fields arrives pre-verified by the government, which means you do not need to run separate verification on them.
 
 ## Data Harvested (~25 fields with zero effort)
 
@@ -36,12 +46,20 @@ import { Aside } from '@astrojs/starlight/components';
 | POA auto-set (Aadhaar) | Derived |
 
 <Aside type="tip" title="IPV Exemption">
-Aadhaar eKYC via DigiLocker = IPV/VIPV exempted per SEBI circular. This saves an entire video call step from the onboarding flow.
+Aadhaar eKYC via DigiLocker = IPV (In-Person Verification) / VIPV (Video In-Person Verification) exempted per SEBI (Securities and Exchange Board of India) circular. This saves an entire video call step from the onboarding flow.
 </Aside>
+
+The placement of this screen is not arbitrary. It is one of the most deliberate architectural decisions in the entire system.
 
 ## Timing is Deliberate
 
-This 60-second buffer (redirect + consent + return) is exactly the time needed for all 4 async API calls from [Screen 2](/broking-kyc/journey/02-pan-dob/) to complete. By the time the user returns from DigiLocker, PAN verification, KRA lookup, CKYC search, and AML screening results are all available.
+This 60-second buffer (redirect + consent + return) is exactly the time needed for all 4 async API calls from [Screen 2](/broking-kyc/journey/02-pan-dob/) to complete. By the time the user returns from DigiLocker, PAN verification, KRA (KYC Registration Agency) lookup, CKYC (Central KYC) search, and AML (Anti-Money Laundering) screening results are all available.
+
+:::note[The hidden benefit of the redirect]
+The DigiLocker redirect is often seen as a UX cost -- the customer briefly leaves your app. But this "cost" is actually a feature. It provides a natural 60-second window during which the system's four background API calls from Screen 2 complete. Without this buffer, you would need to show a loading spinner on Screen 4 while waiting for KRA and CKYC results. The redirect eliminates that wait entirely.
+:::
+
+Now let us look at the vendor options for DigiLocker integration. The choice here also affects your eSign and Video KYC capabilities, since several vendors bundle these together.
 
 ## Vendor Comparison: Aadhaar / DigiLocker
 
@@ -61,5 +79,9 @@ Full spec: [DigiLocker Integration](/broking-kyc/vendors/identity/digilocker)
 <Aside type="caution">
 If DigiLocker is down, fallback to HyperVerge Aadhaar OCR + manual document upload. This loses the IPV exemption and requires a VIPV (Video In-Person Verification) step.
 </Aside>
+
+:::caution[OTP timeout during DigiLocker]
+The DigiLocker session has a limited timeout window. If the customer takes too long to enter their Aadhaar OTP on the DigiLocker portal, the session expires and they are returned to your app without any data. Your system must detect this gracefully and offer a retry. Do not assume every DigiLocker redirect will succeed on the first attempt.
+:::
 
 </ScreenCard>

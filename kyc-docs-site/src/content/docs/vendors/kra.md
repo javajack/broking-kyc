@@ -3,6 +3,11 @@ title: KRA Integration
 description: KRA (KYC Registration Agency) integration — lookup, fetch, submit, and modify across all 5 KRAs via Digio.
 ---
 
+The KYC Registration Agency (KRA) is the backbone of investor identity verification in India's securities market. Before a stock broker or any SEBI (Securities and Exchange Board of India)-registered intermediary can open a trading account for a client, they must verify that client's KYC status at a KRA. This is not optional -- it is a regulatory prerequisite that directly determines whether a person can buy or sell securities on Indian exchanges.
+
+There are five SEBI-registered KRAs, but thanks to a mandated interoperability framework they function as a single logical system. A query to any one KRA returns the investor's record regardless of which KRA originally holds it. In practice, this means a broker needs only a single integration point -- and vendors like Digio provide a unified REST API that abstracts away the differences between all five KRAs. The KRA status code returned by this lookup (Registered, Validated, On Hold, Rejected, or Not Available) is the gate that controls whether the client's account can be activated for trading.
+
+Since August 2024, SEBI mandates that every securities intermediary must perform a dual upload of client KYC data to both the KRA and CKYC (Central KYC Registry, maintained by CERSAI). This page is the complete reference for KRA integration: the Digio API specifications for lookup, fetch, submit, and modify operations; the status codes that gate trading access; field-level upload specifications for both Part I (identity) and Part II (intermediary-specific) data; modification workflows and their downstream impact; non-individual entity requirements; and the edge cases that arise in production.
 
 ## Table of Contents
 
@@ -97,6 +102,8 @@ Per SEBI KYC Master Circular (SEBI/HO/MIRSD/MIRSD-SEC-2/P/CIR/2023/168, October 
 - The intermediary must also verify the 6 KYC attributes (Name, PAN, Address, Mobile, Email, Income Range) and ensure consistency across KRA, exchange UCC, and depository records.
 
 ---
+
+With the KRA ecosystem and regulatory landscape established, the next step is the practical integration. Digio serves as the recommended wrapper, providing a single REST/JSON interface to all five KRAs -- replacing weeks of SOAP/XML development with a two-day integration.
 
 ## 2. Digio KRA API (Primary Integration Path)
 
@@ -516,6 +523,8 @@ X-Digio-Signature: <HMAC-SHA256 signature>
 
 ---
 
+Understanding KRA status codes is arguably the most important part of this integration, because the status returned by the KRA directly controls whether a client can trade. Every downstream system -- account activation, order placement, compliance reporting -- keys off these values.
+
 ## 3. KRA Status Codes (Critical for Trading)
 
 ### 3.1 Status Definitions
@@ -565,6 +574,10 @@ X-Digio-Signature: <HMAC-SHA256 signature>
 ```
 
 ### 3.3 Key Rules
+
+:::caution[Trading Gate]
+The KRA status is the hard gate for trading access. If a client's status is anything other than "KYC Registered" or "KYC Validated", the broker's systems **must** block account activation and order placement. There is no override -- this is a regulatory requirement, not a business rule.
+:::
 
 - **Only "KYC Registered" or "KYC Validated" allows trading.** All other statuses block account activation and trading.
 - Hold/Rejection can happen at **any stage** after submission. A previously Registered client can be placed On Hold if discrepancies are discovered during validation.
@@ -774,6 +787,10 @@ KRA systems typically have scheduled maintenance:
 - **NDML KRA**: Sunday maintenance (typically 6 AM - 12 PM IST)
 - **All KRAs**: Year-end / quarter-end may have extended processing times
 
+:::tip[Build a Retry Queue]
+KRA downtime is a regular occurrence, especially on weekends and quarter-ends. Design your submission pipeline with a persistent retry queue from the start: automatically retry failed submissions every 15 minutes for up to 24 hours, then escalate to operations. SEBI allows 3 working days for KRA upload, so brief downtime windows do not create compliance risk as long as the queue reliably drains.
+:::
+
 **Recommendation**: Build retry queues for KRA submissions. If a submission fails due to KRA downtime, queue it for automatic retry every 15 minutes for up to 24 hours, then escalate to operations.
 
 ---
@@ -804,6 +821,10 @@ A KRA modification is required when a client's data changes after the initial KY
 | **Modifiable with Re-verification** | Name (first/middle/last), Date of Birth, Gender | Requires supporting documents: gazette notification (name change), marriage certificate, court order. KRA manual review triggered. Takes 3-5 working days. |
 | **Non-Modifiable** | PAN | PAN is the primary key. Cannot be changed. If PAN itself changes (surrender + new allotment), a fresh KYC submission is required. Old record linked via old PAN becomes inactive. |
 | **Restricted** | Citizenship, Nationality, Residential status | Change from Resident to NRI (or vice versa) triggers enhanced due diligence. New PIS permission letter needed for NRI conversion. Residential status change may require fresh account opening. |
+
+:::danger[PAN Cannot Be Modified]
+PAN is the primary key of the entire KRA system. There is no API call, batch process, or manual override that can change the PAN on an existing KRA record. If a client's PAN changes (due to surrender and re-allotment by the Income Tax Department), the old KRA record becomes permanently inactive and a completely fresh KYC submission under the new PAN is required, along with new UCC registration at exchanges and a new BO account at the depository.
+:::
 
 ### 6.3 Modification API Call
 
@@ -850,6 +871,8 @@ When any of the 6 KYC attributes (Name, PAN, Address, Mobile, Email, Income Rang
 Failure to synchronize creates a mismatch, which triggers non-compliance flags during exchange reconciliation.
 
 ---
+
+The sections above cover individual KYC, which accounts for the vast majority of onboarding volume. However, brokers also onboard corporate entities, HUFs, partnerships, trusts, LLPs, and NRIs -- each with distinct documentation requirements and additional mandatory fields at the KRA.
 
 ## 7. Non-Individual Entities
 
@@ -1023,6 +1046,8 @@ KRA supports multiple entity types beyond individuals. Each has additional manda
 
 ---
 
+While Digio is the recommended path for Phase 1, some brokers at scale choose to integrate directly with a KRA to reduce per-transaction costs. The following section documents the direct integration approach for reference and future planning.
+
 ## 8. Direct KRA Integration (Alternative - for Reference)
 
 Direct integration with a KRA (bypassing Digio) provides more control and is cheaper at scale but requires significantly more development effort. This path is NOT recommended for Phase 1.
@@ -1119,6 +1144,10 @@ Similar functionality to CVL KRA with different endpoint structures.
 
 ### 9.1 Regulatory Background
 
+:::note[Dual Upload is Mandatory Since August 2024]
+Failure to upload client KYC to **both** KRA and CKYC constitutes a compliance violation. During SEBI inspections, auditors check for completeness of both uploads. Build your pipeline to treat a successful KRA upload without a corresponding CKYC upload as an incomplete onboarding, even though the client can trade based on KRA status alone.
+:::
+
 SEBI mandated dual upload to both KRA and CKYC (CERSAI) effective **August 2024**. This ensures that:
 1. Securities-market KYC is maintained at the KRA (for trading eligibility)
 2. Financial-sector-wide KYC is maintained at CKYC (for cross-sector interoperability)
@@ -1207,6 +1236,8 @@ SEBI requires that 6 key KYC attributes must be consistent across all systems wh
 ```
 
 ---
+
+In production, KRA integration encounters a range of real-world scenarios that fall outside the standard lookup-fetch-submit flow. The following edge cases require special handling in application logic, operations workflows, or both.
 
 ## 11. Edge Cases
 

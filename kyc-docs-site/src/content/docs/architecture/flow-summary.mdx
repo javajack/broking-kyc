@@ -7,9 +7,11 @@ import { Aside } from '@astrojs/starlight/components';
 import Diagram from '../../../components/Diagram.astro';
 import StatusFlow from '../../../components/StatusFlow.astro';
 
-The complete onboarding pipeline at a glance — from the user's first mobile OTP to the moment they can trade. Shows the 9-screen user journey (~6 min), the maker-checker review, and the multi-agency batch processing.
+This page gives you the complete onboarding pipeline in a single view -- from the customer's first mobile OTP (One-Time Password) to the moment their account status changes to "ACTIVE" and they can place their first trade. If you are a new engineer, read this page after the [Design Principles](/broking-kyc/architecture/design-principles/) and before diving into the individual screen specifications. It will give you the end-to-end mental model that ties everything together: the 9-screen user journey (~6 minutes of customer time), the maker-checker review (internal quality gate), and the multi-agency batch processing (the 24-72 hours where the system registers the customer with every exchange and depository).
 
 ## User Journey (9 Screens, ~6 Minutes)
+
+The flow below shows each screen, the fields the customer provides, and the async operations that fire at each step. Notice how the async calls are strategically placed to complete before the data is needed.
 
 ```
 Screen 1: Mobile / Email Registration (1 field: mobile + OTP)
@@ -41,12 +43,24 @@ Screen 9: Review + Face Match + Aadhaar OTP e-Sign
 User is done in ~6 minutes. Everything after Screen 9 is automatic.
 </Aside>
 
+:::tip[Reading the flow diagram]
+Each `ASYNC` tag indicates a background operation that runs without blocking the customer. The results of these operations converge at Screen 8 (the blocking gate). If you are tracing a specific data point through the system -- say, PAN (Permanent Account Number) verification status -- follow it from Screen 2 where it fires, through DigiLocker (Government of India's digital document platform) on Screen 3 where it completes in the background, to Screen 8 where it is evaluated.
+:::
+
+Once the customer completes Screen 9, the application enters the internal review pipeline. The customer does not see or interact with this phase -- they simply receive a notification when their account is active.
+
 ## Maker-Checker Review
 
 <StatusFlow nodes={['User Submits', 'Maker Review', 'Checker Approval', 'Batch Zone']} />
 
 - **Maker** (Step 10): Auto-approve if all checks pass; manual only for edge cases
 - **Checker** (Step 11): Final approval before batch submission
+
+:::note[Why maker-checker?]
+SEBI (Securities and Exchange Board of India) regulations require a dual-control review process for account opening. The maker reviews the application data and flags any discrepancies. The checker independently verifies and gives final approval. In the happy path (all async checks passed, no discrepancies), both steps can be semi-automated -- the reviewer simply confirms what the system has already validated.
+:::
+
+After the checker approves, the system triggers 8 independent batch pipelines. Each pipeline registers the customer with a different regulatory agency or exchange. They run in parallel because none of them depend on each other's output.
 
 ## Batch Zone (Parallel Agency Pipelines)
 
@@ -62,6 +76,12 @@ After checker approval, 8 pipelines run in parallel:
 | **CDSL** | BO File | KYC Check → Bank Valid | Active | 1-2 hrs (API) |
 | **NSDL** | UDiFF Submit | CDS Process → DPM Update | Active | ~15 days |
 | **Income** | Perfios/AA verify | - | Confirmed | 1-2 hrs |
+
+:::caution[NSDL is the bottleneck]
+Notice that NSDL (National Securities Depository Limited) takes approximately 15 days -- significantly longer than every other pipeline. This is because NSDL still uses the UDiFF batch format and has a longer processing cycle compared to CDSL (Central Depository Services Limited), which offers API-based BO (Beneficiary Owner) account opening with 1-2 hour turnaround. If your firm uses CDSL as the primary depository, the customer can typically start trading within 24 hours.
+:::
+
+The final gate determines when the customer's account status changes to "ACTIVE" and they receive the notification that they can trade.
 
 ## Final Gate
 

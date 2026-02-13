@@ -3,6 +3,11 @@ title: CKYC
 description: Central KYC (CERSAI) integration — search, download, and upload for KYC identity record management.
 ---
 
+Central KYC (CKYC) is India's unified identity registry for all financial institutions, operated by CERSAI (Central Registry of Securitisation Asset Reconstruction and Security Interest of India) through its technology partner Protean (formerly NSDL e-Governance Infrastructure Limited). Unlike the KRA (KYC Registration Agency) system which serves only the securities market, CKYC spans banking, insurance, securities, and NBFCs (Non-Banking Financial Companies) -- making it the single most comprehensive KYC repository in the Indian financial ecosystem.
+
+Every individual in the registry is assigned a unique 14-digit KIN (KYC Identification Number) that serves as a permanent cross-sector identity reference. When a customer completes KYC at any financial institution, that record becomes available to all other regulated entities through search and download operations. This is the "do KYC once, use everywhere" vision that CKYC was designed to fulfill -- eliminating redundant identity verification across institutions and reducing onboarding friction for customers.
+
+Since August 2024, SEBI (Securities and Exchange Board of India) mandates dual upload to both KRA and CKYC for every new account. This page covers the complete CKYC integration: search, download, and upload operations via Decentro (our primary aggregator), the SFTP batch pipeline for bulk processing, dual upload orchestration with KRA, and handling of the January 2025 masking change that altered how CKYC numbers are returned in search responses.
 
 ## Table of Contents
 
@@ -84,6 +89,8 @@ Since **August 1, 2024**, SEBI mandates that all intermediaries must upload KYC 
 
 ## 2. CKYC Operations
 
+With the conceptual groundwork established, this section walks through the four core API operations -- Search, Download, Upload, and Modify -- that make up the real-time CKYC integration via Decentro.
+
 ### 2a. Search
 
 Search the CKYC registry to check if a customer already has an existing CKYC record.
@@ -112,7 +119,9 @@ Search the CKYC registry to check if a customer already has an existing CKYC rec
 | Passport | `PASSPORT` | Passport number |
 | Driving Licence | `DRIVING_LICENCE` | DL number |
 
-PAN is the recommended search key because it has the highest match rate and is mandatory for all securities market participants.
+:::tip[Use PAN as the Primary Search Key]
+PAN is the recommended search key because it has the highest match rate and is mandatory for all securities market participants. Since PAN is already captured and verified earlier in the onboarding flow, it is always available at the point when CKYC search is triggered -- no additional customer input required.
+:::
 
 #### Response (Success -- Record Found)
 
@@ -167,6 +176,10 @@ Since **January 2025**, CERSAI introduced a privacy enhancement: CKYC Search ret
 - If you need the KIN for KRA upload or depository records, you must call Download
 - The masked ID can still be used to identify that a record exists
 - The `ckycReferenceId` from search can be used as input to the Download API
+
+:::caution[Breaking Change -- Masked KIN in Search Response]
+The January 2025 masking change is a breaking change for any integration that previously relied on the Search response alone to obtain the full 14-digit KIN. If your system stored the KIN from Search results, you must now add a Download call after every successful Search to retrieve the unmasked KIN. Audit any existing code paths that parse the `ckycId` field, as the masked format (`$XXXX1234$`) will fail validation checks expecting 14 numeric digits.
+:::
 
 #### Error Codes
 
@@ -540,6 +553,8 @@ When a customer's data changes (address change, name change after marriage, mobi
 
 ## 3. SFTP Batch Upload
 
+While the API operations above handle real-time, per-customer interactions with CKYC, high-volume scenarios -- particularly the nightly batch after maker-checker approval -- call for a bulk upload mechanism via SFTP.
+
 For bulk uploads -- typically used after maker-checker approval in the admin system for processing multiple records in a single batch.
 
 ### File Format
@@ -688,6 +703,8 @@ Digio also offers CKYC integration but with a different setup:
 ---
 
 ## 5. CKYC + KRA Dual Upload Flow
+
+With both the API and batch pathways for CKYC covered, this section addresses the orchestration challenge: how to coordinate CKYC uploads alongside the mandatory KRA upload so that neither system becomes a bottleneck for account activation.
 
 ### Mandate
 
@@ -917,6 +934,8 @@ The KIN must be stored in the broker's system at multiple levels:
 
 ## 8. Edge Cases
 
+The specifications above describe the happy path, but production systems inevitably encounter scenarios that require special handling. The cases below capture the most common real-world complications and the recommended resolution for each.
+
 ### 8.1 Customer Already Has CKYC from Another FI
 
 **Scenario**: Customer completed KYC at a bank. Now opening a broking account.
@@ -999,6 +1018,10 @@ The KIN must be stored in the broker's system at multiple levels:
 3. Compliance dashboard should flag "CKYC Pending" accounts
 4. Escalate if not resolved within 10 working days
 
+:::note[CKYC Is Non-Blocking for Trading]
+Unlike KRA status, which directly gates trading permission, CKYC upload status has no impact on whether a client can place orders. A failed or pending CKYC upload is a compliance concern, not a trading blocker. Design your system so that CKYC failures never delay account activation -- route them to an async retry queue and a compliance monitoring dashboard instead.
+:::
+
 ### 8.8 PAN Not Active
 
 **Scenario**: CKYC upload fails because PAN is inactive/deactivated.
@@ -1012,12 +1035,18 @@ The KIN must be stored in the broker's system at multiple levels:
 
 ## 9. Data Privacy
 
+Because CKYC centralizes sensitive personal data across all financial sectors, a robust privacy and consent framework governs every interaction with the registry. This section outlines the key data handling obligations that the broker's implementation must satisfy.
+
 ### Aadhaar Handling
 
 - Aadhaar is stored in **masked form** within CKYC records (last 4 digits visible)
 - Full Aadhaar number is never stored or transmitted in CKYC APIs
 - Aadhaar masking format: `XXXX XXXX 5678`
 - Aadhaar as address proof: only masked version submitted to CKYC
+
+:::danger[Aadhaar Storage and Transmission Restrictions]
+Under the Aadhaar Act (Section 29) and UIDAI regulations, storing or logging the full 12-digit Aadhaar number is prohibited unless you are an authorized AUA/KUA. The broker must never persist the full Aadhaar number in any database, log file, API response cache, or analytics pipeline. Only the masked format (`XXXX XXXX 5678`) may be stored. Violations carry penalties up to Rs. 1 crore per incident under the Aadhaar Act.
+:::
 
 ### Consent Framework
 

@@ -3,13 +3,15 @@ title: Non-Individual Entities
 description: KYC requirements for Corporate, HUF, Partnership, Trust, LLP, and other non-individual entity types across all vendor integrations.
 ---
 
-KYC requirements for Corporate, HUF, Partnership, Trust, LLP, and other non-individual entity types. This page consolidates non-individual sections from across all 12 vendor integration specs.
+While the current KYC system focuses on individual customer onboarding, the securities market also serves corporates, partnerships, trusts, HUFs (Hindu Undivided Families), and LLPs (Limited Liability Partnerships). Each of these entity types has its own set of KYC documents, verification requirements, and regulatory obligations. This page consolidates the non-individual touchpoints identified across all vendor integration specifications during the individual KYC design process. It serves as a planning reference for when the team begins the non-individual onboarding phase.
 
 :::note
 The current KYC system focuses on **individual customer onboarding**. Non-individual entity onboarding is planned for a future phase. This page documents the vendor touchpoints and requirements identified during the individual KYC specification process.
 :::
 
 ## Entity Types
+
+Each entity type maps to different category codes across the KRA (KYC Registration Agency), CKYC (Central KYC) registry, and CDSL (Central Depository Services Limited). The "Key Documents" column gives you a sense of the additional documentation burden compared to individual onboarding.
 
 | Entity Type | KRA Category | CKYC Constitution | CDSL Category | Key Documents |
 |-------------|-------------|-------------------|---------------|--------------|
@@ -22,16 +24,18 @@ The current KYC system focuses on **individual customer onboarding**. Non-indivi
 
 ## Vendor Touchpoints by Entity Type
 
+Each vendor integration has specific handling for non-individual entities. The sections below summarize what changes in each integration when the customer is not an individual.
+
 ### KRA (via Digio)
 - Separate upload templates per entity type
 - Director/Partner/Trustee KYC as sub-records
-- FATCA/CRS declaration per authorized signatory
+- FATCA/CRS (Foreign Account Tax Compliance Act / Common Reporting Standard) declaration per authorized signatory
 - Full spec: [KRA Integration](/broking-kyc/vendors/kra) Section 7
 
 ### CKYC (via Decentro)
 - 7 constitution types supported
 - Authorized signatory photo and signature required
-- Ultimate Beneficial Owner (UBO) identification for companies
+- UBO (Ultimate Beneficial Owner) identification for companies
 - Full spec: [CKYC Integration](/broking-kyc/vendors/identity/ckyc) Section 6
 
 ### CDSL BO Account
@@ -42,7 +46,7 @@ The current KYC system focuses on **individual customer onboarding**. Non-indivi
 
 ### Exchange UCC (NSE/BSE/MCX)
 - Client type codes differ per entity
-- Director/Partner PAN verification required
+- Director/Partner PAN (Permanent Account Number) verification required
 - Additional document requirements per exchange
 - Full specs: [NSE](/broking-kyc/vendors/exchanges/nse), [BSE](/broking-kyc/vendors/exchanges/bse), [MCX](/broking-kyc/vendors/exchanges/mcx)
 
@@ -67,8 +71,12 @@ The current KYC system focuses on **individual customer onboarding**. Non-indivi
 
 Non-individual entity onboarding will be implemented after the individual KYC system is stable. Priority order:
 
-1. **HUF** — Simplest non-individual type, single Karta
-2. **Partnership/LLP** — Multiple partners, similar structure
-3. **Corporate** — Most complex (board resolution, directors, UBO)
-4. **Trust** — Requires trustee verification, deed analysis
-5. **NRI** — See [NRI Deep Dive](/broking-kyc/appendix/nri-deep-dive)
+1. **HUF** -- Simplest non-individual type, single Karta
+2. **Partnership/LLP** -- Multiple partners, similar structure
+3. **Corporate** -- Most complex (board resolution, directors, UBO)
+4. **Trust** -- Requires trustee verification, deed analysis
+5. **NRI** -- See [NRI Deep Dive](/broking-kyc/appendix/nri-deep-dive)
+
+:::tip[Why HUF first?]
+An HUF (Hindu Undivided Family) is structurally similar to an individual account -- it has a single Karta (head of family) whose PAN and KYC are the primary identifiers. This makes it the smallest incremental step from individual onboarding and a good starting point for validating the non-individual architecture.
+:::

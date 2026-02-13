@@ -3,6 +3,11 @@ title: CDSL BO Integration
 description: CDSL Beneficiary Owner (BO) account opening — CDAS system, fixed-length positional file format, and DDPI.
 ---
 
+Every share your client owns, every dividend they receive, every trade that settles — it all flows through a demat account at CDSL. If your firm's trading platform is the storefront, CDSL is the vault in the back. This document is your complete guide to integrating with that vault: opening accounts, managing securities, handling pledges, and staying compliant. By the time you finish reading, you will understand not just the *how* of CDSL integration, but the *why* behind every file format quirk, every maker-checker requirement, and every circular reference number your compliance team will throw at you.
+
+:::tip[How to read this document]
+If you are new to depository operations, read sections 1-5 first — they build the foundational concepts (what CDSL is, how CDAS works, and how accounts are opened). Sections 6-8 cover the day-to-day authorization mechanisms your clients will interact with. Sections 9-22 go deeper into edge cases, reporting, and compliance. The [deep-dive guides](#deep-dive-guides) at the end cover DDPI, pledge operations, modifications, and integration setup in dedicated pages.
+:::
 
 ## Table of Contents
 

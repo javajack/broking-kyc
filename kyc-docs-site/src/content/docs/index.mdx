@@ -17,11 +17,19 @@ hero:
 import { Card, CardGrid } from '@astrojs/starlight/components';
 import Diagram from '../../components/Diagram.astro';
 
+Welcome to the KYC (Know Your Customer) onboarding specification. If you are new to the firm, this is the single most important system you need to understand. Every customer who wants to buy their first share, place their first F&O order, or simply open a demat account must pass through this gateway. Think of it as the bridge that transforms a stranger on the internet into a verified, regulation-compliant client who is authorized to trade on Indian stock exchanges. By the time you finish reading these docs, you will understand exactly how that transformation happens -- from the moment a user enters their mobile number to the moment their signed application reaches NSE, BSE, CDSL, and NSDL.
+
 ## What Is This?
 
-A complete technical specification for **stock broking KYC onboarding** — covering a 9-screen mobile-first user journey, 25+ vendor integrations, 8 parallel batch pipelines, maker-checker admin workflow, and full SEBI/KRA/CKYC regulatory compliance. Built for an Indian stock broking firm enabling individual customers to go from mobile OTP to first trade in 24-72 hours.
+A complete technical specification for **stock broking KYC onboarding** -- covering a 9-screen mobile-first user journey, 25+ vendor integrations, 8 parallel batch pipelines, maker-checker admin workflow, and full SEBI (Securities and Exchange Board of India) / KRA (KYC Registration Agency) / CKYC (Central KYC) regulatory compliance. Built for an Indian stock broking firm enabling individual customers to go from mobile OTP (One-Time Password) to first trade in 24-72 hours.
+
+:::tip[Where to start]
+If you are a new engineer, start with the [User Journey](/broking-kyc/journey/) section. Walk through all 9 screens in order. That will give you the clearest mental model of what the customer experiences and what the system does at each step. Come back here afterward to explore the architecture, vendor integrations, and operations sections.
+:::
 
 ## Who Is This For?
+
+Whether you are building features, integrating vendors, or answering compliance queries, there is a reading path for you.
 
 <CardGrid>
 	<Card title="Product Managers" icon="rocket">
@@ -46,9 +54,13 @@ A complete technical specification for **stock broking KYC onboarding** — cove
 	</Card>
 </CardGrid>
 
+The diagram below shows the complete onboarding flow. Spend a minute studying it -- every box corresponds to a section in these docs.
+
 ## Onboarding Flow
 
 <Diagram src="/diagrams/01-onboarding-flow.svg" label="Complete Onboarding Flow — 9 Screens + Maker-Checker + Batch Pipelines" />
+
+Here are the numbers that define the system. These are the metrics you will hear in every sprint planning and stakeholder review.
 
 ## At a Glance
 
@@ -67,7 +79,13 @@ A complete technical specification for **stock broking KYC onboarding** — cove
 	</Card>
 </CardGrid>
 
+:::note[Why so many vendors?]
+Indian securities regulation requires identity verification through multiple independent sources -- PAN through NSDL/Protean, KYC status through KRA agencies, central identity through CKYC (CERSAI), and document verification through DigiLocker. No single vendor covers all of these. The vendor strategy section explains how we stitch them together.
+:::
+
 ## Documentation Structure
+
+The table below maps each section to what you will find inside. Use it as a reference whenever you need to locate a specific topic.
 
 | Section | What You'll Find |
 |---------|-----------------|
@@ -78,7 +96,13 @@ A complete technical specification for **stock broking KYC onboarding** — cove
 | **[Reference](/broking-kyc/reference/master-dataset/)** | Full 454-field master dataset, code tables, regulatory circulars, cost analysis, architecture diagrams |
 | **[Appendix](/broking-kyc/appendix/non-individual-entities/)** | Non-individual entities, NRI flows, minor/joint accounts, vendor roadmap, communications |
 
+:::caution[Regulations change frequently]
+SEBI issues circulars throughout the year that can alter KYC requirements, field formats, or compliance deadlines. The regulatory references below are current as of this writing, but always cross-check with the [Regulatory Circulars](/broking-kyc/reference/regulatory-circulars/) page and the official SEBI website for the latest updates.
+:::
+
 ## Key Regulatory References
+
+These are the circulars and regulations that govern everything in this specification. You will see them referenced throughout the docs. Bookmark this table -- you will come back to it often.
 
 | Regulation | Reference |
 |-----------|-----------|

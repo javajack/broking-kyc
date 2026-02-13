@@ -14,11 +14,17 @@ import VendorTable from '../../../components/VendorTable.astro';
 import VendorBadge from '../../../components/VendorBadge.astro';
 import { Aside } from '@astrojs/starlight/components';
 
+The customer has just returned from DigiLocker (Government of India's digital document platform). They land on a screen that already knows their name, date of birth, gender, father's name, address, and photo. All of this was fetched from their Aadhaar XML during the DigiLocker consent. On top of that, the four async API calls from Screen 2 have now completed, so the system also has their KRA (KYC Registration Agency) record (occupation, income range, net worth) and CKYC (Central KYC) data if they exist. The customer sees a pre-filled form and only needs to type one thing: their email address. This is the payoff of the DigiLocker-first architecture.
+
 <ScreenCard number={4} title="Confirm Identity" time="~30 seconds">
 
 **Purpose:** Present the pre-filled identity data for user confirmation. Only email needs to be entered.
 
+This screen is where the customer first sees the power of the system working on their behalf. Instead of filling out a long form, they are reviewing data that the system has already gathered from three authoritative sources: DigiLocker, KRA, and CKYC.
+
 ## Pre-filled Fields (Read-Only)
+
+These fields come directly from DigiLocker and are displayed as read-only. The customer cannot edit them -- they are government-verified.
 
 | Field | Source |
 |-------|--------|
@@ -28,7 +34,9 @@ import { Aside } from '@astrojs/starlight/components';
 | Father's Name | DigiLocker (Aadhaar XML) |
 | Full Address | DigiLocker (Aadhaar XML) |
 | Photo | DigiLocker (Aadhaar XML) |
-| PAN | User input (Screen 2) |
+| PAN (Permanent Account Number) | User input (Screen 2) |
+
+If the customer has an existing KYC record with another broker, additional financial fields are also pre-filled. These come from the KRA lookup and CKYC search that fired on Screen 2.
 
 ## Pre-filled from KRA / CKYC (if found)
 
@@ -38,6 +46,12 @@ import { Aside } from '@astrojs/starlight/components';
 | Income Range | KRA / CKYC record |
 | Net Worth | KRA / CKYC record |
 | CKYC Number | CKYC Search result |
+
+:::tip[First-time vs. existing KYC customers]
+If the customer has never opened a trading or demat account before, the KRA lookup will return empty and the CKYC search will find no record. In that case, the occupation and income fields will be blank and the customer will need to fill them in manually. This is the "new-to-market" path. For customers who already have a KYC record with another intermediary, these fields arrive pre-filled, saving them additional effort.
+:::
+
+The only field the customer actually types on this screen is their email address.
 
 ## User Input
 
@@ -49,6 +63,8 @@ import { Aside } from '@astrojs/starlight/components';
 Mobile was already verified on Screen 1. Only email needs to be entered here. If KRA/CKYC returned an email, it can be pre-filled for the user to confirm.
 </Aside>
 
+Behind the scenes, this screen is also where your system assembles the identity record that will be used for all downstream operations -- exchange registration, depository account opening, and regulatory filings. The data sources are stitched together with a clear priority: DigiLocker fields take precedence, followed by CKYC, then KRA.
+
 ## Vendor Comparison: KRA Integration
 
 <VendorTable title="KRA Integration">
@@ -57,11 +73,13 @@ Mobile was already verified on Screen 1. Only email needs to be entered here. If
 |--------|------|-------------|----------|
 | **Digio** <VendorBadge type="recommended" /> | REST/JSON | All 5 KRAs via interoperability. PAN Status Check, Fetch Details, Upload/Update. IP whitelisting. 2-day integration. | Rs.3-5 |
 | CVL KRA Direct <VendorBadge type="alternate" /> | SOAP/XML | GetPanStatus, InsertUpdateKYCRecord, bulk tilde-delimited files. Legacy but stable. | Rs.2-3 |
-| TrackWizz <VendorBadge type="new" /> | REST/JSON | KRA submission + CKYC upload + AML screening in one platform. Regulatory reporting bundle. | Rs.3-5 |
+| TrackWizz <VendorBadge type="new" /> | REST/JSON | KRA submission + CKYC upload + AML (Anti-Money Laundering) screening in one platform. Regulatory reporting bundle. | Rs.3-5 |
 
 </VendorTable>
 
 Full spec: [KRA Integration](/broking-kyc/vendors/kra)
+
+The CKYC integration serves a dual purpose: it provides pre-fill data now, and later (post-approval) the system will upload the customer's complete KYC record back to the CKYC registry. This dual upload -- to both KRA and CKYC -- has been mandatory since August 2024.
 
 ## Vendor Comparison: CKYC Integration
 
@@ -81,5 +99,9 @@ Full spec: [CKYC Integration](/broking-kyc/vendors/identity/ckyc)
 <Aside type="caution">
 CKYC Search now returns a masked CKYC number (since Jan 2025). A full Download call is needed to get the complete record for identity matching.
 </Aside>
+
+:::note[What the customer does not see]
+By the time the customer reviews and confirms their identity on this screen, the system has already evaluated PAN validity, checked KRA status, searched CKYC, and screened against AML/PEP (Politically Exposed Person) watchlists. None of these results are shown to the customer -- they feed into the blocking gate at Screen 8. The customer simply sees a clean, pre-filled form.
+:::
 
 </ScreenCard>

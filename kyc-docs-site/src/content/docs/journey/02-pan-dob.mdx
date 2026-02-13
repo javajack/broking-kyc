@@ -15,9 +15,13 @@ import VendorTable from '../../../components/VendorTable.astro';
 import VendorBadge from '../../../components/VendorBadge.astro';
 import { Aside } from '@astrojs/starlight/components';
 
+The customer has just verified their mobile number. Now they see a screen with two fields: PAN (Permanent Account Number) and Date of Birth (DOB). To the customer, this feels like a simple identity check. Behind the scenes, this is the most consequential screen in the entire journey. The moment the customer taps "Submit," the system fires four parallel API calls that will determine whether this person can trade, what data is already on file for them, and whether they appear on any watchlists. Everything that follows -- pre-filled forms, compliance gates, the final approval -- traces back to what happens here.
+
 <ScreenCard number={2} title="PAN + Date of Birth" time="~20 seconds">
 
 **Purpose:** Capture the two identity keys that unlock all downstream data lookups.
+
+PAN is the universal financial identifier in India. Combined with DOB, it is the composite key that the KRA (KYC Registration Agency), CKYC (Central KYC) registry, and AML (Anti-Money Laundering) screening systems use to locate a person's records. Think of PAN + DOB as the "primary key" for the entire Indian financial identity system.
 
 ## User Input
 
@@ -35,6 +39,8 @@ On submit, 4 parallel API calls fire (results ready by Screen 4):
 These 4 async calls complete during the ~60-second DigiLocker redirect on Screen 3. By the time the user reaches Screen 4 (Confirm Identity), all results are available for pre-fill and gate evaluation.
 </Aside>
 
+Here is where it gets interesting from an engineering perspective. The system does not wait for any of these calls to return before moving the customer to Screen 3. All four run in parallel, and the DigiLocker (Government of India's digital document platform) redirect on the next screen provides the natural time buffer for them to complete.
+
 ## Async Operations Detail
 
 | # | API Call | What It Returns | Used At |
@@ -43,6 +49,12 @@ These 4 async calls complete during the ~60-second DigiLocker redirect on Screen
 | 2 | KRA Lookup | KYC status, occupation, income range, net worth, existing KYC data | Pre-fill (Screen 4) |
 | 3 | CKYC Search | Masked CKYC number (since Jan 2025), identity data, address | Pre-fill (Screen 4) |
 | 4 | AML/PEP Screen | Risk level (LOW/MEDIUM/HIGH), watchlist matches | Gate (Screen 8) |
+
+:::tip[Understanding PAN status codes]
+The PAN verification response includes a status code that is critical for the blocking gate. **E** means the PAN exists and is active -- this is what you want. **F** means a fake or invalid PAN. **X** means deactivated. **D** means the PAN holder is deceased. **N** means not found. Any status other than **E** is a hard block at Screen 8.
+:::
+
+Now let us look at the vendor options for these API calls. The first and most critical is PAN verification, since it determines whether the customer can proceed at all.
 
 ## Vendor Comparison: PAN Verification
 
@@ -58,18 +70,24 @@ These 4 async calls complete during the ~60-second DigiLocker redirect on Screen
 
 Full spec: [Decentro Integration](/broking-kyc/vendors/verification/decentro)
 
+The second vendor comparison covers AML screening. While PAN verification tells you if the identity is valid, AML screening tells you if the person behind that identity poses a regulatory risk.
+
 ## Vendor Comparison: AML / PEP / Sanctions Screening
 
 <VendorTable title="AML / PEP / Sanctions Screening">
 
 | Vendor | Key Features | Watchlists | Cost/txn |
 |--------|-------------|-----------|----------|
-| **TrackWizz** <VendorBadge type="recommended" /> | India-specific: SEBI debarred, RBI defaulters, MHA lists. Fuzzy matching. Ongoing monitoring with webhooks. | 120+ | Rs.5-15 |
+| **TrackWizz** <VendorBadge type="recommended" /> | India-specific: SEBI (Securities and Exchange Board of India) debarred, RBI defaulters, MHA lists. Fuzzy matching. Ongoing monitoring with webhooks. | 120+ | Rs.5-15 |
 | ComplyAdvantage <VendorBadge type="alternate" /> | Global coverage. EU/US/APAC endpoints. Real-time + batch screening. | 100+ | Rs.10-25 |
 | Bureau.id <VendorBadge type="new" /> | Device fingerprint (99.7% persistence). 200+ real-time risk signals. KYC/KYB/AML across 195+ markets. | Global + India | Contact |
 
 </VendorTable>
 
 Full spec: [TrackWizz Integration](/broking-kyc/vendors/fraud/trackwizz)
+
+:::caution[KRA lookup can return stale data]
+KRA records are only as current as the last intermediary that updated them. If a customer opened an account with another broker two years ago and their address has changed since, the KRA data will still show the old address. Always treat DigiLocker data as the authoritative source for identity fields, and use KRA/CKYC data for pre-fill and cross-verification only.
+:::
 
 </ScreenCard>

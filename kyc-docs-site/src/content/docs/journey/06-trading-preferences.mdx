@@ -15,9 +15,13 @@ import VendorTable from '../../../components/VendorTable.astro';
 import VendorBadge from '../../../components/VendorBadge.astro';
 import { Aside } from '@astrojs/starlight/components';
 
+Up to this point, the system has been focused on establishing who the customer is. Now the conversation shifts to what they want to do. This screen asks a deceptively simple question: which market segments do you want to trade in? The customer sees a set of toggles -- Equity, F&O (Futures and Options), Currency Derivatives, and Commodity. For a customer who only wants to buy and hold stocks, this screen takes five seconds. But if they toggle on F&O or Commodity, the system needs income proof, and that introduces a conditional branch that can add time and complexity. This is where KYC (Know Your Customer) meets suitability -- not just "are you who you say you are" but "are you financially qualified to trade derivatives?"
+
 <ScreenCard number={6} title="Trading Preferences" time="~30 seconds">
 
 **Purpose:** Select trading segments and provide income proof if required for derivatives.
+
+The segment selection here directly determines which exchanges the system will register this customer with during the post-approval batch pipeline. Equity maps to NSE and BSE. F&O maps to NSE F&O segment. Commodity maps to MCX. Each segment activation is a separate registration with the respective exchange.
 
 ## Segment Toggles
 
@@ -27,6 +31,12 @@ import { Aside } from '@astrojs/starlight/components';
 | F&O | OFF | Yes |
 | Currency Derivatives | OFF | No |
 | Commodity | OFF | Yes |
+
+:::note[Why Equity is ON by default]
+Every trading account needs at least one active segment. Equity (cash market) is the baseline -- it allows the customer to buy and sell shares on NSE and BSE. It requires no income proof and has no additional eligibility criteria beyond standard KYC. The other segments are opt-in because they carry additional regulatory requirements.
+:::
+
+When a customer toggles on F&O or Commodity, the screen conditionally reveals an income verification step. This is not optional -- SEBI (Securities and Exchange Board of India) mandates income qualification for derivatives trading.
 
 ## Conditional Fields
 
@@ -41,6 +51,8 @@ If F&O/Commodity selected, income verification fires:
 **Perfios ITR Analyser** or **Setu Account Aggregator**
 </AsyncBar>
 
+The income verification step is where the Account Aggregator (AA) framework can significantly improve the customer experience. Instead of asking the customer to upload a bank statement PDF (which they may not have on their phone), the AA flow lets them consent to share their bank data digitally. Let us look at the vendor options.
+
 ## Vendor Comparison: Income / ITR Verification
 
 <VendorTable title="Income / ITR Verification">
@@ -54,6 +66,8 @@ If F&O/Commodity selected, income verification fires:
 
 </VendorTable>
 
+The Account Aggregator framework is a broader ecosystem that extends beyond income verification. It is worth understanding because it represents the future of consent-based financial data sharing in India.
+
 ## Vendor Comparison: Account Aggregator Framework
 
 <VendorTable title="Account Aggregator Framework (RBI-licensed)">
@@ -61,7 +75,7 @@ If F&O/Commodity selected, income verification fires:
 | AA Operator | Role | Relevance for KYC |
 |------------|------|-------------------|
 | **Setu (Onemoney)** | AA + FIU tech | Can replace income proof upload: user consents, bank statement fetched automatically. Also fetch demat holdings via CDSL/NSDL FIP. |
-| **Perfios (Anumati)** | AA Operator | Income verification without manual upload. ITR + bank statement via consent. Rs.5-25/fetch. |
+| **Perfios (Anumati)** | AA Operator | Income verification without manual upload. ITR (Income Tax Return) + bank statement via consent. Rs.5-25/fetch. |
 | Finvu | AA Operator | Bank statement fetch for F&O income proof. 40+ FIP integrations. |
 | CAMS Finserv | AA Operator | Mutual fund holdings data for net worth verification. |
 
@@ -70,5 +84,9 @@ If F&O/Commodity selected, income verification fires:
 <Aside type="tip">
 SEBI circular Aug 2022 allowed depositories (CDSL/NSDL) as FIPs in the AA ecosystem. Brokers can fetch demat holdings, bank statements, and ITR data via consent-based AA flow instead of manual document upload. See [Account Aggregator](/broking-kyc/vendors/account-aggregator) for details.
 </Aside>
+
+:::tip[Designing the F&O toggle experience]
+When a customer toggles F&O on, do not immediately show a file upload dialog. First check if the KRA record (from Screen 2) already contains an income range that meets the threshold. If it does, you can skip the income proof step entirely. Only fall back to bank statement upload or AA consent if the existing data is insufficient or absent.
+:::
 
 </ScreenCard>

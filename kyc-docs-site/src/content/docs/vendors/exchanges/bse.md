@@ -3,6 +3,22 @@ title: BSE UCC
 description: BSE Unique Client Code registration — BOLT Plus portal, PAN verification, and batch upload.
 ---
 
+BSE Limited (formerly Bombay Stock Exchange), established in 1875, is Asia's oldest stock exchange and a cornerstone of India's financial infrastructure. For KYC (Know Your Customer) onboarding at a stock broking firm, BSE's UCC (Unique Client Code) registration system is a mandatory integration -- every client who trades on BSE must have a registered UCC before placing their first order. While NSE (National Stock Exchange) uses a modern REST API, BSE's UCC system is built on SOAP (Simple Object Access Protocol) web services -- a different technology that requires a different integration approach. This page covers everything you need to build that integration, from the SOAP API payloads and batch file formats to PAN (Permanent Account Number) verification, segment activation, and the BSE StAR MF (Mutual Fund) platform.
+
+:::tip[Quick Reference]
+
+| Item | Detail |
+|------|--------|
+| Exchange | BSE Limited (formerly Bombay Stock Exchange) |
+| Trading System | BOLT Plus (BSE Online Trading - Plus) |
+| Clearing Corporation | ICCL (Indian Clearing Corporation Limited) |
+| UCC Portal | https://ucc.bseindia.com |
+| SOAP API Endpoint | `https://ucc.bseindia.com/newucc/ucc_api_webservice/ucc_api_service.asmx` |
+| Segments | Equity Cash, Equity Derivatives (F&O), Currency Derivatives, Debt |
+| Settlement | T+1 (since Jan 27, 2023) |
+| MF Platform | BSE StAR MF (https://www.bsestarmf.in) |
+
+:::
 
 ## Table of Contents
 
@@ -32,6 +48,8 @@ description: BSE Unique Client Code registration — BOLT Plus portal, PAN verif
 
 ---
 
+Let us start with the big picture: what BSE is, how it fits into the Indian capital market ecosystem, and the scope of integration required for KYC onboarding.
+
 ## 1. Overview
 
 BSE (formerly Bombay Stock Exchange), established in 1875, is Asia's oldest stock exchange. For KYC onboarding, the primary integration point is the **UCC (Unique Client Code)** registration system, which is mandatory before any client can trade on BSE segments.
@@ -59,7 +77,15 @@ BSE (formerly Bombay Stock Exchange), established in 1875, is Asia's oldest stoc
 - Client modification and closure
 - UCC-Demat mapping (SEBI/HO/MIRSD/DOP/CIR/P/2019/136)
 
+:::note[BSE vs NSE: The Key Technical Difference]
+NSE uses a REST API (JSON over HTTPS) introduced in January 2024. BSE uses a long-standing SOAP API (XML over HTTP). The underlying data model is now identical (183 fields, harmonized since May 2025), but the transport mechanism is fundamentally different. If you have only worked with REST APIs before, expect a different integration experience with BSE's SOAP services.
+:::
+
+Now let us understand the trading infrastructure that UCC registration feeds into.
+
 ---
+
+Before diving into UCC registration, it helps to understand the trading system your clients will use. BOLT Plus is BSE's trading engine, and the connectivity options determine how orders flow from your application to the exchange.
 
 ## 2. BOLT Plus System & Broker Connectivity
 
@@ -80,6 +106,8 @@ BSE (formerly Bombay Stock Exchange), established in 1875, is Asia's oldest stoc
 | Leased Line | Dedicated circuit | Production primary | Fixed | BSE data center co-location |
 | MPLS VPN | IP-based WAN | Production alternate | Low | Multiple PoPs |
 | VSAT | Satellite | Remote / disaster recovery | Higher | For locations without terrestrial links |
+
+In plain English: ETI is for algorithmic traders who need microsecond latency, IML is for standard brokers who run their own trading software, and BOW is for small brokers who just need a browser. The choice does not affect UCC registration -- it only affects how orders reach the exchange.
 
 ### 2.3 ETI Technical Specifications
 
@@ -128,6 +156,10 @@ MemberPort=<member_application_port>
 Segment=<EQ|EQD|CUR|DEBT>
 ```
 
+:::caution[One IML Instance Per Segment]
+A common setup mistake is trying to use a single IML instance for multiple segments. Each segment (Equity, F&O, Currency, Debt) requires its own dedicated IML instance with separate port configurations.
+:::
+
 ### 2.5 Test Environment
 
 BSE provides a BOLT Plus simulation environment for integration testing. Members can connect using Exchange-provided terminal software or build custom applications.
@@ -136,7 +168,11 @@ BSE provides a BOLT Plus simulation environment for integration testing. Members
 - Simulation hours are announced by BSE (typically after market hours or weekends)
 - Members should test: order placement, modification, cancellation, trade confirmation, margin computation
 
+With the trading infrastructure understood, let us move to the core topic: how to register UCCs on BSE.
+
 ---
+
+BSE offers multiple methods for UCC registration, ranging from manual web forms to SOAP APIs to bulk batch files. The choice depends on your scale and automation needs. This section maps out all options and helps you decide.
 
 ## 3. UCC Registration Methods
 
@@ -154,7 +190,7 @@ BSE supports multiple methods for UCC (Unique Client Code) registration. The met
 
 ### UCC Field Structure Evolution
 
-The BSE UCC structure has evolved significantly over 2024-2025 to accommodate SEBI mandates (10 nominees, enhanced KYC attributes).
+The BSE UCC structure has evolved significantly over 2024-2025 to accommodate SEBI (Securities and Exchange Board of India) mandates (10 nominees, enhanced KYC attributes).
 
 | Version | Field Count | Effective Date | Status |
 |---------|-------------|---------------|--------|
@@ -168,7 +204,13 @@ The BSE UCC structure has evolved significantly over 2024-2025 to accommodate SE
 - 150 to 183: Nominees increased from 3 to 10 (SEBI mandate effective Jan 2025), guardian relationship fields for minor clients, standardized nominee relationship codes, FATCA/CRS enhancements
 - Nominees 4-10 are submitted via a separate Non-Financial Transaction API Webservice (not within the main SaveUCC payload)
 
+In plain English: if you are building a new integration today, target the 183-field SaveUCC_V2 structure. The older formats are either discontinued or will be soon.
+
+Now let us look at the SOAP API in detail, starting with the original SaveUCC operation.
+
 ---
+
+The SOAP API is BSE's primary programmatic interface for UCC operations. If you are unfamiliar with SOAP, think of it as the XML equivalent of a REST API -- you send structured XML requests and receive structured XML responses. The next two sections cover both the original SaveUCC and the current SaveUCC_V2 operations.
 
 ## 4. SOAP API - SaveUCC
 
@@ -310,14 +352,21 @@ The `XmlUCCdata` parameter is a string containing XML-encoded client data. The X
 </UCCDetails>
 ```
 
+:::caution[XML Encoding is Critical]
+The XML string inside `<XmlUCCdata>` must be properly XML-encoded. Ampersands become `&amp;`, angle brackets become `&lt;` and `&gt;`. Failure to encode properly is one of the most common causes of SOAP call failures. Test with names containing ampersands (e.g., "M&M") to verify your encoding.
+:::
+
 **Important Notes**:
-- The XML string must be properly XML-encoded (ampersand as `&amp;`, angle brackets as `&lt;` `&gt;`) when placed inside `<XmlUCCdata>`
 - All date fields must be in `DD/MM/YYYY` format
 - PAN must be in `AAAAA9999A` format (5 alpha + 4 numeric + 1 alpha)
 - Mobile must be exactly 10 digits
 - Pincode must be exactly 6 digits
 
+The SaveUCC operation supports the 150-field structure. For new registrations, you should use SaveUCC_V2 with the full 183-field structure, covered next.
+
 ---
+
+SaveUCC_V2 is the current standard for all new UCC registrations on BSE. It extends the original SaveUCC with 33 additional fields, primarily to support 10 nominees, enhanced FATCA/CRS (Foreign Account Tax Compliance Act / Common Reporting Standard) reporting, and minor client guardianship details.
 
 ## 5. SOAP API - SaveUCC_V2 (183 Fields)
 
@@ -404,7 +453,15 @@ Where `X` = 1, 2, or 3.
 
 **Nominees 4-10**: Cannot be submitted via SaveUCC_V2. Must use the separate Non-Financial Transaction API Webservice (see Section 6).
 
+:::note[Split Nominee Submission]
+This is a design quirk worth noting: nominees 1-3 go through the main SaveUCC_V2 call, but nominees 4-10 require a completely separate API. Your system needs to handle this two-step submission and ensure nominee percentages total exactly 100 across both calls.
+:::
+
+The next section covers the separate API for nominees 4 through 10.
+
 ---
+
+SEBI mandated support for up to 10 nominees effective January 2025. Because the main SaveUCC_V2 API only accommodates nominees 1-3, BSE created a separate API for the remaining nominees. This section covers that supplementary integration.
 
 ## 6. Non-Financial Transaction API (Nominees 4-10)
 
@@ -437,7 +494,11 @@ SEBI mandated support for up to 10 nominees effective Jan 2025 (extended deadlin
 
 **Validation**: Total percentage across ALL nominees (1-10) must equal exactly 100.
 
+With the API structures covered, let us turn to PAN verification -- the mandatory check that determines whether a client can trade.
+
 ---
+
+PAN verification is the single most important gate in the UCC registration process. BSE's 3-parameter check (PAN + Name + DOB) is like a bouncer checking your ID against the guest list -- all three must match or you are turned away. This section covers how the verification works and how to handle failures.
 
 ## 7. 3-Parameter PAN Verification
 
@@ -450,7 +511,7 @@ BSE mandates 3-parameter PAN verification against NSDL/Protean (Income Tax Depar
 | # | Parameter | Field Description | Mandatory |
 |---|-----------|-------------------|-----------|
 | 1 | **PAN Number** | 10-character alphanumeric in `AAAAA9999A` format | Yes - for all holders |
-| 2 | **Client Name** | Name exactly as per PAN/ITD records | Yes - for all holders |
+| 2 | **Client Name** | Name exactly as per PAN/ITD (Income Tax Department) records | Yes - for all holders |
 | 3 | **DOB / DOI / DOR** | Date of Birth (individuals), Date of Incorporation (companies), Date of Registration (other entities) | Yes - for all holders **including Guardian** |
 
 ### 7.3 Verification Result Codes
@@ -482,7 +543,13 @@ BSE mandates 3-parameter PAN verification against NSDL/Protean (Income Tax Depar
 | I | Any | Any | Any | **NPTT** - correct PAN at ITD |
 | P | Any | Any | Any | **NPTT** - wait for verification |
 
+In plain English: PTT requires ALL four conditions to be met -- PAN approved, KYC complete, bank verified, and demat linked. If any one fails, the client cannot trade.
+
+Beyond the SOAP API, BSE also supports batch file uploads for high-volume operations. The next section documents the batch file format.
+
 ---
+
+Batch files are essential for bulk operations -- migrating clients from another broker, doing end-of-day reconciliation, or activating segments across thousands of clients at once. BSE supports significantly higher batch limits than NSE (30,000 vs 10,000 records per file), making batch uploads particularly useful for large-scale operations.
 
 ## 8. Batch File Format Specification
 
@@ -505,6 +572,10 @@ BSE mandates 3-parameter PAN verification against NSDL/Protean (Income Tax Depar
 | Bank Details Update | 20,000 | Feb 23, 2024 |
 | Depository Details Update | 30,000 | Jul 29, 2024 |
 | Segment Activation | 50,000 | Jul 29, 2024 |
+
+:::tip[BSE Has Higher Batch Limits]
+BSE allows up to 30,000 records per registration file (vs NSE's 10,000) and 50,000 for segment activation (vs NSE's 10,000). If you are migrating a large client base, BSE batch processing can be significantly more efficient.
+:::
 
 ### 8.3 Row 1 - General Information (Revised Format, effective Apr 19, 2024)
 
@@ -605,7 +676,11 @@ These rules are strictly enforced during batch upload validation:
 | 6 | Pincode must be 6 digits | Non-numeric or wrong length |
 | 7 | State code must be valid 2-character code | Invalid state abbreviation |
 
+The next several sections cover the code tables used in UCC records. These are SEBI-standardized and identical across all exchanges, but understanding them is essential for building your validation logic.
+
 ---
+
+Client category codes classify each entity type. The category you assign determines which additional fields are mandatory and what trading capabilities apply. For a retail broking firm, category 01 (Individual) will account for the vast majority of onboarding, but your system must handle the full range.
 
 ## 9. Client Category Codes
 
@@ -695,6 +770,8 @@ UPI-based trading (Block Mechanism / ASBA-like for secondary market) is applicab
 
 ---
 
+Income range codes determine F&O (Futures and Options) eligibility and are one of the 6 mandatory KYC attributes. Understanding these codes is essential for building correct segment activation logic.
+
 ## 11. Income Range Codes
 
 | Code | Income Range (Annual, INR) | F&O Eligibility |
@@ -713,7 +790,11 @@ UPI-based trading (Block Mechanism / ASBA-like for secondary market) is applicab
 - SEBI enhanced F&O eligibility criteria: SEBI/HO/MRD/TPD-1/P/CIR/2025/33
 - Non-individual entities: Use the entity's annual turnover/income
 
+Now let us cover segment activation -- the mechanism that controls which market segments a client can trade in on BSE.
+
 ---
+
+Segment activation on BSE follows the same SEBI rules as NSE, but there is one notable difference: BSE does not have a commodity segment (commodities trade on NSE and MCX). This section covers the available segments, eligibility requirements, and the batch activation process.
 
 ## 12. Segment Activation
 
@@ -755,7 +836,11 @@ Per SEBI/HO/MRD/TPD-1/P/CIR/2025/33, the following must be validated before acti
 - **Debt Segment**: Separate activation required; minimal additional documentation
 - Each segment requires a separate IML instance for BOLT Plus connectivity
 
+With segment activation covered, let us look at the status codes that govern a client's lifecycle -- from registration through PTT to potential closure.
+
 ---
+
+Status codes determine whether a client can trade on BSE. Understanding the status matrix and the transitions between states is critical for building correct lifecycle management in your system.
 
 ## 13. Status Codes & Trading Eligibility
 
@@ -782,6 +867,10 @@ Per SEBI/HO/MRD/TPD-1/P/CIR/2025/33, the following must be validated before acti
 | **Inactive** | I | Member-deactivated or non-compliant; temporarily suspended | Can move to A (with re-verification) |
 | **Closed** | C | Account permanently closed by member | **Irreversible** - cannot reopen |
 
+:::caution[Closed is Irreversible]
+Once a UCC is marked Closed (`C`), it can never be reopened. A new UCC must be registered if the client wishes to trade again. Implement a confirmation step with a cooling-off period in your system before allowing closure.
+:::
+
 ### 13.4 Combined Status Matrix
 
 | PAN Status | Client Status | KYC Complete | Bank Verified | Demat Linked | Result |
@@ -795,7 +884,13 @@ Per SEBI/HO/MRD/TPD-1/P/CIR/2025/33, the following must be validated before acti
 | P | A | Y | Y | Y | NPTT - Wait for PAN verification |
 | Any | C | Any | Any | Any | NPTT - Account closed (irreversible) |
 
+In plain English: every row in this matrix represents a real scenario your operations team will encounter. Build your client dashboard to surface the exact reason a client is NPTT, so the operations team can take targeted action.
+
+The next section covers the additional requirements for non-individual entities.
+
 ---
+
+Most clients are individuals, but your system must also handle companies, trusts, partnerships, HUFs (Hindu Undivided Families), and NRIs (Non-Resident Indians). Each entity type has specific mandatory fields and documents beyond the standard individual requirements.
 
 ## 14. Non-Individual Entity Requirements
 
@@ -841,7 +936,11 @@ Required for: Company (04), Body Corporate (07), Partnership (06).
 | Foreign Resident | `Y` / `N` | Yes |
 | Director PAN | `AAAAA9999A` format | Yes |
 
+Now let us look at BSE's clearing corporation, ICCL, and how it relates to UCC registration.
+
 ---
+
+Every trade on BSE generates settlement obligations managed by ICCL. Understanding this relationship helps you appreciate why UCC compliance has financial consequences beyond order rejection -- margins, collateral, and settlement obligations are all tracked at the UCC level.
 
 ## 15. BSE ICCL (Clearing Corporation)
 
@@ -879,13 +978,17 @@ Required for: Company (04), Body Corporate (07), Partnership (06).
 | Clearing Bank | Clearing members must maintain clear balance in depository account + funds in clearing bank |
 | Acceptable Collateral | Equity securities with impact cost <= 0.1% for Rs. 1 Lakh order, traded >= 99% of days in previous 6 months |
 
+BSE also operates a mutual fund distribution platform called StAR MF. If your broking firm plans to distribute mutual funds, the next section covers how StAR MF integrates with UCC and KYC.
+
 ---
+
+BSE StAR MF is India's largest mutual fund distribution platform by transaction volume. If your broking firm distributes mutual funds, this integration is essential. The KYC and UCC requirements overlap significantly with the equity trading UCC, making it efficient to build both integrations together.
 
 ## 16. BSE StAR MF Integration
 
 ### 16.1 Platform Overview
 
-**BSE StAR MF** (Stock Exchange Aggregation and Reporting - Mutual Funds) is BSE's mutual fund distribution platform that allows brokers, distributors, and RIAs to process MF transactions.
+**BSE StAR MF** (Stock Exchange Aggregation and Reporting - Mutual Funds) is BSE's mutual fund distribution platform that allows brokers, distributors, and RIAs (Registered Investment Advisors) to process MF transactions.
 
 ### 16.2 API Details
 
@@ -959,7 +1062,11 @@ Tax Status codes align with Client Category Codes (Section 9).
 | JO | Joint |
 | AS | Anyone or Survivor |
 
+Now let us cover modifications and closures -- the ongoing lifecycle management of UCC records.
+
 ---
+
+Client data changes are inevitable. Whether it is an address update, a bank account change, or a full account closure, this section covers the rules, processes, and important constraints you need to build into your system.
 
 ## 17. Modification & Closure Process
 
@@ -1011,7 +1118,11 @@ Tax Status codes align with Client Category Codes (Section 9).
 
 **Critical**: Closure is **irreversible**. A closed UCC cannot be reopened. If the client wishes to trade again, a completely new UCC registration is required.
 
+When things go wrong -- and in a system processing thousands of UCCs, they will -- you need to understand error codes and validation rules. The next section is your debugging reference.
+
 ---
+
+Error handling is where your integration will be tested the most. This section catalogues the validation rules, common rejection reasons, and SOAP error codes you will encounter, along with the resolution for each. Keep this section bookmarked.
 
 ## 18. Error Handling & Validation Rules
 
@@ -1048,7 +1159,7 @@ Tax Status codes align with Client Category Codes (Section 9).
 | **Missing mandatory fields** | Required fields are blank or contain invalid data | Complete all mandatory fields |
 | **KYC non-compliant** | All 6 KYC attributes not valid | Update all 6 attributes (Name, PAN, Address, Mobile, Email, Income) |
 | **Bank details invalid** | IFSC code not found or account number invalid | Correct bank details; verify via penny drop |
-| **Demat details invalid** | DP ID / Client ID mismatch with depository records | Verify DP ID and Client ID with CDSL/NSDL |
+| **Demat details invalid** | DP (Depository Participant) ID / Client ID mismatch with depository records | Verify DP ID and Client ID with CDSL/NSDL |
 | **PAN-Aadhaar not linked** | PAN marked inoperative at ITD | Client links Aadhaar at ITD portal (exception: NRI with "Not applicable" status) |
 | **Income range missing** | No income declaration provided | Client provides income range (mandatory KYC attribute) |
 | **Nominee percentage mismatch** | Total nominee % does not equal 100 | Adjust percentages to total exactly 100 |
@@ -1062,6 +1173,10 @@ Tax Status codes align with Client Category Codes (Section 9).
 5. **Do NOT** resubmit already-accepted records (will cause duplicate UCC errors)
 6. For PAN-related rejections: client must first correct at ITD, then broker resubmits
 7. Monitor resubmission results in next batch cycle
+
+:::tip[Automate Rejection Handling]
+Build an automated parser for BSE rejection reports that maps each error to the original record, flags the specific field that failed, and queues the record for correction. This is essential for handling batch uploads at scale.
+:::
 
 ### 18.4 SOAP API Error Response Format
 
@@ -1088,7 +1203,11 @@ Common SOAP error codes:
 | ERR_DEMAT_INVALID | DP ID/Client ID not found | Verify with depository |
 | ERR_AUTH_FAILED | API authentication failure | Check credentials |
 
+Monitoring and reconciliation are essential for production operations. The next section covers the reports BSE provides and how to use them.
+
 ---
+
+Daily reconciliation is not optional -- it is how you catch compliance drift before it blocks your clients from trading. This section covers the reports BSE provides and the reconciliation processes you should implement.
 
 ## 19. Reconciliation & Reports
 
@@ -1121,7 +1240,11 @@ Common SOAP error codes:
 3. For accepted records, verify PTT status on T+1
 4. For rejected records, initiate correction workflow
 
+Now let us look at the SLAs and timelines that govern BSE UCC operations.
+
 ---
+
+Understanding SLAs helps you set the right expectations with your product and operations teams. The most important question is always: "When can the client start trading?" This section provides definitive answers.
 
 ## 20. Timeline & SLA
 
@@ -1149,7 +1272,15 @@ Common SOAP error codes:
 | Batch file upload | No fixed cut-off | But processing happens overnight |
 | Modification effective | T+1 | Non-financial modifications processed overnight |
 
+:::note[The 10 PM Rule]
+Just like NSE, the critical SLA to remember: if a compliant UCC is submitted before 10 PM (22:00 hrs), the client gets PTT status the next trading day. Design your batch processes around this cutoff.
+:::
+
+The regulatory landscape for BSE UCC has evolved significantly over 2024-2025. The next section documents the key circulars that shaped the current system.
+
 ---
+
+Staying current with circulars is essential. Each one can change field formats, add new mandatory fields, or alter eligibility criteria. The following timeline gives you the regulatory context for how the BSE UCC system reached its current state.
 
 ## 21. Recent Circulars (Jan 2024 - Jan 2026)
 
@@ -1179,7 +1310,11 @@ Common SOAP error codes:
 | Dec 10, 2025 | SEBI Circular | NRI KYC relaxation for re-KYC process | Reduced re-KYC burden for NRIs |
 | Jan 7, 2026 | SEBI | New Stock Brokers Regulations 2026 notified (replaces 1992 regs) | Comprehensive regulatory overhaul |
 
+The 6 KYC attributes must be consistent across all systems. The next section explains these attributes and the cross-system consistency requirements specific to BSE.
+
 ---
+
+The 6 KYC attributes are the backbone of client compliance. They must match across the KRA (KYC Registration Agency), the exchange (BSE and NSE), and the depository (CDSL/NSDL). A mismatch in any one of them can block trading. This section explains the attributes and the consistency requirements.
 
 ## 22. 6 KYC Attributes Compliance
 
@@ -1203,11 +1338,17 @@ The 6 KYC attributes must match across **KRA**, **Exchange (BSE/NSE)**, and **De
 | KRA (CVL/NDML/DOTEX/CAMS/KFintech) | KYC application form | Upload within 3 working days |
 | BSE UCC | UCC registration API/batch | Must match KRA record |
 | NSE UCC | UCI Online / API | Must match KRA record |
-| MCX UCC | MCX CONNECT | Must match KRA record |
-| CDSL BO Account | CDAS | Must match KRA record |
-| NSDL BO Account | DPM / Insta Interface | Must match KRA record |
+| MCX (Multi Commodity Exchange) UCC | MCX CONNECT | Must match KRA record |
+| CDSL (Central Depository Services Limited) BO Account | CDAS | Must match KRA record |
+| NSDL (National Securities Depository Limited) BO Account | DPM / Insta Interface | Must match KRA record |
 
 Any mismatch in the 6 attributes across these systems results in compliance flags and potential trading blocks.
+
+:::caution[Cross-System Sync is Non-Negotiable]
+When a client updates their address on one system, that same update must propagate to all others. Your KYC system should treat these updates as a single atomic operation -- update one, update all.
+:::
+
+Finally, here is the implementation checklist to guide your development and go-live process.
 
 ---
 

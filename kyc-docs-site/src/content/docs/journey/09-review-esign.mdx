@@ -15,9 +15,13 @@ import VendorTable from '../../../components/VendorTable.astro';
 import VendorBadge from '../../../components/VendorBadge.astro';
 import { Aside } from '@astrojs/starlight/components';
 
+This is the finish line. The customer has passed the blocking gate, and all their data is verified and ready. Now they need to do three final things: review the complete application, take a selfie for face matching against their Aadhaar photo, and sign the application digitally using an Aadhaar OTP (One-Time Password). When this screen is complete, the customer is done. They close the app and wait for their account to be activated -- typically within 24-72 hours. Everything that follows (maker-checker review, KRA submission, exchange registration, depository account opening) happens entirely in the background.
+
 <ScreenCard number={9} title="Review + Face Match + e-Sign (Final)" time="~60 seconds">
 
-**Purpose:** Final review, biometric verification, and legally binding e-Sign. User is done after this screen.
+**Purpose:** Final review, biometric verification, and legally binding eSign (electronic signature via Aadhaar OTP). User is done after this screen.
+
+This screen has three distinct steps, presented sequentially. The customer cannot skip any of them. Each step serves a specific regulatory purpose.
 
 ## 3-Step Process
 
@@ -26,8 +30,12 @@ import { Aside } from '@astrojs/starlight/components';
 ### Step 1: Review Application
 Scroll-through review of the complete pre-filled application. All data from Screens 1-8 is presented in a read-only summary. User confirms everything is correct.
 
+:::note[Why a full review is required]
+The review step is not just good UX -- it is a regulatory requirement. The customer must see and confirm all the data that will be submitted to KRA (KYC Registration Agency), CKYC (Central KYC), and the exchanges before they sign. This is the "informed consent" step. If a customer later claims they did not agree to certain information in their application, the signed PDF with the review confirmation is the audit trail.
+:::
+
 ### Step 2: Face Match
-Selfie capture compared against the Aadhaar photo from DigiLocker.
+Selfie capture compared against the Aadhaar photo from DigiLocker (Government of India's digital document platform).
 
 | Parameter | Requirement |
 |-----------|------------|
@@ -35,8 +43,12 @@ Selfie capture compared against the Aadhaar photo from DigiLocker.
 | Liveness check | Must pass (anti-spoof) |
 | Photo quality | Minimum 800px width |
 
+:::tip[Liveness detection is non-negotiable]
+The face match step includes a liveness check to prevent spoofing -- someone holding up a printed photo or a screen showing someone else's face. HyperVerge's passive liveness detection meets ISO 30107 Level 2 and can detect prints, screens, videos, 3D masks, and deepfakes. Never implement face match without liveness detection.
+:::
+
 ### Step 3: Aadhaar OTP e-Sign
-Digital signature on the complete application PDF.
+Digital signature on the complete application PDF. This is the legally binding moment -- the customer's Aadhaar-authenticated signature is embedded in the PDF along with a CCA-compliant (Controller of Certifying Authorities) digital certificate.
 
 | Parameter | Detail |
 |-----------|--------|
@@ -46,12 +58,14 @@ Digital signature on the complete application PDF.
 | Output | Signed PDF with embedded certificate |
 
 <Aside type="tip" title="IPV/VIPV: EXEMPTED">
-Aadhaar eKYC (DigiLocker) was used on Screen 3. No video call needed per SEBI circular.
+Aadhaar eKYC (DigiLocker) was used on Screen 3. No video call needed per SEBI (Securities and Exchange Board of India) circular.
 </Aside>
 
 **USER DONE. Total journey: ~6 minutes.**
 
 ---
+
+Now let us look at the vendors that power these three steps. The eSign vendor is particularly important because it produces the legally binding signed PDF that forms the foundation of the customer's account.
 
 ## Vendor Comparison: e-Sign
 
@@ -72,6 +86,8 @@ Full spec: [Leegality Integration](/broking-kyc/vendors/esign/leegality)
 Leegality offers zero license fee and ~Rs.25/sign with eStamping — ideal for cost-sensitive or pilot deployments. Digio remains recommended because its multi-product stack (KRA + DigiLocker + VIPV + eSign) reduces overall vendor count and integration overhead.
 </Aside>
 
+The face match vendor must provide both high accuracy and liveness detection. This is a security-critical step -- a weak face match implementation is an open door for identity fraud.
+
 ## Vendor Comparison: Face Match and Liveness Detection
 
 <VendorTable title="Face Match & Liveness Detection">
@@ -85,6 +101,8 @@ Leegality offers zero license fee and ~Rs.25/sign with eStamping — ideal for c
 </VendorTable>
 
 Full spec: [HyperVerge Integration](/broking-kyc/vendors/verification/hyperverge)
+
+VIPV (Video In-Person Verification) is normally not needed in this flow because DigiLocker provides the IPV (In-Person Verification) exemption. However, there are two scenarios where it becomes necessary.
 
 ## Vendor Comparison: Video KYC / VIPV (Fallback)
 
@@ -102,13 +120,15 @@ Full spec: [HyperVerge Integration](/broking-kyc/vendors/verification/hyperverge
 VIPV is only needed in two scenarios: (1) the user opted out of nominations on Screen 7 and needs a video declaration, or (2) DigiLocker was unavailable and manual Aadhaar verification was used, which does not qualify for the IPV exemption.
 </Aside>
 
+In rare cases where the DigiLocker flow was not used (e.g., DigiLocker downtime), document OCR (Optical Character Recognition) becomes necessary as a fallback for identity verification.
+
 ## Vendor Comparison: OCR and Document Verification
 
 <VendorTable title="OCR & Document Verification">
 
 | Vendor | Accuracy | Docs Supported | Cost/doc |
 |--------|---------|---------------|----------|
-| **HyperVerge** <VendorBadge type="recommended" /> | 99.8% | PAN, Aadhaar, Passport, Voter ID, DL, Cheque. Confidence scores per field. Tampering detection. | Rs.1-3 |
+| **HyperVerge** <VendorBadge type="recommended" /> | 99.8% | PAN (Permanent Account Number), Aadhaar, Passport, Voter ID, DL, Cheque. Confidence scores per field. Tampering detection. | Rs.1-3 |
 | IDfy <VendorBadge type="alternate" /> | ~99% | Wide range. 3 modes: OCR-only, Verify-only, OCR+Verify. Government database cross-check. | Rs.1-3 |
 | Signzy <VendorBadge type="new" /> | ~99% | 14,000+ doc types from 180+ countries. SDK offline mode. SOC 2 + ISO 27001. | Contact |
 
@@ -118,9 +138,11 @@ Full spec: [HyperVerge Integration](/broking-kyc/vendors/verification/hyperverge
 
 ---
 
+The customer's part of the journey is complete. But the system's work is just beginning. What follows is the maker-checker review and the 8 parallel batch pipelines that register the customer with every exchange and depository.
+
 ## What Happens Next?
 
-:::note[User Is Done — Backend Takes Over]
+:::note[User Is Done -- Backend Takes Over]
 After e-Sign, the application enters **maker-checker review**. Once the checker approves, **8 parallel batch pipelines** fire:
 KRA (2-3 days), CKYC (4-5 days), NSE/BSE/MCX (same day), CDSL (1-2 hrs), NSDL (~15 days), Income (1-2 hrs if F&O).
 

@@ -13,11 +13,17 @@ import ScreenCard from '../../../components/ScreenCard.astro';
 import AsyncBar from '../../../components/AsyncBar.astro';
 import { Aside } from '@astrojs/starlight/components';
 
+The client has just opened your app for the first time. They do not have a trading account yet, they have never heard of KYC (Know Your Customer), and they probably do not know what a depository is. The very first thing they see is a clean screen asking for one thing: their mobile number. This is where the onboarding journey begins -- and it is deliberately the simplest screen in the entire flow.
+
 <ScreenCard number={1} title="Mobile / Email Registration" time="~30 seconds">
 
-**Purpose:** Establish the identity anchor and OTP communication channel before any KYC data is captured.
+**Purpose:** Establish the identity anchor and OTP (One-Time Password) communication channel before any KYC data is captured.
+
+Why mobile first? Because every subsequent step -- PAN (Permanent Account Number) verification, KRA (KYC Registration Agency) lookup, DigiLocker (Government of India's digital document platform) authentication, eSign (electronic signature via Aadhaar OTP) -- relies on the ability to send the customer an OTP. Without a verified mobile number, the entire pipeline has no communication channel.
 
 ## User Input
+
+The customer types a single field. That is it. The entire screen exists to capture and verify one piece of data.
 
 | Field | Validation | Notes |
 |-------|-----------|-------|
@@ -30,8 +36,10 @@ On registration, device fingerprinting fires: **Bureau.id Device Intelligence** 
 </AsyncBar>
 
 <Aside type="tip" title="Why start with mobile?">
-Mobile number is the universal communication channel for OTPs, KRA verification, CKYC, and all post-onboarding notifications. Establishing it first ensures every subsequent step has a verified contact channel.
+Mobile number is the universal communication channel for OTPs, KRA verification, CKYC (Central KYC), and all post-onboarding notifications. Establishing it first ensures every subsequent step has a verified contact channel.
 </Aside>
+
+While the customer is looking at the OTP input field, something important is happening silently in the background. The system is already assessing the device they are using.
 
 ## What Fires Async
 
@@ -41,11 +49,21 @@ Mobile number is the universal communication channel for OTPs, KRA verification,
 
 This device intelligence layer runs silently in the background. No user interaction required. Results feed into the AML/fraud evaluation at the [Blocking Gate (Screen 8)](/broking-kyc/journey/08-declarations-gate/).
 
+:::caution[OTP delivery failures]
+If the SMS OTP does not arrive within 30 seconds, the customer can request a resend. After 3 failed attempts, the system should offer email-based registration as a fallback. Do not let OTP delivery issues become a dead end -- mobile network congestion is common in India, especially during market hours.
+:::
+
+At this point, the system has everything it needs to move forward. The customer has proven they control this mobile number, and the device has been fingerprinted for fraud analysis later.
+
 ## Data Captured
 
 After this screen, the system has:
 - Verified mobile number (OTP-confirmed)
 - Device fingerprint and risk score
 - Session identifier for all subsequent API calls
+
+:::note[What happens next]
+The customer moves to Screen 2, where they will enter their PAN and date of birth. Those two fields unlock four parallel API calls that form the backbone of the entire KYC verification. But none of that would be possible without the verified mobile number established here.
+:::
 
 </ScreenCard>

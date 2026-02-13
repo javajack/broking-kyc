@@ -5,9 +5,11 @@ description: Every state an application can be in — from the first mobile OTP 
 
 import Diagram from '../../../components/Diagram.astro';
 
+Every application in the KYC (Know Your Customer) system has a status -- a single value that tells you exactly where it stands in the pipeline. If a customer calls asking "when can I trade?", the status is the first thing you look up. If a batch pipeline fails, the status tells you which applications are stuck and where. If a compliance audit asks "how many applications are pending review?", the status gives you the answer. This page documents all 12 possible states, the transitions between them, and the triggers that cause each transition. Think of it as the state machine that governs the entire application lifecycle.
+
 <Diagram src="/diagrams/04-status-lifecycle.svg" label="12-State Application Lifecycle — Registration to Trading" />
 
-Every state an application can be in — from the first mobile OTP to trading-ready. Tracks the user journey (9 screens), maker-checker review, and batch registration across agencies.
+The diagram above shows the complete lifecycle. The happy path flows left to right, from REGISTERED to ACTIVE. The two terminal/blocked states -- GATE_FAILED and REJECTED -- have retry paths back into the flow. Let us walk through each state.
 
 ## Application Status Flow
 
@@ -17,25 +19,37 @@ REGISTERED → PAN_ENTERED → DIGILOCKER_PENDING → FILLING → GATE_CHECK →
 
 **Terminal/blocked states:** GATE_FAILED (any blocking check fails), REJECTED (admin rejection)
 
+:::note[Status is the single source of truth]
+Every API endpoint, admin dashboard query, and batch pipeline scheduler uses the application status to determine what action to take next. If you are building any feature that interacts with KYC applications, the first thing you need to check is the current status. Never assume an application is in a particular state -- always read it from the database.
+:::
+
+The table below is the definitive reference for every status transition. Each row tells you exactly what event causes an application to move from one state to another.
+
 ## Status Transitions
 
 | From | To | Trigger |
 |------|----|---------|
-| — | REGISTERED | Mobile OTP verified (Screen 1 complete) |
-| REGISTERED | PAN_ENTERED | PAN + DOB submitted (Screen 2), async checks fire |
-| PAN_ENTERED | DIGILOCKER_PENDING | Redirected to DigiLocker (Screen 3) |
+| -- | REGISTERED | Mobile OTP (One-Time Password) verified (Screen 1 complete) |
+| REGISTERED | PAN_ENTERED | PAN (Permanent Account Number) + DOB (Date of Birth) submitted (Screen 2), async checks fire |
+| PAN_ENTERED | DIGILOCKER_PENDING | Redirected to DigiLocker (Government of India's digital document platform) (Screen 3) |
 | DIGILOCKER_PENDING | FILLING | DigiLocker consent complete, data harvested |
 | DIGILOCKER_PENDING | PAN_ENTERED | DigiLocker cancelled (retry) |
 | FILLING | GATE_CHECK | Screen 8 declarations submitted |
-| GATE_CHECK | e_SIGNED | Gate passed + e-Sign complete (Screen 9) |
+| GATE_CHECK | e_SIGNED | Gate passed + eSign (electronic signature via Aadhaar OTP) complete (Screen 9) |
 | GATE_CHECK | GATE_FAILED | Any blocking check failed |
 | GATE_FAILED | FILLING | User corrects issue + retries |
-| e_SIGNED | UNDER_REVIEW | Auto — enters maker-checker queue |
+| e_SIGNED | UNDER_REVIEW | Auto -- enters maker-checker queue |
 | UNDER_REVIEW | APPROVED | Checker approval (after maker review) |
 | UNDER_REVIEW | REJECTED | Checker rejection |
 | REJECTED | FILLING | User resubmits with corrections |
 | APPROVED | REGISTERING | Batch pipelines fire (KRA, CKYC, UCC, BO) |
 | REGISTERING | ACTIVE | KRA Registered + UCC Approved + BO Active |
+
+:::tip[The two retry loops]
+There are two places where an application can loop back: GATE_FAILED returns to FILLING (the customer fixes the issue, such as linking PAN-Aadhaar, and retries), and REJECTED returns to FILLING (the admin identifies a problem, the customer corrects it, and resubmits). In both cases, the application re-enters the flow at the FILLING state, not at the beginning. The customer does not need to re-enter their mobile, PAN, or go through DigiLocker again.
+:::
+
+Each status belongs to one of four phases. Knowing the phase helps you quickly understand where in the overall pipeline an application currently sits.
 
 ## Status Descriptions
 
@@ -46,13 +60,19 @@ REGISTERED → PAN_ENTERED → DIGILOCKER_PENDING → FILLING → GATE_CHECK →
 | DIGILOCKER_PENDING | User Journey | Waiting for DigiLocker consent redirect |
 | FILLING | User Journey | User completing Screens 4-8 |
 | GATE_CHECK | User Journey | Blocking gate evaluation (Screen 8) |
-| GATE_FAILED | User Journey | A blocking check failed — user must fix |
+| GATE_FAILED | User Journey | A blocking check failed -- user must fix |
 | e_SIGNED | Submitted | Aadhaar OTP e-Sign complete |
 | UNDER_REVIEW | Admin | In maker-checker queue |
 | APPROVED | Admin | Checker signed off |
 | REJECTED | Admin | Checker rejected |
 | REGISTERING | Batch | Agency pipelines running (KRA/CKYC/UCC/BO) |
-| ACTIVE | Complete | All gates passed — can trade |
+| ACTIVE | Complete | All gates passed -- can trade |
+
+:::caution[REGISTERING can take days]
+The REGISTERING state is not instantaneous. It can last anywhere from a few hours (if CDSL is the primary depository) to 15+ days (if NSDL processing is involved). The admin dashboard should show a sub-status breakdown for REGISTERING applications -- which pipelines have completed and which are still pending. See the [Batch Pipeline](/broking-kyc/operations/batch-pipeline/) documentation for individual pipeline timelines.
+:::
+
+The blocking gate at Screen 8 is the most common point where applications get stuck. The table below shows each check and what the system requires before allowing the application to proceed to eSign.
 
 ## Blocking Gate Checks (Screen 8)
 
@@ -62,8 +82,12 @@ The gate evaluates these checks before allowing e-Sign:
 |-------|----------------|--------|
 | PAN verification | Status = E (valid) | Decentro |
 | PAN-Aadhaar linkage | Linked | Decentro |
-| AML/PEP screening | Completed (any result) | TrackWizz |
+| AML (Anti-Money Laundering) / PEP (Politically Exposed Person) screening | Completed (any result) | TrackWizz |
 | Bank verification | Penny drop complete | Decentro |
 | DigiLocker consent | Data harvested | DigiLocker |
 
 If any check hasn't completed (timeout/error), it blocks with a specific message telling the user what needs resolution.
+
+:::note[AML screening: "completed" not "clean"]
+Notice that the AML/PEP gate check requires "Completed (any result)" -- not "LOW risk." This is because even HIGH risk applications are allowed to proceed to eSign; they are simply flagged for enhanced due diligence during the maker-checker review. The blocking gate stops incomplete checks, not high-risk ones. The risk level determines the review path, not the gate outcome.
+:::

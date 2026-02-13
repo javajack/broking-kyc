@@ -3,6 +3,7 @@ title: DigiLocker
 description: Consent-based document fetch from DigiLocker — Aadhaar eKYC XML, PAN, driving license via OAuth 2.0 flow.
 ---
 
+If you are joining the KYC engineering team, DigiLocker is one of the first systems you must understand deeply. DigiLocker is a government-issued digital wallet for your documents -- instead of carrying physical copies of your Aadhaar, PAN (Permanent Account Number), and driving license, customers share verified digital originals directly from the issuing authority. In the context of stock broker onboarding, DigiLocker is the single most impactful integration because it eliminates the need for Video KYC (known as VIPV, or Video In-Person Verification) for the vast majority of customers, saving both time and money. Around 80-85% of customers will complete their identity verification through this path. The remaining 15-20% who cannot use DigiLocker fall back to a more expensive and slower process involving document uploads, OCR (Optical Character Recognition), and video verification.
 
 ## Table of Contents
 
@@ -23,6 +24,8 @@ description: Consent-based document fetch from DigiLocker — Aadhaar eKYC XML, 
 
 ---
 
+Before diving into the technical details, let us establish what DigiLocker is and why it matters. This overview section gives you the foundational context you will need to make sense of every subsequent section.
+
 ## 1. Overview
 
 ### What is DigiLocker?
@@ -40,24 +43,32 @@ DigiLocker is a flagship initiative of the **Ministry of Electronics and Informa
 | **Documents Available** | Aadhaar, PAN, Driving License, Voter ID, Passport, Marksheets, Vehicle RC, etc. |
 | **Legal Framework** | IT Act 2000, Section 9 (electronic gazette); documents treated at par with originals under Rule 9A of IT (Preservation and Retention) Rules |
 | **Portal** | https://www.digilocker.gov.in |
-| **API Docs** | https://api.digitallocker.gov.in and https://apisetu.gov.in/digilocker |
+| **API (Application Programming Interface) Docs** | https://api.digitallocker.gov.in and https://apisetu.gov.in/digilocker |
 | **Spec PDF** | https://img1.digitallocker.gov.in/assets/img/Digital%20Locker%20Authorized%20Partner%20API%20Specification%20v1.11.pdf |
+
+In plain English, DigiLocker is the government's official digital document repository. When a customer grants consent, we can pull their verified Aadhaar, PAN, and other documents directly from the authorities that issued them -- no photocopies, no scanning, no forgery risk.
 
 ### Why DigiLocker Matters for Broking KYC
 
-1. **IPV Exemption**: SEBI circular explicitly allows **In-Person Verification (IPV) exemption** when Aadhaar eKYC is obtained via DigiLocker. This eliminates the need for Video KYC (VIPV), saving Rs. 30-50 per customer and dramatically simplifying the onboarding flow.
+1. **IPV (In-Person Verification) Exemption**: SEBI (Securities and Exchange Board of India) circular explicitly allows **In-Person Verification exemption** when Aadhaar eKYC (electronic Know Your Customer) is obtained via DigiLocker. This eliminates the need for Video KYC (VIPV), saving Rs. 30-50 per customer and dramatically simplifying the onboarding flow.
 
-2. **Consent-Based**: Documents are fetched only with explicit user consent via OAuth 2.0. The user sees exactly which documents are being requested and can grant or deny access. This aligns with DPDP Act 2023 principles.
+2. **Consent-Based**: Documents are fetched only with explicit user consent via OAuth 2.0. The user sees exactly which documents are being requested and can grant or deny access. This aligns with DPDP (Digital Personal Data Protection) Act 2023 principles.
 
 3. **Government-Issued, Digitally Signed**: Documents fetched from DigiLocker carry the digital signature of the issuing authority (e.g., UIDAI for Aadhaar, Income Tax Dept for PAN). No separate document verification or forgery detection is needed.
 
-4. **Auto-Fill Capability**: Aadhaar XML from DigiLocker provides ~25 structured fields (name, DOB, gender, full address, photo) that can be used to auto-fill KYC forms, KRA submissions, CKYC uploads, and exchange UCC registrations.
+4. **Auto-Fill Capability**: Aadhaar XML from DigiLocker provides ~25 structured fields (name, DOB, gender, full address, photo) that can be used to auto-fill KYC forms, KRA (KYC Registration Agency) submissions, CKYC (Central KYC) uploads, and exchange UCC registrations.
 
 5. **Cost Efficiency**: DigiLocker is a government service with minimal per-transaction cost (Rs. 0-5 depending on integration path), compared to OCR-based extraction (Rs. 1-3 per doc) plus manual verification overhead.
 
-6. **Coverage**: With 200M+ registered users, a significant portion of the target customer base already has DigiLocker accounts. For those who do not, account creation takes approximately 2 minutes using Aadhaar OTP.
+6. **Coverage**: With 200M+ registered users, a significant portion of the target customer base already has DigiLocker accounts. For those who do not, account creation takes approximately 2 minutes using Aadhaar OTP (One-Time Password).
+
+:::tip[Why This Matters for You]
+As a junior engineer, remember this: DigiLocker is the "happy path" for KYC onboarding. If a customer uses DigiLocker, the entire onboarding can complete in 5-7 minutes at a cost of Rs. 30-50. Without it, the same process takes 10-15 minutes and costs Rs. 80-120. Every design decision in the system is optimized around maximizing DigiLocker adoption.
+:::
 
 ---
+
+Now that you understand what DigiLocker is and why it matters, the next question is: how do we actually connect to it? There are two approaches, and choosing the right one depends on your scale and timeline.
 
 ## 2. Integration Paths
 
@@ -96,6 +107,8 @@ Become a **Requester Entity (RE)** by partnering directly with MeitY/NeGD.
 
 ### 2b: Via Aggregator (Digio / Decentro)
 
+If the 2-4 month empanelment timeline is too long for your go-to-market window, an aggregator lets you start fetching DigiLocker documents within days. The trade-off is a higher per-transaction cost and a dependency on the aggregator's uptime.
+
 Use a MeitY-approved partner that provides a REST API wrapper over DigiLocker.
 
 #### Option 1: Digio
@@ -107,7 +120,7 @@ Use a MeitY-approved partner that provides a REST API wrapper over DigiLocker.
 | **Auth** | `Authorization: Basic <base64(client_id:client_secret)>` |
 | **IP Whitelist** | UAT: 35.154.20.28; Prod: 13.126.198.236, 52.66.66.81 |
 | **Sandbox** | Yes (UAT environment) |
-| **SDK** | Android SDK, iOS SDK, Web SDK available |
+| **SDK (Software Development Kit)** | Android SDK, iOS SDK, Web SDK available |
 | **Additional** | Also provides Aadhaar Offline XML decryption (see Section 7) |
 
 #### Option 2: Decentro
@@ -134,9 +147,11 @@ Use a MeitY-approved partner that provides a REST API wrapper over DigiLocker.
 
 ### Recommendation
 
-**Start with an aggregator (Digio recommended)** for rapid go-to-market. Digio is already the recommended vendor for KRA and eSign integrations (see Vendor Integrations), so consolidating DigiLocker through Digio reduces vendor count and integration complexity.
+**Start with an aggregator (Digio recommended)** for rapid go-to-market. Digio is already the recommended vendor for KRA and eSign (electronic signature based on Aadhaar OTP) integrations (see Vendor Integrations), so consolidating DigiLocker through Digio reduces vendor count and integration complexity.
 
 **Migrate to direct MeitY partnership at scale** (10,000+ onboardings/month) to reduce per-transaction cost and gain full control. The OAuth 2.0 flow and document parsing logic remain identical; only the base URL and authentication mechanism change.
+
+With the integration path decided, the next step is understanding the actual data exchange protocol. DigiLocker uses the industry-standard OAuth 2.0 flow, and understanding it is essential for building and debugging the integration.
 
 ---
 
@@ -194,6 +209,8 @@ User (Browser/App)           Broker Backend           DigiLocker Server
        |<--------------------------|                          |
 ```
 
+In plain English, the flow works like logging into a website using "Sign in with Google." The customer is redirected to DigiLocker, logs in there, grants consent, and is sent back to our app with a temporary code that we exchange for an access token. We then use that token to fetch their documents.
+
 ### Step-by-Step API Calls
 
 #### Step 1: Redirect User to DigiLocker Authorization
@@ -214,6 +231,10 @@ GET https://api.digitallocker.gov.in/public/oauth2/1/authorize
 | `redirect_uri` | Yes | Pre-registered callback URL (must match exactly) |
 | `state` | Yes | Random CSRF token; verified on callback to prevent CSRF attacks |
 | `scope` | Yes | `openid` for basic profile; additional scopes for documents |
+
+:::caution[Security: Always Validate the State Parameter]
+The `state` parameter is your defense against Cross-Site Request Forgery (CSRF) attacks. Generate a cryptographically random value, store it in the user's session before redirecting, and verify it matches when the callback arrives. Skipping this check is a security vulnerability that could allow an attacker to link their DigiLocker account to another user's KYC application.
+:::
 
 #### Step 2: User Authentication
 
@@ -277,7 +298,7 @@ code=<AUTHORIZATION_CODE>
 
 | Field | Description |
 |-------|-------------|
-| `access_token` | JWT token used for all subsequent API calls |
+| `access_token` | JWT (JSON Web Token) used for all subsequent API calls |
 | `token_type` | Always `Bearer` |
 | `expires_in` | Token validity in seconds (typically 3600 = 1 hour) |
 | `refresh_token` | Optional; used to obtain new access token without re-consent |
@@ -327,6 +348,10 @@ Returns the document as **XML** (for structured data like Aadhaar) or **PDF** (f
 
 ### Session Management
 
+:::caution[Consent Tokens Expire Quickly]
+The access token from DigiLocker is valid for only 1 hour. If your onboarding flow has steps between the DigiLocker consent and the final document fetch (for example, a bank verification step in between), the token may expire before you get to use it. Design your flow so that document fetching happens immediately after consent, and store the extracted data rather than relying on the token for later retrieval.
+:::
+
 | Aspect | Details |
 |--------|---------|
 | **Access Token Lifetime** | Typically 1 hour (3600 seconds) |
@@ -334,6 +359,8 @@ Returns the document as **XML** (for structured data like Aadhaar) or **PDF** (f
 | **Token Storage** | Store encrypted; never log or expose in URLs |
 | **Concurrent Sessions** | Single active session per user per client_id |
 | **Revocation** | User can revoke consent from DigiLocker dashboard at any time |
+
+Now that you understand the consent flow, let us look at what documents we can actually fetch and which ones matter most for stock broker KYC.
 
 ---
 
@@ -354,6 +381,10 @@ The following documents are relevant for stock broker KYC onboarding and can be 
 | **Class 10 Marksheet** | CBSE/State Board | Varies by board | PDF | Name, DOB, Father's Name, Roll Number | DOB verification (fallback) |
 | **Class 12 Marksheet** | CBSE/State Board | Varies by board | PDF | Name, DOB, Father's Name | Not typically used |
 
+:::tip[Use DigiLocker for Address Proof to Avoid OCR Entirely]
+If a customer's Aadhaar address is current and accurate, you do not need to collect any separate address proof document. The structured address fields from the Aadhaar XML (house, street, locality, city, state, pincode) can be mapped directly to KRA, CKYC, and exchange UCC address fields without any OCR processing. This eliminates an entire category of document handling errors.
+:::
+
 ### Priority for Broking KYC
 
 For individual stock broker KYC, the documents are fetched in this priority order:
@@ -366,6 +397,12 @@ For individual stock broker KYC, the documents are fetched in this priority orde
 ### Minimum Viable Fetch
 
 For the standard KYC flow, **only Aadhaar XML is strictly necessary** from DigiLocker. PAN verification is handled independently via the Decentro PAN API (V1). Additional documents are fetched only in exception scenarios (address mismatch, name mismatch, etc.).
+
+:::note[Design Principle]
+The system is designed so that a single DigiLocker consent gives us everything we need for 80-85% of customers. Only the remaining 15-20% (those who do not use DigiLocker) require the more complex document upload and OCR path.
+:::
+
+With an understanding of the documents available, let us now focus on the most important one: Aadhaar eKYC. This section is the heart of the DigiLocker integration.
 
 ---
 
@@ -385,6 +422,10 @@ This is the most important section of this document. DigiLocker-based Aadhaar eK
 - Significant cost saving: Rs. 30-50 per customer (VIPV cost eliminated)
 - Significant time saving: 3-5 minutes per customer (VIPV duration eliminated)
 - Better conversion: no drop-off at VIPV stage (historically 10-15% drop-off at video step)
+
+:::caution[Compliance Critical]
+The IPV exemption only applies when Aadhaar eKYC is obtained through DigiLocker or an equivalent government electronic mechanism. If a customer uploads a scanned Aadhaar card or uses Aadhaar Offline XML, the IPV exemption does NOT apply, and VIPV becomes mandatory. Getting this distinction wrong means either conducting unnecessary VIPV (waste of money) or skipping required VIPV (compliance violation).
+:::
 
 **Impact on Onboarding Flow**:
 
@@ -453,6 +494,8 @@ The Aadhaar e-KYC XML obtained via DigiLocker has the following structure:
 | `Poa/@po` | Post Office | String | 99 | `Gurgaon GPO` | Post office name |
 | `Pht` | Photo | Base64 | ~50KB | Base64 JPEG | Face match reference image |
 
+In plain English, this XML gives us almost everything needed for a complete KYC form: the customer's full name, date of birth, gender, complete address broken into structured fields, and a photograph. The phone and email are returned as hashed values (not plaintext), so they can only be used for cross-verification, not for direct reading.
+
 ### Data Mapping to KYC Master Dataset
 
 | DigiLocker Field | Master Dataset Field | Field ID | Section | Notes |
@@ -492,6 +535,10 @@ Country:        India
 
 **BSE UCC Address Rules**: Address Line 1 must NOT start with client name. Address Lines 1, 2, and 3 must all be distinct. The concatenation logic above naturally satisfies these rules.
 
+:::tip[Implementation Tip]
+Some Aadhaar XML fields may be empty (for example, `lm` or `loc`). Your address concatenation logic should handle empty fields gracefully -- skip them rather than producing strings like "123, MG Road, , Sector 5". Also, trim extra whitespace and commas.
+:::
+
 ### Photo Extraction and Usage
 
 The `<Pht>` element contains a base64-encoded JPEG photograph of the Aadhaar holder. This photo is used for:
@@ -525,9 +572,13 @@ Input:  "S/O SURESH KUMAR"
 Output: relationship = "Father", name = "SURESH KUMAR"
 ```
 
+With the core Aadhaar eKYC integration understood, let us look at an emerging alternative that SEBI approved in June 2025 -- NPCI e-KYC Setu.
+
 ---
 
 ## 6. NPCI e-KYC Setu (New - Jun 2025)
+
+While DigiLocker is the established path for Aadhaar eKYC, a newer government initiative offers a privacy-preserving alternative. NPCI e-KYC Setu was designed specifically to address the concern that even masked Aadhaar numbers carry re-identification risk -- it performs Aadhaar-based identity verification without ever disclosing the Aadhaar number to the requesting entity.
 
 ### Overview
 
@@ -540,7 +591,7 @@ NPCI (National Payments Corporation of India) launched **e-KYC Setu** on March 1
 | Aspect | DigiLocker Aadhaar eKYC | NPCI e-KYC Setu |
 |--------|------------------------|-----------------|
 | **Aadhaar Number Disclosure** | Masked Aadhaar (XXXXXXXX1234) is visible | Aadhaar number is **never disclosed** to the broker |
-| **License Required** | None (via aggregator) or MeitY empanelment (direct) | None; no AUA/KUA license needed for SEBI-regulated entities |
+| **License Required** | None (via aggregator) or MeitY empanelment (direct) | None; no AUA (Authentication User Agency)/KUA (KYC User Agency) license needed for SEBI-regulated entities |
 | **Infrastructure** | DigiLocker servers (MeitY) | NPCI infrastructure |
 | **Token Approach** | Access token (OAuth 2.0) | Tokenized identity (privacy-preserving) |
 | **Data Returned** | Full demographic + photo + address | Demographic data without Aadhaar number |
@@ -554,7 +605,7 @@ NPCI (National Payments Corporation of India) launched **e-KYC Setu** on March 1
 
 - SEBI allowed NPCI e-KYC Setu for securities market intermediaries from **June 2025**
 - Reference: SEBI Stock Brokers Master Circular SEBI/HO/MIRSD/PoD/P/CIR/2025/90
-- No AUA (Authentication User Agency) or KUA (KYC User Agency) license required
+- No AUA or KUA license required
 - Privacy-preserving: aligns with DPDP Act 2023 data minimization principle
 
 ### Integration Status and Recommendation
@@ -571,11 +622,13 @@ NPCI (National Payments Corporation of India) launched **e-KYC Setu** on March 1
 - **Plan Migration**: When e-KYC Setu reaches maturity and IPV exemption is explicitly confirmed, evaluate migration for privacy benefits
 - **Parallel Support**: Consider supporting both DigiLocker and e-KYC Setu to give customers a choice
 
+Not every customer will use DigiLocker. The next section covers the fallback mechanism for the 15-20% who do not.
+
 ---
 
 ## 7. Aadhaar Offline XML (Fallback)
 
-For users who do not have a DigiLocker account or prefer not to use it, the **Aadhaar Offline XML** method serves as a fallback.
+For users who do not have a DigiLocker account or prefer not to use it, the **Aadhaar Offline XML** method serves as a fallback. Think of it as the manual, offline version of the DigiLocker flow -- the customer downloads their own Aadhaar data from UIDAI, password-protects it with a 4-digit share code, and uploads it to our app.
 
 ### Flow
 
@@ -668,6 +721,12 @@ Body:
 4. User's Aadhaar mobile number has changed (DigiLocker OTP will fail)
 5. Technical issues with DigiLocker OAuth flow (browser compatibility, redirect failures)
 
+:::note[Important Distinction]
+Both DigiLocker and Aadhaar Offline XML qualify as Aadhaar eKYC and both provide the IPV exemption. The difference is purely in the user experience and the data freshness. The downstream data (name, address, photo) is identical in both cases because it comes from the same UIDAI source.
+:::
+
+So far, we have focused on individual customers. The next section addresses the limitations of DigiLocker for non-individual entities like companies, trusts, and partnerships.
+
 ---
 
 ## 8. Non-Individual Entities
@@ -686,6 +745,8 @@ DigiLocker is primarily designed for individual citizens. Its applicability for 
 | **LLP** | Partial (designated partners only) | Individual DPs' Aadhaar/PAN | LLP Agreement, LLPIN certificate | Manual upload |
 | **Trust** | Partial (trustees only) | Individual trustees' Aadhaar/PAN | Trust deed, registration certificate | Manual upload |
 | **Minor (on behalf of)** | Partial (guardian only) | Guardian's Aadhaar/PAN | Minor's birth certificate (may be on DigiLocker if issued digitally) | Manual upload |
+
+In plain English, DigiLocker helps with the individual people behind a company or entity, but it cannot fetch entity-level documents like incorporation certificates, partnership deeds, or board resolutions. Those must still be collected through manual upload and verified via OCR.
 
 ### NRI-Specific Considerations
 
@@ -722,6 +783,8 @@ Step 4: Entity documents (manual upload):
 Step 5: OCR + manual verification of uploaded entity documents
 ```
 
+Handling the data fetched from DigiLocker carries significant privacy and compliance responsibilities. The next section covers what you must and must not do with this data.
+
 ---
 
 ## 9. Data Privacy and Compliance
@@ -734,9 +797,13 @@ Step 5: OCR + manual verification of uploaded entity documents
 | **IT Act 2000** | Electronic documents | DigiLocker documents are legally equivalent to originals (Section 9, Rule 9A) |
 | **DPDP Act 2023** | Personal data processing | Consent management, purpose limitation, data minimization, data principal rights |
 | **SEBI KYC Master Circular** | KYC data retention | 8 years post account closure (SEBI Stock Brokers Regulations 2026) |
-| **PMLA 2002** | Customer due diligence | KYC records for AML compliance |
+| **PMLA (Prevention of Money Laundering Act) 2002** | Customer due diligence | KYC records for AML (Anti-Money Laundering) compliance |
 
 ### Aadhaar Number Handling - Critical Rules
+
+:::danger[Full Aadhaar Number Storage is a Criminal Offence]
+Under Section 29(2) of the Aadhaar Act 2016, no entity may store, publish, or display the full 12-digit Aadhaar number. Violations carry penalties of up to Rs. 1 crore for body corporates and imprisonment up to 3 years for individuals. This applies to databases, log files, error messages, debug traces, and any other persistent storage. Ensure your logging framework is configured to redact any 12-digit numeric patterns from all log output. Always store only the masked format (XXXXXXXX1234) showing the last 4 digits.
+:::
 
 **Do**:
 - Store only the masked Aadhaar number: `XXXXXXXX1234` (last 4 digits visible)
@@ -784,6 +851,8 @@ Aadhaar Virtual ID (VID) is a 16-digit temporary number that maps to the Aadhaar
 | **Generation** | User generates from UIDAI portal or mAadhaar app |
 | **DigiLocker Support** | VID can be used for DigiLocker login instead of Aadhaar number |
 | **Recommendation** | Support VID as alternative; privacy-conscious users may prefer it |
+
+With the privacy rules established, let us move to the technical details of the API itself -- endpoints, rate limits, error codes, and retry strategies.
 
 ---
 
@@ -854,6 +923,10 @@ Retry Policy:
   Non-retryable: 400, 401, 403, 404
 ```
 
+:::tip[When to Retry vs When to Fallback]
+Retry transient errors (408, 500, 502, 503) up to 3 times. But if DigiLocker is consistently returning 503 (maintenance), do not keep the customer waiting -- offer the Aadhaar Offline XML fallback immediately. A good rule of thumb: if 2 consecutive requests fail within 30 seconds, switch to the fallback path and show the customer their options.
+:::
+
 ### Webhook / Polling
 
 DigiLocker does **not** natively support webhooks. The OAuth flow is synchronous:
@@ -872,6 +945,8 @@ If using an aggregator (Digio), webhook callbacks may be available for status up
 | **Character Encoding** | UTF-8 |
 | **Date Format** | `YYYY-MM-DD` (ISO 8601) in Aadhaar XML; `DD-MM-YYYY` in some profile responses |
 | **Photo Format** | Base64-encoded JPEG in XML; inline in PDF documents |
+
+Now that you know how the API works, let us prepare for what can go wrong. Edge cases are where production systems succeed or fail, and DigiLocker has several important ones.
 
 ---
 
@@ -953,6 +1028,10 @@ If using an aggregator (Digio), webhook callbacks may be available for status up
    -> Inform customer: "Name on Aadhaar does not match PAN. Please correct at UIDAI or Income Tax Department before proceeding."
 5. Cannot auto-resolve name mismatches; only the customer can update their records
 ```
+
+:::caution[Name Mismatch is a Common Source of KYC Rejections]
+Name mismatches between Aadhaar and PAN are one of the top 3 reasons for KRA (KYC Registration Agency) rejections. Always use the PAN name as the canonical name for all financial submissions (KRA, CKYC, exchange UCC, depository BO). The PAN name is the legal name for securities market purposes.
+:::
 
 ### 11.5: DigiLocker Service Downtime
 
@@ -1039,11 +1118,13 @@ If using an aggregator (Digio), webhook callbacks may be available for status up
    c. "Visit nearest Aadhaar enrollment center to update mobile number"
 ```
 
+With all the edge cases mapped out, the next section shows how DigiLocker data flows into the rest of the vendor ecosystem -- HyperVerge for face match, KRA for registration, CKYC for the central registry, and exchanges for UCC.
+
 ---
 
 ## 12. Integration with Other Vendors
 
-DigiLocker data flows into multiple downstream systems and vendor integrations.
+DigiLocker data flows into multiple downstream systems and vendor integrations. Understanding this data flow is essential because any issue with DigiLocker data quality will cascade into all downstream systems.
 
 ### Data Flow Diagram
 
@@ -1069,6 +1150,8 @@ DigiLocker data flows into multiple downstream systems and vendor integrations.
   Photo vs Selfie  Auto-fill    Auto-fill    Auto-fill
   Liveness check   KRA fields   CKYC fields  UCC fields
 ```
+
+The subsections below walk through each downstream system in detail, showing exactly which DigiLocker fields map to which vendor API fields. If you are building the data mapping layer, these tables are your primary reference.
 
 ### 12.1: DigiLocker Photo -> HyperVerge Face Match
 
@@ -1141,6 +1224,8 @@ Fields auto-filled into CKYC upload payload (Decentro CKYC API):
 | `Poa/@pc` | `pincode` | `Pincode` |
 | Masked Aadhaar | `aadhaar_number` (masked) | `Aadhaar Number` (masked) |
 
+The regulatory landscape around DigiLocker has evolved significantly over the past two years. The next section documents these changes so you understand the current state and what to watch for.
+
 ---
 
 ## 13. Recent Changes (2024-2026)
@@ -1151,7 +1236,7 @@ Fields auto-filled into CKYC upload payload (Decentro CKYC API):
 |------|--------|--------------------------------|
 | **Oct 2023** | SEBI KYC Master Circular (SEBI/HO/MIRSD/MIRSD-SEC-2/P/CIR/2023/168) | Confirmed DigiLocker as valid eKYC mechanism; IPV exemption codified |
 | **Feb 2023** | SEBI circular on Aadhaar eKYC (SEBI/HO/MIRSD/SEC-2/P/CIR/2023/37) | Explicit IPV exemption when Aadhaar eKYC via DigiLocker |
-| **Nov 2022** | DDPI replaces POA | No direct impact on DigiLocker; DDPI is a separate consent |
+| **Nov 2022** | DDPI (Demat Debit and Pledge Instruction) replaces POA (Power of Attorney) | No direct impact on DigiLocker; DDPI is a separate consent |
 | **Jan 2025** | CKYC Search returns masked CKYC number | No impact on DigiLocker; affects downstream CKYC integration |
 | **Jan 2025** | Up to 10 nominees (SEBI mandate) | No impact on DigiLocker; nominee data collected in KYC form |
 | **Mar 2025** | NPCI e-KYC Setu launched | New alternative to DigiLocker Aadhaar eKYC (Section 6) |
@@ -1168,7 +1253,7 @@ Fields auto-filled into CKYC upload payload (Decentro CKYC API):
 | v1.0 | Deprecated | Original XML-based API |
 | v1.1 | Current (production) | OAuth 2.0 consent flow; JSON + XML responses; partner spec v1.11 |
 | v2.0 | Upcoming (announced) | Enhanced API; additional document types; improved error handling |
-| v3.0 | Planned | Potential integration with Account Aggregator ecosystem |
+| v3.0 | Planned | Potential integration with Account Aggregator (AA) ecosystem |
 
 ### What to Watch
 
@@ -1176,6 +1261,8 @@ Fields auto-filled into CKYC upload payload (Decentro CKYC API):
 2. **DigiLocker for corporates**: MeitY has discussed expanding DigiLocker to cover CIN-linked corporate documents; would transform non-individual KYC
 3. **Account Aggregator integration**: DigiLocker data as a consent artifact in the AA ecosystem is being explored
 4. **DPDP Act enforcement**: Full enforcement of the Digital Personal Data Protection Act may impose additional consent and data handling requirements on DigiLocker integrations
+
+Finally, let us look at the cost picture. Understanding the economics helps you make informed decisions about when to use DigiLocker vs fallback paths.
 
 ---
 
@@ -1206,6 +1293,8 @@ Fields auto-filled into CKYC upload payload (Decentro CKYC API):
 | **Monthly Minimum** | Rs. 5,000-10,000 | Rs. 5,000-10,000 | Varies by contract |
 | **Volume Discounts** | Available at 10K+/month | Available at 10K+/month | Negotiate slab-based pricing |
 
+The per-item costs above only tell part of the story. The real economic impact becomes clear when you compare the total cost of the DigiLocker path against the manual upload path for a single customer end-to-end.
+
 ### Cost Comparison: DigiLocker Path vs Manual Upload Path
 
 | Cost Item | DigiLocker Path | Manual Upload + OCR Path |
@@ -1229,15 +1318,21 @@ At 10,000 onboardings/month, DigiLocker path saves approximately **Rs. 3-5 lakh/
 | Bank Verification (Penny Drop) | Decentro | 2-5 |
 | KRA Lookup | Digio | 3-5 |
 | Face Match + Liveness | HyperVerge | 2-4 |
-| AML/PEP Screening | TrackWizz | 5-15 |
+| AML/PEP (Anti-Money Laundering / Politically Exposed Person) Screening | TrackWizz | 5-15 |
 | eSign | Digio | 15-25 |
 | CKYC Upload | Decentro | 5-10 |
 | **Total (DigiLocker path)** | | **Rs. 36-72** |
 | **Total (without DigiLocker, with VIPV)** | | **Rs. 80-150** |
 
+:::tip[Cost Optimization]
+The single biggest cost-saving lever in the entire KYC onboarding process is maximizing DigiLocker adoption. Every percentage point increase in DigiLocker usage rate directly reduces your per-customer cost by eliminating VIPV expenses. Invest in UX that makes the DigiLocker path seamless and fallback-free.
+:::
+
 ---
 
 ## 15. Implementation Checklist
+
+This checklist consolidates every task mentioned in the preceding sections into a single trackable list. Use it as a project plan when building the DigiLocker integration from scratch.
 
 ### Pre-Integration
 
@@ -1250,12 +1345,12 @@ At 10,000 onboardings/month, DigiLocker path saves approximately **Rs. 3-5 lakh/
 
 ### Development
 
-- [ ] Implement OAuth 2.0 consent flow (authorization URL → callback → token exchange)
+- [ ] Implement OAuth 2.0 consent flow (authorization URL -> callback -> token exchange)
 - [ ] Implement Aadhaar eKYC document fetch (demographic + photo)
 - [ ] Implement PAN document fetch from DigiLocker
 - [ ] Implement Driving License fetch (if needed)
 - [ ] Parse Aadhaar XML response (name, DOB, gender, address, photo)
-- [ ] Build NPCI e-KYC Setu integration (Jun 2025 — Aadhaar eKYC without sharing Aadhaar number)
+- [ ] Build NPCI e-KYC Setu integration (Jun 2025 -- Aadhaar eKYC without sharing Aadhaar number)
 - [ ] Implement Aadhaar Offline XML fallback (share code + decrypt)
 - [ ] Build consent management (capture, store, audit trail per DPDP Act)
 - [ ] Implement document verification (check DigiLocker digital signature)
@@ -1265,17 +1360,17 @@ At 10,000 onboardings/month, DigiLocker path saves approximately **Rs. 3-5 lakh/
 
 ### Testing (UAT)
 
-- [ ] Test: OAuth consent flow — successful authorization
-- [ ] Test: OAuth consent flow — user denies consent
-- [ ] Test: Aadhaar eKYC fetch — complete data
-- [ ] Test: Aadhaar eKYC fetch — partial data (missing fields)
-- [ ] Test: PAN fetch — successful
-- [ ] Test: NPCI e-KYC Setu — Aadhaar eKYC without Aadhaar number
-- [ ] Test: Aadhaar Offline XML — download, share code, decrypt
+- [ ] Test: OAuth consent flow -- successful authorization
+- [ ] Test: OAuth consent flow -- user denies consent
+- [ ] Test: Aadhaar eKYC fetch -- complete data
+- [ ] Test: Aadhaar eKYC fetch -- partial data (missing fields)
+- [ ] Test: PAN fetch -- successful
+- [ ] Test: NPCI e-KYC Setu -- Aadhaar eKYC without Aadhaar number
+- [ ] Test: Aadhaar Offline XML -- download, share code, decrypt
 - [ ] Test: Token expiry and refresh flow
 - [ ] Test: DigiLocker downtime handling (fallback to manual upload)
-- [ ] Test: Cross-verification — DigiLocker name vs PAN name (fuzzy match)
-- [ ] Test: Address parsing — various address formats
+- [ ] Test: Cross-verification -- DigiLocker name vs PAN name (fuzzy match)
+- [ ] Test: Address parsing -- various address formats
 
 ### Production
 

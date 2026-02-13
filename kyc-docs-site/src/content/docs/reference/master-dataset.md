@@ -3,9 +3,17 @@ title: Master Dataset
 description: Complete field-level specification — all ~454 fields across 30 sections with data types, sizes, validation rules, source systems, and regulatory references.
 ---
 
+This is the single most comprehensive reference in the entire documentation set. It defines every field the KYC system captures, stores, or generates -- roughly 454 fields across 30 sections, covering everything from the customer's PAN (Permanent Account Number) to the audit trail of every modification made to their record. You will not read this cover-to-cover, but you will come back to it regularly when building forms, writing validation logic, debugging field-mapping issues, or answering compliance questions about where a particular piece of data comes from and why it is required.
+
+:::tip[How to use this page]
+Use your browser's search (Ctrl+F) to find a specific field name like `pan_verify_status` or a section letter like "Section G." Each field has a unique identifier (e.g., A01, G12) that is referenced throughout the codebase and in API mapping documents.
+:::
+
 ## 1. Architecture Overview
 
 ### 1.1 Two-Part KYC Structure (SEBI Mandated)
+
+SEBI (Securities and Exchange Board of India) mandates that KYC is split into two parts. This is not an implementation choice -- it is a regulatory requirement. Part I is standardized across all intermediaries (brokers, mutual funds, insurance), while Part II is specific to each intermediary's line of business.
 
 | Part | Name | Purpose | Template |
 |------|------|---------|----------|
@@ -13,6 +21,8 @@ description: Complete field-level specification — all ~454 fields across 30 se
 | **Part II** | CDD (Customer Due Diligence) | Activity-specific information for the intermediary (trading prefs, segments, risk) | Intermediary-designed |
 
 ### 1.2 Systems Involved
+
+These are all the external systems our KYC application communicates with. You will see their abbreviations throughout this document and the codebase.
 
 | System | Entity | Purpose |
 |--------|--------|---------|
@@ -27,6 +37,8 @@ description: Complete field-level specification — all ~454 fields across 30 se
 | **CDSL/NSDL** | Depositories | BO/Demat account creation |
 
 ### 1.3 Onboarding Flow Summary
+
+This is the high-level decision tree that determines how much data the system needs to capture from the customer. If a KRA (KYC Registration Agency) record already exists for their PAN, much of the form is prefilled. If neither KRA nor CKYC (Central KYC) has a record, the customer goes through the full capture flow.
 
 ```
 Client Initiates -> PAN Lookup in KRA -> KRA Found?
@@ -55,6 +67,8 @@ All Paths Lead To:
 
 **Source**: CERSAI KYC Template (Part I) + KRA Fields
 **Required By**: KRA, CKYC, NSE, BSE, MCX, CDSL, NSDL
+
+This is the foundational identity section. Every downstream system -- exchanges, depositories, KRA, CKYC -- needs these fields. The name fields (A05-A07) must match the PAN card exactly; even minor spelling differences will cause KRA rejections.
 
 | # | Field Name | Data Type | Size | Mandatory | Validation | Source/Notes |
 |---|-----------|-----------|------|-----------|------------|-------------|
@@ -97,6 +111,8 @@ All Paths Lead To:
 
 **Source**: CERSAI KYC Template + KRA Fields
 **Required By**: KRA, CKYC, NSE, BSE, CDSL, NSDL
+
+Address data typically comes from DigiLocker (Aadhaar XML). If the permanent address is the same as the correspondence address, the customer sets `perm_same_as_corr` to Y and the permanent fields are auto-copied.
 
 ### B1: Correspondence / Current Address
 
@@ -147,7 +163,9 @@ All Paths Lead To:
 
 ## 5. Section D: Identity Documents (POI)
 
-**Officially Valid Documents (OVDs) per PMLA Rules**
+**Officially Valid Documents (OVDs) per PMLA (Prevention of Money Laundering Act) Rules**
+
+These are the Proof of Identity documents accepted under Indian law. In practice, almost all customers use Aadhaar (via DigiLocker) or PAN as their POI (Proof of Identity).
 
 | # | Field Name | Data Type | Size | Mandatory | Validation |
 |---|-----------|-----------|------|-----------|------------|
@@ -175,6 +193,8 @@ All Paths Lead To:
 ---
 
 ## 6. Section E: Address Documents (POA)
+
+POA (Proof of Address) documents have validity constraints. A utility bill older than two months is not acceptable. You will encounter these constraints in the document upload validation logic.
 
 | # | Field Name | Data Type | Size | Mandatory | Validation |
 |---|-----------|-----------|------|-----------|------------|
@@ -205,6 +225,8 @@ All Paths Lead To:
 ## 7. Section F: Financial Profile
 
 **Required By**: PMLA/AML compliance, Segment activation, KRA (optional), Exchange registration
+
+The financial profile drives two critical decisions: which trading segments the customer can access (F&O and Commodity require income proof), and what risk category they fall into for AML (Anti-Money Laundering) screening.
 
 | # | Field Name | Data Type | Size | Mandatory | Validation | Notes |
 |---|-----------|-----------|------|-----------|------------|-------|
@@ -242,6 +264,10 @@ All Paths Lead To:
 | 05 | 25 Lakhs - 1 Crore | 1 - 2 Crore |
 | 06 | Above 1 Crore | Above 2 Crore |
 
+:::caution
+SEBI proposed revised income range codes in January 2026. When these are finalized, every system that stores or transmits income range codes -- KRA, exchanges, back-office -- will need to be updated simultaneously. Watch for the final circular.
+:::
+
 ---
 
 ## 8. Section G: Bank Account Details
@@ -249,6 +275,8 @@ All Paths Lead To:
 **Required By**: Broker (pay-in/pay-out), Exchange (settlement), SEBI regulation
 **Validation**: Penny Drop verification mandatory for primary account
 **Multiple Accounts**: Up to 5 bank accounts allowed
+
+The bank section is where many onboarding failures occur. The penny drop verification (a Rs.1 IMPS credit to confirm the account exists and the name matches) is a blocking step. If the name returned by the bank does not match the PAN name above a configurable threshold, the application cannot proceed.
 
 ### Per Bank Account (repeat for each, max 5):
 
@@ -277,6 +305,8 @@ All Paths Lead To:
 
 **Required By**: CDSL/NSDL (BO account), Broker (settlement)
 
+The BO (Beneficiary Owner) ID format differs between the two depositories. CDSL uses a 16-digit numeric ID, while NSDL uses "IN" followed by 14 alphanumeric characters. You will see this distinction in every depository-related integration.
+
 | # | Field Name | Data Type | Size | Mandatory | Validation | Notes |
 |---|-----------|-----------|------|-----------|------------|-------|
 | H01 | `depository` | String | 4 | **Y** | CDSL/NSDL | |
@@ -295,6 +325,8 @@ All Paths Lead To:
 
 **Regulatory Basis**: SEBI circular Jan 10, 2025 (up to 10 nominees), SEBI circular Jun 10, 2024 (simplified to 3 mandatory fields)
 **Required By**: CDSL/NSDL demat, Broker trading account
+
+Nomination rules changed significantly in 2024-2025. Previously, nomination was optional. Now, customers must either nominate at least one person or explicitly opt out -- and opting out requires video verification.
 
 | # | Field Name | Data Type | Size | Mandatory | Validation |
 |---|-----------|-----------|------|-----------|------------|
@@ -338,6 +370,8 @@ All Paths Lead To:
 **Regulatory Basis**: SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12 (Feb 20, 2024) - Centralization at KRAs
 **Required By**: KRA (upload mandatory since Jul 1, 2024), All SEBI intermediaries
 
+FATCA (Foreign Account Tax Compliance Act) and CRS (Common Reporting Standard) are international tax compliance frameworks. India participates in both. For the vast majority of Indian-resident customers, the declaration is straightforward -- they check "tax resident of India only" and move on. The complexity arises for NRIs (Non-Resident Indians) and dual citizens who have tax residency in other countries.
+
 | # | Field Name | Data Type | Size | Mandatory | Validation |
 |---|-----------|-----------|------|-----------|------------|
 | J01 | `is_tax_resident_of_india_only` | Boolean | 1 | **Y** | Y/N |
@@ -372,6 +406,8 @@ All Paths Lead To:
 
 **Regulatory Basis**: SEBI AML/CFT Master Circular (SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78)
 
+A PEP (Politically Exposed Person) is anyone who holds or has recently held a prominent public function -- a minister, a senior government official, or a high-ranking military officer. Their immediate family members and close associates are also classified as PEP-related. If a customer declares PEP status, the application triggers EDD (Enhanced Due Diligence), which involves additional manual review by the compliance team.
+
 | # | Field Name | Data Type | Size | Mandatory | Validation |
 |---|-----------|-----------|------|-----------|------------|
 | K01 | `is_pep` | Boolean | 1 | **Y** | Y/N |
@@ -386,6 +422,8 @@ All Paths Lead To:
 ## 13. Section L: Trading Preferences & Segments
 
 **Required By**: NSE/BSE/MCX UCC registration, Broker
+
+This section determines what the customer can trade. Equity cash is the default segment that every customer gets. F&O (Futures and Options) and Commodity segments require income proof, which is why the financial profile (Section F) must be completed first.
 
 | # | Field Name | Data Type | Size | Mandatory | Validation | Conditions |
 |---|-----------|-----------|------|-----------|------------|------------|
@@ -433,6 +471,8 @@ All Paths Lead To:
 **Regulatory Basis**: SEBI KYC Master Circular - IPV mandatory unless Aadhaar e-KYC used
 **Required By**: KRA (IPV flag), Broker
 
+IPV (In-Person Verification) is a regulatory requirement to confirm that the person applying is who they claim to be. VIPV (Video In-Person Verification) is the digital equivalent -- a recorded video call where a trained agent verifies the customer's identity against their documents.
+
 | # | Field Name | Data Type | Size | Mandatory | Validation | Notes |
 |---|-----------|-----------|------|-----------|------------|-------|
 | N01 | `ipv_required` | Boolean | 1 | **Y** | | N if Aadhaar e-KYC or DigiLocker used |
@@ -470,6 +510,8 @@ All Paths Lead To:
 **Required By**: CDSL/NSDL, Broker
 **Note**: DDPI is **optional** - broker cannot deny services if client refuses
 
+DDPI (Demat Debit and Pledge Instruction) replaced the older POA (Power of Attorney) mechanism in November 2022. It authorizes the broker to debit securities from the customer's demat account for specific purposes -- settlement, pledging, mutual fund transactions, and tendering in open offers. Without DDPI, the customer must manually authorize each debit through the depository's system (CDSL's CDAS or NSDL's SPEED-e).
+
 | # | Field Name | Data Type | Size | Mandatory | Validation |
 |---|-----------|-----------|------|-----------|------------|
 | O01 | `ddpi_opted` | Boolean | 1 | **Y** | Y/N |
@@ -486,6 +528,8 @@ All Paths Lead To:
 ---
 
 ## 17. Section P: Consent & Declarations
+
+This section covers the legal consents and declarations that the customer must acknowledge before the application can be e-signed. Several of these are SEBI-mandated and cannot be made optional.
 
 | # | Field Name | Data Type | Size | Mandatory | Notes |
 |---|-----------|-----------|------|-----------|-------|
@@ -548,6 +592,8 @@ All Paths Lead To:
 ## 19. Section R: Third-Party Verification Results
 
 **Stored results from all external verification APIs**
+
+These fields are system-populated -- they come from vendor API responses, not from user input. When debugging a verification failure, these are the fields you will inspect to understand what the external system returned.
 
 ### R1: PAN Verification (NSDL/Protean)
 
@@ -667,6 +713,8 @@ All Paths Lead To:
 
 **UCC = Unique Client Code, registered on each exchange the client will trade on**
 
+The UCC (Unique Client Code) is the customer's identity on the exchange. Each exchange has its own registration process and slightly different field requirements, but the core data is the same. The UCC is assigned by the broker and submitted to the exchange for approval.
+
 ### U1: Common UCC Fields (NSE/BSE/MCX)
 
 | # | Field Name | Data Type | Size | Mandatory | Notes |
@@ -708,6 +756,8 @@ All Paths Lead To:
 
 **Regulatory Basis**: RBI PIS (Portfolio Investment Scheme), FEMA regulations
 **When Applicable**: residential_status (A22) = NRI / FN / PIO
+
+NRI (Non-Resident Indian) onboarding involves additional regulatory requirements that resident Indians do not face. The most significant is the PIS (Portfolio Investment Scheme) permission from an AD (Authorized Dealer) bank, which is mandatory before an NRI can trade in Indian equities.
 
 | # | Field Name | Data Type | Size | Mandatory | Validation | Notes |
 |---|-----------|-----------|------|-----------|------------|-------|
@@ -817,6 +867,8 @@ Complete replication of Section A (Personal Identity), Section B (Address), Sect
 
 **Regulatory Basis**: SEBI framework for automated deactivation (Jul 2022), SEBI (Stock Brokers) Regulations 2026
 
+These fields track the account from activation through dormancy to closure. You will encounter them when building the account status dashboard and the automated dormancy workflows.
+
 | # | Field Name | Data Type | Size | Mandatory | Notes |
 |---|-----------|-----------|------|-----------|-------|
 | Y01 | `account_status` | String | 2 | **Y** | AC=Active, IN=Inactive, DO=Dormant, SU=Suspended, CL=Closed |
@@ -845,6 +897,8 @@ Complete replication of Section A (Personal Identity), Section B (Address), Sect
 ## 27. Section Z: Audit Trail & Modification Tracking
 
 **Regulatory Basis**: SEBI (Stock Brokers) Regulations 2026 - 8-year record retention
+
+Every change to a client record is logged. This is not optional -- SEBI requires a complete, tamper-proof audit trail for eight years. The maker-checker workflow (Z09-Z15) ensures that no single person can modify a client record without a second person reviewing and approving the change.
 
 ### Z1: Modification Log (per change)
 
@@ -886,6 +940,8 @@ Complete replication of Section A (Personal Identity), Section B (Address), Sect
 ## 28. Section AA: DPDP Act 2023 Consent Management
 
 **Regulatory Basis**: Digital Personal Data Protection Act 2023, DPDP Rules 2025 (compliance deadline: May 13, 2027)
+
+The DPDP (Digital Personal Data Protection) Act requires granular, informed consent before processing personal data. Each consent purpose must be separately captured and independently revocable.
 
 | # | Field Name | Data Type | Size | Mandatory | Notes |
 |---|-----------|-----------|------|-----------|-------|
@@ -945,6 +1001,8 @@ Complete replication of Section A (Personal Identity), Section B (Address), Sect
 
 ## Appendix A: Code Tables
 
+The code tables below are the lookup values used throughout the master dataset. You will reference these when building dropdowns, writing validation logic, or parsing data from external systems.
+
 ### A1: Occupation Codes (KRA/CKYC)
 
 | Code | Description |
@@ -1000,6 +1058,10 @@ Complete replication of Section A (Personal Identity), Section B (Address), Sect
 | KYC Rejected | Rejected after verification | No |
 | KYC Registered - Incomplete | Old record, needs update | Limited |
 | Not Available | No record in any KRA | N/A (fresh KYC) |
+
+:::tip[The two statuses that matter most]
+In day-to-day operations, you will mostly care about "KYC Registered" and "On Hold." The first means the customer can trade; the second means something in their KYC did not pass validation and needs manual intervention before trading can begin.
+:::
 
 ### A5: Relationship Codes (Nominees)
 

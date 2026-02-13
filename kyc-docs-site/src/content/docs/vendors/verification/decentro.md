@@ -3,6 +3,11 @@ title: Decentro
 description: PAN verification, bank account verification (penny drop), and CKYC proxy via Decentro unified REST API platform.
 ---
 
+Decentro is a unified fintech API platform that consolidates multiple identity verification, banking, and KYC (Know Your Customer) operations into a single REST (Representational State Transfer) integration. For the broking KYC system, Decentro serves as the primary aggregator for PAN (Permanent Account Number) verification, bank account validation via penny drop and reverse penny drop, CKYC (Central Know Your Customer) operations against the CERSAI (Central Registry of Securitisation Asset Reconstruction and Security Interest of India) registry, and Aadhaar-based verification.
+
+By routing through Decentro rather than integrating directly with NSDL/Protean for PAN, NPCI (National Payments Corporation of India) for bank verification, and CERSAI for CKYC, the system reduces vendor count from three to one, simplifies authentication to a single credential set per module, and provides a unified dashboard for monitoring all verification operations. This consolidation is particularly valuable during the early phase of a broking platform where engineering bandwidth is limited and time-to-market matters.
+
+This page documents the Decentro API specifications for each verification type used in the onboarding flow, including request/response formats, field mappings to the master dataset, and error handling. It also covers edge cases specific to Indian financial infrastructure -- merged bank IFSCs, joint accounts, NRI accounts, and PAN-Aadhaar linking -- that the implementation team will encounter during development and testing.
 
 ## 1. Overview
 
@@ -33,6 +38,8 @@ Decentro serves banks, NBFCs, fintechs, and brokerages across India. Publicly kn
 - CKYC: https://docs.decentro.tech/docs/kyc-and-onboarding-identities-ckyc-services
 
 ---
+
+With the overview and rationale established, the following sections detail each API that the onboarding system will call. PAN verification is the first gate in the customer journey -- it runs immediately after the user enters their PAN on Screen 1 and determines whether the application can proceed.
 
 ## 2. PAN Verification API
 
@@ -187,6 +194,8 @@ Contact Decentro for batch API documentation and rate limits.
 
 ---
 
+Once PAN verification and CKYC lookup are complete, the next critical verification step is confirming the customer's bank account. Bank account verification serves a dual purpose: it validates that the account exists and is active, and it provides an independent name source for cross-referencing against the PAN name. Decentro offers three methods for this -- penny drop, penniless, and reverse penny drop -- each with different cost, reliability, and coverage tradeoffs.
+
 ## 3. Bank Account Verification
 
 ### 3.1 Penny Drop (IMPS Rs.1 Credit) -- Primary Method
@@ -331,6 +340,10 @@ An alternative where no actual funds are transferred. Decentro validates the acc
 
 **Recommendation**: Use penny drop for all new customer onboarding. Use penniless only for periodic re-verification of existing clients where cost matters and you already have a verified account on record.
 
+:::note[Penny drop vs reverse penny drop tradeoffs]
+Penny drop (broker-initiated Rs.1 credit) has near-universal coverage because it relies on the IMPS network, which all scheduled commercial banks support. Reverse penny drop (customer-initiated UPI payment) is cheaper and higher-trust since the customer authenticates via their UPI PIN, but it only works for customers who have an active UPI setup. For a broking onboarding flow targeting a broad demographic, penny drop is the safer default with reverse penny drop offered as an optional alternative for digitally savvy users.
+:::
+
 ### 3.5 Reverse Penny Drop (Alternative)
 
 In reverse penny drop, the customer initiates a UPI payment of Rs.1 TO the broker's VPA (Virtual Payment Address). The broker's system receives the payment notification and extracts the verified account details from the UPI response.
@@ -365,6 +378,8 @@ In reverse penny drop, the customer initiates a UPI payment of Rs.1 TO the broke
 | `decentroTxnId` | `bank_verify_txn_id` | R14 | R: Third-Party Results |
 
 ---
+
+Beyond PAN and bank verification, CKYC integration is the third major Decentro capability used in this system. CKYC operations are particularly valuable because they can pre-fill most of the onboarding form from an existing registry record, reducing data entry for the customer and improving data accuracy. CKYC upload after account approval is also a regulatory obligation under the dual-upload mandate (KRA + CKYC) effective since August 2024.
 
 ## 4. CKYC Proxy APIs
 
@@ -606,6 +621,8 @@ The upload payload is complex because it mirrors the CERSAI record structure:
 
 ---
 
+The preceding sections cover the standard individual onboarding flow, which accounts for the majority of new accounts. However, the same Decentro APIs also return data for non-individual entities -- companies, HUFs (Hindu Undivided Families), partnerships, and trusts -- which require different handling logic. This section documents those variations.
+
 ## 5. Non-Individual Entity Handling
 
 ### 5.1 Corporate PAN (4th character `C` or `A`)
@@ -684,6 +701,8 @@ NRE (Non-Resident External) and NRO (Non-Resident Ordinary) accounts:
 
 ---
 
+With the API specifications and entity-specific handling covered, this section shifts to the operational aspects of integrating with Decentro: authentication, environments, rate limits, SLAs, error codes, and security configuration.
+
 ## 6. Integration Details
 
 ### 6.1 Authentication
@@ -709,6 +728,10 @@ All Decentro API calls require three headers:
 | Staging | `https://in.staging.decentro.tech` | Integration testing, sandbox data |
 | Production | `https://in.decentro.tech` | Live transactions |
 
+:::tip[Use the sandbox environment liberally during development]
+Decentro's staging environment returns deterministic test responses for known test PANs and bank accounts, making it suitable for automated integration testing and CI pipelines. No real money moves in staging -- penny drop calls are simulated. Request the full list of test fixtures (valid PAN, invalid PAN, various bank verification outcomes) from your Decentro account manager during onboarding.
+:::
+
 ### 6.3 Rate Limits
 
 | Plan | Typical TPS (Transactions Per Second) |
@@ -722,6 +745,10 @@ Rate limit headers returned in response:
 - `X-RateLimit-Limit`: Maximum requests per window
 - `X-RateLimit-Remaining`: Remaining requests in current window
 - `X-RateLimit-Reset`: Time when the rate limit resets
+
+:::danger[Rate limiting can silently block onboarding]
+If your application exceeds the contracted TPS (Transactions Per Second) limit, Decentro returns HTTP 429 for all subsequent requests until the rate window resets. During a marketing campaign or bulk migration, this can silently halt all new customer onboardings. Implement circuit-breaker logic that monitors `X-RateLimit-Remaining` and queues requests proactively rather than waiting for 429 responses. Also set up alerting when remaining capacity drops below 20% of the limit.
+:::
 
 ### 6.4 SLA
 
@@ -796,6 +823,10 @@ Retry policy:
 - Whitelist your server's static IPs (or NAT gateway IPs if behind VPC)
 - Staging environment does not require IP whitelisting
 
+:::caution[IP whitelisting is critical for production security]
+While Decentro marks IP whitelisting as optional, it should be treated as mandatory for a SEBI-regulated broking platform. Without it, a leaked API credential can be used from any IP address. Ensure your NAT gateway or load balancer IPs are static and whitelisted before go-live. If your infrastructure uses auto-scaling with dynamic IPs, route all Decentro traffic through a fixed egress proxy or NAT gateway.
+:::
+
 ---
 
 ## 7. Pricing
@@ -825,6 +856,8 @@ Retry policy:
 - **Total**: Rs. 10-19 per customer (Decentro portion only)
 
 ---
+
+Indian financial infrastructure has numerous quirks -- merged bank IFSCs, payment bank limitations, joint account name mismatches, and stale CKYC records -- that will surface during real-world onboarding. The following edge cases should be handled explicitly in the implementation.
 
 ## 8. Edge Cases
 
@@ -902,6 +935,8 @@ If a customer provides an old IFSC, the penny drop may still work (banks maintai
 
 ---
 
+While Decentro is the recommended vendor for PAN, bank, and CKYC verification, it is useful to understand how it compares to alternatives. The following table summarizes the key differences to support future vendor re-evaluation or fallback planning.
+
 ## 9. Alternatives Comparison
 
 | Feature | Decentro | Setu | Cashfree |
@@ -965,6 +1000,8 @@ If a customer provides an old IFSC, the penny drop may still work (banks maintai
 | Webhook security | Verify HMAC signature on all webhook callbacks before processing |
 
 ---
+
+This section maps the Decentro APIs documented above to the specific screens and steps in the broking onboarding flow, including how verification results feed into cross-verification logic and the backend error handling strategy.
 
 ## 11. Integration with Our System
 

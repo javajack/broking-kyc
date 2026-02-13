@@ -5,28 +5,46 @@ description: Visual architecture of the onboarding system — three SVG diagrams
 
 import Diagram from '../../../components/Diagram.astro';
 
-Visual architecture of the onboarding system — three SVG diagrams showing the complete 9-screen flow, data source mapping, and batch processing pipeline.
+This page collects all the architecture diagrams in one place. If you are the kind of engineer who thinks visually, start here. Each diagram corresponds to a major section of the documentation, and together they give you a complete picture of the KYC (Know Your Customer) onboarding system -- from the customer-facing screens to the back-office batch pipelines. You will find these same diagrams embedded in their respective sections throughout the docs, but having them all on a single page makes it easy to reference them during discussions or print them for a whiteboard session.
+
+:::tip[How to use these diagrams]
+Each diagram is designed to answer a specific question. Diagram 1 answers "what is the end-to-end flow?" Diagram 2 answers "where does each piece of data come from?" Diagram 3 answers "what happens after the customer is done?" Diagram 4 answers "what are all the possible states an application can be in?" When someone asks you a question about the system, start by pointing them to the right diagram.
+:::
 
 ## Diagram 1: Complete Onboarding Flow
 
-The full 9-screen user journey, maker-checker review, and batch agency pipelines.
+The full 9-screen user journey, maker-checker review, and batch agency pipelines. This is the "big picture" diagram -- it shows everything from the customer's first mobile OTP (One-Time Password) to the moment their account becomes active. Start here if you are new to the system.
 
 <Diagram src="/diagrams/01-onboarding-flow.svg" label="Complete Onboarding Flow (9 Screens + Maker-Checker + Batch)" />
 
+The next diagram zooms into the data layer. While Diagram 1 shows what happens at each step, Diagram 2 shows where each field comes from.
+
 ## Diagram 2: Data Source Mapping
 
-Where each field comes from — resolution priority across DigiLocker, CKYC, KRA, vendor APIs, and user input.
+Where each field comes from -- resolution priority across DigiLocker (Government of India's digital document platform), CKYC (Central KYC), KRA (KYC Registration Agency), vendor APIs, and user input. This diagram is essential for understanding the pre-fill architecture. When you need to know whether a field comes from DigiLocker, CKYC, KRA, or the customer's manual input, this is the reference.
 
 <Diagram src="/diagrams/02-data-source-mapping.svg" label="Data Source Mapping — Where Each Field Comes From" />
 
+:::note[Data source priority]
+When multiple sources return the same field (e.g., name from both DigiLocker and KRA), the system uses a defined resolution priority: DigiLocker takes precedence, followed by CKYC, then KRA, and finally user input. This priority ensures that the most authoritative, government-verified data is always used.
+:::
+
+Diagram 3 focuses on what happens after the customer finishes their journey. This is the backend processing that turns a signed application into an active trading account.
+
 ## Diagram 3: Async Batch Processing Pipeline
 
-The multi-agency batch pipeline that runs after maker-checker approval — KRA, CKYC, NSE, BSE, MCX, CDSL, NSDL pipelines in parallel.
+The multi-agency batch pipeline that runs after maker-checker approval -- KRA, CKYC, NSE, BSE, MCX, CDSL, NSDL pipelines in parallel. Each pipeline has its own submission format, processing timeline, and success/failure handling. See the [Batch Pipeline](/broking-kyc/operations/batch-pipeline/) documentation for the detailed specification of each pipeline.
 
 <Diagram src="/diagrams/03-async-batch-processing.svg" label="Async Batch Processing Pipeline" />
 
+:::caution[Pipeline timelines vary widely]
+CDSL (Central Depository Services Limited) can activate a BO (Beneficiary Owner) account in 1-2 hours via API, while NSDL (National Securities Depository Limited) takes approximately 15 days via the UDiFF batch format. NSE and BSE process UCC (Unique Client Code) registrations on the same day. KRA takes 2-3 days, and CKYC takes 4-5 days. The total time to "ACTIVE" is determined by the slowest pipeline that is required for the customer's account type.
+:::
+
+The final diagram shows the application status lifecycle -- the state machine that tracks every application from creation to completion.
+
 ## Diagram 4: Status Lifecycle
 
-The 12-state application lifecycle — from REGISTERED to ACTIVE, with retry paths from GATE_FAILED and REJECTED.
+The 12-state application lifecycle -- from REGISTERED to ACTIVE, with retry paths from GATE_FAILED and REJECTED. This diagram maps directly to the [Status Machine](/broking-kyc/operations/status-machine/) documentation, which provides the complete transition table and trigger definitions.
 
 <Diagram src="/diagrams/04-status-lifecycle.svg" label="KYC Application Status Lifecycle" />

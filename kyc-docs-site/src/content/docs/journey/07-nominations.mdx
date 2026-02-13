@@ -12,11 +12,17 @@ next:
 import ScreenCard from '../../../components/ScreenCard.astro';
 import { Aside } from '@astrojs/starlight/components';
 
+The customer has chosen their trading segments. Now the system asks a question that most customers do not expect during account opening: who should receive your holdings if something happens to you? Nomination is a regulatory requirement for all demat and trading accounts in India. SEBI (Securities and Exchange Board of India) updated the rules in January 2025 to allow up to 10 nominees (previously capped at 3), and introduced a mandatory video declaration for customers who choose to opt out of nominating anyone. This screen handles both paths -- adding nominees or opting out.
+
 <ScreenCard number={7} title="Nominations" time="~30 seconds to ~2 minutes">
 
 **Purpose:** Capture nominee details or record opt-out declaration.
 
+The customer has two choices: add one or more nominees, or explicitly opt out. There is no "skip" option -- SEBI requires every customer to make an active choice on this screen.
+
 ## Option A: Add Nominee(s)
+
+If the customer chooses to add nominees, they fill in the following fields for each nominee. Most customers add one nominee and move on in about 30 seconds.
 
 | Field | Validation | Notes |
 |-------|-----------|-------|
@@ -28,8 +34,14 @@ import { Aside } from '@astrojs/starlight/components';
 Up to 10 nominees allowed (SEBI Jan 2025 regulation). Total allocation must equal 100%.
 
 <Aside type="note">
-Nominee details can be pre-filled from KRA/CKYC records if the user has existing nominee data on file. This reduces typing for users who are migrating from another broker.
+Nominee details can be pre-filled from KRA (KYC Registration Agency) / CKYC (Central KYC) records if the user has existing nominee data on file. This reduces typing for users who are migrating from another broker.
 </Aside>
+
+:::tip[Allocation must total exactly 100%]
+If a customer adds 3 nominees with allocations of 50%, 30%, and 15%, the system should block submission and highlight the 5% gap. Build real-time validation that shows the running total as nominees are added. This is the most common user error on this screen.
+:::
+
+If the customer does not want to nominate anyone, they take the opt-out path instead.
 
 ## Option B: Opt Out of Nomination
 
@@ -38,6 +50,8 @@ The user selects "I choose to opt out of nomination." This requires an asynchron
 <Aside type="caution" title="Video Declaration Required">
 Opting out of nomination requires a video declaration per SEBI rules. This is recorded asynchronously — the user does not need to complete it during onboarding, but must do so within 30 days. See [Video KYC / VIPV vendors](/broking-kyc/journey/09-review-esign/) for vendor options.
 </Aside>
+
+The video declaration for nomination opt-out is a relatively new SEBI requirement. It is designed to ensure that customers are making an informed, deliberate choice rather than simply skipping a screen they do not understand.
 
 ## Timing
 
@@ -49,9 +63,15 @@ Opting out of nomination requires a video declaration per SEBI rules. This is re
 
 ## Regulatory Context
 
+These are the current rules governing nominations. They have changed significantly in recent years, so it is important to stay current.
+
 - **SEBI Jan 2025:** Maximum nominees increased from 3 to 10
 - **Allocation:** Must total exactly 100% across all nominees
 - **Minor nominees:** Guardian details required if nominee is a minor
 - **Opt-out video:** Must be completed within 30 days of account opening; trading can proceed in the interim
+
+:::caution[Do not block account activation on opt-out video]
+The video declaration for nomination opt-out is deferred -- the customer can start trading before completing it. However, if the video is not recorded within 30 days, the account should be flagged for follow-up. Build a reminder workflow (SMS + email at day 7, 14, 21, 28) to ensure compliance.
+:::
 
 </ScreenCard>

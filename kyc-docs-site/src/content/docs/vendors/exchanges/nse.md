@@ -3,6 +3,8 @@ title: NSE UCC
 description: NSE Unique Client Code (UCC) registration — UCI Online portal, REST API, and batch file integration.
 ---
 
+The National Stock Exchange of India (NSE) is where the vast majority of equity and derivatives trading in India happens. If you are building a KYC onboarding system for a stock broking firm, NSE's Unique Client Code (UCC) registration is one of the first integrations you will implement -- because without a UCC, your client simply cannot place an order. Think of registering a UCC as getting a passport for your client: no exchange will let them trade without it. This page walks you through everything you need to know about NSE's UCC system, from the web portal and REST API to batch file formats, PAN (Permanent Account Number) verification, segment activation, and error handling.
+
 :::tip[Quick Reference]
 
 | Attribute | Value |
@@ -46,15 +48,21 @@ description: NSE Unique Client Code (UCC) registration — UCI Online portal, RE
 
 ---
 
+Let us begin with the big picture: what NSE is, why it matters, and the regulatory framework that governs UCC registration. Understanding this foundation will make every subsequent section click into place.
+
 ## 1. Overview
 
 ### 1.1 NSE in the Indian Capital Markets
 
-The National Stock Exchange of India (NSE), established in 1992 and operational since 1994, is India's largest stock exchange by turnover. NSE introduced electronic, screen-based trading to India and operates across multiple market segments. NSE is the mandatory exchange for UCC (Unique Client Code) registration as part of the SEBI-mandated KYC framework.
+The National Stock Exchange of India (NSE), established in 1992 and operational since 1994, is India's largest stock exchange by turnover. NSE introduced electronic, screen-based trading to India and operates across multiple market segments. NSE is the mandatory exchange for UCC (Unique Client Code) registration as part of the SEBI (Securities and Exchange Board of India)-mandated KYC (Know Your Customer) framework.
 
 ### 1.2 NSE's Role in KYC/UCC
 
-Every trading member (broker) registered with NSE must register each client with a Unique Client Code (UCC) before the client can place any order. The UCC record captures identity, financial profile, bank, and demat details and must remain synchronized with the client's KRA and CKYC records. NSE enforces 6 mandatory KYC attributes (Name, PAN, Address, Mobile, Email, Income Range) that must be compliant before a client is marked "Permitted to Trade" (PTT).
+Every trading member (broker) registered with NSE must register each client with a Unique Client Code (UCC) before the client can place any order. The UCC record captures identity, financial profile, bank, and demat details and must remain synchronized with the client's KRA (KYC Registration Agency) and CKYC (Central KYC) records. NSE enforces 6 mandatory KYC attributes (Name, PAN, Address, Mobile, Email, Income Range) that must be compliant before a client is marked "Permitted to Trade" (PTT).
+
+:::note[Why UCC Matters]
+A UCC is not just a registration formality. It is the single identifier that ties your client's identity to every order, trade, settlement, and margin obligation on NSE. If the UCC is non-compliant, the trading system will reject orders in real time.
+:::
 
 ### 1.3 Regulatory Foundation
 
@@ -67,7 +75,11 @@ Every trading member (broker) registered with NSE must register each client with
 | NSE UCC API Introduction | NSE/ISC/60418 (Jan 25, 2024) |
 | UCC-Demat Mapping | SEBI/HO/MIRSD/DOP/CIR/P/2019/136 |
 
+Now that you understand the regulatory landscape, let us look at the trading infrastructure itself -- the systems that actually execute trades once a UCC is in place.
+
 ---
+
+Before a client can trade, their UCC must be registered. But it helps to understand what they are trading on. The next section covers NSE's trading systems, so you know the environment your UCC integrations feed into.
 
 ## 2. Trading System (NEAT/NOW)
 
@@ -89,6 +101,8 @@ NOW is the browser-based version of the NEAT terminal. It provides trading acces
 | Co-location | Direct rack in NSE data center | Algo/HFT trading | Microseconds |
 | NOW (Web) | HTTPS | Manual trading, small brokers | Higher |
 
+In plain English: larger brokers use leased lines or co-location for speed, while smaller brokers can get started with NOW's browser-based access. The choice of connectivity does not affect UCC registration -- it only affects how orders reach the exchange.
+
 ### 2.4 Trading API (CTCL/NOTIS)
 
 For order routing, NSE provides:
@@ -101,7 +115,11 @@ For order routing, NSE provides:
 
 **Note**: UCC registration is a **prerequisite** for order placement on any of these systems. The UCC is validated at every order entry point.
 
+With the trading infrastructure understood, let us turn to the portal where all UCC operations actually happen -- UCI Online.
+
 ---
+
+UCI Online is the primary web interface for managing your clients' UCC records. Whether you plan to use the API, batch uploads, or manual entry, you will interact with this portal. The next section covers what it offers and how to access it.
 
 ## 3. UCI Online Portal
 
@@ -146,7 +164,11 @@ Access to UCI Online requires:
 2. IP whitelisting (production)
 3. Two-factor authentication (OTP to registered mobile)
 
+Now that you know where UCC operations happen, the next question is: which method should you use to register UCCs? NSE offers three distinct approaches, each suited to different scales of operation.
+
 ---
+
+Choosing the right registration method is one of the first architectural decisions you will make. The trade-off is between automation, speed, and volume. This section helps you decide.
 
 ## 4. UCC Registration Methods
 
@@ -171,7 +193,15 @@ NSE provides three methods for UCC registration, each suited to different operat
 | Segment activation for existing clients | Batch Upload |
 | Corrections / resubmissions | UCI Online or API |
 
+:::tip[Practical Guidance]
+For a digital-first broking firm, the REST API is your primary path. Use the manual portal for debugging and one-off registrations during development, and the batch upload for bulk migrations or end-of-day reconciliation runs.
+:::
+
+With the decision framework in place, let us dive into the API itself -- the integration that most modern broking firms will build as their primary UCC channel.
+
 ---
+
+The REST API is NSE's most significant modernization for UCC operations, introduced in January 2024. If you are building a digital onboarding flow, this is your primary integration. The following section covers authentication, endpoints, payloads, error handling, and the UAT certification process.
 
 ## 5. API Integration (REST API)
 
@@ -207,6 +237,8 @@ NSE introduced the REST API for UCC registration via circular **NSE/ISC/60418** 
 2. Use token in subsequent requests:
    Authorization: Bearer eyJ...
 ```
+
+In plain English: you first exchange your credentials for a time-limited token, then attach that token to every subsequent API call. The token expires after one hour, so your code needs to handle renewal.
 
 ### 5.4 API Endpoints
 
@@ -331,6 +363,10 @@ X-Member-Code: ABCDEF
 }
 ```
 
+:::note[PTT is Not Immediate]
+Notice that `ptt_status` comes back as `PENDING` even when the registration succeeds. UCC registration is real-time, but PTT (Permitted to Trade) is granted in an overnight batch. The client can trade starting the next trading day, not immediately.
+:::
+
 ### 5.7 Modify UCC - Request Payload
 
 ```json
@@ -415,6 +451,10 @@ X-Member-Code: ABCDEF
 - Error handling (duplicate UCC, invalid PAN, missing fields)
 - Nominee addition (up to 10 nominees)
 
+:::caution[UAT Certification is Mandatory]
+You cannot skip UAT. NSE will not issue production credentials until your integration passes all required test cases. Plan for 2-6 weeks from API access request to production go-live.
+:::
+
 ### 5.11 Rate Limits
 
 | Tier | Rate Limit | Burst |
@@ -422,7 +462,11 @@ X-Member-Code: ABCDEF
 | Standard | 60 requests/minute | 10 requests/second |
 | High Volume (upon approval) | 300 requests/minute | 50 requests/second |
 
+The API is the recommended path for real-time onboarding. But many operational scenarios -- bulk migrations, end-of-day reconciliation, segment activation for large client bases -- are better handled through batch files. Let us look at that format next.
+
 ---
+
+Batch files are the workhorse of bulk UCC operations. Even if your primary integration is the REST API, you will likely use batch uploads for migrations, corrections, and segment activations. Understanding the file format is essential.
 
 ## 6. Batch File Format
 
@@ -444,6 +488,8 @@ X-Member-Code: ABCDEF
 **Row 1**: General client information -- applicable to ALL client types (individuals and non-individuals). Contains fields 1 through 183 as per the revised 183-field structure (effective May 2025, harmonized with BSE SaveUCC_V2).
 
 **Row 2**: Director/partner details -- applicable ONLY to non-individual entities (Corporate, Body Corporate, Partnership). If the client is an individual, Row 2 is omitted or left as an empty row.
+
+In plain English: for a typical individual retail client, you submit one pipe-delimited row with 183 fields. For a company, you submit that same row plus one additional row per director.
 
 ### 6.3 Sample Batch File (Individual Client)
 
@@ -491,7 +537,11 @@ NEW|COR0001234|ANITA MEHTA|87654321|N|KLMNO6789L
 | Segment Activation | Activate/deactivate segments | 10,000 | Client code + segment flags |
 | Nominee Update | Update nominee details | 10,000 | Client code + nominee fields |
 
+The batch format is built on a 183-field structure. The next section documents the most critical fields you need to understand for implementation.
+
 ---
+
+With 183 fields in the UCC record, it is easy to feel overwhelmed. The following section focuses on the fields that matter most for implementation -- the ones that cause the most rejections, require the most validation, and have the trickiest rules.
 
 ## 7. Key Field Specifications
 
@@ -542,6 +592,10 @@ The following table documents the key fields in the 183-field pipe-delimited str
 | 39 | POA/DDPI for Securities | A | 1 | O | Y / N |
 | 40 | Running Account Auth | A | 1 | O | M = Monthly, Q = Quarterly |
 | 41 | Nomination Opt-out | A | 1 | M | Y = Opted out (video verification required), N = Nominees provided |
+
+:::caution[Address Line 1 Trap]
+One of the most common batch rejection reasons is Address Line 1 starting with the client's name. For example, if the client is "RAKESH KUMAR" and the address is "RAKESH KUMAR, 123 MG Road" -- this will be rejected. Always strip the client name from the beginning of address fields.
+:::
 
 ### 7.2 Nominee Fields (Fields 42-101, accommodating 10 nominees)
 
@@ -637,7 +691,11 @@ Each nominee occupies 6 fields. With up to 10 nominees (SEBI mandate effective J
 | KL | Kerala | LA | Ladakh |
 | MP | Madhya Pradesh | DN | Dadra & Nagar Haveli |
 
+With the field specifications covered, the next critical piece is PAN verification -- the single most important validation that determines whether your client can trade.
+
 ---
+
+PAN verification is the gatekeeper for trading eligibility. If a client's PAN does not pass the 3-parameter check, they are stuck in NPTT (Not Permitted to Trade) status. This section explains how verification works and what to do when it fails.
 
 ## 8. PAN Verification (3-Parameter)
 
@@ -650,8 +708,10 @@ NSE mandates 3-parameter PAN verification against NSDL/Protean (Income Tax Depar
 | # | Parameter | Field | Source | Mandatory |
 |---|-----------|-------|--------|-----------|
 | 1 | PAN Number | 10-character alphanumeric (AAAAA9999A) | Client input | Yes |
-| 2 | Client Name | Name as per PAN/ITD records | Client input (must match ITD) | Yes |
+| 2 | Client Name | Name as per PAN/ITD (Income Tax Department) records | Client input (must match ITD) | Yes |
 | 3 | DOB / DOI / DOR | Date of Birth (individuals) / Date of Incorporation (companies) / Date of Registration | Client input (must match ITD) | Yes -- for all holders including Guardian |
+
+BSE's 3-parameter check works identically: PAN plus Name plus DOB must all match -- like a bouncer checking your ID against the guest list, where all three must match or you are turned away.
 
 ### 8.3 Verification Result Codes
 
@@ -682,7 +742,15 @@ NSE mandates 3-parameter PAN verification against NSDL/Protean (Income Tax Depar
 7. PAN re-verification automatically triggered
 ```
 
+:::tip[Common PAN Mismatch Scenario]
+The most frequent PAN failure is a name mismatch. For example, the client's PAN card says "RAKESH KUMAR" but ITD records have "RAKESH KUMAR SHARMA." The client must update their records at the Income Tax Department before you can proceed -- there is no workaround on the broker side.
+:::
+
+Once the PAN is verified and the UCC is registered, NSE validates the UCC at every single order entry. The next section shows exactly what that validation looks like.
+
 ---
+
+Understanding order-level validation helps you debug production issues. When a client calls saying "my order was rejected," the validation chain below tells you exactly where to look.
 
 ## 9. UCC/PAN Validation at Order Entry
 
@@ -731,6 +799,8 @@ Order Received
   |     Yes --> ORDER ACCEPTED
 ```
 
+In plain English: the exchange runs six sequential checks on every order. If any check fails, the order is rejected with a specific reason. This is why getting UCC registration right is so critical -- a single non-compliant attribute blocks all trading.
+
 ### 9.4 Contingency Mode Exception
 
 During **contingency time** (system disruption, disaster recovery, or exchange-declared contingency periods), UCC validation may be temporarily relaxed. Specifically:
@@ -742,7 +812,11 @@ During **contingency time** (system disruption, disaster recovery, or exchange-d
 
 **Important**: This exception is rare and applies only during exchange-declared contingency events. Normal operations always enforce full validation.
 
+Now let us look at segment activation -- the mechanism that controls which market segments a client can trade in.
+
 ---
+
+Not every client should trade every segment. Segment activation controls access to specific markets (equities, derivatives, commodities, etc.) and has eligibility requirements, especially for F&O (Futures and Options). This section covers the rules.
 
 ## 10. Segment Activation
 
@@ -794,7 +868,11 @@ ABCDEF|CLI0005678|Y|Y|Y|Y|N|N
 
 Max records per segment activation file: **10,000**
 
+Segment activation relies on the 6 KYC attributes being in order. The next section explains what those attributes are and why keeping them consistent across systems is so important.
+
 ---
+
+The 6 KYC attributes are the backbone of client compliance. They must match across the KRA, the exchange, and the depository. A mismatch in any one of them can block trading. This section explains the rules and the consistency requirements.
 
 ## 11. 6 KYC Attributes
 
@@ -828,6 +906,10 @@ Income Range<=======>   Income (Field 20)  <=======>  N/A (not in demat)
 
 Any discrepancy between these three systems triggers compliance alerts and may result in NPTT status.
 
+:::caution[Cross-System Sync is Non-Negotiable]
+When a client updates their address on the exchange, that same update must propagate to the KRA and the depository. Your KYC system should treat these three updates as a single atomic operation -- update one, update all.
+:::
+
 ### 11.4 Distinct Mobile & Email (SEBI Dec 2024)
 
 Per SEBI circular (Dec 2024):
@@ -836,11 +918,15 @@ Per SEBI circular (Dec 2024):
 - **Family exception**: Spouse, dependent children, and dependent parents may share mobile/email
 - NSE enforces this during UCC registration; duplicate mobile/email across unrelated clients will be rejected
 
+The next few sections cover the code tables that feed into UCC records: client categories, occupations, and income ranges. These are SEBI-standardized and identical across all exchanges.
+
 ---
+
+Client category codes classify the type of entity being onboarded. Getting this right is important because it determines which additional fields are mandatory and what trading privileges apply.
 
 ## 12. Client Category Codes
 
-Client category codes are standardized by SEBI and are identical across NSE, BSE, and MCX.
+Client category codes are standardized by SEBI and are identical across NSE, BSE (BSE Limited, formerly Bombay Stock Exchange), and MCX (Multi Commodity Exchange).
 
 | Code | Category | Entity Type | Notes |
 |------|----------|-------------|-------|
@@ -883,6 +969,8 @@ Client category codes are standardized by SEBI and are identical across NSE, BSE
 
 **UPI Applicability**: Only client categories **01** (Individual) and **03** (HUF), Cash segment (CM) only.
 
+In plain English: for a typical retail broking firm, the overwhelming majority of your clients will be category 01 (Individual). Categories 02 (Minor), 03 (HUF), and 04 (Company) are the next most common. The NRI and institutional categories are lower volume but carry additional compliance requirements.
+
 ---
 
 ## 13. Occupation Codes
@@ -901,6 +989,8 @@ Occupation codes are standardized by SEBI and identical across all exchanges.
 | 08 | Others | Any not covered above |
 
 ---
+
+Income range codes directly affect segment eligibility -- particularly for F&O trading, where SEBI requires a minimum income threshold. Understanding these codes is essential for building your segment activation logic.
 
 ## 14. Income Range Codes
 
@@ -921,7 +1011,11 @@ Income range codes are standardized by SEBI and identical across all exchanges.
 - Income range must be updated periodically; stale declarations may trigger compliance review
 - This is one of the 6 mandatory KYC attributes
 
+Now let us cover the status codes that govern a client's lifecycle on NSE -- from registration to PTT to closure.
+
 ---
+
+Status codes determine whether a client can trade, and understanding the transitions between them is critical for building correct state management in your system. Pay particular attention to the irreversibility of the Closed status.
 
 ## 15. Status Codes & Responses
 
@@ -933,7 +1027,9 @@ Income range codes are standardized by SEBI and identical across all exchanges.
 | Inactive | I | Member-deactivated or non-compliant | No | Yes (can reactivate) |
 | Closed | C | Account permanently closed by member | No | **No (irreversible)** |
 
-**Critical**: Closed status is **irreversible**. Once a UCC is marked Closed, it cannot be reopened. A new UCC must be registered if the client wishes to resume trading. This is different from Inactive status, which can be reversed.
+:::caution[Closed is Forever]
+Once a UCC is marked Closed, it cannot be reopened. A new UCC must be registered if the client wishes to resume trading. This is different from Inactive status, which can be reversed. Implement a confirmation step and a cooling-off period in your system before allowing closure.
+:::
 
 ### 15.2 PAN Verification Status
 
@@ -975,7 +1071,11 @@ NPTT = TRUE when ANY of the above is not met
 
 **Demat Auto-Delinking**: When a UCC status changes from Active to Inactive or Closed, the demat account mapping is automatically delinked from trading. Relinking requires re-verification when reactivating (Inactive case only).
 
+With status codes covered, let us look at the additional requirements for non-individual entities -- companies, trusts, partnerships, and NRIs.
+
 ---
+
+Most of your clients will be individuals, but you must also handle non-individual entities. These require additional mandatory fields, documents, and in some cases entirely different onboarding workflows. This section covers what changes for each entity type.
 
 ## 16. Non-Individual Entity Requirements
 
@@ -1039,7 +1139,11 @@ NEW|COR0001234|ANITA MEHTA|87654321|N|KLMNO6789L
 
 **Director Changes**: Existing directors can be removed by submitting Row 2 with Action = `DEL`.
 
+Once a client is onboarded, their data will inevitably change -- addresses, bank accounts, phone numbers. The next section covers how modifications and closures are handled.
+
 ---
+
+Client data changes are a fact of life. Whether it is an address update or an account closure, the modification process has specific rules, timelines, and gotchas you should know about.
 
 ## 17. Modification & Closure Process
 
@@ -1103,7 +1207,11 @@ Via UCI Online (Manual):
 10. Closed UCC code CANNOT be reused for another client
 ```
 
+Every UCC must be linked to at least one demat account. The next section covers how that mapping works and why PAN consistency between the trading and demat accounts is critical.
+
 ---
+
+The UCC-Demat mapping connects a client's trading identity (UCC) to their securities holding identity (BO account at CDSL or NSDL). Without this link, the settlement system cannot deliver or receive securities on behalf of the client.
 
 ## 18. UCC-Demat Mapping
 
@@ -1118,7 +1226,7 @@ Per **SEBI/HO/MIRSD/DOP/CIR/P/2019/136**, every UCC must be mapped to at least o
 | Minimum mapping | Each UCC must have at least 1 demat account mapped |
 | Multiple demat | A UCC can be mapped to multiple demat accounts (across CDSL and NSDL) |
 | PAN consistency | PAN on UCC must match PAN on demat account |
-| Name consistency | Name on UCC must match BO name on demat account |
+| Name consistency | Name on UCC must match BO (Beneficiary Owner) name on demat account |
 | One-to-many | One UCC can map to multiple demat accounts |
 | Many-to-one | Multiple UCCs (at different brokers) can map to the same demat account |
 
@@ -1126,8 +1234,10 @@ Per **SEBI/HO/MIRSD/DOP/CIR/P/2019/136**, every UCC must be mapped to at least o
 
 | Depository | Format | Example | Structure |
 |------------|--------|---------|-----------|
-| NSDL | IN + 6-digit DP ID + 8-digit Client ID | IN30154912345678 | 16 characters starting with "IN" |
-| CDSL | 8-digit DP ID + 8-digit Client ID | 1234567812345678 | 16 digits (no "IN" prefix) |
+| NSDL (National Securities Depository Limited) | IN + 6-digit DP ID + 8-digit Client ID | IN30154912345678 | 16 characters starting with "IN" |
+| CDSL (Central Depository Services Limited) | 8-digit DP ID + 8-digit Client ID | 1234567812345678 | 16 digits (no "IN" prefix) |
+
+In plain English: think of NSDL and CDSL as two competing banks -- both hold your securities safely, but they use different account number formats and different software systems. Your code must handle both.
 
 ### 18.4 Auto-Delinking Behavior
 
@@ -1154,7 +1264,11 @@ Authorization: Bearer <access_token>
 }
 ```
 
+With UCC-Demat mapping covered, let us look at how the clearing corporation fits into the picture -- because every trade generates settlement obligations that are tracked at the UCC level.
+
 ---
+
+NSE Clearing Limited handles the settlement of every trade on NSE. Understanding this relationship helps you grasp why UCC compliance has financial consequences that go beyond just order rejection.
 
 ## 19. NSE Clearing (NCL) Relationship
 
@@ -1193,7 +1307,11 @@ NCL (formerly NSCCL - National Securities Clearing Corporation Limited) is the c
 | Debt (D) | T+1 | |
 | SLBM | As per lending/borrowing contract | |
 
+When things go wrong -- and they will -- you need to understand error codes and common rejection reasons. The next section is your debugging reference.
+
 ---
+
+Error handling is where your integration will be tested most. The following section catalogues every common error code, rejection reason, and validation rule, along with resolutions. Keep this section bookmarked -- you will refer to it often during development and production support.
 
 ## 20. Error Handling & Common Rejection Reasons
 
@@ -1246,6 +1364,10 @@ NCL (formerly NSCCL - National Securities Clearing Corporation Limited) is the c
    - Do NOT include already-accepted records (causes duplicate error)
 ```
 
+:::tip[Rejection Report Best Practice]
+Build an automated parser for the rejection report. It should map each rejection to the original record in your database, flag the specific field that failed, and queue the record for correction. Manual handling of batch rejections does not scale beyond a few hundred clients.
+:::
+
 ### 20.3 Common Validation Rules
 
 | # | Rule | Applies To |
@@ -1266,7 +1388,11 @@ NCL (formerly NSCCL - National Securities Clearing Corporation Limited) is the c
 | 14 | Client Category: valid code from 01-46 table | Field 9 |
 | 15 | Gender: M, F, or T only (mandatory for individuals) | Field 8 |
 
+With error handling covered, let us look at the timelines and SLAs you need to design your system around.
+
 ---
+
+Understanding SLAs helps you set the right expectations with your product and operations teams. The key question is always: "When can the client start trading after we submit their UCC?" This section answers that definitively.
 
 ## 21. Timeline & SLA
 
@@ -1309,7 +1435,15 @@ NCL (formerly NSCCL - National Securities Clearing Corporation Limited) is the c
 | Batch processing cutoff | ~22:00 | Files submitted after this processed next day |
 | Emergency PTT cutoff | 14:30 | For same-day PTT processing |
 
+:::note[The 10 PM Rule]
+The most important SLA to remember: if a compliant UCC is submitted before 10 PM (22:00 hrs), the client gets PTT status the next trading day. Miss that window, and it is pushed by another day. Design your batch processes around this cutoff.
+:::
+
+The regulatory landscape evolves constantly. The next section lists the key circulars from 2024 through 2026 that shaped the current UCC system.
+
 ---
+
+Staying current with circulars is essential. Each one can change field formats, add new mandatory fields, or alter eligibility criteria. The following timeline gives you the regulatory context for the system as it stands today.
 
 ## 22. Recent Circulars (2024-2025-2026)
 
@@ -1329,7 +1463,11 @@ NCL (formerly NSCCL - National Securities Clearing Corporation Limited) is the c
 | Dec 2025 | SEBI | NRI KYC relaxation for re-KYC process | Eases periodic KYC renewal for NRIs |
 | Jan 7, 2026 | SEBI | Stock Brokers Regulations 2026 notified | Replaces 1992 regulations entirely; new compliance framework |
 
+Finally, let us cover the edge cases and future considerations that will affect your system as it matures.
+
 ---
+
+Edge cases are where production systems break. The following section catalogues the unusual scenarios that your system must handle gracefully, along with upcoming regulatory changes to plan for.
 
 ## 23. Edge Cases & Future Considerations
 
@@ -1374,6 +1512,8 @@ SEBI has been progressively simplifying NRI requirements:
 - Expected: further simplification of PIS requirement and documentation for NRI onboarding
 
 ---
+
+The final section consolidates all the reference documents, contacts, and related internal documentation you will need during implementation.
 
 ## 24. Key Reference Documents & Contacts
 

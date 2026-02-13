@@ -3,6 +3,11 @@ title: TrackWizz
 description: AML/PEP/sanctions screening and ongoing monitoring via TrackWizz for regulatory compliance.
 ---
 
+TrackWizz is a specialized AML (Anti-Money Laundering), PEP (Politically Exposed Person), and sanctions screening platform built for Indian capital markets participants. Under SEBI's KYC norms and the PMLA (Prevention of Money Laundering Act, 2002), every stock broker must screen prospective clients against sanctions lists, PEP databases, and adverse media sources before activating a trading account — and must continue doing so on an ongoing basis throughout the client relationship.
+
+AML screening is not a one-time check. SEBI requires ongoing monitoring with periodic rescreening at intervals determined by the client's risk classification. TrackWizz provides access to over 120 global and Indian watchlists, including sanctions lists from the UN, OFAC (Office of Foreign Assets Control), the EU, and India's UAPA (Unlawful Activities Prevention Act), as well as PEP databases covering both domestic and international politically exposed persons, and adverse media monitoring powered by a Refinitiv World-Check partnership. A positive hit does not automatically block account opening — it triggers Enhanced Due Diligence (EDD) by the compliance team, who must investigate and document their findings before a decision is made.
+
+This page covers TrackWizz's API specifications for screening operations, the breadth of its database coverage, the hit resolution and alert management workflows, risk scoring methodology, PMLA compliance tooling, and how the screening gate integrates into the maker-checker admin pipeline of our onboarding system.
 
 ## Table of Contents
 
@@ -136,6 +141,8 @@ Coverage includes: fraud, corruption, bribery, money laundering, terrorist finan
 | IRDA/NHB/NCLT | Periodic (weekly-monthly) |
 
 ---
+
+The watchlist and PEP database coverage described above forms the foundation of every screening call. The following section details the API contracts for invoking that screening — both for individual customers during real-time onboarding and for batch operations during periodic rescreening cycles.
 
 ## 3. Screening API
 
@@ -304,6 +311,10 @@ Each potential match is assigned a score from 0 to 100:
 | 50-69 | **Partial match** | Likely false positive, review recommended | Configurable |
 | 0-49 | **Low match** | Auto-dismiss (threshold configurable) | Yes (default) |
 
+:::tip
+To reduce false positive noise, always submit DOB, PAN, and father's name alongside the customer name. This additional context can reduce false positives by approximately 80%. Setting the auto-dismiss threshold to 50 is a reasonable starting point — matches below this score are overwhelmingly false positives for common Indian names. The threshold is configurable and should be tuned after reviewing initial screening results during UAT.
+:::
+
 **Score Calculation Factors**:
 - Name similarity (weighted highest)
 - Date of birth match/proximity
@@ -376,6 +387,8 @@ Each potential match is assigned a score from 0 to 100:
 
 ---
 
+Screening results are only as useful as the compliance framework that governs how they are acted upon. The next section maps TrackWizz's capabilities to the specific requirements of the PMLA and its associated rules, covering Customer Due Diligence, Enhanced Due Diligence triggers, STR/CTR filing obligations, and record retention.
+
 ## 4. PMLA Compliance
 
 TrackWizz provides tooling aligned with the Prevention of Money Laundering Act, 2002 (PMLA) and the Prevention of Money Laundering (Maintenance of Records) Rules, 2005.
@@ -407,6 +420,10 @@ EDD is triggered when any of the following conditions are met:
 | **High-value transactions** | As per broker's internal policy thresholds | Additional verification, senior management review |
 | **Complex ownership structure** | Multiple UBO layers identified | Trace full ownership chain, verify all UBOs |
 
+:::danger
+PEP matches and sanctions hits must be escalated to the designated compliance officer or Principal Officer. These cannot be auto-cleared by the system or dismissed at L1 analyst level, regardless of the match score. SEBI's AML framework and PMLA mandate that senior management approval is obtained before onboarding any PEP, and sanctions matches must be treated as potential account-blocking events until fully investigated and documented.
+:::
+
 **FATF High-Risk Jurisdictions** (as of Feb 2026):
 
 | Category | Countries | Impact |
@@ -415,6 +432,10 @@ EDD is triggered when any of the following conditions are met:
 | **Grey List** (Increased Monitoring) | Updated per FATF plenary | EDD mandatory, enhanced scrutiny |
 
 ### 4.3 STR (Suspicious Transaction Report)
+
+:::note
+Under PMLA Section 12, stock brokers are classified as "reporting entities" and are legally obligated to file Suspicious Transaction Reports (STRs) with FIU-IND. Failure to file an STR when there are grounds for suspicion — or tipping off the customer about the filing — is a criminal offense that can result in prosecution by the Enforcement Directorate. TrackWizz provides pre-formatted STR templates but the decision to file remains with the designated Principal Officer.
+:::
 
 Filed with FIU-IND (Financial Intelligence Unit - India) when suspicious activity is identified.
 
@@ -461,6 +482,12 @@ Filed with FIU-IND (Financial Intelligence Unit - India) when suspicious activit
 **Note**: SEBI Stock Brokers Regulations 2026 require 8-year retention for KYC records overall, which supersedes the 5-year PMLA minimum for brokers.
 
 ---
+
+PMLA compliance obligations do not end at onboarding. One of the most important aspects of a broker's AML program is ongoing monitoring — ensuring that existing clients are continuously rescreened as watchlists are updated and that any changes in a client's risk profile are detected promptly.
+
+:::caution
+AML screening at onboarding is necessary but not sufficient. SEBI requires ongoing monitoring of all clients throughout the business relationship, with rescreening frequency determined by risk classification. Failure to maintain an ongoing monitoring program is a compliance violation that can result in penalties from both SEBI and FIU-IND, even if the initial onboarding screening was properly conducted.
+:::
 
 ## 5. Ongoing Monitoring
 
@@ -586,6 +613,8 @@ Risk Score
 ```
 
 ---
+
+Risk scoring applies to individuals, but brokers also onboard non-individual entities — companies, partnerships, HUFs, trusts, and other structures. Entity screening adds complexity because the broker must screen not just the entity itself but also its directors, partners, beneficial owners, and authorized signatories.
 
 ## 7. Non-Individual Entity Screening
 
@@ -727,6 +756,8 @@ The designated Principal Officer (PO) is the single point of contact with FIU-IN
 | **PMLA (ED)** | Provisional attachment | Attachment of property involved in money laundering |
 
 ---
+
+With the regulatory framework established, the following section covers the practical details of integrating with TrackWizz's API — authentication, environments, rate limits, SLAs, webhook configuration, and error handling.
 
 ## 9. Integration Details
 
@@ -875,6 +906,8 @@ Verify by computing `HMAC-SHA256(webhook_secret, request_body)` and comparing wi
 
 ---
 
+Beyond the screening API itself, TrackWizz provides a reporting layer that supports regulatory filings, management oversight, and audit readiness. The following section details the available reports and the management dashboard.
+
 ## 10. Reporting
 
 ### 10.1 STR Filing Assistance
@@ -978,6 +1011,8 @@ The audit trail is immutable and retained for the configured retention period (m
 | Large broker | 50,000 | 5,00,000 annual | Rs. 5,00,000+ (custom) |
 
 ---
+
+Real-world AML screening inevitably encounters edge cases — common names generating excessive false positives, customers whose status changes after onboarding, transliteration ambiguities, and more. The following section documents these scenarios and the recommended handling approach.
 
 ## 12. Edge Cases
 
@@ -1115,6 +1150,8 @@ TrackWizz handles this with phonetic matching algorithms (Soundex, Metaphone, an
 - Proxy/VPN usage during onboarding
 
 ---
+
+Finally, this section ties everything together by describing how TrackWizz fits into our specific onboarding flow, where the screening gate sits in the pipeline, how screening results map to the master dataset fields, and how ongoing rescreening is scheduled.
 
 ## 14. Integration with Our System
 

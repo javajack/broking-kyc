@@ -3,6 +3,11 @@ title: HyperVerge
 description: OCR document extraction, face match, video-in-person verification (VIPV), and liveness detection for KYC onboarding.
 ---
 
+HyperVerge is an AI-powered identity verification platform specializing in document OCR (Optical Character Recognition), face matching, liveness detection, and Video In-Person Verification (VIPV). For the broking KYC system, HyperVerge handles the critical visual verification layer -- extracting data from identity documents, matching the applicant's live face against document photos, and conducting SEBI-compliant video KYC sessions. Founded in India and serving major banks, fintechs, and stock brokers, HyperVerge offers both REST APIs and native SDKs across Android, iOS, and Web.
+
+SEBI's KYC norms require In-Person Verification (IPV) for all new demat and trading accounts. HyperVerge's liveness-certified face match satisfies the IPV requirement digitally, eliminating the need for physical branch visits. Their iBeta Level 2 certified liveness detection -- tested against printed photos, digital screens, video replays, 3D masks, and deepfakes -- prevents spoofing attempts and provides a defensible audit trail for regulatory inspections. For the estimated 15-20% of applicants who do not complete DigiLocker-based Aadhaar eKYC, HyperVerge's VIPV module provides a fully compliant fallback path with tamper-proof recording and geo-tagged activity logs.
+
+This page covers HyperVerge's API specifications for OCR, face match, liveness detection, and VIPV workflows, including SDK integration for mobile and web, response field mappings, confidence score thresholds, and quality handling strategies. The integration details at the end describe how HyperVerge fits into our broader KYC pipeline alongside DigiLocker, Decentro, and the KYC Admin back-office.
 
 ## Table of Contents
 
@@ -165,7 +170,13 @@ The face match API works in conjunction with liveness detection (Section 3) to d
 | `result.details.face_detected_ref` | `face_match_ref_detected` (R42) | R: Third-Party Results |
 | `result.details.face_detected_selfie` | `face_match_selfie_detected` (R43) | R: Third-Party Results |
 
+:::danger[Face match failures are blocking]
+A face match score below 60% after three selfie re-capture attempts blocks the onboarding flow entirely. The applicant must be routed to VIPV (Section 4) or flagged for manual intervention in KYC Admin. Never silently proceed with a failed face match -- SEBI treats IPV as a hard gate for account activation.
+:::
+
 ---
+
+While face match confirms that the person in the selfie matches the document photo, it does not by itself prove that a live human is present. A printed photograph or a video replay of someone's face could pass a naive face comparison. Liveness detection closes this gap by verifying the physical presence of a real person at the time of capture.
 
 ## 3. Liveness Detection
 
@@ -264,7 +275,17 @@ Body: { "image": <selfie_file> }
 - Level 2 = defends against sophisticated presentation attacks (not just printed photos)
 - Attacks tested: print (laser/inkjet), digital display (phone/tablet/monitor), 3D mask, video replay
 
+:::note[What iBeta Level 2 certification means]
+iBeta Quality Assurance is an independent, NIST/NVLAP-accredited laboratory that tests biometric systems against the ISO 30107-3 standard for Presentation Attack Detection (PAD). Level 1 covers basic attacks (printed photos, simple screen replays), while Level 2 extends to sophisticated attacks including 3D silicone masks, latex overlays, and high-resolution video replays. HyperVerge's Level 2 certification means their liveness engine has been independently validated against these advanced spoofing vectors -- a meaningful differentiator over competitors with only Level 1 or no independent certification.
+:::
+
+:::tip[Recommended liveness thresholds]
+For production use, configure the passive liveness auto-approve threshold at 0.90 or above. Scores between 0.70 and 0.89 should trigger a selfie re-capture prompt (up to 3 attempts) before falling back to active liveness or manual review. Scores below 0.70 almost always indicate a presentation attack or severely degraded image quality, and should be treated as a rejection. These thresholds are pre-configured in the `hyperverge.yml` environment config (Section 14).
+:::
+
 ---
+
+When a customer does not complete DigiLocker-based Aadhaar eKYC, the IPV exemption does not apply, and a Video In-Person Verification session becomes mandatory. VIPV combines face match, liveness, document OCR, and OTP verification into a single recorded video session that satisfies SEBI's IPV requirements.
 
 ## 4. VIPV (Video In-Person Verification) - SEBI Compliant
 
@@ -427,6 +448,10 @@ Headers: { "appId": "xxx", "appKey": "xxx" }
 | Storage Location | India (Mumbai data center) |
 | Access | Downloadable via API with authenticated credentials |
 | Format | MP4 (H.264 video, AAC audio) |
+
+:::caution[VIPV recording retention is a regulatory obligation]
+SEBI and RBI guidelines require VIPV session recordings to be retained for a minimum of 7 years in tamper-proof storage with verifiable integrity (SHA-256 hash). Failure to produce recordings during a SEBI inspection can result in compliance action against the broker. Ensure that the recording storage contract with HyperVerge explicitly covers the 7-year retention period and that your ops team periodically verifies recording accessibility and hash integrity.
+:::
 
 ### Data Mapping (to Master Dataset, Section N)
 
@@ -694,6 +719,8 @@ Tamper detection results appear in the response as:
 
 ---
 
+The individual document OCR capabilities described above cover the primary onboarding flow. However, accounts opened on behalf of Hindu Undivided Families (HUFs), partnerships, and corporates require additional document types that do not follow standardized layouts.
+
 ## 6. Non-Individual Entity Documents
 
 HyperVerge's OCR capabilities extend beyond individual KYC documents to support entity-level verification.
@@ -835,6 +862,8 @@ All SDKs handle the following:
 | Localization | Support for multiple Indian languages in UI text |
 
 ---
+
+With the SDK handling client-side capture and quality checks, the backend integration layer is responsible for authentication, API orchestration, error handling, and webhook processing. The following section covers these server-side concerns in detail.
 
 ## 8. Integration Details
 
@@ -1020,6 +1049,8 @@ HyperVerge provides an admin dashboard at `https://dashboard.hyperverge.co` for 
 
 ---
 
+Beyond pricing, the choice of a verification vendor in the Indian broking context is heavily influenced by regulatory compliance posture. HyperVerge's certification portfolio and data residency commitments are summarized below.
+
 ## 11. Compliance & Certifications
 
 ### Certifications
@@ -1064,6 +1095,8 @@ HyperVerge supports the following for SEBI inspection/audit:
 | Data retention proof | Logs and recordings retained per configured retention policy |
 
 ---
+
+Even with high accuracy rates and robust certifications, real-world onboarding introduces a wide range of edge cases -- poor lighting, elderly applicants whose appearance has changed significantly since their Aadhaar photo was taken, laminated documents with glare, and unreliable mobile network connections during VIPV sessions. The following section catalogs these scenarios and prescribes handling strategies.
 
 ## 12. Edge Cases & Failure Handling
 
