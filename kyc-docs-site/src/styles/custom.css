@@ -1,45 +1,119 @@
 /* KYC Onboarding Spec — Custom Starlight Theme */
+/* v2.0: Inter font, mobile tables, component polish, dark mode */
 
-/* Accent color: Blue */
+/* ─── Typography: Inter via Google Fonts ─── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* ─── Root: Design tokens ─── */
 :root {
+	--sl-font: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+	--sl-font-system-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Code', 'Segoe UI Mono', 'Liberation Mono', Menlo, Monaco, Consolas, monospace;
+	--sl-line-height: 1.8;
+	--sl-line-height-headings: 1.25;
+	--sl-content-gap-y: 1.25rem;
+
+	/* Accent: Blue */
 	--sl-color-accent-low: #1e3a5f;
 	--sl-color-accent: #3B82F6;
 	--sl-color-accent-high: #bfdbfe;
-	--sl-font-system-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Code', 'Segoe UI Mono', 'Liberation Mono', Menlo, Monaco, Consolas, monospace;
 }
 
+/* ─── Light Mode ─── */
 :root[data-theme='light'] {
 	--sl-color-accent-low: #dbeafe;
 	--sl-color-accent: #2563eb;
 	--sl-color-accent-high: #1e3a5f;
+
+	/* Warmer grays: hue 220, less saturation */
+	--sl-color-gray-6: hsl(220, 15%, 95%);
+	--sl-color-gray-7: hsl(220, 15%, 98%);
 }
 
-/* Table header styling */
+/* ─── Heading typography ─── */
+h1, h2 {
+	font-weight: 700;
+}
+
+h2 {
+	margin-top: 2.5em;
+}
+
+h3 {
+	margin-top: 2em;
+}
+
+/* ─── Tables ─── */
+
+/* Friendlier headers: no uppercase, slightly larger */
 table thead th {
-	text-transform: uppercase;
-	font-size: 0.75rem;
-	letter-spacing: 0.05em;
+	text-transform: none;
+	font-size: 0.813rem;
+	letter-spacing: 0.01em;
 	font-weight: 600;
 }
 
-/* Vendor table purple border */
+/* Zebra striping */
+table tbody tr:nth-child(even) {
+	background: var(--sl-color-gray-7, hsl(220, 15%, 98%));
+}
+
+/* Minimum cell width to prevent absurd compression */
+table td,
+table th {
+	min-width: 4.5rem;
+}
+
+/* Table wrapper for scroll shadow affordance */
+.sl-markdown-content table {
+	display: block;
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+	/* Scroll shadow trick */
+	background:
+		linear-gradient(to right, var(--sl-color-bg, white) 30%, transparent),
+		linear-gradient(to left, var(--sl-color-bg, white) 30%, transparent),
+		linear-gradient(to right, rgba(0,0,0,0.08), transparent 15px),
+		linear-gradient(to left, rgba(0,0,0,0.08), transparent 15px);
+	background-position: left center, right center, left center, right center;
+	background-repeat: no-repeat;
+	background-size: 40px 100%, 40px 100%, 15px 100%, 15px 100%;
+	background-attachment: local, local, scroll, scroll;
+}
+
+/* Sticky first column */
+table th:first-child,
+table td:first-child {
+	position: sticky;
+	left: 0;
+	z-index: 1;
+	background: var(--sl-color-bg, white);
+}
+
+table tbody tr:nth-child(even) td:first-child {
+	background: var(--sl-color-gray-7, hsl(220, 15%, 98%));
+}
+
+/* ─── Vendor table ─── */
 .vendor-table {
 	border-left: 4px solid #8b5cf6;
-	padding-left: 1rem;
+	padding: 0.75rem 1rem;
 	margin: 1.5rem 0;
+	background: #8b5cf605;
+	border-radius: 0 0.5rem 0.5rem 0;
 }
 
 .vendor-table table {
 	width: 100%;
 }
 
-/* Screen card component */
+/* ─── Screen card ─── */
 .screen-card {
 	border: 1px solid var(--sl-color-gray-5);
-	border-radius: 0.5rem;
+	border-radius: 0.75rem;
 	padding: 1.5rem;
 	margin: 1.5rem 0;
 	background: var(--sl-color-gray-7, var(--sl-color-bg));
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
 .screen-card-header {
@@ -75,13 +149,16 @@ table thead th {
 	font-size: 0.8rem;
 	color: var(--sl-color-gray-3);
 	white-space: nowrap;
+	background: var(--sl-color-gray-6, hsl(220, 15%, 95%));
+	padding: 0.2rem 0.6rem;
+	border-radius: 1rem;
 }
 
-/* Async bar */
+/* ─── Async bar ─── */
 .async-bar {
 	background: linear-gradient(90deg, #3b82f610 0%, #8b5cf610 100%);
-	border: 1px dashed #8b5cf6;
-	border-radius: 0.375rem;
+	border: 1px dashed var(--sl-color-gray-4, #8b5cf6);
+	border-radius: 0.5rem;
 	padding: 0.75rem 1rem;
 	margin: 1rem 0;
 	font-size: 0.875rem;
@@ -101,30 +178,34 @@ table thead th {
 	vertical-align: middle;
 }
 
-/* Gate box */
+/* ─── Gate box ─── */
 .gate-box {
 	border: 2px solid #ef4444;
-	border-radius: 0.5rem;
-	padding: 1rem 1.25rem;
+	border-radius: 0.625rem;
+	padding: 1.25rem 1.5rem;
 	margin: 1.5rem 0;
 	background: #ef444408;
 }
 
 .gate-box-title {
 	font-weight: 700;
-	color: #ef4444;
+	color: #dc2626;
 	margin-bottom: 0.5rem;
 	font-size: 0.9rem;
 	text-transform: uppercase;
 	letter-spacing: 0.03em;
 }
 
-/* Field tags */
+.gate-box-title::before {
+	content: '🚧 ';
+}
+
+/* ─── Field tags ─── */
 .field-tag {
 	display: inline-block;
-	font-size: 0.7rem;
+	font-size: 0.65rem;
 	font-weight: 600;
-	padding: 0.1rem 0.45rem;
+	padding: 0.1rem 0.4rem;
 	border-radius: 0.2rem;
 	text-transform: uppercase;
 	letter-spacing: 0.03em;
@@ -151,13 +232,13 @@ table thead th {
 	color: #5b21b6;
 }
 
-/* Vendor badges */
+/* ─── Vendor badges ─── */
 .vendor-badge {
 	display: inline-block;
-	font-size: 0.7rem;
+	font-size: 0.65rem;
 	font-weight: 700;
 	padding: 0.15rem 0.5rem;
-	border-radius: 1rem;
+	border-radius: 0.25rem;
 	text-transform: uppercase;
 	letter-spacing: 0.04em;
 }
@@ -180,28 +261,28 @@ table thead th {
 	border: 1px solid #fcd34d;
 }
 
-/* Info box variants (purple and cyan — other colors use Starlight Aside) */
+/* ─── Info boxes ─── */
 .info-box-purple {
 	border-left: 4px solid #8b5cf6;
-	background: #8b5cf608;
-	padding: 0.75rem 1rem;
-	border-radius: 0 0.375rem 0.375rem 0;
+	background: #8b5cf60d;
+	padding: 1rem 1.25rem;
+	border-radius: 0 0.5rem 0.5rem 0;
 	margin: 1rem 0;
 }
 
 .info-box-cyan {
 	border-left: 4px solid #06b6d4;
-	background: #06b6d408;
-	padding: 0.75rem 1rem;
-	border-radius: 0 0.375rem 0.375rem 0;
+	background: #06b6d40d;
+	padding: 1rem 1.25rem;
+	border-radius: 0 0.5rem 0.5rem 0;
 	margin: 1rem 0;
 }
 
-/* Status flow */
+/* ─── Status flow ─── */
 .status-flow {
 	display: flex;
 	align-items: center;
-	gap: 0.25rem;
+	gap: 0.5rem;
 	flex-wrap: wrap;
 	margin: 1rem 0;
 	font-size: 0.85rem;
@@ -217,14 +298,26 @@ table thead th {
 	white-space: nowrap;
 }
 
+.status-flow-node:first-child {
+	background: var(--sl-color-accent-low);
+	border-color: var(--sl-color-accent);
+	color: var(--sl-color-accent-high);
+}
+
+.status-flow-node:last-of-type {
+	background: #dcfce7;
+	border-color: #86efac;
+	color: #166534;
+}
+
 .status-flow-arrow {
 	color: var(--sl-color-gray-3);
 	font-size: 1rem;
 }
 
-/* Diagram container */
+/* ─── Diagram container ─── */
 .diagram-container {
-	margin: 1.5rem 0;
+	margin: 2rem 0;
 	text-align: center;
 }
 
@@ -236,15 +329,253 @@ table thead th {
 .diagram-label {
 	font-size: 0.8rem;
 	color: var(--sl-color-gray-3);
-	margin-top: 0.5rem;
+	margin-top: 0.75rem;
 	font-style: italic;
 }
 
-/* Table horizontal scroll on mobile */
+/* ══════════════════════════════════════════════════
+   Dark Mode Polish
+   ══════════════════════════════════════════════════ */
+:root[data-theme='dark'] {
+	/* Zebra stripe dark tint */
+	--_table-stripe: hsl(220, 15%, 14%);
+}
+
+:root[data-theme='dark'] table tbody tr:nth-child(even) {
+	background: var(--_table-stripe);
+}
+
+:root[data-theme='dark'] table th:first-child,
+:root[data-theme='dark'] table td:first-child {
+	background: var(--sl-color-bg);
+}
+
+:root[data-theme='dark'] table tbody tr:nth-child(even) td:first-child {
+	background: var(--_table-stripe);
+}
+
+/* Scroll shadow for dark */
+:root[data-theme='dark'] .sl-markdown-content table {
+	background:
+		linear-gradient(to right, var(--sl-color-bg) 30%, transparent),
+		linear-gradient(to left, var(--sl-color-bg) 30%, transparent),
+		linear-gradient(to right, rgba(255,255,255,0.06), transparent 15px),
+		linear-gradient(to left, rgba(255,255,255,0.06), transparent 15px);
+	background-position: left center, right center, left center, right center;
+	background-repeat: no-repeat;
+	background-size: 40px 100%, 40px 100%, 15px 100%, 15px 100%;
+	background-attachment: local, local, scroll, scroll;
+}
+
+/* Field tags — dark mode */
+:root[data-theme='dark'] .field-tag-user {
+	background: #1e3a5f;
+	color: #93c5fd;
+}
+
+:root[data-theme='dark'] .field-tag-auto {
+	background: #14532d;
+	color: #86efac;
+}
+
+:root[data-theme='dark'] .field-tag-system {
+	background: #78350f;
+	color: #fde68a;
+}
+
+:root[data-theme='dark'] .field-tag-api {
+	background: #3b0764;
+	color: #c4b5fd;
+}
+
+/* Vendor badges — dark mode */
+:root[data-theme='dark'] .vendor-badge-recommended {
+	background: #14532d;
+	color: #86efac;
+	border-color: #166534;
+}
+
+:root[data-theme='dark'] .vendor-badge-alternate {
+	background: #1e3a5f;
+	color: #93c5fd;
+	border-color: #1e40af;
+}
+
+:root[data-theme='dark'] .vendor-badge-new {
+	background: #78350f;
+	color: #fde68a;
+	border-color: #92400e;
+}
+
+/* Gate box — dark mode */
+:root[data-theme='dark'] .gate-box {
+	background: #ef444412;
+}
+
+:root[data-theme='dark'] .gate-box-title {
+	color: #f87171;
+}
+
+/* Async bar — dark mode */
+:root[data-theme='dark'] .async-bar {
+	background: linear-gradient(90deg, #3b82f618 0%, #8b5cf618 100%);
+}
+
+/* Vendor table — dark mode */
+:root[data-theme='dark'] .vendor-table {
+	background: #8b5cf60a;
+}
+
+/* Info boxes — dark mode */
+:root[data-theme='dark'] .info-box-purple {
+	background: #8b5cf615;
+}
+
+:root[data-theme='dark'] .info-box-cyan {
+	background: #06b6d415;
+}
+
+/* Status flow last node — dark mode */
+:root[data-theme='dark'] .status-flow-node:last-of-type {
+	background: #14532d;
+	border-color: #166534;
+	color: #86efac;
+}
+
+/* ══════════════════════════════════════════════════
+   Mobile Breakpoints
+   ══════════════════════════════════════════════════ */
+
+/* ── ≤768px: Tablet / large mobile ── */
 @media (max-width: 768px) {
-	table {
-		display: block;
-		overflow-x: auto;
-		-webkit-overflow-scrolling: touch;
+	/* Table scroll already set via .sl-markdown-content above */
+
+	/* Reduced table padding */
+	table td,
+	table th {
+		padding: 0.5rem 0.6rem;
+		font-size: 0.813rem;
+	}
+
+	/* Screen card compact */
+	.screen-card {
+		padding: 1rem;
+	}
+
+	.screen-card-header {
+		gap: 0.5rem;
+	}
+
+	.screen-card-title {
+		font-size: 1.1rem;
+	}
+
+	/* Status flow wrap tighter */
+	.status-flow {
+		gap: 0.35rem;
+		font-size: 0.8rem;
+	}
+
+	.status-flow-node {
+		padding: 0.25rem 0.5rem;
+	}
+}
+
+/* ── ≤480px: Standard mobile ── */
+@media (max-width: 480px) {
+	/* Tighter table cells */
+	table td,
+	table th {
+		padding: 0.4rem 0.5rem;
+		font-size: 0.75rem;
+	}
+
+	table thead th {
+		font-size: 0.7rem;
+	}
+
+	/* Smaller screen card number */
+	.screen-card-number {
+		width: 1.75rem;
+		height: 1.75rem;
+		font-size: 0.85rem;
+	}
+
+	.screen-card-title {
+		font-size: 1rem;
+	}
+
+	.screen-card-time {
+		font-size: 0.7rem;
+		padding: 0.15rem 0.45rem;
+	}
+
+	/* Smaller status flow */
+	.status-flow {
+		font-size: 0.75rem;
+	}
+
+	.status-flow-node {
+		padding: 0.2rem 0.4rem;
+		font-size: 0.7rem;
+	}
+
+	/* Async bar tighter */
+	.async-bar {
+		padding: 0.5rem 0.75rem;
+		font-size: 0.8rem;
+	}
+
+	/* Gate box tighter */
+	.gate-box {
+		padding: 0.75rem 1rem;
+	}
+}
+
+/* ── ≤375px: Small mobile (iPhone SE, etc.) ── */
+@media (max-width: 375px) {
+	/* Minimum viable table styling */
+	table td,
+	table th {
+		padding: 0.3rem 0.4rem;
+		font-size: 0.688rem;
+		min-width: 3.5rem;
+	}
+
+	table thead th {
+		font-size: 0.625rem;
+	}
+
+	/* Tight code in table cells */
+	table code {
+		font-size: 0.625rem;
+		padding: 0.05rem 0.2rem;
+	}
+
+	/* Screen card minimal */
+	.screen-card {
+		padding: 0.75rem;
+		margin: 1rem 0;
+	}
+
+	.screen-card-number {
+		width: 1.5rem;
+		height: 1.5rem;
+		font-size: 0.75rem;
+	}
+
+	.screen-card-title {
+		font-size: 0.9rem;
+	}
+
+	/* Field tags & vendor badges minimal */
+	.field-tag {
+		font-size: 0.575rem;
+		padding: 0.05rem 0.3rem;
+	}
+
+	.vendor-badge {
+		font-size: 0.575rem;
+		padding: 0.1rem 0.35rem;
 	}
 }
