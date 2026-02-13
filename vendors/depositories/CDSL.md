@@ -1,10 +1,11 @@
 # CDSL Integration Specification
 ## Central Depository Services Limited - PRIMARY Depository
 
-**Version**: 1.0
+**Version**: 2.0
 **Date**: 2026-02-13
 **Status**: Primary Depository for BO Account Operations
 **Parent Document**: [VENDOR_INTEGRATIONS.md](../../VENDOR_INTEGRATIONS.md) (V13)
+**Deep Dive Spec**: [CDSL_INTEGRATION.md](../../CDSL_INTEGRATION.md) (v1.3)
 **Website**: https://www.cdslindia.com
 **DP API Portal**: https://www.cdslindia.com/DP/APIs.html
 
@@ -34,6 +35,20 @@
 20. [Recent Circulars (2024-2026)](#20-recent-circulars-2024-2026)
 21. [Edge Cases](#21-edge-cases)
 22. [Future Considerations](#22-future-considerations)
+23. [UAT / Test Environment vs Production](#23-uat--test-environment-vs-production)
+24. [Request Tracking & Sequence Numbers](#24-request-tracking--sequence-numbers)
+25. [Security & Encryption Extended](#25-security--encryption-extended)
+26. [DDPI Deep Dive](#26-ddpi-deep-dive)
+27. [MTF / Pledge Operations Deep Dive](#27-mtf--pledge-operations-deep-dive)
+28. [BO Modification - Comprehensive Use Cases](#28-bo-modification---comprehensive-use-cases)
+29. [SEBI Circulars Reference Extended](#29-sebi-circulars-reference-extended)
+
+**Appendices**:
+- [Appendix A: CDSL State Code Table](#appendix-a-cdsl-state-code-table)
+- [Appendix B: Relationship Code Table](#appendix-b-relationship-code-table)
+- [Appendix C: Tax Status Code Table](#appendix-c-tax-status-code-table)
+- [Appendix D: Integration Checklist](#appendix-d-integration-checklist)
+- [Appendix E: Quick Reference - API Endpoints Summary](#appendix-e-quick-reference---api-endpoints-summary)
 
 ---
 
@@ -1903,6 +1918,1297 @@ Corporate account opening is more complex than individual:
 - e-Voting (corporate governance) already uses blockchain
 - Future: tokenized securities may change demat operations fundamentally
 - No immediate integration impact, but worth monitoring
+
+---
+
+## 23. UAT / Test Environment vs Production
+
+> Source: [CDSL_INTEGRATION.md](../../CDSL_INTEGRATION.md) Section 30
+
+### 23.1 Environment Endpoints
+
+| Aspect | UAT / Test | Production |
+|--------|-----------|------------|
+| **WebCDAS URL** | `test1.cdslindia.com` | `cdslweb.cdslindia.com` and `cdslapp.cdslindia.com` |
+| **Mock Environment** | `mock.cdslindia.com` (MOCKCDAS for RTA/DP testing) | N/A |
+| **API Services** | Test API server (credentials from dprtasupport@cdslindia.com) | `api.cdslindia.com/APIServices` |
+| **eDIS Portal** | Sandbox eDIS (on request) | `edis.cdslindia.com` |
+| **TPIN Generation** | Test TPIN generation | `edis.cdslindia.com/Home/GeneratePin` |
+| **easi/EASIEST** | Test instance | `web.cdslindia.com/myeasitoken/Home/Login` |
+| **CVL KRA Verification** | Test URL | `validate.cvlindia.com/CVLKRAVerification_V1/` |
+| **Issuer Portal** | Test instance | `issuercentre.cdslindia.com/Home/Login` |
+
+### 23.2 Test vs Production Environment Differences
+
+| Aspect | UAT / Test | Production |
+|--------|-----------|------------|
+| **DP ID** | Test DP ID assigned by CDSL (unique per testing entity) | Real DP ID (8 digits, assigned at registration) |
+| **Client IDs** | Test Client IDs (no real securities) | Real Client IDs auto-assigned by CDAS |
+| **API Key** | Separate test API key (may have shorter validity) | Production API key (longer validity, strict rotation) |
+| **eDIS API Key** | Test eDIS key (separate from production) | Production eDIS API key |
+| **Data** | Synthetic data; no real securities or settlements | Live market data, real ISINs, real settlements |
+| **DSC** | Test DSC certificates (relaxed requirements) | Production DSC from Registered Authority of TCS (mandatory) |
+| **Connectivity** | Internet access sufficient; no leased line needed | Leased line / MPLS / Internet with IP whitelisting |
+| **IP Whitelisting** | May be relaxed; dynamic IPs may be allowed | Static IPs mandatory; registered with CDSL |
+| **SSL/TLS** | TLS 1.2 (same as production) | TLS 1.2 or higher (mandatory) |
+| **TransDtls Encryption** | Same encryption algorithm as production | Same encryption, production keys |
+| **Settlement** | No real settlement; simulated settlement cycle | T+1 live settlement |
+| **Audit Logging** | Minimal / test-only | Full audit trail per SEBI requirements |
+| **Go-Live** | Self-service testing | Requires CDSL UAT sign-off certification |
+
+### 23.3 UAT Certification Process
+
+```
+Phase 1: Registration & Setup (1-2 weeks)
+   ├─ Submit request to dprtasupport@cdslindia.com
+   ├─ Specify: APIs needed, connectivity mode, test scope
+   ├─ CDSL assigns Test DP ID
+   ├─ CDSL generates Test API Key
+   ├─ CDSL provides Test WebCDAS credentials
+   └─ MOCKCDAS access granted for file format testing
+
+Phase 2: Integration Development (2-4 weeks)
+   ├─ BO Setup file generation and upload testing
+   ├─ API call testing (BO Setup, eDIS, Transaction Upload)
+   ├─ File format validation (fixed-length positional for BO, XML-tag for transactions)
+   ├─ Error handling and rejection scenario testing
+   └─ Download report parsing (DP57, DPM3, DPM4)
+
+Phase 3: Test Case Execution (1-2 weeks, CDSL-defined test cases)
+   ├─ BO account opening (all account categories: IND, HUF, BDC, TRU)
+   ├─ BO modification (name, address, bank, contact, KYC attributes)
+   ├─ Nomination (add, modify, opt-out with video verification flag)
+   ├─ eDIS flow (TPIN generation → VerifyDIS → OTP → callback)
+   ├─ DDPI submission (online eSign + offline physical)
+   ├─ Transaction uploads (pledge, IDT, off-market, freeze/unfreeze)
+   ├─ File download parsing (DP57, DPM3, DPM4, Client Master)
+   └─ Error scenarios (duplicate PAN, missing fields, invalid codes)
+
+Phase 4: UAT Sign-Off (1 week)
+   ├─ CDSL reviews test execution results
+   ├─ Issues UAT completion certificate
+   └─ Any issues must be resolved before production onboarding
+
+Phase 5: Production Onboarding (1-2 weeks)
+   ├─ Production DP ID + API key provisioned
+   ├─ IP whitelisting configured for production servers
+   ├─ DSC mapping completed for all authorized signatories
+   ├─ Leased line / MPLS / Internet connectivity certified
+   ├─ Production security configuration verified
+   └─ Go-Live approval issued by CDSL
+```
+
+### 23.4 CDSL Innovation Sandbox (Extended)
+
+| Aspect | Details |
+|--------|---------|
+| **Governance** | SEBI Innovation Sandbox Committee |
+| **Eligibility** | Fintech startups, registered intermediaries, educational institutions, individual innovators |
+| **Application** | Via SEBI Innovation Sandbox portal (https://innovation-sandbox.in) |
+| **Cost** | Free for approved applicants |
+| **Duration** | Defined testing window per approval |
+| **Test Data** | Synthetic account statements, holding data, transaction data |
+| **File Formats Provided** | Unformatted account statements, BO upload/download specifications, sample files |
+| **Guidelines** | Operating Guidelines v3 (final) on CDSL website |
+| **Notable User** | Finzoom (developer of INDmoney app) - used sandbox for portfolio dashboard development |
+| **Reference** | https://www.cdslindia.com/Publications/InnovationSandbox.html |
+
+**Sandbox vs DP UAT vs Production**:
+
+| Aspect | Innovation Sandbox | DP UAT | Production |
+|--------|-------------------|--------|------------|
+| **Access** | Open application via SEBI portal | Registered DP only | Live registered DP |
+| **Data** | Sample/static test data | Dynamic test data, simulated flows | Live production data |
+| **Credentials** | Sandbox-specific | Test API key from CDSL | Production API key |
+| **APIs** | Limited (data access only) | Full API suite for testing | Full API suite |
+| **File Formats** | Sample specifications and files | Full upload/download testing | Production file processing |
+| **Use Case** | Prototyping, learning, hackathons | Integration development and certification | Live DP operations |
+| **Contact** | innovation-sandbox.in | dprtasupport@cdslindia.com | helpdesk@cdslindia.com |
+
+---
+
+## 24. Request Tracking & Sequence Numbers
+
+> Source: [CDSL_INTEGRATION.md](../../CDSL_INTEGRATION.md) Section 31
+
+### 24.1 Unique Sequence Number Field
+
+| Aspect | Details |
+|--------|---------|
+| **Field Name** | Unique Sequence Number |
+| **Present In** | BO setup upload, BO modify upload, and transaction uploads |
+| **Mandatory Since** | October 30, 2015 (initially optional; uniqueness checked if populated) |
+| **Uniqueness Scope** | Per DP ID - each DP maintains its own sequence space |
+| **Validation** | CDSL checks uniqueness across all records ever submitted by the DP |
+| **Purpose** | Prevent duplicate submissions; enable idempotent retries |
+| **Format** | Numeric; DP-defined; must be unique across all submissions (no reuse) |
+
+### 24.2 Request Reference Number Types
+
+| Reference Type | Format | Source | Description |
+|----------------|--------|--------|-------------|
+| **Unique Sequence Number** | Numeric (DP-defined) | DP generates | Master tracking ID for each record in upload files |
+| **eDIS ReqId** | 15-digit numeric (e.g., `291951000000401`) | DP generates | Unique request ID for eDIS VerifyDIS API calls |
+| **File Request ID** | Auto-generated by CDAS | CDSL assigns | Assigned when file upload is accepted by CDAS |
+| **Transaction Reference** | Auto-generated by CDAS | CDSL assigns | Unique reference for each transaction in CDAS |
+| **DRN (Demat Request Number)** | 10-digit numeric | CDSL assigns | Dematerialization/Rematerialization request number |
+| **BO Setup Reference** | DP-generated | DP generates | Internal reference for BO account opening request |
+| **Settlement ID** | Exchange-assigned | Exchange | Settlement number for on-market transactions |
+| **CM ID** | 8-digit | Clearing Corp | Clearing Member identifier for settlement matching |
+
+### 24.3 Sequence Number Best Practices
+
+| Aspect | Recommendation |
+|--------|----------------|
+| **Format** | `YYYYMMDD` + 6-digit zero-padded counter (e.g., `20260213000001`) |
+| **Reset** | No automatic reset by CDSL; DP must ensure global uniqueness |
+| **Counter Strategy** | Monotonically increasing; never reuse even after rejection |
+| **Collision Handling** | Duplicate sequence number = record/file rejected by CDSL |
+| **Retry Logic** | On rejection, generate NEW sequence number and resubmit (never reuse) |
+| **Storage** | Persist sequence counter in database with transaction-safe increment |
+| **Multi-Instance** | If multiple application instances, use partitioned ranges or centralized counter |
+| **Disaster Recovery** | DR system must have access to same sequence counter or separate range |
+
+### 24.4 File Naming Conventions
+
+**DP57 Report (Common Download)**:
+```
+Format: COD_EXP_<DPID>_<FILE_REQ_ID>_<I/F>_YYYYMMDDHHMM_<SeqNo>.csv
+
+Components:
+  COD          = Common Online Download
+  EXP          = Export
+  DPID         = 8-digit Depository Participant ID
+  FILE_REQ_ID  = File request identifier assigned by CDSL
+  I/F          = I (Incremental during day) or F (Full end-of-day)
+  YYYYMMDDHHMM = Timestamp of report generation
+  SeqNo        = Sequential number (for multiple files in same period)
+
+Example: COD_EXP_12049200_78542_I_202602131430_001.csv
+```
+
+**DPM3 Holdings Report (Statement of Holdings)**:
+```
+Format: SOH_EXP_<DPID>_<ReqID>_<I/F>_YYYYMMDDHHMM_<Seq>.csv
+
+Components:
+  SOH          = Statement of Holdings
+  EXP          = Export
+  DPID         = 8-digit DP ID
+  ReqID        = Request identifier from CDSL
+  I/F          = I (Incremental) or F (Full)
+  YYYYMMDDHHMM = Generation timestamp
+  Seq          = Sequence number
+
+Example: SOH_EXP_12049200_45321_F_202602130600_001.csv
+```
+
+**DP97 Report**:
+```
+Associated with COD (Cash on Demand) exports; generated alongside DP57 reports.
+```
+
+### 24.5 File Upload Acknowledgment & Status Polling Flow
+
+```
+┌─────────────┐     ┌──────────────────┐
+│  DP System   │     │   CDSL CDAS       │
+└──────┬──────┘     └────────┬─────────┘
+       │                     │
+       │ 1. Upload File      │
+       │ (BO Setup / Txn /   │
+       │  Common Upload)     │
+       │ ─────────────────────►
+       │                     │
+       │ 2. Immediate ACK    │
+       │ (HTTP 200 + File    │
+       │  Request ID)        │
+       │ ◄─────────────────────
+       │                     │
+       │     [CDSL Processes] │
+       │     - Validates each │
+       │       record         │
+       │     - Applies biz    │
+       │       rules          │
+       │     - Checks unique  │
+       │       sequence nos.  │
+       │                     │
+       │ 3. Poll Status      │
+       │ (File Request ID)   │
+       │ ─────────────────────►
+       │                     │
+       │ 4. Status Response  │
+       │ ◄─────────────────────
+       │                     │
+       │  Possible statuses: │
+       │  - Processing       │
+       │  - Accepted          │
+       │  - Partially Accepted│
+       │  - Rejected          │
+       │                     │
+       │ 5. Download Detail  │
+       │ (record-level       │
+       │  success/reject     │
+       │  with error codes)  │
+       │ ─────────────────────►
+       │                     │
+       │ 6. Result File      │
+       │ (per record: status │
+       │  + error code +     │
+       │  assigned BO ID for │
+       │  successful setups) │
+       │ ◄─────────────────────
+       └──────────────────────┘
+```
+
+### 24.6 Upload Processing Modes
+
+| Mode | Behavior | Use Case |
+|------|----------|----------|
+| **File Level Upload** | Entire file processed if ALL records valid; entire file rejected if ANY record fails | Critical batch where all-or-nothing is needed |
+| **Record Level Upload** | Successful records processed; error records rejected individually | Routine batch processing; partial success acceptable |
+
+### 24.7 Date of Receipt Tracking (SEBI Mandate)
+
+Per SEBI directive, CDSL mandates that DPs capture the date of receipt of request from BO for all transaction types. This field is present in:
+- Online CDAS entry screens
+- File upload formats (both BO setup and transaction uploads)
+- API request payloads
+
+Purpose: Audit trail for SLA compliance. CDSL uses this to monitor DP adherence to processing timelines (e.g., 2-day closure SLA, same-day off-market processing).
+
+### 24.8 DP57 Report Generation Schedule
+
+| Time | Report Type | Content |
+|------|------------|---------|
+| **Intra-day (multiple)** | Incremental (I) | Transactions processed since last incremental |
+| **End of Day** | Full (F) | All transactions for the entire business day |
+| **On-demand** | Full or Incremental | DP can request specific time window |
+
+The DP57 single download was activated for all DPs with effect from January 18, 2011, replacing the need for separate module-specific downloads.
+
+---
+
+## 25. Security & Encryption Extended
+
+> Source: [CDSL_INTEGRATION.md](../../CDSL_INTEGRATION.md) Section 32
+
+### 25.1 Multi-Layered Security Architecture
+
+```
+┌──────────────────────────────────────────────────────────────────────┐
+│                     CDSL Security Architecture                       │
+├──────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  Layer 1: Network Security                                           │
+│  ├─ Leased Line / MPLS VPN (dedicated, physically isolated)         │
+│  ├─ IP Whitelisting (static IPs registered per DP)                   │
+│  ├─ Firewall rules at CDSL data center (both primary + DR)          │
+│  ├─ VPN tunnel with IPSec (for internet-based connectivity)          │
+│  └─ VSAT encryption (satellite connectivity, for remote locations)   │
+│                                                                      │
+│  Layer 2: Transport Security                                         │
+│  ├─ TLS 1.2+ for ALL HTTPS API communication                        │
+│  ├─ SSL certificates for WebCDAS access                              │
+│  ├─ Encrypted SFTP for batch file transfers (where applicable)       │
+│  └─ SSL 2.0/3.0 + TLS 1.0 supported for legacy CDAS modules        │
+│                                                                      │
+│  Layer 3: Application Authentication                                 │
+│  ├─ API Key (unique per DP, generated during registration)           │
+│  ├─ Login ID + Password for CDAS web application                     │
+│  ├─ Two-Factor Authentication (2FA) for DP module access             │
+│  ├─ Session management with configurable timeout                     │
+│  └─ Role-based access control within DP module                       │
+│                                                                      │
+│  Layer 4: Transaction Authorization                                  │
+│  ├─ Digital Signature Certificate (DSC) via hardware e-Token         │
+│  │   ├─ Required for: on-market, off-market, IDT transactions        │
+│  │   ├─ Provider: Registered Authority of TCS (or Sify Safescrypt)   │
+│  │   ├─ Class 3 certificate (individual + organizational)            │
+│  │   └─ Hardware USB token (not software-based)                      │
+│  ├─ TPIN (6-digit, CDSL-generated, BO-only, DP has NO access)       │
+│  └─ OTP (CDSL sends directly to BO registered mobile)               │
+│                                                                      │
+│  Layer 5: Data-Level Security                                        │
+│  ├─ eDIS TransDtls payload encryption (CDSL-provided algorithm/key)  │
+│  ├─ Data at rest encryption per CDSL IT security policy              │
+│  ├─ Complete audit trail (per SEBI mandate)                          │
+│  └─ ISO 27001 + ISO 22301 certified infrastructure                  │
+│                                                                      │
+└──────────────────────────────────────────────────────────────────────┘
+```
+
+### 25.2 Digital Signature Certificate (DSC) - Comprehensive
+
+| Aspect | Details |
+|--------|---------|
+| **Primary CA** | Sify Safescrypt (CDSL-approved Certifying Authority) |
+| **Other CAs** | eMudhra, nCode, (s)TRUST (Capricorn) - BOs can use DSC from any RA |
+| **DSC Class** | Class 3 Digital Signature Certificate |
+| **Token Type** | Hardware USB e-Token (software certificates NOT accepted) |
+| **Issuance Time** | 7-10 working days from application |
+| **Validity Period** | Typically 2-3 years; must be renewed before expiry |
+| **Required For** | All on-market, off-market, early pay-in, and inter-depository transactions |
+| **Mapping** | Each authorized signatory's DSC must be mapped to their CDAS user profile |
+| **Self-Authorization** | NOT allowed - DSC signatory must differ from DP authorized signatory |
+| **BO DSC for EASIEST** | BO submits filled Annexure + DSC screenshot to DP; DP verifies and sends to CDSL |
+| **No BO Charge** | CDSL does not charge for mapping DSC from other RAs to BO's EASIEST login |
+| **Renewal** | Must renew before expiry; expired DSC blocks transaction authorization |
+
+### 25.3 DSC Mapping Checklist (from CDSL Official Checklist)
+
+| # | Checklist Item | Required |
+|---|---------------|----------|
+| 1 | DSC Authorized Signatory name DIFFERENT from DP Authorized Signatory | Mandatory |
+| 2 | Clear and visible snapshot of DSC details provided | Mandatory |
+| 3 | Duly filled and signed Annexure (individual BO/CBO/CM form) | Mandatory |
+| 4 | Print screen of Digital Signature Certificate details attached | Mandatory |
+| 5 | DP verification stamp and signature on the form | Mandatory |
+| 6 | Form submitted to CDSL for DSC-to-user mapping | Mandatory |
+
+### 25.4 eDIS Encryption Details
+
+| Aspect | Details |
+|--------|---------|
+| **Encrypted Field** | `TransDtls` parameter in VerifyDIS API call |
+| **Content** | ISIN, quantity, exchange (NSE/BSE/MCX), segment (CM/FO/CD/COM), bulk flag |
+| **Encryption** | DP encrypts using CDSL-provided encryption key and algorithm |
+| **Key Provisioning** | Encryption parameters provided in API documentation during DP registration |
+| **Key Rotation** | CDSL may rotate encryption keys; DP must implement key update mechanism |
+| **Decryption** | CDSL decrypts server-side on eDIS portal |
+| **TPIN Entry** | ALWAYS on CDSL's eDIS webpage - never on DP portal (prevents DP from capturing TPIN) |
+| **OTP Delivery** | CDSL sends directly to BO's registered mobile (DP has zero access) |
+
+### 25.5 WebCDAS Browser Security Configuration
+
+From CDSL's RELID/WebCDAS Installation Guide:
+
+| Setting | Configuration |
+|---------|--------------|
+| **Browser** | Internet Explorer / Edge (ActiveX compatibility); Chrome for WebCDAS |
+| **Trusted Sites** | Add `http://cdslweb.cdslindia.com` and `http://cdslapp.cdslindia.com` |
+| **SSL Settings** | Enable SSL 2.0, SSL 3.0, TLS 1.0 in Tools > Internet Options > Advanced > Security |
+| **ActiveX Controls** | Enable for CDAS DP Module (signed ActiveX required) |
+| **Pop-Up Blocker** | Disable for CDSL domains |
+| **Java Runtime** | May be required for older CDAS modules |
+| **Security Zone** | CDSL URLs in Trusted Sites zone with Medium security level |
+| **Cookies** | Must be enabled for CDSL domains |
+
+> **Migration Note**: CDSL has been progressively migrating to WebCDAS (browser-based) and REST APIs to reduce dependency on thick-client DP Module and ActiveX. Newer APIs (BO Setup, Transaction Upload, eDIS) are REST-based and browser-agnostic.
+
+### 25.6 IP Whitelisting Requirements
+
+| Aspect | Details |
+|--------|---------|
+| **Requirement** | All DP servers calling CDSL APIs must have their IP addresses registered |
+| **IP Type** | Static IPs only (dynamic IPs NOT permitted for production) |
+| **Scope** | Primary data center + DR site IPs |
+| **Multiple IPs** | Supported - DP can register multiple IPs |
+| **VPN Egress** | If DP connects via VPN, the VPN exit (egress) IP must be whitelisted |
+| **Change Process** | Written request to CDSL operations team; 2-3 working days to update |
+| **UAT Relaxation** | Dynamic IPs may be allowed for test/UAT environment |
+| **Verification** | CDSL may periodically verify that registered IPs are still in use |
+
+### 25.7 Connectivity Security Comparison
+
+| Mode | Encryption | Authentication | Security Level | Monthly Cost | Best For |
+|------|-----------|----------------|----------------|-------------|----------|
+| **Local Leased Line** | Physical isolation (inherently secure) | N/A (dedicated circuit) | Highest | Rs. 8K-15K/month | Large DPs with high volume |
+| **MPLS VPN** | Provider-managed label switching | Provider credentials + SLA | High | Rs. 4K-8K/month | Multi-branch DPs |
+| **Site-to-Site VPN (IPSec)** | IPSec tunnel encryption | Certificate + pre-shared key | High | Rs. 2K-4K/month | Cost-effective secure connectivity |
+| **Internet (HTTPS Direct)** | TLS 1.2+ for API calls | API Key + IP whitelisting | Moderate | Existing internet cost | API-only integration, small DPs |
+| **VSAT** | Satellite encryption | VSAT credentials | Moderate | Rs. 10K-20K/month | Remote/rural locations |
+
+### 25.8 CDSL Data Center Security
+
+| Aspect | Details |
+|--------|---------|
+| **Certifications** | ISO 27001 (InfoSec), ISO 22301 (Business Continuity), BS 7799 |
+| **Primary Site** | Mumbai-based data center |
+| **DR Site** | Geographically separated Disaster Recovery site |
+| **RPO** | Near-zero Recovery Point Objective (synchronous replication) |
+| **RTO** | Recovery Time Objective within regulatory requirements |
+| **Audit** | Regular SEBI inspections + internal audits |
+| **Penetration Testing** | Periodic external penetration testing |
+
+---
+
+## 26. DDPI Deep Dive
+
+> Source: [CDSL_INTEGRATION.md](../../CDSL_INTEGRATION.md) Section 34
+
+### 26.1 Regulatory Background
+
+DDPI was introduced through a series of SEBI circulars to replace the broad-scope Power of Attorney (POA) with a limited-purpose authorization:
+
+| Circular | Date | Subject |
+|----------|------|---------|
+| SEBI/HO/MIRSD/DoP/P/CIR/2022/44 | April 4, 2022 | Initial DDPI framework for settlement delivery + pledge/re-pledge |
+| SEBI/HO/MIRSD/DoP/P/CIR/2022/119 | June 2022 | Implementation extension |
+| SEBI/HO/MIRSD-PoD-1/P/CIR/2022/137 | October 6, 2022 | Expanded scope: MF on exchange + open offer tendering |
+| SEBI/HO/MIRSD/DoP/P/CIR/2022/153 | November 2022 | Further implementation extension |
+| CDSL Communique DP-332 | June 14, 2022 (implemented Nov 2022) | CDSL system implementation of DDPI |
+| CDSL Communique DP-5565 | Ongoing | BO Setup/Modify file format changes for DDPI/POA holder fields |
+
+### 26.2 Four DDPI Authorization Types
+
+DDPI is limited to exactly four purposes (no broader authority):
+
+| # | Authorization Type | Description | SEBI Circular |
+|---|-------------------|-------------|---------------|
+| 1 | **Settlement Delivery** | Transfer of securities held in BO account towards stock exchange-related deliveries / settlement obligations arising out of trades executed by the client | Apr 2022 (original) |
+| 2 | **Pledge / Re-pledge for Margin** | Pledging / re-pledging of securities in favour of TM/CM for the purpose of meeting margin requirements of the client | Apr 2022 (original) |
+| 3 | **Mutual Fund on Exchange** | Mutual fund transactions being executed on stock exchange order entry platforms (e.g., BSE StAR MF, NSE MFSS) | Oct 2022 (amendment) |
+| 4 | **Open Offer Tendering** | Tendering shares in open offers through stock exchange platforms (takeover / buyback offers routed via exchange) | Oct 2022 (amendment) |
+
+> **CRITICAL**: Any other use (e.g., off-market transfers, inter-depository transfers, gift transfers) is NOT covered by DDPI. These require eDIS (TPIN + OTP) authorization.
+
+### 26.3 DDPI vs POA - Detailed Comparison
+
+| Aspect | DDPI (Current) | POA (Legacy - Discontinued for new clients) |
+|--------|---------------|----------------------------------------------|
+| **Scope** | Limited to 4 specific purposes only | Broad - could cover any demat operation |
+| **Legal Instrument** | Standardized SEBI-prescribed format | General POA on stamp paper |
+| **Stamp Duty** | Required (varies by state: Rs. 100 typical) | Required (higher in many states) |
+| **Digital Execution** | Aadhaar eSign supported (hybrid: digital sign + stamp duty) | Generally physical only |
+| **Activation Time** | ~24 working hours (online via eSign) | 2-5 business days (physical processing) |
+| **Cost to Client** | Rs. 100 + 18% GST = Rs. 118 (one-time) | Rs. 100-500 (varied) |
+| **Revocation** | Anytime by BO, effective immediately | Anytime by BO |
+| **Risk** | Low - limited scope, no misuse of broader powers | High - broad authority, potential misuse |
+| **New Clients (post Sep 2022)** | Only option available | Not accepted |
+| **Existing POA Holders** | POA remains valid until client revokes | N/A |
+| **Nominee Action** | Person acting under DDPI CANNOT add/modify nominees | Person acting under POA CANNOT add nominees (Jan 2025 rule) |
+
+### 26.4 CDSL DDPI Implementation - Technical Details
+
+#### 26.4.1 POA_TYPE_FLAG in BO File Format
+
+CDSL introduced a new field `POA_TYPE_FLAG` in the BO Setup/Modify file format per Communique DP-332:
+
+| POA_TYPE_FLAG Value | Meaning |
+|--------------------|---------|
+| **P** | Traditional POA (legacy, existing clients only) |
+| **D** | DDPI (Demat Debit and Pledge Instruction) |
+| **N** | No POA / No DDPI (client uses eDIS TPIN+OTP for each transaction) |
+
+#### 26.4.2 DDPI Master POA ID Creation
+
+```
+Step 1: DP creates DDPI Master POA ID in CDAS
+   - POA_TYPE_FLAG = 'D'
+   - DDPI authorization details populated
+   |
+Step 2: DP links DDPI Master POA ID to the BO's demat account
+   - Via BO Modify Upload API or CDAS Web Portal
+   - Line 06 (Additional Details) updated with DDPI linkage
+   - Line 21 repeated for each CM POA / PMS POA / DDPI Account Mapping combination
+   |
+Step 3: CDSL activates DDPI flag on BO account
+   - BO account now has DDPI = Active
+   - Settlement debits, margin pledges, MF/open offer handled automatically
+```
+
+#### 26.4.3 Online DDPI Submission Flow (DP Integration)
+
+```
+┌──────────────────┐     ┌───────────────┐     ┌──────────────┐     ┌──────────┐
+│  Broker App/Web  │     │   eSign API   │     │  CDSL CDAS   │     │   BO     │
+│  (DP System)     │     │  (Leegality/  │     │              │     │ (Client) │
+│                  │     │   Digio)      │     │              │     │          │
+└────────┬─────────┘     └──────┬────────┘     └──────┬───────┘     └────┬─────┘
+         │                      │                      │                  │
+         │  1. Client clicks    │                      │                  │
+         │     "Activate DDPI"  │                      │                  │
+         │ <──────────────────────────────────────────────────────────────│
+         │                      │                      │                  │
+         │  2. Generate DDPI    │                      │                  │
+         │     document         │                      │                  │
+         │     (pre-filled BO   │                      │                  │
+         │      details)        │                      │                  │
+         │                      │                      │                  │
+         │  3. Send to eSign    │                      │                  │
+         │ ────────────────────>│                      │                  │
+         │                      │                      │                  │
+         │                      │  4. Aadhaar OTP      │                  │
+         │                      │     to client        │                  │
+         │                      │ ───────────────────────────────────────>│
+         │                      │                      │                  │
+         │                      │  5. Client enters    │                  │
+         │                      │     OTP              │                  │
+         │                      │ <───────────────────────────────────────│
+         │                      │                      │                  │
+         │  6. Signed DDPI      │                      │                  │
+         │     document         │                      │                  │
+         │ <────────────────────│                      │                  │
+         │                      │                      │                  │
+         │  7. Collect stamp    │                      │                  │
+         │     duty (Rs. 100    │                      │                  │
+         │     + GST) via PG    │                      │                  │
+         │ <──────────────────────────────────────────────────────────────│
+         │                      │                      │                  │
+         │  8. Upload DDPI to   │                      │                  │
+         │     CDSL via BO      │                      │                  │
+         │     Modify API       │                      │                  │
+         │ ───────────────────────────────────────────>│                  │
+         │                      │                      │                  │
+         │  9. CDSL activates   │                      │                  │
+         │     DDPI (~24 hrs)   │                      │                  │
+         │ <───────────────────────────────────────────│                  │
+         │                      │                      │                  │
+         │  10. Confirmation    │                      │                  │
+         │      to client       │                      │                  │
+         │ ──────────────────────────────────────────────────────────────>│
+```
+
+### 26.5 DDPI BO Modify File Format
+
+When activating DDPI, the DP submits a BO Modify file with Line 06 (Additional Details) updated:
+
+| Field | Type | Length | Value | Description |
+|-------|------|--------|-------|-------------|
+| POA_TYPE_FLAG | Alpha | 1 | `D` | Indicates DDPI |
+| POA_MASTER_ID | Alphanumeric | 16 | DDPI Master POA ID | CDAS-assigned ID for the DDPI record |
+| POA_HOLDER_NAME | Alpha | 100 | Broker/DP name | Name of DDPI holder (the broker) |
+| POA_HOLDER_PAN | Alphanumeric | 10 | Broker PAN | PAN of the DDPI holder entity |
+| DDPI_AUTH_SETTLEMENT | Alpha | 1 | `Y`/`N` | Authorization for settlement delivery |
+| DDPI_AUTH_PLEDGE | Alpha | 1 | `Y`/`N` | Authorization for pledge/re-pledge |
+| DDPI_AUTH_MF | Alpha | 1 | `Y`/`N` | Authorization for MF on exchange |
+| DDPI_AUTH_OPENOFFER | Alpha | 1 | `Y`/`N` | Authorization for open offer tendering |
+| DDPI_ESIGN_DATE | Numeric | 8 | DDMMYYYY | Date of eSign |
+| DDPI_ESIGN_REF | Alphanumeric | 30 | eSign reference | eSign transaction ID from Aadhaar eSign |
+| DDPI_STAMP_DUTY_REF | Alphanumeric | 20 | Stamp duty ref | Stamp duty payment reference |
+| DDPI_EFFECTIVE_DATE | Numeric | 8 | DDMMYYYY | Date DDPI becomes effective |
+
+> **NOTE**: Exact field positions are in CDSL Communique DP-332 and DP-5565. These are estimated fields based on public documentation. Obtain the full spec from CDSL after DP registration.
+
+### 26.6 DDPI Modification and Revocation
+
+#### 26.6.1 Client-Initiated Revocation
+
+| Aspect | Details |
+|--------|---------|
+| **Right** | Client can revoke DDPI at any time without giving reasons |
+| **Process** | Submit revocation request to DP (online or physical) |
+| **DP Obligation** | Must process revocation within 1 working day |
+| **Effect** | DDPI flag set to inactive; client must use eDIS (TPIN+OTP) for all subsequent transactions |
+| **CDSL Update** | DP submits BO Modify with POA_TYPE_FLAG = 'N' |
+| **Re-activation** | Client can submit new DDPI anytime (fresh process + stamp duty) |
+| **SEBI Mandate** | Stock exchanges and depositories shall ensure that brokers have enabled clients to revoke/cancel DDPI |
+
+#### 26.6.2 Broker-Initiated Deactivation
+
+| Scenario | Action |
+|----------|--------|
+| Client closure of trading account | DDPI automatically deactivated |
+| DP registration cancelled | All DDPI under that DP deactivated |
+| Regulatory order | CDSL can deactivate DDPI as per SEBI/court order |
+
+#### 26.6.3 DDPI Modification
+
+DDPI modification is limited - the four authorization types are all-or-nothing in practice. If a client wants to change authorization scope:
+
+1. Revoke existing DDPI
+2. Submit new DDPI with updated authorizations
+3. Fresh stamp duty required
+
+### 26.7 Trading Flow: With vs Without DDPI
+
+#### With DDPI Active:
+```
+Client sells shares --> Broker executes trade on exchange -->
+T+1: Clearing Corporation sends delivery obligation -->
+Broker automatically debits shares from client BO account (DDPI authorized) -->
+Shares delivered to CC for settlement -->
+T+1 settlement complete
+```
+
+#### Without DDPI (eDIS):
+```
+Client sells shares --> Broker executes trade on exchange -->
+T+0/T+1: Client receives eDIS authorization request -->
+Client redirected to CDSL eDIS portal (edis.cdslindia.com) -->
+Client enters TPIN (6-digit) --> CDSL sends OTP to registered mobile -->
+Client enters OTP --> Authorization complete -->
+Broker debits shares --> Delivered to CC --> Settlement complete
+
+RISK: If client misses TPIN+OTP window --> Short delivery -->
+      Auction penalty (20% + 5% annualized) on the broker
+```
+
+### 26.8 DDPI Stamp Duty Considerations
+
+| State | E-Stamp Duty for DDPI | Notes |
+|-------|-----------------------|-------|
+| Maharashtra | Rs. 100 | Can be paid via SHCIL e-Stamp |
+| Karnataka | Rs. 100-200 | e-Stamping via KSRSAC |
+| Delhi | Rs. 100 | Via e-Stamp portals |
+| Tamil Nadu | Rs. 100 | Via TNREGINET |
+| Other States | Rs. 50-200 | Varies; broker typically handles payment |
+
+> **Implementation Note**: Most brokers collect a flat Rs. 100 + GST from the client and handle stamp duty procurement. The e-stamping can be automated via SHCIL/NeSL APIs.
+
+### 26.9 DDPI Processing Timeline
+
+| Stage | Online (eSign) | Offline (Physical) |
+|-------|---------------|-------------------|
+| Client initiates | T+0 | T+0 |
+| Document generation | Instant | N/A |
+| eSign / Physical sign | T+0 (minutes) | T+0 to T+2 (courier) |
+| Stamp duty payment | T+0 (online PG) | T+0 (stamp paper) |
+| Upload to CDSL | T+0 | T+1 to T+3 |
+| CDSL processing | ~24 working hours | 2-3 working days |
+| DDPI active | T+1 | T+3 to T+5 |
+
+---
+
+## 27. MTF / Pledge Operations Deep Dive
+
+> Source: [CDSL_INTEGRATION.md](../../CDSL_INTEGRATION.md) Section 35
+
+### 27.1 Regulatory Framework
+
+The margin pledge framework was introduced by SEBI to eliminate the older title-transfer system where brokers physically held client securities:
+
+| Circular | Date | Subject |
+|----------|------|---------|
+| SEBI/HO/MIRSD/DOP/CIR/P/2020/28 | Feb 25, 2020 | Margin obligations by way of Pledge/Re-pledge in Depository System |
+| SEBI/HO/MIRSD/DOP/CIR/P/2020/88 | Jun 1, 2020 | Extension of timeline to August 1, 2020 |
+| CDSL Communique DP-234 | May 22, 2020 | Operational modalities and file formats for margin pledge/re-pledge |
+| CDSL Communique DP-412 | August 2020 | Margin Pledge/Re-Pledge implementation |
+| CDSL/OPS/DP/POLCY/2024/314 | Jun 7, 2024 | Revised file format with mandatory rejection reason code field |
+| SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/82 | Jun 3, 2025 | Automated pledge release + invocation mechanism |
+| SEBI extension | Aug 2025 | Extended automation deadline to October 10, 2025 |
+
+### 27.2 Pledge Ecosystem Architecture
+
+```
+┌─────────────────┐
+│   CLIENT (BO)   │
+│   Demat Account │  Securities remain HERE
+│   (16-digit ID) │  throughout the pledge lifecycle
+└────────┬────────┘
+         │
+         │ Margin Pledge (Client --> TM/CM)
+         │ Client authorizes via TPIN+OTP or DDPI
+         v
+┌─────────────────────────────────┐
+│  BROKER (TM/CM)                 │
+│  Client Securities Margin       │
+│  Pledge Account (CUSPA)         │
+│  Sub-status code: 40            │
+└────────┬────────────────────────┘
+         │
+         │ Re-pledge (TM --> CM --> CC)
+         │ Broker re-pledges to Clearing Corporation
+         v
+┌─────────────────────────────────┐
+│  CLEARING CORPORATION           │
+│  (NSCCL / ICCL / MCXCCL)       │
+│  Receives re-pledge lien        │
+│  Provides margin credit         │
+└─────────────────────────────────┘
+```
+
+**Key Principle**: Securities NEVER leave the client's demat account. Only pledge liens are created in the depository system, maintaining full audit trail. Client continues to receive dividends, bonuses, and other corporate action benefits.
+
+### 27.3 Three Types of Pledges in CDSL
+
+| Pledge Type | Purpose | Pledgor --> Pledgee | OTP Required |
+|-------------|---------|---------------------|--------------|
+| **Normal Pledge** | Loan Against Shares (eLAS) | Client --> NBFC/Bank | Yes (TPIN+OTP) |
+| **Margin Pledge** | Margin collateral for trading | Client --> TM/CM CUSPA | Yes (TPIN+OTP) or DDPI |
+| **MTF Pledge** | Margin Trading Facility funding | Client --> TM/CM Funding Account | Yes (TPIN+OTP) or DDPI |
+
+### 27.4 Margin Pledge Process Flow
+
+#### 27.4.1 Client-to-Broker Pledge (Margin Pledge)
+
+```
+Step 1: Client selects securities to pledge via broker app
+   |
+Step 2: Broker initiates margin pledge request in CDSL
+   - Transaction Type: Margin Pledge
+   - Pledgor: Client BO ID (16-digit)
+   - Pledgee: Broker's CUSPA ID
+   - ISIN + Quantity specified
+   |
+Step 3: CDSL sends authentication link to client
+   - Email: Registered email ID
+   - SMS: Registered mobile number
+   - Contains: List of securities + quantities pending pledge
+   |
+Step 4: Client authenticates pledge
+   Option A (With DDPI): Automatic - no client action needed
+   Option B (Without DDPI):
+     - Client clicks link, enters PAN or Demat Account Number
+     - Reviews securities list
+     - Clicks "Generate OTP" (OTP valid for 20 minutes)
+     - Enters OTP to authorize
+   |
+Step 5: CDSL creates pledge lien
+   - Securities marked as "Pledged" in client's BO account
+   - Lien reflected in CUSPA
+   - Securities remain in client account
+   |
+Step 6: Margin credit available from T+1 onwards
+   - Clearing Corporation provides margin benefit
+   - Haircut applied based on security category (VaR + ELM)
+```
+
+#### 27.4.2 Broker-to-CC Re-pledge
+
+```
+Step 7: Broker re-pledges client securities to Clearing Corporation
+   - Transaction Type: Margin Re-pledge
+   - Pledgor: Broker's CUSPA
+   - Pledgee: Clearing Corporation (NSCCL/ICCL/MCXCCL)
+   - ISIN + Quantity
+   |
+Step 8: Clearing Corporation accepts re-pledge
+   - Margin credit granted to broker against client position
+   - Complete trail visible: Client --> TM/CM --> CC
+```
+
+#### 27.4.3 Unpledge Process
+
+```
+Step 9: Client requests unpledge via broker app
+   |
+Step 10: Broker unpledges from CC first (if re-pledged)
+   - Reverse re-pledge: CC releases lien
+   |
+Step 11: Broker releases pledge from CUSPA
+   - Client's securities become "free" in BO account
+   - Available for sale or other transactions
+   |
+Timeline: Unpledge typically completes within few hours (same day)
+```
+
+### 27.5 MTF Pledge Process Flow
+
+MTF is different from regular margin pledge - here the broker funds the client's purchase:
+
+```
+Step 1: Client buys shares worth Rs. 10 lakh using MTF
+   - Client pays Rs. 2.5 lakh (25% margin)
+   - Broker funds Rs. 7.5 lakh (75% funding)
+   |
+Step 2: Shares credited to client's demat account on T+1
+   |
+Step 3: Broker initiates MTF pledge request
+   - Pledgor: Client BO ID
+   - Pledgee: Broker's "Client Securities under Margin Funding Account"
+   |
+Step 4: CDSL sends pledge authentication link to client
+   - Email + SMS to registered details
+   |
+Step 5: Client must accept pledge by T+3 (5:00 PM deadline)
+   - Authentication via PAN/Demat number + OTP
+   |
+Step 6: If client FAILS to accept by T+3:
+   - Broker MUST square off position on T+4
+   - Applicable penalties and interest charged to client
+   |
+Step 7: Once pledged, broker re-pledges to CC for margin benefit
+```
+
+### 27.6 CDSL Pledge File Format (Tag-Based)
+
+Pledge transactions use the **tag-based** Common Upload format (not positional):
+
+#### 27.6.1 Pledge Transaction Tags
+
+| Tag | Field | Type | Length | Description |
+|-----|-------|------|--------|-------------|
+| `<Tp>` | Transaction Type | Numeric | 2 | `7` = Pledge/Unpledge/Confiscation |
+| `<Usn>` | User Serial Number | Numeric | 8 | DP's unique serial for this transaction |
+| `<Pldgtp>` | Pledge Type | Alpha | 1 | `P`=Pledge, `U`=Unpledge, `C`=Confiscation (Invocation) |
+| `<Subtp>` | Pledge Sub Type | Alpha | 1 | `S`=Setup, `A`=Accept, `R`=Reject, `C`=Cancel by Pledgor, `E`=Reversal by Pledgee |
+| `<Psn>` | Pledge Sequence Number | Numeric | 10 | CDSL-assigned sequence number |
+| `<Bnfcry>` | Pledgor BO ID | Alpha | 16 | 16-digit BO ID of pledgor (client) |
+| `<CtrPty>` | Pledgee BO ID | Alpha | 16 | 16-digit BO ID of pledgee (broker CUSPA / CC) |
+| `<ISIN>` | ISIN Code | Alpha | 12 | 12-character ISIN (e.g., INE009A01021) |
+| `<Qty>` | Quantity | Numeric | 15.3 | Max 12 digits before decimal, 3 after; decimal required |
+| `<Prtqty>` | Partial Quantity | Numeric | 15.3 | For partial unpledge |
+| `<Rcvdt>` | Request Received Date | Numeric | 8 | DDMMYYYY - date instruction received from client |
+| `<Remk>` | Remarks | Alpha | 50 | Free text remarks |
+| `<RejRsnCd>` | Rejection Reason Code | Alpha | 3 | Mandatory when rejecting pledge/unpledge (since Jun 2024, per CDSL/OPS/DP/POLCY/2024/314) |
+
+#### 27.6.2 Margin Pledge Specific Tags (Additional)
+
+| Tag | Field | Description |
+|-----|-------|-------------|
+| `<MrgPldgTp>` | Margin Pledge Type | `MP`=Margin Pledge, `MRP`=Margin Re-pledge, `MFP`=MTF Pledge |
+| `<CMID>` | Clearing Member ID | For re-pledge to CC |
+| `<ExchCd>` | Exchange Code | NSE/BSE/MCX |
+| `<SegCd>` | Segment Code | CM/FO/CD/COM |
+
+#### 27.6.3 Sample Pledge File
+
+```xml
+<Tp>7</Tp>
+<Usn>00000001</Usn>
+<Pldgtp>P</Pldgtp>
+<Subtp>S</Subtp>
+<Bnfcry>1234567800012345</Bnfcry>
+<CtrPty>1234567899990040</CtrPty>
+<ISIN>INE009A01021</ISIN>
+<Qty>100.000</Qty>
+<Rcvdt>13022026</Rcvdt>
+<MrgPldgTp>MP</MrgPldgTp>
+<Remk>Margin pledge for equity derivatives</Remk>
+```
+
+#### 27.6.4 Sample Unpledge File
+
+```xml
+<Tp>7</Tp>
+<Usn>00000002</Usn>
+<Pldgtp>U</Pldgtp>
+<Subtp>S</Subtp>
+<Psn>0000012345</Psn>
+<Bnfcry>1234567800012345</Bnfcry>
+<CtrPty>1234567899990040</CtrPty>
+<ISIN>INE009A01021</ISIN>
+<Qty>50.000</Qty>
+<Prtqty>50.000</Prtqty>
+<Rcvdt>14022026</Rcvdt>
+<MrgPldgTp>MP</MrgPldgTp>
+<Remk>Partial unpledge - client request</Remk>
+```
+
+#### 27.6.5 Sample Invocation (Confiscation) File
+
+```xml
+<Tp>7</Tp>
+<Usn>00000003</Usn>
+<Pldgtp>C</Pldgtp>
+<Subtp>S</Subtp>
+<Psn>0000012345</Psn>
+<Bnfcry>1234567800012345</Bnfcry>
+<CtrPty>1234567899990040</CtrPty>
+<ISIN>INE009A01021</ISIN>
+<Qty>100.000</Qty>
+<Rcvdt>15022026</Rcvdt>
+<Remk>Margin call failure - invocation</Remk>
+```
+
+### 27.7 Pledge Invocation (Confiscation)
+
+Invocation occurs when the broker exercises the pledge to recover dues:
+
+| Aspect | Details |
+|--------|---------|
+| **Trigger** | Client fails to meet margin call / MTF funding obligation |
+| **Process** | Broker submits confiscation instruction to CDSL (Pldgtp = 'C') |
+| **Effect** | Securities transferred from client BO to broker BO / CC account |
+| **Client Notification** | CDSL sends SMS + email to client about invocation |
+| **Reversal** | Not possible once executed; client must buy back |
+| **Rejection Reason** | Since Jun 2024, broker must specify rejection reason code when rejecting pledge/unpledge |
+
+### 27.8 SEBI Automated Pledge Mechanism (June 2025)
+
+SEBI circular SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/82 introduced three new automated mechanisms effective October 10, 2025:
+
+#### 27.8.1 Pledge Release for Early Pay-in (PR-EP)
+
+| Aspect | Details |
+|--------|---------|
+| **Trigger** | Client sells securities that are currently pledged (margin/CUSPA/MTF) |
+| **Old Process** | Manual: Client unpledges, waits, then sells. Short delivery risk. |
+| **New Process** | Automated single instruction: Pledge release + Early pay-in block simultaneously |
+| **Key Feature** | Does NOT require DDPI/POA or any electronic/physical instruction from client |
+| **Validation** | Based on confirmed delivery obligation data from Clearing Corporation |
+| **Effective Date** | October 10, 2025 (extended from September 1, 2025 after CDSL/NSDL representations) |
+
+#### 27.8.2 Invocation for Early Pay-in (IV-EP)
+
+| Aspect | Details |
+|--------|---------|
+| **Trigger** | Broker invokes pledged margin securities for client's settlement |
+| **Process** | Securities automatically blocked for early pay-in in client's demat account |
+| **Trail** | Transaction trail maintained in broker's margin pledge account |
+| **Validation** | Limited to confirmed delivery obligations only |
+| **Exclusion** | Mutual fund units not traded on exchange excluded |
+
+#### 27.8.3 Invocation for Redemption (IV-RD)
+
+| Aspect | Details |
+|--------|---------|
+| **Trigger** | Broker invokes pledged securities for redemption (MF units, etc.) |
+| **Process** | Direct redemption instruction from broker's pledge account |
+
+### 27.9 Pledge APIs Summary
+
+| API | Endpoint | Purpose | Auth |
+|-----|----------|---------|------|
+| **e-Margin Pledge** | `api.cdslindia.com/APIServices` | Create margin pledge from BO to TM/CM | API Key + DSC |
+| **Margin Repledge** | `api.cdslindia.com/APIServices` | Re-pledge from TM/CM to CC | API Key + DSC |
+| **eLAS** | `api.cdslindia.com/APIServices` | Loan Against Shares pledge | API Key + DSC |
+| **Transaction Upload** | `api.cdslindia.com/APIServices` | Batch pledge/unpledge via file upload | API Key + DSC |
+| **Pledge Query** | `api.cdslindia.com/APIServices` | Query pledge status by BO/ISIN | API Key |
+
+### 27.10 Margin Pledge Haircut Framework
+
+When securities are pledged as margin, the Clearing Corporation applies a haircut:
+
+| Security Category | Typical Haircut | Margin Benefit (on Rs. 1 lakh pledged) |
+|-------------------|-----------------|----------------------------------------|
+| Group I (Large Cap, liquid) | VaR (8-15%) + ELM (3.5%) | Rs. 81,500 - Rs. 88,500 |
+| Group II (Mid Cap) | VaR (15-30%) + ELM (5%) | Rs. 65,000 - Rs. 80,000 |
+| Group III (Small Cap) | VaR (30-50%) + ELM (5%) | Rs. 45,000 - Rs. 65,000 |
+| ETFs / Liquid Bees | 5-10% | Rs. 90,000 - Rs. 95,000 |
+| Sovereign Gold Bonds | 10-15% | Rs. 85,000 - Rs. 90,000 |
+
+> **Note**: Actual haircuts are published daily by Clearing Corporations (NSCCL/ICCL). These are indicative ranges.
+
+### 27.11 Client Securities Margin Pledge Account (CUSPA)
+
+| Aspect | Details |
+|--------|---------|
+| **Sub-Status Code** | 40 (Client Securities Margin Pledge Account) |
+| **Who Opens** | Broker (TM/CM) opens with CDSL |
+| **Tag** | "TMCM - Client Securities Margin Pledge Account" |
+| **Purpose** | Holds pledge liens from clients who have given DDPI/POA |
+| **AMC** | Rs. 500/year (charged by CDSL to DP) |
+| **Separate from** | Broker's proprietary account (sub-status 30/31/32) |
+| **Visibility** | Client can see pledge status via easi/EASIEST/myEasi |
+| **SEBI Mandate** | Every TM/CM must open CUSPA for collecting client securities as margin |
+
+### 27.12 MTF-Specific Demat Account
+
+| Aspect | Details |
+|--------|---------|
+| **Account Label** | "Client Securities under Margin Funding Account" |
+| **Who Opens** | Broker opens with CDSL |
+| **Purpose** | Holds MTF pledge liens (funded stock) |
+| **SEBI Requirement** | Mandatory separate account for MTF funded stock (per SEBI/HO/MIRSD/DOP/CIR/P/2020/28) |
+| **Pledge Duration** | Until client repays MTF funding or position is squared off |
+| **Client Action** | Must accept pledge by T+3 (5:00 PM) else auto square-off on T+4 |
+| **Interest** | Broker charges MTF interest (typically 12-18% p.a.) on funded amount |
+
+### 27.13 Pledge Cost Structure
+
+| Operation | CDSL Charge | Typical DP Charge to Client |
+|-----------|------------|---------------------------|
+| Margin Pledge (create) | Part of Rs. 3.50/debit txn | Rs. 25-30 per ISIN + GST |
+| Unpledge | No separate charge | Free or Rs. 10-15 |
+| Re-pledge (TM to CC) | Part of Rs. 3.50/debit txn | Not charged to client |
+| Invocation | Part of Rs. 3.50/debit txn | Penalty charges to client |
+
+---
+
+## 28. BO Modification - Comprehensive Use Cases
+
+> Source: [CDSL_INTEGRATION.md](../../CDSL_INTEGRATION.md) Section 36
+
+### 28.1 Overview
+
+BO modifications are submitted via the same **BO Modify Upload API** used for account opening, using the same Line 01-07 file structure. Only modified fields need to contain new values; unchanged fields retain existing data.
+
+| Aspect | Details |
+|--------|---------|
+| **API** | POST /v1/bo/modify (same structure as BO Setup Upload API) |
+| **File Upload** | `BO_MODIFY_{DPID}_{YYYYMMDD}_{SEQ}.txt` |
+| **Processing** | Online: 1-2 hours; Batch: next working day |
+| **Maker-Checker** | Required in CDAS (Maker sets up, Checker verifies and releases) |
+| **Print Rule** | On modification: Line Code 0 (header) + all fields of modified Line Code printed |
+| **Nominee Print Rule** | If nominee modified: Line Code 0 + ALL Line Code 07 fields printed (modified + unmodified) |
+| **Joint Holder Print Rule** | Address changes: Line Codes 01, 02, 03 all printed |
+| **Auto-Propagation** | Address changes automatically downloaded to all companies where BO holds securities |
+| **CDSL Communiques** | DP-408, DP-304, DP-5565 |
+
+### 28.2 Address Change
+
+#### 28.2.1 Process Flow
+
+```
+Step 1: Client submits address change request to DP
+   - Online: Via broker app/portal
+   - Offline: Physical form + supporting documents
+   |
+Step 2: DP validates supporting documents
+   - Acceptable: Aadhaar, Passport, Utility Bill (<3 months),
+     Voter ID, Driving License, Bank Statement
+   - Third-party address: Additional KYC for third party required
+     (DP must obtain PoI + PoA for third party as well)
+   |
+Step 3: Maker creates modification in CDAS
+   - BO Modify file: Line 02 (Address Details) updated
+   - Correspondence address and/or Permanent address
+   |
+Step 4: Checker verifies and releases
+   - Cross-validates documents against entered address
+   |
+Step 5: CDSL processes modification
+   - Address change auto-propagated to ALL companies where BO holds securities
+   |
+Step 6: Confirmation sent to client (SMS + email)
+```
+
+### 28.3 Bank Account Modification
+
+#### 28.3.1 Process Flow
+
+```
+Step 1: Client requests bank account change
+   - Add new bank / Change primary bank / Delete bank (keep min 1)
+   |
+Step 2: DP collects supporting documents
+   - Cancelled cheque leaf (new bank)
+   - Bank statement header (new bank)
+   - Self-attested ID proof
+   |
+Step 3: DP verifies new bank account
+   - Penny drop verification (Rs. 1 credit via IMPS)
+   - IFSC validation against RBI directory
+   - Account holder name match with BO name
+   |
+Step 4: Maker creates modification in CDAS (Line 05)
+   |
+Step 5: Checker verifies and releases
+   |
+Step 6: CDSL processes update (typically same day)
+   - All future corporate action payouts to new/updated bank
+```
+
+#### 28.3.2 Bank Modification Rules
+
+| Rule | Details |
+|------|---------|
+| **Minimum Banks** | Must maintain at least 1 bank account |
+| **Maximum Banks** | Up to 5 bank accounts per BO |
+| **Primary Bank** | Exactly 1 must be marked as primary |
+| **Verification** | New bank must be penny-drop verified before submission |
+| **NRI Accounts** | NRE account for NRE demat; NRO account for NRO demat (must match) |
+| **Name Match** | Bank account holder name must match BO name (or joint holder) |
+
+### 28.4 Nominee Update
+
+#### 28.4.1 SEBI Nomination Rules (January 10, 2025)
+
+Circular: SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2025/3 (Jan 10, 2025)
+Amendment: SEBI Feb 28, 2025 (clarifications)
+Extension: SEBI Jul 2025 (Phase II & III implementation extension)
+
+| Aspect | Details |
+|--------|---------|
+| **Maximum Nominees** | 10 (increased from 3) |
+| **Effective Date** | March 1, 2025 |
+| **Mandatory Fields** | Name, relationship, percentage, address, email, mobile, one ID (PAN or DL or last 4 Aadhaar digits) |
+| **Percentage** | Must total exactly 100.00% across all nominees |
+| **Minor Nominee** | Guardian details mandatory (name, PAN, relationship, address) |
+| **POA/DDPI Restriction** | Person acting under POA/DDPI CANNOT add/modify nominees |
+| **Default Distribution** | If percentages not specified, equal distribution |
+| **Non-Compliance** | Account frozen for debits |
+| **Record Retention** | 8 years post-transmission |
+
+#### 28.4.2 Nomination Update Process
+
+```
+Step 1: Client initiates nomination change
+   Option A: Online via broker portal (OTP verified)
+   Option B: Physical nomination form (signed by all holders)
+   |
+Step 2: Populate nominee details (for each nominee, up to 10):
+   - Full name, Relationship code (SP/CH/PA/SI/OT)
+   - Percentage share, Full address (line 1, city, state, pincode)
+   - Email ID (mandatory since Mar 2025)
+   - Mobile number (mandatory since Mar 2025)
+   - One ID: PAN or DL number or last 4 digits of Aadhaar
+   - DOB; If minor: Guardian name, PAN, relationship, address
+   |
+Step 3: Maker enters in CDAS (Line 07 updated; ALL nominees sent)
+   |
+Step 4: Checker verifies (percentages = 100%, guardian for minors)
+   |
+Step 5: CDSL processes update (T+0 via API)
+```
+
+#### 28.4.3 Opt-Out Process (Decline Nomination)
+
+```
+Step 1: Client declares opt-out of nomination
+   |
+Step 2: Online process:
+   - OTP verification to registered mobile/email
+   - PLUS one of:
+     a) Video recording by the regulated entity, OR
+     b) Physical acknowledgment at DP office
+   |
+Step 3: DP uploads opt-out to CDSL (Line 07: Flag='N', OptOut='Y', Video='Y')
+   |
+Step 4: CDSL marks account as "Nomination Opted Out"
+```
+
+#### 28.4.4 Simplified Transmission (On Death of Holder)
+
+Per SEBI Jan 2025 circular:
+
+| Document | Required? | Notes |
+|----------|-----------|-------|
+| Death certificate | **Yes** | Mandatory |
+| Nominee's KYC documents | **Yes** | Updated KYC |
+| Affidavit | **No** | Removed by SEBI |
+| Indemnity bond | **No** | Removed by SEBI |
+| Undertaking / Attestation / Notarization | **No** | All removed by SEBI |
+
+- **Joint accounts**: Surviving holders need only death certificate (no KYC re-verification)
+- **Unclaimed portions**: Frozen in original account with enhanced due diligence
+- **Liability protection**: Post-transmission claims are between nominee(s) and claimants only, without reference to regulated entities
+
+### 28.5 Email / Mobile Update
+
+| Step | Details |
+|------|---------|
+| 1 | Client submits change request (online or offline) |
+| 2 | New email verified via OTP to new email |
+| 3 | New mobile verified via OTP to new mobile |
+| 4 | Maker updates in CDAS: Line 02 (mobile, email fields) |
+| 5 | Checker verifies and releases |
+| 6 | Confirmation sent to BOTH old and new contact details |
+
+**Critical**: Mobile and Email are part of the 6 mandatory KYC attributes. Changes must be propagated to KRA + Exchange (UCC) within 10 working days.
+
+### 28.6 PAN Correction
+
+Per CDSL Notification CDSL/OPS/DP/POLCY/2024/657 (October 30, 2024):
+
+| Step | Details |
+|------|---------|
+| 1 | BO submits PAN correction request with self-attested PAN copy |
+| 2 | DP stamps PAN copy: "Verified with original" + "PAN verified with income tax site" |
+| 3 | DP verifies PAN on protean-tinpan.com |
+| 4 | DP matches BO's signature on PAN copy with signature in CDAS |
+| 5 | For partnership/trust/HUF: First and last 3 pages of deeds |
+| 6 | For mergers: Merger docs + new entity PAN |
+| 7 | Maker creates modification in CDAS (Line 01) |
+| 8 | Checker processes by T+2 working days |
+| 9 | Cross-system sync: KRA + Exchange + CKYC must be updated |
+
+### 28.7 Segment Activation / Deactivation
+
+Segment activation is primarily an **exchange-level operation** (UCC), not a CDSL BO modification. The depository does not enforce segment-level restrictions on BO accounts.
+
+| Segment | Exchange(s) | Income Proof | Process |
+|---------|-------------|-------------|---------|
+| CM (Equity) | NSE, BSE | No (default) | Auto with UCC |
+| FO (Derivatives) | NSE, BSE | Yes (min Rs. 10L) | UCC modify at exchange |
+| CD (Currency) | NSE, BSE, MSE | No | UCC modify at exchange |
+| COM (Commodity) | MCX, NCDEX | Yes (mandatory) | UCC modify at exchange |
+| SLB | NSE, BSE | Separate agreement | SLB agreement with broker |
+
+### 28.8 BO Account Closure
+
+#### 28.8.1 Regulatory Framework
+
+| Aspect | Details |
+|--------|---------|
+| **SEBI Mandate** | DPs with online services MUST provide online closure facility |
+| **Circular** | SEBI/HO/MRD/MRD-PoD-1/P/CIR/2024/168 (Dec 2024) |
+| **Effective Date** | July 14, 2025 (new procedures) |
+| **Client Right** | BO shall NOT be required to give reasons for closure (online mode) |
+
+#### 28.8.2 Closure Process
+
+```
+Step 1: Client initiates closure (online: no reason required; or physical ACRF)
+   |
+Step 2: Pre-conditions check:
+   [ ] All free securities transferred to target BO account
+   [ ] No outstanding dues (AMC, transaction charges)
+   [ ] No pending corporate actions
+   [ ] All pledges released (unpledged)
+   [ ] No frozen/suspended securities
+   [ ] No pending inter-depository transfers
+   |
+Step 3a: No dues --> DP closes within 2 working days
+Step 3b: Dues exist --> DP notifies within 2 days; client pays within 30 days
+   |
+Step 4: Securities transferred to target BO via Account Transfer (ACCTRANSFER)
+   |
+Step 5: Account status = "Closed" in CDAS
+   |
+Step 6: Closure confirmation within 2 working days (SMS + email)
+```
+
+#### 28.8.3 Special Securities During Closure
+
+| Security Type | Transfer Rules |
+|---------------|---------------|
+| **Free securities** | Standard transfer |
+| **Locked-in** | Intra-CDSL: standard; Cross-depository: Corporate Action mechanism |
+| **Pledged** | Must be unpledged first |
+| **Frozen** | Permitted with identical PAN pattern within same depository; freeze maintained |
+| **Suspended** | Cannot be transferred until lifted |
+
+#### 28.8.4 Dormancy and Reactivation
+
+| Aspect | Details |
+|--------|---------|
+| **Dormant** | No transactions for 12+ months |
+| **Reactivation** | Request to DP + updated KYC (PAN, address proof, photo) |
+| **Timeline** | 2-3 working days |
+
+### 28.9 BO Modification Summary Matrix
+
+| Modification | File Line | Timeline | Key Documents | Cross-System Sync |
+|-------------|-----------|----------|--------------|-------------------|
+| Address Change | Line 02 | Same day | Address proof | KRA (10 days) |
+| Bank Add/Change | Line 05 | Same day | Cheque + penny drop | Exchange (10 days) |
+| Nominee Update | Line 07 | T+0 | Nom form + OTP | N/A |
+| Nominee Opt-Out | Line 07 | T+0 | Video + declaration | N/A |
+| Email/Mobile | Line 02 | Same day | OTP (old + new) | KRA + Exchange (10 days) |
+| PAN Correction | Line 01 | T+2 | PAN copy + IT verify | KRA + Exchange + CKYC |
+| Segment Activation | N/A | 1-2 days | Income proof | Exchange UCC |
+| DDPI Activation | Line 06 | ~24 hours | eSign + stamp duty | N/A |
+| Account Closure | Closure API | 2 working days | ACRF + transfer | Exchange UCC deactivation |
+
+---
+
+## 29. SEBI Circulars Reference Extended
+
+> Source: [CDSL_INTEGRATION.md](../../CDSL_INTEGRATION.md) Section 37
+
+### 29.1 DDPI Circulars
+
+| Circular Number | Date | Subject |
+|-----------------|------|---------|
+| SEBI/HO/MIRSD/DoP/P/CIR/2022/44 | Apr 4, 2022 | DDPI for settlement + pledge (original) |
+| SEBI/HO/MIRSD/DoP/P/CIR/2022/119 | Jun 2022 | Implementation timeline extension |
+| SEBI/HO/MIRSD-PoD-1/P/CIR/2022/137 | Oct 6, 2022 | DDPI scope expanded: MF + open offer |
+| SEBI/HO/MIRSD/DoP/P/CIR/2022/153 | Nov 2022 | Further implementation extension |
+
+### 29.2 Margin Pledge Circulars
+
+| Circular Number | Date | Subject |
+|-----------------|------|---------|
+| SEBI/HO/MIRSD/DOP/CIR/P/2020/28 | Feb 25, 2020 | Margin pledge/re-pledge in depository system |
+| SEBI/HO/MIRSD/DOP/CIR/P/2020/88 | Jun 1, 2020 | Extension to Aug 1, 2020 |
+| SEBI/HO/MIRSD/DOP/CIR/P/2020/144 | Sep 22, 2020 | MTF securities as maintenance margin |
+| SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/82 | Jun 3, 2025 | Automated pledge release + invocation |
+
+### 29.3 Nomination Circulars
+
+| Circular Number | Date | Subject |
+|-----------------|------|---------|
+| SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2025/3 | Jan 10, 2025 | Revise and Revamp Nomination Facilities |
+| SEBI Feb 28, 2025 | Feb 28, 2025 | Clarifications to nomination circular |
+| SEBI Jul 2025 | Jul 2025 | Extended Phase II & III implementation |
+
+### 29.4 CDSL Communiques for DDPI/Pledge/Modifications
+
+| Communique | Date | Subject |
+|------------|------|---------|
+| DP-115 | Ongoing | SEBI Circular on Margin Obligations |
+| DP-234 | May 22, 2020 | Operational modalities for margin pledge/re-pledge |
+| DP-304 | Jul 2021 | Mandatory updation of certain KYC attributes |
+| DP-332 | Jun 14, 2022 | DDPI implementation |
+| DP-408 | Aug 3, 2018 | Changes in BO Account Information |
+| DP-412 | Aug 2020 | Margin Pledge/Re-Pledge implementation |
+| DP-5565 | Ongoing | BO Setup/Modify changes for CM/POA/DDPI holder |
+| CDSL/OPS/DP/POLCY/2024/314 | Jun 7, 2024 | Pledge file format: rejection reason code |
+| CDSL/OPS/DP/POLCY/2024/657 | Oct 30, 2024 | PAN modification at DP end |
 
 ---
 
