@@ -20,7 +20,43 @@ export default defineConfig({
 				PageFrame: './src/components/overrides/PageFrame.astro',
 			},
 			head: [
-				// Google Analytics with Consent Mode v2 (consent handled by CookieConsent component)
+				// Google Consent Mode v2 - MUST load BEFORE gtag.js (synchronous)
+				{
+					tag: 'script',
+					content: `
+						// Initialize dataLayer and gtag function
+						window.dataLayer = window.dataLayer || [];
+						function gtag(){dataLayer.push(arguments);}
+
+						// Regional scoping: Detect if user is in GDPR region
+						function isGDPRRegion() {
+							// Check timezone as proxy for region (EU timezones)
+							const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+							const euTimezones = ['Europe/', 'Atlantic/Reykjavik', 'Atlantic/Azores', 'Atlantic/Madeira'];
+							return euTimezones.some(zone => tz.startsWith(zone));
+						}
+
+						// Set consent defaults based on region
+						// GDPR regions: denied by default (show banner)
+						// Other regions: granted by default (no banner, better measurement)
+						const isGDPR = isGDPRRegion();
+
+						gtag('consent', 'default', {
+							'ad_storage': 'denied',
+							'ad_user_data': 'denied',
+							'ad_personalization': 'denied',
+							'analytics_storage': isGDPR ? 'denied' : 'granted',
+							'functionality_storage': 'granted',
+							'personalization_storage': 'denied',
+							'security_storage': 'granted',
+							'wait_for_update': 500,
+						});
+
+						// Store GDPR flag for banner logic
+						window.__isGDPRRegion = isGDPR;
+					`,
+				},
+				// Google Analytics - Load gtag.js (async, after consent default)
 				{ tag: 'script', attrs: { async: true, src: 'https://www.googletagmanager.com/gtag/js?id=G-G986QLPFZ1' } },
 				{
 					tag: 'script',

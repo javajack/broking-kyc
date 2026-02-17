@@ -52,46 +52,50 @@
 </div>
 
 <script>
-	// Google Consent Mode v2 - Initialize with default denied
+	// Note: Consent mode default is initialized in <head> BEFORE gtag.js loads
+	// This script only handles UI and consent updates
+
 	window.dataLayer = window.dataLayer || [];
 	function gtag() { dataLayer.push(arguments); }
 
-	gtag('consent', 'default', {
-		'ad_storage': 'denied',
-		'ad_user_data': 'denied',
-		'ad_personalization': 'denied',
-		'analytics_storage': 'denied',
-		'functionality_storage': 'granted',
-		'personalization_storage': 'denied',
-		'security_storage': 'granted',
-		'wait_for_update': 500,
-	});
+	const CONSENT_KEY = 'cookie_consent';
+	const isGDPRRegion = window.__isGDPRRegion || false;
 
 	// Check for existing consent
-	const CONSENT_KEY = 'cookie_consent';
 	const consent = localStorage.getItem(CONSENT_KEY);
 
 	if (consent) {
+		// User has previously set consent - apply it
 		const { analytics } = JSON.parse(consent);
 		updateConsent(analytics);
-	} else {
-		// Show banner if no consent stored
+	} else if (isGDPRRegion) {
+		// GDPR region + no consent stored = show banner
 		document.getElementById('cookie-consent-banner').style.display = 'block';
+	} else {
+		// Non-GDPR region + no consent stored = already granted in default, no banner needed
+		// But save this implicit consent for consistency
+		saveConsent(true, false); // true = analytics granted, false = don't hide banner (not shown)
 	}
 
-	// Update consent mode
+	// Update consent mode (calls gtag consent API)
 	function updateConsent(analyticsGranted) {
 		gtag('consent', 'update', {
 			'analytics_storage': analyticsGranted ? 'granted' : 'denied'
 		});
 	}
 
-	// Save consent
-	function saveConsent(analytics) {
-		localStorage.setItem(CONSENT_KEY, JSON.stringify({ analytics, timestamp: Date.now() }));
+	// Save consent to localStorage and update consent mode
+	function saveConsent(analytics, hideBanner = true) {
+		localStorage.setItem(CONSENT_KEY, JSON.stringify({
+			analytics,
+			timestamp: Date.now(),
+			region: isGDPRRegion ? 'gdpr' : 'other'
+		}));
 		updateConsent(analytics);
-		document.getElementById('cookie-consent-banner').style.display = 'none';
-		document.getElementById('cookie-settings-modal').style.display = 'none';
+		if (hideBanner) {
+			document.getElementById('cookie-consent-banner').style.display = 'none';
+			document.getElementById('cookie-settings-modal').style.display = 'none';
+		}
 	}
 
 	// Accept all
