@@ -19,6 +19,17 @@ export default defineConfig({
 				SiteTitle: './src/components/overrides/SiteTitle.astro',
 			},
 			head: [
+				// Google Analytics
+				{ tag: 'script', attrs: { async: true, src: 'https://www.googletagmanager.com/gtag/js?id=G-G986QLPFZ1' } },
+				{
+					tag: 'script',
+					content: `
+						window.dataLayer = window.dataLayer || [];
+						function gtag(){dataLayer.push(arguments);}
+						gtag('js', new Date());
+						gtag('config', 'G-G986QLPFZ1');
+					`,
+				},
 				// Yandex Webmaster verification
 				{ tag: 'meta', attrs: { name: 'yandex-verification', content: '5281e40eca9463d2' } },
 				{ tag: 'meta', attrs: { property: 'og:image', content: 'https://javajack.github.io/broking-kyc/og-image.png' } },
