@@ -1,0 +1,179 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 650" font-family="Inter, -apple-system, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#475569"/>
+    </marker>
+    <marker id="arrow-red" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#dc2626"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#16a34a"/>
+    </marker>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1e293b"/>
+      <stop offset="100%" style="stop-color:#334155"/>
+    </linearGradient>
+    <filter id="shadow" x="-2%" y="-2%" width="104%" height="104%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.1"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1400" height="650" fill="white"/>
+
+  <!-- Title Bar -->
+  <rect x="0" y="0" width="1400" height="60" fill="url(#headerGrad)"/>
+  <text x="700" y="28" text-anchor="middle" fill="white" font-size="20" font-weight="700">KYC Application Status Lifecycle</text>
+  <text x="700" y="48" text-anchor="middle" fill="#94a3b8" font-size="12">12 states — from REGISTERED to ACTIVE, with retry paths from GATE_FAILED and REJECTED</text>
+
+  <!-- Legend -->
+  <rect x="30" y="70" width="1340" height="40" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
+  <rect x="50" y="82" width="16" height="16" rx="4" fill="#3b82f6"/> <text x="72" y="94" font-size="11" fill="#475569">User Journey</text>
+  <rect x="170" y="82" width="16" height="16" rx="4" fill="#d97706"/> <text x="192" y="94" font-size="11" fill="#475569">Gate</text>
+  <rect x="250" y="82" width="16" height="16" rx="4" fill="#dc2626"/> <text x="272" y="94" font-size="11" fill="#475569">Failure</text>
+  <rect x="340" y="82" width="16" height="16" rx="4" fill="#8b5cf6"/> <text x="362" y="94" font-size="11" fill="#475569">Submitted</text>
+  <rect x="450" y="82" width="16" height="16" rx="4" fill="#ea580c"/> <text x="472" y="94" font-size="11" fill="#475569">Admin</text>
+  <rect x="540" y="82" width="16" height="16" rx="4" fill="#475569"/> <text x="562" y="94" font-size="11" fill="#475569">Batch</text>
+  <rect x="620" y="82" width="16" height="16" rx="4" fill="#16a34a"/> <text x="642" y="94" font-size="11" fill="#475569">Success</text>
+  <line x1="740" y1="90" x2="790" y2="90" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="798" y="94" font-size="11" fill="#475569">Transition</text>
+  <line x1="880" y1="90" x2="930" y2="90" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arrow-red)"/>
+  <text x="938" y="94" font-size="11" fill="#475569">Retry Path</text>
+
+  <!-- ==================== ROW 1: Main happy path (y=160) ==================== -->
+
+  <!-- REGISTERED -->
+  <rect x="30" y="150" width="140" height="56" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="2" filter="url(#shadow)"/>
+  <text x="100" y="175" text-anchor="middle" font-size="11" font-weight="700" fill="#1e40af">REGISTERED</text>
+  <text x="100" y="192" text-anchor="middle" font-size="9" fill="#64748b">Mobile OTP done</text>
+
+  <!-- Arrow: REGISTERED → PAN_ENTERED -->
+  <line x1="170" y1="178" x2="196" y2="178" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="183" y="170" text-anchor="middle" font-size="8" fill="#64748b">PAN+DOB</text>
+
+  <!-- PAN_ENTERED -->
+  <rect x="206" y="150" width="140" height="56" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="2" filter="url(#shadow)"/>
+  <text x="276" y="175" text-anchor="middle" font-size="11" font-weight="700" fill="#1e40af">PAN_ENTERED</text>
+  <text x="276" y="192" text-anchor="middle" font-size="9" fill="#64748b">Async checks fire</text>
+
+  <!-- Arrow: PAN_ENTERED → DIGILOCKER_PENDING -->
+  <line x1="346" y1="178" x2="372" y2="178" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="359" y="170" text-anchor="middle" font-size="8" fill="#64748b">Redirect</text>
+
+  <!-- DIGILOCKER_PENDING -->
+  <rect x="382" y="140" width="160" height="56" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="2" filter="url(#shadow)"/>
+  <text x="462" y="163" text-anchor="middle" font-size="10" font-weight="700" fill="#1e40af">DIGILOCKER_</text>
+  <text x="462" y="176" text-anchor="middle" font-size="10" font-weight="700" fill="#1e40af">PENDING</text>
+  <text x="462" y="190" text-anchor="middle" font-size="9" fill="#64748b">Consent wait</text>
+
+  <!-- Arrow: DIGILOCKER_PENDING → FILLING -->
+  <line x1="542" y1="168" x2="568" y2="168" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="555" y="160" text-anchor="middle" font-size="8" fill="#64748b">Done</text>
+
+  <!-- FILLING -->
+  <rect x="578" y="150" width="120" height="56" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="2" filter="url(#shadow)"/>
+  <text x="638" y="175" text-anchor="middle" font-size="11" font-weight="700" fill="#1e40af">FILLING</text>
+  <text x="638" y="192" text-anchor="middle" font-size="9" fill="#64748b">Screens 4-8</text>
+
+  <!-- Arrow: FILLING → GATE_CHECK -->
+  <line x1="698" y1="178" x2="724" y2="178" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="711" y="170" text-anchor="middle" font-size="8" fill="#64748b">Submit</text>
+
+  <!-- GATE_CHECK (diamond) -->
+  <polygon points="790,148 830,178 790,208 750,178" fill="#fffbeb" stroke="#d97706" stroke-width="2" filter="url(#shadow)"/>
+  <text x="790" y="175" text-anchor="middle" font-size="9" font-weight="700" fill="#92400e">GATE</text>
+  <text x="790" y="186" text-anchor="middle" font-size="9" font-weight="700" fill="#92400e">CHECK</text>
+
+  <!-- Arrow: GATE_CHECK → e_SIGNED (pass) -->
+  <line x1="830" y1="178" x2="866" y2="178" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="848" y="170" text-anchor="middle" font-size="8" fill="#16a34a">Pass</text>
+
+  <!-- e_SIGNED -->
+  <rect x="876" y="150" width="120" height="56" rx="10" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="2" filter="url(#shadow)"/>
+  <text x="936" y="175" text-anchor="middle" font-size="11" font-weight="700" fill="#6d28d9">e_SIGNED</text>
+  <text x="936" y="192" text-anchor="middle" font-size="9" fill="#64748b">User done</text>
+
+  <!-- Arrow: e_SIGNED → UNDER_REVIEW -->
+  <line x1="996" y1="178" x2="1022" y2="178" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="1009" y="170" text-anchor="middle" font-size="8" fill="#64748b">Auto</text>
+
+  <!-- UNDER_REVIEW -->
+  <rect x="1032" y="150" width="140" height="56" rx="10" fill="#fff7ed" stroke="#ea580c" stroke-width="2" filter="url(#shadow)"/>
+  <text x="1102" y="175" text-anchor="middle" font-size="10" font-weight="700" fill="#c2410c">UNDER_REVIEW</text>
+  <text x="1102" y="192" text-anchor="middle" font-size="9" fill="#64748b">Maker-Checker</text>
+
+  <!-- ==================== ROW 2: Right side continuation (y=300) ==================== -->
+
+  <!-- Arrow: UNDER_REVIEW → APPROVED (down-right) -->
+  <path d="M 1102,206 L 1102,270 L 1102,280" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="1115" y="250" font-size="8" fill="#16a34a">Approve</text>
+
+  <!-- APPROVED -->
+  <rect x="1032" y="290" width="140" height="56" rx="10" fill="#fff7ed" stroke="#ea580c" stroke-width="2" filter="url(#shadow)"/>
+  <text x="1102" y="315" text-anchor="middle" font-size="11" font-weight="700" fill="#c2410c">APPROVED</text>
+  <text x="1102" y="332" text-anchor="middle" font-size="9" fill="#64748b">Checker sign-off</text>
+
+  <!-- Arrow: APPROVED → REGISTERING -->
+  <path d="M 1102,346 L 1102,400" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="1115" y="380" font-size="8" fill="#64748b">Batch fire</text>
+
+  <!-- REGISTERING -->
+  <rect x="1032" y="410" width="140" height="56" rx="10" fill="#f1f5f9" stroke="#475569" stroke-width="2" filter="url(#shadow)"/>
+  <text x="1102" y="435" text-anchor="middle" font-size="11" font-weight="700" fill="#1e293b">REGISTERING</text>
+  <text x="1102" y="452" text-anchor="middle" font-size="9" fill="#64748b">8 pipelines run</text>
+
+  <!-- Arrow: REGISTERING → ACTIVE -->
+  <path d="M 1102,466 L 1102,520" fill="none" stroke="#16a34a" stroke-width="2" marker-end="url(#arrow-green)"/>
+  <text x="1115" y="500" font-size="8" fill="#16a34a">All pass</text>
+
+  <!-- ACTIVE -->
+  <rect x="1032" y="530" width="140" height="56" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2.5" filter="url(#shadow)"/>
+  <text x="1102" y="555" text-anchor="middle" font-size="13" font-weight="700" fill="#15803d">ACTIVE</text>
+  <text x="1102" y="572" text-anchor="middle" font-size="9" fill="#64748b">Can trade</text>
+
+  <!-- ==================== FAILURE STATES (y=300) ==================== -->
+
+  <!-- Arrow: GATE_CHECK → GATE_FAILED (down) -->
+  <path d="M 790,208 L 790,280" fill="none" stroke="#dc2626" stroke-width="1.5" marker-end="url(#arrow-red)"/>
+  <text x="803" y="250" font-size="8" fill="#dc2626">Fail</text>
+
+  <!-- GATE_FAILED -->
+  <rect x="720" y="290" width="140" height="56" rx="10" fill="#fef2f2" stroke="#dc2626" stroke-width="2" filter="url(#shadow)"/>
+  <text x="790" y="315" text-anchor="middle" font-size="11" font-weight="700" fill="#dc2626">GATE_FAILED</text>
+  <text x="790" y="332" text-anchor="middle" font-size="9" fill="#64748b">Check failed</text>
+
+  <!-- Retry: GATE_FAILED → FILLING (dashed) -->
+  <path d="M 720,318 L 638,318 L 638,206" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arrow-red)"/>
+  <text x="670" y="310" text-anchor="middle" font-size="8" fill="#dc2626">Fix + retry</text>
+
+  <!-- Arrow: UNDER_REVIEW → REJECTED (down-left) -->
+  <path d="M 1032,195 L 980,195 L 980,290" fill="none" stroke="#dc2626" stroke-width="1.5" marker-end="url(#arrow-red)"/>
+  <text x="968" y="250" font-size="8" fill="#dc2626">Reject</text>
+
+  <!-- REJECTED -->
+  <rect x="910" y="290" width="140" height="56" rx="10" fill="#fef2f2" stroke="#dc2626" stroke-width="2" filter="url(#shadow)"/>
+  <text x="980" y="315" text-anchor="middle" font-size="11" font-weight="700" fill="#dc2626">REJECTED</text>
+  <text x="980" y="332" text-anchor="middle" font-size="9" fill="#64748b">Admin rejected</text>
+
+  <!-- Retry: REJECTED → FILLING (dashed) -->
+  <path d="M 910,340 L 638,340 L 638,206" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arrow-red)"/>
+  <text x="774" y="355" text-anchor="middle" font-size="8" fill="#dc2626">Resubmit with corrections</text>
+
+  <!-- Retry: DIGILOCKER_PENDING → PAN_ENTERED (dashed, cancel) -->
+  <path d="M 462,196 L 462,240 L 276,240 L 276,206" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arrow-red)"/>
+  <text x="369" y="253" text-anchor="middle" font-size="8" fill="#dc2626">DigiLocker cancelled</text>
+
+  <!-- ==================== ACTIVATION REQUIREMENTS BOX ==================== -->
+  <rect x="1220" y="410" width="160" height="140" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-dasharray="4,2"/>
+  <text x="1300" y="432" text-anchor="middle" font-size="10" font-weight="700" fill="#15803d">Activation Gate</text>
+  <line x1="1235" y1="440" x2="1365" y2="440" stroke="#bbf7d0"/>
+  <text x="1240" y="458" font-size="9" fill="#475569">KRA: Registered</text>
+  <text x="1240" y="475" font-size="9" fill="#475569">UCC: Approved</text>
+  <text x="1240" y="492" font-size="9" fill="#64748b">(NSE + BSE + MCX)</text>
+  <text x="1240" y="512" font-size="9" fill="#475569">BO: Active</text>
+  <text x="1240" y="529" font-size="9" fill="#64748b">(CDSL + NSDL)</text>
+
+  <!-- Arrow from box to ACTIVE -->
+  <line x1="1220" y1="558" x2="1175" y2="558" stroke="#16a34a" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#arrow-green)"/>
+
+</svg>

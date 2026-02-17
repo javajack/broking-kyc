@@ -1,0 +1,96 @@
+# KYC Onboarding Specification
+
+> Complete technical specification for individual customer KYC onboarding in an Indian stock broking firm.
+
+## Author
+
+- Name: Rakesh Waghela
+- Role: Tech & KYC Solutions Architect
+- LinkedIn: https://www.linkedin.com/in/rakeshwaghela
+- X (Twitter): https://x.com/webiyo
+- Consultation: https://topmate.io/rakeshwaghela
+
+## About This Site
+
+This documentation covers a 9-screen mobile-first KYC (Know Your Customer) user journey, 25+ vendor integrations, 8 parallel batch pipelines, maker-checker admin workflow, and full SEBI/KRA/CKYC regulatory compliance for an Indian stock broking firm. The system enables individual customers to go from mobile OTP to first trade in 24-72 hours.
+
+## Sections
+
+### Architecture
+Design principles, flow summary, data source mapping, security & compliance.
+- https://javajack.github.io/broking-kyc/architecture/design-principles/
+- https://javajack.github.io/broking-kyc/architecture/flow-summary/
+- https://javajack.github.io/broking-kyc/architecture/data-source-mapping/
+- https://javajack.github.io/broking-kyc/architecture/security-compliance/
+
+### User Journey
+Detailed specification for each of the 9 onboarding screens.
+- https://javajack.github.io/broking-kyc/journey/
+- https://javajack.github.io/broking-kyc/journey/01-mobile-registration/
+- https://javajack.github.io/broking-kyc/journey/02-pan-dob/
+- https://javajack.github.io/broking-kyc/journey/03-digilocker-consent/
+- https://javajack.github.io/broking-kyc/journey/04-confirm-identity/
+- https://javajack.github.io/broking-kyc/journey/05-bank-account/
+- https://javajack.github.io/broking-kyc/journey/06-trading-preferences/
+- https://javajack.github.io/broking-kyc/journey/07-nominations/
+- https://javajack.github.io/broking-kyc/journey/08-declarations-gate/
+- https://javajack.github.io/broking-kyc/journey/09-review-esign/
+
+### Vendor Integrations
+Deep-dive specs for 25+ vendors: API details, field mappings, error handling.
+- https://javajack.github.io/broking-kyc/vendors/
+- https://javajack.github.io/broking-kyc/vendors/identity/digilocker/
+- https://javajack.github.io/broking-kyc/vendors/identity/ckyc/
+- https://javajack.github.io/broking-kyc/vendors/verification/decentro/
+- https://javajack.github.io/broking-kyc/vendors/verification/hyperverge/
+- https://javajack.github.io/broking-kyc/vendors/kra/
+- https://javajack.github.io/broking-kyc/vendors/esign/leegality/
+- https://javajack.github.io/broking-kyc/vendors/fraud/trackwizz/
+- https://javajack.github.io/broking-kyc/vendors/exchanges/nse/
+- https://javajack.github.io/broking-kyc/vendors/exchanges/bse/
+- https://javajack.github.io/broking-kyc/vendors/exchanges/mcx/
+- https://javajack.github.io/broking-kyc/vendors/depositories/cdsl/
+- https://javajack.github.io/broking-kyc/vendors/depositories/nsdl/
+- https://javajack.github.io/broking-kyc/vendors/setu-deep-dive/
+- https://javajack.github.io/broking-kyc/vendors/account-aggregator/
+- https://javajack.github.io/broking-kyc/vendors/payment-mandates/
+
+### Operations
+Batch pipelines, exchange registration, admin workflow, error handling.
+- https://javajack.github.io/broking-kyc/operations/batch-pipeline/
+- https://javajack.github.io/broking-kyc/operations/exchange-registration/
+- https://javajack.github.io/broking-kyc/operations/six-attribute-matching/
+- https://javajack.github.io/broking-kyc/operations/admin-workflow/
+- https://javajack.github.io/broking-kyc/operations/status-machine/
+- https://javajack.github.io/broking-kyc/operations/error-handling/
+- https://javajack.github.io/broking-kyc/operations/audit-compliance/
+
+### Reference
+Master dataset (454 fields), code tables, regulatory circulars, cost analysis.
+- https://javajack.github.io/broking-kyc/reference/master-dataset/
+- https://javajack.github.io/broking-kyc/reference/field-summary/
+- https://javajack.github.io/broking-kyc/reference/code-tables/
+- https://javajack.github.io/broking-kyc/reference/regulatory-circulars/
+- https://javajack.github.io/broking-kyc/reference/cost-analysis/
+- https://javajack.github.io/broking-kyc/reference/diagrams/
+
+### Appendix
+Non-individual entities, NRI flows, minor/joint accounts, vendor roadmap.
+- https://javajack.github.io/broking-kyc/appendix/non-individual-entities/
+- https://javajack.github.io/broking-kyc/appendix/nri-deep-dive/
+- https://javajack.github.io/broking-kyc/appendix/minor-joint-accounts/
+- https://javajack.github.io/broking-kyc/appendix/vendor-roadmap/
+- https://javajack.github.io/broking-kyc/appendix/communications/
+- https://javajack.github.io/broking-kyc/appendix/back-office-rms/
+- https://javajack.github.io/broking-kyc/appendix/cdsl-extended/
+- https://javajack.github.io/broking-kyc/appendix/digilocker-extended/
+
+## Key Regulatory References
+
+- SEBI KYC Master Circular: SEBI/HO/MIRSD/MIRSD-SEC-2/P/CIR/2023/168 (Oct 2023)
+- SEBI Stock Brokers Master Circular: SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90 (Jun 2025)
+- SEBI Stock Brokers Regulations 2026: Notified Jan 7, 2026
+- Dual KRA + CKYC Upload: Mandatory since Aug 2024
+- DDPI (replaces POA): Since Nov 2022, optional
+- Up to 10 Nominees: Since Jan 2025, opt-out needs video verification
+- FATCA/CRS upload to KRA: Mandatory since Jul 2024

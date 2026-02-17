@@ -1,0 +1,1094 @@
+<!DOCTYPE html><html lang="en" dir="ltr" data-theme="dark" data-has-toc data-has-sidebar class="astro-bguv2lll"> <head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>CDSL Integration Guide | KYC Onboarding Spec</title><link rel="canonical" href="https://javajack.github.io/broking-kyc/vendors/depositories/cdsl-integration-guide/"/><link rel="sitemap" href="/broking-kyc/sitemap-index.xml"/><script>
+						// Initialize dataLayer and gtag function
+						window.dataLayer = window.dataLayer || [];
+						function gtag(){dataLayer.push(arguments);}
+
+						// Regional scoping: Detect if user is in GDPR region
+						function isGDPRRegion() {
+							// Check timezone as proxy for region (EU timezones)
+							const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+							const euTimezones = ['Europe/', 'Atlantic/Reykjavik', 'Atlantic/Azores', 'Atlantic/Madeira'];
+							return euTimezones.some(zone => tz.startsWith(zone));
+						}
+
+						// Set consent defaults based on region
+						// GDPR regions: denied by default (show banner)
+						// Other regions: granted by default (no banner, better measurement)
+						const isGDPR = isGDPRRegion();
+
+						gtag('consent', 'default', {
+							'ad_storage': 'denied',
+							'ad_user_data': 'denied',
+							'ad_personalization': 'denied',
+							'analytics_storage': isGDPR ? 'denied' : 'granted',
+							'functionality_storage': 'granted',
+							'personalization_storage': 'denied',
+							'security_storage': 'granted',
+							'wait_for_update': 500,
+						});
+
+						// Store GDPR flag for banner logic
+						window.__isGDPRRegion = isGDPR;
+					</script><script async src="https://www.googletagmanager.com/gtag/js?id=G-G986QLPFZ1"></script><script>
+						window.dataLayer = window.dataLayer || [];
+						function gtag(){dataLayer.push(arguments);}
+						gtag('js', new Date());
+						gtag('config', 'G-G986QLPFZ1', {
+							'anonymize_ip': true,
+							'cookie_flags': 'SameSite=None;Secure'
+						});
+					</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon="{&#34;token&#34;: &#34;7ce325bb227e4b42a8406f369ff4e788&#34;}"></script><script defer src="/broking-kyc/cookie-consent.js"></script><script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","name":"KYC Onboarding Specification","url":"https://javajack.github.io/broking-kyc/","description":"Complete technical specification for individual customer KYC onboarding in an Indian stock broking firm.","author":{"@id":"#rakesh"}},{"@type":"Person","@id":"#rakesh","name":"Rakesh Waghela","url":"https://www.linkedin.com/in/rakeshwaghela","jobTitle":"Tech & KYC Solutions Architect","sameAs":["https://x.com/webiyo","https://www.linkedin.com/in/rakeshwaghela","https://topmate.io/rakeshwaghela"]}]}</script><link rel="shortcut icon" href="/broking-kyc/favicon.svg" type="image/svg+xml"/><meta name="generator" content="Astro v5.17.2"/><meta name="generator" content="Starlight v0.37.6"/><meta property="og:title" content="CDSL Integration Guide"/><meta property="og:type" content="article"/><meta property="og:url" content="https://javajack.github.io/broking-kyc/vendors/depositories/cdsl-integration-guide/"/><meta property="og:locale" content="en"/><meta property="og:description" content="UAT/production environments, request tracking, sequence numbers, security architecture, encryption, IP whitelisting, and SEBI circulars reference."/><meta property="og:site_name" content="KYC Onboarding Spec"/><meta name="twitter:card" content="summary_large_image"/><meta name="description" content="UAT/production environments, request tracking, sequence numbers, security architecture, encryption, IP whitelisting, and SEBI circulars reference."/><meta name="twitter:site" content="@webiyo"/><meta name="yandex-verification" content="5281e40eca9463d2"/><meta property="og:image" content="https://javajack.github.io/broking-kyc/og-image.png"/><meta property="og:image:width" content="1200"/><meta property="og:image:height" content="630"/><meta name="twitter:image" content="https://javajack.github.io/broking-kyc/og-image.png"/><script>
+	window.StarlightThemeProvider = (() => {
+		const storedTheme =
+			typeof localStorage !== 'undefined' && localStorage.getItem('starlight-theme');
+		const theme =
+			storedTheme ||
+			(window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+		document.documentElement.dataset.theme = theme === 'light' ? 'light' : 'dark';
+		return {
+			updatePickers(theme = storedTheme || 'auto') {
+				document.querySelectorAll('starlight-theme-select').forEach((picker) => {
+					const select = picker.querySelector('select');
+					if (select) select.value = theme;
+					/** @type {HTMLTemplateElement | null} */
+					const tmpl = document.querySelector(`#theme-icons`);
+					const newIcon = tmpl && tmpl.content.querySelector('.' + theme);
+					if (newIcon) {
+						const oldIcon = picker.querySelector('svg.label-icon');
+						if (oldIcon) {
+							oldIcon.replaceChildren(...newIcon.cloneNode(true).childNodes);
+						}
+					}
+				});
+			},
+		};
+	})();
+</script><template id="theme-icons"><svg aria-hidden="true" class="light astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M5 12a1 1 0 0 0-1-1H3a1 1 0 0 0 0 2h1a1 1 0 0 0 1-1Zm.64 5-.71.71a1 1 0 0 0 0 1.41 1 1 0 0 0 1.41 0l.71-.71A1 1 0 0 0 5.64 17ZM12 5a1 1 0 0 0 1-1V3a1 1 0 0 0-2 0v1a1 1 0 0 0 1 1Zm5.66 2.34a1 1 0 0 0 .7-.29l.71-.71a1 1 0 1 0-1.41-1.41l-.66.71a1 1 0 0 0 0 1.41 1 1 0 0 0 .66.29Zm-12-.29a1 1 0 0 0 1.41 0 1 1 0 0 0 0-1.41l-.71-.71a1.004 1.004 0 1 0-1.43 1.41l.73.71ZM21 11h-1a1 1 0 0 0 0 2h1a1 1 0 0 0 0-2Zm-2.64 6A1 1 0 0 0 17 18.36l.71.71a1 1 0 0 0 1.41 0 1 1 0 0 0 0-1.41l-.76-.66ZM12 6.5a5.5 5.5 0 1 0 5.5 5.5A5.51 5.51 0 0 0 12 6.5Zm0 9a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Zm0 3.5a1 1 0 0 0-1 1v1a1 1 0 0 0 2 0v-1a1 1 0 0 0-1-1Z"/></svg><svg aria-hidden="true" class="dark astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21.64 13a1 1 0 0 0-1.05-.14 8.049 8.049 0 0 1-3.37.73 8.15 8.15 0 0 1-8.14-8.1 8.59 8.59 0 0 1 .25-2A1 1 0 0 0 8 2.36a10.14 10.14 0 1 0 14 11.69 1 1 0 0 0-.36-1.05Zm-9.5 6.69A8.14 8.14 0 0 1 7.08 5.22v.27a10.15 10.15 0 0 0 10.14 10.14 9.784 9.784 0 0 0 2.1-.22 8.11 8.11 0 0 1-7.18 4.32v-.04Z"/></svg><svg aria-hidden="true" class="auto astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg></template><link rel="stylesheet" href="/broking-kyc/_astro/print.DNXP8c50.css" media="print"><link rel="stylesheet" href="/broking-kyc/_astro/index.Q0fI46Ss.css">
+<style>@layer starlight.components{:root{--sl-badge-default-border: var(--sl-color-accent);--sl-badge-default-bg: var(--sl-color-accent-low);--sl-badge-default-text: #fff;--sl-badge-note-border: var(--sl-color-blue);--sl-badge-note-bg: var(--sl-color-blue-low);--sl-badge-note-text: #fff;--sl-badge-danger-border: var(--sl-color-red);--sl-badge-danger-bg: var(--sl-color-red-low);--sl-badge-danger-text: #fff;--sl-badge-success-border: var(--sl-color-green);--sl-badge-success-bg: var(--sl-color-green-low);--sl-badge-success-text: #fff;--sl-badge-caution-border: var(--sl-color-orange);--sl-badge-caution-bg: var(--sl-color-orange-low);--sl-badge-caution-text: #fff;--sl-badge-tip-border: var(--sl-color-purple);--sl-badge-tip-bg: var(--sl-color-purple-low);--sl-badge-tip-text: #fff}[data-theme=light]:root{--sl-badge-default-bg: var(--sl-color-accent-high);--sl-badge-note-bg: var(--sl-color-blue-high);--sl-badge-danger-bg: var(--sl-color-red-high);--sl-badge-success-bg: var(--sl-color-green-high);--sl-badge-caution-bg: var(--sl-color-orange-high);--sl-badge-tip-bg: var(--sl-color-purple-high)}.sl-badge:where(.astro-avdet4wd){display:inline-block;border:1px solid var(--sl-color-border-badge);border-radius:.25rem;font-family:var(--sl-font-system-mono);line-height:normal;color:var(--sl-color-text-badge);background-color:var(--sl-color-bg-badge);overflow-wrap:anywhere}.sidebar-content .sl-badge:where(.astro-avdet4wd){line-height:1;font-size:var(--sl-text-xs);padding:.125rem .375rem}.sidebar-content a[aria-current=page]>.sl-badge:where(.astro-avdet4wd){--sl-color-bg-badge: transparent;--sl-color-border-badge: currentColor;color:inherit}.default:where(.astro-avdet4wd){--sl-color-bg-badge: var(--sl-badge-default-bg);--sl-color-border-badge: var(--sl-badge-default-border);--sl-color-text-badge: var(--sl-badge-default-text)}.note:where(.astro-avdet4wd){--sl-color-bg-badge: var(--sl-badge-note-bg);--sl-color-border-badge: var(--sl-badge-note-border);--sl-color-text-badge: var(--sl-badge-note-text)}.danger:where(.astro-avdet4wd){--sl-color-bg-badge: var(--sl-badge-danger-bg);--sl-color-border-badge: var(--sl-badge-danger-border);--sl-color-text-badge: var(--sl-badge-danger-text)}.success:where(.astro-avdet4wd){--sl-color-bg-badge: var(--sl-badge-success-bg);--sl-color-border-badge: var(--sl-badge-success-border);--sl-color-text-badge: var(--sl-badge-success-text)}.tip:where(.astro-avdet4wd){--sl-color-bg-badge: var(--sl-badge-tip-bg);--sl-color-border-badge: var(--sl-badge-tip-border);--sl-color-text-badge: var(--sl-badge-tip-text)}.caution:where(.astro-avdet4wd){--sl-color-bg-badge: var(--sl-badge-caution-bg);--sl-color-border-badge: var(--sl-badge-caution-border);--sl-color-text-badge: var(--sl-badge-caution-text)}.small:where(.astro-avdet4wd){font-size:var(--sl-text-xs);padding:.125rem .25rem}.medium:where(.astro-avdet4wd){font-size:var(--sl-text-sm);padding:.175rem .35rem}.large:where(.astro-avdet4wd){font-size:var(--sl-text-base);padding:.225rem .45rem}.sl-markdown-content :is(h1,h2,h3,h4,h5,h6) .sl-badge:where(.astro-avdet4wd){vertical-align:middle}}
+@layer starlight.components{.card:where(.astro-v5tidmuc){--sl-card-border: var(--sl-color-purple);--sl-card-bg: var(--sl-color-purple-low);border:1px solid var(--sl-color-gray-5);background-color:var(--sl-color-black);padding:clamp(1rem,calc(.125rem + 3vw),2.5rem);flex-direction:column;gap:clamp(.5rem,calc(.125rem + 1vw),1rem)}.card:where(.astro-v5tidmuc):nth-child(4n+1){--sl-card-border: var(--sl-color-orange);--sl-card-bg: var(--sl-color-orange-low)}.card:where(.astro-v5tidmuc):nth-child(4n+3){--sl-card-border: var(--sl-color-green);--sl-card-bg: var(--sl-color-green-low)}.card:where(.astro-v5tidmuc):nth-child(4n+4){--sl-card-border: var(--sl-color-red);--sl-card-bg: var(--sl-color-red-low)}.card:where(.astro-v5tidmuc):nth-child(4n+5){--sl-card-border: var(--sl-color-blue);--sl-card-bg: var(--sl-color-blue-low)}.title:where(.astro-v5tidmuc){font-weight:600;font-size:var(--sl-text-h4);color:var(--sl-color-white);line-height:var(--sl-line-height-headings);gap:1rem;align-items:center}.card:where(.astro-v5tidmuc) .icon:where(.astro-v5tidmuc){border:1px solid var(--sl-card-border);background-color:var(--sl-card-bg);padding:.2em;border-radius:.25rem;flex-shrink:0}.card:where(.astro-v5tidmuc) .body:where(.astro-v5tidmuc){margin:0;font-size:clamp(var(--sl-text-sm),calc(.5rem + 1vw),var(--sl-text-body))}}
+@layer starlight.components{.card-grid:where(.astro-zntqmydn){display:grid;grid-template-columns:100%;gap:1rem}.card-grid:where(.astro-zntqmydn)>*{margin-top:0!important}@media(min-width:50rem){.card-grid:where(.astro-zntqmydn){grid-template-columns:1fr 1fr;gap:1.5rem}.stagger:where(.astro-zntqmydn){--stagger-height: 5rem;padding-bottom:var(--stagger-height)}.stagger:where(.astro-zntqmydn)>*:nth-child(2n){transform:translateY(var(--stagger-height))}}}
+@layer starlight.components{svg:where(.astro-c6vsoqas){color:var(--sl-icon-color);font-size:var(--sl-icon-size, 1em);width:1em;height:1em}}
+@layer starlight.components{.sl-steps{--bullet-size: calc(var(--sl-line-height) * 1rem);--bullet-margin: .375rem;list-style:none;counter-reset:steps-counter var(--sl-steps-start, 0);padding-inline-start:0}.sl-steps>li{counter-increment:steps-counter;position:relative;padding-inline-start:calc(var(--bullet-size) + 1rem);padding-bottom:1px;min-height:calc(var(--bullet-size) + var(--bullet-margin))}.sl-steps>li+li{margin-top:0}.sl-steps>li:before{content:counter(steps-counter);position:absolute;top:0;inset-inline-start:0;width:var(--bullet-size);height:var(--bullet-size);line-height:var(--bullet-size);font-size:var(--sl-text-xs);font-weight:600;text-align:center;color:var(--sl-color-white);background-color:var(--sl-color-gray-6);border-radius:99rem;box-shadow:inset 0 0 0 1px var(--sl-color-gray-5)}.sl-steps>li:after{--guide-width: 1px;content:"";position:absolute;top:calc(var(--bullet-size) + var(--bullet-margin));bottom:var(--bullet-margin);inset-inline-start:calc((var(--bullet-size) - var(--guide-width)) / 2);width:var(--guide-width);background-color:var(--sl-color-hairline-light)}}@layer starlight.content{.sl-steps>li>:first-child{--lh: calc(1em * var(--sl-line-height));--shift-y: calc(.5 * (var(--bullet-size) - var(--lh)));transform:translateY(var(--shift-y));margin-bottom:var(--shift-y)}.sl-steps>li>:first-child:where(h1,h2,h3,h4,h5,h6){--lh: calc(1em * var(--sl-line-height-headings))}@supports (--prop: 1lh){.sl-steps>li>:first-child{--lh: 1lh}}}
+@layer starlight.components{.sl-link-button:where(.astro-xwgiixxa){align-items:center;border:1px solid transparent;border-radius:999rem;display:inline-flex;font-size:var(--sl-text-sm);gap:.5em;line-height:1.1875;outline-offset:.25rem;padding:.4375rem 1.125rem;text-decoration:none}.sl-link-button:where(.astro-xwgiixxa).primary{background:var(--sl-color-text-accent);border-color:var(--sl-color-text-accent);color:var(--sl-color-black)}.sl-link-button:where(.astro-xwgiixxa).primary:hover{color:var(--sl-color-black)}.sl-link-button:where(.astro-xwgiixxa).secondary{border-color:inherit;color:var(--sl-color-white)}.sl-link-button:where(.astro-xwgiixxa).minimal{color:var(--sl-color-white);padding-inline:0}.sl-link-button:where(.astro-xwgiixxa) svg{flex-shrink:0}@media(min-width:50rem){.sl-link-button:where(.astro-xwgiixxa){font-size:var(--sl-text-base);padding:.9375rem 1.25rem}}.sl-markdown-content .sl-link-button:where(.astro-xwgiixxa){margin-inline-end:1rem}.sl-markdown-content .sl-link-button:where(.astro-xwgiixxa):not(:where(p *)){margin-block:1rem}}
+</style><script type="module" src="/broking-kyc/_astro/page.B1D-nYk3.js"></script></head> <body class="astro-bguv2lll"> <a href="#_top" class="astro-7q3lir66">Skip to content</a>  <div class="page sl-flex astro-vrdttmbt"> <header class="header astro-vrdttmbt"><div class="header astro-kmkmnagf"> <div class="title-wrapper sl-flex astro-kmkmnagf"> <a href="/broking-kyc/" class="site-title sl-flex astro-joi45scb">  <span class="title-group astro-joi45scb"> <span class="astro-joi45scb" translate="no"> KYC Onboarding Spec </span> <span class="author-byline astro-joi45scb">by Rakesh Waghela</span> </span> </a>  </div> <div class="sl-flex print:hidden astro-kmkmnagf"> <site-search class="astro-kmkmnagf astro-v37mnknz" data-translations="{&#34;placeholder&#34;:&#34;Search&#34;}"> <button data-open-modal disabled aria-label="Search" aria-keyshortcuts="Control+K" class="astro-v37mnknz"> <svg aria-hidden="true" class="astro-v37mnknz astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21.71 20.29 18 16.61A9 9 0 1 0 16.61 18l3.68 3.68a.999.999 0 0 0 1.42 0 1 1 0 0 0 0-1.39ZM11 18a7 7 0 1 1 0-14 7 7 0 0 1 0 14Z"/></svg> <span class="sl-hidden md:sl-block astro-v37mnknz" aria-hidden="true">Search</span> <kbd class="sl-hidden md:sl-flex astro-v37mnknz" style="display: none;"> <kbd class="astro-v37mnknz">Ctrl</kbd><kbd class="astro-v37mnknz">K</kbd> </kbd> </button> <dialog style="padding:0" aria-label="Search" class="astro-v37mnknz"> <div class="dialog-frame sl-flex astro-v37mnknz">  <button data-close-modal class="sl-flex md:sl-hidden astro-v37mnknz"> Cancel </button> <div class="search-container astro-v37mnknz"> <div id="starlight__search" class="astro-v37mnknz"></div> </div> </div> </dialog> </site-search>  <script>
+	(() => {
+		const openBtn = document.querySelector('button[data-open-modal]');
+		const shortcut = openBtn?.querySelector('kbd');
+		if (!openBtn || !(shortcut instanceof HTMLElement)) return;
+		const platformKey = shortcut.querySelector('kbd');
+		if (platformKey && /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform)) {
+			platformKey.textContent = '⌘';
+			openBtn.setAttribute('aria-keyshortcuts', 'Meta+K');
+		}
+		shortcut.style.display = '';
+	})();
+</script> <script type="module" src="/broking-kyc/_astro/Search.astro_astro_type_script_index_0_lang.ve89zhW1.js"></script>   </div> <div class="sl-hidden md:sl-flex print:hidden right-group astro-kmkmnagf"> <div class="sl-flex social-icons astro-kmkmnagf"> <a href="https://x.com/webiyo" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">Rakesh on X</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M 18.242188 2.25 L 21.554688 2.25 L 14.324219 10.507812 L 22.828125 21.75 L 16.171875 21.75 L 10.953125 14.933594 L 4.992188 21.75 L 1.679688 21.75 L 9.40625 12.914062 L 1.257812 2.25 L 8.082031 2.25 L 12.792969 8.480469 Z M 17.082031 19.773438 L 18.914062 19.773438 L 7.082031 4.125 L 5.113281 4.125 Z M 17.082031 19.773438 "/></svg></a><a href="https://www.linkedin.com/in/rakeshwaghela" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">Rakesh on LinkedIn</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M20.47 2H3.53a1.45 1.45 0 0 0-1.47 1.43v17.14A1.45 1.45 0 0 0 3.53 22h16.94a1.45 1.45 0 0 0 1.47-1.43V3.43A1.45 1.45 0 0 0 20.47 2ZM8.09 18.74h-3v-9h3v9ZM6.59 8.48a1.56 1.56 0 0 1 0-3.12 1.57 1.57 0 1 1 0 3.12Zm12.32 10.26h-3v-4.83c0-1.21-.43-2-1.52-2A1.65 1.65 0 0 0 12.85 13a2 2 0 0 0-.1.73v5h-3v-9h3V11a3 3 0 0 1 2.71-1.5c2 0 3.45 1.29 3.45 4.06v5.18Z"/></svg></a><a href="https://topmate.io/rakeshwaghela" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">Book a Consultation</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M19.33 10.18a1 1 0 0 1-.77 0 1 1 0 0 1-.62-.93l.01-1.83-8.2 8.2a1 1 0 0 1-1.41-1.42l8.2-8.2H14.7a1 1 0 0 1 0-2h4.25a1 1 0 0 1 1 1v4.25a1 1 0 0 1-.62.93Z"/><path d="M11 4a1 1 0 1 1 0 2H7a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-4a1 1 0 1 1 2 0v4a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h4Z"/></svg></a> </div> <starlight-theme-select>  <label style="--sl-select-width: 6.25em" class="astro-4yphtoen"> <span class="sr-only astro-4yphtoen">Select theme</span> <svg aria-hidden="true" class="icon label-icon astro-4yphtoen astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg> <select autocomplete="off" class="astro-4yphtoen"> <option value="dark" class="astro-4yphtoen">Dark</option><option value="light" class="astro-4yphtoen">Light</option><option value="auto" selected class="astro-4yphtoen">Auto</option> </select> <svg aria-hidden="true" class="icon caret astro-4yphtoen astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 9.17a1 1 0 0 0-1.41 0L12 12.71 8.46 9.17a1 1 0 1 0-1.41 1.42l4.24 4.24a1.002 1.002 0 0 0 1.42 0L17 10.59a1.002 1.002 0 0 0 0-1.42Z"/></svg> </label>  </starlight-theme-select>  <script>
+	StarlightThemeProvider.updatePickers();
+</script> <script type="module">const r="starlight-theme",o=e=>e==="auto"||e==="dark"||e==="light"?e:"auto",c=()=>o(typeof localStorage<"u"&&localStorage.getItem(r));function n(e){typeof localStorage<"u"&&localStorage.setItem(r,e==="light"||e==="dark"?e:"")}const l=()=>matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";function t(e){StarlightThemeProvider.updatePickers(e),document.documentElement.dataset.theme=e==="auto"?l():e,n(e)}matchMedia("(prefers-color-scheme: light)").addEventListener("change",()=>{c()==="auto"&&t("auto")});class s extends HTMLElement{constructor(){super(),t(c()),this.querySelector("select")?.addEventListener("change",a=>{a.currentTarget instanceof HTMLSelectElement&&t(o(a.currentTarget.value))})}}customElements.define("starlight-theme-select",s);</script> <script type="module">class s extends HTMLElement{constructor(){super();const e=this.querySelector("select");e&&(e.addEventListener("change",t=>{t.currentTarget instanceof HTMLSelectElement&&(window.location.pathname=t.currentTarget.value)}),window.addEventListener("pageshow",t=>{if(!t.persisted)return;const n=e.querySelector("option[selected]")?.index;n!==e.selectedIndex&&(e.selectedIndex=n??0)}))}}customElements.define("starlight-lang-select",s);</script> </div> </div> </header> <nav class="sidebar print:hidden astro-vrdttmbt" aria-label="Main"> <starlight-menu-button class="print:hidden astro-jif73yzw"> <button aria-expanded="false" aria-label="Menu" aria-controls="starlight__sidebar" class="sl-flex md:sl-hidden astro-jif73yzw"> <svg aria-hidden="true" class="open-menu astro-jif73yzw astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M3 8h18a1 1 0 1 0 0-2H3a1 1 0 0 0 0 2Zm18 8H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Zm0-5H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Z"/></svg> <svg aria-hidden="true" class="close-menu astro-jif73yzw astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="m13.41 12 6.3-6.29a1.004 1.004 0 1 0-1.42-1.42L12 10.59l-6.29-6.3a1.004 1.004 0 0 0-1.42 1.42l6.3 6.29-6.3 6.29a1 1 0 0 0 0 1.42.998.998 0 0 0 1.42 0l6.29-6.3 6.29 6.3a.999.999 0 0 0 1.42 0 1 1 0 0 0 0-1.42L13.41 12Z"/></svg> </button> </starlight-menu-button> <script type="module">class s extends HTMLElement{constructor(){super(),this.btn=this.querySelector("button"),this.btn.addEventListener("click",()=>this.toggleExpanded());const t=this.closest("nav");t&&t.addEventListener("keyup",e=>this.closeOnEscape(e))}setExpanded(t){this.setAttribute("aria-expanded",String(t)),document.body.toggleAttribute("data-mobile-menu-expanded",t)}toggleExpanded(){this.setExpanded(this.getAttribute("aria-expanded")!=="true")}closeOnEscape(t){t.code==="Escape"&&(this.setExpanded(!1),this.btn.focus())}}customElements.define("starlight-menu-button",s);</script>   <div id="starlight__sidebar" class="sidebar-pane astro-vrdttmbt"> <div class="sidebar-content sl-flex astro-vrdttmbt"> <sl-sidebar-state-persist data-hash="17qz5hn" class="astro-kku4brbg"> <script aria-hidden="true">
+		(() => {
+			try {
+				if (!matchMedia('(min-width: 50em)').matches) return;
+				/** @type {HTMLElement | null} */
+				const target = document.querySelector('sl-sidebar-state-persist');
+				const state = JSON.parse(sessionStorage.getItem('sl-sidebar-state') || '0');
+				if (!target || !state || target.dataset.hash !== state.hash) return;
+				window._starlightScrollRestore = state.scroll;
+				customElements.define(
+					'sl-sidebar-restore',
+					class SidebarRestore extends HTMLElement {
+						connectedCallback() {
+							try {
+								const idx = parseInt(this.dataset.index || '');
+								const details = this.closest('details');
+								if (details && typeof state.open[idx] === 'boolean') details.open = state.open[idx];
+							} catch {}
+						}
+					}
+				);
+			} catch {}
+		})();
+	</script>  <ul class="top-level astro-3ii7xxms"> <li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Getting Started</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="0"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/broking-kyc/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Overview</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Architecture</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="1"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/broking-kyc/architecture/design-principles/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Design Principles</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/architecture/flow-summary/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Flow Summary</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/architecture/data-source-mapping/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Data Source Mapping</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/architecture/security-compliance/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Security &amp; Compliance</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">User Journey</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="2"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/broking-kyc/journey/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Journey Overview</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/journey/01-mobile-registration/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">1. Mobile Registration</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/journey/02-pan-dob/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">2. PAN + DOB</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/journey/03-digilocker-consent/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">3. DigiLocker Consent</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/journey/04-confirm-identity/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">4. Confirm Identity</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/journey/05-bank-account/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">5. Bank Account</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/journey/06-trading-preferences/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">6. Trading Preferences</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/journey/07-nominations/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">7. Nominations</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/journey/08-declarations-gate/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">8. Declarations Gate</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/journey/09-review-esign/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">9. Review + eSign</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Vendor Integrations</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="3"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/broking-kyc/vendors/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Vendor Strategy</span>  </a> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Identity</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="4"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/broking-kyc/vendors/identity/digilocker/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">DigiLocker</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/vendors/identity/ckyc/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">CKYC</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Verification</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="5"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/broking-kyc/vendors/verification/decentro/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Decentro</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/vendors/verification/hyperverge/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">HyperVerge</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/vendors/kra/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">KRA</span>  </a> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">eSign</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="6"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/broking-kyc/vendors/esign/leegality/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Leegality</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Fraud &amp; AML</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="7"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/broking-kyc/vendors/fraud/trackwizz/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">TrackWizz</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Exchanges</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="8"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/broking-kyc/vendors/exchanges/nse/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">NSE</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/vendors/exchanges/bse/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">BSE</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/vendors/exchanges/mcx/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">MCX</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Depositories</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="9"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">CDSL</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="10"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/broking-kyc/vendors/depositories/cdsl/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Overview</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/vendors/depositories/cdsl-ddpi/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">DDPI Deep Dive</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/vendors/depositories/cdsl-mtf-pledge/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">MTF &amp; Pledge</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/vendors/depositories/cdsl-modifications/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Modifications</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/vendors/depositories/cdsl-integration-guide/" aria-current="page" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Integration Guide</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/vendors/depositories/nsdl/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">NSDL</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/vendors/setu-deep-dive/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Setu Deep Dive</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/vendors/account-aggregator/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Account Aggregator</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/vendors/payment-mandates/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Payment Mandates</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Operations</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="11"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/broking-kyc/operations/batch-pipeline/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Batch Pipeline</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/operations/exchange-registration/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Exchange Registration</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/operations/six-attribute-matching/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">6-Attribute Matching</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/operations/admin-workflow/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Admin Workflow</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/operations/status-machine/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Status Machine</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/operations/error-handling/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Error Handling</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/operations/audit-compliance/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Audit &amp; Compliance</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Reference</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="12"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/broking-kyc/reference/master-dataset/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Master Dataset</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/reference/field-summary/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Field Summary</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/reference/code-tables/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Code Tables</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/reference/regulatory-circulars/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Regulatory Circulars</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/reference/cost-analysis/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Cost Analysis</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/reference/diagrams/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Diagrams</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Appendix</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="13"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/broking-kyc/appendix/non-individual-entities/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Non-Individual Entities</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/appendix/nri-deep-dive/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">NRI Deep Dive</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/appendix/minor-joint-accounts/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Minor &amp; Joint Accounts</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/appendix/vendor-roadmap/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Vendor Roadmap</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/appendix/communications/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Communications</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/appendix/back-office-rms/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Back-Office &amp; RMS</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/appendix/cdsl-extended/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">CDSL Extended</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/broking-kyc/appendix/digilocker-extended/" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">DigiLocker Extended</span>  </a> </li> </ul>  </details> </li> </ul>   <script aria-hidden="true">
+		(() => {
+			const scroller = document.getElementById('starlight__sidebar');
+			if (!window._starlightScrollRestore || !scroller) return;
+			scroller.scrollTop = window._starlightScrollRestore;
+			delete window._starlightScrollRestore;
+		})();
+	</script> </sl-sidebar-state-persist>  <div class="md:sl-hidden"> <div class="mobile-preferences sl-flex astro-wu23bvmt"> <div class="social-icons astro-wu23bvmt"> <a href="https://x.com/webiyo" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">Rakesh on X</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M 18.242188 2.25 L 21.554688 2.25 L 14.324219 10.507812 L 22.828125 21.75 L 16.171875 21.75 L 10.953125 14.933594 L 4.992188 21.75 L 1.679688 21.75 L 9.40625 12.914062 L 1.257812 2.25 L 8.082031 2.25 L 12.792969 8.480469 Z M 17.082031 19.773438 L 18.914062 19.773438 L 7.082031 4.125 L 5.113281 4.125 Z M 17.082031 19.773438 "/></svg></a><a href="https://www.linkedin.com/in/rakeshwaghela" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">Rakesh on LinkedIn</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M20.47 2H3.53a1.45 1.45 0 0 0-1.47 1.43v17.14A1.45 1.45 0 0 0 3.53 22h16.94a1.45 1.45 0 0 0 1.47-1.43V3.43A1.45 1.45 0 0 0 20.47 2ZM8.09 18.74h-3v-9h3v9ZM6.59 8.48a1.56 1.56 0 0 1 0-3.12 1.57 1.57 0 1 1 0 3.12Zm12.32 10.26h-3v-4.83c0-1.21-.43-2-1.52-2A1.65 1.65 0 0 0 12.85 13a2 2 0 0 0-.1.73v5h-3v-9h3V11a3 3 0 0 1 2.71-1.5c2 0 3.45 1.29 3.45 4.06v5.18Z"/></svg></a><a href="https://topmate.io/rakeshwaghela" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">Book a Consultation</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M19.33 10.18a1 1 0 0 1-.77 0 1 1 0 0 1-.62-.93l.01-1.83-8.2 8.2a1 1 0 0 1-1.41-1.42l8.2-8.2H14.7a1 1 0 0 1 0-2h4.25a1 1 0 0 1 1 1v4.25a1 1 0 0 1-.62.93Z"/><path d="M11 4a1 1 0 1 1 0 2H7a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-4a1 1 0 1 1 2 0v4a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h4Z"/></svg></a> </div> <starlight-theme-select>  <label style="--sl-select-width: 6.25em" class="astro-4yphtoen"> <span class="sr-only astro-4yphtoen">Select theme</span> <svg aria-hidden="true" class="icon label-icon astro-4yphtoen astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg> <select autocomplete="off" class="astro-4yphtoen"> <option value="dark" class="astro-4yphtoen">Dark</option><option value="light" class="astro-4yphtoen">Light</option><option value="auto" selected class="astro-4yphtoen">Auto</option> </select> <svg aria-hidden="true" class="icon caret astro-4yphtoen astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 9.17a1 1 0 0 0-1.41 0L12 12.71 8.46 9.17a1 1 0 1 0-1.41 1.42l4.24 4.24a1.002 1.002 0 0 0 1.42 0L17 10.59a1.002 1.002 0 0 0 0-1.42Z"/></svg> </label>  </starlight-theme-select>  <script>
+	StarlightThemeProvider.updatePickers();
+</script>   </div>  </div> </div> </div> </nav> <div class="main-frame astro-vrdttmbt">  <script type="module">const a=document.getElementById("starlight__sidebar"),n=a?.querySelector("sl-sidebar-state-persist"),o="sl-sidebar-state",i=()=>{let t=[];const e=n?.dataset.hash||"";try{const s=sessionStorage.getItem(o),r=JSON.parse(s||"{}");Array.isArray(r.open)&&r.hash===e&&(t=r.open)}catch{}return{hash:e,open:t,scroll:a?.scrollTop||0}},c=t=>{try{sessionStorage.setItem(o,JSON.stringify(t))}catch{}},d=()=>c(i()),l=(t,e)=>{const s=i();s.open[e]=t,c(s)};n?.addEventListener("click",t=>{if(!(t.target instanceof Element))return;const e=t.target.closest("summary")?.closest("details");if(!e)return;const s=e.querySelector("sl-sidebar-restore"),r=parseInt(s?.dataset.index||"");isNaN(r)||l(!e.open,r)});addEventListener("visibilitychange",()=>{document.visibilityState==="hidden"&&d()});addEventListener("pageHide",d);</script> <div class="lg:sl-flex astro-67yu43on"> <aside class="right-sidebar-container print:hidden astro-67yu43on"> <div class="right-sidebar astro-67yu43on"> <script type="module" src="/broking-kyc/_astro/MobileTableOfContents.astro_astro_type_script_index_0_lang.hwBsy0Mo.js"></script><script type="module" src="/broking-kyc/_astro/TableOfContents.astro_astro_type_script_index_0_lang.FuRcXuRY.js"></script><div class="lg:sl-hidden astro-pb3aqygn"><mobile-starlight-toc data-min-h="2" data-max-h="3" class="astro-doynk5tl"><nav aria-labelledby="starlight__on-this-page--mobile" class="astro-doynk5tl"><details id="starlight__mobile-toc" class="astro-doynk5tl"><summary id="starlight__on-this-page--mobile" class="sl-flex astro-doynk5tl"><span class="toggle sl-flex astro-doynk5tl">On this page<svg aria-hidden="true" class="caret astro-doynk5tl astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></span><span class="display-current astro-doynk5tl"></span></summary><div class="dropdown astro-doynk5tl"><ul class="isMobile astro-g2bywc46" style="--depth: 0;"> <li class="astro-g2bywc46" style="--depth: 0;"> <a href="#_top" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Overview</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#1-uat--test-environment-vs-production" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">1. UAT / Test Environment vs Production</span> </a> <ul class="isMobile astro-g2bywc46" style="--depth: 1;"> <li class="astro-g2bywc46" style="--depth: 1;"> <a href="#11-environment-endpoints" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">1.1 Environment Endpoints</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#12-test-vs-production-environment-differences" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">1.2 Test vs Production Environment Differences</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#13-uat-certification-process" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">1.3 UAT Certification Process</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#14-cdsl-innovation-sandbox-extended" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">1.4 CDSL Innovation Sandbox (Extended)</span> </a>  </li> </ul>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#2-request-tracking--sequence-numbers" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">2. Request Tracking &amp; Sequence Numbers</span> </a> <ul class="isMobile astro-g2bywc46" style="--depth: 1;"> <li class="astro-g2bywc46" style="--depth: 1;"> <a href="#21-unique-sequence-number-field" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">2.1 Unique Sequence Number Field</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#22-request-reference-number-types" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">2.2 Request Reference Number Types</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#23-sequence-number-best-practices" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">2.3 Sequence Number Best Practices</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#24-file-naming-conventions" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">2.4 File Naming Conventions</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#25-file-upload-acknowledgment--status-polling-flow" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">2.5 File Upload Acknowledgment &amp; Status Polling Flow</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#26-upload-processing-modes" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">2.6 Upload Processing Modes</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#27-date-of-receipt-tracking-sebi-mandate" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">2.7 Date of Receipt Tracking (SEBI Mandate)</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#28-dp57-report-generation-schedule" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">2.8 DP57 Report Generation Schedule</span> </a>  </li> </ul>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#3-security--encryption" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">3. Security &amp; Encryption</span> </a> <ul class="isMobile astro-g2bywc46" style="--depth: 1;"> <li class="astro-g2bywc46" style="--depth: 1;"> <a href="#31-multi-layered-security-architecture" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">3.1 Multi-Layered Security Architecture</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#32-digital-signature-certificate-dsc--comprehensive" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">3.2 Digital Signature Certificate (DSC) — Comprehensive</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#33-dsc-mapping-checklist-from-cdsl-official-checklist" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">3.3 DSC Mapping Checklist (from CDSL Official Checklist)</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#34-edis-encryption-details" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">3.4 eDIS Encryption Details</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#35-webcdas-browser-security-configuration" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">3.5 WebCDAS Browser Security Configuration</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#36-ip-whitelisting-requirements" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">3.6 IP Whitelisting Requirements</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#37-connectivity-security-comparison" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">3.7 Connectivity Security Comparison</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#38-cdsl-data-center-security" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">3.8 CDSL Data Center Security</span> </a>  </li> </ul>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#4-sebi-circulars-reference" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">4. SEBI Circulars Reference</span> </a> <ul class="isMobile astro-g2bywc46" style="--depth: 1;"> <li class="astro-g2bywc46" style="--depth: 1;"> <a href="#41-ddpi-circulars" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">4.1 DDPI Circulars</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#42-margin-pledge-circulars" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">4.2 Margin Pledge Circulars</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#43-nomination-circulars" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">4.3 Nomination Circulars</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#44-cdsl-communiques-for-ddpipledgemodifications" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">4.4 CDSL Communiques for DDPI/Pledge/Modifications</span> </a>  </li> </ul>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#related-pages" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Related Pages</span> </a>  </li> </ul> </div></details></nav></mobile-starlight-toc></div><div class="right-sidebar-panel sl-hidden lg:sl-block astro-pb3aqygn"><div class="sl-container astro-pb3aqygn"><starlight-toc data-min-h="2" data-max-h="3"><nav aria-labelledby="starlight__on-this-page"><h2 id="starlight__on-this-page">On this page</h2><ul class="astro-g2bywc46" style="--depth: 0;"> <li class="astro-g2bywc46" style="--depth: 0;"> <a href="#_top" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Overview</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#1-uat--test-environment-vs-production" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">1. UAT / Test Environment vs Production</span> </a> <ul class="astro-g2bywc46" style="--depth: 1;"> <li class="astro-g2bywc46" style="--depth: 1;"> <a href="#11-environment-endpoints" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">1.1 Environment Endpoints</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#12-test-vs-production-environment-differences" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">1.2 Test vs Production Environment Differences</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#13-uat-certification-process" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">1.3 UAT Certification Process</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#14-cdsl-innovation-sandbox-extended" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">1.4 CDSL Innovation Sandbox (Extended)</span> </a>  </li> </ul>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#2-request-tracking--sequence-numbers" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">2. Request Tracking &amp; Sequence Numbers</span> </a> <ul class="astro-g2bywc46" style="--depth: 1;"> <li class="astro-g2bywc46" style="--depth: 1;"> <a href="#21-unique-sequence-number-field" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">2.1 Unique Sequence Number Field</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#22-request-reference-number-types" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">2.2 Request Reference Number Types</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#23-sequence-number-best-practices" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">2.3 Sequence Number Best Practices</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#24-file-naming-conventions" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">2.4 File Naming Conventions</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#25-file-upload-acknowledgment--status-polling-flow" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">2.5 File Upload Acknowledgment &amp; Status Polling Flow</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#26-upload-processing-modes" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">2.6 Upload Processing Modes</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#27-date-of-receipt-tracking-sebi-mandate" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">2.7 Date of Receipt Tracking (SEBI Mandate)</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#28-dp57-report-generation-schedule" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">2.8 DP57 Report Generation Schedule</span> </a>  </li> </ul>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#3-security--encryption" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">3. Security &amp; Encryption</span> </a> <ul class="astro-g2bywc46" style="--depth: 1;"> <li class="astro-g2bywc46" style="--depth: 1;"> <a href="#31-multi-layered-security-architecture" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">3.1 Multi-Layered Security Architecture</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#32-digital-signature-certificate-dsc--comprehensive" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">3.2 Digital Signature Certificate (DSC) — Comprehensive</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#33-dsc-mapping-checklist-from-cdsl-official-checklist" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">3.3 DSC Mapping Checklist (from CDSL Official Checklist)</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#34-edis-encryption-details" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">3.4 eDIS Encryption Details</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#35-webcdas-browser-security-configuration" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">3.5 WebCDAS Browser Security Configuration</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#36-ip-whitelisting-requirements" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">3.6 IP Whitelisting Requirements</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#37-connectivity-security-comparison" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">3.7 Connectivity Security Comparison</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#38-cdsl-data-center-security" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">3.8 CDSL Data Center Security</span> </a>  </li> </ul>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#4-sebi-circulars-reference" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">4. SEBI Circulars Reference</span> </a> <ul class="astro-g2bywc46" style="--depth: 1;"> <li class="astro-g2bywc46" style="--depth: 1;"> <a href="#41-ddpi-circulars" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">4.1 DDPI Circulars</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#42-margin-pledge-circulars" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">4.2 Margin Pledge Circulars</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#43-nomination-circulars" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">4.3 Nomination Circulars</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#44-cdsl-communiques-for-ddpipledgemodifications" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">4.4 CDSL Communiques for DDPI/Pledge/Modifications</span> </a>  </li> </ul>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#related-pages" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Related Pages</span> </a>  </li> </ul> </nav></starlight-toc></div></div> </div> </aside> <div class="main-pane astro-67yu43on">  <main data-pagefind-body class="astro-bguv2lll" lang="en" dir="ltr">    <div class="content-panel astro-7nkwcw3z"> <div class="sl-container astro-7nkwcw3z"> <h1 id="_top" class="astro-j6tvhyss">CDSL Integration Guide</h1>  </div> </div>  <div class="content-panel astro-7nkwcw3z"> <div class="sl-container astro-7nkwcw3z"> <div class="sl-markdown-content"> <p>Before a single real client account can be opened in CDSL (Central Depository Services Limited), your system must pass through a multi-phase certification process that includes UAT (User Acceptance Testing) environment setup, test case execution against CDSL-defined scenarios, and a formal sign-off. After that, production onboarding involves leased line connectivity, IP whitelisting, DSC (Digital Signature Certificate) mapping, and strict security protocols. This page is the practical engineering guide to that journey — from requesting your first test credentials to processing your first live transaction. Whether you are integrating with CDSL for the first time or troubleshooting a production issue with file uploads and sequence numbers, this is where you will find the answers.</p>
+<blockquote>
+<p>Back to <a href="/broking-kyc/vendors/depositories/cdsl/">CDSL Overview</a></p>
+</blockquote>
+<hr>
+<p>The first decision you will face is which environment to work in. CDSL provides three tiers — an Innovation Sandbox for prototyping, a DP (Depository Participant) UAT environment for real integration testing, and the production environment for live operations. Understanding the differences between these environments will save you from common mistakes like using test credentials in production or expecting real settlement behavior in UAT.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="1-uat--test-environment-vs-production">1. UAT / Test Environment vs Production</h2><a class="sl-anchor-link" href="#1-uat--test-environment-vs-production"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only" data-pagefind-ignore="">Section titled “1. UAT / Test Environment vs Production”</span></a></div>
+<div class="sl-heading-wrapper level-h3"><h3 id="11-environment-endpoints">1.1 Environment Endpoints</h3><a class="sl-anchor-link" href="#11-environment-endpoints"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only" data-pagefind-ignore="">Section titled “1.1 Environment Endpoints”</span></a></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Aspect</th><th>UAT / Test</th><th>Production</th></tr></thead><tbody><tr><td><strong>WebCDAS URL</strong></td><td><code dir="auto">test1.cdslindia.com</code></td><td><code dir="auto">cdslweb.cdslindia.com</code> and <code dir="auto">cdslapp.cdslindia.com</code></td></tr><tr><td><strong>Mock Environment</strong></td><td><code dir="auto">mock.cdslindia.com</code> (MOCKCDAS for RTA/DP testing)</td><td>N/A</td></tr><tr><td><strong>API Services</strong></td><td>Test API server (credentials from <a href="mailto:dprtasupport@cdslindia.com">dprtasupport@cdslindia.com</a>)</td><td><code dir="auto">api.cdslindia.com/APIServices</code></td></tr><tr><td><strong>eDIS Portal</strong></td><td>Sandbox eDIS (on request)</td><td><code dir="auto">edis.cdslindia.com</code></td></tr><tr><td><strong>TPIN Generation</strong></td><td>Test TPIN generation</td><td><code dir="auto">edis.cdslindia.com/Home/GeneratePin</code></td></tr><tr><td><strong>easi/EASIEST</strong></td><td>Test instance</td><td><code dir="auto">web.cdslindia.com/myeasitoken/Home/Login</code></td></tr><tr><td><strong>CVL KRA Verification</strong></td><td>Test URL</td><td><code dir="auto">validate.cvlindia.com/CVLKRAVerification_V1/</code></td></tr><tr><td><strong>Issuer Portal</strong></td><td>Test instance</td><td><code dir="auto">issuercentre.cdslindia.com/Home/Login</code></td></tr></tbody></table>
+<aside aria-label="Bookmark these URLs early" class="starlight-aside starlight-aside--tip"><p class="starlight-aside__title" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="starlight-aside__icon"><path fill-rule="evenodd" clip-rule="evenodd" d="M1.43909 8.85483L1.44039 8.85354L4.96668 5.33815C5.30653 4.99386 5.7685 4.79662 6.2524 4.78972L6.26553 4.78963L12.9014 4.78962L13.8479 3.84308C16.9187 0.772319 20.0546 0.770617 21.4678 0.975145C21.8617 1.02914 22.2271 1.21053 22.5083 1.4917C22.7894 1.77284 22.9708 2.13821 23.0248 2.53199C23.2294 3.94517 23.2278 7.08119 20.1569 10.1521L19.2107 11.0983V17.7338L19.2106 17.7469C19.2037 18.2308 19.0067 18.6933 18.6624 19.0331L15.1456 22.5608C14.9095 22.7966 14.6137 22.964 14.29 23.0449C13.9663 23.1259 13.6267 23.1174 13.3074 23.0204C12.9881 22.9235 12.7011 22.7417 12.4771 22.4944C12.2533 22.2473 12.1006 21.9441 12.0355 21.6171L11.1783 17.3417L6.65869 12.822L4.34847 12.3589L2.38351 11.965C2.05664 11.8998 1.75272 11.747 1.50564 11.5232C1.25835 11.2992 1.07653 11.0122 0.979561 10.6929C0.882595 10.3736 0.874125 10.034 0.955057 9.7103C1.03599 9.38659 1.20328 9.09092 1.43909 8.85483ZM6.8186 10.8724L2.94619 10.096L6.32006 6.73268H10.9583L6.8186 10.8724ZM15.2219 5.21703C17.681 2.75787 20.0783 2.75376 21.1124 2.8876C21.2462 3.92172 21.2421 6.31895 18.783 8.77812L12.0728 15.4883L8.51172 11.9272L15.2219 5.21703ZM13.9042 21.0538L13.1279 17.1811L17.2676 13.0414V17.68L13.9042 21.0538Z"></path><path d="M9.31827 18.3446C9.45046 17.8529 9.17864 17.3369 8.68945 17.1724C8.56178 17.1294 8.43145 17.1145 8.30512 17.1243C8.10513 17.1398 7.91519 17.2172 7.76181 17.3434C7.62613 17.455 7.51905 17.6048 7.45893 17.7835C6.97634 19.2186 5.77062 19.9878 4.52406 20.4029C4.08525 20.549 3.6605 20.644 3.29471 20.7053C3.35607 20.3395 3.45098 19.9148 3.59711 19.476C4.01221 18.2294 4.78141 17.0237 6.21648 16.5411C6.39528 16.481 6.54504 16.3739 6.65665 16.2382C6.85126 16.0016 6.92988 15.678 6.84417 15.3647C6.83922 15.3466 6.83373 15.3286 6.82767 15.3106C6.74106 15.053 6.55701 14.8557 6.33037 14.7459C6.10949 14.6389 5.84816 14.615 5.59715 14.6994C5.47743 14.7397 5.36103 14.7831 5.24786 14.8294C3.22626 15.6569 2.2347 17.4173 1.75357 18.8621C1.49662 19.6337 1.36993 20.3554 1.30679 20.8818C1.27505 21.1464 1.25893 21.3654 1.25072 21.5213C1.24662 21.5993 1.24448 21.6618 1.24337 21.7066L1.243 21.7226L1.24235 21.7605L1.2422 21.7771L1.24217 21.7827L1.24217 21.7856C1.24217 22.3221 1.67703 22.7579 2.2137 22.7579L2.2155 22.7579L2.22337 22.7578L2.23956 22.7577C2.25293 22.7575 2.27096 22.7572 2.29338 22.7567C2.33821 22.7555 2.40073 22.7534 2.47876 22.7493C2.63466 22.7411 2.85361 22.725 3.11822 22.6932C3.64462 22.6301 4.36636 22.5034 5.13797 22.2464C6.58274 21.7653 8.3431 20.7738 9.17063 18.7522C9.21696 18.639 9.26037 18.5226 9.30064 18.4029C9.30716 18.3835 9.31304 18.364 9.31827 18.3446Z"></path></svg>Bookmark these URLs early</p><div class="starlight-aside__content"><p>During integration, you will switch between these endpoints dozens of times a day. Bookmark all UAT URLs separately from production ones, and use environment variables in your codebase to manage the switch. A common production incident is accidentally pointing to the test API server — or worse, the reverse.</p></div></aside>
+<div class="sl-heading-wrapper level-h3"><h3 id="12-test-vs-production-environment-differences">1.2 Test vs Production Environment Differences</h3><a class="sl-anchor-link" href="#12-test-vs-production-environment-differences"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only" data-pagefind-ignore="">Section titled “1.2 Test vs Production Environment Differences”</span></a></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Aspect</th><th>UAT / Test</th><th>Production</th></tr></thead><tbody><tr><td><strong>DP ID</strong></td><td>Test DP ID assigned by CDSL (unique per testing entity)</td><td>Real DP ID (8 digits, assigned at registration)</td></tr><tr><td><strong>Client IDs</strong></td><td>Test Client IDs (no real securities)</td><td>Real Client IDs auto-assigned by CDAS (Central Depository Accounting System)</td></tr><tr><td><strong>API Key</strong></td><td>Separate test API key (may have shorter validity)</td><td>Production API key (longer validity, strict rotation)</td></tr><tr><td><strong>eDIS API Key</strong></td><td>Test eDIS (Electronic Delivery Instruction Slip) key (separate from production)</td><td>Production eDIS API key</td></tr><tr><td><strong>Data</strong></td><td>Synthetic data; no real securities or settlements</td><td>Live market data, real ISINs (International Securities Identification Numbers), real settlements</td></tr><tr><td><strong>DSC</strong></td><td>Test DSC certificates (relaxed requirements)</td><td>Production DSC from Registered Authority of TCS (mandatory)</td></tr><tr><td><strong>Connectivity</strong></td><td>Internet access sufficient; no leased line needed</td><td>Leased line / MPLS (Multiprotocol Label Switching) / Internet with IP whitelisting</td></tr><tr><td><strong>IP Whitelisting</strong></td><td>May be relaxed; dynamic IPs may be allowed</td><td>Static IPs mandatory; registered with CDSL</td></tr><tr><td><strong>SSL/TLS</strong></td><td>TLS 1.2 (same as production)</td><td>TLS 1.2 or higher (mandatory)</td></tr><tr><td><strong>TransDtls Encryption</strong></td><td>Same encryption algorithm as production</td><td>Same encryption, production keys</td></tr><tr><td><strong>Settlement</strong></td><td>No real settlement; simulated settlement cycle</td><td>T+1 live settlement</td></tr><tr><td><strong>Audit Logging</strong></td><td>Minimal / test-only</td><td>Full audit trail per SEBI (Securities and Exchange Board of India) requirements</td></tr><tr><td><strong>Go-Live</strong></td><td>Self-service testing</td><td>Requires CDSL UAT sign-off certification</td></tr></tbody></table>
+<p>In plain English: the UAT environment mirrors production in its API structure and file formats, but uses synthetic data and relaxed security. Think of it as a flight simulator — the controls are identical to a real cockpit, but crashing has no consequences. Production is the real flight.</p>
+<div class="sl-heading-wrapper level-h3"><h3 id="13-uat-certification-process">1.3 UAT Certification Process</h3><a class="sl-anchor-link" href="#13-uat-certification-process"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only" data-pagefind-ignore="">Section titled “1.3 UAT Certification Process”</span></a></div>
+<div class="expressive-code"><link rel="stylesheet" href="/broking-kyc/_astro/ec.v4551.css"><script type="module" src="/broking-kyc/_astro/ec.0vx5m.js"></script><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">Phase 1: Registration &#x26; Setup (1-2 weeks)</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">   </span></span><span style="--0:#d6deeb;--1:#403f53">├─ Submit request to dprtasupport@cdslindia.com</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">   </span></span><span style="--0:#d6deeb;--1:#403f53">├─ Specify: APIs needed, connectivity mode, test scope</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">   </span></span><span style="--0:#d6deeb;--1:#403f53">├─ CDSL assigns Test DP ID</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">   </span></span><span style="--0:#d6deeb;--1:#403f53">├─ CDSL generates Test API Key</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">   </span></span><span style="--0:#d6deeb;--1:#403f53">├─ CDSL provides Test WebCDAS credentials</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">   </span></span><span style="--0:#d6deeb;--1:#403f53">└─ MOCKCDAS access granted for file format testing</span></div></div><div class="ec-line"><div class="code">
+</div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">Phase 2: Integration Development (2-4 weeks)</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">   </span></span><span style="--0:#d6deeb;--1:#403f53">├─ BO Setup file generation and upload testing</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">   </span></span><span style="--0:#d6deeb;--1:#403f53">├─ API call testing (BO Setup, eDIS, Transaction Upload)</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">   </span></span><span style="--0:#d6deeb;--1:#403f53">├─ File format validation (fixed-length positional for BO, XML-tag for transactions)</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">   </span></span><span style="--0:#d6deeb;--1:#403f53">├─ Error handling and rejection scenario testing</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">   </span></span><span style="--0:#d6deeb;--1:#403f53">└─ Download report parsing (DP57, DPM3, DPM4)</span></div></div><div class="ec-line"><div class="code">
+</div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">Phase 3: Test Case Execution (1-2 weeks, CDSL-defined test cases)</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">   </span></span><span style="--0:#d6deeb;--1:#403f53">├─ BO account opening (all account categories: IND, HUF, BDC, TRU)</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">   </span></span><span style="--0:#d6deeb;--1:#403f53">├─ BO modification (name, address, bank, contact, KYC attributes)</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">   </span></span><span style="--0:#d6deeb;--1:#403f53">├─ Nomination (add, modify, opt-out with video verification flag)</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">   </span></span><span style="--0:#d6deeb;--1:#403f53">├─ eDIS flow (TPIN generation → VerifyDIS → OTP → callback)</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">   </span></span><span style="--0:#d6deeb;--1:#403f53">├─ DDPI submission (online eSign + offline physical)</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">   </span></span><span style="--0:#d6deeb;--1:#403f53">├─ Transaction uploads (pledge, IDT, off-market, freeze/unfreeze)</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">   </span></span><span style="--0:#d6deeb;--1:#403f53">├─ File download parsing (DP57, DPM3, DPM4, Client Master)</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">   </span></span><span style="--0:#d6deeb;--1:#403f53">└─ Error scenarios (duplicate PAN, missing fields, invalid codes)</span></div></div><div class="ec-line"><div class="code">
+</div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">Phase 4: UAT Sign-Off (1 week)</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">   </span></span><span style="--0:#d6deeb;--1:#403f53">├─ CDSL reviews test execution results</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">   </span></span><span style="--0:#d6deeb;--1:#403f53">├─ Issues UAT completion certificate</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">   </span></span><span style="--0:#d6deeb;--1:#403f53">└─ Any issues must be resolved before production onboarding</span></div></div><div class="ec-line"><div class="code">
+</div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">Phase 5: Production Onboarding (1-2 weeks)</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">   </span></span><span style="--0:#d6deeb;--1:#403f53">├─ Production DP ID + API key provisioned</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">   </span></span><span style="--0:#d6deeb;--1:#403f53">├─ Client ID range pre-allocation requested (for BO ID on eSigned forms)</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">   </span></span><span style="--0:#d6deeb;--1:#403f53">├─ IP whitelisting configured for production servers</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">   </span></span><span style="--0:#d6deeb;--1:#403f53">├─ DSC mapping completed for all authorized signatories</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">   </span></span><span style="--0:#d6deeb;--1:#403f53">├─ Leased line / MPLS / Internet connectivity certified</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">   </span></span><span style="--0:#d6deeb;--1:#403f53">├─ Production security configuration verified</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">   </span></span><span style="--0:#d6deeb;--1:#403f53">└─ Go-Live approval issued by CDSL</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="Phase 1: Registration &#x26; Setup (1-2 weeks)   ├─ Submit request to dprtasupport@cdslindia.com   ├─ Specify: APIs needed, connectivity mode, test scope   ├─ CDSL assigns Test DP ID   ├─ CDSL generates Test API Key   ├─ CDSL provides Test WebCDAS credentials   └─ MOCKCDAS access granted for file format testingPhase 2: Integration Development (2-4 weeks)   ├─ BO Setup file generation and upload testing   ├─ API call testing (BO Setup, eDIS, Transaction Upload)   ├─ File format validation (fixed-length positional for BO, XML-tag for transactions)   ├─ Error handling and rejection scenario testing   └─ Download report parsing (DP57, DPM3, DPM4)Phase 3: Test Case Execution (1-2 weeks, CDSL-defined test cases)   ├─ BO account opening (all account categories: IND, HUF, BDC, TRU)   ├─ BO modification (name, address, bank, contact, KYC attributes)   ├─ Nomination (add, modify, opt-out with video verification flag)   ├─ eDIS flow (TPIN generation → VerifyDIS → OTP → callback)   ├─ DDPI submission (online eSign + offline physical)   ├─ Transaction uploads (pledge, IDT, off-market, freeze/unfreeze)   ├─ File download parsing (DP57, DPM3, DPM4, Client Master)   └─ Error scenarios (duplicate PAN, missing fields, invalid codes)Phase 4: UAT Sign-Off (1 week)   ├─ CDSL reviews test execution results   ├─ Issues UAT completion certificate   └─ Any issues must be resolved before production onboardingPhase 5: Production Onboarding (1-2 weeks)   ├─ Production DP ID + API key provisioned   ├─ Client ID range pre-allocation requested (for BO ID on eSigned forms)   ├─ IP whitelisting configured for production servers   ├─ DSC mapping completed for all authorized signatories   ├─ Leased line / MPLS / Internet connectivity certified   ├─ Production security configuration verified   └─ Go-Live approval issued by CDSL"><div></div></button></div></figure></div>
+<aside aria-label="Caution" class="starlight-aside starlight-aside--caution"><p class="starlight-aside__title" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="starlight-aside__icon"><path d="M12 16C11.8022 16 11.6089 16.0587 11.4444 16.1686C11.28 16.2784 11.1518 16.4346 11.0761 16.6173C11.0004 16.8001 10.9806 17.0011 11.0192 17.1951C11.0578 17.3891 11.153 17.5673 11.2929 17.7071C11.4327 17.847 11.6109 17.9422 11.8049 17.9808C11.9989 18.0194 12.2 17.9996 12.3827 17.9239C12.5654 17.8482 12.7216 17.72 12.8315 17.5556C12.9413 17.3911 13 17.1978 13 17C13 16.7348 12.8946 16.4805 12.7071 16.2929C12.5196 16.1054 12.2652 16 12 16ZM22.67 17.47L14.62 3.47003C14.3598 3.00354 13.9798 2.61498 13.5192 2.3445C13.0586 2.07401 12.5341 1.9314 12 1.9314C11.4659 1.9314 10.9414 2.07401 10.4808 2.3445C10.0202 2.61498 9.64019 3.00354 9.38 3.47003L1.38 17.47C1.11079 17.924 0.966141 18.441 0.960643 18.9688C0.955144 19.4966 1.089 20.0166 1.34868 20.4761C1.60837 20.9356 1.9847 21.3185 2.43968 21.5861C2.89466 21.8536 3.41218 21.9964 3.94 22H20.06C20.5921 22.0053 21.1159 21.8689 21.5779 21.6049C22.0399 21.341 22.4234 20.9589 22.689 20.4978C22.9546 20.0368 23.0928 19.5134 23.0895 18.9814C23.0862 18.4493 22.9414 17.9277 22.67 17.47ZM20.94 19.47C20.8523 19.626 20.7245 19.7556 20.5697 19.8453C20.4149 19.935 20.2389 19.9815 20.06 19.98H3.94C3.76111 19.9815 3.5851 19.935 3.43032 19.8453C3.27553 19.7556 3.14765 19.626 3.06 19.47C2.97223 19.318 2.92602 19.1456 2.92602 18.97C2.92602 18.7945 2.97223 18.622 3.06 18.47L11.06 4.47003C11.1439 4.30623 11.2714 4.16876 11.4284 4.07277C11.5855 3.97678 11.766 3.92599 11.95 3.92599C12.134 3.92599 12.3145 3.97678 12.4716 4.07277C12.6286 4.16876 12.7561 4.30623 12.84 4.47003L20.89 18.47C20.9892 18.6199 21.0462 18.7937 21.055 18.9732C21.0638 19.1527 21.0241 19.3312 20.94 19.49V19.47ZM12 8.00003C11.7348 8.00003 11.4804 8.10538 11.2929 8.29292C11.1054 8.48046 11 8.73481 11 9.00003V13C11 13.2652 11.1054 13.5196 11.2929 13.7071C11.4804 13.8947 11.7348 14 12 14C12.2652 14 12.5196 13.8947 12.7071 13.7071C12.8946 13.5196 13 13.2652 13 13V9.00003C13 8.73481 12.8946 8.48046 12.7071 8.29292C12.5196 8.10538 12.2652 8.00003 12 8.00003Z"></path></svg>Caution</p><div class="starlight-aside__content"><p>The entire UAT-to-production journey typically takes 6-10 weeks. Do not underestimate Phase 3 — CDSL provides a specific list of test cases, and every one must pass. The most common delays are in error scenario testing (Phase 3) and DSC mapping (Phase 5). Start the DSC procurement process in Phase 1, because getting hardware USB tokens takes 7-10 working days from the certifying authority.</p></div></aside>
+<aside aria-label="Pre-Allocated BO IDs" class="starlight-aside starlight-aside--tip"><p class="starlight-aside__title" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="starlight-aside__icon"><path fill-rule="evenodd" clip-rule="evenodd" d="M1.43909 8.85483L1.44039 8.85354L4.96668 5.33815C5.30653 4.99386 5.7685 4.79662 6.2524 4.78972L6.26553 4.78963L12.9014 4.78962L13.8479 3.84308C16.9187 0.772319 20.0546 0.770617 21.4678 0.975145C21.8617 1.02914 22.2271 1.21053 22.5083 1.4917C22.7894 1.77284 22.9708 2.13821 23.0248 2.53199C23.2294 3.94517 23.2278 7.08119 20.1569 10.1521L19.2107 11.0983V17.7338L19.2106 17.7469C19.2037 18.2308 19.0067 18.6933 18.6624 19.0331L15.1456 22.5608C14.9095 22.7966 14.6137 22.964 14.29 23.0449C13.9663 23.1259 13.6267 23.1174 13.3074 23.0204C12.9881 22.9235 12.7011 22.7417 12.4771 22.4944C12.2533 22.2473 12.1006 21.9441 12.0355 21.6171L11.1783 17.3417L6.65869 12.822L4.34847 12.3589L2.38351 11.965C2.05664 11.8998 1.75272 11.747 1.50564 11.5232C1.25835 11.2992 1.07653 11.0122 0.979561 10.6929C0.882595 10.3736 0.874125 10.034 0.955057 9.7103C1.03599 9.38659 1.20328 9.09092 1.43909 8.85483ZM6.8186 10.8724L2.94619 10.096L6.32006 6.73268H10.9583L6.8186 10.8724ZM15.2219 5.21703C17.681 2.75787 20.0783 2.75376 21.1124 2.8876C21.2462 3.92172 21.2421 6.31895 18.783 8.77812L12.0728 15.4883L8.51172 11.9272L15.2219 5.21703ZM13.9042 21.0538L13.1279 17.1811L17.2676 13.0414V17.68L13.9042 21.0538Z"></path><path d="M9.31827 18.3446C9.45046 17.8529 9.17864 17.3369 8.68945 17.1724C8.56178 17.1294 8.43145 17.1145 8.30512 17.1243C8.10513 17.1398 7.91519 17.2172 7.76181 17.3434C7.62613 17.455 7.51905 17.6048 7.45893 17.7835C6.97634 19.2186 5.77062 19.9878 4.52406 20.4029C4.08525 20.549 3.6605 20.644 3.29471 20.7053C3.35607 20.3395 3.45098 19.9148 3.59711 19.476C4.01221 18.2294 4.78141 17.0237 6.21648 16.5411C6.39528 16.481 6.54504 16.3739 6.65665 16.2382C6.85126 16.0016 6.92988 15.678 6.84417 15.3647C6.83922 15.3466 6.83373 15.3286 6.82767 15.3106C6.74106 15.053 6.55701 14.8557 6.33037 14.7459C6.10949 14.6389 5.84816 14.615 5.59715 14.6994C5.47743 14.7397 5.36103 14.7831 5.24786 14.8294C3.22626 15.6569 2.2347 17.4173 1.75357 18.8621C1.49662 19.6337 1.36993 20.3554 1.30679 20.8818C1.27505 21.1464 1.25893 21.3654 1.25072 21.5213C1.24662 21.5993 1.24448 21.6618 1.24337 21.7066L1.243 21.7226L1.24235 21.7605L1.2422 21.7771L1.24217 21.7827L1.24217 21.7856C1.24217 22.3221 1.67703 22.7579 2.2137 22.7579L2.2155 22.7579L2.22337 22.7578L2.23956 22.7577C2.25293 22.7575 2.27096 22.7572 2.29338 22.7567C2.33821 22.7555 2.40073 22.7534 2.47876 22.7493C2.63466 22.7411 2.85361 22.725 3.11822 22.6932C3.64462 22.6301 4.36636 22.5034 5.13797 22.2464C6.58274 21.7653 8.3431 20.7738 9.17063 18.7522C9.21696 18.639 9.26037 18.5226 9.30064 18.4029C9.30716 18.3835 9.31304 18.364 9.31827 18.3446Z"></path></svg>Pre-Allocated BO IDs</p><div class="starlight-aside__content"><p>During Phase 5, request a <strong>Client ID range pre-allocation</strong> from CDSL. This allows you to assign BO (Beneficiary Owner) IDs before eSign, so the account opening form displays the demat account number when the client signs it. See <a href="/broking-kyc/vendors/depositories/cdsl/#54-pre-allocated-client-id-bo-id-range-reservation">CDSL Overview — Section 5.4</a> for the full mechanism, implementation requirements, and eSign workflow.</p></div></aside>
+<div class="sl-heading-wrapper level-h3"><h3 id="14-cdsl-innovation-sandbox-extended">1.4 CDSL Innovation Sandbox (Extended)</h3><a class="sl-anchor-link" href="#14-cdsl-innovation-sandbox-extended"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only" data-pagefind-ignore="">Section titled “1.4 CDSL Innovation Sandbox (Extended)”</span></a></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Aspect</th><th>Details</th></tr></thead><tbody><tr><td><strong>Governance</strong></td><td>SEBI Innovation Sandbox Committee</td></tr><tr><td><strong>Eligibility</strong></td><td>Fintech startups, registered intermediaries, educational institutions, individual innovators</td></tr><tr><td><strong>Application</strong></td><td>Via SEBI Innovation Sandbox portal</td></tr><tr><td><strong>Cost</strong></td><td>Free for approved applicants</td></tr><tr><td><strong>Duration</strong></td><td>Defined testing window per approval</td></tr><tr><td><strong>Test Data</strong></td><td>Synthetic account statements, holding data, transaction data</td></tr><tr><td><strong>File Formats Provided</strong></td><td>Unformatted account statements, BO upload/download specifications, sample files</td></tr><tr><td><strong>Guidelines</strong></td><td>Operating Guidelines v3 (final) on CDSL website</td></tr></tbody></table>
+<p>The Innovation Sandbox is useful if you want to explore CDSL integration before committing to a full DP registration. However, it provides limited API access (data access only) and static test data. For actual integration development, you need the DP UAT environment.</p>
+<p><strong>Sandbox vs DP UAT vs Production</strong>:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Aspect</th><th>Innovation Sandbox</th><th>DP UAT</th><th>Production</th></tr></thead><tbody><tr><td><strong>Access</strong></td><td>Open application via SEBI portal</td><td>Registered DP only</td><td>Live registered DP</td></tr><tr><td><strong>Data</strong></td><td>Sample/static test data</td><td>Dynamic test data, simulated flows</td><td>Live production data</td></tr><tr><td><strong>Credentials</strong></td><td>Sandbox-specific</td><td>Test API key from CDSL</td><td>Production API key</td></tr><tr><td><strong>APIs</strong></td><td>Limited (data access only)</td><td>Full API suite for testing</td><td>Full API suite</td></tr><tr><td><strong>File Formats</strong></td><td>Sample specifications and files</td><td>Full upload/download testing</td><td>Production file processing</td></tr><tr><td><strong>Use Case</strong></td><td>Prototyping, learning, hackathons</td><td>Integration development and certification</td><td>Live DP operations</td></tr><tr><td><strong>Contact</strong></td><td>innovation-sandbox.in</td><td><a href="mailto:dprtasupport@cdslindia.com">dprtasupport@cdslindia.com</a></td><td><a href="mailto:helpdesk@cdslindia.com">helpdesk@cdslindia.com</a></td></tr></tbody></table>
+<hr>
+<p>Every file you upload to CDSL and every API call you make needs a tracking mechanism. CDSL uses a system of sequence numbers and reference IDs that serve as the backbone for idempotency, deduplication, and audit trails. Getting sequence number management wrong is one of the most common causes of production file rejections. This section covers the tracking architecture in detail.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="2-request-tracking--sequence-numbers">2. Request Tracking &#x26; Sequence Numbers</h2><a class="sl-anchor-link" href="#2-request-tracking--sequence-numbers"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only" data-pagefind-ignore="">Section titled “2. Request Tracking &#x26; Sequence Numbers”</span></a></div>
+<div class="sl-heading-wrapper level-h3"><h3 id="21-unique-sequence-number-field">2.1 Unique Sequence Number Field</h3><a class="sl-anchor-link" href="#21-unique-sequence-number-field"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only" data-pagefind-ignore="">Section titled “2.1 Unique Sequence Number Field”</span></a></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Aspect</th><th>Details</th></tr></thead><tbody><tr><td><strong>Field Name</strong></td><td>Unique Sequence Number</td></tr><tr><td><strong>Present In</strong></td><td>BO setup upload, BO modify upload, and transaction uploads</td></tr><tr><td><strong>Mandatory Since</strong></td><td>October 30, 2015 (initially optional; uniqueness checked if populated)</td></tr><tr><td><strong>Uniqueness Scope</strong></td><td>Per DP ID — each DP maintains its own sequence space</td></tr><tr><td><strong>Validation</strong></td><td>CDSL checks uniqueness across all records ever submitted by the DP</td></tr><tr><td><strong>Purpose</strong></td><td>Prevent duplicate submissions; enable idempotent retries</td></tr><tr><td><strong>Format</strong></td><td>Numeric; DP-defined; must be unique across all submissions (no reuse)</td></tr></tbody></table>
+<p>In plain English: the Unique Sequence Number is like a receipt number at a bank counter — every transaction you submit gets a unique number, and if you accidentally submit the same number twice, CDSL rejects the duplicate. This prevents double account openings, double pledges, and other costly duplication errors.</p>
+<div class="sl-heading-wrapper level-h3"><h3 id="22-request-reference-number-types">2.2 Request Reference Number Types</h3><a class="sl-anchor-link" href="#22-request-reference-number-types"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only" data-pagefind-ignore="">Section titled “2.2 Request Reference Number Types”</span></a></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Reference Type</th><th>Format</th><th>Source</th><th>Description</th></tr></thead><tbody><tr><td><strong>Unique Sequence Number</strong></td><td>Numeric (DP-defined)</td><td>DP generates</td><td>Master tracking ID for each record in upload files</td></tr><tr><td><strong>eDIS ReqId</strong></td><td>15-digit numeric (e.g., <code dir="auto">291951000000401</code>)</td><td>DP generates</td><td>Unique request ID for eDIS VerifyDIS API calls</td></tr><tr><td><strong>File Request ID</strong></td><td>Auto-generated by CDAS</td><td>CDSL assigns</td><td>Assigned when file upload is accepted by CDAS</td></tr><tr><td><strong>Transaction Reference</strong></td><td>Auto-generated by CDAS</td><td>CDSL assigns</td><td>Unique reference for each transaction in CDAS</td></tr><tr><td><strong>DRN (Demat Request Number)</strong></td><td>10-digit numeric</td><td>CDSL assigns</td><td>Dematerialization/Rematerialization request number</td></tr><tr><td><strong>BO Setup Reference</strong></td><td>DP-generated</td><td>DP generates</td><td>Internal reference for BO account opening request</td></tr><tr><td><strong>Settlement ID</strong></td><td>Exchange-assigned</td><td>Exchange</td><td>Settlement number for on-market transactions</td></tr><tr><td><strong>CM ID</strong></td><td>8-digit</td><td>Clearing Corp</td><td>Clearing Member identifier for settlement matching</td></tr></tbody></table>
+<aside aria-label="You generate some, CDSL generates others" class="starlight-aside starlight-aside--note"><p class="starlight-aside__title" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="starlight-aside__icon"><path d="M12 11C11.7348 11 11.4804 11.1054 11.2929 11.2929C11.1054 11.4804 11 11.7348 11 12V16C11 16.2652 11.1054 16.5196 11.2929 16.7071C11.4804 16.8946 11.7348 17 12 17C12.2652 17 12.5196 16.8946 12.7071 16.7071C12.8946 16.5196 13 16.2652 13 16V12C13 11.7348 12.8946 11.4804 12.7071 11.2929C12.5196 11.1054 12.2652 11 12 11ZM12.38 7.08C12.1365 6.97998 11.8635 6.97998 11.62 7.08C11.4973 7.12759 11.3851 7.19896 11.29 7.29C11.2017 7.3872 11.1306 7.49882 11.08 7.62C11.024 7.73868 10.9966 7.86882 11 8C10.9992 8.13161 11.0245 8.26207 11.0742 8.38391C11.124 8.50574 11.1973 8.61656 11.29 8.71C11.3872 8.79833 11.4988 8.86936 11.62 8.92C11.7715 8.98224 11.936 9.00632 12.099 8.99011C12.2619 8.97391 12.4184 8.91792 12.5547 8.82707C12.691 8.73622 12.8029 8.61328 12.8805 8.46907C12.9582 8.32486 12.9992 8.16378 13 8C12.9963 7.73523 12.8927 7.48163 12.71 7.29C12.6149 7.19896 12.5028 7.12759 12.38 7.08ZM12 2C10.0222 2 8.08879 2.58649 6.4443 3.6853C4.79981 4.78412 3.51809 6.3459 2.76121 8.17317C2.00433 10.0004 1.8063 12.0111 2.19215 13.9509C2.578 15.8907 3.53041 17.6725 4.92894 19.0711C6.32746 20.4696 8.10929 21.422 10.0491 21.8079C11.9889 22.1937 13.9996 21.9957 15.8268 21.2388C17.6541 20.4819 19.2159 19.2002 20.3147 17.5557C21.4135 15.9112 22 13.9778 22 12C22 10.6868 21.7413 9.38642 21.2388 8.17317C20.7363 6.95991 19.9997 5.85752 19.0711 4.92893C18.1425 4.00035 17.0401 3.26375 15.8268 2.7612C14.6136 2.25866 13.3132 2 12 2ZM12 20C10.4178 20 8.87104 19.5308 7.55544 18.6518C6.23985 17.7727 5.21447 16.5233 4.60897 15.0615C4.00347 13.5997 3.84504 11.9911 4.15372 10.4393C4.4624 8.88743 5.22433 7.46197 6.34315 6.34315C7.46197 5.22433 8.88743 4.4624 10.4393 4.15372C11.9911 3.84504 13.5997 4.00346 15.0615 4.60896C16.5233 5.21447 17.7727 6.23984 18.6518 7.55544C19.5308 8.87103 20 10.4177 20 12C20 14.1217 19.1572 16.1566 17.6569 17.6569C16.1566 19.1571 14.1217 20 12 20Z"></path></svg>You generate some, CDSL generates others</p><div class="starlight-aside__content"><p>Notice the “Source” column carefully. Some reference numbers (Unique Sequence Number, eDIS ReqId, BO Setup Reference) are generated by your system — you control the format and must ensure uniqueness. Others (File Request ID, Transaction Reference, DRN) are assigned by CDSL after processing — you must capture and store these from CDSL’s response for downstream tracking.</p></div></aside>
+<div class="sl-heading-wrapper level-h3"><h3 id="23-sequence-number-best-practices">2.3 Sequence Number Best Practices</h3><a class="sl-anchor-link" href="#23-sequence-number-best-practices"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only" data-pagefind-ignore="">Section titled “2.3 Sequence Number Best Practices”</span></a></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Aspect</th><th>Recommendation</th></tr></thead><tbody><tr><td><strong>Format</strong></td><td><code dir="auto">YYYYMMDD</code> + 6-digit zero-padded counter (e.g., <code dir="auto">20260213000001</code>)</td></tr><tr><td><strong>Reset</strong></td><td>No automatic reset by CDSL; DP must ensure global uniqueness</td></tr><tr><td><strong>Counter Strategy</strong></td><td>Monotonically increasing; never reuse even after rejection</td></tr><tr><td><strong>Collision Handling</strong></td><td>Duplicate sequence number = record/file rejected by CDSL</td></tr><tr><td><strong>Retry Logic</strong></td><td>On rejection, generate NEW sequence number and resubmit (never reuse)</td></tr><tr><td><strong>Storage</strong></td><td>Persist sequence counter in database with transaction-safe increment</td></tr><tr><td><strong>Multi-Instance</strong></td><td>If multiple application instances, use partitioned ranges or centralized counter</td></tr><tr><td><strong>Disaster Recovery</strong></td><td>DR system must have access to same sequence counter or separate range</td></tr></tbody></table>
+<aside aria-label="Caution" class="starlight-aside starlight-aside--caution"><p class="starlight-aside__title" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="starlight-aside__icon"><path d="M12 16C11.8022 16 11.6089 16.0587 11.4444 16.1686C11.28 16.2784 11.1518 16.4346 11.0761 16.6173C11.0004 16.8001 10.9806 17.0011 11.0192 17.1951C11.0578 17.3891 11.153 17.5673 11.2929 17.7071C11.4327 17.847 11.6109 17.9422 11.8049 17.9808C11.9989 18.0194 12.2 17.9996 12.3827 17.9239C12.5654 17.8482 12.7216 17.72 12.8315 17.5556C12.9413 17.3911 13 17.1978 13 17C13 16.7348 12.8946 16.4805 12.7071 16.2929C12.5196 16.1054 12.2652 16 12 16ZM22.67 17.47L14.62 3.47003C14.3598 3.00354 13.9798 2.61498 13.5192 2.3445C13.0586 2.07401 12.5341 1.9314 12 1.9314C11.4659 1.9314 10.9414 2.07401 10.4808 2.3445C10.0202 2.61498 9.64019 3.00354 9.38 3.47003L1.38 17.47C1.11079 17.924 0.966141 18.441 0.960643 18.9688C0.955144 19.4966 1.089 20.0166 1.34868 20.4761C1.60837 20.9356 1.9847 21.3185 2.43968 21.5861C2.89466 21.8536 3.41218 21.9964 3.94 22H20.06C20.5921 22.0053 21.1159 21.8689 21.5779 21.6049C22.0399 21.341 22.4234 20.9589 22.689 20.4978C22.9546 20.0368 23.0928 19.5134 23.0895 18.9814C23.0862 18.4493 22.9414 17.9277 22.67 17.47ZM20.94 19.47C20.8523 19.626 20.7245 19.7556 20.5697 19.8453C20.4149 19.935 20.2389 19.9815 20.06 19.98H3.94C3.76111 19.9815 3.5851 19.935 3.43032 19.8453C3.27553 19.7556 3.14765 19.626 3.06 19.47C2.97223 19.318 2.92602 19.1456 2.92602 18.97C2.92602 18.7945 2.97223 18.622 3.06 18.47L11.06 4.47003C11.1439 4.30623 11.2714 4.16876 11.4284 4.07277C11.5855 3.97678 11.766 3.92599 11.95 3.92599C12.134 3.92599 12.3145 3.97678 12.4716 4.07277C12.6286 4.16876 12.7561 4.30623 12.84 4.47003L20.89 18.47C20.9892 18.6199 21.0462 18.7937 21.055 18.9732C21.0638 19.1527 21.0241 19.3312 20.94 19.49V19.47ZM12 8.00003C11.7348 8.00003 11.4804 8.10538 11.2929 8.29292C11.1054 8.48046 11 8.73481 11 9.00003V13C11 13.2652 11.1054 13.5196 11.2929 13.7071C11.4804 13.8947 11.7348 14 12 14C12.2652 14 12.5196 13.8947 12.7071 13.7071C12.8946 13.5196 13 13.2652 13 13V9.00003C13 8.73481 12.8946 8.48046 12.7071 8.29292C12.5196 8.10538 12.2652 8.00003 12 8.00003Z"></path></svg>Caution</p><div class="starlight-aside__content"><p>The most dangerous bug in sequence number management is reusing a number after a rejection. When CDSL rejects a file, the sequence numbers in that file are “burned” — they can never be used again, even though the records were not processed. Always generate a fresh sequence number for retries. If your counter is in-memory only (not persisted to a database), a server restart could cause sequence reuse and silent rejections.</p></div></aside>
+<div class="sl-heading-wrapper level-h3"><h3 id="24-file-naming-conventions">2.4 File Naming Conventions</h3><a class="sl-anchor-link" href="#24-file-naming-conventions"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only" data-pagefind-ignore="">Section titled “2.4 File Naming Conventions”</span></a></div>
+<p><strong>DP57 Report (Common Download)</strong>:</p>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">Format: COD_EXP_&#x3C;DPID>_&#x3C;FILE_REQ_ID>_&#x3C;I/F>_YYYYMMDDHHMM_&#x3C;SeqNo>.csv</span></div></div><div class="ec-line"><div class="code">
+</div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">Components:</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">  </span></span><span style="--0:#d6deeb;--1:#403f53">COD          = Common Online Download</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">  </span></span><span style="--0:#d6deeb;--1:#403f53">EXP          = Export</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">  </span></span><span style="--0:#d6deeb;--1:#403f53">DPID         = 8-digit Depository Participant ID</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">  </span></span><span style="--0:#d6deeb;--1:#403f53">FILE_REQ_ID  = File request identifier assigned by CDSL</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">  </span></span><span style="--0:#d6deeb;--1:#403f53">I/F          = I (Incremental during day) or F (Full end-of-day)</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">  </span></span><span style="--0:#d6deeb;--1:#403f53">YYYYMMDDHHMM = Timestamp of report generation</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">  </span></span><span style="--0:#d6deeb;--1:#403f53">SeqNo        = Sequential number (for multiple files in same period)</span></div></div><div class="ec-line"><div class="code">
+</div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">Example: COD_EXP_12049200_78542_I_202602131430_001.csv</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="Format: COD_EXP_<DPID>_<FILE_REQ_ID>_<I/F>_YYYYMMDDHHMM_<SeqNo>.csvComponents:  COD          = Common Online Download  EXP          = Export  DPID         = 8-digit Depository Participant ID  FILE_REQ_ID  = File request identifier assigned by CDSL  I/F          = I (Incremental during day) or F (Full end-of-day)  YYYYMMDDHHMM = Timestamp of report generation  SeqNo        = Sequential number (for multiple files in same period)Example: COD_EXP_12049200_78542_I_202602131430_001.csv"><div></div></button></div></figure></div>
+<p><strong>DPM3 Holdings Report (Statement of Holdings)</strong>:</p>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">Format: SOH_EXP_&#x3C;DPID>_&#x3C;ReqID>_&#x3C;I/F>_YYYYMMDDHHMM_&#x3C;Seq>.csv</span></div></div><div class="ec-line"><div class="code">
+</div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">Components:</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">  </span></span><span style="--0:#d6deeb;--1:#403f53">SOH          = Statement of Holdings</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">  </span></span><span style="--0:#d6deeb;--1:#403f53">EXP          = Export</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">  </span></span><span style="--0:#d6deeb;--1:#403f53">DPID         = 8-digit DP ID</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">  </span></span><span style="--0:#d6deeb;--1:#403f53">ReqID        = Request identifier from CDSL</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">  </span></span><span style="--0:#d6deeb;--1:#403f53">I/F          = I (Incremental) or F (Full)</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">  </span></span><span style="--0:#d6deeb;--1:#403f53">YYYYMMDDHHMM = Generation timestamp</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">  </span></span><span style="--0:#d6deeb;--1:#403f53">Seq          = Sequence number</span></div></div><div class="ec-line"><div class="code">
+</div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">Example: SOH_EXP_12049200_45321_F_202602130600_001.csv</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="Format: SOH_EXP_<DPID>_<ReqID>_<I/F>_YYYYMMDDHHMM_<Seq>.csvComponents:  SOH          = Statement of Holdings  EXP          = Export  DPID         = 8-digit DP ID  ReqID        = Request identifier from CDSL  I/F          = I (Incremental) or F (Full)  YYYYMMDDHHMM = Generation timestamp  Seq          = Sequence numberExample: SOH_EXP_12049200_45321_F_202602130600_001.csv"><div></div></button></div></figure></div>
+<p><strong>DP97 Report</strong>:</p>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">Associated with COD (Cash on Demand) exports; generated alongside DP57 reports.</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="Associated with COD (Cash on Demand) exports; generated alongside DP57 reports."><div></div></button></div></figure></div>
+<div class="sl-heading-wrapper level-h3"><h3 id="25-file-upload-acknowledgment--status-polling-flow">2.5 File Upload Acknowledgment &#x26; Status Polling Flow</h3><a class="sl-anchor-link" href="#25-file-upload-acknowledgment--status-polling-flow"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only" data-pagefind-ignore="">Section titled “2.5 File Upload Acknowledgment &#x26; Status Polling Flow”</span></a></div>
+<p>Understanding the upload-poll-download cycle is essential because CDSL processes files asynchronously. You upload a file, receive an immediate acknowledgment, and then must poll for the processing result. This is not a synchronous request-response pattern.</p>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">┌─────────────┐     ┌──────────────────┐</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">│  DP System   │     │   CDSL CDAS       │</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">└──────┬──────┘     └────────┬─────────┘</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│                     │</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│ 1. Upload File      │</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│ (BO Setup / Txn /   │</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│  Common Upload)     │</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│ ─────────────────────►</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│                     │</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│ 2. Immediate ACK    │</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│ (HTTP 200 + File    │</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│  Request ID)        │</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│ ◄─────────────────────</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│                     │</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│     [CDSL Processes] │</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│     - Validates each │</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│       record         │</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│     - Applies biz    │</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│       rules          │</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│     - Checks unique  │</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│       sequence nos.  │</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│                     │</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│ 3. Poll Status      │</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│ (File Request ID)   │</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│ ─────────────────────►</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│                     │</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│ 4. Status Response  │</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│ ◄─────────────────────</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│                     │</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│  Possible statuses: │</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│  - Processing       │</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│  - Accepted          │</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│  - Partially Accepted│</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│  - Rejected          │</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│                     │</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│ 5. Download Detail  │</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│ (record-level       │</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│  success/reject     │</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│  with error codes)  │</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│ ─────────────────────►</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│                     │</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│ 6. Result File      │</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│ (per record: status │</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│  + error code +     │</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│  assigned BO ID for │</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│  successful setups) │</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">│ ◄─────────────────────</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">       </span></span><span style="--0:#d6deeb;--1:#403f53">└──────────────────────┘</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="┌─────────────┐     ┌──────────────────┐│  DP System   │     │   CDSL CDAS       │└──────┬──────┘     └────────┬─────────┘       │                     │       │ 1. Upload File      │       │ (BO Setup / Txn /   │       │  Common Upload)     │       │ ─────────────────────►       │                     │       │ 2. Immediate ACK    │       │ (HTTP 200 + File    │       │  Request ID)        │       │ ◄─────────────────────       │                     │       │     [CDSL Processes] │       │     - Validates each │       │       record         │       │     - Applies biz    │       │       rules          │       │     - Checks unique  │       │       sequence nos.  │       │                     │       │ 3. Poll Status      │       │ (File Request ID)   │       │ ─────────────────────►       │                     │       │ 4. Status Response  │       │ ◄─────────────────────       │                     │       │  Possible statuses: │       │  - Processing       │       │  - Accepted          │       │  - Partially Accepted│       │  - Rejected          │       │                     │       │ 5. Download Detail  │       │ (record-level       │       │  success/reject     │       │  with error codes)  │       │ ─────────────────────►       │                     │       │ 6. Result File      │       │ (per record: status │       │  + error code +     │       │  assigned BO ID for │       │  successful setups) │       │ ◄─────────────────────       └──────────────────────┘"><div></div></button></div></figure></div>
+<aside aria-label="Design your polling with exponential backoff" class="starlight-aside starlight-aside--tip"><p class="starlight-aside__title" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="starlight-aside__icon"><path fill-rule="evenodd" clip-rule="evenodd" d="M1.43909 8.85483L1.44039 8.85354L4.96668 5.33815C5.30653 4.99386 5.7685 4.79662 6.2524 4.78972L6.26553 4.78963L12.9014 4.78962L13.8479 3.84308C16.9187 0.772319 20.0546 0.770617 21.4678 0.975145C21.8617 1.02914 22.2271 1.21053 22.5083 1.4917C22.7894 1.77284 22.9708 2.13821 23.0248 2.53199C23.2294 3.94517 23.2278 7.08119 20.1569 10.1521L19.2107 11.0983V17.7338L19.2106 17.7469C19.2037 18.2308 19.0067 18.6933 18.6624 19.0331L15.1456 22.5608C14.9095 22.7966 14.6137 22.964 14.29 23.0449C13.9663 23.1259 13.6267 23.1174 13.3074 23.0204C12.9881 22.9235 12.7011 22.7417 12.4771 22.4944C12.2533 22.2473 12.1006 21.9441 12.0355 21.6171L11.1783 17.3417L6.65869 12.822L4.34847 12.3589L2.38351 11.965C2.05664 11.8998 1.75272 11.747 1.50564 11.5232C1.25835 11.2992 1.07653 11.0122 0.979561 10.6929C0.882595 10.3736 0.874125 10.034 0.955057 9.7103C1.03599 9.38659 1.20328 9.09092 1.43909 8.85483ZM6.8186 10.8724L2.94619 10.096L6.32006 6.73268H10.9583L6.8186 10.8724ZM15.2219 5.21703C17.681 2.75787 20.0783 2.75376 21.1124 2.8876C21.2462 3.92172 21.2421 6.31895 18.783 8.77812L12.0728 15.4883L8.51172 11.9272L15.2219 5.21703ZM13.9042 21.0538L13.1279 17.1811L17.2676 13.0414V17.68L13.9042 21.0538Z"></path><path d="M9.31827 18.3446C9.45046 17.8529 9.17864 17.3369 8.68945 17.1724C8.56178 17.1294 8.43145 17.1145 8.30512 17.1243C8.10513 17.1398 7.91519 17.2172 7.76181 17.3434C7.62613 17.455 7.51905 17.6048 7.45893 17.7835C6.97634 19.2186 5.77062 19.9878 4.52406 20.4029C4.08525 20.549 3.6605 20.644 3.29471 20.7053C3.35607 20.3395 3.45098 19.9148 3.59711 19.476C4.01221 18.2294 4.78141 17.0237 6.21648 16.5411C6.39528 16.481 6.54504 16.3739 6.65665 16.2382C6.85126 16.0016 6.92988 15.678 6.84417 15.3647C6.83922 15.3466 6.83373 15.3286 6.82767 15.3106C6.74106 15.053 6.55701 14.8557 6.33037 14.7459C6.10949 14.6389 5.84816 14.615 5.59715 14.6994C5.47743 14.7397 5.36103 14.7831 5.24786 14.8294C3.22626 15.6569 2.2347 17.4173 1.75357 18.8621C1.49662 19.6337 1.36993 20.3554 1.30679 20.8818C1.27505 21.1464 1.25893 21.3654 1.25072 21.5213C1.24662 21.5993 1.24448 21.6618 1.24337 21.7066L1.243 21.7226L1.24235 21.7605L1.2422 21.7771L1.24217 21.7827L1.24217 21.7856C1.24217 22.3221 1.67703 22.7579 2.2137 22.7579L2.2155 22.7579L2.22337 22.7578L2.23956 22.7577C2.25293 22.7575 2.27096 22.7572 2.29338 22.7567C2.33821 22.7555 2.40073 22.7534 2.47876 22.7493C2.63466 22.7411 2.85361 22.725 3.11822 22.6932C3.64462 22.6301 4.36636 22.5034 5.13797 22.2464C6.58274 21.7653 8.3431 20.7738 9.17063 18.7522C9.21696 18.639 9.26037 18.5226 9.30064 18.4029C9.30716 18.3835 9.31304 18.364 9.31827 18.3446Z"></path></svg>Design your polling with exponential backoff</p><div class="starlight-aside__content"><p>CDSL does not push results to you — you must poll. A common mistake is polling too aggressively (e.g., every second), which can get your IP rate-limited, or too lazily (e.g., every hour), which delays client account activation. Start polling at 30-second intervals and use exponential backoff up to 5 minutes. For BO Setup files, expect processing to take 1-2 hours during business hours and longer for batch files submitted near end-of-day.</p></div></aside>
+<div class="sl-heading-wrapper level-h3"><h3 id="26-upload-processing-modes">2.6 Upload Processing Modes</h3><a class="sl-anchor-link" href="#26-upload-processing-modes"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only" data-pagefind-ignore="">Section titled “2.6 Upload Processing Modes”</span></a></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Mode</th><th>Behavior</th><th>Use Case</th></tr></thead><tbody><tr><td><strong>File Level Upload</strong></td><td>Entire file processed if ALL records valid; entire file rejected if ANY record fails</td><td>Critical batch where all-or-nothing is needed</td></tr><tr><td><strong>Record Level Upload</strong></td><td>Successful records processed; error records rejected individually</td><td>Routine batch processing; partial success acceptable</td></tr></tbody></table>
+<p>In plain English: with File Level Upload, a single bad record in a 1,000-record file causes all 1,000 records to be rejected. With Record Level Upload, the 999 good records go through and only the bad one is rejected. For day-to-day operations, Record Level Upload is almost always the right choice.</p>
+<div class="sl-heading-wrapper level-h3"><h3 id="27-date-of-receipt-tracking-sebi-mandate">2.7 Date of Receipt Tracking (SEBI Mandate)</h3><a class="sl-anchor-link" href="#27-date-of-receipt-tracking-sebi-mandate"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only" data-pagefind-ignore="">Section titled “2.7 Date of Receipt Tracking (SEBI Mandate)”</span></a></div>
+<p>Per SEBI directive, CDSL mandates that DPs capture the date of receipt of request from BO for all transaction types. This field is present in:</p>
+<ul>
+<li>Online CDAS entry screens</li>
+<li>File upload formats (both BO setup and transaction uploads)</li>
+<li>API request payloads</li>
+</ul>
+<p>Purpose: Audit trail for SLA compliance. CDSL uses this to monitor DP adherence to processing timelines (e.g., 2-day closure SLA, same-day off-market processing).</p>
+<div class="sl-heading-wrapper level-h3"><h3 id="28-dp57-report-generation-schedule">2.8 DP57 Report Generation Schedule</h3><a class="sl-anchor-link" href="#28-dp57-report-generation-schedule"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only" data-pagefind-ignore="">Section titled “2.8 DP57 Report Generation Schedule”</span></a></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Time</th><th>Report Type</th><th>Content</th></tr></thead><tbody><tr><td><strong>Intra-day (multiple)</strong></td><td>Incremental (I)</td><td>Transactions processed since last incremental</td></tr><tr><td><strong>End of Day</strong></td><td>Full (F)</td><td>All transactions for the entire business day</td></tr><tr><td><strong>On-demand</strong></td><td>Full or Incremental</td><td>DP can request specific time window</td></tr></tbody></table>
+<p>The DP57 single download was activated for all DPs with effect from January 18, 2011, replacing the need for separate module-specific downloads.</p>
+<hr>
+<p>Security is not an afterthought in CDSL integration — it is a multi-layered architecture that spans network isolation, transport encryption, application authentication, transaction authorization, and data-level encryption. As an engineer, you will interact with most of these layers during integration. The security architecture below is not just a reference diagram — each layer maps to specific configuration steps you will need to complete.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="3-security--encryption">3. Security &#x26; Encryption</h2><a class="sl-anchor-link" href="#3-security--encryption"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only" data-pagefind-ignore="">Section titled “3. Security &#x26; Encryption”</span></a></div>
+<div class="sl-heading-wrapper level-h3"><h3 id="31-multi-layered-security-architecture">3.1 Multi-Layered Security Architecture</h3><a class="sl-anchor-link" href="#31-multi-layered-security-architecture"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only" data-pagefind-ignore="">Section titled “3.1 Multi-Layered Security Architecture”</span></a></div>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">┌──────────────────────────────────────────────────────────────────────┐</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">│                     CDSL Security Architecture                       │</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">├──────────────────────────────────────────────────────────────────────┤</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">│                                                                      │</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">│  Layer 1: Network Security                                           │</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">│  ├─ Leased Line / MPLS VPN (dedicated, physically isolated)         │</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">│  ├─ IP Whitelisting (static IPs registered per DP)                   │</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">│  ├─ Firewall rules at CDSL data center (both primary + DR)          │</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">│  ├─ VPN tunnel with IPSec (for internet-based connectivity)          │</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">│  └─ VSAT encryption (satellite connectivity, for remote locations)   │</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">│                                                                      │</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">│  Layer 2: Transport Security                                         │</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">│  ├─ TLS 1.2+ for ALL HTTPS API communication                        │</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">│  ├─ SSL certificates for WebCDAS access                              │</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">│  ├─ Encrypted SFTP for batch file transfers (where applicable)       │</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">│  └─ SSL 2.0/3.0 + TLS 1.0 supported for legacy CDAS modules        │</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">│                                                                      │</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">│  Layer 3: Application Authentication                                 │</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">│  ├─ API Key (unique per DP, generated during registration)           │</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">│  ├─ Login ID + Password for CDAS web application                     │</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">│  ├─ Two-Factor Authentication (2FA) for DP module access             │</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">│  ├─ Session management with configurable timeout                     │</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">│  └─ Role-based access control within DP module                       │</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">│                                                                      │</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">│  Layer 4: Transaction Authorization                                  │</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">│  ├─ Digital Signature Certificate (DSC) via hardware e-Token         │</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">│  │   ├─ Required for: on-market, off-market, IDT transactions        │</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">│  │   ├─ Provider: Registered Authority of TCS (or Sify Safescrypt)   │</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">│  │   ├─ Class 3 certificate (individual + organizational)            │</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">│  │   └─ Hardware USB token (not software-based)                      │</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">│  ├─ TPIN (6-digit, CDSL-generated, BO-only, DP has NO access)       │</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">│  └─ OTP (CDSL sends directly to BO registered mobile)               │</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">│                                                                      │</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">│  Layer 5: Data-Level Security                                        │</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">│  ├─ eDIS TransDtls payload encryption (CDSL-provided algorithm/key)  │</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">│  ├─ Data at rest encryption per CDSL IT security policy              │</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">│  ├─ Complete audit trail (per SEBI mandate)                          │</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">│  └─ ISO 27001 + ISO 22301 certified infrastructure                  │</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">│                                                                      │</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">└──────────────────────────────────────────────────────────────────────┘</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="┌──────────────────────────────────────────────────────────────────────┐│                     CDSL Security Architecture                       │├──────────────────────────────────────────────────────────────────────┤│                                                                      ││  Layer 1: Network Security                                           ││  ├─ Leased Line / MPLS VPN (dedicated, physically isolated)         ││  ├─ IP Whitelisting (static IPs registered per DP)                   ││  ├─ Firewall rules at CDSL data center (both primary + DR)          ││  ├─ VPN tunnel with IPSec (for internet-based connectivity)          ││  └─ VSAT encryption (satellite connectivity, for remote locations)   ││                                                                      ││  Layer 2: Transport Security                                         ││  ├─ TLS 1.2+ for ALL HTTPS API communication                        ││  ├─ SSL certificates for WebCDAS access                              ││  ├─ Encrypted SFTP for batch file transfers (where applicable)       ││  └─ SSL 2.0/3.0 + TLS 1.0 supported for legacy CDAS modules        ││                                                                      ││  Layer 3: Application Authentication                                 ││  ├─ API Key (unique per DP, generated during registration)           ││  ├─ Login ID + Password for CDAS web application                     ││  ├─ Two-Factor Authentication (2FA) for DP module access             ││  ├─ Session management with configurable timeout                     ││  └─ Role-based access control within DP module                       ││                                                                      ││  Layer 4: Transaction Authorization                                  ││  ├─ Digital Signature Certificate (DSC) via hardware e-Token         ││  │   ├─ Required for: on-market, off-market, IDT transactions        ││  │   ├─ Provider: Registered Authority of TCS (or Sify Safescrypt)   ││  │   ├─ Class 3 certificate (individual + organizational)            ││  │   └─ Hardware USB token (not software-based)                      ││  ├─ TPIN (6-digit, CDSL-generated, BO-only, DP has NO access)       ││  └─ OTP (CDSL sends directly to BO registered mobile)               ││                                                                      ││  Layer 5: Data-Level Security                                        ││  ├─ eDIS TransDtls payload encryption (CDSL-provided algorithm/key)  ││  ├─ Data at rest encryption per CDSL IT security policy              ││  ├─ Complete audit trail (per SEBI mandate)                          ││  └─ ISO 27001 + ISO 22301 certified infrastructure                  ││                                                                      │└──────────────────────────────────────────────────────────────────────┘"><div></div></button></div></figure></div>
+<p>In plain English: Layer 1 controls who can talk to CDSL’s network. Layer 2 encrypts the conversation. Layer 3 verifies who you are. Layer 4 authorizes specific high-value actions (like moving securities). Layer 5 protects the data itself, even at rest. As an integrating DP, you will configure Layers 1-4 during onboarding. Layer 5 is managed by CDSL.</p>
+<div class="sl-heading-wrapper level-h3"><h3 id="32-digital-signature-certificate-dsc--comprehensive">3.2 Digital Signature Certificate (DSC) — Comprehensive</h3><a class="sl-anchor-link" href="#32-digital-signature-certificate-dsc--comprehensive"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only" data-pagefind-ignore="">Section titled “3.2 Digital Signature Certificate (DSC) — Comprehensive”</span></a></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Aspect</th><th>Details</th></tr></thead><tbody><tr><td><strong>Primary CA</strong></td><td>Sify Safescrypt (CDSL-approved Certifying Authority)</td></tr><tr><td><strong>Other CAs</strong></td><td>eMudhra, nCode, (s)TRUST (Capricorn) — BOs can use DSC from any RA</td></tr><tr><td><strong>DSC Class</strong></td><td>Class 3 Digital Signature Certificate</td></tr><tr><td><strong>Token Type</strong></td><td>Hardware USB e-Token (software certificates NOT accepted)</td></tr><tr><td><strong>Issuance Time</strong></td><td>7-10 working days from application</td></tr><tr><td><strong>Validity Period</strong></td><td>Typically 2-3 years; must be renewed before expiry</td></tr><tr><td><strong>Required For</strong></td><td>All on-market, off-market, early pay-in, and inter-depository transactions</td></tr><tr><td><strong>Mapping</strong></td><td>Each authorized signatory’s DSC must be mapped to their CDAS user profile</td></tr><tr><td><strong>Self-Authorization</strong></td><td>NOT allowed — DSC signatory must differ from DP authorized signatory</td></tr><tr><td><strong>BO DSC for EASIEST</strong></td><td>BO submits filled Annexure + DSC screenshot to DP; DP verifies and sends to CDSL</td></tr><tr><td><strong>No BO Charge</strong></td><td>CDSL does not charge for mapping DSC from other RAs to BO’s EASIEST login</td></tr><tr><td><strong>Renewal</strong></td><td>Must renew before expiry; expired DSC blocks transaction authorization</td></tr></tbody></table>
+<aside aria-label="Caution" class="starlight-aside starlight-aside--caution"><p class="starlight-aside__title" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="starlight-aside__icon"><path d="M12 16C11.8022 16 11.6089 16.0587 11.4444 16.1686C11.28 16.2784 11.1518 16.4346 11.0761 16.6173C11.0004 16.8001 10.9806 17.0011 11.0192 17.1951C11.0578 17.3891 11.153 17.5673 11.2929 17.7071C11.4327 17.847 11.6109 17.9422 11.8049 17.9808C11.9989 18.0194 12.2 17.9996 12.3827 17.9239C12.5654 17.8482 12.7216 17.72 12.8315 17.5556C12.9413 17.3911 13 17.1978 13 17C13 16.7348 12.8946 16.4805 12.7071 16.2929C12.5196 16.1054 12.2652 16 12 16ZM22.67 17.47L14.62 3.47003C14.3598 3.00354 13.9798 2.61498 13.5192 2.3445C13.0586 2.07401 12.5341 1.9314 12 1.9314C11.4659 1.9314 10.9414 2.07401 10.4808 2.3445C10.0202 2.61498 9.64019 3.00354 9.38 3.47003L1.38 17.47C1.11079 17.924 0.966141 18.441 0.960643 18.9688C0.955144 19.4966 1.089 20.0166 1.34868 20.4761C1.60837 20.9356 1.9847 21.3185 2.43968 21.5861C2.89466 21.8536 3.41218 21.9964 3.94 22H20.06C20.5921 22.0053 21.1159 21.8689 21.5779 21.6049C22.0399 21.341 22.4234 20.9589 22.689 20.4978C22.9546 20.0368 23.0928 19.5134 23.0895 18.9814C23.0862 18.4493 22.9414 17.9277 22.67 17.47ZM20.94 19.47C20.8523 19.626 20.7245 19.7556 20.5697 19.8453C20.4149 19.935 20.2389 19.9815 20.06 19.98H3.94C3.76111 19.9815 3.5851 19.935 3.43032 19.8453C3.27553 19.7556 3.14765 19.626 3.06 19.47C2.97223 19.318 2.92602 19.1456 2.92602 18.97C2.92602 18.7945 2.97223 18.622 3.06 18.47L11.06 4.47003C11.1439 4.30623 11.2714 4.16876 11.4284 4.07277C11.5855 3.97678 11.766 3.92599 11.95 3.92599C12.134 3.92599 12.3145 3.97678 12.4716 4.07277C12.6286 4.16876 12.7561 4.30623 12.84 4.47003L20.89 18.47C20.9892 18.6199 21.0462 18.7937 21.055 18.9732C21.0638 19.1527 21.0241 19.3312 20.94 19.49V19.47ZM12 8.00003C11.7348 8.00003 11.4804 8.10538 11.2929 8.29292C11.1054 8.48046 11 8.73481 11 9.00003V13C11 13.2652 11.1054 13.5196 11.2929 13.7071C11.4804 13.8947 11.7348 14 12 14C12.2652 14 12.5196 13.8947 12.7071 13.7071C12.8946 13.5196 13 13.2652 13 13V9.00003C13 8.73481 12.8946 8.48046 12.7071 8.29292C12.5196 8.10538 12.2652 8.00003 12 8.00003Z"></path></svg>Caution</p><div class="starlight-aside__content"><p>DSC expiry is a silent production killer. When your DSC expires, all transaction authorizations fail, but the error message from CDSL may not clearly indicate “DSC expired.” Set up calendar reminders 60 days, 30 days, and 7 days before expiry. Better yet, build an automated check in your operations dashboard that flags DSC certificates approaching expiry.</p></div></aside>
+<div class="sl-heading-wrapper level-h3"><h3 id="33-dsc-mapping-checklist-from-cdsl-official-checklist">3.3 DSC Mapping Checklist (from CDSL Official Checklist)</h3><a class="sl-anchor-link" href="#33-dsc-mapping-checklist-from-cdsl-official-checklist"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only" data-pagefind-ignore="">Section titled “3.3 DSC Mapping Checklist (from CDSL Official Checklist)”</span></a></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>#</th><th>Checklist Item</th><th>Required</th></tr></thead><tbody><tr><td>1</td><td>DSC Authorized Signatory name DIFFERENT from DP Authorized Signatory</td><td>Mandatory</td></tr><tr><td>2</td><td>Clear and visible snapshot of DSC details provided</td><td>Mandatory</td></tr><tr><td>3</td><td>Duly filled and signed Annexure (individual BO/CBO/CM form)</td><td>Mandatory</td></tr><tr><td>4</td><td>Print screen of Digital Signature Certificate details attached</td><td>Mandatory</td></tr><tr><td>5</td><td>DP verification stamp and signature on the form</td><td>Mandatory</td></tr><tr><td>6</td><td>Form submitted to CDSL for DSC-to-user mapping</td><td>Mandatory</td></tr></tbody></table>
+<div class="sl-heading-wrapper level-h3"><h3 id="34-edis-encryption-details">3.4 eDIS Encryption Details</h3><a class="sl-anchor-link" href="#34-edis-encryption-details"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only" data-pagefind-ignore="">Section titled “3.4 eDIS Encryption Details”</span></a></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Aspect</th><th>Details</th></tr></thead><tbody><tr><td><strong>Encrypted Field</strong></td><td><code dir="auto">TransDtls</code> parameter in VerifyDIS API call</td></tr><tr><td><strong>Content</strong></td><td>ISIN, quantity, exchange (NSE/BSE/MCX), segment (CM/FO/CD/COM), bulk flag</td></tr><tr><td><strong>Encryption</strong></td><td>DP encrypts using CDSL-provided encryption key and algorithm</td></tr><tr><td><strong>Key Provisioning</strong></td><td>Encryption parameters provided in API documentation during DP registration</td></tr><tr><td><strong>Key Rotation</strong></td><td>CDSL may rotate encryption keys; DP must implement key update mechanism</td></tr><tr><td><strong>Decryption</strong></td><td>CDSL decrypts server-side on eDIS portal</td></tr><tr><td><strong>TPIN Entry</strong></td><td>ALWAYS on CDSL’s eDIS webpage — never on DP portal (prevents DP from capturing TPIN)</td></tr><tr><td><strong>OTP Delivery</strong></td><td>CDSL sends directly to BO’s registered mobile (DP has zero access)</td></tr></tbody></table>
+<aside aria-label="Why TPIN never touches your system" class="starlight-aside starlight-aside--note"><p class="starlight-aside__title" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="starlight-aside__icon"><path d="M12 11C11.7348 11 11.4804 11.1054 11.2929 11.2929C11.1054 11.4804 11 11.7348 11 12V16C11 16.2652 11.1054 16.5196 11.2929 16.7071C11.4804 16.8946 11.7348 17 12 17C12.2652 17 12.5196 16.8946 12.7071 16.7071C12.8946 16.5196 13 16.2652 13 16V12C13 11.7348 12.8946 11.4804 12.7071 11.2929C12.5196 11.1054 12.2652 11 12 11ZM12.38 7.08C12.1365 6.97998 11.8635 6.97998 11.62 7.08C11.4973 7.12759 11.3851 7.19896 11.29 7.29C11.2017 7.3872 11.1306 7.49882 11.08 7.62C11.024 7.73868 10.9966 7.86882 11 8C10.9992 8.13161 11.0245 8.26207 11.0742 8.38391C11.124 8.50574 11.1973 8.61656 11.29 8.71C11.3872 8.79833 11.4988 8.86936 11.62 8.92C11.7715 8.98224 11.936 9.00632 12.099 8.99011C12.2619 8.97391 12.4184 8.91792 12.5547 8.82707C12.691 8.73622 12.8029 8.61328 12.8805 8.46907C12.9582 8.32486 12.9992 8.16378 13 8C12.9963 7.73523 12.8927 7.48163 12.71 7.29C12.6149 7.19896 12.5028 7.12759 12.38 7.08ZM12 2C10.0222 2 8.08879 2.58649 6.4443 3.6853C4.79981 4.78412 3.51809 6.3459 2.76121 8.17317C2.00433 10.0004 1.8063 12.0111 2.19215 13.9509C2.578 15.8907 3.53041 17.6725 4.92894 19.0711C6.32746 20.4696 8.10929 21.422 10.0491 21.8079C11.9889 22.1937 13.9996 21.9957 15.8268 21.2388C17.6541 20.4819 19.2159 19.2002 20.3147 17.5557C21.4135 15.9112 22 13.9778 22 12C22 10.6868 21.7413 9.38642 21.2388 8.17317C20.7363 6.95991 19.9997 5.85752 19.0711 4.92893C18.1425 4.00035 17.0401 3.26375 15.8268 2.7612C14.6136 2.25866 13.3132 2 12 2ZM12 20C10.4178 20 8.87104 19.5308 7.55544 18.6518C6.23985 17.7727 5.21447 16.5233 4.60897 15.0615C4.00347 13.5997 3.84504 11.9911 4.15372 10.4393C4.4624 8.88743 5.22433 7.46197 6.34315 6.34315C7.46197 5.22433 8.88743 4.4624 10.4393 4.15372C11.9911 3.84504 13.5997 4.00346 15.0615 4.60896C16.5233 5.21447 17.7727 6.23984 18.6518 7.55544C19.5308 8.87103 20 10.4177 20 12C20 14.1217 19.1572 16.1566 17.6569 17.6569C16.1566 19.1571 14.1217 20 12 20Z"></path></svg>Why TPIN never touches your system</p><div class="starlight-aside__content"><p>CDSL deliberately designed the eDIS flow so that the client’s TPIN (Transaction PIN) is entered only on CDSL’s own webpage. Your system redirects the client to CDSL’s eDIS portal, but you never see or handle the TPIN. This is a security design principle — it prevents brokers from capturing client TPIN credentials. Similarly, the OTP goes directly from CDSL to the client’s mobile. Your system only receives the final authorization callback (success or failure).</p></div></aside>
+<div class="sl-heading-wrapper level-h3"><h3 id="35-webcdas-browser-security-configuration">3.5 WebCDAS Browser Security Configuration</h3><a class="sl-anchor-link" href="#35-webcdas-browser-security-configuration"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only" data-pagefind-ignore="">Section titled “3.5 WebCDAS Browser Security Configuration”</span></a></div>
+<p>From CDSL’s RELID/WebCDAS Installation Guide:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Setting</th><th>Configuration</th></tr></thead><tbody><tr><td><strong>Browser</strong></td><td>Internet Explorer / Edge (ActiveX compatibility); Chrome for WebCDAS</td></tr><tr><td><strong>Trusted Sites</strong></td><td>Add <code dir="auto">http://cdslweb.cdslindia.com</code> and <code dir="auto">http://cdslapp.cdslindia.com</code></td></tr><tr><td><strong>SSL Settings</strong></td><td>Enable SSL 2.0, SSL 3.0, TLS 1.0 in Tools > Internet Options > Advanced > Security</td></tr><tr><td><strong>ActiveX Controls</strong></td><td>Enable for CDAS DP Module (signed ActiveX required)</td></tr><tr><td><strong>Pop-Up Blocker</strong></td><td>Disable for CDSL domains</td></tr><tr><td><strong>Java Runtime</strong></td><td>May be required for older CDAS modules</td></tr><tr><td><strong>Security Zone</strong></td><td>CDSL URLs in Trusted Sites zone with Medium security level</td></tr><tr><td><strong>Cookies</strong></td><td>Must be enabled for CDSL domains</td></tr></tbody></table>
+<aside aria-label="Migration Note" class="starlight-aside starlight-aside--note"><p class="starlight-aside__title" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="starlight-aside__icon"><path d="M12 11C11.7348 11 11.4804 11.1054 11.2929 11.2929C11.1054 11.4804 11 11.7348 11 12V16C11 16.2652 11.1054 16.5196 11.2929 16.7071C11.4804 16.8946 11.7348 17 12 17C12.2652 17 12.5196 16.8946 12.7071 16.7071C12.8946 16.5196 13 16.2652 13 16V12C13 11.7348 12.8946 11.4804 12.7071 11.2929C12.5196 11.1054 12.2652 11 12 11ZM12.38 7.08C12.1365 6.97998 11.8635 6.97998 11.62 7.08C11.4973 7.12759 11.3851 7.19896 11.29 7.29C11.2017 7.3872 11.1306 7.49882 11.08 7.62C11.024 7.73868 10.9966 7.86882 11 8C10.9992 8.13161 11.0245 8.26207 11.0742 8.38391C11.124 8.50574 11.1973 8.61656 11.29 8.71C11.3872 8.79833 11.4988 8.86936 11.62 8.92C11.7715 8.98224 11.936 9.00632 12.099 8.99011C12.2619 8.97391 12.4184 8.91792 12.5547 8.82707C12.691 8.73622 12.8029 8.61328 12.8805 8.46907C12.9582 8.32486 12.9992 8.16378 13 8C12.9963 7.73523 12.8927 7.48163 12.71 7.29C12.6149 7.19896 12.5028 7.12759 12.38 7.08ZM12 2C10.0222 2 8.08879 2.58649 6.4443 3.6853C4.79981 4.78412 3.51809 6.3459 2.76121 8.17317C2.00433 10.0004 1.8063 12.0111 2.19215 13.9509C2.578 15.8907 3.53041 17.6725 4.92894 19.0711C6.32746 20.4696 8.10929 21.422 10.0491 21.8079C11.9889 22.1937 13.9996 21.9957 15.8268 21.2388C17.6541 20.4819 19.2159 19.2002 20.3147 17.5557C21.4135 15.9112 22 13.9778 22 12C22 10.6868 21.7413 9.38642 21.2388 8.17317C20.7363 6.95991 19.9997 5.85752 19.0711 4.92893C18.1425 4.00035 17.0401 3.26375 15.8268 2.7612C14.6136 2.25866 13.3132 2 12 2ZM12 20C10.4178 20 8.87104 19.5308 7.55544 18.6518C6.23985 17.7727 5.21447 16.5233 4.60897 15.0615C4.00347 13.5997 3.84504 11.9911 4.15372 10.4393C4.4624 8.88743 5.22433 7.46197 6.34315 6.34315C7.46197 5.22433 8.88743 4.4624 10.4393 4.15372C11.9911 3.84504 13.5997 4.00346 15.0615 4.60896C16.5233 5.21447 17.7727 6.23984 18.6518 7.55544C19.5308 8.87103 20 10.4177 20 12C20 14.1217 19.1572 16.1566 17.6569 17.6569C16.1566 19.1571 14.1217 20 12 20Z"></path></svg>Migration Note</p><div class="starlight-aside__content"><p>CDSL has been progressively migrating to WebCDAS (browser-based) and REST APIs to reduce dependency on thick-client DP Module and ActiveX. Newer APIs (BO Setup, Transaction Upload, eDIS) are REST-based and browser-agnostic.</p></div></aside>
+<div class="sl-heading-wrapper level-h3"><h3 id="36-ip-whitelisting-requirements">3.6 IP Whitelisting Requirements</h3><a class="sl-anchor-link" href="#36-ip-whitelisting-requirements"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only" data-pagefind-ignore="">Section titled “3.6 IP Whitelisting Requirements”</span></a></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Aspect</th><th>Details</th></tr></thead><tbody><tr><td><strong>Requirement</strong></td><td>All DP servers calling CDSL APIs must have their IP addresses registered</td></tr><tr><td><strong>IP Type</strong></td><td>Static IPs only (dynamic IPs NOT permitted for production)</td></tr><tr><td><strong>Scope</strong></td><td>Primary data center + DR site IPs</td></tr><tr><td><strong>Multiple IPs</strong></td><td>Supported — DP can register multiple IPs</td></tr><tr><td><strong>VPN (Virtual Private Network) Egress</strong></td><td>If DP connects via VPN, the VPN exit (egress) IP must be whitelisted</td></tr><tr><td><strong>Change Process</strong></td><td>Written request to CDSL operations team; 2-3 working days to update</td></tr><tr><td><strong>UAT Relaxation</strong></td><td>Dynamic IPs may be allowed for test/UAT environment</td></tr><tr><td><strong>Verification</strong></td><td>CDSL may periodically verify that registered IPs are still in use</td></tr></tbody></table>
+<aside aria-label="Plan for IP changes before they happen" class="starlight-aside starlight-aside--tip"><p class="starlight-aside__title" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="starlight-aside__icon"><path fill-rule="evenodd" clip-rule="evenodd" d="M1.43909 8.85483L1.44039 8.85354L4.96668 5.33815C5.30653 4.99386 5.7685 4.79662 6.2524 4.78972L6.26553 4.78963L12.9014 4.78962L13.8479 3.84308C16.9187 0.772319 20.0546 0.770617 21.4678 0.975145C21.8617 1.02914 22.2271 1.21053 22.5083 1.4917C22.7894 1.77284 22.9708 2.13821 23.0248 2.53199C23.2294 3.94517 23.2278 7.08119 20.1569 10.1521L19.2107 11.0983V17.7338L19.2106 17.7469C19.2037 18.2308 19.0067 18.6933 18.6624 19.0331L15.1456 22.5608C14.9095 22.7966 14.6137 22.964 14.29 23.0449C13.9663 23.1259 13.6267 23.1174 13.3074 23.0204C12.9881 22.9235 12.7011 22.7417 12.4771 22.4944C12.2533 22.2473 12.1006 21.9441 12.0355 21.6171L11.1783 17.3417L6.65869 12.822L4.34847 12.3589L2.38351 11.965C2.05664 11.8998 1.75272 11.747 1.50564 11.5232C1.25835 11.2992 1.07653 11.0122 0.979561 10.6929C0.882595 10.3736 0.874125 10.034 0.955057 9.7103C1.03599 9.38659 1.20328 9.09092 1.43909 8.85483ZM6.8186 10.8724L2.94619 10.096L6.32006 6.73268H10.9583L6.8186 10.8724ZM15.2219 5.21703C17.681 2.75787 20.0783 2.75376 21.1124 2.8876C21.2462 3.92172 21.2421 6.31895 18.783 8.77812L12.0728 15.4883L8.51172 11.9272L15.2219 5.21703ZM13.9042 21.0538L13.1279 17.1811L17.2676 13.0414V17.68L13.9042 21.0538Z"></path><path d="M9.31827 18.3446C9.45046 17.8529 9.17864 17.3369 8.68945 17.1724C8.56178 17.1294 8.43145 17.1145 8.30512 17.1243C8.10513 17.1398 7.91519 17.2172 7.76181 17.3434C7.62613 17.455 7.51905 17.6048 7.45893 17.7835C6.97634 19.2186 5.77062 19.9878 4.52406 20.4029C4.08525 20.549 3.6605 20.644 3.29471 20.7053C3.35607 20.3395 3.45098 19.9148 3.59711 19.476C4.01221 18.2294 4.78141 17.0237 6.21648 16.5411C6.39528 16.481 6.54504 16.3739 6.65665 16.2382C6.85126 16.0016 6.92988 15.678 6.84417 15.3647C6.83922 15.3466 6.83373 15.3286 6.82767 15.3106C6.74106 15.053 6.55701 14.8557 6.33037 14.7459C6.10949 14.6389 5.84816 14.615 5.59715 14.6994C5.47743 14.7397 5.36103 14.7831 5.24786 14.8294C3.22626 15.6569 2.2347 17.4173 1.75357 18.8621C1.49662 19.6337 1.36993 20.3554 1.30679 20.8818C1.27505 21.1464 1.25893 21.3654 1.25072 21.5213C1.24662 21.5993 1.24448 21.6618 1.24337 21.7066L1.243 21.7226L1.24235 21.7605L1.2422 21.7771L1.24217 21.7827L1.24217 21.7856C1.24217 22.3221 1.67703 22.7579 2.2137 22.7579L2.2155 22.7579L2.22337 22.7578L2.23956 22.7577C2.25293 22.7575 2.27096 22.7572 2.29338 22.7567C2.33821 22.7555 2.40073 22.7534 2.47876 22.7493C2.63466 22.7411 2.85361 22.725 3.11822 22.6932C3.64462 22.6301 4.36636 22.5034 5.13797 22.2464C6.58274 21.7653 8.3431 20.7738 9.17063 18.7522C9.21696 18.639 9.26037 18.5226 9.30064 18.4029C9.30716 18.3835 9.31304 18.364 9.31827 18.3446Z"></path></svg>Plan for IP changes before they happen</p><div class="starlight-aside__content"><p>IP whitelisting changes take 2-3 working days — there is no emergency fast-track. If you are migrating data centers or changing cloud providers, submit the new IP whitelisting request weeks in advance. Running production traffic from a non-whitelisted IP will result in immediate connection refusals with no clear error message at the application layer.</p></div></aside>
+<div class="sl-heading-wrapper level-h3"><h3 id="37-connectivity-security-comparison">3.7 Connectivity Security Comparison</h3><a class="sl-anchor-link" href="#37-connectivity-security-comparison"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only" data-pagefind-ignore="">Section titled “3.7 Connectivity Security Comparison”</span></a></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Mode</th><th>Encryption</th><th>Authentication</th><th>Security Level</th><th>Monthly Cost</th><th>Best For</th></tr></thead><tbody><tr><td><strong>Local Leased Line</strong></td><td>Physical isolation (inherently secure)</td><td>N/A (dedicated circuit)</td><td>Highest</td><td>Rs. 8K-15K/month</td><td>Large DPs with high volume</td></tr><tr><td><strong>MPLS VPN</strong></td><td>Provider-managed label switching</td><td>Provider credentials + SLA</td><td>High</td><td>Rs. 4K-8K/month</td><td>Multi-branch DPs</td></tr><tr><td><strong>Site-to-Site VPN (IPSec)</strong></td><td>IPSec tunnel encryption</td><td>Certificate + pre-shared key</td><td>High</td><td>Rs. 2K-4K/month</td><td>Cost-effective secure connectivity</td></tr><tr><td><strong>Internet (HTTPS Direct)</strong></td><td>TLS 1.2+ for API calls</td><td>API Key + IP whitelisting</td><td>Moderate</td><td>Existing internet cost</td><td>API-only integration, small DPs</td></tr><tr><td><strong>VSAT</strong></td><td>Satellite encryption</td><td>VSAT credentials</td><td>Moderate</td><td>Rs. 10K-20K/month</td><td>Remote/rural locations</td></tr></tbody></table>
+<p>In plain English: if you are a large broker with high transaction volumes, a leased line gives you the most reliable and secure connection. If you are a smaller DP or building a cloud-native integration, HTTPS Direct with IP whitelisting is the most practical starting point. Most new DPs start with HTTPS Direct and upgrade to MPLS or leased line as their volume grows.</p>
+<div class="sl-heading-wrapper level-h3"><h3 id="38-cdsl-data-center-security">3.8 CDSL Data Center Security</h3><a class="sl-anchor-link" href="#38-cdsl-data-center-security"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only" data-pagefind-ignore="">Section titled “3.8 CDSL Data Center Security”</span></a></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Aspect</th><th>Details</th></tr></thead><tbody><tr><td><strong>Certifications</strong></td><td>ISO 27001 (InfoSec), ISO 22301 (Business Continuity), BS 7799</td></tr><tr><td><strong>Primary Site</strong></td><td>Mumbai-based data center</td></tr><tr><td><strong>DR Site</strong></td><td>Geographically separated Disaster Recovery site</td></tr><tr><td><strong>RPO</strong></td><td>Near-zero Recovery Point Objective (synchronous replication)</td></tr><tr><td><strong>RTO</strong></td><td>Recovery Time Objective within regulatory requirements</td></tr><tr><td><strong>Audit</strong></td><td>Regular SEBI inspections + internal audits</td></tr><tr><td><strong>Penetration Testing</strong></td><td>Periodic external penetration testing</td></tr></tbody></table>
+<hr>
+<p>The final section of this guide is a comprehensive reference of all SEBI circulars and CDSL communiques relevant to DDPI (Demat Debit and Pledge Instruction), margin pledge, nomination, and BO modifications. Bookmark this section — you will refer to it frequently when tracing a regulatory requirement back to its source circular, or when compliance asks “which circular requires this?“</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="4-sebi-circulars-reference">4. SEBI Circulars Reference</h2><a class="sl-anchor-link" href="#4-sebi-circulars-reference"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only" data-pagefind-ignore="">Section titled “4. SEBI Circulars Reference”</span></a></div>
+<div class="sl-heading-wrapper level-h3"><h3 id="41-ddpi-circulars">4.1 DDPI Circulars</h3><a class="sl-anchor-link" href="#41-ddpi-circulars"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only" data-pagefind-ignore="">Section titled “4.1 DDPI Circulars”</span></a></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Circular Number</th><th>Date</th><th>Subject</th></tr></thead><tbody><tr><td>SEBI/HO/MIRSD/DoP/P/CIR/2022/44</td><td>Apr 4, 2022</td><td>DDPI for settlement + pledge (original)</td></tr><tr><td>SEBI/HO/MIRSD/DoP/P/CIR/2022/119</td><td>Jun 2022</td><td>Implementation timeline extension</td></tr><tr><td>SEBI/HO/MIRSD-PoD-1/P/CIR/2022/137</td><td>Oct 6, 2022</td><td>DDPI scope expanded: MF + open offer</td></tr><tr><td>SEBI/HO/MIRSD/DoP/P/CIR/2022/153</td><td>Nov 2022</td><td>Further implementation extension</td></tr></tbody></table>
+<div class="sl-heading-wrapper level-h3"><h3 id="42-margin-pledge-circulars">4.2 Margin Pledge Circulars</h3><a class="sl-anchor-link" href="#42-margin-pledge-circulars"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only" data-pagefind-ignore="">Section titled “4.2 Margin Pledge Circulars”</span></a></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Circular Number</th><th>Date</th><th>Subject</th></tr></thead><tbody><tr><td>SEBI/HO/MIRSD/DOP/CIR/P/2020/28</td><td>Feb 25, 2020</td><td>Margin pledge/re-pledge in depository system</td></tr><tr><td>SEBI/HO/MIRSD/DOP/CIR/P/2020/88</td><td>Jun 1, 2020</td><td>Extension to Aug 1, 2020</td></tr><tr><td>SEBI/HO/MIRSD/DOP/CIR/P/2020/144</td><td>Sep 22, 2020</td><td>MTF securities as maintenance margin</td></tr><tr><td>SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/82</td><td>Jun 3, 2025</td><td>Automated pledge release + invocation</td></tr></tbody></table>
+<div class="sl-heading-wrapper level-h3"><h3 id="43-nomination-circulars">4.3 Nomination Circulars</h3><a class="sl-anchor-link" href="#43-nomination-circulars"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only" data-pagefind-ignore="">Section titled “4.3 Nomination Circulars”</span></a></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Circular Number</th><th>Date</th><th>Subject</th></tr></thead><tbody><tr><td>SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2025/3</td><td>Jan 10, 2025</td><td>Revise and Revamp Nomination Facilities</td></tr><tr><td>SEBI Feb 28, 2025</td><td>Feb 28, 2025</td><td>Clarifications to nomination circular</td></tr><tr><td>SEBI Jul 2025</td><td>Jul 2025</td><td>Extended Phase II &#x26; III implementation</td></tr></tbody></table>
+<div class="sl-heading-wrapper level-h3"><h3 id="44-cdsl-communiques-for-ddpipledgemodifications">4.4 CDSL Communiques for DDPI/Pledge/Modifications</h3><a class="sl-anchor-link" href="#44-cdsl-communiques-for-ddpipledgemodifications"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only" data-pagefind-ignore="">Section titled “4.4 CDSL Communiques for DDPI/Pledge/Modifications”</span></a></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Communique</th><th>Date</th><th>Subject</th></tr></thead><tbody><tr><td>DP-115</td><td>Ongoing</td><td>SEBI Circular on Margin Obligations</td></tr><tr><td>DP-234</td><td>May 22, 2020</td><td>Operational modalities for margin pledge/re-pledge</td></tr><tr><td>DP-304</td><td>Jul 2021</td><td>Mandatory updation of certain KYC attributes</td></tr><tr><td>DP-332</td><td>Jun 14, 2022</td><td>DDPI implementation</td></tr><tr><td>DP-408</td><td>Aug 3, 2018</td><td>Changes in BO Account Information</td></tr><tr><td>DP-412</td><td>Aug 2020</td><td>Margin Pledge/Re-Pledge implementation</td></tr><tr><td>DP-5565</td><td>Ongoing</td><td>BO Setup/Modify changes for CM/POA (Power of Attorney)/DDPI holder</td></tr><tr><td>CDSL/OPS/DP/POLCY/2024/314</td><td>Jun 7, 2024</td><td>Pledge file format: rejection reason code</td></tr><tr><td>CDSL/OPS/DP/POLCY/2024/657</td><td>Oct 30, 2024</td><td>PAN modification at DP end</td></tr></tbody></table>
+<aside aria-label="Keep a circular tracker" class="starlight-aside starlight-aside--tip"><p class="starlight-aside__title" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="starlight-aside__icon"><path fill-rule="evenodd" clip-rule="evenodd" d="M1.43909 8.85483L1.44039 8.85354L4.96668 5.33815C5.30653 4.99386 5.7685 4.79662 6.2524 4.78972L6.26553 4.78963L12.9014 4.78962L13.8479 3.84308C16.9187 0.772319 20.0546 0.770617 21.4678 0.975145C21.8617 1.02914 22.2271 1.21053 22.5083 1.4917C22.7894 1.77284 22.9708 2.13821 23.0248 2.53199C23.2294 3.94517 23.2278 7.08119 20.1569 10.1521L19.2107 11.0983V17.7338L19.2106 17.7469C19.2037 18.2308 19.0067 18.6933 18.6624 19.0331L15.1456 22.5608C14.9095 22.7966 14.6137 22.964 14.29 23.0449C13.9663 23.1259 13.6267 23.1174 13.3074 23.0204C12.9881 22.9235 12.7011 22.7417 12.4771 22.4944C12.2533 22.2473 12.1006 21.9441 12.0355 21.6171L11.1783 17.3417L6.65869 12.822L4.34847 12.3589L2.38351 11.965C2.05664 11.8998 1.75272 11.747 1.50564 11.5232C1.25835 11.2992 1.07653 11.0122 0.979561 10.6929C0.882595 10.3736 0.874125 10.034 0.955057 9.7103C1.03599 9.38659 1.20328 9.09092 1.43909 8.85483ZM6.8186 10.8724L2.94619 10.096L6.32006 6.73268H10.9583L6.8186 10.8724ZM15.2219 5.21703C17.681 2.75787 20.0783 2.75376 21.1124 2.8876C21.2462 3.92172 21.2421 6.31895 18.783 8.77812L12.0728 15.4883L8.51172 11.9272L15.2219 5.21703ZM13.9042 21.0538L13.1279 17.1811L17.2676 13.0414V17.68L13.9042 21.0538Z"></path><path d="M9.31827 18.3446C9.45046 17.8529 9.17864 17.3369 8.68945 17.1724C8.56178 17.1294 8.43145 17.1145 8.30512 17.1243C8.10513 17.1398 7.91519 17.2172 7.76181 17.3434C7.62613 17.455 7.51905 17.6048 7.45893 17.7835C6.97634 19.2186 5.77062 19.9878 4.52406 20.4029C4.08525 20.549 3.6605 20.644 3.29471 20.7053C3.35607 20.3395 3.45098 19.9148 3.59711 19.476C4.01221 18.2294 4.78141 17.0237 6.21648 16.5411C6.39528 16.481 6.54504 16.3739 6.65665 16.2382C6.85126 16.0016 6.92988 15.678 6.84417 15.3647C6.83922 15.3466 6.83373 15.3286 6.82767 15.3106C6.74106 15.053 6.55701 14.8557 6.33037 14.7459C6.10949 14.6389 5.84816 14.615 5.59715 14.6994C5.47743 14.7397 5.36103 14.7831 5.24786 14.8294C3.22626 15.6569 2.2347 17.4173 1.75357 18.8621C1.49662 19.6337 1.36993 20.3554 1.30679 20.8818C1.27505 21.1464 1.25893 21.3654 1.25072 21.5213C1.24662 21.5993 1.24448 21.6618 1.24337 21.7066L1.243 21.7226L1.24235 21.7605L1.2422 21.7771L1.24217 21.7827L1.24217 21.7856C1.24217 22.3221 1.67703 22.7579 2.2137 22.7579L2.2155 22.7579L2.22337 22.7578L2.23956 22.7577C2.25293 22.7575 2.27096 22.7572 2.29338 22.7567C2.33821 22.7555 2.40073 22.7534 2.47876 22.7493C2.63466 22.7411 2.85361 22.725 3.11822 22.6932C3.64462 22.6301 4.36636 22.5034 5.13797 22.2464C6.58274 21.7653 8.3431 20.7738 9.17063 18.7522C9.21696 18.639 9.26037 18.5226 9.30064 18.4029C9.30716 18.3835 9.31304 18.364 9.31827 18.3446Z"></path></svg>Keep a circular tracker</p><div class="starlight-aside__content"><p>SEBI and CDSL issue circulars and communiques throughout the year, and they often amend or supersede earlier ones. Maintain an internal tracker (a simple spreadsheet works) that maps each circular to the feature or validation rule it affects in your system. When a new circular arrives, check your tracker to see what needs updating. This practice will save your compliance team significant effort during SEBI inspections.</p></div></aside>
+<hr>
+<div class="sl-heading-wrapper level-h2"><h2 id="related-pages">Related Pages</h2><a class="sl-anchor-link" href="#related-pages"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only" data-pagefind-ignore="">Section titled “Related Pages”</span></a></div>
+<ul>
+<li><a href="/broking-kyc/vendors/depositories/cdsl/">CDSL Overview</a> — Core BO integration spec</li>
+<li><a href="/broking-kyc/vendors/depositories/cdsl-ddpi/">DDPI Deep Dive</a> — DDPI lifecycle and authorization types</li>
+<li><a href="/broking-kyc/vendors/depositories/cdsl-mtf-pledge/">MTF &#x26; Pledge Deep Dive</a> — Pledge operations and file formats</li>
+<li><a href="/broking-kyc/vendors/depositories/cdsl-modifications/">BO Modifications</a> — Address, bank, nominee, PAN changes</li>
+</ul> </div> <footer class="sl-flex astro-3yyafb3n"> <div class="meta sl-flex astro-3yyafb3n">   </div> <div class="pagination-links print:hidden astro-u2l5gyhi" dir="ltr"> <a href="/broking-kyc/vendors/depositories/cdsl-modifications/" rel="prev" class="astro-u2l5gyhi"> <svg aria-hidden="true" class="astro-u2l5gyhi astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17 11H9.41l3.3-3.29a1.004 1.004 0 1 0-1.42-1.42l-5 5a1 1 0 0 0-.21.33 1 1 0 0 0 0 .76 1 1 0 0 0 .21.33l5 5a1.002 1.002 0 0 0 1.639-.325 1 1 0 0 0-.219-1.095L9.41 13H17a1 1 0 0 0 0-2Z"/></svg> <span class="astro-u2l5gyhi"> Previous <br class="astro-u2l5gyhi"> <span class="link-title astro-u2l5gyhi">Modifications</span> </span> </a> <a href="/broking-kyc/vendors/depositories/nsdl/" rel="next" class="astro-u2l5gyhi"> <svg aria-hidden="true" class="astro-u2l5gyhi astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17.92 11.62a1.001 1.001 0 0 0-.21-.33l-5-5a1.003 1.003 0 1 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1.002 1.002 0 0 0 .325 1.639 1 1 0 0 0 1.095-.219l5-5a1 1 0 0 0 .21-.33 1 1 0 0 0 0-.76Z"/></svg> <span class="astro-u2l5gyhi"> Next <br class="astro-u2l5gyhi"> <span class="link-title astro-u2l5gyhi">NSDL</span> </span> </a> </div>   </footer>  <div class="author-footer astro-fxeopwe4"> <div class="author-footer-inner astro-fxeopwe4"> <p class="author-line astro-fxeopwe4">
+Built by <strong class="astro-fxeopwe4">Rakesh Waghela</strong> — Tech & KYC Solutions Architect
+</p> <div class="author-social astro-fxeopwe4"> <a href="https://topmate.io/rakeshwaghela" target="_blank" rel="noopener noreferrer" title="Book a Consultation" class="astro-fxeopwe4"> <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="astro-fxeopwe4"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" class="astro-fxeopwe4"></rect><line x1="16" y1="2" x2="16" y2="6" class="astro-fxeopwe4"></line><line x1="8" y1="2" x2="8" y2="6" class="astro-fxeopwe4"></line><line x1="3" y1="10" x2="21" y2="10" class="astro-fxeopwe4"></line></svg>
+Topmate
+</a> <a href="https://www.linkedin.com/in/rakeshwaghela" target="_blank" rel="noopener noreferrer" title="Rakesh on LinkedIn" class="astro-fxeopwe4"> <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="astro-fxeopwe4"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" class="astro-fxeopwe4"></path></svg>
+LinkedIn
+</a> <a href="https://x.com/webiyo" target="_blank" rel="noopener noreferrer" title="@webiyo on X" class="astro-fxeopwe4"> <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="astro-fxeopwe4"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" class="astro-fxeopwe4"></path></svg>
+@webiyo
+</a> </div> <p class="author-cta astro-fxeopwe4">
+Need help building KYC or compliance systems?
+<a href="https://topmate.io/rakeshwaghela" target="_blank" rel="noopener noreferrer" class="astro-fxeopwe4">Let's connect.</a> </p> <p class="cookie-settings-link astro-fxeopwe4"> <button onclick="window.openCookieSettings()" class="cookie-link-btn astro-fxeopwe4">🍪 Cookie Settings</button>
+·
+<span class="privacy-notice astro-fxeopwe4">We respect your privacy and comply with GDPR</span> </p> </div> </div>  </div> </div>   </main> </div> </div>  </div> </div>  </body></html>

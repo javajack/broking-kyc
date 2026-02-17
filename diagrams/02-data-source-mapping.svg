@@ -1,0 +1,339 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1800" font-family="Inter, -apple-system, sans-serif">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#475569"/>
+    </marker>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1e293b"/>
+      <stop offset="100%" style="stop-color:#334155"/>
+    </linearGradient>
+    <filter id="shadow" x="-2%" y="-2%" width="104%" height="104%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.1"/>
+    </filter>
+  </defs>
+
+  <!-- Title -->
+  <rect x="0" y="0" width="1400" height="80" fill="url(#headerGrad)"/>
+  <text x="700" y="35" text-anchor="middle" fill="white" font-size="22" font-weight="700">Data Source Mapping — Where Each Field Comes From</text>
+  <text x="700" y="60" text-anchor="middle" fill="#94a3b8" font-size="13">~454 total fields: User Types ~12, DigiLocker ~25, KRA/CKYC ~40, System ~350+, Vendor APIs ~25</text>
+
+  <!-- Legend -->
+  <rect x="30" y="95" width="1340" height="50" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+  <rect x="55" y="112" width="16" height="16" rx="3" fill="#fef3c7" stroke="#f59e0b"/>
+  <text x="80" y="124" font-size="12" fill="#475569">User Types (~12)</text>
+  <rect x="210" y="112" width="16" height="16" rx="3" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="235" y="124" font-size="12" fill="#475569">DigiLocker (~25)</text>
+  <rect x="380" y="112" width="16" height="16" rx="3" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="405" y="124" font-size="12" fill="#475569">KRA/CKYC Prefill (~40)</text>
+  <rect x="575" y="112" width="16" height="16" rx="3" fill="#f3e8ff" stroke="#8b5cf6"/>
+  <text x="600" y="124" font-size="12" fill="#475569">Vendor API (~25)</text>
+  <rect x="745" y="112" width="16" height="16" rx="3" fill="#f1f5f9" stroke="#94a3b8"/>
+  <text x="770" y="124" font-size="12" fill="#475569">System Generated (~350+)</text>
+  <rect x="960" y="112" width="16" height="16" rx="3" fill="#fce7f3" stroke="#ec4899"/>
+  <text x="985" y="124" font-size="12" fill="#475569">Conditional User Input</text>
+  <rect x="1155" y="112" width="16" height="16" rx="3" fill="#e0f2fe" stroke="#0ea5e9"/>
+  <text x="1180" y="124" font-size="12" fill="#475569">IFSC Lookup (RBI)</text>
+
+  <!-- ===== SOURCE 1: DigiLocker (Aadhaar XML + PAN Doc) ===== -->
+  <rect x="40" y="170" width="640" height="290" rx="12" fill="white" stroke="#3b82f6" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="40" y="170" width="640" height="40" rx="12" fill="#3b82f6"/>
+  <rect x="40" y="198" width="640" height="12" fill="#3b82f6"/>
+  <text x="65" y="197" fill="white" font-size="15" font-weight="700">DigiLocker Consent Flow (Aadhaar XML + PAN Document)</text>
+
+  <!-- Aadhaar XML fields -->
+  <text x="65" y="235" font-size="13" fill="#1e40af" font-weight="700">From Aadhaar XML:</text>
+  <rect x="65" y="245" width="140" height="24" rx="4" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="75" y="262" font-size="11" fill="#1e40af">A05-08: Full Name</text>
+  <rect x="215" y="245" width="130" height="24" rx="4" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="225" y="262" font-size="11" fill="#1e40af">A18: Gender</text>
+  <rect x="355" y="245" width="130" height="24" rx="4" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="365" y="262" font-size="11" fill="#1e40af">A20: DOB</text>
+  <rect x="495" y="245" width="170" height="24" rx="4" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="505" y="262" font-size="11" fill="#1e40af">Q01: Photo (JPEG)</text>
+
+  <rect x="65" y="278" width="140" height="24" rx="4" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="75" y="295" font-size="11" fill="#1e40af">B01: House/Bldg</text>
+  <rect x="215" y="278" width="130" height="24" rx="4" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="225" y="295" font-size="11" fill="#1e40af">B02: Street</text>
+  <rect x="355" y="278" width="130" height="24" rx="4" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="365" y="295" font-size="11" fill="#1e40af">B03: Landmark</text>
+  <rect x="495" y="278" width="170" height="24" rx="4" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="505" y="295" font-size="11" fill="#1e40af">B04: Locality/Area</text>
+
+  <rect x="65" y="311" width="140" height="24" rx="4" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="75" y="328" font-size="11" fill="#1e40af">B05: City/Town</text>
+  <rect x="215" y="311" width="130" height="24" rx="4" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="225" y="328" font-size="11" fill="#1e40af">B06: District</text>
+  <rect x="355" y="311" width="130" height="24" rx="4" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="365" y="328" font-size="11" fill="#1e40af">B07: State</text>
+  <rect x="495" y="311" width="170" height="24" rx="4" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="505" y="328" font-size="11" fill="#1e40af">B08: Pincode</text>
+
+  <!-- PAN Doc fields -->
+  <text x="65" y="362" font-size="13" fill="#1e40af" font-weight="700">From PAN Document:</text>
+  <rect x="65" y="372" width="140" height="24" rx="4" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="75" y="389" font-size="11" fill="#1e40af">A15: Father's Name</text>
+  <rect x="215" y="372" width="160" height="24" rx="4" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="225" y="389" font-size="11" fill="#1e40af">A01: PAN (cross-verify)</text>
+  <rect x="385" y="372" width="140" height="24" rx="4" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="395" y="389" font-size="11" fill="#1e40af">D01-07: POI auto-set</text>
+
+  <!-- Auto-set -->
+  <text x="65" y="428" font-size="13" fill="#1e40af" font-weight="700">Auto-set by DigiLocker flow:</text>
+  <rect x="65" y="438" width="200" height="20" rx="3" fill="#eff6ff" stroke="#bfdbfe"/>
+  <text x="75" y="452" font-size="10" fill="#3b82f6">E01-07: POA auto-set (Aadhaar = POA)</text>
+
+  <!-- Total count -->
+  <rect x="540" y="425" width="120" height="30" rx="6" fill="#1e40af"/>
+  <text x="600" y="445" text-anchor="middle" fill="white" font-size="13" font-weight="700">~25 fields</text>
+
+  <!-- ===== SOURCE 2: User Types ===== -->
+  <rect x="720" y="170" width="640" height="290" rx="12" fill="white" stroke="#f59e0b" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="720" y="170" width="640" height="40" rx="12" fill="#f59e0b"/>
+  <rect x="720" y="198" width="640" height="12" fill="#f59e0b"/>
+  <text x="745" y="197" fill="white" font-size="15" font-weight="700">User Typed Input (Absolute Minimum)</text>
+
+  <!-- Screen 1 -->
+  <text x="745" y="235" font-size="12" fill="#92400e" font-weight="700">Screen 1 — Start (2 fields):</text>
+  <rect x="745" y="245" width="140" height="24" rx="4" fill="#fef3c7" stroke="#f59e0b"/>
+  <text x="755" y="262" font-size="11" fill="#92400e">A02: Aadhaar Number</text>
+  <rect x="895" y="245" width="140" height="24" rx="4" fill="#fef3c7" stroke="#f59e0b"/>
+  <text x="905" y="262" font-size="11" fill="#92400e">A01: PAN Number</text>
+
+  <!-- Screen 3 -->
+  <text x="745" y="296" font-size="12" fill="#92400e" font-weight="700">Screen 3 — Identity (3 fields):</text>
+  <rect x="745" y="306" width="100" height="24" rx="4" fill="#fef3c7" stroke="#f59e0b"/>
+  <text x="755" y="323" font-size="11" fill="#92400e">C01: Mobile</text>
+  <rect x="855" y="306" width="100" height="24" rx="4" fill="#fef3c7" stroke="#f59e0b"/>
+  <text x="865" y="323" font-size="11" fill="#92400e">C03: Email</text>
+  <rect x="965" y="306" width="130" height="24" rx="4" fill="#fef3c7" stroke="#f59e0b"/>
+  <text x="975" y="323" font-size="11" fill="#92400e">A19: Marital Status</text>
+
+  <!-- Screen 4 -->
+  <text x="745" y="358" font-size="12" fill="#92400e" font-weight="700">Screen 4 — Bank (3 fields):</text>
+  <rect x="745" y="368" width="130" height="24" rx="4" fill="#fef3c7" stroke="#f59e0b"/>
+  <text x="755" y="385" font-size="11" fill="#92400e">G01: Account No.</text>
+  <rect x="885" y="368" width="110" height="24" rx="4" fill="#fef3c7" stroke="#f59e0b"/>
+  <text x="895" y="385" font-size="11" fill="#92400e">G03: IFSC Code</text>
+  <rect x="1005" y="368" width="120" height="24" rx="4" fill="#fef3c7" stroke="#f59e0b"/>
+  <text x="1015" y="385" font-size="11" fill="#92400e">G07: Account Type</text>
+
+  <!-- Screen 5-7 -->
+  <text x="745" y="420" font-size="12" fill="#92400e" font-weight="700">Screen 5-7 — Selections (4 interactions):</text>
+  <rect x="745" y="430" width="160" height="20" rx="3" fill="#fef3c7" stroke="#f59e0b"/>
+  <text x="755" y="444" font-size="10" fill="#92400e">L01-L06: Segment toggles</text>
+  <rect x="915" y="430" width="160" height="20" rx="3" fill="#fef3c7" stroke="#f59e0b"/>
+  <text x="925" y="444" font-size="10" fill="#92400e">I: Nominee or opt-out</text>
+  <rect x="1085" y="430" width="160" height="20" rx="3" fill="#fef3c7" stroke="#f59e0b"/>
+  <text x="1095" y="444" font-size="10" fill="#92400e">P: Declaration checkboxes</text>
+
+  <!-- Total count -->
+  <rect x="1220" y="190" width="120" height="30" rx="6" fill="#f59e0b"/>
+  <text x="1280" y="210" text-anchor="middle" fill="white" font-size="13" font-weight="700">~12 fields</text>
+
+  <!-- ===== SOURCE 3: KRA Lookup/Fetch ===== -->
+  <rect x="40" y="490" width="430" height="260" rx="12" fill="white" stroke="#16a34a" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="40" y="490" width="430" height="40" rx="12" fill="#16a34a"/>
+  <rect x="40" y="518" width="430" height="12" fill="#16a34a"/>
+  <text x="65" y="517" fill="white" font-size="15" font-weight="700">KRA Fetch (Digio) — If Record Exists</text>
+
+  <text x="65" y="555" font-size="12" fill="#166534" font-weight="600">Pre-fills (overlaps with DigiLocker):</text>
+  <rect x="65" y="565" width="180" height="22" rx="4" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="75" y="581" font-size="10" fill="#166534">Name, DOB, Gender, Address</text>
+  <rect x="255" y="565" width="180" height="22" rx="4" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="265" y="581" font-size="10" fill="#166534">PAN, Aadhaar, Father's Name</text>
+
+  <text x="65" y="610" font-size="12" fill="#166534" font-weight="600">Unique KRA fields (~15):</text>
+  <rect x="65" y="620" width="180" height="22" rx="4" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="75" y="636" font-size="10" fill="#166534">F01: Occupation, F03: Income</text>
+  <rect x="255" y="620" width="180" height="22" rx="4" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="265" y="636" font-size="10" fill="#166534">F04: Net Worth, F06: Wealth Src</text>
+  <rect x="65" y="650" width="180" height="22" rx="4" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="75" y="666" font-size="10" fill="#166534">J: FATCA/CRS (if submitted)</text>
+  <rect x="255" y="650" width="180" height="22" rx="4" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="265" y="666" font-size="10" fill="#166534">K: PEP status (if declared)</text>
+  <rect x="65" y="680" width="180" height="22" rx="4" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="75" y="696" font-size="10" fill="#166534">S: KRA Status/App Ref</text>
+  <rect x="255" y="680" width="180" height="22" rx="4" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="265" y="696" font-size="10" fill="#166534">Signature image (if on file)</text>
+
+  <text x="65" y="730" font-size="11" fill="#64748b">~60% of KRA records exist for repeat market participants</text>
+
+  <!-- ===== SOURCE 4: CKYC Search/Download ===== -->
+  <rect x="490" y="490" width="430" height="260" rx="12" fill="white" stroke="#16a34a" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="490" y="490" width="430" height="40" rx="12" fill="#16a34a"/>
+  <rect x="490" y="518" width="430" height="12" fill="#16a34a"/>
+  <text x="515" y="517" fill="white" font-size="15" font-weight="700">CKYC Download (Decentro) — If KIN Exists</text>
+
+  <text x="515" y="555" font-size="12" fill="#166534" font-weight="600">Pre-fills (overlaps with DigiLocker + KRA):</text>
+  <rect x="515" y="565" width="180" height="22" rx="4" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="525" y="581" font-size="10" fill="#166534">Full identity + address fields</text>
+  <rect x="705" y="565" width="180" height="22" rx="4" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="715" y="581" font-size="10" fill="#166534">POI + POA document refs</text>
+
+  <text x="515" y="610" font-size="12" fill="#166534" font-weight="600">Unique CKYC fields (~10):</text>
+  <rect x="515" y="620" width="180" height="22" rx="4" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="525" y="636" font-size="10" fill="#166534">T01: CKYC Number (KIN)</text>
+  <rect x="705" y="620" width="180" height="22" rx="4" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="715" y="636" font-size="10" fill="#166534">T05: CKYC Status</text>
+  <rect x="515" y="650" width="180" height="22" rx="4" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="525" y="666" font-size="10" fill="#166534">Additional ID types on file</text>
+  <rect x="705" y="650" width="180" height="22" rx="4" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="715" y="666" font-size="10" fill="#166534">Cross-sector KYC history</text>
+
+  <text x="515" y="700" font-size="11" fill="#64748b">CKYC masked since Jan 2025 — full download only after</text>
+  <text x="515" y="716" font-size="11" fill="#64748b">identity match (PAN + DOB + Name)</text>
+  <text x="515" y="738" font-size="11" fill="#16a34a" font-weight="600">CKYC exists for ~40% of first-time investors</text>
+
+  <!-- ===== SOURCE 5: Vendor APIs ===== -->
+  <rect x="940" y="490" width="420" height="260" rx="12" fill="white" stroke="#8b5cf6" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="940" y="490" width="420" height="40" rx="12" fill="#8b5cf6"/>
+  <rect x="940" y="518" width="420" height="12" fill="#8b5cf6"/>
+  <text x="965" y="517" fill="white" font-size="15" font-weight="700">Vendor API Responses (Real-time)</text>
+
+  <text x="965" y="555" font-size="12" fill="#6d28d9" font-weight="600">PAN Verify (Decentro) — R01-R07:</text>
+  <rect x="965" y="565" width="370" height="22" rx="4" fill="#f3e8ff" stroke="#8b5cf6"/>
+  <text x="975" y="581" font-size="10" fill="#6d28d9">PAN status (E/F/X/D/N), Name on PAN, PAN-Aadhaar link, Seeding status</text>
+
+  <text x="965" y="610" font-size="12" fill="#6d28d9" font-weight="600">Bank Penny Drop (Decentro) — R08-R14:</text>
+  <rect x="965" y="620" width="370" height="22" rx="4" fill="#f3e8ff" stroke="#8b5cf6"/>
+  <text x="975" y="636" font-size="10" fill="#6d28d9">Account holder name, Name match %, IMPS UTR, Bank response code</text>
+
+  <text x="965" y="660" font-size="12" fill="#6d28d9" font-weight="600">AML/PEP Screening (TrackWizz) — R15-R22:</text>
+  <rect x="965" y="670" width="370" height="22" rx="4" fill="#f3e8ff" stroke="#8b5cf6"/>
+  <text x="975" y="686" font-size="10" fill="#6d28d9">AML risk score, PEP match, Sanctions match, Risk level (H/M/L)</text>
+
+  <text x="965" y="710" font-size="12" fill="#6d28d9" font-weight="600">Face Match (HyperVerge) — R23-R28:</text>
+  <rect x="965" y="720" width="370" height="22" rx="4" fill="#f3e8ff" stroke="#8b5cf6"/>
+  <text x="975" y="736" font-size="10" fill="#6d28d9">Face match score, Liveness score, Selfie quality, Spoof detection result</text>
+
+  <!-- ===== SOURCE 6: System Generated ===== -->
+  <rect x="40" y="780" width="640" height="250" rx="12" fill="white" stroke="#64748b" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="40" y="780" width="640" height="40" rx="12" fill="#64748b"/>
+  <rect x="40" y="808" width="640" height="12" fill="#64748b"/>
+  <text x="65" y="807" fill="white" font-size="15" font-weight="700">System Generated (~350+ fields — Largest Category)</text>
+
+  <text x="65" y="845" font-size="12" fill="#334155" font-weight="600">Application Metadata:</text>
+  <rect x="65" y="855" width="270" height="20" rx="3" fill="#f1f5f9" stroke="#94a3b8"/>
+  <text x="75" y="869" font-size="10" fill="#64748b">App ID, Timestamps, Status, Channel, Version</text>
+  <rect x="345" y="855" width="310" height="20" rx="3" fill="#f1f5f9" stroke="#94a3b8"/>
+  <text x="355" y="869" font-size="10" fill="#64748b">IP Address, Device fingerprint, Geolocation, Session ID</text>
+
+  <text x="65" y="895" font-size="12" fill="#334155" font-weight="600">KRA/CKYC Submission Tracking (S, T sections):</text>
+  <rect x="65" y="905" width="270" height="20" rx="3" fill="#f1f5f9" stroke="#94a3b8"/>
+  <text x="75" y="919" font-size="10" fill="#64748b">KRA app ref, Submit date, Status, Ack number</text>
+  <rect x="345" y="905" width="310" height="20" rx="3" fill="#f1f5f9" stroke="#94a3b8"/>
+  <text x="355" y="919" font-size="10" fill="#64748b">CKYC KIN, Upload date, Status, Response code</text>
+
+  <text x="65" y="945" font-size="12" fill="#334155" font-weight="600">Exchange Registration (U section):</text>
+  <rect x="65" y="955" width="270" height="20" rx="3" fill="#f1f5f9" stroke="#94a3b8"/>
+  <text x="75" y="969" font-size="10" fill="#64748b">UCC codes (NSE/BSE/MCX), Registration dates</text>
+  <rect x="345" y="955" width="310" height="20" rx="3" fill="#f1f5f9" stroke="#94a3b8"/>
+  <text x="355" y="969" font-size="10" fill="#64748b">BO ID (CDSL/NSDL), DP mapping, Activation status</text>
+
+  <text x="65" y="995" font-size="12" fill="#334155" font-weight="600">Audit, Lifecycle, DPDP (Y, Z, AA sections):</text>
+  <rect x="65" y="1005" width="580" height="20" rx="3" fill="#f1f5f9" stroke="#94a3b8"/>
+  <text x="75" y="1019" font-size="10" fill="#64748b">Change logs, Maker-checker trail, Consent records, Dormancy tracking, Running account settlement dates</text>
+
+  <!-- ===== SOURCE 7: IFSC Lookup ===== -->
+  <rect x="720" y="780" width="320" height="120" rx="12" fill="white" stroke="#0ea5e9" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="720" y="780" width="320" height="40" rx="12" fill="#0ea5e9"/>
+  <rect x="720" y="808" width="320" height="12" fill="#0ea5e9"/>
+  <text x="745" y="807" fill="white" font-size="15" font-weight="700">IFSC Lookup (RBI Master)</text>
+
+  <text x="745" y="845" font-size="12" fill="#0c4a6e" font-weight="600">From user's IFSC code, auto-fill:</text>
+  <rect x="745" y="855" width="130" height="22" rx="4" fill="#e0f2fe" stroke="#0ea5e9"/>
+  <text x="755" y="871" font-size="10" fill="#0c4a6e">G02: Bank Name</text>
+  <rect x="885" y="855" width="130" height="22" rx="4" fill="#e0f2fe" stroke="#0ea5e9"/>
+  <text x="895" y="871" font-size="10" fill="#0c4a6e">G04: Branch Name</text>
+  <rect x="745" y="885" width="130" height="22" rx="4" fill="#e0f2fe" stroke="#0ea5e9"/>
+  <text x="755" y="901" font-size="10" fill="#0c4a6e">G05: Branch City</text>
+  <rect x="885" y="885" width="130" height="22" rx="4" fill="#e0f2fe" stroke="#0ea5e9"/>
+  <text x="895" y="901" font-size="10" fill="#0c4a6e">G06: MICR Code</text>
+
+  <!-- ===== SOURCE 8: Conditional Input ===== -->
+  <rect x="1060" y="780" width="300" height="250" rx="12" fill="white" stroke="#ec4899" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="1060" y="780" width="300" height="40" rx="12" fill="#ec4899"/>
+  <rect x="1060" y="808" width="300" height="12" fill="#ec4899"/>
+  <text x="1085" y="807" fill="white" font-size="15" font-weight="700">Conditional User Input</text>
+
+  <text x="1085" y="845" font-size="11" fill="#9d174d" font-weight="600">If F&amp;O/Commodity selected:</text>
+  <rect x="1085" y="855" width="250" height="20" rx="3" fill="#fce7f3" stroke="#ec4899"/>
+  <text x="1095" y="869" font-size="10" fill="#9d174d">Upload: Income proof document</text>
+
+  <text x="1085" y="896" font-size="11" fill="#9d174d" font-weight="600">If FATCA = non-India tax resident:</text>
+  <rect x="1085" y="906" width="250" height="20" rx="3" fill="#fce7f3" stroke="#ec4899"/>
+  <text x="1095" y="920" font-size="10" fill="#9d174d">J04-J15: Country, TIN, GIIN fields</text>
+
+  <text x="1085" y="947" font-size="11" fill="#9d174d" font-weight="600">If PEP = Yes:</text>
+  <rect x="1085" y="957" width="250" height="20" rx="3" fill="#fce7f3" stroke="#ec4899"/>
+  <text x="1095" y="971" font-size="10" fill="#9d174d">K: PEP details + enhanced due diligence</text>
+
+  <text x="1085" y="998" font-size="11" fill="#9d174d" font-weight="600">If Nomination opt-out:</text>
+  <rect x="1085" y="1008" width="250" height="20" rx="3" fill="#fce7f3" stroke="#ec4899"/>
+  <text x="1095" y="1022" font-size="10" fill="#9d174d">Video declaration (async, post-sign)</text>
+
+  <!-- ===== FIELD RESOLUTION PRIORITY ===== -->
+  <rect x="40" y="1060" width="1320" height="180" rx="12" fill="#1e293b" filter="url(#shadow)"/>
+  <text x="700" y="1090" text-anchor="middle" fill="white" font-size="18" font-weight="700">Field Resolution Priority (when multiple sources provide same field)</text>
+
+  <!-- Priority chain -->
+  <rect x="80" y="1110" width="200" height="55" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <text x="180" y="1132" text-anchor="middle" font-size="13" fill="#1e40af" font-weight="700">1. DigiLocker</text>
+  <text x="180" y="1152" text-anchor="middle" font-size="10" fill="#3b82f6">Govt source of truth</text>
+
+  <text x="300" y="1140" font-size="20" fill="#94a3b8" font-weight="700">&gt;</text>
+
+  <rect x="330" y="1110" width="200" height="55" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+  <text x="430" y="1132" text-anchor="middle" font-size="13" fill="#166534" font-weight="700">2. CKYC (CERSAI)</text>
+  <text x="430" y="1152" text-anchor="middle" font-size="10" fill="#16a34a">Cross-sector verified</text>
+
+  <text x="550" y="1140" font-size="20" fill="#94a3b8" font-weight="700">&gt;</text>
+
+  <rect x="580" y="1110" width="200" height="55" rx="8" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="680" y="1132" text-anchor="middle" font-size="13" fill="#166534" font-weight="700">3. KRA Fetch</text>
+  <text x="680" y="1152" text-anchor="middle" font-size="10" fill="#16a34a">Market-sector verified</text>
+
+  <text x="800" y="1140" font-size="20" fill="#94a3b8" font-weight="700">&gt;</text>
+
+  <rect x="830" y="1110" width="200" height="55" rx="8" fill="#f3e8ff" stroke="#8b5cf6"/>
+  <text x="930" y="1132" text-anchor="middle" font-size="13" fill="#6d28d9" font-weight="700">4. Vendor API</text>
+  <text x="930" y="1152" text-anchor="middle" font-size="10" fill="#8b5cf6">Real-time verification</text>
+
+  <text x="1050" y="1140" font-size="20" fill="#94a3b8" font-weight="700">&gt;</text>
+
+  <rect x="1080" y="1110" width="200" height="55" rx="8" fill="#fef3c7" stroke="#f59e0b"/>
+  <text x="1180" y="1132" text-anchor="middle" font-size="13" fill="#92400e" font-weight="700">5. User Input</text>
+  <text x="1180" y="1152" text-anchor="middle" font-size="10" fill="#f59e0b">Fallback / unique data</text>
+
+  <text x="80" y="1210" font-size="12" fill="#94a3b8">Rule: DigiLocker wins for identity fields. KRA/CKYC win for financial profile. User input only for data no source can provide (mobile, email, segment choice).</text>
+  <text x="80" y="1228" font-size="12" fill="#94a3b8">Exception: If PAN name (Protean) differs from DigiLocker name, flag for manual review. Name on bank (penny drop) is cross-validated but doesn't overwrite.</text>
+
+  <!-- ===== PIE CHART approximation ===== -->
+  <rect x="40" y="1270" width="1320" height="200" rx="12" fill="white" stroke="#e2e8f0" filter="url(#shadow)"/>
+  <text x="700" y="1300" text-anchor="middle" font-size="18" fill="#1e293b" font-weight="700">Field Distribution Summary (~454 total fields in Master Dataset)</text>
+
+  <!-- Bar chart representation -->
+  <rect x="80" y="1330" width="875" height="35" rx="4" fill="#f1f5f9" stroke="#94a3b8"/>
+  <text x="80" y="1320" font-size="11" fill="#64748b">System Generated (77%)</text>
+  <rect x="80" y="1330" width="875" height="35" rx="4" fill="#f1f5f9"/>
+  <text x="500" y="1353" text-anchor="middle" font-size="13" fill="#475569" font-weight="600">~350 fields: Timestamps, IDs, Status codes, Audit logs, API responses, Submission tracking</text>
+
+  <rect x="80" y="1375" width="170" height="35" rx="4" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="80" y="1365" font-size="11" fill="#166534">KRA/CKYC Prefill (9%)</text>
+  <text x="165" y="1398" text-anchor="middle" font-size="12" fill="#166534" font-weight="600">~40 fields</text>
+
+  <rect x="260" y="1375" width="130" height="35" rx="4" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="260" y="1365" font-size="11" fill="#1e40af">DigiLocker (5.5%)</text>
+  <text x="325" y="1398" text-anchor="middle" font-size="12" fill="#1e40af" font-weight="600">~25 fields</text>
+
+  <rect x="400" y="1375" width="120" height="35" rx="4" fill="#f3e8ff" stroke="#8b5cf6"/>
+  <text x="400" y="1365" font-size="11" fill="#6d28d9">Vendor API (5.5%)</text>
+  <text x="460" y="1398" text-anchor="middle" font-size="12" fill="#6d28d9" font-weight="600">~25 fields</text>
+
+  <rect x="530" y="1375" width="60" height="35" rx="4" fill="#fef3c7" stroke="#f59e0b"/>
+  <text x="530" y="1365" font-size="11" fill="#92400e">User (3%)</text>
+  <text x="560" y="1398" text-anchor="middle" font-size="12" fill="#92400e" font-weight="700">~12</text>
+
+  <text x="80" y="1450" font-size="13" fill="#16a34a" font-weight="700">Key Insight: User only needs to type ~12 fields out of ~454 total. Everything else is auto-sourced, pre-filled, or system-generated.</text>
+</svg>
