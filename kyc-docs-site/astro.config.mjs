@@ -17,7 +17,6 @@ export default defineConfig({
 			components: {
 				Footer: './src/components/overrides/Footer.astro',
 				SiteTitle: './src/components/overrides/SiteTitle.astro',
-				PageFrame: './src/components/overrides/PageFrame.astro',
 			},
 			head: [
 				// Google Consent Mode v2 - MUST load BEFORE gtag.js (synchronous)
@@ -78,6 +77,8 @@ export default defineConfig({
 				{ tag: 'meta', attrs: { name: 'twitter:image', content: 'https://javajack.github.io/broking-kyc/og-image.png' } },
 				// Cloudflare Web Analytics
 				{ tag: 'script', attrs: { defer: true, src: 'https://static.cloudflareinsights.com/beacon.min.js', 'data-cf-beacon': '{"token": "7ce325bb227e4b42a8406f369ff4e788"}' } },
+				// Cookie Consent Banner (injected via script)
+				{ tag: 'script', attrs: { defer: true, src: '/broking-kyc/cookie-consent.js' } },
 				{
 					tag: 'script',
 					attrs: { type: 'application/ld+json' },
