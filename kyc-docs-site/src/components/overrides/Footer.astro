@@ -27,6 +27,11 @@ import Default from '@astrojs/starlight/components/Footer.astro';
 			Need help building KYC or compliance systems?
 			<a href="https://topmate.io/rakeshwaghela" target="_blank" rel="noopener noreferrer">Let's connect.</a>
 		</p>
+		<p class="cookie-settings-link">
+			<button onclick="window.openCookieSettings()" class="cookie-link-btn">🍪 Cookie Settings</button>
+			·
+			<span class="privacy-notice">We respect your privacy and comply with GDPR</span>
+		</p>
 	</div>
 </div>
 
@@ -80,6 +85,34 @@ import Default from '@astrojs/starlight/components/Footer.astro';
 		}
 		.author-cta a:hover {
 			text-decoration: underline;
+		}
+		.cookie-settings-link {
+			font-size: var(--sl-text-xs);
+			color: var(--sl-color-gray-4);
+			margin: 0.75rem 0 0;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 0.5rem;
+			flex-wrap: wrap;
+		}
+		.cookie-link-btn {
+			background: none;
+			border: none;
+			color: var(--sl-color-accent);
+			text-decoration: none;
+			font-size: var(--sl-text-xs);
+			cursor: pointer;
+			padding: 0;
+			font-weight: 500;
+			transition: opacity 0.15s;
+		}
+		.cookie-link-btn:hover {
+			text-decoration: underline;
+			opacity: 0.8;
+		}
+		.privacy-notice {
+			color: var(--sl-color-gray-4);
 		}
 	}
 </style>

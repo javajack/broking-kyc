@@ -17,9 +17,10 @@ export default defineConfig({
 			components: {
 				Footer: './src/components/overrides/Footer.astro',
 				SiteTitle: './src/components/overrides/SiteTitle.astro',
+				PageFrame: './src/components/overrides/PageFrame.astro',
 			},
 			head: [
-				// Google Analytics
+				// Google Analytics with Consent Mode v2 (consent handled by CookieConsent component)
 				{ tag: 'script', attrs: { async: true, src: 'https://www.googletagmanager.com/gtag/js?id=G-G986QLPFZ1' } },
 				{
 					tag: 'script',
@@ -27,7 +28,10 @@ export default defineConfig({
 						window.dataLayer = window.dataLayer || [];
 						function gtag(){dataLayer.push(arguments);}
 						gtag('js', new Date());
-						gtag('config', 'G-G986QLPFZ1');
+						gtag('config', 'G-G986QLPFZ1', {
+							'anonymize_ip': true,
+							'cookie_flags': 'SameSite=None;Secure'
+						});
 					`,
 				},
 				// Yandex Webmaster verification
