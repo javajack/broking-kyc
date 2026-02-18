@@ -66,16 +66,32 @@ npm install
 
 ## Key Regulatory References
 
+37+ circulars across SEBI, RBI, NPCI, and MeitY are tracked. Here are the most critical ones:
+
 | Regulation | Reference |
 |---|---|
 | SEBI KYC Master Circular | SEBI/HO/MIRSD/MIRSD-SEC-2/P/CIR/2023/168 (Oct 2023) |
-| SEBI Stock Brokers Master | SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90 (Jun 2025) |
-| SEBI Stock Brokers Regulations 2026 | Notified Jan 7, 2026 |
-| Dual KRA + CKYC Upload | Mandatory since Aug 2024 |
-| DDPI (replaces POA) | Since Nov 2022 |
-| Up to 10 Nominees | Since Jan 2025 |
+| KYC Process & Technology (Online KYC, VIPV) | SEBI/HO/MIRSD/DOP/CIR/P/2020/73 (Apr 2020) |
+| KYC Simplification at KRAs | SEBI/HO/MIRSD/FATF/P/CIR/2023/0144 (Aug 2023) |
+| PAN-Aadhaar Linking Relaxation | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/41 (May 2024) |
+| Dual KRA + CKYC Upload | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/79 (Jun 2024) — mandatory since Aug 2024 |
+| FATCA/CRS Centralization at KRAs | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12 (Feb 2024) — mandatory since Jul 2024 |
+| AML/CFT Guidelines | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78 (Jun 2024) |
+| DDPI replacing POA | SEBI/HO/MIRSD/DoP/P/CIR/2022/44 (Apr 2022) — mandatory since Nov 2022 |
+| Nomination Revamp (up to 10 nominees) | SEBI circular (Jan 10, 2025) — video verification for opt-out |
+| DigiLocker for Demat Holdings | SEBI/HO/OIAE/OIAE_IAD-3/P/CIR/2025/32 (Mar 2025) |
+| SEBI Stock Brokers Master Circular | SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90 (Jun 2025) |
+| SEBI Stock Brokers Regulations 2026 | SEBI/LAD-NRO/GN/2026/291 (Jan 7, 2026) — replaces 1992 regulations |
+| Client Fund Upstreaming | SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/84 (Jun 2023) |
+| UPI Block Mechanism (QSBs) | SEBI consultation paper (Aug 2024) — mandatory from Feb 1, 2025 |
+| T+0 Settlement | SEBI/HO/MRD/MRD-PoD-3/P/CIR/2024/20 (Mar 2024) — top 500 stocks Dec 2024 |
+| e-KYC Setu (NPCI) | SEBI press release (Jun 2025) — Aadhaar e-KYC without AUA/KUA license |
+| UPI AutoPay Rs 1 Lakh Limit | RBI/2023-2024/88 + NPCI/UPI/OC-151A (Dec 2023) |
+| Account Aggregator Master Direction | RBI/DNBR/2016-17/46 (Sep 2016, updated Sep 2024) |
+| DPDP Act 2023 + Rules 2025 | Notified Nov 13, 2025 — full compliance deadline May 2027 |
+| KYC Onboarding Consultation Paper | SEBI (Jan 16, 2026) — proposes centralized KYC, 5-year review cycle |
 
-See the full [Regulatory Circulars](https://javajack.github.io/broking-kyc/reference/regulatory-circulars/) and [References & Sources](https://javajack.github.io/broking-kyc/reference/references-sources/) pages for complete listings.
+See the full [Regulatory Circulars](https://javajack.github.io/broking-kyc/reference/regulatory-circulars/) (37 entries with official links) and [References & Sources](https://javajack.github.io/broking-kyc/reference/references-sources/) (130+ URLs) pages for complete listings.
 
 ## Author
 
