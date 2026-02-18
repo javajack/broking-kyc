@@ -32,6 +32,11 @@ import Default from '@astrojs/starlight/components/Footer.astro';
 			·
 			<span class="privacy-notice">We respect your privacy and comply with GDPR</span>
 		</p>
+		<div class="footer-disclaimer">
+			<p>
+				<strong>Disclaimer:</strong> This documentation was generated using Claude Code, an AI-powered LLM by Anthropic, as a research and capability estimation exercise. AI models can hallucinate — information here may be inaccurate, incomplete, or outdated. Any resemblance to the products or documentation of any specific vendor or organization is purely coincidental and unintended. This project is not directly inspired by any particular product, vendor, or proprietary system, and no plagiarism is intended. All content is based on publicly available information. This is not legal, financial, or compliance advice.
+			</p>
+		</div>
 	</div>
 </div>
 
@@ -113,6 +118,21 @@ import Default from '@astrojs/starlight/components/Footer.astro';
 		}
 		.privacy-notice {
 			color: var(--sl-color-gray-4);
+		}
+		.footer-disclaimer {
+			margin-top: 1rem;
+			padding-top: 0.75rem;
+			border-top: 1px solid var(--sl-color-gray-5);
+		}
+		.footer-disclaimer p {
+			font-size: var(--sl-text-xs);
+			color: var(--sl-color-gray-4);
+			line-height: 1.6;
+			margin: 0;
+			max-width: 48rem;
+		}
+		.footer-disclaimer strong {
+			color: var(--sl-color-gray-3);
 		}
 	}
 </style>
