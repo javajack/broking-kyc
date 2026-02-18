@@ -20,7 +20,7 @@ There are two ways to integrate with DigiLocker. The choice depends on your onbo
 | Path | Description | When to Use |
 |------|------------|------------|
 | **Direct (MeitY RE)** | Register as Requester Entity with MeitY (Ministry of Electronics and Information Technology) | 5,000+ onboardings/month (cost-effective) |
-| **Aggregator (Digio/Decentro)** | Use aggregator's DigiLocker gateway | Faster integration, lower initial investment |
+| **Aggregator** | Use aggregator's DigiLocker gateway | Faster integration, lower initial investment |
 
 ### OAuth 2.0 Consent Flow
 

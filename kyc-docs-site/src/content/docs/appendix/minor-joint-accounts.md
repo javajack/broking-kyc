@@ -46,7 +46,7 @@ Joint accounts multiply the data capture and verification effort since each hold
 - **CDSL**: Lines 03-04 for 2nd/3rd holder details
 - **NSDL**: Joint holder records in UDiFF format
 - **Exchange UCC**: 1st holder is the trading account holder
-- **eSign**: All holders must sign (multi-signatory workflow via Leegality)
+- **eSign**: All holders must sign (multi-signatory eSign workflow)
 
 ## Fields (Section W -- 26 Fields)
 

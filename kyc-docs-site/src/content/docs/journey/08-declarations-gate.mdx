@@ -15,11 +15,11 @@ import { Aside } from '@astrojs/starlight/components';
 
 The customer has completed their nominations and now lands on what looks like a simple checkbox screen -- FATCA (Foreign Account Tax Compliance Act) declarations, PEP (Politically Exposed Person) disclosures, risk acknowledgements, and terms acceptance. But underneath those checkboxes lies the most critical engineering component in the entire onboarding flow: the blocking gate. This is the moment where every asynchronous check that has been running since Screen 1 converges into a single pass/fail decision. If all checks pass, the customer proceeds to eSign (electronic signature via Aadhaar OTP) on the final screen. If any check fails, the journey stops here -- and the system must tell the customer exactly why and what to do next.
 
-<ScreenCard number={8} title="Declarations + Blocking Gate" time="~30 seconds">
+<ScreenCard number={8} title="Declarations + Blocking Gate">
 
 **Purpose:** Collect regulatory declarations and enforce the blocking gate before e-Sign.
 
-The declarations on this screen are not just legal formalities. FATCA compliance is required by international tax treaties (India is a CRS signatory), and the PEP declaration is a PMLA (Prevention of Money Laundering Act) requirement. Every checkbox has a regulatory mandate behind it.
+The declarations on this screen are not just legal formalities. FATCA compliance is required by international tax treaties (India is a CRS signatory per SEBI circular SEBI/HO/MIRSD/CIR/P/2018/73), and the PEP declaration is a PMLA (Prevention of Money Laundering Act) requirement. Every checkbox has a regulatory mandate behind it.
 
 ## Declaration Checkboxes
 
@@ -30,10 +30,10 @@ The declarations on this screen are not just legal formalities. FATCA compliance
 | Risk Disclosure: Acknowledged | Checkbox | Mandatory acknowledgement |
 | Terms & Conditions: Accepted | Checkbox | Mandatory acceptance |
 | Running Account: Quarterly settlement | Selected | Settlement preference |
-| DDPI: Opt-in | Optional | Replaced POA since Nov 2022 |
+| DDPI: Opt-in | Optional | Replaced POA since Nov 2022 per SEBI circular |
 
 :::note[What is DDPI?]
-DDPI (Demat Debit and Pledge Instruction) replaced the older POA (Power of Attorney) mechanism in November 2022. It gives the broker permission to debit securities from the customer's demat account for delivery-based trades. DDPI is optional -- without it, the customer must manually authorize each sell transaction through CDSL's TPIN mechanism. Most customers opt in for convenience.
+DDPI (Demat Debit and Pledge Instruction) replaced the older POA (Power of Attorney) mechanism in November 2022 per SEBI circular SEBI/HO/MIRSD/DoP/P/CIR/2022/99. It gives the broker permission to debit securities from the customer's demat account for delivery-based trades. DDPI is optional -- without it, the customer must manually authorize each sell transaction through CDSL's TPIN mechanism. Most customers opt in for convenience.
 :::
 
 If the customer declares that they are a non-India tax resident or a PEP, additional fields appear. These are uncommon paths but must be handled correctly for compliance.
@@ -47,13 +47,13 @@ If the customer declares that they are a non-India tax resident or a PEP, additi
 
 Now comes the most important part of this screen -- the blocking gate. While the customer was ticking checkboxes, the system has been assembling the results of every async check fired since Screen 1.
 
-<GateBox title="BLOCKING GATE — All must pass before e-Sign">
+<GateBox title="BLOCKING GATE -- All must pass before e-Sign">
 
-- **PAN (Permanent Account Number) Valid** — Status = E (exists and valid)
-- **PAN-Aadhaar Linked** — Seeding status = Y
-- **AML (Anti-Money Laundering) / PEP Clean** — Risk level = LOW or MEDIUM
-- **Penny Drop Success** — Name match >= 70%
-- **PMLA Checks** — Anti-money laundering compliance verified
+- **PAN (Permanent Account Number) Valid** -- Status = E (exists and valid)
+- **PAN-Aadhaar Linked** -- Seeding status = Y
+- **AML (Anti-Money Laundering) / PEP Clean** -- Risk level passes screening per SEBI AML/CFT guidelines
+- **Penny Drop Success** -- Account holder name passes verification against applicant identity
+- **PMLA Checks** -- Anti-money laundering compliance verified
 
 </GateBox>
 
@@ -67,24 +67,26 @@ If any gate check fails, the user cannot proceed to e-Sign. The system displays 
 - **PMLA check failed:** Route to compliance officer for review
 </Aside>
 
-The table below shows exactly when each gate check was fired and when its result became available. Notice that every check was completed well before the customer reaches this screen -- the gate is pure evaluation with zero additional latency.
+The table below shows exactly when each gate check was fired and when its result became available. Every check was completed well before the customer reaches this screen -- the gate is pure evaluation with zero additional latency.
 
 ## Gate Check Sources
 
-| Check | Fired At | Vendor | Result Ready By |
-|-------|---------|--------|----------------|
-| PAN Valid | Screen 2 | Decentro | Screen 4 |
-| PAN-Aadhaar Linked | Screen 2 | Decentro (PAN verify) | Screen 4 |
-| AML/PEP Clean | Screen 2 | TrackWizz | Screen 4 |
-| Penny Drop Success | Screen 5 | Decentro | Screen 6 |
-| PMLA Checks | Screen 2 | TrackWizz | Screen 4 |
+| Check | Fired At | Result Ready By |
+|-------|---------|----------------|
+| PAN Valid (NSDL/Protean) | Screen 2 | Screen 4 |
+| PAN-Aadhaar Linked | Screen 2 | Screen 4 |
+| AML/PEP Clean | Screen 2 | Screen 4 |
+| Penny Drop Success | Screen 5 | Screen 6 |
+| PMLA Checks | Screen 2 | Screen 4 |
 
 <Aside type="tip">
-All gate checks were fired asynchronously on earlier screens. By Screen 8, every result is already available. The gate is an evaluation step, not a waiting step — the user experiences zero additional latency here.
+All gate checks were fired asynchronously on earlier screens. By Screen 8, every result is already available. The gate is an evaluation step, not a waiting step.
 </Aside>
 
+For vendor implementation options, see [Vendor Integrations](/broking-kyc/vendors/).
+
 :::caution[Handle the "still pending" edge case]
-In rare scenarios (vendor downtime, network issues), a gate check result may not be available by the time the customer reaches Screen 8. Do not let the customer wait indefinitely. If a result is still pending after a reasonable timeout (e.g., 15 seconds on this screen), show a clear message: "We are still verifying your details. You can close the app and we will notify you when your application is ready to continue." Queue a retry in the background and send a push notification when the gate can be re-evaluated.
+In rare scenarios (vendor downtime, network issues), a gate check result may not be available by the time the customer reaches Screen 8. Do not let the customer wait indefinitely. If a result is still pending after a reasonable timeout, show a clear message: "We are still verifying your details. You can close the app and we will notify you when your application is ready to continue." Queue a retry in the background and send a push notification when the gate can be re-evaluated.
 :::
 
 </ScreenCard>

@@ -1,6 +1,6 @@
 ---
 title: "Screen 5: Bank Account"
-description: "Bank account capture and penny drop verification — ~45 seconds, 3 fields."
+description: "Bank account capture and penny drop verification — 3 fields."
 prev:
   link: /broking-kyc/journey/04-confirm-identity/
   label: '← 4. Confirm Identity'
@@ -11,17 +11,15 @@ next:
 
 import ScreenCard from '../../../components/ScreenCard.astro';
 import AsyncBar from '../../../components/AsyncBar.astro';
-import VendorTable from '../../../components/VendorTable.astro';
-import VendorBadge from '../../../components/VendorBadge.astro';
 import { Aside } from '@astrojs/starlight/components';
 
 The customer's identity is now confirmed. The next question the system needs to answer is: where does this person's money live? Every trading account must be linked to a verified bank account -- this is how funds move in and out. The customer enters three fields (account number, IFSC code, and account type), and the system immediately fires a penny drop to verify that the account exists and belongs to the person whose name is on the KYC (Know Your Customer) application. This is one of the few screens where the customer provides genuinely new information that cannot be pre-filled from any external source.
 
-<ScreenCard number={5} title="Bank Account" time="~45 seconds">
+<ScreenCard number={5} title="Bank Account">
 
 **Purpose:** Capture bank account details and verify ownership via penny drop.
 
-A penny drop is exactly what it sounds like: the system sends Re.1 (one rupee) via IMPS to the customer's bank account. The bank responds with the account holder's name, which the system then matches against the name from DigiLocker (Government of India's digital document platform). This proves the account exists, is active, and belongs to the right person.
+Bank account verification via IMPS credit (penny drop) validates account holder name. The system sends Re.1 (one rupee) via IMPS to the customer's bank account. The bank responds with the account holder's name, which the system then matches against the name from DigiLocker (Government of India's digital document platform). This proves the account exists, is active, and belongs to the right person.
 
 ## User Input
 
@@ -45,48 +43,27 @@ The moment the customer enters a valid IFSC code, these fields populate automati
 | MICR Code | RBI IFSC Master |
 
 <AsyncBar>
-Penny Drop verification fires on submit — Rs.1 IMPS credit + name match scoring. IFSC Lookup + cheque/statement OCR also fire.
+Penny Drop verification fires on submit -- Rs.1 IMPS credit + name match scoring. IFSC Lookup also fires.
 </AsyncBar>
 
 :::tip[Why penny drop and not just account number validation?]
 An account number alone proves nothing -- it is just a sequence of digits. The penny drop proves three things simultaneously: the account exists at the given IFSC, the account is active and can receive funds, and the name on the account matches the KYC applicant. This is why SEBI (Securities and Exchange Board of India) and exchanges require bank verification as a mandatory step.
 :::
 
-Now let us look at the vendor options for bank account verification. The key differentiator among vendors is the name match algorithm and the availability of reverse penny drop (where the customer pays Re.1 via UPI instead of receiving it).
-
-## Vendor Comparison: Bank Account Verification
-
-<VendorTable title="Bank Account Verification">
-
-| Vendor | Methods | Name Match | Cost/txn |
-|--------|---------|-----------|----------|
-| **Decentro** <VendorBadge type="recommended" /> | Penny drop, Penniless, Reverse penny drop (UPI) | Score 0-100 + FULL/PARTIAL/NO match. Rs.1 IMPS credit. Less than 2 sec response. | Rs.2-5 |
-| Setu <VendorBadge type="new" /> | Penny drop, **Reverse penny drop (pioneer)**, PennyLess | Yes — customer pays Rs.1 via UPI, data cannot be spoofed. Webhook with 5 exponential retries. | Rs.2-4 |
-| Cashfree <VendorBadge type="alternate" /> | Penny drop (async webhook) | Yes. Free trial Rs.100 credits. Does NOT support Deutsche Bank and Paytm Payments Bank. | Rs.2-4 |
-| Karza <VendorBadge type="new" /> | Penny drop + IFSC lookup | Yes. Bank verification + IFSC master lookup in one. Under Perfios umbrella. | Rs.2-4 |
-
-</VendorTable>
-
-Full spec: [Decentro Integration](/broking-kyc/vendors/verification/decentro)
-
-<Aside type="tip">
-Setu pioneered the **reverse penny drop** — customer pays Rs.1 via UPI, and the system extracts account + name + IFSC from the transaction. Data cannot be spoofed since it comes from the bank's UPI response. This is a strong alternative to traditional penny drop.
-</Aside>
-
-The penny drop result does not block the customer on this screen. It runs asynchronously and is evaluated later at the blocking gate on Screen 8. This keeps the customer moving forward without any loading spinner.
-
 ## Penny Drop Result
 
-The penny drop result feeds into the [Blocking Gate (Screen 8)](/broking-kyc/journey/08-declarations-gate/). The gate requires a name match score of 70% or above.
+The penny drop result feeds into the [Blocking Gate (Screen 8)](/broking-kyc/journey/08-declarations-gate/). The gate requires that the account holder name passes verification against the applicant's name from DigiLocker/Aadhaar records.
 
 | Result | Action |
 |--------|--------|
-| Name match >= 70% | Pass — proceed to e-Sign |
-| Name match < 70% | Block — manual review required |
-| Transaction failed | Block — retry or alternate verification |
+| Name passes verification | Pass -- proceed to e-Sign |
+| Name does not pass verification | Block -- manual review required |
+| Transaction failed | Block -- retry or alternate verification |
+
+For vendor implementation options for bank account verification, see [Vendor Integrations](/broking-kyc/vendors/).
 
 :::caution[Bank account verification edge cases]
-Some banks have delayed IMPS processing, especially smaller cooperative banks and regional rural banks. If the penny drop does not return within 30 seconds, the system should queue it for retry rather than failing immediately. Also, name mismatches are common when the bank records use abbreviated names (e.g., "S. Kumar" vs. "Suresh Kumar") -- this is why the threshold is 70% rather than 100%.
+Some banks have delayed IMPS processing, especially smaller cooperative banks and regional rural banks. If the penny drop does not return within a reasonable window, the system should queue it for retry rather than failing immediately. Also, name mismatches are common when the bank records use abbreviated names (e.g., "S. Kumar" vs. "Suresh Kumar") -- this is why a fuzzy name matching algorithm is required rather than an exact string comparison.
 :::
 
 </ScreenCard>

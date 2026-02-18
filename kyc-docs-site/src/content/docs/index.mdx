@@ -25,7 +25,7 @@ Welcome to the KYC (Know Your Customer) onboarding specification. If you are new
 
 ## What Is This?
 
-A complete technical specification for **stock broking KYC onboarding** -- covering a 9-screen mobile-first user journey, 25+ vendor integrations, 8 parallel batch pipelines, maker-checker admin workflow, and full SEBI (Securities and Exchange Board of India) / KRA (KYC Registration Agency) / CKYC (Central KYC) regulatory compliance. Built for an Indian stock broking firm enabling individual customers to go from mobile OTP (One-Time Password) to first trade in 24-72 hours.
+A complete technical specification for **stock broking KYC onboarding** -- covering the regulatory data collection workflow, identity verification via government sources, batch submissions to KRA/CKYC/exchanges/depositories, maker-checker admin workflow, and full SEBI (Securities and Exchange Board of India) / KRA (KYC Registration Agency) / CKYC (Central KYC) regulatory compliance. Built for an Indian stock broking firm enabling individual customers to complete KYC onboarding and begin trading.
 
 :::tip[Where to start]
 If you are a new engineer, start with the [User Journey](/broking-kyc/journey/) section. Walk through all 9 screens in order. That will give you the clearest mental model of what the customer experiences and what the system does at each step. Come back here afterward to explore the architecture, vendor integrations, and operations sections.
@@ -37,9 +37,9 @@ Whether you are building features, integrating vendors, or answering compliance 
 
 <CardGrid>
 	<Card title="Product Managers" icon="rocket">
-		Understand the end-to-end user experience: 9 screens, ~6 minutes, ~12 typed fields.
+		Understand the end-to-end user experience: multi-step identity verification and regulatory data capture.
 
-		Start: [Journey Overview](/broking-kyc/journey/) → [9 Screens](/broking-kyc/journey/01-mobile-registration/) → [Design Principles](/broking-kyc/architecture/design-principles/)
+		Start: [Journey Overview](/broking-kyc/journey/) → [Step-by-Step Flow](/broking-kyc/journey/01-mobile-registration/) → [Design Principles](/broking-kyc/architecture/design-principles/)
 	</Card>
 	<Card title="Engineers" icon="document">
 		API specs, field mappings, async patterns, batch file formats, and error handling.
@@ -64,22 +64,22 @@ The diagram below shows the complete onboarding flow. Spend a minute studying it
 
 <Diagram src="/diagrams/01-onboarding-flow.svg" label="Complete Onboarding Flow — 9 Screens + Maker-Checker + Batch Pipelines" />
 
-Here are the numbers that define the system. These are the metrics you will hear in every sprint planning and stakeholder review.
+Here are the key dimensions of the system, derived from SEBI regulatory requirements and the KRA/CKYC/exchange/depository submission mandates.
 
 ## At a Glance
 
 <CardGrid stagger>
-	<Card title="9 Screens, ~6 Minutes" icon="rocket">
-		Mobile-first user journey: mobile OTP → PAN → DigiLocker → identity confirm → bank → trading prefs → nominations → declarations → eSign.
+	<Card title="Multi-Step Identity Verification" icon="rocket">
+		Mobile OTP → PAN verification → Government identity source (DigiLocker/Aadhaar) → identity confirmation → bank verification → trading preferences → nominations → declarations → eSign.
 	</Card>
-	<Card title="~454 Fields, ~90% Prefilled" icon="document">
-		DigiLocker + KRA + CKYC prefill ~90% of identity/financial fields. User only types mobile, PAN, DOB, email, bank details, and segment toggles.
+	<Card title="Comprehensive KYC Data Capture" icon="document">
+		Government identity sources (DigiLocker, KRA, CKYC) provide pre-verified identity and financial data, minimizing manual data entry errors per SEBI KYC norms.
 	</Card>
-	<Card title="25+ Vendor Integrations" icon="puzzle">
-		Decentro, Digio, HyperVerge, Leegality, TrackWizz, and more — covering PAN, bank, KRA, CKYC, DigiLocker, eSign, AML, face match, exchanges, and depositories.
+	<Card title="Identity, KRA, Exchange & Depository Integrations" icon="puzzle">
+		PAN verification (NSDL/Protean), KRA agencies, CKYC (CERSAI), DigiLocker, eSign, AML screening, biometric verification, exchanges (NSE/BSE/MCX), and depositories (CDSL/NSDL). See [Vendor Integrations](/broking-kyc/vendors/) for implementation options.
 	</Card>
-	<Card title="8 Parallel Batch Pipelines" icon="list-format">
-		KRA, CKYC, NSE, BSE, MCX, CDSL, NSDL, and Income pipelines run asynchronously after maker-checker approval.
+	<Card title="8 Regulatory Batch Pipelines" icon="list-format">
+		KRA, CKYC, NSE, BSE, MCX, CDSL, NSDL, and Income pipelines run asynchronously after maker-checker approval per SEBI dual-control requirements.
 	</Card>
 </CardGrid>
 
@@ -93,9 +93,9 @@ The table below maps each section to what you will find inside. Use it as a refe
 
 | Section | What You'll Find |
 |---------|-----------------|
-| **[Architecture](/broking-kyc/architecture/design-principles/)** | 11 design principles, 9-screen flow overview, data source mapping, security requirements |
-| **[User Journey](/broking-kyc/journey/)** | Detailed specification for each of the 9 onboarding screens with vendor integration points |
-| **[Vendor Integrations](/broking-kyc/vendors/)** | Deep-dive specs for 12+ vendors: API details, field mappings, error handling, implementation checklists |
+| **[Architecture](/broking-kyc/architecture/design-principles/)** | Regulatory design principles, onboarding flow overview, data source mapping, security requirements |
+| **[User Journey](/broking-kyc/journey/)** | Detailed specification for each onboarding step with SEBI-mandated data capture requirements |
+| **[Vendor Integrations](/broking-kyc/vendors/)** | Deep-dive specs for identity, KRA, eSign, AML, exchange, and depository integrations |
 | **[Operations](/broking-kyc/operations/batch-pipeline/)** | Batch pipelines, exchange registration, 6-attribute matching, admin workflow, status machine |
 | **[Reference](/broking-kyc/reference/master-dataset/)** | Full 454-field master dataset, code tables, regulatory circulars, cost analysis, architecture diagrams |
 | **[Appendix](/broking-kyc/appendix/non-individual-entities/)** | Non-individual entities, NRI flows, minor/joint accounts, vendor roadmap, communications |

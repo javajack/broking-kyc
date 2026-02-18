@@ -30,7 +30,7 @@ Checker Approved
   ├─→ [MCX Pipeline]     UCC Submit → Income Verify → Approved (next working day, if commodity)
   ├─→ [CDSL Pipeline]    BO File (Lines 01,02,05,07) → KYC Check → Bank Valid → Active (1-2 hrs)
   ├─→ [NSDL Pipeline]    UDiFF Submit → CDS Process → DPM Update → PAN Flag → Active (~15 days)
-  └─→ [Income Pipeline]  Perfios/AA verify → Confirmed (1-2 hrs, if F&O)
+  └─→ [Income Pipeline]  Income verify → Confirmed (1-2 hrs, if F&O)
 
   Final Gate: KRA Registered + BO Active + UCC Approved → ACTIVE (can trade)
 ```
@@ -45,7 +45,7 @@ The KRA pipeline is the regulatory backbone of the entire process. Every new cus
 
 | Step | Action | Vendor | Input/Output | Status | SLA |
 |------|--------|--------|-------------|--------|-----|
-| 1 | Submit KRA record | Digio API (Application Programming Interface) / CVL SOAP / bulk TXT | Full KYC payload → App ref number | SUBMITTED | Immediate |
+| 1 | Submit KRA record | KRA agency API (Application Programming Interface) or batch file submission | Full KYC payload → App ref number | SUBMITTED | Immediate |
 | 2 | KRA receives and validates | KRA (CVL/NDML) | Cross-checks PAN format, name, DOB | UNDER_PROCESS | 1-2 working days |
 | 3 | Identity cross-checks | KRA | PAN-Aadhaar link, name consistency | REGISTERED | Same batch cycle |
 | 4 | Email + mobile validation | KRA | Sends validation link to client | VALIDATED | +1 working day |
@@ -64,7 +64,7 @@ CKYC is the centralized identity repository maintained by CERSAI (Central Regist
 
 | Step | Action | Vendor | Input/Output | Status | SLA |
 |------|--------|--------|-------------|--------|-----|
-| 1 | Submit JSON payload | Decentro API | Photo, POA, contact, IDs → Acknowledgement | UPLOADED | Immediate |
+| 1 | Submit JSON payload | CKYC intermediary API | Photo, POA, contact, IDs → Acknowledgement | UPLOADED | Immediate |
 | 2 | CERSAI queues for processing | CERSAI | Record enters validation queue | QUEUED | 1-2 working days |
 | 3 | Document OCR and verification | CERSAI | Auto-verification of submitted documents | VALIDATED | +1-2 working days |
 | 4 | KIN generated | CERSAI | 14-digit CKYC Identification Number → SMS/email | KIN_GENERATED | +1 working day |
@@ -144,7 +144,7 @@ NSDL, promoted by NSE, uses a different file format called UDiFF (Unified Distil
 | 1 | Submit via Insta Interface | UDiFF format (ISO-tagged, since Mar 2024) | Full KYC record | SUBMITTED | Immediate |
 | 2 | CDS processing | CDS | Account ID + BO ID ("IN" + 14 chars) | PROCESSING | 3-5 working days |
 | 3 | "Out file" sent back to DPM | DPM (Depository Participant Module) | Client_IDs returned in response file | DPM_UPDATED | +2-3 working days |
-| 4 | Back-office client master created | Internal | Trading + margin limits set in ODIN | CLIENT_CREATED | +1 working day |
+| 4 | Back-office client master created | Internal | Trading + margin limits set in back-office/RMS system | CLIENT_CREATED | +1 working day |
 | 5 | PAN flag enablement | DPM | PAN flag enabled → trading enabled | ACTIVE | +5-7 working days |
 
 :::tip[Why Most Brokers Default to CDSL]
@@ -159,24 +159,24 @@ If the customer has requested F&O (Futures and Options) or commodity segments, t
 
 | Step | Action | Vendor | Input/Output | Status | SLA |
 |------|--------|--------|-------------|--------|-----|
-| 1 | Verify income | Perfios ITR / Setu AA (Account Aggregator) | ITR/bank statement → verified income | VERIFIED | 1-2 hours |
+| 1 | Verify income | Income verification provider / Account Aggregator | ITR/bank statement → verified income | VERIFIED | 1-2 hours |
 
-In plain English: the system fetches the customer's income data — either by parsing their ITR (Income Tax Return) via Perfios or by pulling bank statements through the Account Aggregator framework — and confirms it aligns with their declared income range.
+In plain English: the system fetches the customer's income data — either by parsing their ITR (Income Tax Return) through an income verification provider or by pulling bank statements through the Account Aggregator framework — and confirms it aligns with their declared income range.
 
 ## Post-Activation Jobs
 
 Once the critical pipelines have completed and the customer's account is active, several follow-up jobs run to finalize the onboarding experience. These are not blocking — the customer can already trade — but they are necessary for full compliance and a complete customer setup.
 
-| Job | Vendor | Output | SLA |
-|-----|--------|--------|-----|
+| Job | Service | Output | SLA |
+|-----|---------|--------|-----|
 | Segment Activation | NSE/BSE/MCX | Segments live | Same day |
-| Back-Office Sync | 63 Moons ODIN | Client master record | Immediate |
-| Welcome Kit | Kaleyra + AWS SES | Email + SMS | On activation |
-| Nominee Video (if opt-out) | HyperVerge | Video declaration | Within 30 days |
+| Back-Office Sync | Back-office/RMS system | Client master record | Immediate |
+| Welcome Kit | Communication service provider | Email + SMS | On activation |
+| Nominee Video (if opt-out) | Video verification provider | Video declaration | Within 30 days |
 | DDPI Setup (if opted) | CDSL/NSDL | DDPI registered | 1 day |
 
 :::note[Nominee Opt-Out Video]
-If a customer chose to opt out of nominating a beneficiary for their demat account, SEBI requires a video declaration within 30 days. This is handled by the HyperVerge VIPV (Video In-Person Verification) system and is one of the few post-activation tasks with a hard regulatory deadline.
+If a customer chose to opt out of nominating a beneficiary for their demat account, SEBI requires a video declaration within 30 days. This is handled by a VIPV (Video In-Person Verification) provider and is one of the few post-activation tasks with a hard regulatory deadline.
 :::
 
 ## Final Activation Gate

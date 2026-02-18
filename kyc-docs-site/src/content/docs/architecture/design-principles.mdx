@@ -1,51 +1,47 @@
 ---
 title: Design Principles
-description: The 11 architectural rules that shape every screen and API call in the KYC onboarding system.
+description: Regulatory and architectural constraints governing the KYC onboarding system design.
 ---
 
 import { Aside } from '@astrojs/starlight/components';
 
-Before you look at any API specification, vendor integration, or screen layout, read this page. These 11 principles are the architectural rules that govern every decision in the KYC (Know Your Customer) onboarding system. When you encounter a design choice elsewhere in the docs and wonder "why is it done this way?", the answer almost always traces back to one of these principles. They were not invented in a vacuum -- they emerged from the constraints of Indian securities regulation, the capabilities of government identity infrastructure (DigiLocker, Aadhaar, CKYC), and the goal of minimizing the time a customer spends typing on their phone.
+This page documents the regulatory and architectural constraints that govern every decision in the KYC (Know Your Customer) onboarding system. These constraints emerge from Indian securities regulation (SEBI circulars, PMLA rules, IT Act 2000), the capabilities of government identity infrastructure (DigiLocker, Aadhaar, CKYC), and the operational requirements of KRA/exchange/depository submissions. When you encounter a design choice elsewhere in the docs, the rationale traces back to one of these constraints.
 
-## The 11 Principles
+## Regulatory Design Constraints
 
-| # | Principle | Implementation |
+| # | Constraint | Regulatory Basis |
 |---|-----------|----------------|
-| 1 | **Mobile-first registration** | Start with mobile OTP (One-Time Password) verification before any KYC data. Establishes the identity anchor and communication channel used for all subsequent OTPs, KRA (KYC Registration Agency) verification, and post-onboarding notifications. |
-| 2 | **DigiLocker-first** | Force Aadhaar + PAN (Permanent Account Number) fetch via DigiLocker (Government of India's digital document platform) consent. Harvests ~25 identity fields with zero typing. |
-| 3 | **Aadhaar via DigiLocker** | DigiLocker consent flow provides Aadhaar eKYC without needing the user to type their Aadhaar number into our app. Strongest identity anchor with IPV (In-Person Verification) exemption. |
-| 4 | **Pre-fill everything** | DigiLocker + KRA + CKYC (Central KYC) cover ~90 identity/financial fields. User only confirms. |
-| 5 | **Async verification** | PAN verify, KRA lookup, CKYC search, AML (Anti-Money Laundering) screening fire in parallel while user is on DigiLocker. |
-| 6 | **Minimal user typing** | ~12 fields: mobile, PAN, DOB (Date of Birth), email, bank a/c, IFSC, a/c type + toggles. |
-| 7 | **e-Sign everything** | Single Aadhaar OTP eSign (electronic signature via Aadhaar OTP) on the complete application. No physical signatures. |
-| 8 | **Batch submission** | KRA, CKYC, UCC, BO account submitted async after maker-checker approval. User never waits. |
-| 9 | **IPV exemption** | Aadhaar eKYC (DigiLocker) exempts IPV/VIPV (Video In-Person Verification) per SEBI (Securities and Exchange Board of India) circular. Saves one step. |
-| 10 | **Progressive disclosure** | Only show fields relevant to choices (F&O income proof, FATCA, PEP). |
-| 11 | **Fail fast, fail gracefully** | If blocking check fails, stop user before e-Sign. Don't waste their time. |
+| 1 | **Mobile verification required for OTP-based authentication** | Mobile OTP establishes the identity anchor and communication channel required for KRA verification, eSign authentication, and post-onboarding notifications per SEBI KYC norms. |
+| 2 | **Government identity sources for IPV exemption** | Aadhaar eKYC via DigiLocker consent provides IPV exemption per SEBI/HO/MIRSD/DOP/CIR/P/2020/73. Identity fields are sourced from government-issued digital documents. |
+| 3 | **Aadhaar eKYC without Aadhaar number collection** | DigiLocker consent flow provides Aadhaar eKYC without requiring the intermediary to collect or store the Aadhaar number, in compliance with Aadhaar Act Section 29 restrictions. |
+| 4 | **Government data sources reduce manual entry errors in regulatory submissions** | DigiLocker, KRA, and CKYC data sources pre-populate identity and financial fields, reducing discrepancies in KRA/CKYC/UCC submissions that lead to rejections. |
+| 5 | **Parallel verification against regulatory databases** | PAN verification, KRA lookup, CKYC search, and AML screening execute in parallel against respective regulatory databases without blocking customer progression. |
+| 6 | **Data quality: fewer manual entries reduce KRA/exchange rejections** | Customer-entered fields are limited to data unavailable from any government or regulatory source (mobile, email, bank account details, segment preferences). |
+| 7 | **Digital signature per IT Act 2000, Section 3A** | Single Aadhaar OTP-based electronic signature on the complete application, legally valid under IT Act 2000 Section 3A and SEBI eSign guidelines. No physical signatures required. |
+| 8 | **Regulatory agency submissions after dual-control approval** | KRA, CKYC, UCC, and BO account submissions are processed in batch after maker-checker approval, per SEBI dual-control requirements for account opening. |
+| 9 | **IPV exemption via Aadhaar eKYC** | Aadhaar eKYC through DigiLocker exempts In-Person Verification (IPV) and Video In-Person Verification (VIPV) per SEBI/HO/MIRSD/DOP/CIR/P/2020/73. |
+| 10 | **Progressive disclosure of conditional fields** | Fields are shown only when relevant to customer selections (e.g., income proof for F&O/Commodity segments, FATCA declarations for tax residency, PEP declarations). |
+| 11 | **Pre-submission validation gate** | All blocking regulatory checks (PAN status, KRA status, AML screening, bank verification) must pass before the customer proceeds to eSign. Applications failing mandatory checks are stopped early with clear remediation guidance. |
 
 <Aside type="tip">
-These principles directly map to the [9-screen user journey](/broking-kyc/journey/). Each screen is designed to collect the minimum input while maximizing pre-filled data from trusted sources.
+These constraints directly map to the [9-screen user journey](/broking-kyc/journey/). Each screen collects the minimum required input while sourcing remaining data from government and regulatory databases.
 </Aside>
 
-:::note[Principles are constraints, not suggestions]
-When you are building a new feature or modifying an existing screen, check it against these 11 principles. If a change requires the user to type a field that could be pre-filled, it violates Principle 4. If a change adds a synchronous API call to the user's critical path, it violates Principle 5. Use this table as a checklist during code reviews and design discussions.
+:::note[Constraints are mandatory, not advisory]
+When building a new feature or modifying an existing screen, verify compliance against these constraints. If a change requires manual entry of a field available from a government source, it violates Constraint 4. If a change adds a synchronous API call to the customer's critical path, it violates Constraint 5. Use this table as a checklist during code reviews and design discussions.
 :::
 
-The principles are not independent -- they reinforce each other in a specific pattern. Understanding how they connect will help you see the system as a whole rather than a collection of screens.
+The constraints are not independent -- they reinforce each other in a specific pattern. Understanding how they connect will help you see the system as a whole rather than a collection of screens.
 
-## How Principles Connect
+## How Constraints Connect
 
-The principles work together as a system:
+The constraints work together as a system:
 
-- **Principles 1-3** establish the identity foundation (mobile → PAN → DigiLocker)
-- **Principles 4-6** minimize friction (pre-fill, async, minimal typing)
-- **Principles 7-8** handle completion (e-Sign, batch)
-- **Principles 9-11** optimize the experience (IPV exemption, progressive disclosure, fail fast)
+- **Constraints 1-3** establish the identity foundation (mobile verification, government identity sources, Aadhaar eKYC)
+- **Constraints 4-6** ensure data quality and completeness from authoritative sources
+- **Constraints 7-8** handle completion (digital signature, batch submission to regulatory agencies)
+- **Constraints 9-11** enforce regulatory compliance (IPV exemption, conditional disclosures, pre-submission validation)
 
-:::tip[The golden path]
-The ideal customer journey -- Principles 1 through 11 firing in sequence -- takes about 6 minutes and requires ~12 typed fields. Every deviation from this golden path (DigiLocker downtime, PAN-Aadhaar not linked, AML flag) is handled by Principle 11: fail fast and tell the customer exactly what needs to happen next.
-:::
-
-:::caution[Do not add synchronous calls to the user path]
-The most common architectural mistake in KYC systems is making the customer wait for an API response before they can proceed. If you find yourself writing code that blocks screen navigation on an API call, stop and reconsider. Principle 5 (async verification) exists because vendor APIs can take anywhere from 500ms to 10 seconds, and that variability should never be the customer's problem.
+:::caution[Do not add synchronous calls to the customer path]
+The most common architectural mistake in KYC systems is making the customer wait for an API response before they can proceed. If you find yourself writing code that blocks screen navigation on an API call, stop and reconsider. Constraint 5 (parallel verification) exists because external API response times are variable, and that variability must not block customer progression through screens where the response is not yet required.
 :::

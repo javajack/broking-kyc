@@ -6,7 +6,7 @@ description: The maker-checker review process — how applications are auto-appr
 Every KYC (Know Your Customer) application that flows through the system must pass a dual review before any data is submitted to regulators, exchanges, or depositories. This dual review is called the "maker-checker" process — a concept borrowed from banking operations where no single person can both initiate and approve a transaction. In our context, the "maker" is often the system itself (automatically verifying data against thresholds), and the "checker" is a human supervisor who gives the final sign-off. Think of it as the quality control station on the assembly line: the maker inspects each item against a checklist, and the checker does a final spot-check before the item ships. This page explains when applications sail through automatically, when they get flagged for human review, and what the checker is ultimately responsible for.
 
 :::note[Why Maker-Checker Matters]
-SEBI (Securities and Exchange Board of India) regulations require that no KYC submission to a KRA (KYC Registration Agency), exchange, or depository happens without appropriate review. The maker-checker model provides this dual control while keeping the process fast — 80-85% of applications need zero human intervention.
+SEBI (Securities and Exchange Board of India) regulations require that no KYC submission to a KRA (KYC Registration Agency), exchange, or depository happens without appropriate review. The maker-checker model provides this dual control while keeping the process fast — the majority of applications need zero human intervention.
 :::
 
 The workflow has three tiers: automated approval (the majority of cases), manual review by operations staff (the maker), and final sign-off by a supervisor (the checker). Let us walk through each.
@@ -15,8 +15,8 @@ The workflow has three tiers: automated approval (the majority of cases), manual
 
 | Step | Role | Action | Outcome |
 |------|------|--------|---------|
-| 10 | **Maker (System)** | Auto-verify all checks against thresholds. If ALL pass → auto-approve. | Auto-approved (80-85% of cases) |
-| 10 | **Maker (Ops)** | If any check is marginal (e.g., name match 70-89%), manually review flagged fields. | Approved / Escalated / Rejected |
+| 10 | **Maker (System)** | Auto-verify all checks against thresholds. If ALL pass → auto-approve. | Auto-approved (majority of cases) |
+| 10 | **Maker (Ops)** | If any check is marginal (e.g., name partially matches), manually review flagged fields. | Approved / Escalated / Rejected |
 | 11 | **Checker (Supervisor)** | Review maker's decision. Final approval or rejection. Mandatory — no batch processing without it. | **Checker Approved** → batch pipelines fire |
 | Esc | **Compliance** | AML (Anti-Money Laundering) HIGH risk, PEP (Politically Exposed Person) matches, sanctions hits escalated from maker. Enhanced CDD (Customer Due Diligence) required. | Approved with conditions / Rejected |
 
@@ -28,21 +28,17 @@ The key to keeping the process efficient is the auto-approve criteria. The bette
 
 Application is auto-approved if ALL conditions are met:
 
-| Check | Threshold | Source |
-|-------|-----------|--------|
-| PAN (Permanent Account Number) status | = E (valid) | Decentro PAN API (Application Programming Interface) |
-| PAN-Aadhaar linked | = Y | Decentro PAN API |
-| PAN name vs DigiLocker name | >= 90% match | Internal name matcher |
-| Penny drop name match | >= 80% | Decentro Penny Drop |
-| Face match score | >= 85% | HyperVerge |
-| Liveness detection | = Pass | HyperVerge |
-| AML risk | = LOW | TrackWizz |
-| PEP match | = None | TrackWizz |
-| Sanctions match | = None | TrackWizz |
-
-:::tip[Expected Auto-Approve Rate]
-**Expected auto-approve rate: 80-85%** of applications need zero human intervention. This means your operations team only needs to manually handle roughly 1 in 5 or 6 applications — a significant efficiency gain over fully manual processes.
-:::
+| Check | Required Outcome |
+|-------|-----------------|
+| PAN (Permanent Account Number) status | Status = E (valid) |
+| PAN-Aadhaar linked | Linked (= Y) |
+| PAN name vs DigiLocker name | Name matches government records with high confidence |
+| Penny drop name match | Bank account name verification passes |
+| Face match score | Biometric face match passes |
+| Liveness detection | Liveness check passes |
+| AML risk | LOW risk |
+| PEP match | No match |
+| Sanctions match | No match |
 
 In plain English: if the customer's PAN is valid and linked to Aadhaar, their name matches across documents, their selfie matches their photo ID, they pass liveness detection, and they have no AML/PEP/sanctions flags, the system auto-approves without any human touching it.
 
@@ -52,18 +48,18 @@ When an application does not meet all the auto-approve thresholds, it gets flagg
 
 | Trigger | Condition | Action Required |
 |---------|-----------|----------------|
-| Name mismatch | PAN vs DigiLocker match 70-89% | Verify names visually, check for initials/abbreviations |
-| Penny drop marginal | Name match 60-79% | Check bank name vs Aadhaar name |
-| Face match marginal | Score 70-84% | Review selfie quality, request retake if needed |
+| Name mismatch | PAN vs DigiLocker name partially matches but does not pass high-confidence threshold | Verify names visually, check for initials/abbreviations |
+| Penny drop marginal | Bank account name does not clearly match identity documents | Check bank name vs Aadhaar name |
+| Face match marginal | Biometric face match requires manual review | Review selfie quality, request retake if needed |
 | AML MEDIUM risk | Risk score above LOW threshold | Review hit details, confirm false positive or escalate |
 | PEP declared | User self-declared PEP = Yes | Enhanced CDD: verify position, source of wealth |
-| Income mismatch | Declared vs verified income diverge > 50% | Review income proof documents |
+| Income mismatch | Declared vs verified income diverge significantly | Review income proof documents |
 
 :::note[Name Mismatches Are the Most Common Manual Trigger]
 Indian names often have variations across documents — initials vs full names, middle names present on one document but not another, or transliteration differences between Aadhaar (which may be in a regional language) and PAN (which is always in English). Your operations team should develop a mental checklist for common name variations before rejecting an application.
 :::
 
-In plain English: most manual reviews are caused by name discrepancies between documents. A 75% name match between PAN and DigiLocker does not necessarily mean fraud — it often just means "Rajesh K" on one document and "Rajesh Kumar" on another.
+In plain English: most manual reviews are caused by name discrepancies between documents. A partial name match between PAN and DigiLocker does not necessarily mean fraud — it often just means "Rajesh K" on one document and "Rajesh Kumar" on another.
 
 Once the maker (whether automated or human) has made a decision, the checker performs the final review.
 

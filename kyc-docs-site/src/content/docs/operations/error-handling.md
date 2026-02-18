@@ -25,7 +25,7 @@ DigiLocker is the government's digital document wallet, and it is the primary so
 In plain English: DigiLocker failures are usually temporary or user-initiated. The system should always offer a retry first, and fall back to manual document upload only after three failed attempts. Never force the customer to start over from scratch.
 
 :::tip[Manual Upload Fallback]
-When DigiLocker is unavailable, the fallback flow asks the customer to upload photos of their PAN card and Aadhaar card. These are then processed through OCR (Optical Character Recognition) via HyperVerge to extract the same data that DigiLocker would have provided. The data quality is slightly lower (OCR can misread characters), which is why DigiLocker is always preferred.
+When DigiLocker is unavailable, the fallback flow asks the customer to upload photos of their PAN card and Aadhaar card. These are then processed through OCR (Optical Character Recognition) to extract the same data that DigiLocker would have provided. The data quality is slightly lower (OCR can misread characters), which is why DigiLocker is always preferred.
 :::
 
 Beyond DigiLocker, several other verification steps can fail during the user journey. Each has its own failure mode and user message.
@@ -40,7 +40,7 @@ These are failures that occur during the identity verification steps — PAN val
 | PAN-Aadhaar not linked | Not seeded | "PAN-Aadhaar linking is mandatory. Visit incometax.gov.in" |
 | AML High Risk | Sanctions/PEP (Politically Exposed Person) | "Your application requires additional review." |
 | Penny Drop Failed | Wrong a/c | "Bank verification failed. Check account number and IFSC (Indian Financial System Code)." |
-| Face Match < 80% | Poor selfie | "Face verification unsuccessful. Try again in good lighting." |
+| Face match failed | Poor selfie | "Face verification unsuccessful. Try again in good lighting." |
 | e-Sign OTP failed | Wrong OTP | "OTP verification failed. Click to resend." (3 attempts) |
 
 :::caution[AML High Risk Is Deliberately Vague]
@@ -73,7 +73,7 @@ Finally, here is the general strategy for handling HTTP error codes from any ven
 
 ## General API Error Strategy
 
-This table applies to every vendor API in the system — Decentro, HyperVerge, TrackWizz, Digio, Setu, and others. The HTTP status codes follow standard conventions, but the retry behavior and alerting logic are specific to our pipeline.
+This table applies to every vendor API in the system. The HTTP status codes follow standard conventions, but the retry behavior and alerting logic are specific to our pipeline.
 
 | HTTP Code | Meaning | Action |
 |-----------|---------|--------|

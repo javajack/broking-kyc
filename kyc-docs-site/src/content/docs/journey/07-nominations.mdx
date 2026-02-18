@@ -14,15 +14,15 @@ import { Aside } from '@astrojs/starlight/components';
 
 The customer has chosen their trading segments. Now the system asks a question that most customers do not expect during account opening: who should receive your holdings if something happens to you? Nomination is a regulatory requirement for all demat and trading accounts in India. SEBI (Securities and Exchange Board of India) updated the rules in January 2025 to allow up to 10 nominees (previously capped at 3), and introduced a mandatory video declaration for customers who choose to opt out of nominating anyone. This screen handles both paths -- adding nominees or opting out.
 
-<ScreenCard number={7} title="Nominations" time="~30 seconds to ~2 minutes">
+<ScreenCard number={7} title="Nominations">
 
-**Purpose:** Capture nominee details or record opt-out declaration.
+**Purpose:** Capture nominee details or record opt-out declaration per SEBI nomination regulations.
 
 The customer has two choices: add one or more nominees, or explicitly opt out. There is no "skip" option -- SEBI requires every customer to make an active choice on this screen.
 
 ## Option A: Add Nominee(s)
 
-If the customer chooses to add nominees, they fill in the following fields for each nominee. Most customers add one nominee and move on in about 30 seconds.
+If the customer chooses to add nominees, they fill in the following fields for each nominee.
 
 | Field | Validation | Notes |
 |-------|-----------|-------|
@@ -48,18 +48,10 @@ If the customer does not want to nominate anyone, they take the opt-out path ins
 The user selects "I choose to opt out of nomination." This requires an asynchronous video declaration to be completed within 30 days.
 
 <Aside type="caution" title="Video Declaration Required">
-Opting out of nomination requires a video declaration per SEBI rules. This is recorded asynchronously — the user does not need to complete it during onboarding, but must do so within 30 days. See [Video KYC / VIPV vendors](/broking-kyc/journey/09-review-esign/) for vendor options.
+Opting out of nomination requires a video declaration per SEBI rules. This is recorded asynchronously -- the user does not need to complete it during onboarding, but must do so within 30 days. The video verification must comply with SEBI VIPV guidelines.
 </Aside>
 
-The video declaration for nomination opt-out is a relatively new SEBI requirement. It is designed to ensure that customers are making an informed, deliberate choice rather than simply skipping a screen they do not understand.
-
-## Timing
-
-| Scenario | Time |
-|----------|------|
-| Single nominee | ~30 seconds |
-| Multiple nominees | ~2 minutes |
-| Opt-out (checkbox only, video deferred) | ~10 seconds |
+The video declaration for nomination opt-out is a SEBI requirement designed to ensure that customers are making an informed, deliberate choice rather than simply skipping a screen they do not understand.
 
 ## Regulatory Context
 
@@ -69,6 +61,8 @@ These are the current rules governing nominations. They have changed significant
 - **Allocation:** Must total exactly 100% across all nominees
 - **Minor nominees:** Guardian details required if nominee is a minor
 - **Opt-out video:** Must be completed within 30 days of account opening; trading can proceed in the interim
+
+For vendor implementation options for video verification, see [Vendor Integrations](/broking-kyc/vendors/).
 
 :::caution[Do not block account activation on opt-out video]
 The video declaration for nomination opt-out is deferred -- the customer can start trading before completing it. However, if the video is not recorded within 30 days, the account should be flagged for follow-up. Build a reminder workflow (SMS + email at day 7, 14, 21, 28) to ensure compliance.

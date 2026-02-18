@@ -11,13 +11,11 @@ next:
 
 import ScreenCard from '../../../components/ScreenCard.astro';
 import AsyncBar from '../../../components/AsyncBar.astro';
-import VendorTable from '../../../components/VendorTable.astro';
-import VendorBadge from '../../../components/VendorBadge.astro';
 import { Aside } from '@astrojs/starlight/components';
 
-Up to this point, the system has been focused on establishing who the customer is. Now the conversation shifts to what they want to do. This screen asks a deceptively simple question: which market segments do you want to trade in? The customer sees a set of toggles -- Equity, F&O (Futures and Options), Currency Derivatives, and Commodity. For a customer who only wants to buy and hold stocks, this screen takes five seconds. But if they toggle on F&O or Commodity, the system needs income proof, and that introduces a conditional branch that can add time and complexity. This is where KYC (Know Your Customer) meets suitability -- not just "are you who you say you are" but "are you financially qualified to trade derivatives?"
+Up to this point, the system has been focused on establishing who the customer is. Now the conversation shifts to what they want to do. This screen asks which market segments the customer wishes to trade in. The customer sees a set of toggles -- Equity, F&O (Futures and Options), Currency Derivatives, and Commodity. For a customer who only wants to buy and hold stocks, this screen is straightforward. But if they toggle on F&O or Commodity, the system needs income proof, and that introduces a conditional branch. This is where KYC (Know Your Customer) meets suitability -- not just "are you who you say you are" but "are you financially qualified to trade derivatives?"
 
-<ScreenCard number={6} title="Trading Preferences" time="~30 seconds">
+<ScreenCard number={6} title="Trading Preferences">
 
 **Purpose:** Select trading segments and provide income proof if required for derivatives.
 
@@ -43,50 +41,31 @@ When a customer toggles on F&O or Commodity, the screen conditionally reveals an
 If F&O or Commodity is selected, income proof upload becomes mandatory.
 
 <Aside type="caution" title="SEBI Requirement">
-F&O/Commodity segments require income verification. Bank statement must show credit of at least Rs.10,000 in last 6 months. Annual income threshold is broker-specific (typically Rs.1-10 lakh).
+F&O/Commodity segments require income verification per SEBI norms. Income proof documents include ITR, bank statements, or salary slips. Annual income threshold is broker-specific (typically Rs.1-10 lakh).
 </Aside>
 
 <AsyncBar>
-If F&O/Commodity selected, income verification fires:
-**Perfios ITR Analyser** or **Setu Account Aggregator**
+If F&O/Commodity selected, income verification fires asynchronously via ITR analysis or Account Aggregator consent flow.
 </AsyncBar>
 
-The income verification step is where the Account Aggregator (AA) framework can significantly improve the customer experience. Instead of asking the customer to upload a bank statement PDF (which they may not have on their phone), the AA flow lets them consent to share their bank data digitally. Let us look at the vendor options.
+## Income Verification Methods
 
-## Vendor Comparison: Income / ITR Verification
+Income verification can be performed via the Account Aggregator framework (RBI Master Direction on Account Aggregator, September 2016) or manual document upload. The Account Aggregator flow lets the customer consent to share their bank data digitally, eliminating the need for manual PDF upload.
 
-<VendorTable title="Income / ITR Verification">
-
-| Vendor | Products | Key Differentiator | Cost |
-|--------|---------|-------------------|------|
-| **Perfios** <VendorBadge type="recommended" /> | ITR Analyser, Bank Statement Analyser, Account Aggregator | Full-stack income verification. 4000+ bank statement formats. AI/ML fraud detection. Sahamati-empaneled TSP. | Volume-based |
-| Setu (via AA) <VendorBadge type="new" /> | Account Aggregator FIU | Eliminates manual income proof upload entirely. User just consents. Most seamless UX. | Rs.5-25/fetch |
-| Finbox (BankConnect) <VendorBadge type="alternate" /> | Bank statement analysis | 500+ predictors. PDF upload + netbanking + AA. Best for thin-file analysis. | Contact |
-| Tartan <VendorBadge type="new" /> | Payroll/HRMS Sync | 30+ HRMS integrations covering 80% of organized market. Real-time salary + employment data. | Contact |
-
-</VendorTable>
-
-The Account Aggregator framework is a broader ecosystem that extends beyond income verification. It is worth understanding because it represents the future of consent-based financial data sharing in India.
-
-## Vendor Comparison: Account Aggregator Framework
-
-<VendorTable title="Account Aggregator Framework (RBI-licensed)">
-
-| AA Operator | Role | Relevance for KYC |
-|------------|------|-------------------|
-| **Setu (Onemoney)** | AA + FIU tech | Can replace income proof upload: user consents, bank statement fetched automatically. Also fetch demat holdings via CDSL/NSDL FIP. |
-| **Perfios (Anumati)** | AA Operator | Income verification without manual upload. ITR (Income Tax Return) + bank statement via consent. Rs.5-25/fetch. |
-| Finvu | AA Operator | Bank statement fetch for F&O income proof. 40+ FIP integrations. |
-| CAMS Finserv | AA Operator | Mutual fund holdings data for net worth verification. |
-
-</VendorTable>
+Available verification approaches:
+- **Account Aggregator (AA) consent flow** -- customer consents digitally, bank statement data fetched automatically via RBI-licensed AA operators
+- **ITR analysis** -- customer uploads ITR or authorises fetch; AI-based analysis extracts income figures
+- **Bank statement upload** -- manual PDF upload with automated parsing
+- **Payroll/HRMS integration** -- real-time salary and employment data (for salaried applicants)
 
 <Aside type="tip">
-SEBI circular Aug 2022 allowed depositories (CDSL/NSDL) as FIPs in the AA ecosystem. Brokers can fetch demat holdings, bank statements, and ITR data via consent-based AA flow instead of manual document upload. See [Account Aggregator](/broking-kyc/vendors/account-aggregator) for details.
+SEBI circular Aug 2022 allowed depositories (CDSL/NSDL) as FIPs in the AA ecosystem. Brokers can fetch demat holdings, bank statements, and ITR data via consent-based AA flow instead of manual document upload.
 </Aside>
 
+For vendor implementation options for income verification and Account Aggregator integration, see [Vendor Integrations](/broking-kyc/vendors/).
+
 :::tip[Designing the F&O toggle experience]
-When a customer toggles F&O on, do not immediately show a file upload dialog. First check if the KRA record (from Screen 2) already contains an income range that meets the threshold. If it does, you can skip the income proof step entirely. Only fall back to bank statement upload or AA consent if the existing data is insufficient or absent.
+When a customer toggles F&O on, first check if the KRA record (from Screen 2) already contains an income range that meets the threshold. If it does, the income proof step can be skipped. Only fall back to bank statement upload or AA consent if the existing data is insufficient or absent.
 :::
 
 </ScreenCard>

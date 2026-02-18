@@ -32,7 +32,7 @@ Each vendor integration has specific handling for non-individual entities. The s
 - FATCA/CRS (Foreign Account Tax Compliance Act / Common Reporting Standard) declaration per authorized signatory
 - Full spec: [KRA Integration](/broking-kyc/vendors/kra) Section 7
 
-### CKYC (via Decentro)
+### CKYC (via CKYC intermediary)
 - 7 constitution types supported
 - Authorized signatory photo and signature required
 - UBO (Ultimate Beneficial Owner) identification for companies
@@ -50,22 +50,22 @@ Each vendor integration has specific handling for non-individual entities. The s
 - Additional document requirements per exchange
 - Full specs: [NSE](/broking-kyc/vendors/exchanges/nse), [BSE](/broking-kyc/vendors/exchanges/bse), [MCX](/broking-kyc/vendors/exchanges/mcx)
 
-### eSign (Leegality)
+### eSign (eSign provider)
 - Multi-signatory workflows for corporates
 - Board resolution verification before signing
 - Authorized signatory face match
-- Full spec: [Leegality Integration](/broking-kyc/vendors/esign/leegality) Section 9
+- Full spec: See [Vendor Integrations](/broking-kyc/vendors/) for eSign provider options
 
-### AML Screening (TrackWizz)
+### AML Screening
 - Screening by entity type (different risk parameters)
 - UBO screening for corporates
 - Director/Partner screening
-- Full spec: [TrackWizz Integration](/broking-kyc/vendors/fraud/trackwizz) Section 7
+- Full spec: See [Vendor Integrations](/broking-kyc/vendors/) for AML screening provider options
 
-### Face Match (HyperVerge)
+### Face Match (Biometric verification)
 - Face match for authorized signatories
 - Multiple face matches for joint holders
-- Full spec: [HyperVerge Integration](/broking-kyc/vendors/verification/hyperverge) Section 6
+- Full spec: See [Vendor Integrations](/broking-kyc/vendors/) for biometric verification provider options
 
 ## Implementation Priority
 

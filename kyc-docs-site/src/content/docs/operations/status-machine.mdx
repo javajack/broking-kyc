@@ -80,10 +80,10 @@ The gate evaluates these checks before allowing e-Sign:
 
 | Check | Required Status | Source |
 |-------|----------------|--------|
-| PAN verification | Status = E (valid) | Decentro |
-| PAN-Aadhaar linkage | Linked | Decentro |
-| AML (Anti-Money Laundering) / PEP (Politically Exposed Person) screening | Completed (any result) | TrackWizz |
-| Bank verification | Penny drop complete | Decentro |
+| PAN verification | Status = E (valid) | PAN verification API |
+| PAN-Aadhaar linkage | Linked | PAN verification API |
+| AML (Anti-Money Laundering) / PEP (Politically Exposed Person) screening | Completed (any result) | AML screening service |
+| Bank verification | Penny drop complete | Bank verification API |
 | DigiLocker consent | Data harvested | DigiLocker |
 
 If any check hasn't completed (timeout/error), it blocks with a specific message telling the user what needs resolution.
