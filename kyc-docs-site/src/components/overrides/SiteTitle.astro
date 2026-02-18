@@ -31,7 +31,7 @@ const { siteTitle, siteTitleHref } = Astro.locals.starlightRoute;
 		<span class:list={{ 'sr-only': config.logo?.replacesTitle }} translate="no">
 			{siteTitle}
 		</span>
-		<span class="author-byline">by Rakesh Waghela</span>
+		<a href="https://www.linkedin.com/in/rakeshwaghela" target="_blank" rel="noopener noreferrer" class="author-byline">by Rakesh Waghela</a>
 	</span>
 </a>
 
@@ -70,6 +70,11 @@ const { siteTitle, siteTitleHref } = Astro.locals.starlightRoute;
 			font-weight: 400;
 			color: var(--sl-color-gray-3);
 			letter-spacing: 0.01em;
+			text-decoration: none;
+			transition: color 0.15s;
+		}
+		.author-byline:hover {
+			color: var(--sl-color-accent);
 		}
 		@media (max-width: 480px) {
 			.author-byline {

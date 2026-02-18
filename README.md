@@ -95,11 +95,13 @@ See the full [Regulatory Circulars](https://javajack.github.io/broking-kyc/refer
 
 ## Author
 
-**Rakesh Waghela** — Tech & KYC Solutions Architect
+**[Rakesh Waghela](https://www.linkedin.com/in/rakeshwaghela)** — Technology & Product Consultant
+
+Available for consulting and collaboration on technology strategy, product architecture, and system design. Reach out via LinkedIn for inquiries.
 
 - [LinkedIn](https://www.linkedin.com/in/rakeshwaghela)
 - [X / Twitter](https://x.com/webiyo)
-- [Book a Consultation](https://topmate.io/rakeshwaghela)
+- [Book a Session](https://topmate.io/rakeshwaghela)
 
 ## License
 
