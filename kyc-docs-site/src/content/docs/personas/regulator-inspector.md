@@ -1,0 +1,77 @@
+---
+title: "Persona: Regulator / Inspector"
+description: Reading path for a regulator (SEBI / exchange / depository) or inspector approaching a broker's framework — compliance posture, audit trails, depth-vs-surface check, regulatory citation traceability.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+You're walking into an inspection. The broker has produced a binder, a runbook, and a 178-page knowledge base (this one). Your job: understand the broker's framework end-to-end, identify gaps between what they claim and what they evidence, and verify that the regulatory citations they cite actually say what they claim.
+
+This page is your shortcut.
+
+## What you'll find useful here
+
+Two layers matter most:
+
+- **Compliance Blueprint** — the broker's master inventory of obligations. If they map each row to evidence, your inspection moves fast. If they don't, you have your starting list.
+- **Circulars index** — the broker's regulatory citation source. Every blueprint row references a circular. Verifiability ties back to here.
+
+Then domain-specific deep-dives — audit, CSCRF, AP framework, SCORES, ECN format, BMC / ABC — for any topic the inspection focuses on.
+
+## Suggested reading path (in this order)
+
+1. **[Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/)** — the master inventory. Use the `evidence` column to write your evidence-request list; the `circular_ref` column to verify the citation.
+
+2. **[Regulatory Circulars master](/broking-kyc/reference/regulatory-circulars/)** + per-issuer sub-pages — verify any cited circular against the project's index. Each entry has a primary URL; click through to verify against the official source.
+
+3. **[Audit deep-dives](/broking-kyc/deep-dives/compliance-audit/concurrent-audit/)** — the broker's existing internal audit cycles. What they're already checking themselves on.
+
+4. **[CSCRF deep-dive](/broking-kyc/deep-dives/compliance-audit/cscrf-deep-dive/)** — the broker's cyber security framework posture. CSCRF clauses 2.1.1 / 2.1.2 categorization; VAPT cadence; incident-reporting timeline.
+
+5. **[SCORES Procedure deep-dive](/broking-kyc/deep-dives/compliance-audit/scores-procedure/)** — the broker's investor-grievance process. 21-day SLA; monthly MIS; escalation.
+
+6. **[Inspection Types deep-dive](/broking-kyc/deep-dives/compliance-audit/inspection-types/)** — the broker's own playbook for handling inspections. Useful for setting expectations on responsiveness.
+
+7. **[AP Framework deep-dive](/broking-kyc/deep-dives/compliance-audit/ap-framework/)** — if the inspection touches the broker's AP network.
+
+8. **[BMC / ABC deep-dive](/broking-kyc/deep-dives/member-compliance/bmc-abc/)** + **[Fit-and-Proper deep-dive](/broking-kyc/deep-dives/member-compliance/fit-and-proper/)** — continuing-compliance posture.
+
+9. **[Market Manipulation Typologies](/broking-kyc/deep-dives/foundational/market-manipulation-typologies/)** — the broker's awareness of the surveillance vocabulary you'd test against.
+
+10. **[Member Default Recovery deep-dive](/broking-kyc/deep-dives/foundational/member-default-recovery/)** — the broker's awareness of default mechanics. Useful for risk-side conversations.
+
+That's the foundation.
+
+<Aside type="caution">
+**This site is AI-generated synthesis.** Every claim cites a circular, but the synthesis hasn't been independently verified. For inspection use, treat the broker's binder + the regulator's own circular text as authoritative; treat this site as the broker's working reference. The site itself acknowledges this — see the "AI disclaimer" footer on every page.
+</Aside>
+
+## Common questions in your role
+
+- **The broker claims peak-margin shortfall response within prescribed window — what's the evidence?** → [Compliance Blueprint Margin domain](/broking-kyc/operations/compliance-blueprint/#margin-compliance-30-entries) — DMF response file reconciliation row + clearing-corp circulars.
+- **Does the broker's SCORES disposal rate meet the 21-day SLA?** → broker's monthly MIS; site's [SCORES procedure deep-dive](/broking-kyc/deep-dives/compliance-audit/scores-procedure/) describes the framework.
+- **Is the broker's CSCRF categorization (Qualified / Mid / Small) appropriate?** → [CSCRF deep-dive](/broking-kyc/deep-dives/compliance-audit/cscrf-deep-dive/) — clauses 2.1.1 / 2.1.2 computation.
+- **The broker's AP supervision — does it match the NSE/COMP chain?** → [AP Framework deep-dive](/broking-kyc/deep-dives/compliance-audit/ap-framework/) — NSE/COMP/45842, 49334, etc. chain referenced.
+- **Capital adequacy: is the broker compliant on networth, BMC, ABC?** → broker's quarterly statutory-auditor certificate; site's [BMC / ABC deep-dive](/broking-kyc/deep-dives/member-compliance/bmc-abc/) describes the framework.
+- **Client funds upstreaming — is the broker compliant with the June 2023 mandate?** → broker's daily upstreaming reports; site's [Client Funds Upstreaming deep-dive](/broking-kyc/deep-dives/settlement/client-funds-upstreaming/).
+- **Direct-payout-to-demat — was the broker's rollout aligned with the Jun 2024 phased mandate?** → [Direct Payout to Demat deep-dive](/broking-kyc/deep-dives/settlement/direct-payout-to-demat/).
+- **DPDP compliance status — broker's preparation for the May 2027 deadline?** → [Compliance Blueprint DPDP domain](/broking-kyc/operations/compliance-blueprint/#dpdp--data-protection-18-entries).
+
+## What to skip (and why)
+
+- **Onboarding journey screens** — useful context but not direct inspection material.
+- **Backend engineer / frontend persona pages** — they cover implementation; inspection cares about compliance posture, not implementation choice.
+- **`appendix/*`** — only relevant if your inspection focuses on a specific cohort (NRI / minor / non-individual).
+
+## When you'd reference
+
+- **For your own reading of the underlying SEBI circular** → click any circular ID in the site → the primary URL takes you to SEBI / exchange / depository's own page.
+- **For independent verification** → use the broker's binder + circular text + this site as triangulation; the site's purpose is to map evidence to obligations transparently.
+
+## Verified through
+
+2026-05-14
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

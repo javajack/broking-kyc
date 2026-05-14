@@ -1,0 +1,80 @@
+---
+title: "Persona: Backend Engineer"
+description: Reading path for a backend or platform engineer integrating with KRA, exchanges, depository, clearing corp, and the surrounding vendor ecosystem. Dependency graphs, field flows, retry policies, file formats.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+You're the one who has to make `POST /api/onboard` actually result in a client who can trade tomorrow morning. Or you're the one who has to figure out why the KRA upload is failing, why the peak margin file doesn't reconcile, why the BO ID came back malformed. The other personas reading this site care about what the system does; you care about how, in what order, with what failure modes.
+
+This page is your shortcut.
+
+## What you'll find useful here
+
+Three layers matter to you:
+
+- **The Integration DAG** — for every significant integration call, what depends on what, what runs in parallel, retry policy, rollback, SLA, failure surface. This is your operational architecture.
+- **The Field Atlas** — for every onboarding field, where it flows (KRA, CKYC, UCC, BO, back-office, RMS, contract notes, reports). This is your data model.
+- **Deep Dives (trading-day, settlement, specialty)** — the technical-reference layer. SPAN methodology, surveillance internals, DLT framework, BCP/DR procedure.
+
+The first two answer "what does the system look like." The third answers "how does this specific thing work."
+
+## Suggested reading path (in this order)
+
+1. **[Flow Summary](/broking-kyc/architecture/flow-summary/)** — short orientation. Tells you the onboarding pipeline shape.
+
+2. **[Integration DAG Overview](/broking-kyc/operations/integration-dag/)** — read this whole thing. Six phases (onboarding, BOD, trading hours, EOD & settlement, recurring cycles, lifecycle events). Each phase has its own ASCII DAG + per-node detail. Bookmark the per-phase pages for reference.
+
+3. **[Field Atlas Overview](/broking-kyc/reference/field-atlas/)** — orientation to the bidirectional dataset. The two views you'll use:
+   - **By section** (28 master-dataset sections + 10 computed/derived) when you're tracking "where does this onboarding field end up."
+   - **By destination** (14 systems — KRA / CKYC / NSE UCC / BSE UCC / MCX UCC / CDSL BO / NSDL BO / back-office / RMS / contract-notes / regulatory-reports / DLT comms / FATCA/CRS / AML/FIU) when you're building an integration with a specific endpoint.
+   - **Master CSV** at `/broking-kyc/field-atlas-master.csv` — 1,300+ rows; `grep` for impact analysis.
+
+4. **[OMS Internals deep-dive](/broking-kyc/deep-dives/trading-day/oms-internals/)** — if your work touches order handling, start here. Pre-trade RMS hot path, FIX gateway specifics, CTCL approval process.
+
+5. **[RMS / SPAN Methodology deep-dive](/broking-kyc/deep-dives/trading-day/rms-span-methodology/)** — the margin computation walkthrough. Worked examples; formulas. Slightly painful reading but reference-grade.
+
+6. **[Vendor Atlas](/broking-kyc/vendors/atlas/)** — when you're choosing an integration partner, this is the named-product enumeration. KYC verification (Decentro, HyperVerge, Karza/Perfios, IDfy, Signzy), eSign (Leegality, Digio, eMudhra), AA (Finvu, OneMoney, Setu), etc.
+
+7. **[Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/)** — yes, you. Read the Reporting + Margin + Settlement domains. The frequency / owner / evidence columns tell you which downstream systems your integration will feed.
+
+8. **[Direct Payout to Demat deep-dive](/broking-kyc/deep-dives/settlement/direct-payout-to-demat/)** and **[Client Funds Upstreaming deep-dive](/broking-kyc/deep-dives/settlement/client-funds-upstreaming/)** — read if you're touching settlement. Post-Jun-2024 pool-account restructure is a thing to understand.
+
+That's the foundation. The rest of the site is searchable.
+
+<Aside type="tip">
+**The Integration DAG node-detail tables are the most useful single artefact for an engineer here.** Per-node: `depends_on`, `blocks`, `parallel_eligible`, `idempotent`, `retry_policy`, `rollback`, `sla`, `failure_surface`. Lift node IDs and dependencies directly into your orchestrator config (Airflow / Temporal / custom).
+</Aside>
+
+## Common questions in your role
+
+- **Can I parallelize the 8 post-eSign batch pipelines?** → Yes. [Onboarding DAG](/broking-kyc/operations/integration-dag/onboarding/) confirms they fan out from `ONB-CHECKER_APPROVE` and converge on `ONB-FINAL_GATE`. No inter-dependencies.
+- **What's the retry policy for KRA upload?** → [Onboarding DAG node ONB-BATCH-KRA](/broking-kyc/operations/integration-dag/onboarding/) — 24h retry then ops alert.
+- **Why does my exchange UCC update fail when I send it concurrently with the KRA update?** → [Modifications page — the shared ordering rule](/broking-kyc/lifecycle/modifications/) — exchange validates against KRA's new state. Strict KRA → CKYC → UCC → BO.
+- **What file format does NSE UCC use?** → [NSE UCC destination page](/broking-kyc/reference/field-atlas/destinations/nse-ucc/) — REST API or pipe-delimited batch; 3-param Protean check.
+- **What's the BO ID structure for CDSL vs NSDL?** → [CDSL BO destination page](/broking-kyc/reference/field-atlas/destinations/cdsl-bo/) (8+8 numeric) and [NSDL BO destination page](/broking-kyc/reference/field-atlas/destinations/nsdl-bo/) ("IN" + 14 alphanumeric).
+- **How do I generate a peak margin DMF row?** → [Trading-hours DAG node TH-SNAP-DMF_ROW](/broking-kyc/operations/integration-dag/trading-hours/) + [RMS/SPAN deep-dive](/broking-kyc/deep-dives/trading-day/rms-span-methodology/).
+- **My contract note isn't dispatching via SMS — what's wrong?** → [DLT Framework deep-dive](/broking-kyc/deep-dives/specialty/dlt-framework/) — 11 common DLT error codes table.
+- **What happens to in-flight orders when CTCL approval lapses?** → [OMS Internals deep-dive](/broking-kyc/deep-dives/trading-day/oms-internals/) + [BOD DAG node BOD-HC-CTCL_STATUS](/broking-kyc/operations/integration-dag/bod/).
+
+## What to skip (and why)
+
+- **All persona pages other than this one** — that's the cross-link block at the bottom; you don't need them.
+- **`appendix/*` edge-case pages** unless you're explicitly working on NRI / minor / joint / non-individual flows.
+- **`lifecycle/*` walkthroughs** unless you're implementing a specific lifecycle scenario — these are operator-walkthroughs, not engineer reference.
+- **Most of the `vendors/` per-vendor pages** — the Vendor Atlas summary is enough until you're scoping a specific integration.
+
+## When you'd hand off
+
+- **"Should we build this in-house?"** → not your call alone — bring in [Product Manager](/broking-kyc/personas/product-manager/) and [Finance / CFO](/broking-kyc/personas/finance-cfo/).
+- **"Are we compliant with X?"** → [Compliance Officer](/broking-kyc/personas/compliance-officer/) — they have the regulatory-citation reading path.
+- **"What does the screen need to show?"** → [Frontend / UX Engineer](/broking-kyc/personas/frontend-ux-engineer/).
+- **"What capital does the new segment activate require?"** → [Finance / CFO](/broking-kyc/personas/finance-cfo/) — BMC / ABC, networth implications.
+
+## Verified through
+
+2026-05-14
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

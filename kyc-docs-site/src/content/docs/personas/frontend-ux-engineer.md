@@ -1,0 +1,76 @@
+---
+title: "Persona: Frontend / UX Engineer"
+description: Reading path for a frontend or UX engineer building broker-side screens — onboarding, modifications, eSign, OTP flows. Field-level validation rules, error states, what happens after submit.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+You're building the screens the client actually sees. You need to know what fields are mandatory, what validation rules fire, what error states the user can land in, what the back-end does after the user taps Submit, and where that handoff goes wrong — because when it does, the user comes back to your screen wondering why.
+
+This page is your shortcut.
+
+## What you'll find useful here
+
+Three layers matter to you:
+
+- **The 9-screen User Journey** — each onboarding screen with fields, async calls, validation, and what happens next. This is your spec.
+- **The Lifecycle walkthroughs** — modification, dormancy reactivation, closure flows. These are the screens you'll build after onboarding ships.
+- **Field-level reference** — master-dataset for shape, validation rules, mandatory flags; field atlas for "what does this field need to look like at the destination."
+
+You don't need most of the operational and regulatory machinery beneath the surface. You need to know enough about it to design honest error messages.
+
+## Suggested reading path (in this order)
+
+1. **[Journey Overview](/broking-kyc/journey/)** — the 9 onboarding screens at a glance. Pick the screens you're working on.
+
+2. **[Master Dataset](/broking-kyc/reference/master-dataset/)** — the canonical field listing. Skim the 30 sections (A through AC) to know what fields exist; come back when you're scoping a specific screen. Each field has data type, size, mandatory flag, validation rules.
+
+3. **[Field Summary](/broking-kyc/reference/field-summary/)** — section counts and prefill ratios. Useful for prioritizing which sections need the most polish (the high-prefill sections are mostly read-only; the user-input sections are where UX matters).
+
+4. **[Code Tables](/broking-kyc/reference/code-tables/)** — enumerations (occupation codes, income ranges, KRA status codes, MCX client categories). Useful for dropdown content.
+
+5. **[Lifecycle: Modifications](/broking-kyc/lifecycle/modifications/)** — if you're building modification screens, this is the spec for what each modification requires (penny drop for bank, OTP for mobile/email, eSign for nominee, etc.).
+
+6. **[Lifecycle: Re-KYC](/broking-kyc/lifecycle/re-kyc/)** — the re-KYC flow. Similar to onboarding but lighter because of prefill.
+
+7. **[Error Handling page](/broking-kyc/operations/error-handling/)** — what error codes appear when an async operation fails (PAN invalid, penny drop name mismatch, AML high-risk, KRA reject, etc.). Useful for writing the error-state UI.
+
+8. **[OMS Internals deep-dive](/broking-kyc/deep-dives/trading-day/oms-internals/)** — if you're building order-placement screens, skip to the pre-trade RMS pipeline section. You need to know what gets rejected and why.
+
+That's most of what you need. The rest is reference.
+
+<Aside type="tip">
+**Most of the onboarding flow is async.** The customer's view of "submit + spin" needs to map to the backend's view of "fire 4 parallel calls and converge at Screen 8." You'll never write that latter explicitly, but knowing it exists explains why some screens have spinners and others don't, and why error states sometimes surface 3 screens later than where the error originated.
+</Aside>
+
+## Common questions in your role
+
+- **What's mandatory in screen 5 (bank account)?** → [Master Dataset section G](/broking-kyc/reference/master-dataset/) — account number, IFSC, type are required; bank name auto-fills from IFSC.
+- **What error states can the user land in on screen 8 (declarations gate)?** → [Journey screen 8](/broking-kyc/journey/08-declarations-gate/) — AND-gate fails on: PAN invalid, AML high risk, penny drop name mismatch, etc.
+- **What validation should fire on PAN entry?** → 10 chars, alphanumeric, 4th char identifies entity type (P = individual). [Master Dataset section A](/broking-kyc/reference/master-dataset/).
+- **What's the format for nominee percentage allocation?** → Must sum to 100% across up to 10 nominees. [Journey screen 7](/broking-kyc/journey/07-nominations/) + [Lifecycle modifications — nominee change](/broking-kyc/lifecycle/modifications/#nominee-change-sebi-jan-2025-revamp).
+- **What does the user see while DigiLocker is fetching?** → They're on DigiLocker's site, not yours. They come back to your Screen 4 with prefilled identity. [Journey screen 3](/broking-kyc/journey/03-digilocker-consent/) explains the redirect.
+- **How long can the user expect the OTP to be valid?** → 5 minutes typical; broker policy. [Journey screen 1](/broking-kyc/journey/01-mobile-registration/).
+- **What's the DSC signature on the contract note about?** → Backend artefact; the user just receives a signed PDF. [ECN & Investor Servicing deep-dive](/broking-kyc/deep-dives/member-compliance/ecn-investor-servicing/) for the format.
+
+## What to skip (and why)
+
+- **Integration DAG, Compliance Blueprint, Field Atlas destination view** — backend-engineer territory. You don't need them unless you're debugging an async issue.
+- **All Deep Dives except OMS Internals and possibly Surveillance** — these are operations-team and engineer reference.
+- **Vendor Atlas** — backend-engineer territory.
+- **All persona pages except this one and possibly Product Manager** — you don't need them.
+- **`appendix/*`** — unless you're explicitly building NRI / minor / joint screens, skip.
+
+## When you'd hand off
+
+- **"Why is my async call failing?"** → [Backend Engineer reading path](/broking-kyc/personas/backend-engineer/).
+- **"What should the post-onboarding dashboard look like?"** → Product decision; involve [Product Manager](/broking-kyc/personas/product-manager/).
+- **"Are we DLT-compliant for these SMS templates?"** → [Compliance Officer](/broking-kyc/personas/compliance-officer/) — DLT framework deep-dive.
+
+## Verified through
+
+2026-05-14
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

@@ -1,0 +1,75 @@
+---
+title: "Persona: Internal Auditor"
+description: Reading path for an internal auditor scoping the half-yearly internal audit — defensible checklists, regulator-aligned sample tests, evidence-collection patterns, observation cycle.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+You're the one writing the audit report that the Compliance Officer signs and the regulator may eventually read. You need to know what the obligations are, what evidence is expected, where it lives, and what tests pass an inspection.
+
+This page is your shortcut.
+
+## What you'll find useful here
+
+Three layers matter most:
+
+- **Compliance Blueprint** — the master inventory of 400 obligations across 16 domains. The skeleton of your audit checklist.
+- **Audit deep-dives** — concurrent / system / cyber audit walkthroughs. Industry-typical scope and methodology.
+- **Circulars index** — citation source for every audit observation you'll write.
+
+## Suggested reading path (in this order)
+
+1. **[Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/)** — read the TL;DR and conceptual overview, then skim domain headers. Each row's `evidence` column is what you'll test for; each row's `circular_ref` column is the citation you'll use in your observations.
+
+2. **[Concurrent Audit deep-dive](/broking-kyc/deep-dives/compliance-audit/concurrent-audit/)** — your continuous audit's scope and methodology.
+
+3. **[System Audit deep-dive](/broking-kyc/deep-dives/compliance-audit/system-audit/)** — the biennial system audit.
+
+4. **[CSCRF deep-dive](/broking-kyc/deep-dives/compliance-audit/cscrf-deep-dive/)** — the cyber audit framework. You either run this or commission it.
+
+5. **[Inspection Types deep-dive](/broking-kyc/deep-dives/compliance-audit/inspection-types/)** — exchange / SEBI / depository inspection mechanics. Your audit observations should anticipate inspection scope.
+
+6. **[Audit & Compliance page](/broking-kyc/operations/audit-compliance/)** — the existing audit landing in the operations section.
+
+7. **[Regulatory Circulars master](/broking-kyc/reference/regulatory-circulars/)** + per-issuer sub-pages — your citation source. Find the specific circular for each observation.
+
+8. **[Member Compliance deep-dives](/broking-kyc/deep-dives/member-compliance/bmc-abc/)** — BMC / ABC, fit-and-proper, KMP, renewal. Continuing-compliance items you'll test for.
+
+That's the foundation.
+
+<Aside type="tip">
+**Build your audit checklist from the Compliance Blueprint.** Take each row's name, evidence column, circular reference, and frequency. The result is a defensible checklist with regulator-aligned citations. The blueprint has 400 rows; an internal audit typically covers ~150-200 of these depending on the half-year's risk-based prioritization.
+</Aside>
+
+## Common questions in your role
+
+- **What evidence proves a peak-margin shortfall response was timely?** → [Compliance Blueprint Margin domain](/broking-kyc/operations/compliance-blueprint/#margin-compliance-30-entries) — DMF response file reconciliation row.
+- **Sample size for client-funds segregation testing?** → [Concurrent Audit deep-dive — sample-size norms](/broking-kyc/deep-dives/compliance-audit/concurrent-audit/) — industry-typical norms with caveat.
+- **A SCORES complaint was disposed at day 22 instead of 21 — observation or pass?** → [SCORES Procedure deep-dive](/broking-kyc/deep-dives/compliance-audit/scores-procedure/) — explicit financial-disincentive section.
+- **What's the broker's compliance posture across DPDP — given the framework's phased compliance?** → [Compliance Blueprint DPDP domain](/broking-kyc/operations/compliance-blueprint/#dpdp--data-protection-18-entries) — current state of DPDP rules + 2027 deadline.
+- **An AP exceeded turnover but supervision documentation is missing — observation?** → [AP Framework deep-dive](/broking-kyc/deep-dives/compliance-audit/ap-framework/) — supervision requirements section.
+- **Surveillance reports showed OTR breaches not flagged — observation?** → [Surveillance deep-dive](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/) — OTR computation and breach response.
+- **The system audit reported a CSCRF observation; how do we test the remediation?** → [CSCRF deep-dive](/broking-kyc/deep-dives/compliance-audit/cscrf-deep-dive/).
+- **Client funds upstreaming was 11:30 instead of 09:00 — material observation?** → [Client Funds Upstreaming deep-dive](/broking-kyc/deep-dives/settlement/client-funds-upstreaming/) — bank cutoff and timing tolerance.
+
+## What to skip (and why)
+
+- **OMS / RMS technical deep-dives** — beyond audit scope unless a specific incident triggers a forensic.
+- **Field Atlas destination pages** — engineer territory.
+- **Integration DAG** — useful as context for understanding how operations work; not directly audited.
+- **`appendix/*`** — only relevant if a specific cohort came up in the audit.
+
+## When you'd hand off
+
+- **"This is operational — how does the broker actually fix it?"** → [Operations Lead](/broking-kyc/personas/operations-lead/) and the responsible domain head.
+- **"This is a regulatory interpretation question"** → [Compliance Officer](/broking-kyc/personas/compliance-officer/) + senior compliance counsel.
+- **"This needs a tax / accounting opinion"** → [Finance / CFO](/broking-kyc/personas/finance-cfo/) + external CA.
+- **"Statutory auditor needs the same trail"** → [Statutory Auditor reading path](/broking-kyc/personas/statutory-auditor/) — they're reading the same site for the annual cycle.
+
+## Verified through
+
+2026-05-14
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

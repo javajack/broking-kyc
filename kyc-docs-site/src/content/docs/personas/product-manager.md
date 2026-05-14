@@ -1,0 +1,76 @@
+---
+title: "Persona: Product Manager"
+description: Reading path for a product manager scoping a broking product, re-platforming, or planning a regulatory-driven feature. End-to-end flow, vendor tradeoffs, lifecycle implications, cost economics.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+You're scoping a new broking product, planning a re-platform, or trying to understand which regulatory change is going to eat the next two quarters of your roadmap. You don't need to know how to write a margin computation; you need to know **what's possible**, **what it costs in time and capital**, **who you're integrating with**, and **what will change next year that you need to design for now**.
+
+This page is your shortcut through the site.
+
+## What you'll find useful here
+
+The site has three layers that matter to a PM:
+
+- **Breadth-first reference** — what exists in the domain (884 circulars, 233 vendors, 400 compliance obligations, 1,314 field-destination flows).
+- **Depth-first narrative** — what actually happens in operations (the trading day, the lifecycle of a client, the dependency graph of integrations).
+- **Operator walkthroughs** — what your team will actually do, day-to-day, when this product is in production.
+
+You'll lean heaviest on the depth and operator layers. The breadth-first reference is where you go when a specific question comes up.
+
+## Suggested reading path (in this order)
+
+1. **[Broker Process Narrative](/broking-kyc/broker-process/narrative/)** — 8.2K words walking through ACTIVE-to-closure operations chronologically. Start here. By the time you're done, you'll have the working mental model.
+
+2. **[Flow Summary](/broking-kyc/architecture/flow-summary/)** — short complement to the narrative; covers the onboarding pipeline (the 9 customer screens + maker-checker + 8 batch pipelines).
+
+3. **[Vendor Atlas](/broking-kyc/vendors/atlas/)** — 233 real products across 22 categories. Skim by category; come back to the categories that matter for your build (OMS / RMS / back-office are the big ones; KYC verification / eSign / AA are the per-onboarding-cost drivers).
+
+4. **[Lifecycle Overview](/broking-kyc/lifecycle/)** — the six post-onboarding scenarios (re-KYC, modifications, dormancy, closure, transmission, NRI conversion). These shape your support cost and your edge-case backlog. Read the [Modifications](/broking-kyc/lifecycle/modifications/) page in full — the KRA → CKYC → UCC → BO ordering rule is the single most common bug class.
+
+5. **[Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/)** — skim the domain headers. You won't memorize 400 rows but you'll know what kinds of obligations exist. Come back to specific domains when your roadmap intersects them.
+
+6. **[Integration DAG Overview](/broking-kyc/operations/integration-dag/)** — gives you the dependency structure of all the integrations. Useful for stage-gate planning ("when can we cut over from old back-office to new").
+
+7. **[Regulatory Circulars master](/broking-kyc/reference/regulatory-circulars/)** — skim the highlight panel of 12 most-impactful circulars. Bookmark; this is where regulatory changes are tracked.
+
+That's the foundation. Once you have it, the rest of the site is searchable.
+
+<Aside type="tip">
+**Time investment.** The above path is ~3–4 hours of reading. That's the cost of being able to ask informed questions of your operations team, your compliance officer, and your vendor list — which is otherwise expensive to develop by absorbing meeting transcripts over six months.
+</Aside>
+
+## Common questions in your role
+
+- **How much does a single client onboarding cost in API/vendor fees?** → [Cost Analysis](/broking-kyc/reference/cost-analysis/) (₹85–175 per client per the recommended stack).
+- **How long from a client tapping "Sign up" to first trade?** → [Flow Summary](/broking-kyc/architecture/flow-summary/) (24–72 hours, gated by NSDL BO opening).
+- **What changes next year I need to plan for now?** → [Circulars Changelog](/broking-kyc/reference/circulars-changelog/) — recent and upcoming regulatory changes.
+- **Build vs buy: should we build our own back-office?** → [Vendor Atlas — Back-office category](/broking-kyc/vendors/atlas/#back-office-15-products) plus [BCP/DR Drill](/broking-kyc/deep-dives/specialty/bcp-dr-drill/) (vendor concentration risk).
+- **What's the cost of MTF as a feature?** → [MTF Operational deep-dive](/broking-kyc/deep-dives/settlement/mtf-operational/) plus [BMC/ABC](/broking-kyc/deep-dives/member-compliance/bmc-abc/) (additional capital).
+- **What's blocking the T+0 settlement rollout for our clients?** → [T+0 / T+1 deep-dive](/broking-kyc/deep-dives/settlement/t0-t1-settlement/) — broker readiness checklist included.
+- **What's the worst-case operational failure I should design against?** → [Member Default Recovery](/broking-kyc/deep-dives/foundational/member-default-recovery/) and [Payin Default + Core SGF](/broking-kyc/deep-dives/settlement/payin-default-core-sgf/).
+- **How big is the compliance team I need?** → [Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/) — count obligations by frequency × owner role; the result is a rough team-size sanity check.
+
+## What to skip (and why)
+
+- **The 13 per-issuer circular sub-pages** (`reference/circulars/<issuer>/`) — these are reference lookup, not learning material. You'll come back to them only when a specific circular comes up.
+- **Field-level Data Flow Atlas detail pages** (`reference/field-atlas/sections/*`, `reference/field-atlas/destinations/*`) — these are integration-engineer reference. You don't need them.
+- **Most of the Deep Dives technical pages** (especially `deep-dives/trading-day/rms-span-methodology/`, `deep-dives/foundational/segment-rules-comparison/`) — engineering reference; not your reading.
+- **`appendix/*`** — edge cases (NRI deep-dive, minor / joint, non-individual entities). Read these only when a specific cohort comes up in product scoping.
+
+## When you'd hand off
+
+A PM doesn't operate the broker — they design the product around it. Once you've read the foundation, you'll be handing off:
+- Detailed integration questions → [Backend Engineer reading path](/broking-kyc/personas/backend-engineer/).
+- Detailed compliance questions → [Compliance Officer reading path](/broking-kyc/personas/compliance-officer/).
+- Capital / cost questions → [Finance / CFO reading path](/broking-kyc/personas/finance-cfo/).
+- Day-to-day operational concerns → [Operations Lead reading path](/broking-kyc/personas/operations-lead/).
+
+## Verified through
+
+2026-05-14
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

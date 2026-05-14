@@ -1,0 +1,99 @@
+---
+title: "Persona: Trainee / New Employee"
+description: First-30-days reading path for someone new to broker operations. Architecture → onboarding journey → broker process narrative → lifecycle walkthroughs. By the end you'll know what BOD, SPAN, peak margin, and KRA mean.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+You joined this week. Your inbox has acronyms you don't know yet — BOD, EOD, SPAN, ELM, OTR, MWPL, KRA, CKYC, DDPI, UCC, BO, ECN, DLT. Your colleagues are using them in meetings as if everyone agreed on what they mean. You don't yet know what most of them stand for, but tomorrow's standup will assume you do.
+
+This reading path is sequential, ungentle, and accurate. It's about 4–6 hours total. By the end you'll be able to participate in meetings and ask informed questions.
+
+## What you'll find useful here
+
+The whole site, eventually. But in your first 30 days, just enough to:
+
+- Understand the broker's place in the Indian capital markets — who SEBI is, what NSE / BSE / MCX do, what CDSL / NSDL do, what KRA / CKYC are.
+- Understand the broker's operational day — BOD → trading hours → EOD → settlement.
+- Understand the client lifecycle — onboarding to ACTIVE → trading → modifications → eventually closure or transmission.
+- Understand the compliance backdrop — there are regulators, they make rules, the broker has to follow them and prove it.
+
+Depth comes later. Breadth first.
+
+## Suggested reading path (in this order)
+
+Day 1–3:
+
+1. **[Project Overview / Homepage](/broking-kyc/)** — what this site is, what's covered. Note the AI-generated disclaimer — verify before relying on anything in production.
+
+2. **[Design Principles](/broking-kyc/architecture/design-principles/)** — the high-level mental model. DigiLocker-first KYC. Six-attribute matching. Sequential vs parallel. Maker-checker.
+
+3. **[Flow Summary](/broking-kyc/architecture/flow-summary/)** — the onboarding pipeline at a glance. 9 customer screens + maker-checker + 8 batch pipelines.
+
+Day 4–6:
+
+4. **[Broker Process Narrative](/broking-kyc/broker-process/narrative/)** — the whole thing, 8.2K words. Read it twice. Section 1 covers ACTIVE-to-first-trade; Sections 2–6 cover trading day → settlement → daily reporting → recurring cycles → lifecycle events. By the time you finish, the acronyms in the email subject lines will start making sense.
+
+Day 7–10:
+
+5. **[Journey Overview](/broking-kyc/journey/)** + the 9 individual screens. The customer-facing onboarding flow.
+
+6. **[Lifecycle Overview](/broking-kyc/lifecycle/)** + each of the 6 scenarios (re-KYC, modifications, dormancy-reactivation, closure, transmission, NRI conversion).
+
+Day 11–20:
+
+7. **[Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/)** — skim domain headers. You don't need to memorize 400 rows. You need to know that 16 domains of compliance exist; ops, RMS, finance, and compliance teams each own subsets.
+
+8. **[Integration DAG Overview](/broking-kyc/operations/integration-dag/)** — the dependency layer. The DAG language ("ONB-S2-PAN_VERIFY blocks ONB-S8-BLOCKING_GATE") will appear in engineer / ops conversations.
+
+Day 21–30:
+
+9. **One Deep Dive that matches your team** — pick one. If you're on the ops team, **[Short-Delivery Auction](/broking-kyc/deep-dives/trading-day/short-delivery-auction/)** is short and meaty. If you're on RMS, **[RMS / SPAN Methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/)**. If you're on compliance, **[SCORES Procedure](/broking-kyc/deep-dives/compliance-audit/scores-procedure/)**.
+
+10. **[Persona pages](/broking-kyc/personas/)** — find your specific persona and follow that path. You're done with this one.
+
+<Aside type="tip">
+**Make a vocabulary glossary as you read.** Each acronym, write it down with a one-sentence definition. By the end of month 1 you'll have a personal glossary that you'll thank yourself for during month 2.
+</Aside>
+
+## Common questions in your first 30 days
+
+- **What's BOD?** → Begin-of-Day. The pre-market window (06:00–09:00) when broker systems pull files from exchanges and depositories. [BOD DAG](/broking-kyc/operations/integration-dag/bod/).
+- **What's EOD?** → End-of-Day. The post-market window (15:40–19:00) when broker systems reconcile, generate contract notes, send files. [EOD DAG](/broking-kyc/operations/integration-dag/eod-settlement/).
+- **What's KRA?** → KYC Registration Agency. There are 5 (CVL, NDML, DOTEX, CAMS, KFintech). They store the broker's customers' KYC records centrally. [Compliance Blueprint KYC domain](/broking-kyc/operations/compliance-blueprint/#kyc-lifecycle-41-entries).
+- **What's CKYC?** → Central KYC Registry. The CERSAI-operated identity registry. Brokers upload to both KRA and CKYC since Aug 2024 (dual upload mandate). [CERSAI Circulars](/broking-kyc/reference/circulars/cersai/).
+- **What's a UCC?** → Unique Client Code at an exchange. Each client has one at NSE, one at BSE, one at MCX. [Exchange Registration](/broking-kyc/operations/exchange-registration/).
+- **What's SPAN?** → Standard Portfolio ANalysis of Risk. The clearing corp's margin methodology. [RMS / SPAN Methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/).
+- **What are the 4 peak margin snapshots?** → 11:30 / 12:30 / 13:30 / 14:30 IST. The clearing corp checks broker margin compliance at each. [Trading Hours DAG](/broking-kyc/operations/integration-dag/trading-hours/).
+- **What's MTF?** → Margin Trading Facility. The broker funds the client's purchase; client pays interest. [MTF Operational](/broking-kyc/deep-dives/settlement/mtf-operational/).
+- **What's DDPI?** → Demat Debit Pledge Instruction. Replaced Power of Attorney (POA) for client-authorization to debit demat securities. [Lifecycle: Modifications](/broking-kyc/lifecycle/modifications/).
+- **What's ECN?** → Electronic Contract Note. The PDF the client receives within T+24h confirming trades. [ECN deep-dive](/broking-kyc/deep-dives/member-compliance/ecn-investor-servicing/).
+
+## What to skip in your first 30 days (and why)
+
+- **Field Atlas destination pages** — engineer reference; you won't need these.
+- **Per-issuer circulars sub-pages** — reference lookup; come back when a specific circular comes up.
+- **Vendor Atlas** — only useful when your firm is talking to a specific vendor.
+- **`appendix/*`** — edge cases. Come back when an NRI or minor / joint account comes up in your work.
+- **The technical deep-dives outside your team's domain** — bookmark them; come back later.
+
+## When you'd hand off (or graduate)
+
+After 30 days, find your specific persona's reading path and use that going forward:
+
+- [Product Manager](/broking-kyc/personas/product-manager/)
+- [Backend Engineer](/broking-kyc/personas/backend-engineer/)
+- [Frontend / UX Engineer](/broking-kyc/personas/frontend-ux-engineer/)
+- [Operations Lead](/broking-kyc/personas/operations-lead/)
+- [Head of OMS / RMS](/broking-kyc/personas/oms-rms-head/)
+- [Compliance Officer](/broking-kyc/personas/compliance-officer/)
+- [Finance / CFO](/broking-kyc/personas/finance-cfo/)
+- [Internal Auditor](/broking-kyc/personas/internal-auditor/)
+
+## Verified through
+
+2026-05-14
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

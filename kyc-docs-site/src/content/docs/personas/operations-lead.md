@@ -1,0 +1,82 @@
+---
+title: "Persona: Operations Lead"
+description: Reading path for an operations lead or head of operations running BOD, intraday surveillance, EOD reconciliation, settlement, monthly reporting, and the ongoing cadence of broker operations.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Your phone pings at 06:15 because the SPAN scanrange file is late. By 09:15 you've cleared three pre-open glitches. By the second peak-margin snapshot you're watching one client's RMS position with a small worry. By 17:00 you're approving the daily margin file. By 22:30 the ledger batch is running and you'd like to go home. Tomorrow you'll do it again, with an extra layer of weekly CFR, monthly client funding, and a quarterly running-account settlement.
+
+This page is your shortcut.
+
+## What you'll find useful here
+
+You operate at the intersection of every other persona's concerns — the engineer's systems, the compliance officer's evidence, the finance officer's funds, the product manager's edge cases. You don't need depth in all of it; you need a working mental model of the whole.
+
+Two layers matter most:
+
+- **The Broker Process Narrative** — chronological story of the operational day, week, month, quarter, year. Your reading list.
+- **The Integration DAG** — when things break, you want to know what downstream depends on what.
+
+Then specific deep-dives for the items that keep coming up in your day.
+
+## Suggested reading path (in this order)
+
+1. **[Broker Process Narrative](/broking-kyc/broker-process/narrative/)** — the whole thing, 8.2K words. This is your foundational reading. Sections 2 (Trading Day), 4 (Daily Reporting), and 5 (Recurring Cycles) you'll keep coming back to.
+
+2. **[Integration DAG Overview](/broking-kyc/operations/integration-dag/)** — orientation to the dependency layer. Then specifically:
+   - **[BOD DAG](/broking-kyc/operations/integration-dag/bod/)** — your morning playbook.
+   - **[Trading-Hours DAG](/broking-kyc/operations/integration-dag/trading-hours/)** — 4 peak margin snapshots, surveillance loops, block-deal windows.
+   - **[EOD & Settlement DAG](/broking-kyc/operations/integration-dag/eod-settlement/)** — the evening playbook.
+   - **[Recurring Cycles DAG](/broking-kyc/operations/integration-dag/recurring-cycles/)** — your weekly / monthly / quarterly compliance calendar.
+   - **[Lifecycle Events DAG](/broking-kyc/operations/integration-dag/lifecycle-events/)** — what your team handles when a client modifies / dormants / closes.
+
+3. **[Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/)** — skim the domain headers; come back to specific rows when a deadline approaches.
+
+4. **[Lifecycle Overview](/broking-kyc/lifecycle/)** — six post-onboarding scenarios your team will run.
+
+5. **Deep dives on the operational items that hit your queue most:**
+   - **[Short-Delivery Auction](/broking-kyc/deep-dives/trading-day/short-delivery-auction/)** — the T+2 auction process and recovery.
+   - **[Payin Default + Core SGF](/broking-kyc/deep-dives/settlement/payin-default-core-sgf/)** — worst case; needs an understood escalation path.
+   - **[Direct Payout to Demat](/broking-kyc/deep-dives/settlement/direct-payout-to-demat/)** — the post-Jun-2024 mechanics.
+   - **[BCP / DR Drill](/broking-kyc/deep-dives/specialty/bcp-dr-drill/)** — what your team does quarterly.
+
+6. **[Error Handling](/broking-kyc/operations/error-handling/)** + **[Status Machine](/broking-kyc/operations/status-machine/)** + **[Admin Workflow](/broking-kyc/operations/admin-workflow/)** — your runbooks.
+
+<Aside type="tip">
+**Build a compliance calendar.** Take the Compliance Blueprint's reporting and audit domains plus the Recurring Cycles DAG. Slot every item into a master calendar by day-of-week / day-of-month / date-of-quarter. That calendar runs your weekly standup agenda, your month-end checklist, and your quarter-end project plan. Done well, this is the most-referenced document in the ops function and survives staff turnover better than most operational systems.
+</Aside>
+
+## Common questions in your role
+
+- **A BOD file didn't arrive by 09:00 — what's my escalation?** → [BOD DAG escalation note](/broking-kyc/operations/integration-dag/bod/) — alternate FTP endpoint, then clearing-corp helpdesk for SPAN files, then DR-site failover.
+- **A peak-margin snapshot was breached — what's the consequence?** → [RMS / SPAN deep-dive](/broking-kyc/deep-dives/trading-day/rms-span-methodology/) penalty section.
+- **A modification request is stuck — where in the chain?** → [Lifecycle modifications — rejection-cascade patterns](/broking-kyc/lifecycle/modifications/#common-rejection-cascade-patterns).
+- **Quarterly running-account settlement is approaching — what's the procedure?** → [Compliance Blueprint client-funds domain](/broking-kyc/operations/compliance-blueprint/#client-funds-21-entries) plus [Broker Process Narrative Section 5](/broking-kyc/broker-process/narrative/#5-recurring-cycles).
+- **A client went dormant and now wants to reactivate — what's required?** → [Lifecycle: Dormancy & Reactivation](/broking-kyc/lifecycle/dormancy-reactivation/).
+- **A death certificate just arrived — what's the transmission procedure?** → [Lifecycle: Transmission](/broking-kyc/lifecycle/transmission/) — 4 sub-cases.
+- **Quarterly BCP drill is next week — what's the scope?** → [BCP / DR Drill deep-dive](/broking-kyc/deep-dives/specialty/bcp-dr-drill/).
+- **A short-delivery happened on a client's sell — what now?** → [Short-Delivery Auction deep-dive](/broking-kyc/deep-dives/trading-day/short-delivery-auction/).
+- **Where are the FIU-IND STR / CTR reporting templates?** → [AML / FIU destination page](/broking-kyc/reference/field-atlas/destinations/aml-fiu/) + [FIU-IND Circulars](/broking-kyc/reference/circulars/fiu-ind/).
+
+## What to skip (and why)
+
+- **All persona pages other than this one** — you don't need them; you handle the cross-cutting view.
+- **Vendor Atlas detailed pages** — backend-engineer territory; you only need to know which vendor categories your firm uses.
+- **Master Dataset, Field Atlas section pages, individual circular sub-pages** — reference material; you'll search them when needed.
+- **Most of the architecture/* pages** — backend-engineer territory.
+
+## When you'd hand off
+
+- **"How do we fix the underlying integration bug?"** → [Backend Engineer reading path](/broking-kyc/personas/backend-engineer/).
+- **"Are we exposed to a particular regulatory action?"** → [Compliance Officer reading path](/broking-kyc/personas/compliance-officer/).
+- **"How much does this incident cost us?"** → [Finance / CFO reading path](/broking-kyc/personas/finance-cfo/).
+- **"Should we onboard this segment?"** → [Product Manager reading path](/broking-kyc/personas/product-manager/) with [Compliance Officer](/broking-kyc/personas/compliance-officer/) sign-off.
+
+## Verified through
+
+2026-05-14
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*
