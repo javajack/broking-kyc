@@ -3,7 +3,9 @@ title: Regulatory Circulars
 description: "Verified index of SEBI / RBI / NPCI / CERSAI / MeitY / FIU-IND / exchange / depository / clearing-corp circulars affecting Indian stock broking, 2020-01-01 to 2026-05-14."
 ---
 
-> **Why this page is structured this way:** Each issuer is dense enough to deserve its own sub-page, so this master page is navigation + highlights + coverage notes. Operators looking for a specific issuer drill into the relevant sub-page; reviewers scanning impact start with the highlight panel; KB users follow the per-issuer counts to gauge coverage.
+> **Who reads this section?** Compliance officers tracking regulatory change. Auditors verifying citations. Engineers checking what's in force. Anyone writing an observation that needs a circular ID. New to the site? Try [Choose Your Role](/broking-kyc/personas/) first.
+
+Each issuer is dense enough to deserve its own sub-page, so this master page is navigation + highlights + coverage notes. Operators looking for a specific issuer drill into the relevant sub-page; reviewers scanning impact start with the highlight panel; KB users follow the per-issuer counts to gauge coverage.
 
 ## TL;DR
 

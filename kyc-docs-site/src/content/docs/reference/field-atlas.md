@@ -3,7 +3,9 @@ title: Field-level Data Flow Atlas
 description: "Bidirectional mapping of every KYC field to its downstream destinations — KRA, CKYC, exchange UCC, depository BO, back-office, RMS, contract notes, regulatory reports, DLT comms, FATCA/CRS, AML/FIU. Browse by section (field-first view) or by destination (system-first view). Includes downloadable master CSV."
 ---
 
-> **Why this page is structured this way:** Two views on the same dataset. Engineers building an integration with a specific destination land here, scan the destination sub-pages, and pull the master CSV for programmatic use. Product / compliance readers scan the per-section sub-pages to see where each onboarded field ends up.
+> **Who reads this section?** Backend engineers building an integration with a specific destination (NSE UCC, NSDL BO, FIU-IND, etc.). Product / compliance readers tracing where each onboarded field ends up. Vendors checking which fields flow through their touchpoint. New to the site? Try [Choose Your Role](/broking-kyc/personas/) first.
+
+Two views on the same dataset. Engineers building an integration with a specific destination land here, scan the destination sub-pages, and pull the master CSV for programmatic use. Product / compliance readers scan the per-section sub-pages to see where each onboarded field ends up.
 
 ## TL;DR
 

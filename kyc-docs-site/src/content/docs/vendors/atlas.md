@@ -3,7 +3,9 @@ title: Vendor Atlas
 description: "Named-product enumeration across the Indian broking technology stack. Real products with positioning, integration shape, pricing shape, and regulatory anchors. Endorsement-free; positions descriptively without ranking."
 ---
 
-> **Why this page is structured this way:** Engineers and architects picking integration partners use this page to see what products exist in each category. Rows are grouped by category so the reader scans their integration surface, then drills into specific products via the linked URLs.
+> **Who reads this section?** Engineers and architects scoping integrations; product managers comparing vendor categories; vendors and integration partners checking how their category is enumerated. New to the site? Try [Choose Your Role](/broking-kyc/personas/) first.
+
+Engineers and architects picking integration partners use this page to see what products exist in each category. Rows are grouped by category so the reader scans their integration surface, then drills into specific products via the linked URLs.
 
 > **Policy note:** This page **names real products** and offers **descriptive positioning** ("dominant in retail back-office", "common AA gateway"). It explicitly avoids **endorsement language** ("best", "top", "leading", "recommended"). All other docs in this site remain vendor-neutral.
 

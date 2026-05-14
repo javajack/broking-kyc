@@ -3,7 +3,9 @@ title: Integration Choreography DAG
 description: Dependency graph for every significant integration call across the six phases of broker operations — onboarding, BOD, trading hours, EOD & settlement, recurring cycles, lifecycle events. ASCII DAGs with per-node detail (idempotency, retry, rollback, SLA, failure surface, spec source).
 ---
 
-> **Why this page is structured this way:** The [Broker Process Narrative](/broking-kyc/broker-process/narrative/) tells the operational story chronologically. The [Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/) inventories what must be done. The [Field-level Data Flow Atlas](/broking-kyc/reference/field-atlas/) maps where each field flows. This page tells **what must run before what** — the orchestration / dependency layer. Each phase has its own page with ASCII DAGs and per-node detail.
+> **Who reads this section?** Backend engineers designing orchestrators or debugging failure modes. Operations leads scoping failure-recovery playbooks. Architects making parallelism decisions. New to the site? Try [Choose Your Role](/broking-kyc/personas/) first.
+
+The [Broker Process Narrative](/broking-kyc/broker-process/narrative/) tells the operational story chronologically. The [Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/) inventories what must be done. The [Field-level Data Flow Atlas](/broking-kyc/reference/field-atlas/) maps where each field flows. This page tells **what must run before what** — the orchestration / dependency layer. Each phase has its own page with ASCII DAGs and per-node detail.
 
 ## TL;DR
 

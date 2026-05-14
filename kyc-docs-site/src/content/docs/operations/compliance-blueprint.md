@@ -3,7 +3,9 @@ title: Compliance Blueprint
 description: "Verified inventory of every operational, one-time, and edge-case compliance touchpoint in Indian stock broking operations. One row per verifiable obligation, with regulator, frequency, owner, trigger, evidence, penalty, and linked circular(s)."
 ---
 
-> **Why this page is structured this way:** Operators come here to find "what must I do, by when, and what evidence proves I did it". Rows are grouped by domain so each ops or compliance function can scan their own bucket. Each row links to the specific circular driving it on the per-issuer sub-pages.
+> **Who reads this section?** Compliance officers signing the half-yearly compliance certificate. Internal and statutory auditors building their checklists. Ops leads slotting recurring items into the master calendar. Regulators verifying the broker's compliance posture. New to the site? Try [Choose Your Role](/broking-kyc/personas/) first.
+
+Operators come here to find "what must I do, by when, and what evidence proves I did it". Rows are grouped by domain so each ops or compliance function can scan their own bucket. Each row links to the specific circular driving it on the per-issuer sub-pages.
 
 ## TL;DR
 
