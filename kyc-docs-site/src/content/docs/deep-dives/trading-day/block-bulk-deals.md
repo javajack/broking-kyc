@@ -10,8 +10,8 @@ import { Aside } from '@astrojs/starlight/components';
 ## TL;DR
 
 - **Block deals** trade in two dedicated daily windows: **morning 08:45–09:00 IST** and **afternoon 14:35–15:05 IST**. Each block deal must clear within the window.
-- Minimum block-deal threshold: **₹10 crore** per trade (the parameter most recently re-iterated via [SEBI/HO/IMD/DOF2/P/CIR/2022/69](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-imd-dof2-p-cir-2022-69)).
-- Price band for block deals: **±1% of the reference price** (LTP at window open or VWAP across a short reference window). ETFs added to block-deal eligibility per [NSE/CMTR/60813](/broking-kyc/reference/circulars/nse/#nse-cmtr-60813) (Feb 2024).
+- Minimum block-deal threshold: **₹10 crore** per trade (the parameter most recently re-iterated via [SEBI/HO/IMD/DOF2/P/CIR/2022/69](/broking-kyc/reference/circulars/sebi-other/#sebihoimddof2pcir202269)).
+- Price band for block deals: **±1% of the reference price** (LTP at window open or VWAP across a short reference window). ETFs added to block-deal eligibility per [NSE/CMTR/60813](/broking-kyc/reference/circulars/nse/#nsecmtr60813) (Feb 2024).
 - **Bulk deals** are continuous-session trades where **a single client buys or sells more than 0.5% of the issued shares of a company in one day**. Bulk deals must be disclosed by the broker post-trade.
 - Post-trade disclosure: **block deals on the same evening**, **bulk deals by 17:00 the same trading day** (per SEBI Master Circular for stock exchanges and clearing corps).
 - Both flows have specific reporting formats — broker submits prescribed CSV / XML files via the exchange member portal.
@@ -39,7 +39,7 @@ Each window operates as a distinct order book — orders entered in the block-de
 
 ### 1.2 Minimum value threshold
 
-Per [SEBI/HO/IMD/DOF2/P/CIR/2022/69](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-imd-dof2-p-cir-2022-69) and prior SEBI block-deal circulars, the minimum threshold is **₹10 crore per trade**. The minimum applies to the total trade value (quantity × price). A trade below ₹10 crore cannot use the block-deal window — it must go through the regular continuous-trading book.
+Per [SEBI/HO/IMD/DOF2/P/CIR/2022/69](/broking-kyc/reference/circulars/sebi-other/#sebihoimddof2pcir202269) and prior SEBI block-deal circulars, the minimum threshold is **₹10 crore per trade**. The minimum applies to the total trade value (quantity × price). A trade below ₹10 crore cannot use the block-deal window — it must go through the regular continuous-trading book.
 
 The threshold has been stable since the framework's evolution; historical changes were upward (from earlier ₹5 crore equivalent threshold to ₹10 crore) in recognition of larger institutional ticket sizes.
 
@@ -67,11 +67,11 @@ The deal is a "block deal" by virtue of being routed through the dedicated windo
 
 ### 1.5 ETF block-deal extension (Feb 2024)
 
-Per [NSE/CMTR/60813](/broking-kyc/reference/circulars/nse/#nse-cmtr-60813) (Feb 2024), ETFs were added to the block-deal-eligible instrument set per [SEBI/HO/IMD/DOF2/P/CIR/2022/69](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-imd-dof2-p-cir-2022-69). Same minimum ₹10 crore threshold, same ±1% price band, same windows. ETFs ≥ ₹25 crore can alternatively use direct redemption / subscription with the AMC.
+Per [NSE/CMTR/60813](/broking-kyc/reference/circulars/nse/#nsecmtr60813) (Feb 2024), ETFs were added to the block-deal-eligible instrument set per [SEBI/HO/IMD/DOF2/P/CIR/2022/69](/broking-kyc/reference/circulars/sebi-other/#sebihoimddof2pcir202269). Same minimum ₹10 crore threshold, same ±1% price band, same windows. ETFs ≥ ₹25 crore can alternatively use direct redemption / subscription with the AMC.
 
 ### 1.6 T+0 block deals
 
-Per [SEBI/HO/MRD/POD-3/P/CIR/2024/172](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-mrd-pod-3-p-cir-2024-172) (Dec 2024), the T+0 expansion (top 500 scrips, effective Jan 31, 2025) includes an **optional block deal window** for T+0. Operational details — exact timing, settlement same evening — are managed per the T+0 framework. Most institutional flows still default to T+1 unless specifically opting into T+0.
+Per [SEBI/HO/MRD/POD-3/P/CIR/2024/172](/broking-kyc/reference/circulars/sebi-other/#sebihomrdpod-3pcir2024172) (Dec 2024), the T+0 expansion (top 500 scrips, effective Jan 31, 2025) includes an **optional block deal window** for T+0. Operational details — exact timing, settlement same evening — are managed per the T+0 framework. Most institutional flows still default to T+1 unless specifically opting into T+0.
 
 ## 2. Block-deal post-trade reporting
 
@@ -121,7 +121,7 @@ The broker's OMS / RMS implements specific pre-trade controls for block-deal ord
 Block deals do not bypass the standard pre-trade gates — they still pass through segment / margin / MWPL / order-type / surveillance gates per the standard pre-trade RMS pipeline (see [OMS internals deep dive](/broking-kyc/deep-dives/trading-day/oms-internals/)).
 
 <Aside type="note">
-**Block-deal margin is full upfront margin like any other CM trade.** The block-deal window doesn't reduce margin requirements; the client must have full SPAN+ELM (or 20% flat alternative per [NSE/INSP/45565](/broking-kyc/reference/circulars/nse/#nse-insp-45565)) margin available at order entry. For ₹100-crore-plus block-deals, this typically translates to ₹15-20 crore margin reservation — institutional clients carry sufficient margin headroom; retail clients almost never participate in block deals.
+**Block-deal margin is full upfront margin like any other CM trade.** The block-deal window doesn't reduce margin requirements; the client must have full SPAN+ELM (or 20% flat alternative per [NSE/INSP/45565](/broking-kyc/reference/circulars/nse/#nseinsp45565)) margin available at order entry. For ₹100-crore-plus block-deals, this typically translates to ₹15-20 crore margin reservation — institutional clients carry sufficient margin headroom; retail clients almost never participate in block deals.
 </Aside>
 
 ## 4. Bulk deals — operational framework
@@ -203,7 +203,7 @@ The exchange's surveillance system monitors bulk deals for:
 A documented manipulation pattern is **front-running or piggy-backing on block deals** — a third party with advance knowledge of the block-deal price / timing trades in the regular continuous session to profit from the inevitable market impact. The exchange's surveillance monitors for this; the broker's institutional-mechanism surveillance (per Chapter IVA) must also detect any internal pattern of employee / authorised-person trades preceding the broker's block-deal clients' trades.
 
 <Aside type="caution">
-**Block-deal-adjacent front-running is one of the most regulator-attention-attracting patterns in surveillance.** The pattern is: an employee or authorised-person learns of an institutional client's pending block deal (informally or via system access) and trades in the regular session to profit from the post-block-deal price move. Detection requires correlating employee / AP trades against client block deals with sub-day time-lags. Brokers must maintain a strict designated-person list, pre-clearance for personal trading, and trading-window-closure mechanisms per the [PIT framework](/broking-kyc/operations/compliance-blueprint/#surveillance-30-entries) row SURVEILLANCE-010.
+**Block-deal-adjacent front-running is one of the most regulator-attention-attracting patterns in surveillance.** The pattern is: an employee or authorised-person learns of an institutional client's pending block deal (informally or via system access) and trades in the regular session to profit from the post-block-deal price move. Detection requires correlating employee / AP trades against client block deals with sub-day time-lags. Brokers must maintain a strict designated-person list, pre-clearance for personal trading, and trading-window-closure mechanisms per the [PIT framework](/broking-kyc/operations/compliance-blueprint/) row SURVEILLANCE-010.
 </Aside>
 
 ## 7. Broker's reporting obligations — consolidated
@@ -242,15 +242,15 @@ The 0.5% bulk-deal threshold is computed across all exchanges where the security
 
 ### 8.5 PIS NRI clients and block / bulk deals
 
-NRI clients via PIS route have additional restrictions (delivery-only, no intraday, separate position limits). Their participation in block deals is permitted but carries the PIS limit / sectoral cap considerations. Post the Sep 2025 CP-code removal ([SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/109](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-p-cir-2025-109)), NRI block-deal handling is direct broker-side.
+NRI clients via PIS route have additional restrictions (delivery-only, no intraday, separate position limits). Their participation in block deals is permitted but carries the PIS limit / sectoral cap considerations. Post the Sep 2025 CP-code removal ([SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/109](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir2025109)), NRI block-deal handling is direct broker-side.
 
 ### 8.6 ETF block deals and direct subscription with AMC
 
-ETFs ≥ ₹25 crore can use direct subscription / redemption with the AMC instead of the block-deal window per [NSE/CMTR/60813](/broking-kyc/reference/circulars/nse/#nse-cmtr-60813). The two routes have different operational paths — direct-subscription bypasses the secondary market entirely; block-deal window is on the secondary market.
+ETFs ≥ ₹25 crore can use direct subscription / redemption with the AMC instead of the block-deal window per [NSE/CMTR/60813](/broking-kyc/reference/circulars/nse/#nsecmtr60813). The two routes have different operational paths — direct-subscription bypasses the secondary market entirely; block-deal window is on the secondary market.
 
 ### 8.7 T+0 block deals are a separate flow
 
-The T+0 optional block-deal window per [SEBI/HO/MRD/POD-3/P/CIR/2024/172](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-mrd-pod-3-p-cir-2024-172) operates on the T+0 expansion (top 500 scrips). Brokers must distinctly flag T+0 block-deal orders in the OMS and route them through the T+0 settlement cycle.
+The T+0 optional block-deal window per [SEBI/HO/MRD/POD-3/P/CIR/2024/172](/broking-kyc/reference/circulars/sebi-other/#sebihomrdpod-3pcir2024172) operates on the T+0 expansion (top 500 scrips). Brokers must distinctly flag T+0 block-deal orders in the OMS and route them through the T+0 settlement cycle.
 
 ### 8.8 Block deals on suspended / GSM-IV / ASM securities
 
@@ -296,7 +296,7 @@ This is `[industry typical]` operational architecture, not a regulatory requirem
 - **Cross-exchange block deals.** A single client may simultaneously execute block deals on NSE and BSE for the same security (e.g., to spread liquidity). Both are separately disclosable.
 - **Anchor-investor lock-in expiry.** The expiry of anchor-investor lock-ins post-IPO often produces clustering of block deals on a specific date. Brokers managing the unwinds typically coordinate block-deal entries across multiple windows.
 - **Promoter sale via OFS.** Offer for Sale (OFS) is a separate mechanism from block deal — promoter sells via the OFS window with its own price-discovery and timing rules. OFS is more flexible than block deals for large promoter stake adjustments.
-- **Block deal across segments?** Block deals are primarily a cash-segment construct. ETF block deals (post Feb 2024 per [NSE/CMTR/60813](/broking-kyc/reference/circulars/nse/#nse-cmtr-60813)) extend the framework to ETFs. F&O has its own large-trade frameworks (negotiated trades) but not a "block-deal" window in the same sense.
+- **Block deal across segments?** Block deals are primarily a cash-segment construct. ETF block deals (post Feb 2024 per [NSE/CMTR/60813](/broking-kyc/reference/circulars/nse/#nsecmtr60813)) extend the framework to ETFs. F&O has its own large-trade frameworks (negotiated trades) but not a "block-deal" window in the same sense.
 - **SLB block deals?** SLB transactions are not block deals; SLB is a separate framework on the SLBS segment.
 - **MTF block deals?** MTF flows are not block deals by definition (MTF is a margin-funded purchase by the broker on the client's behalf). MTF buy-side trades typically use the regular continuous session.
 
@@ -315,17 +315,17 @@ This is `[industry typical]` operational architecture, not a regulatory requirem
 
 - [Integration DAG: Trading hours](/broking-kyc/operations/integration-dag/trading-hours/) — block-deal window detection node (TH-BD-WINDOW) and reporting node (TH-BD-REPORT).
 - [Broker Process Narrative](/broking-kyc/broker-process/narrative/) — Section 2 mentions block-deal windows in narrative.
-- [Compliance Blueprint — Surveillance domain](/broking-kyc/operations/compliance-blueprint/#surveillance-30-entries) — block-deal-window compliance row SURVEILLANCE-019.
-- [Compliance Blueprint — Settlement domain](/broking-kyc/operations/compliance-blueprint/#settlement-22-entries) — block-deal settlement row SETTLEMENT-012.
+- [Compliance Blueprint — Surveillance domain](/broking-kyc/operations/compliance-blueprint/) — block-deal-window compliance row SURVEILLANCE-019.
+- [Compliance Blueprint — Settlement domain](/broking-kyc/operations/compliance-blueprint/) — block-deal settlement row SETTLEMENT-012.
 - [Deep Dive: OMS internals](/broking-kyc/deep-dives/trading-day/oms-internals/) — block-deal pre-trade controls in the OMS.
 - [Deep Dive: SPAN methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/) — block-deal margin requirements (full upfront margin).
 - [Deep Dive: Surveillance, GSM, ASM](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/) — surveillance of block / bulk deals and the PIT framework.
 - [Deep Dive: Short-delivery auction](/broking-kyc/deep-dives/trading-day/short-delivery-auction/) — short-delivery handling applies to block-deal settlement.
 - [Deep Dive: Retail algo framework](/broking-kyc/deep-dives/trading-day/retail-algo-framework/) — algo participation in block-deal windows.
-- [SEBI other circulars — block deal framework](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-imd-dof2-p-cir-2022-69) — [SEBI/HO/IMD/DOF2/P/CIR/2022/69](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-imd-dof2-p-cir-2022-69).
-- [NSE circulars — ETF block-deal extension](/broking-kyc/reference/circulars/nse/#nse-cmtr-60813) — [NSE/CMTR/60813](/broking-kyc/reference/circulars/nse/#nse-cmtr-60813).
-- [SEBI other circulars — T+0 expansion with optional block-deal window](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-mrd-pod-3-p-cir-2024-172) — [SEBI/HO/MRD/POD-3/P/CIR/2024/172](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-mrd-pod-3-p-cir-2024-172).
-- [Vendor Atlas — OMS / Trading Platforms](/broking-kyc/vendors/atlas/#oms-ems-trading-platforms-15-products) — vendor support for institutional block-deal flow.
+- [SEBI other circulars — block deal framework](/broking-kyc/reference/circulars/sebi-other/#sebihoimddof2pcir202269) — [SEBI/HO/IMD/DOF2/P/CIR/2022/69](/broking-kyc/reference/circulars/sebi-other/#sebihoimddof2pcir202269).
+- [NSE circulars — ETF block-deal extension](/broking-kyc/reference/circulars/nse/#nsecmtr60813) — [NSE/CMTR/60813](/broking-kyc/reference/circulars/nse/#nsecmtr60813).
+- [SEBI other circulars — T+0 expansion with optional block-deal window](/broking-kyc/reference/circulars/sebi-other/#sebihomrdpod-3pcir2024172) — [SEBI/HO/MRD/POD-3/P/CIR/2024/172](/broking-kyc/reference/circulars/sebi-other/#sebihomrdpod-3pcir2024172).
+- [Vendor Atlas — OMS / Trading Platforms](/broking-kyc/vendors/atlas/) — vendor support for institutional block-deal flow.
 
 ## Verified through
 

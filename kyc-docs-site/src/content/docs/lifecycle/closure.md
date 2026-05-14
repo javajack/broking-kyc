@@ -127,7 +127,7 @@ Closure touches master-dataset Section Y (Account Lifecycle) primarily, with rev
 
 ## Cross-references
 
-- [Compliance Blueprint — KYC lifecycle domain](/broking-kyc/operations/compliance-blueprint/#kyc-lifecycle-41-entries)
+- [Compliance Blueprint — KYC lifecycle domain](/broking-kyc/operations/compliance-blueprint/)
 - [Integration DAG — closure path](/broking-kyc/operations/integration-dag/lifecycle-events/)
 - [Field Atlas — Section Y (Account Lifecycle)](/broking-kyc/reference/field-atlas/sections/y-account-lifecycle/)
 - [Lifecycle: Re-KYC](./re-kyc/)

@@ -178,7 +178,7 @@ Leegality's Secure Virtual Signature is a non-Aadhaar electronic authentication 
 | SEBI KYC Master Circular | SEBI/HO/MIRSD/MIRSD-SEC-2/P/CIR/2023/168 (Oct 2023) | Aadhaar eSign accepted in lieu of wet signature on KYC documents |
 | SEBI Stock Brokers Master | SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90 (Jun 2025) | eSign provisions for account opening documents |
 | SEBI DDPI Circular | SEBI/HO/MIRSD/DoP/CIR/P/2022/51 (Apr 2022) | DDPI can be digitally signed; replaces POA; requires stamping |
-| SEBI eKYC Notification | [SEBI/HO/MIRSD/DOP/CIR/P/2020/73](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-dop-cir-p-2020-73) (Apr 2020) | eSign + Video KYC for end-to-end digital onboarding |
+| SEBI eKYC Notification | [SEBI/HO/MIRSD/DOP/CIR/P/2020/73](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddopcirp202073) (Apr 2020) | eSign + Video KYC for end-to-end digital onboarding |
 | IT Act 2000, Section 5 | Central legislation | Electronic signatures given legal recognition |
 | e-Authentication Guidelines | CCA, MeitY (May 2019) | Regulatory framework for Aadhaar eSign operations |
 | Gazette Notification | GSR 61(E) (Jan 2015) | Aadhaar eSign added to Schedule II of IT Act |

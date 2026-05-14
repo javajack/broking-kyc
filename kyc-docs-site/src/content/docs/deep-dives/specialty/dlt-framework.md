@@ -498,8 +498,8 @@ A broker's DLT operations team typically tracks:
 ## Cross-references
 
 - [Broker Process Narrative](/broking-kyc/broker-process/narrative/) — Section 1 covers the welcome cascade and DLT-approved template usage; Section 4 covers daily reporting touchpoints including investor servicing communications.
-- [Compliance Blueprint — Investor servicing domain](/broking-kyc/operations/compliance-blueprint/#investor-servicing-15-entries) — investor charter, contract note dispatch obligations that use DLT templates.
-- [Compliance Blueprint — Cyber security domain](/broking-kyc/operations/compliance-blueprint/#cyber-security-27-entries) — CSCRF retention rules apply to DLT logs as part of operational logs.
+- [Compliance Blueprint — Investor servicing domain](/broking-kyc/operations/compliance-blueprint/) — investor charter, contract note dispatch obligations that use DLT templates.
+- [Compliance Blueprint — Cyber security domain](/broking-kyc/operations/compliance-blueprint/) — CSCRF retention rules apply to DLT logs as part of operational logs.
 - [Vendor Atlas — DLT / SMS / WhatsApp category](/broking-kyc/vendors/atlas/#dlt--sms--whatsapp-12-products) — 12 vendor profiles for TMs / BSPs and their DLT capabilities.
 - [SEBI MIRSD Circulars](/broking-kyc/reference/circulars/sebi-mirsd/) — investor-protection master circular covers contract-note dispatch rules.
 - [Lifecycle: Re-KYC](/broking-kyc/lifecycle/re-kyc/) — re-KYC reminder cascade uses DLT-approved templates.

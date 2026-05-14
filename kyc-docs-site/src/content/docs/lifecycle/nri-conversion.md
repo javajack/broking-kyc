@@ -196,7 +196,7 @@ NRI conversion touches sections A (Identity), B (Address), C (Contact), G (Bank 
 
 ## Cross-references
 
-- [Compliance Blueprint — Edge-case compliances (NRI)](/broking-kyc/operations/compliance-blueprint/#edge-case-compliances-30-entries)
+- [Compliance Blueprint — Edge-case compliances (NRI)](/broking-kyc/operations/compliance-blueprint/)
 - [Integration DAG — NRI conversion path](/broking-kyc/operations/integration-dag/lifecycle-events/)
 - [Field Atlas — Section V (NRI-Specific)](/broking-kyc/reference/field-atlas/sections/v-nri-specific/)
 - [Appendix — NRI Deep Dive](/broking-kyc/appendix/nri-deep-dive/) (existing reference for non-conversion NRI specifics)

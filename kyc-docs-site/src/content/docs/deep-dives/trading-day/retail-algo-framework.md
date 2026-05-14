@@ -9,13 +9,13 @@ import { Aside } from '@astrojs/starlight/components';
 
 ## TL;DR
 
-- SEBI's **Safer Participation of Retail Investors in Algorithmic Trading** framework was issued on **4 Feb 2025** ([SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/0000013](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-p-cir-2025-0000013)), originally effective **1 Aug 2025**, subsequently extended via SEBI Jul 2025 timeline extension circular.
-- Implementation forwarded by NSE in a chain: **[NSE/INVG/66524](/broking-kyc/reference/circulars/nse/#nse-invg-66524)** (Feb 5, 2025) → **[NSE/INVG/67858](/broking-kyc/reference/circulars/nse/#nse-invg-67858)** (May 5, 2025) → **[NSE/INVG/69255](/broking-kyc/reference/circulars/nse/#nse-invg-69255)** (Jul 22, 2025), with parallel pre-trade-controls hardening via **[NSE/FAOP/69296](/broking-kyc/reference/circulars/nse/#nse-faop-69296)** (Aug 2025).
-- **Principal-agent model:** Broker acts as **principal**, algo providers / fintechs act as **agents**. Broker is accountable for any algo-misuse via its APIs (per [NSE/INVG/67858](/broking-kyc/reference/circulars/nse/#nse-invg-67858)).
+- SEBI's **Safer Participation of Retail Investors in Algorithmic Trading** framework was issued on **4 Feb 2025** ([SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/0000013](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir20250000013)), originally effective **1 Aug 2025**, subsequently extended via SEBI Jul 2025 timeline extension circular.
+- Implementation forwarded by NSE in a chain: **[NSE/INVG/66524](/broking-kyc/reference/circulars/nse/#nseinvg66524)** (Feb 5, 2025) → **[NSE/INVG/67858](/broking-kyc/reference/circulars/nse/#nseinvg67858)** (May 5, 2025) → **[NSE/INVG/69255](/broking-kyc/reference/circulars/nse/#nseinvg69255)** (Jul 22, 2025), with parallel pre-trade-controls hardening via **[NSE/FAOP/69296](/broking-kyc/reference/circulars/nse/#nsefaop69296)** (Aug 2025).
+- **Principal-agent model:** Broker acts as **principal**, algo providers / fintechs act as **agents**. Broker is accountable for any algo-misuse via its APIs (per [NSE/INVG/67858](/broking-kyc/reference/circulars/nse/#nseinvg67858)).
 - **Algo categorisation:** **white-box** (execution algos, deterministic logic) vs **black-box** (predictive / AI-driven, where logic is not fully transparent).
 - **OPS threshold:** retail API access ≤ **10 orders per second**. Above this, the order flow is treated as algorithmic and must be registered with a unique algo-ID tagged to every order.
-- **Pre-trade controls under [NSE/FAOP/69296](/broking-kyc/reference/circulars/nse/#nse-faop-69296):** Algo Market Order pre-emptive cancellation introduced to prevent runaway market orders; NNF Terminal ID to Algo ID validation enforced.
-- **Audit trail retention:** **5 years** per [NSE/INVG/67858](/broking-kyc/reference/circulars/nse/#nse-invg-67858) — broker traces every algo-tagged order to its registered algo-ID and the API vendor.
+- **Pre-trade controls under [NSE/FAOP/69296](/broking-kyc/reference/circulars/nse/#nsefaop69296):** Algo Market Order pre-emptive cancellation introduced to prevent runaway market orders; NNF Terminal ID to Algo ID validation enforced.
+- **Audit trail retention:** **5 years** per [NSE/INVG/67858](/broking-kyc/reference/circulars/nse/#nseinvg67858) — broker traces every algo-tagged order to its registered algo-ID and the API vendor.
 - **Approval chain:** Algo providers register with their broker; brokers register their empanelled algo / vendor with NSE / BSE / MCX (per exchange); each segment / each algo / each broker requires its own approval.
 - **Vendor-empanelled vs in-house algos:** Both paths exist; empanelled-vendor algos must be in the broker's registered list; in-house algos require broker-level Type-III system audit per [NSE/INSP/64438](/broking-kyc/reference/circulars/nse/) / [NSE/INSP/70900](/broking-kyc/reference/circulars/nse/).
 - **Predecessor frameworks:** 2022–2024 institutional-algo framework provided the foundation (CTCL approval, NNF terminal IDs, Type-III audit cadence); 2025 retail framework is the extension to retail-API access.
@@ -34,7 +34,7 @@ This page covers all of it. For the broader OMS architecture that hosts the algo
 
 ### 1.1 Circular reference
 
-[SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/0000013](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-p-cir-2025-0000013), issued **4 Feb 2025**, titled "Safer participation of retail investors in Algorithmic trading". Originally effective **1 Aug 2025**; extended via SEBI's July 2025 extension circular (effective implementation moved to later date per the extension; check the latest circular for current effective date).
+[SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/0000013](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir20250000013), issued **4 Feb 2025**, titled "Safer participation of retail investors in Algorithmic trading". Originally effective **1 Aug 2025**; extended via SEBI's July 2025 extension circular (effective implementation moved to later date per the extension; check the latest circular for current effective date).
 
 ### 1.2 Core constructs
 
@@ -59,7 +59,7 @@ This concentration of responsibility on the broker is intentional: SEBI's enforc
 
 NSE has issued a sequence of operational circulars implementing the SEBI framework.
 
-### 2.1 [NSE/INVG/66524](/broking-kyc/reference/circulars/nse/#nse-invg-66524) (Feb 5, 2025)
+### 2.1 [NSE/INVG/66524](/broking-kyc/reference/circulars/nse/#nseinvg66524) (Feb 5, 2025)
 
 Forwards the SEBI Feb 4, 2025 circular to NSE members. Establishes the implementation date (originally 1 Aug 2025) and frames the obligations:
 
@@ -69,7 +69,7 @@ Forwards the SEBI Feb 4, 2025 circular to NSE members. Establishes the implement
 - Broker-API-vendor traceability for 5 years,
 - Exchange-approved server hosting.
 
-### 2.2 [NSE/INVG/67858](/broking-kyc/reference/circulars/nse/#nse-invg-67858) (May 5, 2025)
+### 2.2 [NSE/INVG/67858](/broking-kyc/reference/circulars/nse/#nseinvg67858) (May 5, 2025)
 
 Issues detailed implementation standards under para 7(a) of the SEBI circular. The annexure covers:
 
@@ -81,7 +81,7 @@ Issues detailed implementation standards under para 7(a) of the SEBI circular. T
 
 This circular is the operational backbone for the broker's compliance team.
 
-### 2.3 [NSE/INVG/69255](/broking-kyc/reference/circulars/nse/#nse-invg-69255) (Jul 22, 2025)
+### 2.3 [NSE/INVG/69255](/broking-kyc/reference/circulars/nse/#nseinvg69255) (Jul 22, 2025)
 
 Detailed operational modalities for safer retail algorithmic trading following the prior two circulars. Specifies:
 
@@ -92,14 +92,14 @@ Detailed operational modalities for safer retail algorithmic trading following t
 - **Broker accountability framework:** the principal model is operationalised.
 - **API-traceability rules:** every API endpoint must trace back to broker → API vendor → client through a documented chain.
 
-### 2.4 [NSE/FAOP/69296](/broking-kyc/reference/circulars/nse/#nse-faop-69296) (Aug 2025)
+### 2.4 [NSE/FAOP/69296](/broking-kyc/reference/circulars/nse/#nsefaop69296) (Aug 2025)
 
 Strengthens pre-trade risk controls for algorithmic orders. Two key controls:
 
 1. **Algo Market Order pre-emptive cancellation:** Introduced to prevent runaway market orders. The OMS / RMS must implement pre-trade controls to detect and cancel algorithmic market orders that match runaway patterns (high frequency, large notional, deep order book penetration).
 2. **NNF Terminal ID to Algo ID validation:** Every order from an NNF terminal that is algo-flagged must have a valid Algo ID; the validation is enforced at the exchange edge.
 
-Builds on the foundational consolidated NNF circular [NSE/FAOP/21794](/broking-kyc/reference/circulars/nse/) (Sep 28, 2012) on Decision Support Tools and Algorithms. Operates alongside [NSE/INVG/67858](/broking-kyc/reference/circulars/nse/#nse-invg-67858).
+Builds on the foundational consolidated NNF circular [NSE/FAOP/21794](/broking-kyc/reference/circulars/nse/) (Sep 28, 2012) on Decision Support Tools and Algorithms. Operates alongside [NSE/INVG/67858](/broking-kyc/reference/circulars/nse/#nseinvg67858).
 
 ## 3. Broker algo approval
 
@@ -130,7 +130,7 @@ A vendor providing algos for both equity F&O and commodity must register separat
 
 ## 4. Algo categorisation
 
-The Jul 2025 [NSE/INVG/69255](/broking-kyc/reference/circulars/nse/#nse-invg-69255) introduces the operational categorisation.
+The Jul 2025 [NSE/INVG/69255](/broking-kyc/reference/circulars/nse/#nseinvg69255) introduces the operational categorisation.
 
 ### 4.1 White-box (execution algos)
 
@@ -272,7 +272,7 @@ Many brokers operate a hybrid: in-house SOR / execution algos, plus empanelled t
 
 ## 9. Audit trail
 
-Per [NSE/INVG/67858](/broking-kyc/reference/circulars/nse/#nse-invg-67858), the audit trail must capture every algo-tagged order with:
+Per [NSE/INVG/67858](/broking-kyc/reference/circulars/nse/#nseinvg67858), the audit trail must capture every algo-tagged order with:
 
 - Order origination timestamp (microsecond),
 - Algo-ID,
@@ -319,11 +319,11 @@ The Type-III audit covers:
 
 ### 10.3 OTR framework (Jun 2020)
 
-[NSE/SURV/45016](/broking-kyc/reference/circulars/nse/#nse-surv-45016) operationalised SEBI's OTR framework for algo orders. OTR ≥ 2000 on three occasions in rolling 30 days triggers 15-minute cooling-off the next day. This applies to algo orders' contribution to member-level OTR.
+[NSE/SURV/45016](/broking-kyc/reference/circulars/nse/#nsesurv45016) operationalised SEBI's OTR framework for algo orders. OTR ≥ 2000 on three occasions in rolling 30 days triggers 15-minute cooling-off the next day. This applies to algo orders' contribution to member-level OTR.
 
 ### 10.4 NNF Terminal IDs
 
-NNF (Neat Now Final) is NSE's family of trading software variants. Each terminal is registered with an NNF ID. Algo orders must originate from an NNF-registered terminal, with the terminal-to-algo-ID mapping validated at the exchange edge per [NSE/FAOP/69296](/broking-kyc/reference/circulars/nse/#nse-faop-69296).
+NNF (Neat Now Final) is NSE's family of trading software variants. Each terminal is registered with an NNF ID. Algo orders must originate from an NNF-registered terminal, with the terminal-to-algo-ID mapping validated at the exchange edge per [NSE/FAOP/69296](/broking-kyc/reference/circulars/nse/#nsefaop69296).
 
 ### 10.5 Surveillance dashboard for algos
 
@@ -335,19 +335,19 @@ The retail algo framework layered onto this foundation; the OPS threshold, algo-
 
 | Date | Event |
 |---|---|
-| 4 Feb 2025 | SEBI issues [SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/0000013](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-p-cir-2025-0000013) (original effective 1 Aug 2025) |
-| 5 Feb 2025 | NSE forwards via [NSE/INVG/66524](/broking-kyc/reference/circulars/nse/#nse-invg-66524) |
-| 5 May 2025 | NSE issues implementation standards [NSE/INVG/67858](/broking-kyc/reference/circulars/nse/#nse-invg-67858) |
+| 4 Feb 2025 | SEBI issues [SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/0000013](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir20250000013) (original effective 1 Aug 2025) |
+| 5 Feb 2025 | NSE forwards via [NSE/INVG/66524](/broking-kyc/reference/circulars/nse/#nseinvg66524) |
+| 5 May 2025 | NSE issues implementation standards [NSE/INVG/67858](/broking-kyc/reference/circulars/nse/#nseinvg67858) |
 | Jul 2025 | SEBI extends effective date via SEBI/HO/MIRSD/.../2025/108 (extension circular) |
-| 22 Jul 2025 | NSE issues operational modalities [NSE/INVG/69255](/broking-kyc/reference/circulars/nse/#nse-invg-69255) |
-| Aug 2025 | NSE issues pre-trade-controls hardening [NSE/FAOP/69296](/broking-kyc/reference/circulars/nse/#nse-faop-69296) |
+| 22 Jul 2025 | NSE issues operational modalities [NSE/INVG/69255](/broking-kyc/reference/circulars/nse/#nseinvg69255) |
+| Aug 2025 | NSE issues pre-trade-controls hardening [NSE/FAOP/69296](/broking-kyc/reference/circulars/nse/#nsefaop69296) |
 | Ongoing | Periodic clarifications and updates expected |
 
 Brokers should monitor the SEBI / NSE feeds for ongoing implementation updates.
 
 ## 12. The retail-client onboarding-with-algo questionnaire
 
-Per [NSE/INVG/69255](/broking-kyc/reference/circulars/nse/#nse-invg-69255), a specific client questionnaire must be captured when a retail client subscribes to or activates an algo strategy:
+Per [NSE/INVG/69255](/broking-kyc/reference/circulars/nse/#nseinvg69255), a specific client questionnaire must be captured when a retail client subscribes to or activates an algo strategy:
 
 - Disclosure of the algo strategy in plain language,
 - Risk profile of the algo (volatility expectations, drawdown history if available),
@@ -361,7 +361,7 @@ The questionnaire is signed (typically e-Signed) and retained as part of the cli
 
 ## 13. Surveillance overlay on algo flow
 
-The broker's institutional-mechanism surveillance (per Chapter IVA, [SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/96](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-1-p-cir-2024-96)) extends to algo-originated flow:
+The broker's institutional-mechanism surveillance (per Chapter IVA, [SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/96](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-pod-1pcir202496)) extends to algo-originated flow:
 
 - **Spoofing / layering** detection at the algo level — most algos don't intentionally spoof, but a poorly-coded execution algo can mimic spoofing patterns,
 - **OBSM-PNC** monitoring — algos generating high order-modification rates contribute to OBSM-PNC,
@@ -381,9 +381,9 @@ The surveillance team typically has a dedicated algo-monitoring desk for high-OP
 - **Algos placing block-deal orders.** Algo flow can place block-deal orders within the dedicated windows (per [block / bulk deals deep dive](/broking-kyc/deep-dives/trading-day/block-bulk-deals/)). The algo-ID and tag still apply; surveillance for block-deal-adjacent front-running applies.
 - **Algos placing AMOs.** Algo orders captured as AMOs (after-market) follow the standard AMO release flow at pre-open. Algo-ID and tag carry through.
 - **Cross-exchange algo flow.** A single algo strategy can place orders simultaneously on NSE and BSE. Each exchange requires its own algo-ID registration; the broker manages the cross-exchange flow.
-- **Algos in T+0 segment.** T+0 expansion (top 500 scrips per [SEBI/HO/MRD/POD-3/P/CIR/2024/172](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-mrd-pod-3-p-cir-2024-172)) is a separate session; algo orders for T+0 must be tagged for T+0 settlement.
+- **Algos in T+0 segment.** T+0 expansion (top 500 scrips per [SEBI/HO/MRD/POD-3/P/CIR/2024/172](/broking-kyc/reference/circulars/sebi-other/#sebihomrdpod-3pcir2024172)) is a separate session; algo orders for T+0 must be tagged for T+0 settlement.
 - **Algos and MTF.** MTF positions (broker-funded purchases) can be exited via algo orders if the broker permits; the algo flow respects the MTF settlement rules.
-- **Algos handling NRI flow.** Post Sep 2025 CP-code removal ([SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/109](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-p-cir-2025-109)), NRI algo flow routes direct broker-side without CP-code intermediation. NRI segment / PIS restrictions still apply.
+- **Algos handling NRI flow.** Post Sep 2025 CP-code removal ([SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/109](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir2025109)), NRI algo flow routes direct broker-side without CP-code intermediation. NRI segment / PIS restrictions still apply.
 - **Algos on commodity segment.** MCX commodity algos have their own registration path via MCX Inspection; the SEBI framework applies but MCX operational paths differ from NSE.
 - **Algos on SLB segment.** SLB transactions can be algorithm-driven; SLBS framework (per [NCL/CMPT/61810](/broking-kyc/reference/circulars/clearing-corps/) / [NCL/CMPT/67763](/broking-kyc/reference/circulars/clearing-corps/)) interacts with the algo framework.
 - **Algos and pension / mutual-fund clients.** Institutional algo flow (mutual funds executing baskets via VWAP) is governed by the broader institutional algo framework rather than the retail framework; the algo-ID tagging and approval still apply.
@@ -405,15 +405,15 @@ The surveillance team typically has a dedicated algo-monitoring desk for high-OP
 
 - [Integration DAG: Trading hours](/broking-kyc/operations/integration-dag/trading-hours/) — algo-tagged order pre-trade pipeline.
 - [Broker Process Narrative](/broking-kyc/broker-process/narrative/) — Section 2 mentions algo flow briefly in narrative.
-- [Compliance Blueprint — Surveillance domain](/broking-kyc/operations/compliance-blueprint/#surveillance-30-entries) — algo-related rows including SURVEILLANCE-024 (algo static-IP and algo-ID controls).
-- [Compliance Blueprint — Cyber security domain](/broking-kyc/operations/compliance-blueprint/#cyber-security-27-entries) — CYBER-024 broker APIs with OAuth/JWT, rate limiting and WAF.
+- [Compliance Blueprint — Surveillance domain](/broking-kyc/operations/compliance-blueprint/) — algo-related rows including SURVEILLANCE-024 (algo static-IP and algo-ID controls).
+- [Compliance Blueprint — Cyber security domain](/broking-kyc/operations/compliance-blueprint/) — CYBER-024 broker APIs with OAuth/JWT, rate limiting and WAF.
 - [Deep Dive: OMS internals](/broking-kyc/deep-dives/trading-day/oms-internals/) — sibling page on the OMS architecture that hosts algo flow.
 - [Deep Dive: SPAN methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/) — sibling page on margin computation for algo positions.
 - [Deep Dive: Surveillance, GSM, ASM](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/) — sibling page on the surveillance overlay including OTR, OBSM-PNC.
 - [Deep Dive: Block / bulk deals](/broking-kyc/deep-dives/trading-day/block-bulk-deals/) — sibling page on the block-deal window's interaction with algo flow.
 - [Deep Dive: Short-delivery auction](/broking-kyc/deep-dives/trading-day/short-delivery-auction/) — sibling page on settlement consequences.
-- [SEBI MIRSD circulars](/broking-kyc/reference/circulars/sebi-mirsd/) — including [SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/0000013](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-p-cir-2025-0000013).
-- [NSE circulars — INVG and FAOP families](/broking-kyc/reference/circulars/nse/) — including [NSE/INVG/66524](/broking-kyc/reference/circulars/nse/#nse-invg-66524), [NSE/INVG/67858](/broking-kyc/reference/circulars/nse/#nse-invg-67858), [NSE/INVG/69255](/broking-kyc/reference/circulars/nse/#nse-invg-69255), [NSE/FAOP/69296](/broking-kyc/reference/circulars/nse/#nse-faop-69296).
+- [SEBI MIRSD circulars](/broking-kyc/reference/circulars/sebi-mirsd/) — including [SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/0000013](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir20250000013).
+- [NSE circulars — INVG and FAOP families](/broking-kyc/reference/circulars/nse/) — including [NSE/INVG/66524](/broking-kyc/reference/circulars/nse/#nseinvg66524), [NSE/INVG/67858](/broking-kyc/reference/circulars/nse/#nseinvg67858), [NSE/INVG/69255](/broking-kyc/reference/circulars/nse/#nseinvg69255), [NSE/FAOP/69296](/broking-kyc/reference/circulars/nse/#nsefaop69296).
 - [Vendor Atlas — Algo Trading and Strategy Marketplaces](/broking-kyc/vendors/atlas/) — vendor landscape for algo providers (subject to ongoing registration evolution).
 
 ## Verified through

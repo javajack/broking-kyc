@@ -9,13 +9,13 @@ import { Aside } from '@astrojs/starlight/components';
 
 ## TL;DR
 
-- **Three layers** of surveillance run in parallel during the trading day: exchange-side **NORMS** (NSE Online Reporting and Monitoring System) + equivalents at BSE / MCX; clearing-corp-side surveillance margins (ASM-for-spoofing); and broker-side **Chapter IVA** institutional mechanism per [SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/96](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-1-p-cir-2024-96).
-- The consolidated NSE Surveillance & Investigation master, [NSE/SURV/74008](/broking-kyc/reference/circulars/nse/#nse-surv-74008) (Apr 30, 2026), is the operational reference — covering GSM, ASM (Short-term, Long-term), ESM, OTR, RTCM, OBSM-PNC, Position Limits, Cautionary Messages.
+- **Three layers** of surveillance run in parallel during the trading day: exchange-side **NORMS** (NSE Online Reporting and Monitoring System) + equivalents at BSE / MCX; clearing-corp-side surveillance margins (ASM-for-spoofing); and broker-side **Chapter IVA** institutional mechanism per [SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/96](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-pod-1pcir202496).
+- The consolidated NSE Surveillance & Investigation master, [NSE/SURV/74008](/broking-kyc/reference/circulars/nse/#nsesurv74008) (Apr 30, 2026), is the operational reference — covering GSM, ASM (Short-term, Long-term), ESM, OTR, RTCM, OBSM-PNC, Position Limits, Cautionary Messages.
 - **GSM** has 4 stages (I–IV) with progressively stricter trade-restriction: caution → additional surveillance → 100% margin → periodic call auction. **ASM** runs in parallel — Short-term and Long-term — with category-specific thresholds. **ESM** covers SME / micro-cap.
-- **OTR** is the ratio of order events (submission + modification + cancellation) to trades. **OTR ≥ 2000 on three occasions in rolling 30 days triggers a 15-minute order-placement cooling-off the next trading day** per [NSE/SURV/45016](/broking-kyc/reference/circulars/nse/#nse-surv-45016).
+- **OTR** is the ratio of order events (submission + modification + cancellation) to trades. **OTR ≥ 2000 on three occasions in rolling 30 days triggers a 15-minute order-placement cooling-off the next trading day** per [NSE/SURV/45016](/broking-kyc/reference/circulars/nse/#nsesurv45016).
 - **T2T segment** forces gross settlement — no intraday netting; the order-flow path must restrict MIS / intraday product types.
 - **MWPL** (Market-Wide Position Limit) for derivatives — orders that would breach are hard-rejected at the OMS / RMS layer.
-- **Social-media surveillance** per [NSE/INVG/54165](/broking-kyc/reference/circulars/nse/#nse-invg-54165) / [NSE/INVG/54196](/broking-kyc/reference/circulars/nse/#nse-invg-54196) and SEBI January 2025 [SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2025/11](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-1-p-cir-2025-11) — brokers must educate clients, monitor associations, and avoid links with persons engaged in prohibited activities.
+- **Social-media surveillance** per [NSE/INVG/54165](/broking-kyc/reference/circulars/nse/#nseinvg54165) / [NSE/INVG/54196](/broking-kyc/reference/circulars/nse/#nseinvg54196) and SEBI January 2025 [SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2025/11](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-pod-1pcir202511) — brokers must educate clients, monitor associations, and avoid links with persons engaged in prohibited activities.
 - **Chapter IVA** rolls out in stages by client-base size: QSB from Aug 2024; >50K UCC from Jan 2025; 2K–50K UCC from Apr 2025; ≤2K UCC from Apr 2026.
 
 ## Conceptual overview
@@ -24,7 +24,7 @@ The Indian securities surveillance regime is built around three institutions tha
 
 For the broker, the surveillance picture has three operational components. First, **list-driven controls** — GSM, ASM, T2T, ESM, restricted-security lists ingested daily and enforced at the pre-trade RMS gate. Second, **rate-and-ratio controls** — OTR accumulators, OBSM-PNC tracker, position-limit monitoring, all running as background services alongside the trading flow. Third, **pattern-detection** — manipulative-pattern flagging, wash / reversal trade detection, spoofing / layering, front-running, social-media-linked trading patterns — running asynchronously and feeding the EOD surveillance review.
 
-This page is the broker's reference to this stack. For the regulatory grid see [Compliance Blueprint — Surveillance domain](/broking-kyc/operations/compliance-blueprint/#surveillance-30-entries); for the pre-trade integration see [OMS internals deep-dive](/broking-kyc/deep-dives/trading-day/oms-internals/); for the chronological day-view see [Broker Process Narrative Section 2](/broking-kyc/broker-process/narrative/).
+This page is the broker's reference to this stack. For the regulatory grid see [Compliance Blueprint — Surveillance domain](/broking-kyc/operations/compliance-blueprint/); for the pre-trade integration see [OMS internals deep-dive](/broking-kyc/deep-dives/trading-day/oms-internals/); for the chronological day-view see [Broker Process Narrative Section 2](/broking-kyc/broker-process/narrative/).
 
 ## 1. NORMS and the exchange surveillance stack
 
@@ -49,11 +49,11 @@ NORMS-driven actions flow back to members via:
 - **Member portal alerts** — surveillance dashboards reviewed by the broker's surveillance team,
 - **Margin uplifts** — surveillance margin imposed via the clearing corp,
 - **Trade cancellations** — RTCM-flagged trades reversed at the exchange,
-- **Disciplinary actions** — penalties under [NSE/SURV/57315](/broking-kyc/reference/circulars/nse/#nse-surv-57315) penalty grid.
+- **Disciplinary actions** — penalties under [NSE/SURV/57315](/broking-kyc/reference/circulars/nse/#nsesurv57315) penalty grid.
 
 ### 1.2 The NSE Surveillance & Investigation master
 
-The master consolidated circular [NSE/SURV/74008](/broking-kyc/reference/circulars/nse/#nse-surv-74008) (Apr 30, 2026), supersedes [NSE/SURV/61848](/broking-kyc/reference/circulars/nse/#nse-surv-61848) (Apr 2024) and [NSE/SURV/67801](/broking-kyc/reference/circulars/nse/#nse-surv-67801) (Apr 2025), and serves as the single operational reference for the year. It covers:
+The master consolidated circular [NSE/SURV/74008](/broking-kyc/reference/circulars/nse/#nsesurv74008) (Apr 30, 2026), supersedes [NSE/SURV/61848](/broking-kyc/reference/circulars/nse/#nsesurv61848) (Apr 2024) and [NSE/SURV/67801](/broking-kyc/reference/circulars/nse/#nsesurv67801) (Apr 2025), and serves as the single operational reference for the year. It covers:
 
 - Cautionary Messages framework (display-at-order-entry),
 - RTCM (Reversal Trade Cancellation Mechanism),
@@ -85,7 +85,7 @@ Stage I and II are most common; Stage III is reserved for sustained surveillance
 
 ### 2.2 GSM SME
 
-The SME-segment GSM framework was extended via [NSE/SURV/67801](/broking-kyc/reference/circulars/nse/#nse-surv-67801) (Apr 2025) with SME-specific stage criteria. Many SMEs have inherently low liquidity and historic volatility patterns; the SME GSM uses adjusted thresholds rather than the main-board ones.
+The SME-segment GSM framework was extended via [NSE/SURV/67801](/broking-kyc/reference/circulars/nse/#nsesurv67801) (Apr 2025) with SME-specific stage criteria. Many SMEs have inherently low liquidity and historic volatility patterns; the SME GSM uses adjusted thresholds rather than the main-board ones.
 
 ### 2.3 GSM dynamics
 
@@ -109,11 +109,11 @@ ASM entry / exit thresholds are calibrated by NSE / BSE jointly. The criteria ar
 
 ### 3.4 ASM SME
 
-The SME ASM framework, like SME GSM, has SME-specific criteria. Both GSM SME and ASM SME were consolidated under [NSE/SURV/67801](/broking-kyc/reference/circulars/nse/#nse-surv-67801).
+The SME ASM framework, like SME GSM, has SME-specific criteria. Both GSM SME and ASM SME were consolidated under [NSE/SURV/67801](/broking-kyc/reference/circulars/nse/#nsesurv67801).
 
 ## 4. ESM — Enhanced Surveillance Measure
 
-ESM was introduced via [NSE/SURV/56948](/broking-kyc/reference/circulars/nse/#nse-surv-56948) (Jun 2023) as a separate framework for micro-small companies (main-board market cap < ₹500 crore). ESM has Stage I and Stage II:
+ESM was introduced via [NSE/SURV/56948](/broking-kyc/reference/circulars/nse/#nsesurv56948) (Jun 2023) as a separate framework for micro-small companies (main-board market cap < ₹500 crore). ESM has Stage I and Stage II:
 
 - **Stage I** — T+1 settlement-only (no intraday position-taking), 100% upfront margin, no upper-price-band relaxation, restricted intraday product.
 - **Stage II** — adds periodic-call-auction-only restriction in some variants.
@@ -135,7 +135,7 @@ The cumulative effect on retail experience is significant: a T2T security cannot
 
 ### 6.1 OTR definition and formula
 
-Per [NSE/SURV/45016](/broking-kyc/reference/circulars/nse/#nse-surv-45016) (operationalising SEBI [SEBI/HO/MRD1/DSAP/CIR/P/2020/107](/broking-kyc/reference/circulars/sebi-other/) of Jun 24, 2020):
+Per [NSE/SURV/45016](/broking-kyc/reference/circulars/nse/#nsesurv45016) (operationalising SEBI [SEBI/HO/MRD1/DSAP/CIR/P/2020/107](/broking-kyc/reference/circulars/sebi-other/) of Jun 24, 2020):
 
 ```
 OTR = (Order Submissions + Order Modifications + Order Cancellations) / Trades
@@ -161,7 +161,7 @@ Broker-side surveillance therefore typically tracks OTR per client and imposes c
 
 ## 7. Cautionary Messages (CCM)
 
-The Cautionary Messages framework — most recently revised via [NSE/SURV/64402](/broking-kyc/reference/circulars/nse/#nse-surv-64402) (and predecessor circulars NSE/SURV/39327 → /45768 → /53054 → /54513 → /55831 → /57110 → /57778 → /60281 → /60574 → /63563) — produces a daily file `REG_INDDDMMYY.csv` (available at the NSE all-reports endpoint) that the broker's trading software must consume to display scrip-specific cautionary messages at order entry. The categories:
+The Cautionary Messages framework — most recently revised via [NSE/SURV/64402](/broking-kyc/reference/circulars/nse/#nsesurv64402) (and predecessor circulars NSE/SURV/39327 → /45768 → /53054 → /54513 → /55831 → /57110 → /57778 → /60281 → /60574 → /63563) — produces a daily file `REG_INDDDMMYY.csv` (available at the NSE all-reports endpoint) that the broker's trading software must consume to display scrip-specific cautionary messages at order entry. The categories:
 
 - "Under Surveillance & Other actions",
 - "Specific actions" (e.g., "Insurance company"),
@@ -174,7 +174,7 @@ These messages are user-facing: the client placing the order sees the warning be
 
 ## 8. RTCM — Reversal Trade Cancellation Mechanism
 
-Introduced via [NSE/SURV/67801](/broking-kyc/reference/circulars/nse/#nse-surv-67801) (Apr 30, 2025) for Equity and Equity Derivative segments, RTCM is the exchange's automatic mechanism to cancel reversal trades — typically self-trades or near-instantaneous buy-then-sell at the same counterparty.
+Introduced via [NSE/SURV/67801](/broking-kyc/reference/circulars/nse/#nsesurv67801) (Apr 30, 2025) for Equity and Equity Derivative segments, RTCM is the exchange's automatic mechanism to cancel reversal trades — typically self-trades or near-instantaneous buy-then-sell at the same counterparty.
 
 The RTCM detection runs at the exchange; flagged trades are cancelled, and the parties are notified. Repeated RTCM flagging triggers surveillance escalation and additional review under Chapter IVA.
 
@@ -200,7 +200,7 @@ The social-media-driven manipulation pattern — finfluencers (registered or unr
 
 ### 10.1 Original NSE/INVG advisories (Oct 2022)
 
-[NSE/INVG/54165](/broking-kyc/reference/circulars/nse/#nse-invg-54165) (Oct 21, 2022) and [NSE/INVG/54196](/broking-kyc/reference/circulars/nse/#nse-invg-54196) (Oct 25, 2022) directed members to:
+[NSE/INVG/54165](/broking-kyc/reference/circulars/nse/#nseinvg54165) (Oct 21, 2022) and [NSE/INVG/54196](/broking-kyc/reference/circulars/nse/#nseinvg54196) (Oct 25, 2022) directed members to:
 - Educate clients on the risks of unsolicited social-media stock tips,
 - Monitor client trading activity tied to such tips,
 - Report fraudulent finfluencer schemes through SCORES and to NSE Investigation,
@@ -210,7 +210,7 @@ Follow-up circular [NSE/INVG/55766](/broking-kyc/reference/circulars/nse/) (Feb 
 
 ### 10.2 SEBI January 2025 framework
 
-[SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2025/11](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-1-p-cir-2025-11) (Jan 29, 2025) directly bars SEBI-regulated entities and their agents from associating with persons engaged in prohibited activities — typically unregistered finfluencers giving investment recommendations or performance claims.
+[SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2025/11](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-pod-1pcir202511) (Jan 29, 2025) directly bars SEBI-regulated entities and their agents from associating with persons engaged in prohibited activities — typically unregistered finfluencers giving investment recommendations or performance claims.
 
 Permitted exceptions:
 - Limited association for **investor education only**, when the third party does not recommend stocks or claim returns,
@@ -228,7 +228,7 @@ SEBI's broader April 2024 framework (referenced in narrative-level documentation
 
 ## 11. Manipulative trade flagging
 
-The exchange-side surveillance flags several categories of manipulative-trade patterns (continuous in [NSE/SURV/74008](/broking-kyc/reference/circulars/nse/#nse-surv-74008) and Chapter IVA framework):
+The exchange-side surveillance flags several categories of manipulative-trade patterns (continuous in [NSE/SURV/74008](/broking-kyc/reference/circulars/nse/#nsesurv74008) and Chapter IVA framework):
 
 | Pattern | Detection signal | Disposition |
 |---|---|---|
@@ -249,13 +249,13 @@ These flags feed both real-time interventions (margin uplifts, cooling-off, hard
 
 OBSM-PNC — Order-Book Surveillance Measure – Persistent Noise Creators — targets clients (and members) generating excessive order modifications and cancellations without genuine trade intent.
 
-Per [NSE/SURV/52992](/broking-kyc/reference/circulars/nse/#nse-surv-52992) (Aug 26, 2022) revising the criteria from [NSE/SURV/47814](/broking-kyc/reference/circulars/nse/), breaching **99 instances** of the OBSM-PNC criteria on a rolling 20-day basis triggers a **15-minute trading disable at the PAN level** across NSE Equity and Equity Derivative segments simultaneously.
+Per [NSE/SURV/52992](/broking-kyc/reference/circulars/nse/#nsesurv52992) (Aug 26, 2022) revising the criteria from [NSE/SURV/47814](/broking-kyc/reference/circulars/nse/), breaching **99 instances** of the OBSM-PNC criteria on a rolling 20-day basis triggers a **15-minute trading disable at the PAN level** across NSE Equity and Equity Derivative segments simultaneously.
 
 The penalty is PAN-level (not member-level), so a noise-creating client at one broker can be disabled at other brokers also. From the broker's side, the disable is announced via NORMS feeds; the OMS must reject orders for the disabled PAN during the 15-minute window.
 
 ## 13. Client Code Modification (CCM) post-trade
 
-Post-trade client code modification (CCM) — changing the UCC of a trade after execution — is permitted only for genuine errors. The framework per [NSE/INVG/56395](/broking-kyc/reference/circulars/nse/#nse-invg-56395) (Apr 17, 2023):
+Post-trade client code modification (CCM) — changing the UCC of a trade after execution — is permitted only for genuine errors. The framework per [NSE/INVG/56395](/broking-kyc/reference/circulars/nse/#nseinvg56395) (Apr 17, 2023):
 
 - Permitted only for **genuine typing errors among related codes** (e.g., between client and a related family / authorised-person account),
 - Specific penalty grid for each modification,
@@ -266,7 +266,7 @@ CCM used as a substitute for trade reallocation (i.e., as a profit-shifting mech
 
 ## 14. Chapter IVA — broker-institutional-mechanism
 
-[SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/96](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-1-p-cir-2024-96) (Jul 2024) introduced the **Chapter IVA institutional mechanism for fraud and market-abuse detection** — the most consequential broker-side surveillance circular in recent years. Implementation is staggered by broker size:
+[SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/96](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-pod-1pcir202496) (Jul 2024) introduced the **Chapter IVA institutional mechanism for fraud and market-abuse detection** — the most consequential broker-side surveillance circular in recent years. Implementation is staggered by broker size:
 
 | Category | UCC count | Effective from |
 |---|---|---|
@@ -303,7 +303,7 @@ The broker's Chapter IVA surveillance system is an operational stack with severa
 | External reporting integration | SCORES, NORMS, SOR submission flows |
 | Audit trail | Every alert, disposition, and report retained for 5+ years |
 
-Most brokers run a vendor surveillance product (see [Vendor Atlas — Market Surveillance](/broking-kyc/vendors/atlas/#market-surveillance-7-products)) — building the stack in-house is expensive and the rule library benefits from cross-broker pattern data the vendor accumulates.
+Most brokers run a vendor surveillance product (see [Vendor Atlas — Market Surveillance](/broking-kyc/vendors/atlas/)) — building the stack in-house is expensive and the rule library benefits from cross-broker pattern data the vendor accumulates.
 
 ## 16. Restricted-security categories — consolidated view
 
@@ -321,7 +321,7 @@ The OMS / RMS pre-trade gate consults a consolidated restricted-security state p
 | Broker-internal restricted | Per broker compliance policy (designated person blacklist, MOU-restricted) | Broker-internal |
 | MWPL breach approach | Hard-block on derivative orders that breach MWPL | Real-time MWPL feed |
 | Symbol-level suspension | All orders rejected | Exchange suspension file |
-| Stamp-duty insufficient (Dec 2025) | "Overdue – Insufficient Stamp Duty" status for off-market and pledge-invocation per [CDSL/OPS/DP/POLCY/2025/779](/broking-kyc/reference/circulars/cdsl/#cdsl-ops-dp-polcy-2025-779) | Daily CDSL feed |
+| Stamp-duty insufficient (Dec 2025) | "Overdue – Insufficient Stamp Duty" status for off-market and pledge-invocation per [CDSL/OPS/DP/POLCY/2025/779](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolcy2025779) | Daily CDSL feed |
 
 The OMS holds the composite restricted-security state as a lookup keyed by ISIN / symbol. Pre-trade gate `TH-PT-SURV_CHECK` consults this state.
 
@@ -331,7 +331,7 @@ The OMS holds the composite restricted-security state as a lookup keyed by ISIN 
 
 ## 17. Penalty grids
 
-### 17.1 Consolidated surveillance penalty structure — [NSE/SURV/57315](/broking-kyc/reference/circulars/nse/#nse-surv-57315)
+### 17.1 Consolidated surveillance penalty structure — [NSE/SURV/57315](/broking-kyc/reference/circulars/nse/#nsesurv57315)
 
 A confidential investigation-department circular (not in public domain but cited as the operational reference) prescribes per-alert penalty structures based on quantum and quality of alerts. Covers:
 
@@ -347,7 +347,7 @@ The exchange-wide disciplinary grid covers most compliance defects with a slab s
 
 ### 17.3 ASM-for-spoofing margin
 
-5% Additional Surveillance Margin on all open positions in the flagged segment per [NSE/SURV/41107](/broking-kyc/reference/circulars/nse/#nse-surv-41107). This margin is in addition to SPAN+ELM and persists until the surveillance flag is cleared.
+5% Additional Surveillance Margin on all open positions in the flagged segment per [NSE/SURV/41107](/broking-kyc/reference/circulars/nse/#nsesurv41107). This margin is in addition to SPAN+ELM and persists until the surveillance flag is cleared.
 
 ### 17.4 OBSM-PNC
 
@@ -355,7 +355,7 @@ The exchange-wide disciplinary grid covers most compliance defects with a slab s
 
 ### 17.5 OTR breach
 
-15-minute cooling-off at the start of the next trading day per [NSE/SURV/45016](/broking-kyc/reference/circulars/nse/#nse-surv-45016).
+15-minute cooling-off at the start of the next trading day per [NSE/SURV/45016](/broking-kyc/reference/circulars/nse/#nsesurv45016).
 
 ### 17.6 RTCM
 
@@ -408,16 +408,16 @@ The broker's surveillance team typically staffs in shifts that cover at least th
 
 - [Integration DAG: Trading hours](/broking-kyc/operations/integration-dag/trading-hours/) — surveillance OTR accumulator and pattern-flagging nodes.
 - [Broker Process Narrative](/broking-kyc/broker-process/narrative/) — Section 2 covers surveillance start-of-day and real-time surveillance in narrative.
-- [Compliance Blueprint — Surveillance domain](/broking-kyc/operations/compliance-blueprint/#surveillance-30-entries) — the regulatory grid (30 entries) for every surveillance obligation.
+- [Compliance Blueprint — Surveillance domain](/broking-kyc/operations/compliance-blueprint/) — the regulatory grid (30 entries) for every surveillance obligation.
 - [Compliance Blueprint — AML / PMLA domain](/broking-kyc/operations/compliance-blueprint/#aml--pmla--sanctions-25-entries) — STR / suspicious activity reporting interfaces with surveillance.
 - [Deep Dive: OMS internals](/broking-kyc/deep-dives/trading-day/oms-internals/) — surveillance gate is the fifth pre-trade RMS check; sibling page.
 - [Deep Dive: SPAN methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/) — surveillance margin (ASM-for-spoofing) is layered on top of SPAN+ELM.
 - [Deep Dive: Retail algo framework](/broking-kyc/deep-dives/trading-day/retail-algo-framework/) — OTR and algo-tagging interact with surveillance.
 - [Deep Dive: Block / bulk deals](/broking-kyc/deep-dives/trading-day/block-bulk-deals/) — block-deal-window surveillance and post-trade reporting.
 - [Deep Dive: Short-delivery auction](/broking-kyc/deep-dives/trading-day/short-delivery-auction/) — short-delivery patterns feed surveillance.
-- [Vendor Atlas — Market Surveillance](/broking-kyc/vendors/atlas/#market-surveillance-7-products) — vendor surveillance product landscape.
-- [NSE circulars — INVG and SURV families](/broking-kyc/reference/circulars/nse/) — full text of cited circulars including the master [NSE/SURV/74008](/broking-kyc/reference/circulars/nse/#nse-surv-74008).
-- [SEBI MIRSD circulars](/broking-kyc/reference/circulars/sebi-mirsd/) — Chapter IVA circular [SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/96](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-1-p-cir-2024-96) and the Jan 2025 social-media circular [SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2025/11](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-1-p-cir-2025-11).
+- [Vendor Atlas — Market Surveillance](/broking-kyc/vendors/atlas/) — vendor surveillance product landscape.
+- [NSE circulars — INVG and SURV families](/broking-kyc/reference/circulars/nse/) — full text of cited circulars including the master [NSE/SURV/74008](/broking-kyc/reference/circulars/nse/#nsesurv74008).
+- [SEBI MIRSD circulars](/broking-kyc/reference/circulars/sebi-mirsd/) — Chapter IVA circular [SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/96](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-pod-1pcir202496) and the Jan 2025 social-media circular [SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2025/11](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-pod-1pcir202511).
 
 ## Verified through
 

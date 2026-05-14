@@ -9,7 +9,7 @@ import { Aside } from '@astrojs/starlight/components';
 
 ## TL;DR
 
-- **SEBI registration** for a stockbroker is structured as a **5-year block fee cycle** under the SEBI fee regime since 1 April 2007, consolidated under the SEBI Stock Broker Master Circular ([SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-pod-1-p-cir-2025-94)) and confirmed under SEBI (Stock Brokers) Regulations 2026 ([SEBI/LAD-NRO/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebi-lad-nro-gn-2026-291)).
+- **SEBI registration** for a stockbroker is structured as a **5-year block fee cycle** under the SEBI fee regime since 1 April 2007, consolidated under the SEBI Stock Broker Master Circular ([SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir202594)) and confirmed under SEBI (Stock Brokers) Regulations 2026 ([SEBI/LAD-NRO/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebilad-nrogn2026291)).
 - **Exchange membership** at NSE / BSE / MCX is renewed annually through exchange-specific fee cycles, evidenced via the exchange's online filing modules (ENIT for NSE, BEFS for BSE, MCX Member Portal for MCX).
 - **Clearing-corporation membership** (NSCCL / ICCL / MCXCCL) is a separate track from exchange membership; clearing rights must be renewed independently per CC byelaws.
 - **Renewal attestations** consolidate confirmations from upstream compliance tracks: half-yearly networth certificate, BMC compliance, fit-and-proper declarations, KMP roster, NISM-certificate validity, advertisement-approval register, compliance certificate, internal audit report.
@@ -29,7 +29,7 @@ The four cycles intersect at renewal time:
 1. **SEBI 5-year block fee cycle** — periodic fee paid to SEBI; receipt evidences continuing registration.
 2. **Exchange annual subscription** — paid to each exchange where the broker is a member; covers infrastructure, surveillance, regulatory oversight at that exchange.
 3. **Clearing-corp annual subscription** — paid to each clearing corp where the broker is a clearing member or self-clears; covers clearing-and-settlement infrastructure.
-4. **Authorised Person (AP) annual fee** — Rs.5,000 per AP per year under [NSE/COMP/63628](/broking-kyc/reference/circulars/nse/#nse-comp-63628) (the joint-exchange AP framework, with FY 2024-25 fee rate set in NSE/COMP/60859); paid by the broker on behalf of each registered AP.
+4. **Authorised Person (AP) annual fee** — Rs.5,000 per AP per year under [NSE/COMP/63628](/broking-kyc/reference/circulars/nse/#nsecomp63628) (the joint-exchange AP framework, with FY 2024-25 fee rate set in NSE/COMP/60859); paid by the broker on behalf of each registered AP.
 
 This page covers all four cycles, the attestations that go with them, the prerequisite cycles that must close before renewal can be filed, and the consequences of late or missing renewal.
 
@@ -41,7 +41,7 @@ This page covers all four cycles, the attestations that go with them, the prereq
 
 ### Mechanics
 
-Per the SEBI Stock Broker Master Circular ([SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-pod-1-p-cir-2025-94)) and the SEBI (Stock Brokers) Regulations 2026 ([SEBI/LAD-NRO/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebi-lad-nro-gn-2026-291)), brokers registered with SEBI hold permanent registration subject to periodic fee payment in 5-year blocks. The broker pays the prescribed fee at the start of each block; receipt issued by SEBI evidences continuing registration.
+Per the SEBI Stock Broker Master Circular ([SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir202594)) and the SEBI (Stock Brokers) Regulations 2026 ([SEBI/LAD-NRO/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebilad-nrogn2026291)), brokers registered with SEBI hold permanent registration subject to periodic fee payment in 5-year blocks. The broker pays the prescribed fee at the start of each block; receipt issued by SEBI evidences continuing registration.
 
 The fee schedule is set by SEBI from time to time, segment-wise (Cash, F&O, CD, COM, IRD, Debt), and varies by membership category. The fee is calibrated to the broker's turnover and exposure pattern, with floor-and-cap bands.
 
@@ -56,10 +56,10 @@ The fee schedule is set by SEBI from time to time, segment-wise (Cash, F&O, CD, 
 Receipt of the fee does not, on its own, keep the registration alive. The broker must also satisfy continuing obligations:
 
 - Fit-and-proper of broker, directors, KMPs, senior management — see [fit-and-proper deep dive](/broking-kyc/deep-dives/member-compliance/fit-and-proper/).
-- Minimum networth — Rs.3 crore base + variable per [SEBI/LAD-NRO/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebi-lad-nro-gn-2026-291).
+- Minimum networth — Rs.3 crore base + variable per [SEBI/LAD-NRO/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebilad-nrogn2026291).
 - BMC at the clearing corp — see [BMC / ABC deep dive](/broking-kyc/deep-dives/member-compliance/bmc-abc/).
-- Half-yearly compliance certificate to SEBI — see [CYC-HY-COMPLIANCE_CERT](/broking-kyc/operations/integration-dag/recurring-cycles/#per-node-detail).
-- Half-yearly internal audit report — see [audit cycles in Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/#audit-cycles-21-entries).
+- Half-yearly compliance certificate to SEBI — see [CYC-HY-COMPLIANCE_CERT](/broking-kyc/operations/integration-dag/recurring-cycles/).
+- Half-yearly internal audit report — see [audit cycles in Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/).
 
 A serious shortfall in any of these — even without missing the 5-year fee — can trigger SEBI enforcement action, including registration suspension or cancellation. The fee receipt is necessary but not sufficient.
 
@@ -88,23 +88,23 @@ Each active segment carries a separate annual fee component. The cumulative fee 
 
 NSE renewal consolidates the following attestations into a single annual filing:
 
-1. **Networth certificate** — most recent half-yearly statutory-auditor-signed networth certificate. Per [NSE/COMP/64293](/broking-kyc/reference/circulars/nse/#nse-comp-64293), filed via ENIT-NEW-COMPLIANCE (Oct 31 for MTF members, Nov 30 for others for September-end half-year).
+1. **Networth certificate** — most recent half-yearly statutory-auditor-signed networth certificate. Per [NSE/COMP/64293](/broking-kyc/reference/circulars/nse/#nsecomp64293), filed via ENIT-NEW-COMPLIANCE (Oct 31 for MTF members, Nov 30 for others for September-end half-year).
 2. **BMC compliance** — most recent BMC deposit confirmation from NSCCL (and ICCL if BSE membership; MCXCCL if MCX; etc.).
-3. **Fit-and-proper declarations** — current annual fit-and-proper attestations from broker, directors, KMPs, senior management ([CYC-AN-FIT_PROPER](/broking-kyc/operations/integration-dag/recurring-cycles/#per-node-detail)).
-4. **KMP roster current** — current Compliance Officer, Principal Officer, Designated Director, MD / CEO, Whole-time Director, CFO, CS, with their NISM certifications attached. Confirmation per [NSE/COMP/56766](/broking-kyc/reference/circulars/nse/#nse-comp-56766).
-5. **NISM-certified roles current** — Compliance Officer NISM Series III-A; Principal Officer NISM Series I / VII; Authorised Persons and Dealers NISM Series VIII. See [MEMBER-COMP-006 / 007 / 008 / 010](/broking-kyc/operations/compliance-blueprint/#member-compliance-23-entries).
-6. **Authorised Person register** — current AP roster with NISM certificate copies and AP annual fee evidence (Rs.5,000 per AP per year per [NSE/COMP/60859](/broking-kyc/reference/circulars/nse/#nse-comp-60859) for FY 2024-25 rate). See AP framework deep dive at [/broking-kyc/deep-dives/compliance-audit/ap-framework/](/broking-kyc/deep-dives/compliance-audit/ap-framework/).
-7. **Advertisement approval register** — current list of approved advertisements; this aligns with [MEMBER-COMP-015](/broking-kyc/operations/compliance-blueprint/#member-compliance-23-entries) and the NSE advertisement-approval framework under [NSE/INSP/66284](/broking-kyc/reference/circulars/nse/#nse-insp-66284) and [NSE/INSP/63425](/broking-kyc/reference/circulars/nse/#nse-insp-63425).
+3. **Fit-and-proper declarations** — current annual fit-and-proper attestations from broker, directors, KMPs, senior management ([CYC-AN-FIT_PROPER](/broking-kyc/operations/integration-dag/recurring-cycles/)).
+4. **KMP roster current** — current Compliance Officer, Principal Officer, Designated Director, MD / CEO, Whole-time Director, CFO, CS, with their NISM certifications attached. Confirmation per [NSE/COMP/56766](/broking-kyc/reference/circulars/nse/#nsecomp56766).
+5. **NISM-certified roles current** — Compliance Officer NISM Series III-A; Principal Officer NISM Series I / VII; Authorised Persons and Dealers NISM Series VIII. See [MEMBER-COMP-006 / 007 / 008 / 010](/broking-kyc/operations/compliance-blueprint/).
+6. **Authorised Person register** — current AP roster with NISM certificate copies and AP annual fee evidence (Rs.5,000 per AP per year per [NSE/COMP/60859](/broking-kyc/reference/circulars/nse/#nsecomp60859) for FY 2024-25 rate). See AP framework deep dive at [/broking-kyc/deep-dives/compliance-audit/ap-framework/](/broking-kyc/deep-dives/compliance-audit/ap-framework/).
+7. **Advertisement approval register** — current list of approved advertisements; this aligns with [MEMBER-COMP-015](/broking-kyc/operations/compliance-blueprint/) and the NSE advertisement-approval framework under [NSE/INSP/66284](/broking-kyc/reference/circulars/nse/#nseinsp66284) and [NSE/INSP/63425](/broking-kyc/reference/circulars/nse/#nseinsp63425).
 8. **Half-yearly compliance certificate** — most recent compliance certificate signed by the Compliance Officer attesting to SEBI / exchange / depository compliance.
 9. **Half-yearly internal audit report** — most recent internal audit report (signed by the appointed CA firm).
 10. **Annual statutory audit report** — most recent annual audit by an independent CA firm.
-11. **CSCRF cyber audit confirmation** — most recent cyber audit per the broker's CSCRF category under [SEBI/HO/MIRSD/CIR/PoD-1/P/CIR/2024/113](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-cir-pod-1-p-cir-2024-113) (annual or biennial depending on category).
+11. **CSCRF cyber audit confirmation** — most recent cyber audit per the broker's CSCRF category under [SEBI/HO/MIRSD/CIR/PoD-1/P/CIR/2024/113](/broking-kyc/reference/circulars/sebi-mirsd/) (annual or biennial depending on category).
 12. **System audit confirmation** — most recent system audit (every 2 years).
 13. **KRA audit confirmation** — most recent annual KRA process audit.
 14. **DP audit confirmation** — most recent annual DP audit (if applicable).
 15. **No-action declaration** — confirmation that no SEBI / exchange / depository action is pending against the broker or directors that would impair fit-and-proper.
-16. **Branch / AP location master** — current branch / AP location roster per [MEMBER-COMP-022](/broking-kyc/operations/compliance-blueprint/#member-compliance-23-entries).
-17. **Office infrastructure** — confirmation of premises and supervisory presence per [MEMBER-COMP-023](/broking-kyc/operations/compliance-blueprint/#member-compliance-23-entries).
+16. **Branch / AP location master** — current branch / AP location roster per [MEMBER-COMP-022](/broking-kyc/operations/compliance-blueprint/).
+17. **Office infrastructure** — confirmation of premises and supervisory presence per [MEMBER-COMP-023](/broking-kyc/operations/compliance-blueprint/).
 
 The attestations are the operational evidence that the *continuing* obligations have been met during the year. Renewal is therefore the consolidation of upstream cycles.
 
@@ -113,10 +113,10 @@ The attestations are the operational evidence that the *continuing* obligations 
 | Component | Indicative fee | Notes |
 |---|---|---|
 | Subscription fee | Variable by segment | Set annually by NSE in member circulars |
-| Authorised Person AMC | Rs.5,000 per AP per year | Per [NSE/COMP/60859](/broking-kyc/reference/circulars/nse/#nse-comp-60859) FY 2024-25; subject to revision |
-| Late-renewal fee | Per [NSE/INSP/53530](/broking-kyc/reference/circulars/nse/#nse-insp-53530) penalty matrix | Daily penalty + escalation |
+| Authorised Person AMC | Rs.5,000 per AP per year | Per [NSE/COMP/60859](/broking-kyc/reference/circulars/nse/#nsecomp60859) FY 2024-25; subject to revision |
+| Late-renewal fee | Per [NSE/INSP/53530](/broking-kyc/reference/circulars/nse/#nseinsp53530) penalty matrix | Daily penalty + escalation |
 
-Members operating in multiple segments cumulate the per-segment subscription fees. The Investor Protection Fund (IPF) contribution and the Core SGF contribution are separate cycles ([CLIENT-FUNDS-019](/broking-kyc/operations/compliance-blueprint/#client-funds-21-entries) and [SETTLEMENT-008](/broking-kyc/operations/compliance-blueprint/#settlement-22-entries)).
+Members operating in multiple segments cumulate the per-segment subscription fees. The Investor Protection Fund (IPF) contribution and the Core SGF contribution are separate cycles ([CLIENT-FUNDS-019](/broking-kyc/operations/compliance-blueprint/) and [SETTLEMENT-008](/broking-kyc/operations/compliance-blueprint/)).
 
 ### Timing
 
@@ -144,7 +144,7 @@ For brokers who are members of both NSE and BSE (the majority of retail brokers)
 
 ### Mechanics
 
-MCX membership covers commodity derivatives (COM). Trading and clearing rights are governed by MCX Bye-Laws and Business Rules, most recently amended via [MCX/MEM/105/2026](/broking-kyc/reference/circulars/mcx/#mcx-mem-105-2026) (effective 2 March 2026). Renewal is annual via the MCX Member Portal.
+MCX membership covers commodity derivatives (COM). Trading and clearing rights are governed by MCX Bye-Laws and Business Rules, most recently amended via [MCX/MEM/105/2026](/broking-kyc/reference/circulars/mcx/#mcxmem1052026) (effective 2 March 2026). Renewal is annual via the MCX Member Portal.
 
 ### Attestations
 
@@ -157,7 +157,7 @@ MCX-specific items include:
 
 ### Six-month grace period for new admissions
 
-Under [MCX/MEM/105/2026](/broking-kyc/reference/circulars/mcx/#mcx-mem-105-2026), newly admitted MCX members have a **six-month grace period** to put deposit and operational infrastructure in place. Beyond the grace period, a late fee of Rs.10,000 per month accrues (capped at Rs.1,20,000 over 12 months); persistent default risks cancellation of the membership application. This grace period operates within the renewal framework for new members only; existing members are on the standard annual renewal cycle.
+Under [MCX/MEM/105/2026](/broking-kyc/reference/circulars/mcx/#mcxmem1052026), newly admitted MCX members have a **six-month grace period** to put deposit and operational infrastructure in place. Beyond the grace period, a late fee of Rs.10,000 per month accrues (capped at Rs.1,20,000 over 12 months); persistent default risks cancellation of the membership application. This grace period operates within the renewal framework for new members only; existing members are on the standard annual renewal cycle.
 
 ### Reporting Portal / Annual Returns
 
@@ -173,9 +173,9 @@ Clearing-corp membership at NSCCL / ICCL / MCXCCL is **separate** from exchange 
 
 Clearing-corp membership has its own:
 
-- **Capital requirements** — TM CUSPA, CM CUSPA, TM CSMFA accounts under [NCL/CMPT/63669](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-63669) for direct-payout framework.
+- **Capital requirements** — TM CUSPA, CM CUSPA, TM CSMFA accounts under [NCL/CMPT/63669](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt63669) for direct-payout framework.
 - **BMC at CC** — clearing-side base minimum capital, parallel to but separate from the trading-side BMC at the exchange.
-- **Core SGF contribution** — quarterly contribution per [NCL/CMPT/61800](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-61800) and [NCL/CMPT/61801](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-61801).
+- **Core SGF contribution** — quarterly contribution per [NCL/CMPT/61800](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt61800) and [NCL/CMPT/61801](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt61801).
 - **Annual subscription fee** — paid to the CC.
 
 The CC renewal cycle typically aligns with the exchange cycle but is filed separately on the CC member portal. Failure to renew CC membership while exchange membership continues results in the broker being trading-active but clearing-inactive — the broker cannot self-settle and must use a PCM, which is operationally significant.
@@ -203,14 +203,14 @@ Most large brokers operate a renewal-cycle calendar that links upstream cycles t
 This calendar is an operational scaffold — actual dates shift with circular updates and exchange-specific cycle revisions. The compliance officer should maintain the calendar with explicit cross-links to the prerequisite cycles and the renewal filing.
 
 <Aside type="caution">
-**Renewal is the most-frequently-deficient compliance event in SEBI / exchange inspections.** Inspectors specifically test whether (a) prerequisite cycles closed cleanly, (b) all attestations are current at renewal date, (c) NISM certifications have not lapsed, (d) fit-and-proper declarations are recent. Deficiencies surface as inspection findings under [NSE/INSP/53530](/broking-kyc/reference/circulars/nse/#nse-insp-53530); penalties scale with the severity and recurrence of the deficiency.
+**Renewal is the most-frequently-deficient compliance event in SEBI / exchange inspections.** Inspectors specifically test whether (a) prerequisite cycles closed cleanly, (b) all attestations are current at renewal date, (c) NISM certifications have not lapsed, (d) fit-and-proper declarations are recent. Deficiencies surface as inspection findings under [NSE/INSP/53530](/broking-kyc/reference/circulars/nse/#nseinsp53530); penalties scale with the severity and recurrence of the deficiency.
 </Aside>
 
 ## Late renewal consequences
 
 ### Stage 1 — Late fee
 
-A renewal filed beyond the prescribed window attracts a late fee per the exchange's penalty matrix. For NSE, the matrix is [NSE/INSP/53530](/broking-kyc/reference/circulars/nse/#nse-insp-53530); BSE and MCX have parallel matrices. Late fees are typically a daily accrual capped at a maximum.
+A renewal filed beyond the prescribed window attracts a late fee per the exchange's penalty matrix. For NSE, the matrix is [NSE/INSP/53530](/broking-kyc/reference/circulars/nse/#nseinsp53530); BSE and MCX have parallel matrices. Late fees are typically a daily accrual capped at a maximum.
 
 ### Stage 2 — Trading restrictions
 
@@ -254,11 +254,11 @@ An adverse action that surfaces during the renewal window (e.g., SEBI initiates 
 
 ### MTF-specific renewal flags
 
-Members offering Margin Trading Facility (MTF) have an earlier networth-certificate deadline (Oct 31 instead of Nov 30 for September half-year per [NSE/COMP/64293](/broking-kyc/reference/circulars/nse/#nse-comp-64293)) and additional capital-adequacy attestations. The MTF endorsement is reconfirmed at each renewal.
+Members offering Margin Trading Facility (MTF) have an earlier networth-certificate deadline (Oct 31 instead of Nov 30 for September half-year per [NSE/COMP/64293](/broking-kyc/reference/circulars/nse/#nsecomp64293)) and additional capital-adequacy attestations. The MTF endorsement is reconfirmed at each renewal.
 
 ### Authorised Person renewal failure cascade
 
-Each AP carries its own annual renewal (Rs.5,000 AMC per [NSE/COMP/63628](/broking-kyc/reference/circulars/nse/#nse-comp-63628) — joint-exchange AP supervisory framework). Failure to renew an AP results in that AP's deactivation, not the broker's. However, persistent AP-renewal failures are a member-supervisory finding under the AP framework.
+Each AP carries its own annual renewal (Rs.5,000 AMC per [NSE/COMP/63628](/broking-kyc/reference/circulars/nse/#nsecomp63628) — joint-exchange AP supervisory framework). Failure to renew an AP results in that AP's deactivation, not the broker's. However, persistent AP-renewal failures are a member-supervisory finding under the AP framework.
 
 ### Bank-CM and Non-Bank-CM differences
 
@@ -294,27 +294,27 @@ A broker that is under suspension at the renewal date faces a complex renewal �
 
 ## Cross-references
 
-- [Compliance Blueprint — Member compliance (23 entries)](/broking-kyc/operations/compliance-blueprint/#member-compliance-23-entries) — MEMBER-COMP-020 (SEBI / exchange registration renewal), MEMBER-COMP-021 (AP renewal), MEMBER-COMP-001 / 002 (networth), MEMBER-COMP-005 (continuing fit-and-proper).
-- [Compliance Blueprint — Client funds (21 entries)](/broking-kyc/operations/compliance-blueprint/#client-funds-21-entries) — CLIENT-FUNDS-007 / 008 / 009 (networth, BMC, ABC) as prerequisites.
-- [Compliance Blueprint — Reporting cadences (40 entries)](/broking-kyc/operations/compliance-blueprint/#reporting-cadences-40-entries) — REPORTING-023 (networth disclosure), REPORTING-033 (KMP roster).
-- [Compliance Blueprint — Settlement (22 entries)](/broking-kyc/operations/compliance-blueprint/#settlement-22-entries) — SETTLEMENT-008 (Core SGF contribution).
+- [Compliance Blueprint — Member compliance (23 entries)](/broking-kyc/operations/compliance-blueprint/) — MEMBER-COMP-020 (SEBI / exchange registration renewal), MEMBER-COMP-021 (AP renewal), MEMBER-COMP-001 / 002 (networth), MEMBER-COMP-005 (continuing fit-and-proper).
+- [Compliance Blueprint — Client funds (21 entries)](/broking-kyc/operations/compliance-blueprint/) — CLIENT-FUNDS-007 / 008 / 009 (networth, BMC, ABC) as prerequisites.
+- [Compliance Blueprint — Reporting cadences (40 entries)](/broking-kyc/operations/compliance-blueprint/) — REPORTING-023 (networth disclosure), REPORTING-033 (KMP roster).
+- [Compliance Blueprint — Settlement (22 entries)](/broking-kyc/operations/compliance-blueprint/) — SETTLEMENT-008 (Core SGF contribution).
 - [BMC / ABC deep dive](/broking-kyc/deep-dives/member-compliance/bmc-abc/) — prerequisite for the BMC attestation in renewal.
 - [Fit-and-proper deep dive](/broking-kyc/deep-dives/member-compliance/fit-and-proper/) — prerequisite for fit-and-proper attestation.
 - [KMP changes deep dive](/broking-kyc/deep-dives/member-compliance/kmp-changes/) — current-KMP roster as renewal input.
 - [ECN and investor servicing deep dive](/broking-kyc/deep-dives/member-compliance/ecn-investor-servicing/) — investor-servicing attestations bundled into renewal.
 - [Authorised Person framework deep dive](/broking-kyc/deep-dives/compliance-audit/ap-framework/) — AP renewal track.
-- [Recurring cycles — CYC-AN-MEMBERSHIP](/broking-kyc/operations/integration-dag/recurring-cycles/#per-node-detail) — node in the cadence DAG; depends on networth + fit-and-proper, blocks nothing (terminal node).
-- [Broker process narrative — Section 5 Annual cycles](/broking-kyc/broker-process/narrative/#5-recurring-cycles) — narrative context.
-- [SEBI (Stock Brokers) Regulations 2026 — SEBI/LAD-NRO/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebi-lad-nro-gn-2026-291) — primary Regulation effective 7 January 2026.
-- [SEBI Stock Broker Master Circular — SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-pod-1-p-cir-2025-94) — operational compliance master.
-- [NSE half-yearly networth — NSE/COMP/64293](/broking-kyc/reference/circulars/nse/#nse-comp-64293) — networth attestation timing and channel.
-- [NSE KMP intimation — NSE/COMP/56766](/broking-kyc/reference/circulars/nse/#nse-comp-56766) — KMP roster maintenance.
-- [NSE AP framework — NSE/COMP/63628](/broking-kyc/reference/circulars/nse/#nse-comp-63628) — joint-exchange AP supervisory framework with annual AMC.
-- [NSE AP AMC FY 2024-25 — NSE/COMP/60859](/broking-kyc/reference/circulars/nse/#nse-comp-60859) — Rs.5,000 per AP per year fee rate.
-- [NSE inspection penalty grid — NSE/INSP/53530](/broking-kyc/reference/circulars/nse/#nse-insp-53530) — late-renewal penalty matrix.
-- [MCX framework — MCX/MEM/105/2026](/broking-kyc/reference/circulars/mcx/#mcx-mem-105-2026) — MCX membership rules with grace-period and late-fee regime.
-- [NSCCL Cash Segment Consolidated Circular — NCL/CMPT/61800](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-61800) — clearing-corp framework underlying CC renewal.
-- [NSCCL F&O Consolidated Circular — NCL/CMPT/61801](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-61801) — F&O CC framework.
+- [Recurring cycles — CYC-AN-MEMBERSHIP](/broking-kyc/operations/integration-dag/recurring-cycles/) — node in the cadence DAG; depends on networth + fit-and-proper, blocks nothing (terminal node).
+- [Broker process narrative — Section 5 Annual cycles](/broking-kyc/broker-process/narrative/) — narrative context.
+- [SEBI (Stock Brokers) Regulations 2026 — SEBI/LAD-NRO/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebilad-nrogn2026291) — primary Regulation effective 7 January 2026.
+- [SEBI Stock Broker Master Circular — SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir202594) — operational compliance master.
+- [NSE half-yearly networth — NSE/COMP/64293](/broking-kyc/reference/circulars/nse/#nsecomp64293) — networth attestation timing and channel.
+- [NSE KMP intimation — NSE/COMP/56766](/broking-kyc/reference/circulars/nse/#nsecomp56766) — KMP roster maintenance.
+- [NSE AP framework — NSE/COMP/63628](/broking-kyc/reference/circulars/nse/#nsecomp63628) — joint-exchange AP supervisory framework with annual AMC.
+- [NSE AP AMC FY 2024-25 — NSE/COMP/60859](/broking-kyc/reference/circulars/nse/#nsecomp60859) — Rs.5,000 per AP per year fee rate.
+- [NSE inspection penalty grid — NSE/INSP/53530](/broking-kyc/reference/circulars/nse/#nseinsp53530) — late-renewal penalty matrix.
+- [MCX framework — MCX/MEM/105/2026](/broking-kyc/reference/circulars/mcx/#mcxmem1052026) — MCX membership rules with grace-period and late-fee regime.
+- [NSCCL Cash Segment Consolidated Circular — NCL/CMPT/61800](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt61800) — clearing-corp framework underlying CC renewal.
+- [NSCCL F&O Consolidated Circular — NCL/CMPT/61801](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt61801) — F&O CC framework.
 
 ## Verified through
 

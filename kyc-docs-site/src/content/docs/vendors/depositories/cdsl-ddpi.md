@@ -17,7 +17,7 @@ DDPI was introduced through a series of SEBI circulars:
 
 | Circular | Date | Subject |
 |----------|------|---------|
-| [SEBI/HO/MIRSD/DoP/P/CIR/2022/44](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-dop-p-cir-2022-44) | April 4, 2022 | Initial DDPI framework for settlement delivery + pledge/re-pledge |
+| [SEBI/HO/MIRSD/DoP/P/CIR/2022/44](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddoppcir202244) | April 4, 2022 | Initial DDPI framework for settlement delivery + pledge/re-pledge |
 | SEBI/HO/MIRSD/DoP/P/CIR/2022/119 | June 2022 | Implementation extension |
 | SEBI/HO/MIRSD-PoD-1/P/CIR/2022/137 | October 6, 2022 | Expanded scope: MF on exchange + open offer tendering |
 | SEBI/HO/MIRSD/DoP/P/CIR/2022/153 | November 2022 | Further implementation extension |

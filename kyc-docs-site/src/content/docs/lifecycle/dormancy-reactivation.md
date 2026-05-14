@@ -128,7 +128,7 @@ Dormancy detection touches master-dataset Section Y (Account Lifecycle & Dormanc
 
 ## Cross-references
 
-- [Compliance Blueprint — KYC lifecycle domain](/broking-kyc/operations/compliance-blueprint/#kyc-lifecycle-41-entries)
+- [Compliance Blueprint — KYC lifecycle domain](/broking-kyc/operations/compliance-blueprint/)
 - [Lifecycle: Re-KYC](./re-kyc/)
 - [Integration DAG — dormancy & reactivation](/broking-kyc/operations/integration-dag/lifecycle-events/)
 - [Field Atlas — Section Y (Account Lifecycle)](/broking-kyc/reference/field-atlas/sections/y-account-lifecycle/)

@@ -20,13 +20,13 @@ Indian stock broking operations run on a daily clock. A trading day starts hours
 
 ## 1. From ACTIVE to First Trade
 
-The [final gate](/broking-kyc/architecture/flow-summary/#final-gate) of onboarding flips three independent flags to green — KRA Registered, BO (Beneficiary Owner) Active at the depository, and UCC (Unique Client Code) Approved at every elected exchange — and only then does the application status machine transition to ACTIVE. Most of what happens next is invisible to the client but takes the broker's back-office an evening to complete.
+The [final gate](/broking-kyc/architecture/flow-summary/) of onboarding flips three independent flags to green — KRA Registered, BO (Beneficiary Owner) Active at the depository, and UCC (Unique Client Code) Approved at every elected exchange — and only then does the application status machine transition to ACTIVE. Most of what happens next is invisible to the client but takes the broker's back-office an evening to complete.
 
 ### Day 0 evening — the welcome cascade
 
 Within minutes of ACTIVE, the broker's back-office runs a "welcome cascade" routine. A status notification is pushed to the client's app and SMS / email via DLT-approved templates (every transactional message must be sent against a header and template ID pre-approved with the telecom DLT registry, per SEBI's December 2024 communications mandate). A welcome kit is emailed: account-opening confirmation letter, MITC (Most Important Terms and Conditions) document signed during eSign, DP (Depository Participant) details and BO ID, segment activation status (CM live by default; F&O / CD / COM live if elected during Screen 6), brokerage and charges schedule, and quick-start links.
 
-Behind the scenes, two more things happen. First, the client's record is propagated to the broker's [back-office](/broking-kyc/vendors/atlas/#back-office-15-products) — TechExcel, Mihir, Shilpi, Aastha, or whatever the broker uses — with margin parameters, segment activation flags, and limit allocations. Second, [RMS](/broking-kyc/vendors/atlas/#risk-management-systems-15-products) initializes the per-client margin envelope: available margin starts at zero (no funds transferred yet), exposure margin parameters are loaded from the day's SPAN scanrange, and the client's name appears in the surveillance NORMS roster as an active retail account.
+Behind the scenes, two more things happen. First, the client's record is propagated to the broker's [back-office](/broking-kyc/vendors/atlas/) — TechExcel, Mihir, Shilpi, Aastha, or whatever the broker uses — with margin parameters, segment activation flags, and limit allocations. Second, [RMS](/broking-kyc/vendors/atlas/) initializes the per-client margin envelope: available margin starts at zero (no funds transferred yet), exposure margin parameters are loaded from the day's SPAN scanrange, and the client's name appears in the surveillance NORMS roster as an active retail account.
 
 ### Day 1 morning — first login
 
@@ -34,13 +34,13 @@ The client logs in. Their dashboard shows account number, BO ID, segment activat
 
 ### Placing the first order
 
-Order capture happens via web, mobile, dealer terminal, or API. Whatever the entry point, the order traverses an identical pre-trade [RMS pipeline](/broking-kyc/operations/compliance-blueprint/#margin-compliance-30-entries) before the broker's [OMS](/broking-kyc/vendors/atlas/#oms-ems-trading-platforms-15-products) releases it to the exchange:
+Order capture happens via web, mobile, dealer terminal, or API. Whatever the entry point, the order traverses an identical pre-trade [RMS pipeline](/broking-kyc/operations/compliance-blueprint/) before the broker's [OMS](/broking-kyc/vendors/atlas/) releases it to the exchange:
 
 1. **Segment activation check.** Is the segment (CM / F&O / CD / COM) live for this client? Hard-block if not.
 2. **Available margin lock.** Does the client have enough margin for the order? For cash-segment buys, margin = SPAN + ELM + exposure + additional + delivery (where applicable); for sells, margin is computed against the client's existing holdings or upfront margin per SEBI rules. The required margin is reserved against the client's available margin balance.
 3. **MWPL check** (derivatives only). If the order would breach the Market-Wide Position Limit, hard-block at the OMS layer.
 4. **Order-type validation.** NRML (carry-forward), MIS (intraday, auto-square-off at 15:20), CO (cover order), BO (bracket order). Each has its own risk profile and time-cut.
-5. **GSM / ASM / restricted-stock check.** Is the security on a [surveillance](/broking-kyc/operations/compliance-blueprint/#surveillance-30-entries) restriction list? Some symbols are tradeable only with 100% upfront margin (T2T), some only in cash segment, some not at all for retail.
+5. **GSM / ASM / restricted-stock check.** Is the security on a [surveillance](/broking-kyc/operations/compliance-blueprint/) restriction list? Some symbols are tradeable only with 100% upfront margin (T2T), some only in cash segment, some not at all for retail.
 
 If everything clears, the OMS releases the order to the exchange via leased line + FIX gateway (typical for institutional brokers) or ETI / Connect2NSE / BEFS (typical for member-broker integration with NSE / BSE). The exchange returns an order acknowledgement with an exchange-generated order ID, which the OMS persists. If the order matches, the trade confirmation comes back; the client sees their first execution.
 
@@ -50,7 +50,7 @@ If everything clears, the OMS releases the order to the exchange via leased line
 
 ### After the first trade
 
-Trade booking happens immediately in the back-office: brokerage, STT (Securities Transaction Tax), exchange transaction charges, SEBI turnover fee, GST on brokerage + exchange charges, and stamp duty are all computed and attached to the contract. Intraday MTM accrues on the open position throughout the day. By T+24h (typically the evening of the trade day), the [contract note](/broking-kyc/operations/compliance-blueprint/#investor-servicing-15-entries) is generated as a signed ECN (Electronic Contract Note), the broker's Digital Signature Certificate is applied, and the document is dispatched via SMS link and email per the DLT-approved templates. The client's first trade is, from the system's perspective, just one of thousands of trades that will pass through the same pipeline; for the operator on the back end, it's a checkpoint that confirms the onboarding pipeline actually delivers a trading account.
+Trade booking happens immediately in the back-office: brokerage, STT (Securities Transaction Tax), exchange transaction charges, SEBI turnover fee, GST on brokerage + exchange charges, and stamp duty are all computed and attached to the contract. Intraday MTM accrues on the open position throughout the day. By T+24h (typically the evening of the trade day), the [contract note](/broking-kyc/operations/compliance-blueprint/) is generated as a signed ECN (Electronic Contract Note), the broker's Digital Signature Certificate is applied, and the document is dispatched via SMS link and email per the DLT-approved templates. The client's first trade is, from the system's perspective, just one of thousands of trades that will pass through the same pipeline; for the operator on the back end, it's a checkpoint that confirms the onboarding pipeline actually delivers a trading account.
 
 ## 2. A Trading Day — operator's view
 
@@ -64,18 +64,18 @@ The Beginning-of-Day phase is mostly file ingestion. Each exchange and clearing 
 
 - **Holiday calendar** — published annually and refreshed for any mid-year amendment. Drives the trading-day check on every BOD.
 - **Contract files** — the day's tradable symbols, lot sizes (for derivatives), tick sizes, market-lot rules. Without this file, the OMS cannot validate orders.
-- **SPAN scanrange files** from the clearing corporation — margin parameters (SPAN, ELM ratios, exposure margins) for derivatives. Applied for the entire day; never re-issued mid-day. The clearing corp publishes these, not the exchange, because [margin computation](/broking-kyc/operations/compliance-blueprint/#margin-compliance-30-entries) is a clearing-side responsibility (NSCCL for NSE, ICCL for BSE, MCXCCL for MCX).
+- **SPAN scanrange files** from the clearing corporation — margin parameters (SPAN, ELM ratios, exposure margins) for derivatives. Applied for the entire day; never re-issued mid-day. The clearing corp publishes these, not the exchange, because [margin computation](/broking-kyc/operations/compliance-blueprint/) is a clearing-side responsibility (NSCCL for NSE, ICCL for BSE, MCXCCL for MCX).
 - **Circuit-filter file** — per-stock daily price band (typically 2 / 5 / 10 / 20 %, occasionally no-band for index constituents). The OMS rejects any order at a price outside this band.
 - **Member files** — the exchange's list of active members, including any suspensions or trading-disabled flags issued overnight.
 - **MTM T-1 file** — yesterday's close prices and per-position MTM, needed for accurate overnight margin computation on carried-forward derivative positions.
 
 **From the depositories** (CDSL and / or NSDL, depending on the broker's primary), the BOD pulls in prior-day obligation files (any settlement items due to be honoured today), pledge status updates, [DDPI](/broking-kyc/reference/circulars/cdsl/) activations finalized overnight, transmission updates, and any account-modification reflections from yesterday's UCC / KRA / depository uploads.
 
-**RMS parameter reload.** With the SPAN scanrange and ELM ratios in hand, the [RMS](/broking-kyc/vendors/atlas/#risk-management-systems-15-products) recomputes per-client margin envelopes. Available margin, blocked margin, and free balance are recalculated based on each client's outstanding positions, fund balance from last night's payin / payout, and today's parameter set. This snapshot is then published to the OMS for pre-trade margin checks. The reload typically completes by 08:30 — leaving 45 minutes of buffer before the pre-open begins.
+**RMS parameter reload.** With the SPAN scanrange and ELM ratios in hand, the [RMS](/broking-kyc/vendors/atlas/) recomputes per-client margin envelopes. Available margin, blocked margin, and free balance are recalculated based on each client's outstanding positions, fund balance from last night's payin / payout, and today's parameter set. This snapshot is then published to the OMS for pre-trade margin checks. The reload typically completes by 08:30 — leaving 45 minutes of buffer before the pre-open begins.
 
-**Surveillance start-of-day.** GSM (Graded Surveillance Measure) lists, ASM (Additional Surveillance Measure) lists, LT-ASM lists, T2T (Trade-to-Trade) segment lists, and restricted security lists are pulled from the exchanges and ingested into the surveillance filter. [Market surveillance](/broking-kyc/vendors/atlas/#market-surveillance-7-products) systems re-arm their alert rules — concentrated position thresholds, OTR (Order-to-Trade Ratio) accumulators, illiquid-security monitoring, social-media surveillance feeds — for the day's trading.
+**Surveillance start-of-day.** GSM (Graded Surveillance Measure) lists, ASM (Additional Surveillance Measure) lists, LT-ASM lists, T2T (Trade-to-Trade) segment lists, and restricted security lists are pulled from the exchanges and ingested into the surveillance filter. [Market surveillance](/broking-kyc/vendors/atlas/) systems re-arm their alert rules — concentrated position thresholds, OTR (Order-to-Trade Ratio) accumulators, illiquid-security monitoring, social-media surveillance feeds — for the day's trading.
 
-**Operational health checks.** The market services team confirms FIX session login to each exchange, CTCL approval status for any modified order-type configurations, trading-software heartbeat to exchange gateways, DR-site replication confirmation (per [BCP / DR](/broking-kyc/operations/compliance-blueprint/#bcp--dr-15-entries) requirements), and CSCRF log-feed verification (per the [cyber security](/broking-kyc/operations/compliance-blueprint/#cyber-security-27-entries) mandate). Any anomaly here — a failed FIX session, a missed scanrange file, a stale heartbeat — is escalated immediately; the broker can't trade if BOD doesn't complete cleanly.
+**Operational health checks.** The market services team confirms FIX session login to each exchange, CTCL approval status for any modified order-type configurations, trading-software heartbeat to exchange gateways, DR-site replication confirmation (per [BCP / DR](/broking-kyc/operations/compliance-blueprint/#bcp--dr-15-entries) requirements), and CSCRF log-feed verification (per the [cyber security](/broking-kyc/operations/compliance-blueprint/) mandate). Any anomaly here — a failed FIX session, a missed scanrange file, a stale heartbeat — is escalated immediately; the broker can't trade if BOD doesn't complete cleanly.
 
 <Aside type="caution">
 **If BOD fails to complete by 09:00, the broker cannot trade.** Operations teams maintain a runbook with an escalation path: failure to ingest scanrange → escalate to clearing corp helpdesk; missed contract file → re-download from a known alternate path (NSE has multiple FTP endpoints); stale RMS parameter → run a manual reload script. Most large brokers have on-call rotation covering 05:30–09:00 specifically for BOD failures. The cost of missing pre-open is real: orders sitting in queue overnight (AMOs) fail to release, clients see error messages, and revenue is lost for the day.
@@ -99,15 +99,15 @@ Continuous trading runs from 09:15 to 15:30, six hours and fifteen minutes durin
 
 **Pre-trade validation.** Every order goes through the same RMS pipeline described in Section 1 — segment / margin / MWPL / order-type / surveillance checks — applied at single-digit-millisecond latency. The OMS releases approved orders to the exchange; rejected orders return to the client with reason codes. Most large brokers process tens of thousands of order events per second at peak; performance and reliability of the RMS layer is one of the biggest investments in the broker's tech stack.
 
-**Intraday peak margin snapshots.** This is the most operator-load-heavy item in the trading window. The clearing corporation captures four peak-margin snapshots during the trading session — at **11:30, 12:30, 13:30, and 14:30 IST**. At each snapshot, every member-broker is expected to have sufficient client-collected margin covering all client positions. The broker generates and submits the [Daily Margin File](/broking-kyc/operations/compliance-blueprint/#margin-compliance-30-entries) (DMF) post-EOD reconciling these four snapshots; the clearing corp issues a peak-margin response file flagging any shortfall. Penalties for shortfall are real and material — they scale with the size and frequency of the breach and have suspension consequences for repeated patterns. The RMS must keep margin position stable across each snapshot window, which means avoiding settlement-driven swings (e.g., a payout received mid-day shouldn't relieve a position that needed margin at the 11:30 snapshot).
+**Intraday peak margin snapshots.** This is the most operator-load-heavy item in the trading window. The clearing corporation captures four peak-margin snapshots during the trading session — at **11:30, 12:30, 13:30, and 14:30 IST**. At each snapshot, every member-broker is expected to have sufficient client-collected margin covering all client positions. The broker generates and submits the [Daily Margin File](/broking-kyc/operations/compliance-blueprint/) (DMF) post-EOD reconciling these four snapshots; the clearing corp issues a peak-margin response file flagging any shortfall. Penalties for shortfall are real and material — they scale with the size and frequency of the breach and have suspension consequences for repeated patterns. The RMS must keep margin position stable across each snapshot window, which means avoiding settlement-driven swings (e.g., a payout received mid-day shouldn't relieve a position that needed margin at the 11:30 snapshot).
 
-**Real-time surveillance.** [NORMS](/broking-kyc/operations/compliance-blueprint/#surveillance-30-entries) at the exchange runs continuously; the broker's surveillance system mirrors much of this server-side. Order-to-Trade Ratio (OTR) accumulators tick up with every order entry / modification / cancellation; if a client's OTR breaches the threshold, additional margin or order-rate-limit is imposed. GSM / ASM list-based intervention happens at the order-entry layer — orders for stocks on the highest GSM stage may require 100% upfront margin or be restricted entirely. Social-media surveillance, mandated since April 2024, monitors public channels for evidence of manipulative coordination (pump-and-dump, ramping). Manipulative-trade flagging tags self-trades, wash trades, layering, and spoofing for post-EOD review.
+**Real-time surveillance.** [NORMS](/broking-kyc/operations/compliance-blueprint/) at the exchange runs continuously; the broker's surveillance system mirrors much of this server-side. Order-to-Trade Ratio (OTR) accumulators tick up with every order entry / modification / cancellation; if a client's OTR breaches the threshold, additional margin or order-rate-limit is imposed. GSM / ASM list-based intervention happens at the order-entry layer — orders for stocks on the highest GSM stage may require 100% upfront margin or be restricted entirely. Social-media surveillance, mandated since April 2024, monitors public channels for evidence of manipulative coordination (pump-and-dump, ramping). Manipulative-trade flagging tags self-trades, wash trades, layering, and spoofing for post-EOD review.
 
 **Block-deal windows.** Two windows allow block deals: the morning window from 08:45 to 09:00 (before continuous trading) and the afternoon window from 14:35 to 15:05. Block deals have distinct reporting requirements — minimum quantity, price-band, and disclosure rules — and feed into a separate reporting flow.
 
 **MWPL checks.** Derivatives have Market-Wide Position Limits at the contract level. The OMS rejects orders that would breach MWPL; the surveillance layer monitors approach to MWPL and may issue advisories ahead of breach.
 
-**Intraday compliance events.** Some compliance items are time-bound during the trading window: a [technical glitch report](/broking-kyc/operations/compliance-blueprint/#cyber-security-27-entries) to SEBI within prescribed minutes if there's a member-side outage; surveillance alert escalation to the exchange within prescribed timing; CSCRF incident reporting to CERT-In within six hours.
+**Intraday compliance events.** Some compliance items are time-bound during the trading window: a [technical glitch report](/broking-kyc/operations/compliance-blueprint/) to SEBI within prescribed minutes if there's a member-side outage; surveillance alert escalation to the exchange within prescribed timing; CSCRF incident reporting to CERT-In within six hours.
 
 ### Closing window (15:30–15:40)
 
@@ -119,9 +119,9 @@ The final peak-margin snapshot for the day is captured at 14:30, before the clos
 
 EOD is reconciliation and reporting time. Three or four hours of back-office work to close out the trading day.
 
-**Trade booking.** Every trade executed during the day is reconciled in the broker's [back-office system](/broking-kyc/vendors/atlas/#back-office-15-products). The back-office receives end-of-day trade files from each exchange (CM, F&O, CD, COM trade files in their respective formats), matches them against orders captured by the OMS, computes brokerage and charges (brokerage per the client's schedule, STT, exchange transaction charges, SEBI turnover fee, GST on brokerage + exchange charges, stamp duty by state), and posts the trades to the client's ledger.
+**Trade booking.** Every trade executed during the day is reconciled in the broker's [back-office system](/broking-kyc/vendors/atlas/). The back-office receives end-of-day trade files from each exchange (CM, F&O, CD, COM trade files in their respective formats), matches them against orders captured by the OMS, computes brokerage and charges (brokerage per the client's schedule, STT, exchange transaction charges, SEBI turnover fee, GST on brokerage + exchange charges, stamp duty by state), and posts the trades to the client's ledger.
 
-**Contract note generation.** By T+24h (typically the evening of the trade day, though SEBI rules allow up to next-day-by-12-noon dispatch), the broker generates a signed [ECN](/broking-kyc/operations/compliance-blueprint/#investor-servicing-15-entries) (Electronic Contract Note) for each client who traded today. The format is prescribed (ICAI and SEBI specify the columns and disclosures); the broker's Digital Signature Certificate is applied to the PDF; the document is dispatched as a link via SMS (per [DLT-approved templates](/broking-kyc/vendors/atlas/#dlt--sms--whatsapp-12-products)) and as an attachment via email.
+**Contract note generation.** By T+24h (typically the evening of the trade day, though SEBI rules allow up to next-day-by-12-noon dispatch), the broker generates a signed [ECN](/broking-kyc/operations/compliance-blueprint/) (Electronic Contract Note) for each client who traded today. The format is prescribed (ICAI and SEBI specify the columns and disclosures); the broker's Digital Signature Certificate is applied to the PDF; the document is dispatched as a link via SMS (per [DLT-approved templates](/broking-kyc/vendors/atlas/#dlt--sms--whatsapp-12-products)) and as an attachment via email.
 
 **MTM end-of-day.** All outstanding derivative positions and pending-settlement equity positions are marked-to-market against the day's closing prices. MTM gains and losses are realized in the back-office ledger; the realized P&L feeds the next day's available-margin calculation.
 
@@ -131,7 +131,7 @@ EOD is reconciliation and reporting time. Three or four hours of back-office wor
 
 **Peak margin response file.** The clearing corp publishes the peak-margin response file in the EOD window. The back-office reconciles this against the DMF the broker will submit, flags any shortfall to the compliance team, and computes the penalty exposure.
 
-**Member compliance reporting.** [CAR](/broking-kyc/operations/compliance-blueprint/#reporting-cadences-40-entries) (Compliance Audit Report) submissions, DPC (Designated Principal Compliance) updates, and any inspection-mandated reports are submitted to the exchange via BEFS (BSE) / ENIT (NSE) / MCX member portal. Some items are intraday; most batch out at EOD.
+**Member compliance reporting.** [CAR](/broking-kyc/operations/compliance-blueprint/) (Compliance Audit Report) submissions, DPC (Designated Principal Compliance) updates, and any inspection-mandated reports are submitted to the exchange via BEFS (BSE) / ENIT (NSE) / MCX member portal. Some items are intraday; most batch out at EOD.
 
 ### Settlement & overnight (19:00–06:00)
 
@@ -171,7 +171,7 @@ The trading day produces obligations; the settlement cycle clears them. India ha
 
 ### T+1 mechanics
 
-For every trade executed today, settlement happens tomorrow. The broker has two obligations on T+1 morning: deliver funds for any net-buy positions, and deliver securities for any net-sell positions. Cut-offs are typically 11:00 IST for funds and 11:30 IST for securities; the clearing corporation then nets across all members, computes obligations, and runs the [pay-in / pay-out cycle](/broking-kyc/operations/compliance-blueprint/#settlement-22-entries) — funds out of paying brokers and into receiving brokers in the same session, securities similarly. By end of T+1 the client typically has the funds or securities they bought, though the broker's intermediate processing may push the visible settlement to T+1 close.
+For every trade executed today, settlement happens tomorrow. The broker has two obligations on T+1 morning: deliver funds for any net-buy positions, and deliver securities for any net-sell positions. Cut-offs are typically 11:00 IST for funds and 11:30 IST for securities; the clearing corporation then nets across all members, computes obligations, and runs the [pay-in / pay-out cycle](/broking-kyc/operations/compliance-blueprint/) — funds out of paying brokers and into receiving brokers in the same session, securities similarly. By end of T+1 the client typically has the funds or securities they bought, though the broker's intermediate processing may push the visible settlement to T+1 close.
 
 ### T+0 beta scope
 
@@ -197,7 +197,7 @@ The rollout was phased: phase 1 in November 2024 covering equity segment; phase 
 
 ### MFOS / FDR upstreaming
 
-Margin Funded Order System (MFOS) instruments and Fixed Deposit Receipts pledged by the broker as collateral with the clearing corp are upstreamed daily per the [June 2023 client funds upstreaming mandate](/broking-kyc/operations/compliance-blueprint/#client-funds-21-entries). The intent of the mandate is to keep client funds off the broker's balance sheet — held with the clearing corp or in segregated bank accounts instead — so that broker default doesn't put client funds at risk. The broker submits collateral allocations to the clearing corp at EOD; the clearing corp confirms acceptance and applies the collateral against the broker's margin obligations for the next day.
+Margin Funded Order System (MFOS) instruments and Fixed Deposit Receipts pledged by the broker as collateral with the clearing corp are upstreamed daily per the [June 2023 client funds upstreaming mandate](/broking-kyc/operations/compliance-blueprint/). The intent of the mandate is to keep client funds off the broker's balance sheet — held with the clearing corp or in segregated bank accounts instead — so that broker default doesn't put client funds at risk. The broker submits collateral allocations to the clearing corp at EOD; the clearing corp confirms acceptance and applies the collateral against the broker's margin obligations for the next day.
 
 ### ASBA-style UPI Block (mandatory for QSBs since Feb 2025)
 
@@ -221,7 +221,7 @@ Most of the day's compliance evidence is produced by side-effect of normal opera
 
 ### Daily Margin File (DMF)
 
-The DMF is the most operationally consequential daily report. Generated post-EOD from the day's four intraday peak-margin snapshots (11:30 / 12:30 / 13:30 / 14:30), it is submitted to the clearing corp and reconciled against the clearing-corp's peak-margin response file. Shortfalls trigger penalties. The DMF format is prescribed by [NSCCL / ICCL / MCXCCL](/broking-kyc/reference/circulars/clearing-corps/) with member-segment-specific columns. See the [Margin compliance domain](/broking-kyc/operations/compliance-blueprint/#margin-compliance-30-entries) for the full row.
+The DMF is the most operationally consequential daily report. Generated post-EOD from the day's four intraday peak-margin snapshots (11:30 / 12:30 / 13:30 / 14:30), it is submitted to the clearing corp and reconciled against the clearing-corp's peak-margin response file. Shortfalls trigger penalties. The DMF format is prescribed by [NSCCL / ICCL / MCXCCL](/broking-kyc/reference/circulars/clearing-corps/) with member-segment-specific columns. See the [Margin compliance domain](/broking-kyc/operations/compliance-blueprint/) for the full row.
 
 ### Client Funding Report (CFR)
 
@@ -233,7 +233,7 @@ New clients onboarded today (any client whose application reached ACTIVE in busi
 
 ### KRA daily upload
 
-Any KYC modification or new KYC record from the day is uploaded to the relevant [KRA](/broking-kyc/operations/compliance-blueprint/#kyc-lifecycle-41-entries) (CVL, NDML, DOTEX, CAMS, KFintech). The submission is typically batched overnight. KRA acknowledges within its own SLA — most return "Registered" same day, with "Validated" status following in 2–3 days.
+Any KYC modification or new KYC record from the day is uploaded to the relevant [KRA](/broking-kyc/operations/compliance-blueprint/) (CVL, NDML, DOTEX, CAMS, KFintech). The submission is typically batched overnight. KRA acknowledges within its own SLA — most return "Registered" same day, with "Validated" status following in 2–3 days.
 
 ### Peak margin snapshots
 
@@ -241,7 +241,7 @@ The four intraday snapshots are themselves the evidence — the broker's RMS pre
 
 ### Surveillance reports
 
-[NORMS-driven surveillance](/broking-kyc/operations/compliance-blueprint/#surveillance-30-entries) produces a slate of daily reports: Order-to-Trade Ratio breaches, GSM-list trade reports, abnormal-trade flags, social-media surveillance findings, manipulative-trade tags. Some flow real-time to the exchange (technical glitches, system outages); most batch out at EOD.
+[NORMS-driven surveillance](/broking-kyc/operations/compliance-blueprint/) produces a slate of daily reports: Order-to-Trade Ratio breaches, GSM-list trade reports, abnormal-trade flags, social-media surveillance findings, manipulative-trade tags. Some flow real-time to the exchange (technical glitches, system outages); most batch out at EOD.
 
 ### CSCRF logs
 
@@ -287,10 +287,10 @@ The daily clock is the densest layer; on top of it sit weekly, monthly, quarterl
 
 ### Quarterly
 
-- **[Running-account settlement](/broking-kyc/operations/compliance-blueprint/#client-funds-21-entries)** at calendar quarter-ends (April, July, October, January) — SEBI mandates that all funds and securities lying with the broker beyond the client's actual exposure be returned to the client unless the client has explicitly authorized retention. The authorization itself has format requirements (specific consent text, periodic renewal). This is one of the most-penalty-attracting items in SEBI inspections; brokers run the settlement on the 31st / 30th of the quarter-end month and produce a per-client artefact (statement of account confirming zero-balance or authorized retention).
+- **[Running-account settlement](/broking-kyc/operations/compliance-blueprint/)** at calendar quarter-ends (April, July, October, January) — SEBI mandates that all funds and securities lying with the broker beyond the client's actual exposure be returned to the client unless the client has explicitly authorized retention. The authorization itself has format requirements (specific consent text, periodic renewal). This is one of the most-penalty-attracting items in SEBI inspections; brokers run the settlement on the 31st / 30th of the quarter-end month and produce a per-client artefact (statement of account confirming zero-balance or authorized retention).
 - **FATCA / CRS refresh** — for foreign-tax-residency clients, quarterly self-certification refresh and reporting cycle.
 - **[BCP drill](/broking-kyc/operations/compliance-blueprint/#bcp--dr-15-entries)** — quarterly disaster-recovery test (some member categories require half-yearly; clearing corp mandates quarterly). The broker runs failover from primary to DR site, validates trading-system continuity, documents the drill, submits the report to the exchange / clearing corp. Owner: CISO / IT / Compliance.
-- **Quarterly statement of accounts** — issued to every active client; covers trades, charges, ledger entries, holding positions. Mandatory dispatch via email per SEBI [investor servicing](/broking-kyc/operations/compliance-blueprint/#investor-servicing-15-entries) framework.
+- **Quarterly statement of accounts** — issued to every active client; covers trades, charges, ledger entries, holding positions. Mandatory dispatch via email per SEBI [investor servicing](/broking-kyc/operations/compliance-blueprint/) framework.
 
 ### Half-yearly
 
@@ -299,12 +299,12 @@ The daily clock is the densest layer; on top of it sit weekly, monthly, quarterl
 
 ### Annual
 
-- **[Statutory audit](/broking-kyc/operations/compliance-blueprint/#audit-cycles-21-entries)** — annual audit by an independent CA firm; produces the broker's audited financial statements. Filed with SEBI, exchanges, and tax authorities.
+- **[Statutory audit](/broking-kyc/operations/compliance-blueprint/)** — annual audit by an independent CA firm; produces the broker's audited financial statements. Filed with SEBI, exchanges, and tax authorities.
 - **KRA audit** — annual audit of the broker's KYC processes, KRA upload accuracy, and CKYC compliance. Conducted by a SEBI-empanelled auditor; report submitted to SEBI.
 - **System audit** — every two years per SEBI (alternate annual cycle); covers IT systems, RMS, OMS, back-office, surveillance, cybersecurity. Conducted by a CERT-In-empanelled auditor.
 - **DP audit** — annual audit of the broker's depository participant function (CDSL or NSDL or both). Covers BO opening / modification / transmission / pledge processes.
 - **Cyber audit per CSCRF** — annual or biennial depending on the broker's CSCRF category (Qualified RE / Mid-size RE / Small RE per the August 2024 framework).
-- **[Fit-and-proper refresh](/broking-kyc/operations/compliance-blueprint/#member-compliance-23-entries)** — annual self-certification by directors, KMPs, and senior management; continuing fit-and-proper compliance per SEBI Intermediaries Regulations.
+- **[Fit-and-proper refresh](/broking-kyc/operations/compliance-blueprint/)** — annual self-certification by directors, KMPs, and senior management; continuing fit-and-proper compliance per SEBI Intermediaries Regulations.
 - **NISM re-certification** — for compliance officer, principal officer, authorized persons, dealers; NISM certifications have validity windows (typically 3 years) and re-certification cycles. Tracking and ensuring no certifications expire is an ongoing task with annual visibility.
 - **ITR Form-16A dispatch** — annual TDS certificates dispatched to clients who had TDS deducted by the broker.
 - **Advertisement approval renewal cycles** — running advertising programs require periodic re-approval by the exchange / SEBI; the broker maintains the active-approvals register.
@@ -345,7 +345,7 @@ An account that's gone ACTIVE rarely stays static. Clients change address, chang
 
 ### Re-KYC periodicity
 
-SEBI's [risk-based re-KYC framework](/broking-kyc/operations/compliance-blueprint/#kyc-lifecycle-41-entries) specifies refresh cycles by client risk category:
+SEBI's [risk-based re-KYC framework](/broking-kyc/operations/compliance-blueprint/) specifies refresh cycles by client risk category:
 
 - **High-risk clients** (PEP exposure, high-risk-country residency, large-value transaction patterns) — re-KYC every 2 years.
 - **Medium-risk clients** — every 8 years.
@@ -386,7 +386,7 @@ The most operationally sensitive lifecycle event.
 
 **Joint account, all holders deceased.** Same succession path as single-holder-no-nominee.
 
-Transmission flows are governed by depository operational circulars ([CDSL](/broking-kyc/reference/circulars/cdsl/) and [NSDL](/broking-kyc/reference/circulars/nsdl/) each publish detailed transmission procedure guides) and SEBI investor protection guidelines. The [edge-case compliance domain](/broking-kyc/operations/compliance-blueprint/#edge-case-compliances-30-entries) enumerates the specific obligations.
+Transmission flows are governed by depository operational circulars ([CDSL](/broking-kyc/reference/circulars/cdsl/) and [NSDL](/broking-kyc/reference/circulars/nsdl/) each publish detailed transmission procedure guides) and SEBI investor protection guidelines. The [edge-case compliance domain](/broking-kyc/operations/compliance-blueprint/) enumerates the specific obligations.
 
 ### NRI ↔ Resident conversion
 

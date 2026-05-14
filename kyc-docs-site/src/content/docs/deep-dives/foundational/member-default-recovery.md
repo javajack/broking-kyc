@@ -238,7 +238,7 @@ Re-admission of a defaulting member to the exchange / CC requires:
 - Full satisfaction of all outstanding client claims (often impossible).
 - Full repayment of SGF / CC contributions consumed.
 - Restoration of capital adequacy (BMC, ABC, net worth).
-- Fresh fit-and-proper assessment per the fit-and-proper framework (see [Fit-and-proper criteria](/broking-kyc/deep-dives/compliance-audit/fit-and-proper/)).
+- Fresh fit-and-proper assessment per the fit-and-proper framework (see [Fit-and-proper criteria](/broking-kyc/deep-dives/member-compliance/fit-and-proper/)).
 - SEBI no-objection.
 - Exchange / CC governance approval.
 - Formal re-admission application processing.

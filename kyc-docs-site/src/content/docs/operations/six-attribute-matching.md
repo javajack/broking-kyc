@@ -35,9 +35,9 @@ Now that you know what the six attributes are, let us look at the SEBI circulars
 | Circular | Date | Subject |
 |----------|------|---------|
 | SEBI/HO/MIRSD/DOP/CIR/P/2019/136 | Nov 2019 | Mapping of UCC with Demat Account based on PAN |
-| [SEBI/HO/MIRSD/FATF/P/CIR/2023/0144](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-fatf-p-cir-2023-0144) | 2023 | KRA attribute verification against official databases |
-| [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/41](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-secfatf-p-cir-2024-41) | May 2024 | Review of KYC validation at KRAs |
-| [SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/37](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-1-p-cir-2023-37) | Mar 2023 | KYC attribute requirements for depository accounts |
+| [SEBI/HO/MIRSD/FATF/P/CIR/2023/0144](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdfatfpcir20230144) | 2023 | KRA attribute verification against official databases |
+| [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/41](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202441) | May 2024 | Review of KYC validation at KRAs |
+| [SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/37](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-pod-1pcir202337) | Mar 2023 | KYC attribute requirements for depository accounts |
 
 The November 2019 circular is particularly important because it established the mechanism by which exchanges and depositories share data daily to keep UCC-demat mappings in sync.
 

@@ -11,12 +11,12 @@ import { Aside } from '@astrojs/starlight/components';
 
 - **Trigger:** any change in a person identified as KMP under Section 2(51) of the Companies Act 2013 *plus* the SEBI broker-specific designations — Compliance Officer (NISM Series III-A), Principal Officer under PMLA (NISM I / VII), Designated Director under PMLA, Managing Director / CEO, Whole-time Director, CFO, Company Secretary, and senior management one level below the board with material control.
 - **Regulatory window for intimation:** typically **7–15 days** post-change. The exact window depends on the regulator and the type of change:
-  - SEBI: per the SEBI Stock Broker Master Circular ([SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-pod-1-p-cir-2025-94)), KMP changes are notifiable; brokers should treat 15 days as the safe default.
-  - Exchanges (NSE / BSE / MCX): typical 15-day window per [NSE/COMP/56766](/broking-kyc/reference/circulars/nse/#nse-comp-56766) and parallel BSE / MCX circulars. ENIT (NSE) is the standard intimation channel.
+  - SEBI: per the SEBI Stock Broker Master Circular ([SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir202594)), KMP changes are notifiable; brokers should treat 15 days as the safe default.
+  - Exchanges (NSE / BSE / MCX): typical 15-day window per [NSE/COMP/56766](/broking-kyc/reference/circulars/nse/#nsecomp56766) and parallel BSE / MCX circulars. ENIT (NSE) is the standard intimation channel.
   - Depositories (CDSL / NSDL) and clearing corps: parallel intimation where the role interfaces with that infrastructure.
-  - PMLA-designated Principal Officer / Designated Director: intimation to FIU-IND per the AML Master Circular ([SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-secfatf-p-cir-2024-78)).
+  - PMLA-designated Principal Officer / Designated Director: intimation to FIU-IND per the AML Master Circular ([SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202478)).
 - **Fit-and-proper re-verification** is mandatory for the new appointee; see the [Fit-and-proper deep dive](/broking-kyc/deep-dives/member-compliance/fit-and-proper/) for the test.
-- **NISM-certification check** is mandatory for roles tied to a specific NISM series — Compliance Officer (Series III-A), Principal Officer (Series I or VII), Authorised Persons / Dealers (Series VIII) — see [MEMBER-COMP-006](/broking-kyc/operations/compliance-blueprint/#member-compliance-23-entries), [MEMBER-COMP-007](/broking-kyc/operations/compliance-blueprint/#member-compliance-23-entries), [MEMBER-COMP-008](/broking-kyc/operations/compliance-blueprint/#member-compliance-23-entries).
+- **NISM-certification check** is mandatory for roles tied to a specific NISM series — Compliance Officer (Series III-A), Principal Officer (Series I or VII), Authorised Persons / Dealers (Series VIII) — see [MEMBER-COMP-006](/broking-kyc/operations/compliance-blueprint/), [MEMBER-COMP-007](/broking-kyc/operations/compliance-blueprint/), [MEMBER-COMP-008](/broking-kyc/operations/compliance-blueprint/).
 - **Board resolution** is required for KMP and senior-role appointments / cessations under the Companies Act 2013.
 - **Avoid the most common operational gap** — temporarily uncovered Compliance Officer role between the outgoing person's last day and the incoming person's appointment. Use board-approved interim arrangements (typically the next-most-senior compliance officer) to avoid SEBI / exchange inspection findings.
 - AI-generated synthesis. **Verify any specific window or procedural step against the linked circulars before acting.**
@@ -25,7 +25,7 @@ import { Aside } from '@astrojs/starlight/components';
 
 A broker is a regulated entity that owes specific obligations to investors, exchanges, clearing corporations, depositories, and SEBI. Several of those obligations are designed around a *named, identifiable person* in role — the Compliance Officer who attests to monthly / quarterly / half-yearly compliance, the Principal Officer who files STRs under PMLA, the Designated Director under PMLA who carries personal liability for AML failures, the Managing Director who signs off on the broker's annual disclosures, and so on. When that named person changes, the regulators need to be told who the new named person is, so that filings continue to be valid, fit-and-proper records remain current, and accountability cascades correctly.
 
-This page sets out the *operational mechanics* of a KMP change. Why it matters: a delayed or missing intimation creates two compounding problems. First, the broker is operationally non-compliant with the named-officer obligation for the period of the gap. Second, filings made in the outgoing person's name during the gap are technically invalid; filings the new person could have made are not made. The cumulative penalty under [NSE/INSP/53530](/broking-kyc/reference/circulars/nse/#nse-insp-53530) can compound quickly.
+This page sets out the *operational mechanics* of a KMP change. Why it matters: a delayed or missing intimation creates two compounding problems. First, the broker is operationally non-compliant with the named-officer obligation for the period of the gap. Second, filings made in the outgoing person's name during the gap are technically invalid; filings the new person could have made are not made. The cumulative penalty under [NSE/INSP/53530](/broking-kyc/reference/circulars/nse/#nseinsp53530) can compound quickly.
 
 The page covers (a) the trigger taxonomy, (b) the master sequence of operational steps, (c) role-specific particulars, (d) the regulatory windows by destination, (e) edge cases, and (f) practical notes.
 
@@ -101,7 +101,7 @@ In an ideal sequence, the outgoing person's last day and the incoming person's f
 
 - **Compliance Officer gap** — the next-most-senior compliance person (deputy compliance officer, head of compliance reporting line) takes interim charge. The board resolution names the interim officer.
 - **Principal Officer (PMLA) gap** — the Designated Director may temporarily cover until a Principal Officer is appointed, with FIU-IND notified of the interim arrangement.
-- **Designated Director (PMLA) gap** — must not occur; if the resident-designated-director threshold under [SEBI/LAD-NRO/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebi-lad-nro-gn-2026-291) is at risk, the board must appoint a replacement before the outgoing person's last day.
+- **Designated Director (PMLA) gap** — must not occur; if the resident-designated-director threshold under [SEBI/LAD-NRO/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebilad-nrogn2026291) is at risk, the board must appoint a replacement before the outgoing person's last day.
 - **MD / CEO gap** — typically covered by the board acting collectively (chairman or whole-time director may chair operations until the new MD is appointed); some firms appoint an interim CEO.
 - **CFO / CS gap** — covered by the next-most-senior finance / secretarial person; board resolution required.
 
@@ -114,19 +114,19 @@ The intimation cascade has four destinations and must run in parallel for fastes
 #### SEBI
 
 - **What is filed** — KMP change notification + new appointee particulars + cessation reason + board resolution.
-- **Where** — SEBI's online filing channels (intermediary portal) per [SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-pod-1-p-cir-2025-94) and the SEBI online registration portal for intermediaries.
+- **Where** — SEBI's online filing channels (intermediary portal) per [SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir202594) and the SEBI online registration portal for intermediaries.
 - **When** — within the prescribed window, treated as 15 days for safety.
 
 #### Exchanges (NSE / BSE / MCX)
 
-- **What is filed** — KMP change intimation via the exchange's online filing module (ENIT for NSE per [NSE/COMP/56766](/broking-kyc/reference/circulars/nse/#nse-comp-56766); equivalent BSE / MCX portals).
+- **What is filed** — KMP change intimation via the exchange's online filing module (ENIT for NSE per [NSE/COMP/56766](/broking-kyc/reference/circulars/nse/#nsecomp56766); equivalent BSE / MCX portals).
 - **Where** — ENIT-NEW-COMPLIANCE for NSE; BEFS for BSE; MCX Member Portal for MCX.
 - **When** — typically 15 days per the NSE circular; BSE / MCX windows align.
 
 #### Depositories (CDSL / NSDL)
 
 - **What is filed** — DP-side change of authorized signatory / DP head / DP compliance officer where applicable. Most DPs file via the depository's policy portal.
-- **Where** — CDSL DP portal (per [CDSL/RCD/DP/GENRL/2025/280](/broking-kyc/reference/circulars/cdsl/#cdsl-rcd-dp-genrl-2025-280) master circular); NSDL DP portal (per [NSDL/POLICY/2024/0003](/broking-kyc/reference/circulars/nsdl/#nsdl-policy-2024-0003) Insta Interface ecosystem).
+- **Where** — CDSL DP portal (per [CDSL/RCD/DP/GENRL/2025/280](/broking-kyc/reference/circulars/cdsl/#cdslrcddpgenrl2025280) master circular); NSDL DP portal (per [NSDL/POLICY/2024/0003](/broking-kyc/reference/circulars/nsdl/#nsdlpolicy20240003) Insta Interface ecosystem).
 - **When** — typically aligned to the SEBI / exchange window.
 
 #### Clearing Corporations (NSCCL / ICCL / MCXCCL)
@@ -137,7 +137,7 @@ The intimation cascade has four destinations and must run in parallel for fastes
 
 #### FIU-IND (for Principal Officer / Designated Director changes)
 
-- **What is filed** — fresh PO / DD designation letter with KYC of the new person, per [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-pod-1-p-cir-2025-94).
+- **What is filed** — fresh PO / DD designation letter with KYC of the new person, per [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir202594).
 - **Where** — FIU-IND FINnet 2.0 portal.
 - **When** — immediate notification — PMLA obligation runs through the named person, so a gap exposes the firm to AML non-compliance.
 
@@ -181,8 +181,8 @@ The transition file is preserved as part of the KMP register for the 8-year rete
 
 ### Compliance Officer
 
-- **Statutory basis:** SEBI Stock Broker Master Circular ([SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-pod-1-p-cir-2025-94)); each broker must have a designated Compliance Officer responsible for compliance with SEBI / exchange / depository regulations.
-- **NISM certification:** **Series III-A — Securities Intermediaries Compliance (Non-Fund)**, valid for 3 years with re-certification ([MEMBER-COMP-006](/broking-kyc/operations/compliance-blueprint/#member-compliance-23-entries) and [MEMBER-COMP-010](/broking-kyc/operations/compliance-blueprint/#member-compliance-23-entries)).
+- **Statutory basis:** SEBI Stock Broker Master Circular ([SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir202594)); each broker must have a designated Compliance Officer responsible for compliance with SEBI / exchange / depository regulations.
+- **NISM certification:** **Series III-A — Securities Intermediaries Compliance (Non-Fund)**, valid for 3 years with re-certification ([MEMBER-COMP-006](/broking-kyc/operations/compliance-blueprint/) and [MEMBER-COMP-010](/broking-kyc/operations/compliance-blueprint/)).
 - **Reporting line:** typically reports to the MD / CEO with dotted line / direct access to the board's audit committee. Industry practice is to ensure independence — the Compliance Officer cannot also head a revenue-generating function.
 - **Specific running obligations:** weekly Client Funding Report; monthly grievance MIS to SCORES; half-yearly compliance certificate to SEBI; annual SCORES disclosure; signing-off on all exchange filings; participation in inspection meetings.
 - **Gap risk:** during a Compliance Officer gap, the broker's compliance certificate filings, complaint MIS, and inspection responses lack their named signatory. Most large brokers maintain a Deputy Compliance Officer designated to step in.
@@ -190,8 +190,8 @@ The transition file is preserved as part of the KMP register for the 8-year rete
 
 ### Principal Officer (PMLA)
 
-- **Statutory basis:** PMLA Section 12; SEBI AML Master Circular ([SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-secfatf-p-cir-2024-78)).
-- **NISM certification:** **Series I (Currency Derivatives)** or **Series VII (Securities Operations and Risk Management)** depending on the broker's segment mix ([MEMBER-COMP-007](/broking-kyc/operations/compliance-blueprint/#member-compliance-23-entries)).
+- **Statutory basis:** PMLA Section 12; SEBI AML Master Circular ([SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202478)).
+- **NISM certification:** **Series I (Currency Derivatives)** or **Series VII (Securities Operations and Risk Management)** depending on the broker's segment mix ([MEMBER-COMP-007](/broking-kyc/operations/compliance-blueprint/)).
 - **Reporting line:** typically reports through the compliance function to the board.
 - **Specific running obligations:** filing CTRs (Cash Transaction Reports) and STRs (Suspicious Transaction Reports) with FIU-IND; PMLA policy adoption and refresh; PMLA training oversight; PMLA inspection response; on-going AML transaction monitoring oversight.
 - **Gap risk:** during a Principal Officer gap, PMLA filings (STRs especially, which have prescribed event-based windows) lack a named filer. The Designated Director may temporarily cover.
@@ -199,8 +199,8 @@ The transition file is preserved as part of the KMP register for the 8-year rete
 
 ### Designated Director (PMLA)
 
-- **Statutory basis:** PMLA Section 13; SEBI AML Master Circular ([SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-secfatf-p-cir-2024-78)).
-- **2026 overlap:** under [SEBI/LAD-NRO/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebi-lad-nro-gn-2026-291), the broker must have at least one designated director resident in India for 182+ days per financial year. The PMLA Designated Director and the SEBI 2026 designated director are typically the same person.
+- **Statutory basis:** PMLA Section 13; SEBI AML Master Circular ([SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202478)).
+- **2026 overlap:** under [SEBI/LAD-NRO/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebilad-nrogn2026291), the broker must have at least one designated director resident in India for 182+ days per financial year. The PMLA Designated Director and the SEBI 2026 designated director are typically the same person.
 - **Reporting line:** is a director on the board; reports to the board collectively.
 - **Specific running obligations:** carries **personal liability** under PMLA for the firm's AML compliance; signs off on PMLA policy; attends FIU-IND interactions; named in the FIU-IND registration.
 - **Gap risk:** a gap in this role is a serious PMLA exposure because of the personal-liability framework. Most firms ensure the successor is in place before the outgoing person's cessation date.
@@ -226,7 +226,7 @@ The transition file is preserved as part of the KMP register for the 8-year rete
 - **Statutory basis:** Companies Act 2013 (KMP); Section 203.
 - **Reporting line:** typically reports to the MD / CEO; signs off on financial statements.
 - **Specific running obligations:** statutory audit interface; financial-statement signoff; networth-certificate process management; tax filings.
-- **Gap risk:** during a CFO gap, the half-yearly networth-certificate submission ([MEMBER-COMP-002](/broking-kyc/operations/compliance-blueprint/#member-compliance-23-entries)) may be at risk if it falls in the gap. Interim arrangements typically have the senior-most finance manager covering.
+- **Gap risk:** during a CFO gap, the half-yearly networth-certificate submission ([MEMBER-COMP-002](/broking-kyc/operations/compliance-blueprint/)) may be at risk if it falls in the gap. Interim arrangements typically have the senior-most finance manager covering.
 
 ### Company Secretary
 
@@ -237,7 +237,7 @@ The transition file is preserved as part of the KMP register for the 8-year rete
 
 ### NISM-certified Dealers / Authorised Persons
 
-- **Statutory basis:** SEBI Stock Broker Master Circular ([SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-pod-1-p-cir-2025-94)); NSE AP supervisory framework ([NSE/COMP/63628](/broking-kyc/reference/circulars/nse/#nse-comp-63628)).
+- **Statutory basis:** SEBI Stock Broker Master Circular ([SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir202594)); NSE AP supervisory framework ([NSE/COMP/63628](/broking-kyc/reference/circulars/nse/#nsecomp63628)).
 - **NISM certification:** **Series VIII — Equity Derivatives** for AP / dealer roles in F&O; segment-specific series (Series VII for securities operations, Series I for currency, etc.) where the segment differs.
 - **Reporting line:** to the head of branch operations or the compliance function.
 - **Specific running obligations:** trading via NISM-certified user ID at the exchange terminal; logging of trades; submission to AP inspection.
@@ -247,14 +247,14 @@ The transition file is preserved as part of the KMP register for the 8-year rete
 
 | Destination | Typical window | Channel | Reference |
 |---|---|---|---|
-| SEBI | 15 days | SEBI online registration / intermediaries portal | [SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-pod-1-p-cir-2025-94) |
-| NSE | 15 days | ENIT-NEW-COMPLIANCE | [NSE/COMP/56766](/broking-kyc/reference/circulars/nse/#nse-comp-56766) |
+| SEBI | 15 days | SEBI online registration / intermediaries portal | [SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir202594) |
+| NSE | 15 days | ENIT-NEW-COMPLIANCE | [NSE/COMP/56766](/broking-kyc/reference/circulars/nse/#nsecomp56766) |
 | BSE | 15 days | BEFS | BSE member circulars |
-| MCX | 15 days | MCX Member Portal | [MCX/MEM/105/2026](/broking-kyc/reference/circulars/mcx/#mcx-mem-105-2026) |
-| CDSL | 15 days | DP portal | [CDSL/RCD/DP/GENRL/2025/280](/broking-kyc/reference/circulars/cdsl/#cdsl-rcd-dp-genrl-2025-280) |
-| NSDL | 15 days | DP portal | [NSDL/POLICY/2024/0003](/broking-kyc/reference/circulars/nsdl/#nsdl-policy-2024-0003) |
-| NSCCL / ICCL / MCXCCL | 15 days | CC member portal | [NCL/CMPT/61800](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-61800) / [NCL/CMPT/61801](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-61801) |
-| FIU-IND | Immediate (within days; treat as 7) | FINnet 2.0 portal | [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-secfatf-p-cir-2024-78) |
+| MCX | 15 days | MCX Member Portal | [MCX/MEM/105/2026](/broking-kyc/reference/circulars/mcx/#mcxmem1052026) |
+| CDSL | 15 days | DP portal | [CDSL/RCD/DP/GENRL/2025/280](/broking-kyc/reference/circulars/cdsl/#cdslrcddpgenrl2025280) |
+| NSDL | 15 days | DP portal | [NSDL/POLICY/2024/0003](/broking-kyc/reference/circulars/nsdl/#nsdlpolicy20240003) |
+| NSCCL / ICCL / MCXCCL | 15 days | CC member portal | [NCL/CMPT/61800](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt61800) / [NCL/CMPT/61801](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt61801) |
+| FIU-IND | Immediate (within days; treat as 7) | FINnet 2.0 portal | [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202478) |
 | KRAs (CVL / NDML / DOTEX / CAMS / KFintech) | 15 days | KRA broker portal | KRA-specific |
 | MCA (Companies Act KMP filings) | 30 days for KMP appointment / cessation | MCA21 portal | Companies Act Sec 170 |
 | Bank (signatory updates for client-funds accounts) | 7–10 day processing | Bank branch | Internal SOP |
@@ -297,7 +297,7 @@ The 2026 Reg requires 182+ days physical presence in India per FY for at least o
 
 ### Sub-broker / Authorised Person aggregator changes
 
-For brokers operating with a large AP network, AP-level changes are handled through the AP supervisory framework ([NSE/COMP/63628](/broking-kyc/reference/circulars/nse/#nse-comp-63628)) rather than the KMP framework. The AP framework deep dive covers this in detail. Where an AP is also an employee KMP (rare), both frameworks apply.
+For brokers operating with a large AP network, AP-level changes are handled through the AP supervisory framework ([NSE/COMP/63628](/broking-kyc/reference/circulars/nse/#nsecomp63628)) rather than the KMP framework. The AP framework deep dive covers this in detail. Where an AP is also an employee KMP (rare), both frameworks apply.
 
 ### Joint MD / co-CEO arrangements
 
@@ -324,20 +324,20 @@ A scheme of arrangement (merger, acquisition) typically involves multiple KMP ch
 
 ## Cross-references
 
-- [Compliance Blueprint — Member compliance (23 entries)](/broking-kyc/operations/compliance-blueprint/#member-compliance-23-entries) — MEMBER-COMP-006 (CO NISM III-A), MEMBER-COMP-007 (PO NISM), MEMBER-COMP-008 (AP NISM VIII), MEMBER-COMP-010 (NISM re-certification), MEMBER-COMP-017 (KMP change intimation), MEMBER-COMP-018 (resident designated director).
+- [Compliance Blueprint — Member compliance (23 entries)](/broking-kyc/operations/compliance-blueprint/) — MEMBER-COMP-006 (CO NISM III-A), MEMBER-COMP-007 (PO NISM), MEMBER-COMP-008 (AP NISM VIII), MEMBER-COMP-010 (NISM re-certification), MEMBER-COMP-017 (KMP change intimation), MEMBER-COMP-018 (resident designated director).
 - [Fit-and-proper deep dive](/broking-kyc/deep-dives/member-compliance/fit-and-proper/) — re-verification of the incoming appointee.
 - [Membership renewal deep dive](/broking-kyc/deep-dives/member-compliance/membership-renewal/) — annual renewal that confirms current KMP roster.
 - [Authorized Person framework deep dive](/broking-kyc/deep-dives/compliance-audit/ap-framework/) — AP-level changes parallel to KMP changes.
-- [NSE compliance — KMP intimation — NSE/COMP/56766](/broking-kyc/reference/circulars/nse/#nse-comp-56766) — primary NSE circular on KMP change intimation.
-- [NSE AP framework — NSE/COMP/63628](/broking-kyc/reference/circulars/nse/#nse-comp-63628) — joint-exchange AP supervisory framework.
-- [SEBI Stock Broker Master Circular — SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-pod-1-p-cir-2025-94) — SEBI overlay for KMP / compliance-officer obligations.
-- [SEBI AML Master Circular — SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-secfatf-p-cir-2024-78) — Principal Officer and Designated Director under PMLA.
-- [SEBI (Stock Brokers) Regulations 2026 — SEBI/LAD-NRO/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebi-lad-nro-gn-2026-291) — resident designated director and continuing fit-and-proper provisions.
-- [MCX framework — MCX/MEM/105/2026](/broking-kyc/reference/circulars/mcx/#mcx-mem-105-2026) — MCX-specific KMP / member changes.
-- [CDSL DP master circular — CDSL/RCD/DP/GENRL/2025/280](/broking-kyc/reference/circulars/cdsl/#cdsl-rcd-dp-genrl-2025-280) — DP-side KMP intimation.
-- [NSDL Insta Interface — NSDL/POLICY/2024/0003](/broking-kyc/reference/circulars/nsdl/#nsdl-policy-2024-0003) — NSDL DP-side intimation channel.
-- [Recurring cycles — CYC-AN-FIT_PROPER](/broking-kyc/operations/integration-dag/recurring-cycles/#per-node-detail) — annual fit-and-proper as part of cadence.
-- [Broker process narrative — Section 5 / 6 lifecycle events](/broking-kyc/broker-process/narrative/#5-recurring-cycles) — broader narrative context.
+- [NSE compliance — KMP intimation — NSE/COMP/56766](/broking-kyc/reference/circulars/nse/#nsecomp56766) — primary NSE circular on KMP change intimation.
+- [NSE AP framework — NSE/COMP/63628](/broking-kyc/reference/circulars/nse/#nsecomp63628) — joint-exchange AP supervisory framework.
+- [SEBI Stock Broker Master Circular — SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir202594) — SEBI overlay for KMP / compliance-officer obligations.
+- [SEBI AML Master Circular — SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202478) — Principal Officer and Designated Director under PMLA.
+- [SEBI (Stock Brokers) Regulations 2026 — SEBI/LAD-NRO/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebilad-nrogn2026291) — resident designated director and continuing fit-and-proper provisions.
+- [MCX framework — MCX/MEM/105/2026](/broking-kyc/reference/circulars/mcx/#mcxmem1052026) — MCX-specific KMP / member changes.
+- [CDSL DP master circular — CDSL/RCD/DP/GENRL/2025/280](/broking-kyc/reference/circulars/cdsl/#cdslrcddpgenrl2025280) — DP-side KMP intimation.
+- [NSDL Insta Interface — NSDL/POLICY/2024/0003](/broking-kyc/reference/circulars/nsdl/#nsdlpolicy20240003) — NSDL DP-side intimation channel.
+- [Recurring cycles — CYC-AN-FIT_PROPER](/broking-kyc/operations/integration-dag/recurring-cycles/) — annual fit-and-proper as part of cadence.
+- [Broker process narrative — Section 5 / 6 lifecycle events](/broking-kyc/broker-process/narrative/) — broader narrative context.
 
 ## Verified through
 

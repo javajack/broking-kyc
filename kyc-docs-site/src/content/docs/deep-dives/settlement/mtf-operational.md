@@ -10,12 +10,12 @@ import { Aside } from '@astrojs/starlight/components';
 ## TL;DR
 
 - **MTF (Margin Trading Facility) is a broker-funded purchase mechanism.** The client puts up margin (typically 25%); the broker funds the remainder (typically 75%); the bought securities are pledged to the broker as collateral via TM CSMFA (Trading Member Client Securities Margin Funded Account).
-- **Regulatory baseline.** SEBI MTF framework is consolidated in the [Master Circular for Stock Brokers](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-pod-1-p-cir-2024-118) (Aug 2024) and successor [SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-pod-1-p-cir-2025-94) (Apr 2025). Operationalised in clearing-corp circulars including [NCL/CMPT/63669](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-63669) (Aug 2024) which mandates CSMFA where the client's demat resides.
+- **Regulatory baseline.** SEBI MTF framework is consolidated in the [Master Circular for Stock Brokers](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir2024118) (Aug 2024) and successor [SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir202594) (Apr 2025). Operationalised in clearing-corp circulars including [NCL/CMPT/63669](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt63669) (Aug 2024) which mandates CSMFA where the client's demat resides.
 - **The T+3 pledge deadline is hard.** Client must accept the MTF pledge by T+3 at 17:00 IST. If not, broker is required to square off on T+4. Per [CDSL MTF & Pledge primer](/broking-kyc/vendors/depositories/cdsl-mtf-pledge/) Section 5 and SEBI MTF framework.
-- **UNPAIDMTF file workflow.** Daily file submission to clearing corp tracking client positions where funds haven't been received against MTF facility. Upload windows per [NCL/CMPT/72224](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-72224): 15:30 – 22:00 (T-1 to T) and 06:30 – 13:00 (T pay-in day).
-- **Automated invocation post Oct 2025.** [SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/82](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-p-cir-2025-82) (Jun 2025, effective 10 Oct 2025) introduced IV-EP (Invocation for Early Pay-in) and IV-RD (Invocation for Redemption) automated mechanisms — broker can invoke pledged MTF / margin securities without manual client unpledge.
+- **UNPAIDMTF file workflow.** Daily file submission to clearing corp tracking client positions where funds haven't been received against MTF facility. Upload windows per [NCL/CMPT/72224](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt72224): 15:30 – 22:00 (T-1 to T) and 06:30 – 13:00 (T pay-in day).
+- **Automated invocation post Oct 2025.** [SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/82](/broking-kyc/reference/circulars/sebi-mirsd/) (Jun 2025, effective 10 Oct 2025) introduced IV-EP (Invocation for Early Pay-in) and IV-RD (Invocation for Redemption) automated mechanisms — broker can invoke pledged MTF / margin securities without manual client unpledge.
 - **Interest.** Typically 12-18% per annum on the funded amount; computed daily and debited to the client's ledger. Each broker discloses the MTF rate schedule in the account-opening kit and on contract notes.
-- **Margin and collateral.** MTF positions count in client margin computation; CSMFA-pledged securities enjoy margin benefit subject to standard haircuts ([CDSL MTF & Pledge primer Section 10](/broking-kyc/vendors/depositories/cdsl-mtf-pledge/#10-margin-pledge-haircut-framework)). Half-yearly networth certificate due Oct 31 for MTF members vs. Nov 30 for others (per [NSE/COMP/64293](/broking-kyc/reference/circulars/nse/#nse-comp-64293)).
+- **Margin and collateral.** MTF positions count in client margin computation; CSMFA-pledged securities enjoy margin benefit subject to standard haircuts ([CDSL MTF & Pledge primer Section 10](/broking-kyc/vendors/depositories/cdsl-mtf-pledge/)). Half-yearly networth certificate due Oct 31 for MTF members vs. Nov 30 for others (per [NSE/COMP/64293](/broking-kyc/reference/circulars/nse/#nsecomp64293)).
 - **Pre-direct-payout vs post-direct-payout flow.** Pre-Nov 2024, MTF securities flowed through broker pool. Post Nov 2024, direct-payout-to-CSMFA: securities flow directly from CC to client demat with MTF pledge in favour of broker CSMFA. See [direct-payout deep dive](./direct-payout-to-demat/).
 
 ## Conceptual overview
@@ -32,14 +32,14 @@ The November 2024 direct-payout-to-demat mandate restructured how MTF securities
 
 ### 1.1 SEBI authority
 
-- **[SEBI/HO/MIRSD/DOP/CIR/P/2020/28](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-dop-cir-p-2020-28)** (25 February 2020, effective 1 August 2020): Foundational framework. Mandates that client securities given to brokers as margin shall be by way of pledge / re-pledge in the depository system, rather than transfer to broker accounts. The TM CSMFA account is the depository-side container for MTF-pledged securities.
-- **[Master Circular for Stock Brokers — SEBI/HO/MIRSD/POD-1/P/CIR/2024/118](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-pod-1-p-cir-2024-118)** (Aug 2024) and successor **[SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-pod-1-p-cir-2025-94)** (Apr 2025): Consolidates MTF provisions including activation, funding model, eligibility, interest disclosure, and compliance reporting.
-- **[SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/82](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-p-cir-2025-82)** (3 June 2025, effective 10 October 2025): Automated pledge release + invocation mechanism. Introduces PR-EP (Pledge Release for Early Pay-in), IV-EP (Invocation for Early Pay-in), and IV-RD (Invocation for Redemption) automated mechanisms. Extension from earlier September 1, 2025 effective date after CDSL / NSDL representations.
+- **[SEBI/HO/MIRSD/DOP/CIR/P/2020/28](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddopcirp202028)** (25 February 2020, effective 1 August 2020): Foundational framework. Mandates that client securities given to brokers as margin shall be by way of pledge / re-pledge in the depository system, rather than transfer to broker accounts. The TM CSMFA account is the depository-side container for MTF-pledged securities.
+- **[Master Circular for Stock Brokers — SEBI/HO/MIRSD/POD-1/P/CIR/2024/118](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir2024118)** (Aug 2024) and successor **[SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir202594)** (Apr 2025): Consolidates MTF provisions including activation, funding model, eligibility, interest disclosure, and compliance reporting.
+- **[SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/82](/broking-kyc/reference/circulars/sebi-mirsd/)** (3 June 2025, effective 10 October 2025): Automated pledge release + invocation mechanism. Introduces PR-EP (Pledge Release for Early Pay-in), IV-EP (Invocation for Early Pay-in), and IV-RD (Invocation for Redemption) automated mechanisms. Extension from earlier September 1, 2025 effective date after CDSL / NSDL representations.
 
 ### 1.2 Clearing-corp implementation
 
-- **[NCL/CMPT/63669](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-63669)** (30 August 2024): Direct-payout-to-demat operational guidelines including the CSMFA requirement. TMs offering MTF maintain CSMFA where client's demat resides. Release-payout-with-pledge-in-favour-of-CSMFA(MTF) facility provided.
-- **[NCL/CMPT/72224](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-72224)** (9 January 2026): Settlement-schedule reference including UNPAIDMTF upload windows for the 15-16 January 2026 holiday-adjusted settlement.
+- **[NCL/CMPT/63669](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt63669)** (30 August 2024): Direct-payout-to-demat operational guidelines including the CSMFA requirement. TMs offering MTF maintain CSMFA where client's demat resides. Release-payout-with-pledge-in-favour-of-CSMFA(MTF) facility provided.
+- **[NCL/CMPT/72224](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt72224)** (9 January 2026): Settlement-schedule reference including UNPAIDMTF upload windows for the 15-16 January 2026 holiday-adjusted settlement.
 
 ### 1.3 Depository implementation — CDSL
 
@@ -55,8 +55,8 @@ The CDSL TM CSMFA account uses a specific sub-status code distinct from the brok
 
 MTF imposes additional broker compliance obligations:
 
-- **Half-yearly networth certificate** due **31 October** for MTF members (vs. 30 November for non-MTF members) per [NSE/COMP/64293](/broking-kyc/reference/circulars/nse/#nse-comp-64293).
-- **MTF disclosure mandatory in audit** per [Margin compliance domain MARGIN-023](/broking-kyc/operations/compliance-blueprint/#margin-compliance-30-entries).
+- **Half-yearly networth certificate** due **31 October** for MTF members (vs. 30 November for non-MTF members) per [NSE/COMP/64293](/broking-kyc/reference/circulars/nse/#nsecomp64293).
+- **MTF disclosure mandatory in audit** per [Margin compliance domain MARGIN-023](/broking-kyc/operations/compliance-blueprint/).
 - **Quarterly MTF position report** to exchange (industry-typical reporting cadence).
 
 ## 2. MTF activation
@@ -78,7 +78,7 @@ To trade MTF, a client must:
 
 1. **Be MTF-eligible** — typically a KYC-complete client with PAN, Aadhaar, address, and an active demat account.
 2. **Sign / eSign the MTF agreement** — separate from the standard Rights & Obligations document. The MTF agreement includes the interest rate, margin maintenance requirements, square-off rules, and consent for pledge.
-3. **Activate DDPI or maintain TPIN authorization** — for pledge acceptance. Per the [CDSL MTF & Pledge primer Section 3](/broking-kyc/vendors/depositories/cdsl-mtf-pledge/#3-three-types-of-pledges-in-cdsl), DDPI activation makes pledge automatic; without DDPI, client must enter TPIN + OTP for each MTF pledge.
+3. **Activate DDPI or maintain TPIN authorization** — for pledge acceptance. Per the [CDSL MTF & Pledge primer Section 3](/broking-kyc/vendors/depositories/cdsl-mtf-pledge/), DDPI activation makes pledge automatic; without DDPI, client must enter TPIN + OTP for each MTF pledge.
 4. **Maintain initial margin** — typically Rs.50,000 or higher per broker policy.
 
 The activation is per-broker; clients with multiple brokers must activate MTF separately at each.
@@ -116,7 +116,7 @@ MTF is a CM-segment trade in terms of exchange order matching and settlement, bu
 
 ### 3.1 UNPAIDMTF file workflow
 
-Where a client doesn't accept the MTF pledge by T+3 or otherwise creates an unpaid position, the broker reports the position via the UNPAIDMTF file to the clearing corp. Per [NCL/CMPT/72224](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-72224) example (15-16 January 2026 settlement holiday):
+Where a client doesn't accept the MTF pledge by T+3 or otherwise creates an unpaid position, the broker reports the position via the UNPAIDMTF file to the clearing corp. Per [NCL/CMPT/72224](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt72224) example (15-16 January 2026 settlement holiday):
 
 - **Upload windows:** 15:30 – 22:00 IST on T-1 / T; 06:30 – 13:00 IST on T pay-in day (where T is the settlement / square-off day).
 - **EPI of securities cut-off:** typically 21:00 IST on the relevant settlement day.
@@ -175,7 +175,7 @@ The T+4 auto square-off is not optional — it's a regulatory mandate. The broke
 
 ## 5. Automated invocation (post October 2025)
 
-[SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/82](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-p-cir-2025-82) (3 June 2025, effective 10 October 2025 after extension) introduced three automated pledge-related mechanisms relevant to MTF:
+[SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/82](/broking-kyc/reference/circulars/sebi-mirsd/) (3 June 2025, effective 10 October 2025 after extension) introduced three automated pledge-related mechanisms relevant to MTF:
 
 ### 5.1 PR-EP — Pledge Release for Early Pay-in
 
@@ -218,7 +218,7 @@ The automation reduces operational complexity in MTF unwind:
 - **Broker-initiated invocation** (default / margin call) becomes automatic via IV-EP for delivery-based unwind.
 - **Manual unpledge-and-sell** legacy flow is largely obsolete for MTF positions.
 
-Brokers updating their MTF workflow to use PR-EP / IV-EP report substantially lower operational overhead and lower short-delivery risk in MTF unwind. See the [CDSL MTF & Pledge primer Section 8](/broking-kyc/vendors/depositories/cdsl-mtf-pledge/#8-sebi-automated-pledge-mechanism-june-2025) for the full primer.
+Brokers updating their MTF workflow to use PR-EP / IV-EP report substantially lower operational overhead and lower short-delivery risk in MTF unwind. See the [CDSL MTF & Pledge primer Section 8](/broking-kyc/vendors/depositories/cdsl-mtf-pledge/) for the full primer.
 
 <Aside type="tip">
 **PR-EP simplifies MTF unwind significantly.** Pre-PR-EP, a client selling an MTF-pledged security required a multi-step sequence: client requests unpledge, broker submits unpledge to depository, broker waits for confirmation, broker releases sale instruction. Each step had a window of risk for short delivery. With PR-EP, a single instruction handles both pledge release and early pay-in block. Brokers that updated their MTF unwind workflow in the October 2025 cutover reported materially fewer short deliveries.
@@ -289,7 +289,7 @@ The client is liable for:
 - **MTF-specific fees** (per the broker's schedule — typically pledge-creation, pledge-release, square-off charges).
 - **Standard brokerage** on the underlying trade.
 - **STT and other statutory charges** on the trade.
-- **Margin shortfall penalty pass-through restrictions** — broker cannot pass on margin penalties to client save for client-attributable exceptions per [NSE/INSP/64315](/broking-kyc/reference/circulars/nse/#nse-insp-64315).
+- **Margin shortfall penalty pass-through restrictions** — broker cannot pass on margin penalties to client save for client-attributable exceptions per [NSE/INSP/64315](/broking-kyc/reference/circulars/nse/#nseinsp64315).
 
 If the square-off doesn't fully recover the broker's exposure, the residual remains a client liability. Broker can pursue normal debt-recovery procedures.
 
@@ -378,7 +378,7 @@ A client holding both an MTF position (long, pledged in CSMFA) and a short posit
 
 ### 8.9 MTF interest during system outage / settlement holiday
 
-Interest continues to accrue daily regardless of trading-day status. A settlement holiday (e.g., [ICCL 20240914-5](/broking-kyc/reference/circulars/clearing-corps/#iccl-20240914-5) Sep 16 / 18 2024 holidays) doesn't pause interest accrual. The broker's daily interest computation runs on calendar days.
+Interest continues to accrue daily regardless of trading-day status. A settlement holiday (e.g., [ICCL 20240914-5](/broking-kyc/reference/circulars/clearing-corps/) Sep 16 / 18 2024 holidays) doesn't pause interest accrual. The broker's daily interest computation runs on calendar days.
 
 <Aside type="caution">
 **MTF leverage amplifies losses on both directions.** A 10% drop in an MTF position with 25% margin wipes out 40% of the client's margin. A larger drop can wipe out the entire margin and put the client in deficit. The broker's auto square-off is structured to limit the broker's loss, not the client's — once the position is closed, the residual loss (if any) is the client's obligation, recoverable as a debt. Clients new to MTF should be explicitly walked through this risk before activation.
@@ -406,15 +406,15 @@ Interest continues to accrue daily regardless of trading-day status. A settlemen
 - **[gotcha]** CSMFA must be opened in each depository where the broker serves clients. A broker serving both CDSL and NSDL clients needs CSMFA in both. Missing one depository's CSMFA blocks MTF for clients in that depository.
 - **[risk trade-off]** Interest charged on calendar days (including weekends / holidays) is industry-typical but client-disclosure-sensitive. Some brokers compute interest on business days only as a client-friendly option; others charge calendar days. The choice should be transparent in the MTF agreement.
 - **[industry typical]** Concentration limits at the per-client and per-scrip level are typically codified in the broker's MTF risk policy. Some brokers cap per-client MTF exposure at a multiple of monthly average ledger balance; others cap by absolute amount; some by both.
-- **[gotcha]** Half-yearly networth certificate deadline 31 October for MTF members vs 30 November for non-MTF members per [NSE/COMP/64293](/broking-kyc/reference/circulars/nse/#nse-comp-64293). Brokers offering MTF must remember the earlier deadline; missing it triggers inspection findings.
+- **[gotcha]** Half-yearly networth certificate deadline 31 October for MTF members vs 30 November for non-MTF members per [NSE/COMP/64293](/broking-kyc/reference/circulars/nse/#nsecomp64293). Brokers offering MTF must remember the earlier deadline; missing it triggers inspection findings.
 - **[cost optimization]** Direct-payout-to-CSMFA (post Nov 2024) eliminated the broker's pool transit for MTF securities. Brokers that updated their MTF workflow during the November 2024 cutover saw smoother settlement and faster pledge creation. Brokers that lagged on the chart-of-accounts update reported reconciliation breaks during the cutover window.
 
 ## Cross-references
 
-- [Broker Process Narrative — Section 3 (Settlement Cycle), MTF subsection](/broking-kyc/broker-process/narrative/#3-the-settlement-cycle) — chronological context
-- [Compliance Blueprint — Margin domain](/broking-kyc/operations/compliance-blueprint/#margin-compliance-30-entries) — MARGIN-023 MTF entry
-- [Compliance Blueprint — Settlement domain](/broking-kyc/operations/compliance-blueprint/#settlement-22-entries) — SETTLEMENT-005 (CSMFA), SETTLEMENT-016 (UNPAIDMTF workflow)
-- [Compliance Blueprint — Member compliance domain](/broking-kyc/operations/compliance-blueprint/#member-compliance-23-entries) — half-yearly networth for MTF members
+- [Broker Process Narrative — Section 3 (Settlement Cycle), MTF subsection](/broking-kyc/broker-process/narrative/) — chronological context
+- [Compliance Blueprint — Margin domain](/broking-kyc/operations/compliance-blueprint/) — MARGIN-023 MTF entry
+- [Compliance Blueprint — Settlement domain](/broking-kyc/operations/compliance-blueprint/) — SETTLEMENT-005 (CSMFA), SETTLEMENT-016 (UNPAIDMTF workflow)
+- [Compliance Blueprint — Member compliance domain](/broking-kyc/operations/compliance-blueprint/) — half-yearly networth for MTF members
 - [Direct payout to demat deep dive](./direct-payout-to-demat/) — CSMFA account structure and direct-payout flow
 - [T+0 / T+1 settlement deep dive](./t0-t1-settlement/) — settlement cycle for MTF trades
 - [Client funds upstreaming deep dive](./client-funds-upstreaming/) — broker funds vs client funds in MTF

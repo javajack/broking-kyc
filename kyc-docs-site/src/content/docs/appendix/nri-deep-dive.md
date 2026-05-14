@@ -11,7 +11,7 @@ NRI onboarding is planned for a future phase after the individual resident KYC s
 
 ## NRI-Specific Fields (Section V -- 22 Fields)
 
-These are the additional fields captured only for NRI customers. They are documented in full in the [Master Dataset, Section V](/broking-kyc/reference/master-dataset#23-section-v-nri-specific-requirements).
+These are the additional fields captured only for NRI customers. They are documented in full in the [Master Dataset, Section V](/broking-kyc/reference/master-dataset/).
 
 | Field | Description | Source |
 |-------|------------|--------|

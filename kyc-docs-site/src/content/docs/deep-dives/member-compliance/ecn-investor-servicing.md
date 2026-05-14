@@ -9,16 +9,16 @@ import { Aside } from '@astrojs/starlight/components';
 
 ## TL;DR
 
-- **Electronic Contract Note (ECN)** is the digitally signed trade-confirmation issued to a client for each trading day with activity. Format prescribed by NSE [NSE/INSP/61999](/broking-kyc/reference/circulars/nse/#nse-insp-61999) (May 13, 2024 revision) with FAQ supplement in [NSE/INSP/63859](/broking-kyc/reference/circulars/nse/#nse-insp-63859). ECN must be **digitally signed under the IT Act 2000** by the broker's Digital Signature Certificate (DSC) and dispatched within **24 hours** of trade execution.
-- **Two ECN format options** under [NSE/INSP/61999](/broking-kyc/reference/circulars/nse/#nse-insp-61999):
+- **Electronic Contract Note (ECN)** is the digitally signed trade-confirmation issued to a client for each trading day with activity. Format prescribed by NSE [NSE/INSP/61999](/broking-kyc/reference/circulars/nse/#nseinsp61999) (May 13, 2024 revision) with FAQ supplement in [NSE/INSP/63859](/broking-kyc/reference/circulars/nse/#nseinsp63859). ECN must be **digitally signed under the IT Act 2000** by the broker's Digital Signature Certificate (DSC) and dispatched within **24 hours** of trade execution.
+- **Two ECN format options** under [NSE/INSP/61999](/broking-kyc/reference/circulars/nse/#nseinsp61999):
   - **Annexure A** — Contract Note Cum Tax Invoice (single combined document)
   - **Annexure B** — Separate Contract Note + Tax Invoice (two distinct documents)
-- **Dispatch channels:** email + SMS link via **DLT-approved templates** per [NSE/INSP/52604](/broking-kyc/reference/circulars/nse/#nse-insp-52604) (June 2022). Both channels are preserved as evidence of dispatch.
-- **Daily margin statement** to clients per [NSE/INSP/64315](/broking-kyc/reference/circulars/nse/#nse-insp-64315) (October 2024).
-- **Quarterly statement of accounts** per the running-account framework — covers trades, ledger, holdings, and the running-account settlement evidence. Settlement on first Friday and/or Saturday of the settlement week per SEBI Dec 2023 ([SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/187](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-1-p-cir-2023-187)).
-- **Daily holding statement** for active accounts via daily API submission to exchange and dispatch to client; standardised by [NSE/INSP/55039](/broking-kyc/reference/circulars/nse/#nse-insp-55039).
+- **Dispatch channels:** email + SMS link via **DLT-approved templates** per [NSE/INSP/52604](/broking-kyc/reference/circulars/nse/#nseinsp52604) (June 2022). Both channels are preserved as evidence of dispatch.
+- **Daily margin statement** to clients per [NSE/INSP/64315](/broking-kyc/reference/circulars/nse/#nseinsp64315) (October 2024).
+- **Quarterly statement of accounts** per the running-account framework — covers trades, ledger, holdings, and the running-account settlement evidence. Settlement on first Friday and/or Saturday of the settlement week per SEBI Dec 2023 ([SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/187](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-pod-1pcir2023187)).
+- **Daily holding statement** for active accounts via daily API submission to exchange and dispatch to client; standardised by [NSE/INSP/55039](/broking-kyc/reference/circulars/nse/#nseinsp55039).
 - **Annual statement (P&L / Form 16A / capital gains)** dispatched once at FY close.
-- **Investor charter** published on broker website per SEBI investor-protection framework and reinforced with SCORES 2.0 launch — see [CDSL/IG/DP/GENRL/2024/593](/broking-kyc/reference/circulars/cdsl/#cdsl-ig-dp-genrl-2024-593) and [SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/0000013](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-p-cir-2025-0000013).
+- **Investor charter** published on broker website per SEBI investor-protection framework and reinforced with SCORES 2.0 launch — see [CDSL/IG/DP/GENRL/2024/593](/broking-kyc/reference/circulars/cdsl/#cdsligdpgenrl2024593) and [SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/0000013](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir20250000013).
 - **Retention period: 8 years for ECNs and most investor-servicing artefacts** per SEBI books-and-records framework; longer for PMLA-relevant records (10 years). Default channel is electronic; physical dispatch on client opt-in.
 - AI-generated synthesis. **Verify any specific column, channel, or retention period against the linked circulars before acting.**
 
@@ -28,12 +28,12 @@ A broker's relationship with a client is documented through a series of *standar
 
 The artefact framework has evolved with regulatory changes:
 
-- **T+1 introduction in January 2023** drove the contract-note format revision under [NSE/INSP/61999](/broking-kyc/reference/circulars/nse/#nse-insp-61999) (with the prior version [NSE/INSP/51772](/broking-kyc/reference/circulars/nse/) March 2022 being the T+2-era format).
-- **Daily client funds upstreaming since July 2023** ([SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/71](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-1-p-cir-2023-71)) drove changes to the daily margin statement and the running-account artefact.
+- **T+1 introduction in January 2023** drove the contract-note format revision under [NSE/INSP/61999](/broking-kyc/reference/circulars/nse/#nseinsp61999) (with the prior version [NSE/INSP/51772](/broking-kyc/reference/circulars/nse/) March 2022 being the T+2-era format).
+- **Daily client funds upstreaming since July 2023** ([SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/71](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-pod-1pcir202371)) drove changes to the daily margin statement and the running-account artefact.
 - **MTF disclosure** drove the addition of MTF line items in the contract note (handled within Annexures A / B).
-- **T+0 expansion in 2024–2025** drove the differential-brokerage disclosure requirement under [SEBI/HO/MRD/POD-3/P/CIR/2024/172](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-mrd-pod-3-p-cir-2024-172).
-- **Direct-payout-to-demat in November 2024 / January–February 2025** ([SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2024/75](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod1-p-cir-2024-75)) changed settlement disclosures.
-- **SCORES 2.0 launch in April 2024** ([SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/0000013](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-p-cir-2025-0000013)) drove the investor charter and grievance-info refresh.
+- **T+0 expansion in 2024–2025** drove the differential-brokerage disclosure requirement under [SEBI/HO/MRD/POD-3/P/CIR/2024/172](/broking-kyc/reference/circulars/sebi-other/#sebihomrdpod-3pcir2024172).
+- **Direct-payout-to-demat in November 2024 / January–February 2025** ([SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2024/75](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-pod1pcir202475)) changed settlement disclosures.
+- **SCORES 2.0 launch in April 2024** ([SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/0000013](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir20250000013)) drove the investor charter and grievance-info refresh.
 
 This page indexes each artefact, its format detail, dispatch / retention requirements, and the cross-link to upstream / downstream cycles.
 
@@ -45,20 +45,20 @@ This page indexes each artefact, its format detail, dispatch / retention require
 
 ### Trigger and timing
 
-The ECN is generated for every trading day on which a client transacted. Per [INVESTOR-SERVICING-001 in the Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/#investor-servicing-15-entries), the ECN must be issued **within 24 hours** of trade execution — i.e., by T+1 noon at the latest, with most brokers dispatching on T-day evening. Late or non-dispatch attracts penalty per [NSE/INSP/53530](/broking-kyc/reference/circulars/nse/#nse-insp-53530) and SCORES complaint exposure.
+The ECN is generated for every trading day on which a client transacted. Per [INVESTOR-SERVICING-001 in the Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/), the ECN must be issued **within 24 hours** of trade execution — i.e., by T+1 noon at the latest, with most brokers dispatching on T-day evening. Late or non-dispatch attracts penalty per [NSE/INSP/53530](/broking-kyc/reference/circulars/nse/#nseinsp53530) and SCORES complaint exposure.
 
 ### Format options under NSE/INSP/61999
 
-The May 13, 2024 NSE circular [NSE/INSP/61999](/broking-kyc/reference/circulars/nse/#nse-insp-61999) revised the contract note format following SEBI master regulatory changes, superseding prior versions [NSE/INSP/51772](/broking-kyc/reference/circulars/nse/) (March 2022), NSE/INSP/45879 (September 2020), NSE/INSP/39158 (October 2018), and NSE/INSP/35036 (June 2017). Members opting for one of two formats:
+The May 13, 2024 NSE circular [NSE/INSP/61999](/broking-kyc/reference/circulars/nse/#nseinsp61999) revised the contract note format following SEBI master regulatory changes, superseding prior versions [NSE/INSP/51772](/broking-kyc/reference/circulars/nse/) (March 2022), NSE/INSP/45879 (September 2020), NSE/INSP/39158 (October 2018), and NSE/INSP/35036 (June 2017). Members opting for one of two formats:
 
 - **Annexure A — Contract Note Cum Tax Invoice** — a single combined document that serves both as the contract note and the tax invoice for GST purposes.
 - **Annexure B — Separate Contract Note + Tax Invoice** — two distinct documents (one as contract note, one as tax invoice), each with its own format.
 
-The FAQ supplement [NSE/INSP/63859](/broking-kyc/reference/circulars/nse/#nse-insp-63859) (September 10, 2024) clarifies optional vs mandatory fields, MTF treatment, and direct-payout-to-demat handling.
+The FAQ supplement [NSE/INSP/63859](/broking-kyc/reference/circulars/nse/#nseinsp63859) (September 10, 2024) clarifies optional vs mandatory fields, MTF treatment, and direct-payout-to-demat handling.
 
 ### Mandatory columns / fields (Annexure A / B)
 
-The columns mandated by the ICAI prescription (carried over and refined under [NSE/INSP/61999](/broking-kyc/reference/circulars/nse/#nse-insp-61999) and the SEBI master) are the following. Specific column names may vary across exchanges (NSE / BSE / MCX) but the substance is consistent:
+The columns mandated by the ICAI prescription (carried over and refined under [NSE/INSP/61999](/broking-kyc/reference/circulars/nse/#nseinsp61999) and the SEBI master) are the following. Specific column names may vary across exchanges (NSE / BSE / MCX) but the substance is consistent:
 
 1. **Contract Note Number** — unique per client per trading day, with broker-specific prefix and a sequential numeric tail.
 2. **Trade Date** — the date on which the trade(s) were executed.
@@ -74,7 +74,7 @@ The columns mandated by the ICAI prescription (carried over and refined under [N
 12. **Quantity** — number of units traded (shares, lots for derivatives, kg for commodities).
 13. **Trade Price** — execution price.
 14. **Gross Value** — quantity × trade price (excluding charges and taxes).
-15. **Brokerage** — the broker's charge for the trade. For T+0 trades, brokerage may differ from T+1 brokerage; the difference must be transparently disclosed (per [SETTLEMENT-018](/broking-kyc/operations/compliance-blueprint/#settlement-22-entries)).
+15. **Brokerage** — the broker's charge for the trade. For T+0 trades, brokerage may differ from T+1 brokerage; the difference must be transparently disclosed (per [SETTLEMENT-018](/broking-kyc/operations/compliance-blueprint/)).
 16. **Exchange Transaction Charges** — fee collected by the exchange (per-trade or basis-points based, varies by segment).
 17. **Clearing Charges** — for self-clearing or clearing-corp-side fees, where applicable.
 18. **SEBI Turnover Fee** — Rs.10 per crore of turnover (subject to revision).
@@ -84,10 +84,10 @@ The columns mandated by the ICAI prescription (carried over and refined under [N
 22. **IPFT (Investor Protection Fund Trust) charge** — small per-trade contribution to IPFT (segment-specific, typically Rs.10 per crore).
 23. **Net Receivable / Payable** — the final cash obligation to / from the client.
 24. **Total Consideration** — gross value + all charges and taxes, signed.
-25. **Direct-payout-to-demat indicator** — added under [SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2024/75](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod1-p-cir-2024-75) to indicate that securities will be credited directly to the client's demat from CC.
+25. **Direct-payout-to-demat indicator** — added under [SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2024/75](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-pod1pcir202475) to indicate that securities will be credited directly to the client's demat from CC.
 26. **MTF flag** — present if the trade is in MTF context, with related disclosure on MTF interest accrual.
-27. **T+0 flag** — present if the trade is in T+0 segment under [SEBI/HO/MRD/POD-3/P/CIR/2024/172](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-mrd-pod-3-p-cir-2024-172); differential brokerage disclosed.
-28. **Pledge / unpledge indicator** — relevant where the trade or position interacts with the pledge framework under [CDSL/OPS/DP/SETT/2025/443](/broking-kyc/reference/circulars/cdsl/#cdsl-ops-dp-sett-2025-443).
+27. **T+0 flag** — present if the trade is in T+0 segment under [SEBI/HO/MRD/POD-3/P/CIR/2024/172](/broking-kyc/reference/circulars/sebi-other/#sebihomrdpod-3pcir2024172); differential brokerage disclosed.
+28. **Pledge / unpledge indicator** — relevant where the trade or position interacts with the pledge framework under [CDSL/OPS/DP/SETT/2025/443](/broking-kyc/reference/circulars/cdsl/#cdslopsdpsett2025443).
 
 ### Header and footer
 
@@ -117,7 +117,7 @@ Some brokers use Annexure B specifically because their B2B (institutional) clien
 
 ### Email dispatch
 
-The ECN PDF is dispatched via email to the client's registered email address. Per [INVESTOR-SERVICING-009 in the Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/#investor-servicing-15-entries), email dispatch must comply with DLT / IT Act / DPDP framework:
+The ECN PDF is dispatched via email to the client's registered email address. Per [INVESTOR-SERVICING-009 in the Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/), email dispatch must comply with DLT / IT Act / DPDP framework:
 
 - Sender domain configured with DKIM / SPF / DMARC records (anti-phishing).
 - Opt-in registered for transactional communications.
@@ -128,7 +128,7 @@ The email subject line typically reads: "Contract Note for [DATE] - [Client UCC]
 
 ### SMS dispatch with DLT-approved template
 
-In addition to email, brokers must dispatch a link to the ECN via SMS per [NSE/INSP/52604](/broking-kyc/reference/circulars/nse/#nse-insp-52604) (June 10, 2022, permitting SMS / instant-messaging delivery in addition to email). The SMS channel uses **DLT-approved templates** with a **registered Sender ID**:
+In addition to email, brokers must dispatch a link to the ECN via SMS per [NSE/INSP/52604](/broking-kyc/reference/circulars/nse/#nseinsp52604) (June 10, 2022, permitting SMS / instant-messaging delivery in addition to email). The SMS channel uses **DLT-approved templates** with a **registered Sender ID**:
 
 - Sender ID — registered with the telecom operator's DLT registry (TRAI Commercial Communications Customer Preference Regulations 2018).
 - Template — pre-approved by the DLT registry.
@@ -143,7 +143,7 @@ is available at [URL]. STN: [STN_NUMBER] | -[BROKER_NAME]
 
 The URL is typically a unique-per-client-per-day signed link to download the ECN PDF.
 
-DLT non-compliance leads to telco blocking of the SMS, SEBI inspection observations, and SCORES complaint exposure. Phishing mitigation is reinforced by [SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/96](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-1-p-cir-2024-96).
+DLT non-compliance leads to telco blocking of the SMS, SEBI inspection observations, and SCORES complaint exposure. Phishing mitigation is reinforced by [SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/96](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-pod-1pcir202496).
 
 ### Preserved-channel log
 
@@ -157,13 +157,13 @@ The preserved-channel log is the broker's evidence that dispatch happened on sch
 
 ### Physical dispatch (opt-in only)
 
-Per [INVESTOR-SERVICING-014](/broking-kyc/operations/compliance-blueprint/#investor-servicing-15-entries), physical dispatch is **opt-in only** — the default is electronic. Clients who specifically request physical receive the ECN by post / courier; the broker maintains a physical-despatch register with proof of delivery.
+Per [INVESTOR-SERVICING-014](/broking-kyc/operations/compliance-blueprint/), physical dispatch is **opt-in only** — the default is electronic. Clients who specifically request physical receive the ECN by post / courier; the broker maintains a physical-despatch register with proof of delivery.
 
 ## Daily margin statement
 
 ### Format
 
-The daily margin statement is dispatched to clients per [INVESTOR-SERVICING-002](/broking-kyc/operations/compliance-blueprint/#investor-servicing-15-entries) and the guidelines in [NSE/INSP/64315](/broking-kyc/reference/circulars/nse/#nse-insp-64315) (October 2024). Typical content:
+The daily margin statement is dispatched to clients per [INVESTOR-SERVICING-002](/broking-kyc/operations/compliance-blueprint/) and the guidelines in [NSE/INSP/64315](/broking-kyc/reference/circulars/nse/#nseinsp64315) (October 2024). Typical content:
 
 - Client identification (UCC, demat BO ID, PAN).
 - Date and time of the statement.
@@ -187,14 +187,14 @@ Per industry practice, brokers obtain an annual signed acknowledgement from the 
 
 ### Trigger and timing
 
-Issued quarterly, aligned to the **running-account settlement cycle** per [CLIENT-FUNDS-003](/broking-kyc/operations/compliance-blueprint/#client-funds-21-entries) and [INVESTOR-SERVICING-003](/broking-kyc/operations/compliance-blueprint/#investor-servicing-15-entries):
+Issued quarterly, aligned to the **running-account settlement cycle** per [CLIENT-FUNDS-003](/broking-kyc/operations/compliance-blueprint/) and [INVESTOR-SERVICING-003](/broking-kyc/operations/compliance-blueprint/):
 
 - April-June quarter — settlement in July.
 - July-September quarter — settlement in October.
 - October-December quarter — settlement in January.
 - January-March quarter — settlement in April.
 
-Per SEBI Dec 2023 ([SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/187](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-1-p-cir-2023-187)), settlement happens on the **first Friday and/or Saturday** of the designated settlement week each quarter, with subsequent operational details in [SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-pod-1-p-cir-2025-94) and the 30-day non-traded refund rule under [SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/04](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-p-cir-2025-04) (effective April 1, 2025).
+Per SEBI Dec 2023 ([SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/187](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-pod-1pcir2023187)), settlement happens on the **first Friday and/or Saturday** of the designated settlement week each quarter, with subsequent operational details in [SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir202594) and the 30-day non-traded refund rule under [SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/04](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202504) (effective April 1, 2025).
 
 ### Mandatory content
 
@@ -214,11 +214,11 @@ Per the SEBI running-account framework, the quarterly statement must include:
 
 ### Monthly statement option
 
-Per [INVESTOR-SERVICING-004](/broking-kyc/operations/compliance-blueprint/#investor-servicing-15-entries), clients may opt for **monthly running-account cycle** instead of quarterly. The monthly statement covers a one-month window with the same content structure. Change between monthly and quarterly cycles requires the client's consent.
+Per [INVESTOR-SERVICING-004](/broking-kyc/operations/compliance-blueprint/), clients may opt for **monthly running-account cycle** instead of quarterly. The monthly statement covers a one-month window with the same content structure. Change between monthly and quarterly cycles requires the client's consent.
 
 ### 30-day non-traded refund
 
-Per [CLIENT-FUNDS-014](/broking-kyc/operations/compliance-blueprint/#client-funds-21-entries) and [SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/04](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-p-cir-2025-04) (effective April 1, 2025), funds with the broker for a client who has not transacted in 30 calendar days and whose funds have been with the broker for over 30 days must be refunded on the upcoming monthly running-account settlement date irrespective of the client's chosen cycle. The quarterly statement reflects any such 30-day refunds.
+Per [CLIENT-FUNDS-014](/broking-kyc/operations/compliance-blueprint/) and [SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/04](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202504) (effective April 1, 2025), funds with the broker for a client who has not transacted in 30 calendar days and whose funds have been with the broker for over 30 days must be refunded on the upcoming monthly running-account settlement date irrespective of the client's chosen cycle. The quarterly statement reflects any such 30-day refunds.
 
 ### Authorisation for retention
 
@@ -228,7 +228,7 @@ If the client has authorised retention of funds beyond actual exposure (e.g., to
 
 ### Trigger
 
-For active accounts, per [INVESTOR-SERVICING-005](/broking-kyc/operations/compliance-blueprint/#investor-servicing-15-entries), brokers provide a daily holding statement showing the client's current securities holdings, pledged status, and collateral allocations.
+For active accounts, per [INVESTOR-SERVICING-005](/broking-kyc/operations/compliance-blueprint/), brokers provide a daily holding statement showing the client's current securities holdings, pledged status, and collateral allocations.
 
 ### Content
 
@@ -242,7 +242,7 @@ For active accounts, per [INVESTOR-SERVICING-005](/broking-kyc/operations/compli
 
 ### API submission and dispatch
 
-Standardised by [NSE/INSP/55039](/broking-kyc/reference/circulars/nse/#nse-insp-55039) (December 2022) for the API submission to exchange (replaces the prior weekly format). The same data is also dispatched to the client (email / app); the exchange-side API is the broker's evidence of submission.
+Standardised by [NSE/INSP/55039](/broking-kyc/reference/circulars/nse/#nseinsp55039) (December 2022) for the API submission to exchange (replaces the prior weekly format). The same data is also dispatched to the client (email / app); the exchange-side API is the broker's evidence of submission.
 
 ### Bank balance API
 
@@ -252,7 +252,7 @@ Same circular also covers daily bank-balance API submission across BA1 / BA2 / B
 
 ### Annual P&L / capital-gains statement
 
-Per [INVESTOR-SERVICING-012](/broking-kyc/operations/compliance-blueprint/#investor-servicing-15-entries), an annual P&L / capital-gains statement is dispatched at financial year close. Content:
+Per [INVESTOR-SERVICING-012](/broking-kyc/operations/compliance-blueprint/), an annual P&L / capital-gains statement is dispatched at financial year close. Content:
 
 - Year-on-year trade summary by segment.
 - Realised capital gains / losses (short-term / long-term).
@@ -263,7 +263,7 @@ Per [INVESTOR-SERVICING-012](/broking-kyc/operations/compliance-blueprint/#inves
 
 ### Form 16A — TDS certificate
 
-Per [INVESTOR-SERVICING-006](/broking-kyc/operations/compliance-blueprint/#investor-servicing-15-entries), Form 16A (TDS Certificate) is dispatched annually for any TDS the broker has deducted (typically on dividends paid via the demat account, NRI client payouts, etc.). The form is generated from the TRACES portal (Income-tax Department), preserved as evidence, and dispatched via email.
+Per [INVESTOR-SERVICING-006](/broking-kyc/operations/compliance-blueprint/), Form 16A (TDS Certificate) is dispatched annually for any TDS the broker has deducted (typically on dividends paid via the demat account, NRI client payouts, etc.). The form is generated from the TRACES portal (Income-tax Department), preserved as evidence, and dispatched via email.
 
 ### Bundling
 
@@ -288,7 +288,7 @@ The investor charter is a public-disclosure document — published on the broker
 
 ### Update on regulatory change
 
-The investor charter must be refreshed on any regulatory change that affects its content. SCORES 2.0 launch on April 1, 2024 triggered a refresh — the new URL (scores.sebi.gov.in) replaced the older sebi.gov.in/scores. Per [CDSL/IG/DP/GENRL/2024/593](/broking-kyc/reference/circulars/cdsl/#cdsl-ig-dp-genrl-2024-593) and [SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/0000013](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-p-cir-2025-0000013), brokers must update the SCORES 2.0 reference in the charter and app help.
+The investor charter must be refreshed on any regulatory change that affects its content. SCORES 2.0 launch on April 1, 2024 triggered a refresh — the new URL (scores.sebi.gov.in) replaced the older sebi.gov.in/scores. Per [CDSL/IG/DP/GENRL/2024/593](/broking-kyc/reference/circulars/cdsl/#cdsligdpgenrl2024593) and [SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/0000013](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir20250000013), brokers must update the SCORES 2.0 reference in the charter and app help.
 
 ### Display
 
@@ -312,7 +312,7 @@ The SEBI books-and-records framework prescribes minimum retention periods. Most 
 | Annual Statement / Form 16A | 8 years | Income-tax Act + SEBI |
 | MITC document | 8 years | SEBI |
 | Investor Charter (archive) | 8 years from update | SEBI |
-| PMLA-relevant records (KYC, transaction records) | **10 years** | PMLA + SEBI AML Master Circular ([SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-secfatf-p-cir-2024-78)) |
+| PMLA-relevant records (KYC, transaction records) | **10 years** | PMLA + SEBI AML Master Circular ([SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202478)) |
 | Settlement evidence (pay-in / pay-out) | 8 years | SEBI Stock Broker Master Circular |
 | Order log (OMS) | 8 years | NSE / SEBI |
 | Pledge / unpledge records | 8 years | CDSL / NSDL |
@@ -328,11 +328,11 @@ Records may be retained electronically subject to digital-signature integrity an
 
 ### Multi-segment trading on a single day
 
-A client who trades in CM, F&O, and CD on the same day receives one consolidated contract note covering all segments, or three segment-specific contract notes with cross-references — the format under [NSE/INSP/61999](/broking-kyc/reference/circulars/nse/#nse-insp-61999) allows either approach. Most brokers consolidate for clarity.
+A client who trades in CM, F&O, and CD on the same day receives one consolidated contract note covering all segments, or three segment-specific contract notes with cross-references — the format under [NSE/INSP/61999](/broking-kyc/reference/circulars/nse/#nseinsp61999) allows either approach. Most brokers consolidate for clarity.
 
 ### T+0 trades
 
-T+0 trades have differential brokerage that must be transparently disclosed in the ECN per [SETTLEMENT-018](/broking-kyc/operations/compliance-blueprint/#settlement-22-entries) and [SEBI/HO/MRD/POD-3/P/CIR/2024/172](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-mrd-pod-3-p-cir-2024-172). The T+0 flag and the brokerage difference are recorded distinctly.
+T+0 trades have differential brokerage that must be transparently disclosed in the ECN per [SETTLEMENT-018](/broking-kyc/operations/compliance-blueprint/) and [SEBI/HO/MRD/POD-3/P/CIR/2024/172](/broking-kyc/reference/circulars/sebi-other/#sebihomrdpod-3pcir2024172). The T+0 flag and the brokerage difference are recorded distinctly.
 
 ### MTF trades
 
@@ -344,7 +344,7 @@ Block deals have minimum quantity / value thresholds and trade in dedicated wind
 
 ### Auction trades
 
-When a client's trade is auctioned for short delivery (under [NCL/CMPT/71045](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-71045) auction mechanism), the auction price and the close-out cost are reflected in the next-day's contract note as an adjusting entry. The client receives both the original contract note (showing the failed delivery) and the auction-adjustment entry.
+When a client's trade is auctioned for short delivery (under [NCL/CMPT/71045](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt71045) auction mechanism), the auction price and the close-out cost are reflected in the next-day's contract note as an adjusting entry. The client receives both the original contract note (showing the failed delivery) and the auction-adjustment entry.
 
 ### Failed dispatch — bounce-back
 
@@ -356,7 +356,7 @@ A client requesting resend of a historical contract note must be supplied with t
 
 ### Account closure — final statement
 
-On account closure (per [CLIENT-FUNDS-018](/broking-kyc/operations/compliance-blueprint/#client-funds-21-entries) — settle on account closure), a final statement is dispatched covering all transactions since the last quarterly statement plus the closure settlement.
+On account closure (per [CLIENT-FUNDS-018](/broking-kyc/operations/compliance-blueprint/) — settle on account closure), a final statement is dispatched covering all transactions since the last quarterly statement plus the closure settlement.
 
 ### NRI clients
 
@@ -384,38 +384,38 @@ Trades executed in the pre-open call auction (09:00–09:15) and the closing auc
 - **[gotcha]** Annexure A vs Annexure B choice should be made consistently — switching between them mid-year creates client confusion and audit-trail discontinuity. Most brokers commit to one annexure and remain on it; transitions happen only at the FY boundary with explicit communication.
 - **[risk trade-off]** Daily holding statement dispatch is operationally heavy (per-client, per-day). Some brokers ration to "active accounts" (defined as accounts with trades or holding-value changes in the last 30 days). The regulatory minimum is met; the operational efficiency improves.
 - **[gotcha]** DSC expiration is the single most common failure mode — a broker continues to "sign" ECNs with an expired DSC, producing technically-unsigned artefacts. Set a calendar alert at T-90, T-30, T-7 days before expiry.
-- **[industry practice]** ECN format compliance is tested in NSE inspections via sample. Inspectors typically request 10–20 contract notes across days / segments / clients and verify column-by-column against [NSE/INSP/61999](/broking-kyc/reference/circulars/nse/#nse-insp-61999). Discrepancies surface as findings under [NSE/INSP/53530](/broking-kyc/reference/circulars/nse/#nse-insp-53530).
+- **[industry practice]** ECN format compliance is tested in NSE inspections via sample. Inspectors typically request 10–20 contract notes across days / segments / clients and verify column-by-column against [NSE/INSP/61999](/broking-kyc/reference/circulars/nse/#nseinsp61999). Discrepancies surface as findings under [NSE/INSP/53530](/broking-kyc/reference/circulars/nse/#nseinsp53530).
 - **[cost optimization]** DLT-approved templates can be created with multiple variants (one for ECN dispatch, one for margin statement, one for quarterly statement, one for closure confirmation). Bundle them in one DLT registration to save per-template approval cost.
-- **[gotcha]** The 30-day non-traded refund rule under [SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/04](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-p-cir-2025-04) (effective April 1, 2025) overrides the client's chosen monthly / quarterly cycle. Compliance officers should ensure the back-office implements the rule even for clients on quarterly cycle.
+- **[gotcha]** The 30-day non-traded refund rule under [SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/04](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202504) (effective April 1, 2025) overrides the client's chosen monthly / quarterly cycle. Compliance officers should ensure the back-office implements the rule even for clients on quarterly cycle.
 - **[industry practice]** Bundle annual statement, Form 16A, capital-gains statement, and the year-end ledger summary into a single annual dispatch with a unified cover note. Reduces client confusion and the broker's dispatch operations cost.
 - **[risk trade-off]** SCORES 2.0 URL refresh (April 2024) was a small operational task but a frequent inspection finding for brokers who did not update website footers and app help. Subsequent refreshes (DPDP-related cookie notice, etc.) should be tracked in the compliance calendar with explicit owner and deadline.
 - **[gotcha]** Physical despatch is opt-in but, where opted, must be evidenced with proof of delivery. Most brokers under-document this and face SCORES exposure on disputed delivery.
 
 ## Cross-references
 
-- [Compliance Blueprint — Investor servicing (15 entries)](/broking-kyc/operations/compliance-blueprint/#investor-servicing-15-entries) — INVESTOR-SERVICING-001 through 015 covering the full artefact set.
-- [Compliance Blueprint — Client funds (21 entries)](/broking-kyc/operations/compliance-blueprint/#client-funds-21-entries) — CLIENT-FUNDS-003 (running-account settlement) and CLIENT-FUNDS-014 (30-day non-traded refund) tying into the quarterly statement.
-- [Compliance Blueprint — Settlement (22 entries)](/broking-kyc/operations/compliance-blueprint/#settlement-22-entries) — SETTLEMENT-018 (T+0 differential brokerage) reflected in the ECN.
-- [NSE Contract Note format — NSE/INSP/61999](/broking-kyc/reference/circulars/nse/#nse-insp-61999) — May 13, 2024 revision; Annexures A and B.
-- [NSE FAQ on Contract Note — NSE/INSP/63859](/broking-kyc/reference/circulars/nse/#nse-insp-63859) — September 10, 2024 supplement.
-- [NSE SMS / IM delivery permission — NSE/INSP/52604](/broking-kyc/reference/circulars/nse/#nse-insp-52604) — June 10, 2022, DLT-template requirement.
-- [NSE Daily Margin Reporting — NSE/INSP/64315](/broking-kyc/reference/circulars/nse/#nse-insp-64315) — October 2024 guidelines.
-- [NSE API submission — NSE/INSP/55039](/broking-kyc/reference/circulars/nse/#nse-insp-55039) — December 2022 daily holding / bank-balance API.
-- [SEBI Stock Broker Master Circular — SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-pod-1-p-cir-2025-94) — operational compliance master including investor-servicing.
-- [SEBI running-account framework — SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/187](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-1-p-cir-2023-187) — Friday and/or Saturday settlement week.
-- [SEBI 30-day non-traded refund — SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/04](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-p-cir-2025-04) — April 1, 2025 rule.
-- [SEBI Master AML Circular — SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-secfatf-p-cir-2024-78) — 10-year retention overlay for PMLA-relevant records.
-- [SEBI Direct-payout-to-demat — SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2024/75](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod1-p-cir-2024-75) — direct-payout disclosure on ECN.
-- [SEBI T+0 expansion — SEBI/HO/MRD/POD-3/P/CIR/2024/172](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-mrd-pod-3-p-cir-2024-172) — differential brokerage disclosure.
-- [SEBI Anti-phishing — SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/96](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-1-p-cir-2024-96) — phishing mitigation in DLT communications.
-- [CDSL SCORES 2.0 — CDSL/IG/DP/GENRL/2024/593](/broking-kyc/reference/circulars/cdsl/#cdsl-ig-dp-genrl-2024-593) — investor charter refresh on SCORES 2.0.
+- [Compliance Blueprint — Investor servicing (15 entries)](/broking-kyc/operations/compliance-blueprint/) — INVESTOR-SERVICING-001 through 015 covering the full artefact set.
+- [Compliance Blueprint — Client funds (21 entries)](/broking-kyc/operations/compliance-blueprint/) — CLIENT-FUNDS-003 (running-account settlement) and CLIENT-FUNDS-014 (30-day non-traded refund) tying into the quarterly statement.
+- [Compliance Blueprint — Settlement (22 entries)](/broking-kyc/operations/compliance-blueprint/) — SETTLEMENT-018 (T+0 differential brokerage) reflected in the ECN.
+- [NSE Contract Note format — NSE/INSP/61999](/broking-kyc/reference/circulars/nse/#nseinsp61999) — May 13, 2024 revision; Annexures A and B.
+- [NSE FAQ on Contract Note — NSE/INSP/63859](/broking-kyc/reference/circulars/nse/#nseinsp63859) — September 10, 2024 supplement.
+- [NSE SMS / IM delivery permission — NSE/INSP/52604](/broking-kyc/reference/circulars/nse/#nseinsp52604) — June 10, 2022, DLT-template requirement.
+- [NSE Daily Margin Reporting — NSE/INSP/64315](/broking-kyc/reference/circulars/nse/#nseinsp64315) — October 2024 guidelines.
+- [NSE API submission — NSE/INSP/55039](/broking-kyc/reference/circulars/nse/#nseinsp55039) — December 2022 daily holding / bank-balance API.
+- [SEBI Stock Broker Master Circular — SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir202594) — operational compliance master including investor-servicing.
+- [SEBI running-account framework — SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/187](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-pod-1pcir2023187) — Friday and/or Saturday settlement week.
+- [SEBI 30-day non-traded refund — SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/04](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202504) — April 1, 2025 rule.
+- [SEBI Master AML Circular — SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202478) — 10-year retention overlay for PMLA-relevant records.
+- [SEBI Direct-payout-to-demat — SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2024/75](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-pod1pcir202475) — direct-payout disclosure on ECN.
+- [SEBI T+0 expansion — SEBI/HO/MRD/POD-3/P/CIR/2024/172](/broking-kyc/reference/circulars/sebi-other/#sebihomrdpod-3pcir2024172) — differential brokerage disclosure.
+- [SEBI Anti-phishing — SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/96](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-pod-1pcir202496) — phishing mitigation in DLT communications.
+- [CDSL SCORES 2.0 — CDSL/IG/DP/GENRL/2024/593](/broking-kyc/reference/circulars/cdsl/#cdsligdpgenrl2024593) — investor charter refresh on SCORES 2.0.
 - [SCORES procedure deep dive](/broking-kyc/deep-dives/compliance-audit/scores-procedure/) — grievance redressal context referenced in the investor charter.
 - [IGRC deep dive](/broking-kyc/deep-dives/compliance-audit/igrc/) — investor grievance redressal committee.
 - [ODR deep dive](/broking-kyc/deep-dives/compliance-audit/odr/) — Smart ODR portal.
 - [BMC / ABC deep dive](/broking-kyc/deep-dives/member-compliance/bmc-abc/) — collateral references that may appear in ECN.
 - [Membership renewal deep dive](/broking-kyc/deep-dives/member-compliance/membership-renewal/) — investor-servicing attestations within renewal.
-- [Broker process narrative — Section 2 EOD](/broking-kyc/broker-process/narrative/#eod-1540--1900) — ECN generation in the trading-day clock.
-- [Broker process narrative — Section 5 Recurring Cycles](/broking-kyc/broker-process/narrative/#5-recurring-cycles) — quarterly / annual statements in cadence.
+- [Broker process narrative — Section 2 EOD](/broking-kyc/broker-process/narrative/) — ECN generation in the trading-day clock.
+- [Broker process narrative — Section 5 Recurring Cycles](/broking-kyc/broker-process/narrative/) — quarterly / annual statements in cadence.
 
 ## Verified through
 

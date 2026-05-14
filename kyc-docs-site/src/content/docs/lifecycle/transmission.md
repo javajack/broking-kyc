@@ -179,7 +179,7 @@ Transmission touches sections A (Identity — both deceased and successor), H (D
 
 ## Cross-references
 
-- [Compliance Blueprint — Edge-case compliances](/broking-kyc/operations/compliance-blueprint/#edge-case-compliances-30-entries)
+- [Compliance Blueprint — Edge-case compliances](/broking-kyc/operations/compliance-blueprint/)
 - [Integration DAG — transmission DAGs](/broking-kyc/operations/integration-dag/lifecycle-events/)
 - [Field Atlas — Section I (Nomination)](/broking-kyc/reference/field-atlas/sections/i-nomination/) and [Section H (Demat)](/broking-kyc/reference/field-atlas/sections/h-demat-account/)
 - [Circulars — CDSL](/broking-kyc/reference/circulars/cdsl/) and [NSDL](/broking-kyc/reference/circulars/nsdl/) (transmission procedure guides)

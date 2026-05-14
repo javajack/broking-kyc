@@ -25,16 +25,16 @@ description: Operator-friendly step-by-step walkthroughs for every post-onboardi
 
 ## How the lifecycle pages relate to other site sections
 
-- **What must happen** — the [Compliance Blueprint KYC-lifecycle domain](/broking-kyc/operations/compliance-blueprint/#kyc-lifecycle-41-entries) lists every verifiable obligation per scenario.
+- **What must happen** — the [Compliance Blueprint KYC-lifecycle domain](/broking-kyc/operations/compliance-blueprint/) lists every verifiable obligation per scenario.
 - **What runs before what** — the [Integration DAG lifecycle-events page](/broking-kyc/operations/integration-dag/lifecycle-events/) maps the dependency graph for each scenario.
 - **Where the data flows** — the [Field-level Data Flow Atlas](/broking-kyc/reference/field-atlas/) shows which destinations receive each modified field.
-- **How it fits the operational day** — the [Broker Process Narrative Section 6](/broking-kyc/broker-process/narrative/#6-lifecycle-events) puts these scenarios in narrative context.
+- **How it fits the operational day** — the [Broker Process Narrative Section 6](/broking-kyc/broker-process/narrative/) puts these scenarios in narrative context.
 - **This section** — operator walkthroughs you can hand to a new ops engineer learning the scenarios.
 
 ## Practical notes
 
 - **[industry practice]** Most brokers maintain a "lifecycle queue" distinct from the onboarding queue. The ops teams running the two queues have different rhythms: onboarding is high-volume / standardised; lifecycle is lower-volume / higher per-case variation.
-- **[gotcha]** The single most common mistake across all lifecycle scenarios: firing KRA / CKYC / exchange UCC / depository BO updates concurrently for a modification. They must serialize — KRA first, the rest validate against the new KRA state. See the [Integration DAG modification path](/broking-kyc/operations/integration-dag/lifecycle-events/#dag-1-modification-address--bank--nominee--segment--mobile--email--name).
+- **[gotcha]** The single most common mistake across all lifecycle scenarios: firing KRA / CKYC / exchange UCC / depository BO updates concurrently for a modification. They must serialize — KRA first, the rest validate against the new KRA state. See the [Integration DAG modification path](/broking-kyc/operations/integration-dag/lifecycle-events/).
 - **[risk trade-off]** Tighter dormancy detection (e.g., 6 months instead of 12) reduces stale-account risk but increases friction for occasional traders. Industry default is 12 months; tighter settings are a deliberate broker-policy choice with measurable customer-experience cost.
 - **[cost optimization]** Lifecycle events generate disproportionate operational cost relative to their volume because they don't fit standard onboarding pipelines. Brokers that invest in specific lifecycle-scenario runbooks for ops staff see substantially faster average resolution time on these events.
 

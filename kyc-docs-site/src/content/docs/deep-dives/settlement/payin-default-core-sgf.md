@@ -11,7 +11,7 @@ import { Aside } from '@astrojs/starlight/components';
 
 - **Payin default occurs when a clearing member fails to honour pay-in obligation by the T+1 cut-off** (typically 10:30 / 11:30 IST for the standard T+1 settlement under the [clearing-corp circulars](/broking-kyc/reference/circulars/clearing-corps/)). The defaulting member is declared in default and the clearing corp invokes its default-fund hierarchy.
 - **Core Settlement Guarantee Fund (Core SGF)** is the apex layer of the CC's default-fund stack. It is jointly funded by the CC, its clearing members, the exchange, and SEBI. The CC's default-management committee (DMC) governs its draw.
-- **Default-fund cascade (industry-standard order, drawn-down sequence):** Defaulter's BMC + ABC + own contribution to SGF → other members' contribution to Core SGF → CC's own contribution to Core SGF → SEBI / exchange backstop. The exact slabs are CC-specific (per [NCL/CMPT/61800](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-61800), [NCL/CMPT/61801](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-61801), and the MCXCCL master consolidated circular [MCX/MCXCCL/437/2023](/broking-kyc/reference/circulars/clearing-corps/#mcx-mcxccl-437-2023)).
+- **Default-fund cascade (industry-standard order, drawn-down sequence):** Defaulter's BMC + ABC + own contribution to SGF → other members' contribution to Core SGF → CC's own contribution to Core SGF → SEBI / exchange backstop. The exact slabs are CC-specific (per [NCL/CMPT/61800](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt61800), [NCL/CMPT/61801](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt61801), and the MCXCCL master consolidated circular [MCX/MCXCCL/437/2023](/broking-kyc/reference/circulars/clearing-corps/#mcxmcxccl4372023)).
 - **Settlement bank guarantees** issued in favour of the CC by the broker's clearing bank provide an additional default cushion before Core SGF is touched.
 - **ISFC** (Interim Settlement Fund Contribution / Interim Settlement Financing Cushion — terminology varies by CC) is the CC-level liquidity reserve providing same-day liquidity while longer-cycle recoveries proceed.
 - **Client funds are protected by the upstreaming framework.** Per the June 2023 [client funds upstreaming](./client-funds-upstreaming/) mandate, EOD client funds sit with the CC — not the broker. The cash buffer needed for T+1 pay-in is the CC's downstreamed allocation, not broker-held funds.
@@ -20,7 +20,7 @@ import { Aside } from '@astrojs/starlight/components';
 
 ## Conceptual overview
 
-The Indian clearing-corp risk model is a multi-layered default-fund cascade. The principle is to absorb a defaulting member's loss without disrupting settlement for the rest of the market. The layers cover: (1) the defaulter's own collateral and deposits at the CC, (2) the defaulter's contribution to the Core SGF, (3) other members' Core SGF contributions, (4) the CC's own contribution, (5) any reinsurance / external backstop. The cascade is documented in each CC's master consolidated circular and forms one of the foundational risk-management chapters at the [Master Circular for Stock Exchanges and Clearing Corporations](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-mrd2-pod-2-cir-p-2023-171).
+The Indian clearing-corp risk model is a multi-layered default-fund cascade. The principle is to absorb a defaulting member's loss without disrupting settlement for the rest of the market. The layers cover: (1) the defaulter's own collateral and deposits at the CC, (2) the defaulter's contribution to the Core SGF, (3) other members' Core SGF contributions, (4) the CC's own contribution, (5) any reinsurance / external backstop. The cascade is documented in each CC's master consolidated circular and forms one of the foundational risk-management chapters at the [Master Circular for Stock Exchanges and Clearing Corporations](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2pod-2cirp2023171).
 
 For operations, payin default is a worst-case event. It triggers immediate consequences: position closure for the defaulting member, suspension or cancellation of clearing rights, recovery action by the CC against the broker's deposits and own funds, possible client-asset implications (for residual client positions held with the broker), and a regulatory inquiry. The entire margin and upstreaming framework — peak margin, intraday snapshots, client-level collateral segregation, EOD upstreaming, gross pay-in under direct-payout — exists in large part to *prevent* payin default. When prevention fails, the cascade above kicks in.
 
@@ -38,7 +38,7 @@ A pay-in default occurs when the member fails to honour any of:
 - Securities pay-in by the prescribed cut-off.
 - Margin pay-in (variation margin / additional margin / surveillance margin) by the prescribed cut-off.
 - Auction settlement (after short delivery) by the auction-settlement cut-off.
-- Internal-shortage close-out valuation (settlement price + 20% per [NCL/CMPT/66779](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-66779)) by noon on settlement day.
+- Internal-shortage close-out valuation (settlement price + 20% per [NCL/CMPT/66779](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt66779)) by noon on settlement day.
 
 Each is a distinct trigger; collectively they fall under "settlement default."
 
@@ -46,10 +46,10 @@ Each is a distinct trigger; collectively they fall under "settlement default."
 
 Pre-default, the member typically shows:
 
-- **Risk Reduction Mode (RRM) activation** at the 90% collateral-utilisation threshold (per [NCL/CMPT/51657](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-51657)).
-- **Margin shortfall** at peak-margin snapshots, evidenced via SA01 – SA06 reports per [NCL/CMPT/55381](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-55381).
+- **Risk Reduction Mode (RRM) activation** at the 90% collateral-utilisation threshold (per [NCL/CMPT/51657](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt51657)).
+- **Margin shortfall** at peak-margin snapshots, evidenced via SA01 – SA06 reports per [NCL/CMPT/55381](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt55381).
 - **MSBA invocation** (Margin Shortfall Block Amount) on commodity-segment members per MCXCCL master.
-- **Networth proximity** to BMC threshold (members are required to disclose net-worth at half-yearly cadence per [NSE/COMP/64293](/broking-kyc/reference/circulars/nse/#nse-comp-64293)).
+- **Networth proximity** to BMC threshold (members are required to disclose net-worth at half-yearly cadence per [NSE/COMP/64293](/broking-kyc/reference/circulars/nse/#nsecomp64293)).
 - **Bank confirmation delays** — the broker's settlement bank not confirming pay-in commitment by EOD.
 
 The CC's risk-monitoring desk monitors these signals daily; persistent warnings can lead to additional margin call, position-restriction, or trading-suspension as preventive measures before actual default.
@@ -81,7 +81,7 @@ A typical T+1 pay-in morning:
 | 16:30 IST | Final settlement 2 pay-in cut-off. Pay-out 21:00 IST. | Late-cycle default |
 | Noon | Internal-shortage close-out valuation (SP + 20%) payable by member to CC. | Close-out default |
 
-Cut-offs vary by settlement number and CC. The above reflects the standard NSCCL T+1 pattern; refer to [NCL/CMPT/67751](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-67751) (FY 2024-25 CM master) and current monthly settlement-schedule circulars for precise timings.
+Cut-offs vary by settlement number and CC. The above reflects the standard NSCCL T+1 pattern; refer to [NCL/CMPT/67751](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt67751) (FY 2024-25 CM master) and current monthly settlement-schedule circulars for precise timings.
 
 ## 3. Default-fund cascade — the recovery hierarchy
 
@@ -90,7 +90,7 @@ The CC has a defined sequence to recover the defaulted obligation. Each layer mu
 ### 3.1 Layer 1 — Defaulter's own resources at the CC
 
 1. **Cash / collateral allocated by the defaulter to TM / CM / client positions.** The CC has direct access to these. First drawn for client-segregated positions are protected to the extent of client-collateral; member-prop and CM-prop balances are immediately available.
-2. **Defaulter's Base Minimum Capital (BMC).** Deposit held at the exchange for trading rights; partially redeployable by the CC for clearing default. BMC is per segment per the SEBI / exchange BMC schedule (see [Margin compliance domain MARGIN-024](/broking-kyc/operations/compliance-blueprint/#margin-compliance-30-entries) and [NSE/COMP/64293](/broking-kyc/reference/circulars/nse/#nse-comp-64293)).
+2. **Defaulter's Base Minimum Capital (BMC).** Deposit held at the exchange for trading rights; partially redeployable by the CC for clearing default. BMC is per segment per the SEBI / exchange BMC schedule (see [Margin compliance domain MARGIN-024](/broking-kyc/operations/compliance-blueprint/) and [NSE/COMP/64293](/broking-kyc/reference/circulars/nse/#nsecomp64293)).
 3. **Defaulter's Additional Base Capital (ABC).** Voluntary deposit beyond BMC to expand permissible gross exposure; first-priority redeployable for default.
 4. **Defaulter's contribution to Core SGF.** Each clearing member contributes to the Core SGF; the defaulter's contribution is drawn first within the Core SGF tier.
 5. **Defaulter's settlement bank guarantees** issued in favour of the CC. The CC invokes the bank guarantee.
@@ -128,7 +128,7 @@ Within Layer 1, the practical liquidation order for non-cash assets:
 4. **MFOS pledge.** Re-pledged units redeemed at NAV.
 5. **Equity / ETF non-cash collateral.** Sold by the CC in the open market.
 
-The CC's collateral framework prioritises cash and cash-equivalents (the 50% cash-equivalent rule at CM level per [NCL/CMPT/51657](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-51657)) precisely because they are immediately available for default recovery.
+The CC's collateral framework prioritises cash and cash-equivalents (the 50% cash-equivalent rule at CM level per [NCL/CMPT/51657](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt51657)) precisely because they are immediately available for default recovery.
 
 ## 4. Core SGF structure and governance
 
@@ -136,10 +136,10 @@ The CC's collateral framework prioritises cash and cash-equivalents (the 50% cas
 
 The Core Settlement Guarantee Fund is the dedicated fund at each CC for absorbing clearing-member default losses. It is referenced in:
 
-- [NCL/CMPT/61800](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-61800) (NSCCL CM Master FY 2023-24, superseded by FY 2024-25 master).
-- [NCL/CMPT/61801](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-61801) (NSCCL F&O Master).
-- [MCX/MCXCCL/437/2023](/broking-kyc/reference/circulars/clearing-corps/#mcx-mcxccl-437-2023) (MCXCCL Master FY 2023-24).
-- [SETTLEMENT-008 in the Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/#settlement-22-entries).
+- [NCL/CMPT/61800](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt61800) (NSCCL CM Master FY 2023-24, superseded by FY 2024-25 master).
+- [NCL/CMPT/61801](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt61801) (NSCCL F&O Master).
+- [MCX/MCXCCL/437/2023](/broking-kyc/reference/circulars/clearing-corps/#mcxmcxccl4372023) (MCXCCL Master FY 2023-24).
+- [SETTLEMENT-008 in the Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/).
 
 Each CC maintains a separate Core SGF for each segment (CM, F&O, CD, SLBS, Commodity, etc.). Cross-default-fund subsidisation between segments is generally not permitted.
 
@@ -156,7 +156,7 @@ Contribution amounts are reviewed at least annually and disclosed in the CC's an
 
 ### 4.3 Governance — Default Management Committee (DMC)
 
-The DMC is a SEBI-mandated statutory committee at each CC, with composition prescribed in [SEBI/HO/MRD/MRD-PoD-3/P/CIR/2024/162](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-mrd-mrd-pod-3-p-cir-2024-162) (Statutory Committees at MIIs, Nov 2024). The DMC:
+The DMC is a SEBI-mandated statutory committee at each CC, with composition prescribed in [SEBI/HO/MRD/MRD-PoD-3/P/CIR/2024/162](/broking-kyc/reference/circulars/sebi-other/#sebihomrdmrd-pod-3pcir2024162) (Statutory Committees at MIIs, Nov 2024). The DMC:
 
 - Reviews the Core SGF size periodically.
 - Approves draw-down on Core SGF in default events.
@@ -194,7 +194,7 @@ Client securities pledged for margin sit in the broker's CUSPA (sub-status 40 pe
 
 ### 5.4 Running-account-settlement compliance
 
-The quarterly running-account settlement (first Friday / Saturday per [SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2023/197](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod1-p-cir-2023-197)) and the 30-day non-traded-credit-balance refund per [SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/04](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-p-cir-2025-04) (Jan 2025) ensure that excess client funds with the broker are refunded to the client's bank account at high frequency.
+The quarterly running-account settlement (first Friday / Saturday per [SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2023/197](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-pod1pcir2023197)) and the 30-day non-traded-credit-balance refund per [SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/04](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202504) (Jan 2025) ensure that excess client funds with the broker are refunded to the client's bank account at high frequency.
 
 ### 5.5 What is at residual risk
 
@@ -220,7 +220,7 @@ On default declaration:
 - **Clearing rights suspended** at the CC. The CC stops accepting trades from the defaulting member for clearing.
 - **Trading rights suspended** at the exchange. The member's terminals are disconnected; CTCL access revoked; FIX sessions terminated.
 - **Position close-out initiated.** The CC tags the defaulting member's open positions for orderly close-out. Brokers nominated by the CC may take over the close-out execution.
-- **Client positions transferred.** The CC initiates client position transfer per the SaaS portability / member-portability framework (per [NCL/CMPT/56168](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-56168) / [ICCL 20230329-18](/broking-kyc/reference/circulars/clearing-corps/#iccl-20230329-18) and [NCL/CMPT/64937](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-64937) mock sessions). The two-way SaaS portability allows positions to be moved to a designated alternate CM.
+- **Client positions transferred.** The CC initiates client position transfer per the SaaS portability / member-portability framework (per [NCL/CMPT/56168](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt56168) / [ICCL 20230329-18](/broking-kyc/reference/circulars/clearing-corps/) and [NCL/CMPT/64937](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt64937) mock sessions). The two-way SaaS portability allows positions to be moved to a designated alternate CM.
 
 ### 6.2 Member intimation
 
@@ -264,7 +264,7 @@ A defaulting member may, in principle, be re-admitted to clearing membership aft
 - Replenishment of Core SGF contribution.
 - Resolution of any pending SEBI enforcement action.
 - Member-rules compliance check at the CC and exchange.
-- Fit-and-proper re-certification of directors / KMPs per [Member compliance domain](/broking-kyc/operations/compliance-blueprint/#member-compliance-23-entries).
+- Fit-and-proper re-certification of directors / KMPs per [Member compliance domain](/broking-kyc/operations/compliance-blueprint/).
 - A waiting period (CC-specific; often a multi-month or multi-year minimum).
 
 Re-admission is rare in practice; defaulting members typically wind up the clearing-membership entity and operate (if at all) under a fresh corporate structure with fresh membership.
@@ -281,11 +281,11 @@ Failure to honour auction pay-in (08:00 IST T+2 for normal T+1 auctions) is a se
 
 ### 8.3 Internal-shortage close-out failure
 
-A member that fails to pay the internal-shortage close-out valuation (settlement price + 20% per [NCL/CMPT/66779](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-66779)) by noon on settlement day triggers an internal-shortage default. The CC computes the loss, the member is subject to additional surveillance margin, and persistent failure cascades to full default declaration.
+A member that fails to pay the internal-shortage close-out valuation (settlement price + 20% per [NCL/CMPT/66779](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt66779)) by noon on settlement day triggers an internal-shortage default. The CC computes the loss, the member is subject to additional surveillance margin, and persistent failure cascades to full default declaration.
 
 ### 8.4 Two-way CC SaaS portability activation
 
-Per [NCL/CMPT/56168](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-56168) / [ICCL 20230329-18](/broking-kyc/reference/circulars/clearing-corps/#iccl-20230329-18), each CC maintains an RMS instance for the other (NCL@ICCL and ICCL@NCL). On a CC-level technical failure, the alternate CC's RMS takes over real-time position / margin / collateral computation. Periodic mock sessions (quarterly per [NCL/CMPT/64937](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-64937)) verify the failover. This is a CC-level BCP, not a member-default mechanism, but it interacts with default cascade if the CC itself is impacted.
+Per [NCL/CMPT/56168](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt56168) / [ICCL 20230329-18](/broking-kyc/reference/circulars/clearing-corps/), each CC maintains an RMS instance for the other (NCL@ICCL and ICCL@NCL). On a CC-level technical failure, the alternate CC's RMS takes over real-time position / margin / collateral computation. Periodic mock sessions (quarterly per [NCL/CMPT/64937](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt64937)) verify the failover. This is a CC-level BCP, not a member-default mechanism, but it interacts with default cascade if the CC itself is impacted.
 
 ### 8.5 Cross-CC offset on default
 
@@ -305,10 +305,10 @@ A member that defaults on one settlement but is otherwise solvent may, in princi
 
 ### 8.9 Cyber-incident-triggered default
 
-A cyber incident at the broker that prevents pay-in could be treated under [SEBI/HO/MIRSD/TPD/P/CIR/2022/93](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-tpd-p-cir-2022-93) (Technical Glitch / Cyber Incident) reporting framework rather than as a pure financial default — provided the broker promptly reports per the 6-hour CERT-In incident rule and demonstrates that the incident, not insolvency, caused the failure. The CC's risk-monitoring committee judges this on the evidence.
+A cyber incident at the broker that prevents pay-in could be treated under [SEBI/HO/MIRSD/TPD/P/CIR/2022/93](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdtpdpcir202293) (Technical Glitch / Cyber Incident) reporting framework rather than as a pure financial default — provided the broker promptly reports per the 6-hour CERT-In incident rule and demonstrates that the incident, not insolvency, caused the failure. The CC's risk-monitoring committee judges this on the evidence.
 
 <Aside type="caution">
-**Repeated peak-margin shortfalls are a default precursor.** Brokers that show persistent SA01 – SA06 short-allocation reports (per [NCL/CMPT/55381](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-55381)) over weeks are flagged by the CC's surveillance and may be subject to enhanced margin, exposure reduction, or trading restriction *before* an actual default. Compliance officers tracking these reports daily are the early-warning line.
+**Repeated peak-margin shortfalls are a default precursor.** Brokers that show persistent SA01 – SA06 short-allocation reports (per [NCL/CMPT/55381](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt55381)) over weeks are flagged by the CC's surveillance and may be subject to enhanced margin, exposure reduction, or trading restriction *before* an actual default. Compliance officers tracking these reports daily are the early-warning line.
 </Aside>
 
 ## 9. ISFC and settlement bank guarantees
@@ -333,7 +333,7 @@ Members are required (or may opt) to issue bank guarantees from their settlement
 
 The bank guarantee gives the CC a direct claim on the issuing bank, simplifying recovery. The bank, in turn, has recourse to the member. The chain "CC → settlement bank → member" allows fast recovery for the CC while the member's solvency works itself out.
 
-Approved settlement banks per the quarterly approved-banks list (e.g., [MCX/MCXCCL/094/2026](/broking-kyc/reference/circulars/clearing-corps/#mcx-mcxccl-094-2026) Annexure 4) form the eligible universe for BG issuance.
+Approved settlement banks per the quarterly approved-banks list (e.g., [MCX/MCXCCL/094/2026](/broking-kyc/reference/circulars/clearing-corps/#mcxmcxccl0942026) Annexure 4) form the eligible universe for BG issuance.
 
 ## 10. Comparative table — what each layer covers
 
@@ -353,9 +353,9 @@ Approved settlement banks per the quarterly approved-banks list (e.g., [MCX/MCXC
 ## Practical notes
 
 - **[industry typical]** Modern Indian markets see clearing-member defaults very rarely — the framework's combination of pre-trade margin, peak-margin snapshots, intraday short-allocation reporting, EOD upstreaming, and the SaaS-portability layer is structurally tight. When defaults occur, they are typically smaller members and contained within Layer 1 of the cascade.
-- **[gotcha]** A member showing persistent SA01 – SA06 short-allocation reports (per [NCL/CMPT/55381](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-55381)) is materially closer to default than a one-off shortfall. Compliance officers should treat persistent intraday short allocation as a structural risk indicator, not a one-off operational issue.
+- **[gotcha]** A member showing persistent SA01 – SA06 short-allocation reports (per [NCL/CMPT/55381](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt55381)) is materially closer to default than a one-off shortfall. Compliance officers should treat persistent intraday short allocation as a structural risk indicator, not a one-off operational issue.
 - **[risk trade-off]** The Core SGF is a mutualised loss-sharing mechanism — non-defaulting members contribute, and on a default cascade, their SGF contribution is drawn (subject to the cap). Members holding a larger SGF contribution have greater systemic exposure to peer defaults. Most members size their SGF participation conservatively given this.
-- **[industry typical]** The Default Management Committee (DMC) and the Risk Management Committee at each CC have statutory composition per [SEBI/HO/MRD/MRD-PoD-3/P/CIR/2024/162](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-mrd-mrd-pod-3-p-cir-2024-162) (Nov 2024). The independence requirements (Independent External Professionals constraint, Public Interest Directors caps) are specifically designed to insulate default-handling from member influence.
+- **[industry typical]** The Default Management Committee (DMC) and the Risk Management Committee at each CC have statutory composition per [SEBI/HO/MRD/MRD-PoD-3/P/CIR/2024/162](/broking-kyc/reference/circulars/sebi-other/#sebihomrdmrd-pod-3pcir2024162) (Nov 2024). The independence requirements (Independent External Professionals constraint, Public Interest Directors caps) are specifically designed to insulate default-handling from member influence.
 - **[gotcha]** Direct-payout-to-demat changed where the broker's default would expose client securities. Pre-mandate, the pool account was the failure point. Post-mandate, the failure point is the TM CUSPA / TM CSMFA pledges — where the broker holds a depository-tracked claim, not the securities themselves. Operationally easier to recover; client title to the underlying remains.
 - **[cost optimization]** Brokers maintaining excess BMC / ABC beyond the minimum prudential threshold absorb a lower cascade load — their own resources cover more of any default — but at the cost of capital deployed. The trade-off is broker-specific and reflects size, mix of client book, and risk appetite.
 - **[industry typical]** Post-default member re-admission is exceedingly rare. In practice, defaulting members wind down and the principals re-enter the market (if at all) under a new corporate entity with fresh membership, fit-and-proper attestation, BMC contribution, and SGF participation. This pattern is well-recognised in the Indian regulatory community.
@@ -365,10 +365,10 @@ Approved settlement banks per the quarterly approved-banks list (e.g., [MCX/MCXC
 
 ## Cross-references
 
-- [Broker Process Narrative — Section 3 (Settlement Cycle)](/broking-kyc/broker-process/narrative/#3-the-settlement-cycle) — chronological narrative
+- [Broker Process Narrative — Section 3 (Settlement Cycle)](/broking-kyc/broker-process/narrative/) — chronological narrative
 - [Integration DAG — EOD & settlement](/broking-kyc/operations/integration-dag/eod-settlement/) — SET-PAYIN-EXECUTE node and default fall-through
-- [Compliance Blueprint — Settlement domain](/broking-kyc/operations/compliance-blueprint/#settlement-22-entries) — SETTLEMENT-008 / 009 / 011 entries
-- [Compliance Blueprint — Margin domain](/broking-kyc/operations/compliance-blueprint/#margin-compliance-30-entries) — MARGIN-024 / 027 / 028 entries (BMC, 50% cash equivalent, short allocation)
+- [Compliance Blueprint — Settlement domain](/broking-kyc/operations/compliance-blueprint/) — SETTLEMENT-008 / 009 / 011 entries
+- [Compliance Blueprint — Margin domain](/broking-kyc/operations/compliance-blueprint/) — MARGIN-024 / 027 / 028 entries (BMC, 50% cash equivalent, short allocation)
 - [SGF / Core SGF deep dive](/broking-kyc/deep-dives/foundational/sgf-core-sgf/) — foundational layer detail
 - [Investor Protection Fund (IPF) deep dive](/broking-kyc/deep-dives/foundational/ipf/) — exchange-administered client-claim layer
 - [Member default recovery deep dive](/broking-kyc/deep-dives/foundational/member-default-recovery/) — sibling page on member-default mechanics

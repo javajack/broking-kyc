@@ -160,7 +160,7 @@ Modifications touch fields across master-dataset sections A (Identity), B (Addre
 
 ## Cross-references
 
-- [Compliance Blueprint — KYC lifecycle domain](/broking-kyc/operations/compliance-blueprint/#kyc-lifecycle-41-entries)
+- [Compliance Blueprint — KYC lifecycle domain](/broking-kyc/operations/compliance-blueprint/)
 - [Integration DAG — modification path](/broking-kyc/operations/integration-dag/lifecycle-events/)
 - [Field Atlas](/broking-kyc/reference/field-atlas/)
 - [Circulars — SEBI MIRSD](/broking-kyc/reference/circulars/sebi-mirsd/) (KYC master + Jan 2025 nominee revamp)

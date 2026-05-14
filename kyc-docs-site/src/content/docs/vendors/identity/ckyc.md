@@ -81,7 +81,7 @@ Every individual in the CKYC registry is assigned a **14-digit CKYC Identificati
 ### Dual Upload Mandate
 
 Since **August 1, 2024**, SEBI mandates that all intermediaries must upload KYC records to **both** KRA and CKYC:
-- **Circular**: [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/79](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-secfatf-p-cir-2024-79) (Jun 6, 2024)
+- **Circular**: [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/79](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202479) (Jun 6, 2024)
 - Previously, brokers only uploaded to KRA; CKYC upload was optional
 - Now both are mandatory for every new account opening
 

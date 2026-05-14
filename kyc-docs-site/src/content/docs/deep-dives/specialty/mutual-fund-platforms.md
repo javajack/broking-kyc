@@ -107,9 +107,9 @@ AMFI maintains a **Know Your Distributor (KYD)** process — biometric verificat
 
 Brokers who act as MFDs are subject to:
 
-- **Mutual Fund Master Circular** [SEBI/HO/IMD/IMD-PoD-1/P/CIR/2024/90](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-imd-imd-pod-1-p-cir-2024-90) (consolidated MF circulars to March 2024).
+- **Mutual Fund Master Circular** [SEBI/HO/IMD/IMD-PoD-1/P/CIR/2024/90](/broking-kyc/reference/circulars/sebi-other/#sebihoimdimd-pod-1pcir202490) (consolidated MF circulars to March 2024).
 - **Distributor code of conduct** under AMFI bye-laws — disclosures, suitability checks, complaint handling.
-- **MF Lite framework** [SEBI/HO/IMD/PoD2/P/CIR/2024/183](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-imd-pod2-p-cir-2024-183) (Dec 2024) for passively-managed schemes — lower compliance burden for index funds, ETFs, FoFs investing in passives.
+- **MF Lite framework** [SEBI/HO/IMD/PoD2/P/CIR/2024/183](/broking-kyc/reference/circulars/sebi-other/#sebihoimdpod2pcir2024183) (Dec 2024) for passively-managed schemes — lower compliance burden for index funds, ETFs, FoFs investing in passives.
 - **MF nomination revamp** [BSE 20250411-43](/broking-kyc/reference/circulars/bse/#20250411-43) (Apr 2025) — UCC structure updated for MF nominee fields.
 
 ## 3. The MF transaction lifecycle — step by step (lumpsum purchase)
@@ -266,7 +266,7 @@ Mutual fund KYC is administered separately from broking KYC at the regulatory la
 
 ### MF KYC "ON HOLD" status
 
-[SEBI/HO/MIRSD/SECFATF/P/CIR/2024/41](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-secfatf-p-cir-2024-41) (May 2024) reviewed KRA validation. Clients with KYC marked "ON HOLD" by the KRA cannot transact MFs — the AMC rejects the order. The broker's app must check KRA status before order submission. [BSE 20241202-5](/broking-kyc/reference/circulars/bse/#20241202-5) extended this to demat freezing for KRA-invalid KYC records.
+[SEBI/HO/MIRSD/SECFATF/P/CIR/2024/41](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202441) (May 2024) reviewed KRA validation. Clients with KYC marked "ON HOLD" by the KRA cannot transact MFs — the AMC rejects the order. The broker's app must check KRA status before order submission. [BSE 20241202-5](/broking-kyc/reference/circulars/bse/#20241202-5) extended this to demat freezing for KRA-invalid KYC records.
 
 ### Re-KYC for MF
 
@@ -274,7 +274,7 @@ Per the SEBI risk-based re-KYC framework, MF KYC re-validation follows the same 
 
 ### Nominee for MF — recent revamp
 
-[BSE 20250411-43](/broking-kyc/reference/circulars/bse/#20250411-43) (April 2025) revised the UCC structure to incorporate nominee-related fields for the MF segment. Per [SEBI/HO/IMD/IMD-PoD-1/P/CIR/2024/29](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-imd-imd-pod-1-p-cir-2024-29) (April 2024), **jointly-held MF folios are exempt** from mandatory nomination — joint holding gives survivorship.
+[BSE 20250411-43](/broking-kyc/reference/circulars/bse/#20250411-43) (April 2025) revised the UCC structure to incorporate nominee-related fields for the MF segment. Per [SEBI/HO/IMD/IMD-PoD-1/P/CIR/2024/29](/broking-kyc/reference/circulars/sebi-other/#sebihoimdimd-pod-1pcir202429) (April 2024), **jointly-held MF folios are exempt** from mandatory nomination — joint holding gives survivorship.
 
 For single-holder folios, nomination is mandatory or the client must explicitly opt out. The SEBI January 2025 nominee revamp extends to MF folios — up to 10 nominees with percentage allocation, opt-out requires video declaration.
 
@@ -320,7 +320,7 @@ For each MF scheme, the AMC offers two variants:
 When the broker submits an order without an ARN tag, the order routes to the Direct plan automatically. Many advisor-style brokers offer Direct plans (especially RIA-licensed advisors charging a separate advisory fee); transaction-broker style brokers offer Regular plans by default. SEBI prevents commingling of the two roles — a SEBI-Registered Investment Advisor (RIA) cannot also be an MFD for the same client.
 
 <Aside type="note">
-**Direct-plan growth and the broker compensation squeeze.** The Direct plan share of MF AUM has grown from ~5% in 2013 (when introduced) to 50%+ in 2024–25 for many AMCs. This squeezes broker compensation; brokers responding with hybrid models — flat advisory fee (Rs 999–4,999 / year) combined with Direct-plan execution, or stay on Regular plans with full-service support. Each has trade-offs. SEBI's MF Lite framework ([SEBI/HO/IMD/PoD2/P/CIR/2024/183](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-imd-pod2-p-cir-2024-183)) introduced in Dec 2024 lowers compliance burden for passive schemes, which may further squeeze trail commissions for passively-managed funds.
+**Direct-plan growth and the broker compensation squeeze.** The Direct plan share of MF AUM has grown from ~5% in 2013 (when introduced) to 50%+ in 2024–25 for many AMCs. This squeezes broker compensation; brokers responding with hybrid models — flat advisory fee (Rs 999–4,999 / year) combined with Direct-plan execution, or stay on Regular plans with full-service support. Each has trade-offs. SEBI's MF Lite framework ([SEBI/HO/IMD/PoD2/P/CIR/2024/183](/broking-kyc/reference/circulars/sebi-other/#sebihoimdpod2pcir2024183)) introduced in Dec 2024 lowers compliance burden for passive schemes, which may further squeeze trail commissions for passively-managed funds.
 </Aside>
 
 ## 8. NFO subscriptions and special order types
@@ -332,7 +332,7 @@ When an AMC launches a new scheme, a defined **NFO period** (typically 15 days) 
 - The exchange platforms (BSE StAR MF, NSE NMF II) and MFU surface the NFO with the open / close dates.
 - Orders during the NFO period are captured and held; funds are debited per the AMC's collection schedule.
 - The AMC allots units at the launch NAV on the **scheme allotment date** (typically T+5 from NFO close).
-- Per [SEBI/HO/IMD/IMD-PoD-1/P/CIR/2025/23](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-imd-imd-pod-1-p-cir-2025-23) (Feb 2025), AMCs must deploy NFO proceeds within **30 business days** from allotment as per declared asset allocation, extendable once by 30 business days with investment-committee justification.
+- Per [SEBI/HO/IMD/IMD-PoD-1/P/CIR/2025/23](/broking-kyc/reference/circulars/sebi-other/#sebihoimdimd-pod-1pcir202523) (Feb 2025), AMCs must deploy NFO proceeds within **30 business days** from allotment as per declared asset allocation, extendable once by 30 business days with investment-committee justification.
 
 ### Cut-off NAV variations
 
@@ -389,7 +389,7 @@ For demat-mode units — flows through the depository's transmission process (se
 
 ### Foreign tax residency (FATCA / CRS)
 
-Clients with foreign tax residency (US persons, OECD-country residents) must complete FATCA / CRS self-certification annually. The AMC reports these holdings to the Income Tax Department, which transmits to the foreign tax authority via inter-government agreement. [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-secfatf-p-cir-2024-12) (Feb 2024) centralised FATCA collection at KRAs effective 1 July 2024.
+Clients with foreign tax residency (US persons, OECD-country residents) must complete FATCA / CRS self-certification annually. The AMC reports these holdings to the Income Tax Department, which transmits to the foreign tax authority via inter-government agreement. [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202412) (Feb 2024) centralised FATCA collection at KRAs effective 1 July 2024.
 
 ### NRI MF investments
 
@@ -426,7 +426,7 @@ Per [BSE 20230109-49](/broking-kyc/reference/circulars/bse/#20230109-49), 2FA is
 
 - [Broker Process Narrative](/broking-kyc/broker-process/narrative/) — Section 4 covers daily reporting touchpoints that include MF transaction reporting.
 - [Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/) — KYC lifecycle and investor servicing domains apply to MF as well as equity.
-- [SEBI Other Circulars](/broking-kyc/reference/circulars/sebi-other/) — MF master circular ([SEBI/HO/IMD/IMD-PoD-1/P/CIR/2024/90](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-imd-imd-pod-1-p-cir-2024-90)), NFO deployment timelines, MF Lite framework.
+- [SEBI Other Circulars](/broking-kyc/reference/circulars/sebi-other/) — MF master circular ([SEBI/HO/IMD/IMD-PoD-1/P/CIR/2024/90](/broking-kyc/reference/circulars/sebi-other/#sebihoimdimd-pod-1pcir202490)), NFO deployment timelines, MF Lite framework.
 - [BSE Circulars](/broking-kyc/reference/circulars/bse/) — StAR MF 2FA mandate, MF nominee revamp.
 - [NPCI Circulars](/broking-kyc/reference/circulars/npci/) — UPI AutoPay enhancement, NACH mandate cancellation, 40-year mandate cap.
 - [SEBI MIRSD Circulars](/broking-kyc/reference/circulars/sebi-mirsd/) — FATCA / CRS centralisation at KRAs, AML master circular.

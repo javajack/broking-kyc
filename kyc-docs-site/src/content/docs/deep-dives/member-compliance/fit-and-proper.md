@@ -5,15 +5,15 @@ description: Reference and walkthrough of the fit-and-proper framework that gove
 
 import { Aside } from '@astrojs/starlight/components';
 
-> **Why this page is structured this way:** Fit-and-proper sits at the intersection of three regulatory layers — SEBI (Intermediaries) Regulations 2008 (Schedule II is the canonical fit-and-proper test), SEBI (Stock Brokers) Regulations 2026 ([SEBI/LAD-NRO/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebi-lad-nro-gn-2026-291), the broker-specific overlay), and the SEBI Stock Broker Master Circular ([SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-pod-1-p-cir-2025-94)). This page knits them together so a compliance officer can answer: "what does fit-and-proper actually require, who does it apply to, how often is it tested, and what happens when an individual fails the test?".
+> **Why this page is structured this way:** Fit-and-proper sits at the intersection of three regulatory layers — SEBI (Intermediaries) Regulations 2008 (Schedule II is the canonical fit-and-proper test), SEBI (Stock Brokers) Regulations 2026 ([SEBI/LAD-NRO/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebilad-nrogn2026291), the broker-specific overlay), and the SEBI Stock Broker Master Circular ([SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir202594)). This page knits them together so a compliance officer can answer: "what does fit-and-proper actually require, who does it apply to, how often is it tested, and what happens when an individual fails the test?".
 
 ## TL;DR
 
 - **Fit-and-proper is a continuing eligibility test**, not a one-time admission gate. Brokers must demonstrate ongoing fit-and-proper status of (a) the broker entity, (b) every director on the board, (c) every Key Managerial Person (KMP) under Section 2(51) of the Companies Act 2013, and (d) senior management with material control over operations.
-- The legal source is **Schedule II of SEBI (Intermediaries) Regulations 2008**, applied to brokers through **Regulation 9 of SEBI (Stock Brokers) Regulations 2026 ([SEBI/LAD-NRO/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebi-lad-nro-gn-2026-291))** and reiterated in the **SEBI Stock Broker Master Circular ([SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-pod-1-p-cir-2025-94))**.
+- The legal source is **Schedule II of SEBI (Intermediaries) Regulations 2008**, applied to brokers through **Regulation 9 of SEBI (Stock Brokers) Regulations 2026 ([SEBI/LAD-NRO/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebilad-nrogn2026291))** and reiterated in the **SEBI Stock Broker Master Circular ([SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir202594))**.
 - **Disqualifying conditions** include: criminal conviction involving moral turpitude or economic offence; SEBI / RBI / other-regulator debarment or specific enforcement action; insolvency; declared NPA on a financial-services account; orders restraining the person from accessing the securities market; ongoing inquiry where adverse findings are likely; and inadequate integrity, reputation, or character.
-- **Cadence: annual self-certification** at minimum, plus event-triggered re-verification when an adverse regulatory action, criminal proceeding, or other disqualifying condition arises. The annual self-certification is one of the named recurring cycles ([CYC-AN-FIT_PROPER](/broking-kyc/operations/integration-dag/recurring-cycles/#per-node-detail)).
-- The **2026 Regulations introduce a resident-director requirement**: at least one designated director must be resident in India for 182+ days per financial year (MEMBER-COMP-018 in the [Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/#member-compliance-23-entries)).
+- **Cadence: annual self-certification** at minimum, plus event-triggered re-verification when an adverse regulatory action, criminal proceeding, or other disqualifying condition arises. The annual self-certification is one of the named recurring cycles ([CYC-AN-FIT_PROPER](/broking-kyc/operations/integration-dag/recurring-cycles/)).
+- The **2026 Regulations introduce a resident-director requirement**: at least one designated director must be resident in India for 182+ days per financial year (MEMBER-COMP-018 in the [Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/)).
 - **Loss of fit-and-proper** at the individual level triggers immediate removal from the role; at the entity level it triggers proceedings that may lead to **registration suspension or cancellation**.
 - AI-generated synthesis. **Verify any specific disqualifying condition or procedural step against the linked regulations and circulars before acting.**
 
@@ -22,7 +22,7 @@ import { Aside } from '@astrojs/starlight/components';
 A securities-market intermediary is a trust-bearing role. Investors hand over funds, securities, and identity data to brokers expecting that the people running the broker firm are not just operationally competent but also trustworthy in a regulatory sense — they have not been criminally convicted, have not been debarred from the securities market, have not previously absconded with client funds, and are not currently under inquiry where adverse findings appear likely. SEBI captures this expectation in two layers:
 
 1. **Schedule II of SEBI (Intermediaries) Regulations 2008** — the canonical fit-and-proper test. It enumerates the specific conditions an applicant or continuing intermediary must satisfy. Schedule II applies across all SEBI-registered intermediary categories (brokers, depository participants, custodians, RTAs, AMCs, portfolio managers, investment advisors).
-2. **Broker-specific overlay under [SEBI (Stock Brokers) Regulations 2026 (SEBI/LAD-NRO/GN/2026/291)](/broking-kyc/reference/circulars/sebi-other/#sebi-lad-nro-gn-2026-291)** — Reg 9 (eligibility, including fit-and-proper) plus broker-specific obligations like the **resident designated director** requirement, the **two-year-securities-trading-experience** mandate for fresh registration (Reg 7), and the codification of senior management and KMP coverage.
+2. **Broker-specific overlay under [SEBI (Stock Brokers) Regulations 2026 (SEBI/LAD-NRO/GN/2026/291)](/broking-kyc/reference/circulars/sebi-other/#sebilad-nrogn2026291)** — Reg 9 (eligibility, including fit-and-proper) plus broker-specific obligations like the **resident designated director** requirement, the **two-year-securities-trading-experience** mandate for fresh registration (Reg 7), and the codification of senior management and KMP coverage.
 
 The framework is *continuing*. Brokers do not pass a fit-and-proper test once at admission and ride that test forever. The annual self-certification refresh, the event-triggered re-test on adverse events, and the operational requirement to intimate the exchange / SEBI within prescribed windows on KMP changes all combine to keep fit-and-proper alive year-round.
 
@@ -84,11 +84,11 @@ A historic violation cured by completion of the prescribed remedy (e.g., serving
 
 ## Broker-specific overlay under SEBI (Stock Brokers) Regulations 2026
 
-[SEBI/LAD-NRO/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebi-lad-nro-gn-2026-291) (in force from 7 January 2026) consolidates and updates the broker-specific layer that sits on top of Schedule II. The 2026 Regulations replace the 1992 framework with a wholesale rewrite, and the fit-and-proper-adjacent provisions worth knowing in detail are:
+[SEBI/LAD-NRO/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebilad-nrogn2026291) (in force from 7 January 2026) consolidates and updates the broker-specific layer that sits on top of Schedule II. The 2026 Regulations replace the 1992 framework with a wholesale rewrite, and the fit-and-proper-adjacent provisions worth knowing in detail are:
 
 ### Eligibility (Reg 7) — two-year securities-trading experience
 
-Fresh registration applications under the 2026 Regulations require evidence of **at least two years of securities-trading experience** at the entity or in the persons in control. The intent is to prevent under-prepared new entrants from inducting client funds. Operational evidence includes prior exchange-membership history, employer certificates from regulated entities, or director CVs showing relevant trading or operations roles. See [MEMBER-COMP-019 in the Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/#member-compliance-23-entries).
+Fresh registration applications under the 2026 Regulations require evidence of **at least two years of securities-trading experience** at the entity or in the persons in control. The intent is to prevent under-prepared new entrants from inducting client funds. Operational evidence includes prior exchange-membership history, employer certificates from regulated entities, or director CVs showing relevant trading or operations roles. See [MEMBER-COMP-019 in the Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/).
 
 ### Resident designated director (Reg requirement)
 
@@ -98,7 +98,7 @@ The 2026 Regulations require at least **one designated director resident in Indi
 - Passport / immigration record (entries / exits).
 - Board resolution confirming the designation.
 
-A loss of residency mid-year (e.g., a designated director takes an overseas posting) is a fit-and-proper trigger: the board must designate a replacement and intimate the exchange / SEBI within the prescribed window before the residency-loss threshold is breached. See [MEMBER-COMP-018](/broking-kyc/operations/compliance-blueprint/#member-compliance-23-entries).
+A loss of residency mid-year (e.g., a designated director takes an overseas posting) is a fit-and-proper trigger: the board must designate a replacement and intimate the exchange / SEBI within the prescribed window before the residency-loss threshold is breached. See [MEMBER-COMP-018](/broking-kyc/operations/compliance-blueprint/).
 
 ### Continuing fit-and-proper (Reg 9 + ongoing obligation)
 
@@ -112,11 +112,11 @@ Brokers are required to maintain fit-and-proper continuously — not only of the
 
 The Companies Act 2013 Section 2(51) defines KMP as the Chief Executive Officer (CEO) or the Managing Director or the Manager; the Whole-time Director; the Company Secretary; the Chief Financial Officer; and "such other officer, not more than one level below the directors who is in whole-time employment, designated as Key Managerial Personnel". SEBI's broker-specific scope explicitly adds:
 
-- **Compliance Officer** — the SEBI-designated person responsible for the compliance function. Must hold a valid **NISM Series III-A** certification ([MEMBER-COMP-006](/broking-kyc/operations/compliance-blueprint/#member-compliance-23-entries)).
-- **Principal Officer (PMLA)** — the PMLA-designated AML officer. Holds NISM Series I or VII as applicable ([MEMBER-COMP-007](/broking-kyc/operations/compliance-blueprint/#member-compliance-23-entries)).
+- **Compliance Officer** — the SEBI-designated person responsible for the compliance function. Must hold a valid **NISM Series III-A** certification ([MEMBER-COMP-006](/broking-kyc/operations/compliance-blueprint/)).
+- **Principal Officer (PMLA)** — the PMLA-designated AML officer. Holds NISM Series I or VII as applicable ([MEMBER-COMP-007](/broking-kyc/operations/compliance-blueprint/)).
 - **Designated Director (PMLA)** — the senior manager designated under PMLA for AML responsibility. Often co-located with the resident-director requirement under the 2026 Regulations.
 - **MD / CEO** — managing director or chief executive who heads the broker entity.
-- **Designated Persons (DP)** under SEBI (PIT) Regulations 2015 — persons in possession of UPSI or having reasonable expectation of access to UPSI ([MEMBER-COMP-013](/broking-kyc/operations/compliance-blueprint/#member-compliance-23-entries)). Designated Persons must also be on the structured digital database (SDD).
+- **Designated Persons (DP)** under SEBI (PIT) Regulations 2015 — persons in possession of UPSI or having reasonable expectation of access to UPSI ([MEMBER-COMP-013](/broking-kyc/operations/compliance-blueprint/)). Designated Persons must also be on the structured digital database (SDD).
 - **Senior management** — broadly defined as the layer one level below the board with material operational control. Compliance officers should adopt a generous reading of this layer rather than the narrow.
 
 ### Promoters and persons in control
@@ -131,7 +131,7 @@ For corporate brokers, fit-and-proper extends to the promoter group and any pers
 
 ### Annual self-certification cycle
 
-The annual fit-and-proper refresh is one of the named recurring cycles ([CYC-AN-FIT_PROPER](/broking-kyc/operations/integration-dag/recurring-cycles/#per-node-detail)). The mechanics typically run as follows:
+The annual fit-and-proper refresh is one of the named recurring cycles ([CYC-AN-FIT_PROPER](/broking-kyc/operations/integration-dag/recurring-cycles/)). The mechanics typically run as follows:
 
 1. **Trigger** — calendar-driven; most brokers schedule the cycle in Q1 of the financial year (April–June) so that the refreshed declarations are on file before the half-yearly compliance certificate (CYC-HY-COMPLIANCE_CERT) is filed at September-end.
 2. **Distribution** — compliance circulates the prescribed self-certification format to each director, KMP, and senior-management person. The format typically includes:
@@ -194,7 +194,7 @@ If a director / KMP / senior manager is found not fit-and-proper — through a r
 
 1. **Immediate removal from role** — the person ceases to function in the named capacity. For directors, this is a board action with effect from the date of the disqualifying event (or as soon as practicable); for KMPs, it is a board / appointing-authority action.
 2. **Replacement** — appoint a replacement within the prescribed window. The replacement must be fit-and-proper independently.
-3. **Exchange / SEBI intimation** — file the KMP-change intimation via [ENIT (NSE)](/broking-kyc/reference/circulars/nse/#nse-comp-56766) / equivalent BSE / MCX channels. Provide the reasons for change.
+3. **Exchange / SEBI intimation** — file the KMP-change intimation via [ENIT (NSE)](/broking-kyc/reference/circulars/nse/#nsecomp56766) / equivalent BSE / MCX channels. Provide the reasons for change.
 4. **Update KRA, depository, and other registrations** as applicable.
 5. **Audit trail** — document the disqualifying event, the firm's response, the removal, the replacement, and the intimations. Preserve for the 8-year retention period.
 6. **Self-disclose on next fit-and-proper cycle** — the next annual declaration must reflect the change in the firm's history.
@@ -230,7 +230,7 @@ Schedule II does not, by itself, attribute the fit-and-proper failings of a rela
 
 ### NISM-certification implications
 
-A compliance officer's loss of fit-and-proper has knock-on effects on the firm's NISM-certified-role coverage. The replacement compliance officer must have a valid NISM Series III-A certificate (or obtain it within the cure window) — see [MEMBER-COMP-006](/broking-kyc/operations/compliance-blueprint/#member-compliance-23-entries) and the [KMP changes deep dive](/broking-kyc/deep-dives/member-compliance/kmp-changes/). Similarly for the Principal Officer's NISM I / VII coverage.
+A compliance officer's loss of fit-and-proper has knock-on effects on the firm's NISM-certified-role coverage. The replacement compliance officer must have a valid NISM Series III-A certificate (or obtain it within the cure window) — see [MEMBER-COMP-006](/broking-kyc/operations/compliance-blueprint/) and the [KMP changes deep dive](/broking-kyc/deep-dives/member-compliance/kmp-changes/). Similarly for the Principal Officer's NISM I / VII coverage.
 
 ### PMLA Designated Director overlap
 
@@ -242,7 +242,7 @@ When a whistleblower or insider raises a fit-and-proper concern against a direct
 
 ### Re-application after cancellation
 
-A broker entity whose registration was cancelled may re-apply after the SEBI-prescribed cooling period, demonstrating that the underlying fit-and-proper concerns have been cured. The fresh application is treated as a new registration under [SEBI/LAD-NRO/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebi-lad-nro-gn-2026-291) including the two-year-experience and resident-director tests.
+A broker entity whose registration was cancelled may re-apply after the SEBI-prescribed cooling period, demonstrating that the underlying fit-and-proper concerns have been cured. The fresh application is treated as a new registration under [SEBI/LAD-NRO/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebilad-nrogn2026291) including the two-year-experience and resident-director tests.
 
 <Aside type="tip">
 **The single highest-leverage practical step** for a compliance officer is to subscribe to SEBI's orders feed (https://www.sebi.gov.in/sebiweb/home/HomeAction.do?doListing=yes&sid=1&ssid=6&smid=0) and run a weekly name match against the firm's directors, KMPs, senior management, and promoters. A weekly check catches a regulatory action within 5–7 days, allowing the firm to respond within the typical 15-day intimation window. Quarterly or annual checks routinely miss the window.
@@ -261,16 +261,16 @@ A broker entity whose registration was cancelled may re-apply after the SEBI-pre
 
 ## Cross-references
 
-- [Compliance Blueprint — Member compliance (23 entries)](/broking-kyc/operations/compliance-blueprint/#member-compliance-23-entries) — MEMBER-COMP-005 (continuing fit-and-proper), MEMBER-COMP-017 (KMP change intimation), MEMBER-COMP-018 (resident designated director), MEMBER-COMP-019 (two-year experience).
-- [SEBI (Stock Brokers) Regulations 2026 — SEBI/LAD-NRO/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebi-lad-nro-gn-2026-291) — primary Regulation effective 7 January 2026.
-- [SEBI Stock Broker Master Circular — SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-pod-1-p-cir-2025-94) — operational layer for continuing compliance.
-- [SEBI Master AML Circular — SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-secfatf-p-cir-2024-78) — Principal Officer and Designated Director under PMLA.
+- [Compliance Blueprint — Member compliance (23 entries)](/broking-kyc/operations/compliance-blueprint/) — MEMBER-COMP-005 (continuing fit-and-proper), MEMBER-COMP-017 (KMP change intimation), MEMBER-COMP-018 (resident designated director), MEMBER-COMP-019 (two-year experience).
+- [SEBI (Stock Brokers) Regulations 2026 — SEBI/LAD-NRO/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebilad-nrogn2026291) — primary Regulation effective 7 January 2026.
+- [SEBI Stock Broker Master Circular — SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir202594) — operational layer for continuing compliance.
+- [SEBI Master AML Circular — SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202478) — Principal Officer and Designated Director under PMLA.
 - [KMP changes deep dive](/broking-kyc/deep-dives/member-compliance/kmp-changes/) — operational procedure for changes triggered by fit-and-proper events.
 - [Membership renewal deep dive](/broking-kyc/deep-dives/member-compliance/membership-renewal/) — fit-and-proper attestations bundled into annual renewal.
-- [NSE compliance — KMP intimation — NSE/COMP/56766](/broking-kyc/reference/circulars/nse/#nse-comp-56766) — KMP-change intimation circular.
-- [NSE inspection penalty grid — NSE/INSP/53530](/broking-kyc/reference/circulars/nse/#nse-insp-53530) — penalty matrix that catches delayed or missing KMP intimations.
-- [Recurring cycles — CYC-AN-FIT_PROPER](/broking-kyc/operations/integration-dag/recurring-cycles/#per-node-detail) — node in the cadence DAG.
-- [Broker process narrative — Section 5 Recurring Cycles](/broking-kyc/broker-process/narrative/#5-recurring-cycles) — narrative context for the annual cycle.
+- [NSE compliance — KMP intimation — NSE/COMP/56766](/broking-kyc/reference/circulars/nse/#nsecomp56766) — KMP-change intimation circular.
+- [NSE inspection penalty grid — NSE/INSP/53530](/broking-kyc/reference/circulars/nse/#nseinsp53530) — penalty matrix that catches delayed or missing KMP intimations.
+- [Recurring cycles — CYC-AN-FIT_PROPER](/broking-kyc/operations/integration-dag/recurring-cycles/) — node in the cadence DAG.
+- [Broker process narrative — Section 5 Recurring Cycles](/broking-kyc/broker-process/narrative/) — narrative context for the annual cycle.
 - [Authorized Person framework deep dive](/broking-kyc/deep-dives/compliance-audit/ap-framework/) — APs are subject to a parallel (lighter) fit-and-proper standard.
 - [Inspection types deep dive](/broking-kyc/deep-dives/compliance-audit/inspection-types/) — fit-and-proper findings often surface in SEBI / exchange inspections.
 

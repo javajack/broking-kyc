@@ -5,7 +5,7 @@ description: Walkthrough and reference for the broker's quarterly BCP / DR drill
 
 import { Aside } from '@astrojs/starlight/components';
 
-> **Why this page is structured this way:** BCP / DR is one of the most-audited domains for stock brokers — SEBI's CSCRF (Aug 2024), the Master Circular for Stock Brokers, and exchange-specific circulars (NSE / BSE / MCX) all converge on drill cadence and reporting obligations. The page walks through the quarterly member-level drill and the half-yearly clearing-corporation drill (live-from-DR session), reference-style for each drill component, and ends with the most common failure modes and their remediation. Voice mirrors the [lifecycle/](/broking-kyc/lifecycle/) and existing [operations/](/broking-kyc/operations/) pages.
+> **Why this page is structured this way:** BCP / DR is one of the most-audited domains for stock brokers — SEBI's CSCRF (Aug 2024), the Master Circular for Stock Brokers, and exchange-specific circulars (NSE / BSE / MCX) all converge on drill cadence and reporting obligations. The page walks through the quarterly member-level drill and the half-yearly clearing-corporation drill (live-from-DR session), reference-style for each drill component, and ends with the most common failure modes and their remediation. Voice mirrors the [lifecycle/](/broking-kyc/lifecycle/) and existing [operations/](/broking-kyc/operations/audit-compliance/) pages.
 
 ## TL;DR
 
@@ -21,7 +21,7 @@ import { Aside } from '@astrojs/starlight/components';
 - **RTO / RPO targets** — broker declares per-application RTO and RPO; SEBI doesn't prescribe specific numbers but expects them to be reasonable and anchored to the 45-minute technical-glitch threshold. Industry practice: trading engine RTO 30–45 min, RMS RTO 30 min, customer app RTO 60 min, data RPO near-zero (synchronous replication) for trade / ledger, < 15 min for analytics.
 - **Geographic separation** — SEBI's BCP/DR for MIIs framework anchored at **near-site (within same city) + far-site (≥ 500 km separation)** for primary / DR. Mid-size REs may rely on cloud-region separation as a pragmatic equivalent.
 - **Reporting** — DR-drill report submitted to NSE / BSE / MCX (ENIT / BEFS portals); MII participation certificate captures member's involvement.
-- **Penalty grid** — per [NSE/INSP/53530](/broking-kyc/reference/circulars/nse/#nse-insp-53530), late drill-report submission attracts Rs 5,000–10,000 per default; persistent default triggers terminal restriction.
+- **Penalty grid** — per [NSE/INSP/53530](/broking-kyc/reference/circulars/nse/#nseinsp53530), late drill-report submission attracts Rs 5,000–10,000 per default; persistent default triggers terminal restriction.
 - AI-generated synthesis. **Verify any specific provision against the linked circulars before acting.**
 
 ## Conceptual overview
@@ -30,9 +30,9 @@ A stock broker is a regulated entity whose operational continuity is a public-in
 
 The framework has consolidated under three primary documents:
 
-1. **SEBI Master Circular for Stock Brokers** [SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-pod-1-p-cir-2025-94) (consolidating brokers' BCP / DR obligations under the technology and system-audit chapter).
-2. **CSCRF (Cybersecurity and Cyber Resilience Framework)** [SEBI/HO/ITD-1/ITD_CSC_EXT/P/CIR/2024/113](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-itd-1-itd-csc-ext-p-cir-2024-113) (20 August 2024, in-force 1 April 2025) — unified the cyber + BCP framework across SEBI-regulated entities, structured around the Identify / Protect / Detect / Respond / Recover functions.
-3. **Exchange / clearing-corp circulars** — NSE / BSE / MCX disseminations of the SEBI framework, plus exchange-led mock-trading-from-DR schedules ([NSE/MSD/61893](/broking-kyc/reference/circulars/nse/#nse-msd-61893), [NSE/MSD/48662](/broking-kyc/reference/circulars/nse/#nse-msd-48662), [NSE/MSD/44692](/broking-kyc/reference/circulars/nse/#nse-msd-44692), [NCL/CMPT/64937](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-64937), BSE 20240507-18).
+1. **SEBI Master Circular for Stock Brokers** [SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir202594) (consolidating brokers' BCP / DR obligations under the technology and system-audit chapter).
+2. **CSCRF (Cybersecurity and Cyber Resilience Framework)** [SEBI/HO/ITD-1/ITD_CSC_EXT/P/CIR/2024/113](/broking-kyc/reference/circulars/sebi-mirsd/) (20 August 2024, in-force 1 April 2025) — unified the cyber + BCP framework across SEBI-regulated entities, structured around the Identify / Protect / Detect / Respond / Recover functions.
+3. **Exchange / clearing-corp circulars** — NSE / BSE / MCX disseminations of the SEBI framework, plus exchange-led mock-trading-from-DR schedules ([NSE/MSD/61893](/broking-kyc/reference/circulars/nse/#nsemsd61893), [NSE/MSD/48662](/broking-kyc/reference/circulars/nse/#nsemsd48662), [NSE/MSD/44692](/broking-kyc/reference/circulars/nse/#nsemsd44692), [NCL/CMPT/64937](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt64937), BSE 20240507-18).
 
 Brokers participate in two distinct drill cadences:
 
@@ -49,7 +49,7 @@ SEBI's framework doesn't prescribe specific RTO / RPO numbers but expects each b
 
 | Application | Industry-typical RTO | Anchor |
 |---|---|---|
-| Trading engine (OMS) | 30–45 minutes | 45-min technical-glitch threshold ([SEBI/HO/MIRSD/TPD-1/P/CIR/2022/160](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-tpd-1-p-cir-2022-160)) |
+| Trading engine (OMS) | 30–45 minutes | 45-min technical-glitch threshold ([SEBI/HO/MIRSD/TPD-1/P/CIR/2022/160](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdtpd-1pcir2022160)) |
 | RMS / risk engine | 30 minutes | Critical to trading; must come back before trading resumes |
 | Back-office / accounting | 4 hours | Non-real-time but needed for EOD |
 | Customer-facing app / portal | 60 minutes | Customer-experience anchor |
@@ -57,7 +57,7 @@ SEBI's framework doesn't prescribe specific RTO / RPO numbers but expects each b
 | Reporting infrastructure | 4 hours | Daily / weekly cadence; some lag acceptable |
 | KYC / onboarding system | 4 hours | Onboarding can pause briefly |
 
-The 45-minute RTO for trading engine is anchored to SEBI's technical-glitch framework — an outage longer than 45 minutes triggers SEBI / exchange disclosure obligations and potential financial disincentives per [NSE/COMP/67379](/broking-kyc/reference/circulars/nse/#nse-comp-67379) and the MII SOP per [SEBI/HO/MRD/TPD-1/P/CIR/2024/124](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-mrd-tpd-1-p-cir-2024-124).
+The 45-minute RTO for trading engine is anchored to SEBI's technical-glitch framework — an outage longer than 45 minutes triggers SEBI / exchange disclosure obligations and potential financial disincentives per [NSE/COMP/67379](/broking-kyc/reference/circulars/nse/#nsecomp67379) and the MII SOP per [SEBI/HO/MRD/TPD-1/P/CIR/2024/124](/broking-kyc/reference/circulars/sebi-other/#sebihomrdtpd-1pcir2024124).
 
 ### RPO (Recovery Point Objective)
 
@@ -187,7 +187,7 @@ Network drills can run quarterly even if data-centre drills don't — network ch
 
 ### Pandemic / WFH continuity
 
-Per BCP-DR-009, the broker maintains a Pandemic / WFH continuity playbook. The 2020 COVID-19 disruption drove SEBI / NSE to formalise this — see [NSE/INSP/43920](/broking-kyc/reference/circulars/nse/#nse-insp-43920) and [NSE/INSP/44009](/broking-kyc/reference/circulars/nse/#nse-insp-44009). Key elements:
+Per BCP-DR-009, the broker maintains a Pandemic / WFH continuity playbook. The 2020 COVID-19 disruption drove SEBI / NSE to formalise this — see [NSE/INSP/43920](/broking-kyc/reference/circulars/nse/#nseinsp43920) and [NSE/INSP/44009](/broking-kyc/reference/circulars/nse/#nseinsp44009). Key elements:
 
 - Remote trading terminals — pre-approved list of dealers who can access systems from home.
 - VPN / VDI infrastructure capacity — can handle full workforce remote.
@@ -203,7 +203,7 @@ This is the more operationally consequential drill from a compliance perspective
 ### Cadence
 
 - **Half-yearly** — typically April-May and October-November in each financial year.
-- Scheduled by the clearing corp and disseminated via [NSE/MSD/61893](/broking-kyc/reference/circulars/nse/#nse-msd-61893), [NSE/MSD/48662](/broking-kyc/reference/circulars/nse/#nse-msd-48662), [BSE 20240507-18], [NCL/CMPT/64937](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-64937), [MCX/TECH/118/2026](/broking-kyc/reference/circulars/mcx/#mcx-tech-118-2026).
+- Scheduled by the clearing corp and disseminated via [NSE/MSD/61893](/broking-kyc/reference/circulars/nse/#nsemsd61893), [NSE/MSD/48662](/broking-kyc/reference/circulars/nse/#nsemsd48662), [BSE 20240507-18], [NCL/CMPT/64937](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt64937), [MCX/TECH/118/2026](/broking-kyc/reference/circulars/mcx/#mcxtech1182026).
 - Mock trading session held on a Saturday (non-trading day) — typically 11:00–14:00 IST.
 
 ### Participation requirements
@@ -249,7 +249,7 @@ The drill validates several layers simultaneously:
 
 ### Penalty for non-participation
 
-Per [NSE/INSP/53530](/broking-kyc/reference/circulars/nse/#nse-insp-53530), non-participation in the half-yearly drill attracts a default penalty of Rs 5,000–10,000. Persistent default (multiple missed drills) escalates to terminal-restriction action. Members with material issues during the drill (e.g., DR site fails to come up) get an advisory and remediation timeline.
+Per [NSE/INSP/53530](/broking-kyc/reference/circulars/nse/#nseinsp53530), non-participation in the half-yearly drill attracts a default penalty of Rs 5,000–10,000. Persistent default (multiple missed drills) escalates to terminal-restriction action. Members with material issues during the drill (e.g., DR site fails to come up) get an advisory and remediation timeline.
 
 ### Member-side preparation
 
@@ -262,12 +262,12 @@ Brokers run a pre-drill rehearsal 1–2 weeks before the actual drill:
 Most brokers also run continuous "DR connectivity heartbeat" — a small periodic test that validates DR-site connectivity is always live, not just at drill time.
 
 <Aside type="note">
-**SaaS-mode mock per SEBI Master Circular for SE & CC.** Per [NCL/CMPT/64937](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-64937), the clearing corp's drill is conducted in a "SaaS-mode" (software-as-a-service) where mock infrastructure is shared across participants. This is operationally efficient but means a single broker's misbehaviour in the drill can affect others — order-flooding, badly-formed orders, etc., can disrupt the shared environment. Brokers are expected to behave responsibly during the drill; sustained misbehaviour results in member-side escalation.
+**SaaS-mode mock per SEBI Master Circular for SE & CC.** Per [NCL/CMPT/64937](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt64937), the clearing corp's drill is conducted in a "SaaS-mode" (software-as-a-service) where mock infrastructure is shared across participants. This is operationally efficient but means a single broker's misbehaviour in the drill can affect others — order-flooding, badly-formed orders, etc., can disrupt the shared environment. Brokers are expected to behave responsibly during the drill; sustained misbehaviour results in member-side escalation.
 </Aside>
 
 ## 4. Geographic separation — near-site vs far-site
 
-SEBI's BCP/DR framework for MIIs (Mar 2019 and Mar 2021 circulars, forwarded via [NSE/MSD/44692](/broking-kyc/reference/circulars/nse/#nse-msd-44692)) anchored the principle of **two-tier DR**:
+SEBI's BCP/DR framework for MIIs (Mar 2019 and Mar 2021 circulars, forwarded via [NSE/MSD/44692](/broking-kyc/reference/circulars/nse/#nsemsd44692)) anchored the principle of **two-tier DR**:
 
 - **Near-site** — typically within the same city or nearby (10–50 km from primary). Used for routine continuity (e.g., power failure at primary, fire at primary).
 - **Far-site** — at least **500 km from primary**. Used for region-level catastrophe (earthquake, regional flood, regional power-grid failure).
@@ -530,7 +530,7 @@ The CSCRF categorises REs into:
 
 Each category has corresponding BCP / DR obligations.
 
-Annual cyber audit ([SEBI/HO/ITD-1/ITD_CSC_EXT/P/CIR/2024/113](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-itd-1-itd-csc-ext-p-cir-2024-113), [NSE/INSP/73849](/broking-kyc/reference/circulars/nse/#nse-insp-73849)) covers BCP / DR as part of its Annexure B / Annexure A scope. The cyber audit can flag drill-related gaps as non-compliance.
+Annual cyber audit ([SEBI/HO/ITD-1/ITD_CSC_EXT/P/CIR/2024/113](/broking-kyc/reference/circulars/sebi-mirsd/), [NSE/INSP/73849](/broking-kyc/reference/circulars/nse/#nseinsp73849)) covers BCP / DR as part of its Annexure B / Annexure A scope. The cyber audit can flag drill-related gaps as non-compliance.
 
 <Aside type="tip">
 **Tabletop is cheaper than full drill.** A tabletop exercise costs the broker only the time of the drill team (typically 3-4 hours). A full failover drill costs the broker the time + infrastructure + risk of actually failing during business hours. Many small / mid-size brokers do quarterly tabletops to maintain readiness and run a full failover drill only annually or semi-annually. The CSCRF mandates annual tabletops; brokers exceeding this cadence (monthly / quarterly) get superior preparedness with minimal cost.
@@ -553,7 +553,7 @@ For each vendor, the broker requires:
 - **Contractual clause** — RTO / RPO obligations from vendor; breach-notification timelines.
 - **Vendor DR-drill participation evidence** — proof that vendor itself runs drills.
 
-If a vendor's incident affects the broker's operations, SEBI treats this as the **broker's incident** under [SEBI/HO/MIRSD/TPD-1/P/CIR/2022/160](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-tpd-1-p-cir-2022-160) (technical-glitch reporting). The broker can't shift responsibility to the vendor.
+If a vendor's incident affects the broker's operations, SEBI treats this as the **broker's incident** under [SEBI/HO/MIRSD/TPD-1/P/CIR/2022/160](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdtpd-1pcir2022160) (technical-glitch reporting). The broker can't shift responsibility to the vendor.
 
 ## 10. Critical-vendor concentration limits
 
@@ -574,11 +574,11 @@ For concentrations > 30%, the broker maintains a mitigation plan:
 - Switchover time — how long to migrate if primary vendor fails?
 - Periodic review of the concentration — quarterly / half-yearly.
 
-The Dec 2024 CSCRF clarification ([SEBI/HO/ITD-1/ITD_CSC_EXT/P/CIR/2024/184](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-itd-1-itd-csc-ext-p-cir-2024-184)) refined cloud-vendor scope. Multi-cloud or hybrid architectures are recommended for critical workloads but are not always cost-effective at smaller scale; SEBI permits cloud-region separation as an alternative.
+The Dec 2024 CSCRF clarification ([SEBI/HO/ITD-1/ITD_CSC_EXT/P/CIR/2024/184](/broking-kyc/reference/circulars/sebi-mirsd/)) refined cloud-vendor scope. Multi-cloud or hybrid architectures are recommended for critical workloads but are not always cost-effective at smaller scale; SEBI permits cloud-region separation as an alternative.
 
 ## 11. Operational risk audit overlay
 
-Per AUDIT-017 in [Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/#audit-cycles-21-entries), the broker conducts an annual operational risk audit (per [SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/96](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-1-p-cir-2024-96)). BCP / DR-related operational risks are part of this:
+Per AUDIT-017 in [Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/), the broker conducts an annual operational risk audit (per [SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/96](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-pod-1pcir202496)). BCP / DR-related operational risks are part of this:
 
 - Failure to conduct quarterly drills.
 - Failure to maintain near-site / far-site separation.
@@ -632,7 +632,7 @@ The broker's professional indemnity / cyber insurance policy typically requires 
 - **[gotcha]** The 45-minute technical-glitch threshold isn't an SEBI-prescribed RTO for trading systems; it's a disclosure-trigger threshold. Brokers should set RTO well below this (typical 30 min for trading engine) to avoid breaching the disclosure threshold in real incidents.
 - **[risk trade-off]** Frequent drilling (monthly tabletops, quarterly full failover) gives confidence but consumes operations time. Most brokers settle on quarterly tabletops + half-yearly full failover + monthly network/database mini-drills.
 - **[industry practice]** Post-drill review meetings should be **blameless** — focused on what failed and how to fix, not who caused the failure. This drives genuine reporting of issues; otherwise, drills get "managed" to show only success.
-- **[cost optimization]** Pre-warming DR replication starting 23:00 the night before a drill cuts ~80% of replication-related drill issues (see [BOD DAG practical notes](/broking-kyc/operations/integration-dag/bod/#practical-notes)).
+- **[cost optimization]** Pre-warming DR replication starting 23:00 the night before a drill cuts ~80% of replication-related drill issues (see [BOD DAG practical notes](/broking-kyc/operations/integration-dag/bod/)).
 - **[gotcha]** Member-level drill report submission has a deadline (typically within 30 days of drill). Late submission attracts the per-default penalty grid; persistent default escalates.
 - **[industry practice]** Some brokers extend the half-yearly clearing-corp drill into a full-day or two-day exercise — using the drill window for additional internal testing. This maximises the operational value of the time.
 - **[gotcha]** The drill's "success" is not the absence of issues but the discovery and resolution of issues. A "zero-issues" drill report often signals that the drill wasn't rigorous enough.
@@ -640,8 +640,8 @@ The broker's professional indemnity / cyber insurance policy typically requires 
 ## Cross-references
 
 - [Compliance Blueprint — BCP / DR domain](/broking-kyc/operations/compliance-blueprint/#bcp--dr-15-entries) — 15 entries covering BCP plan, drill, RTO / RPO, near-site / far-site, application / network DR, vendor BCP coverage.
-- [Compliance Blueprint — Cyber security domain](/broking-kyc/operations/compliance-blueprint/#cyber-security-27-entries) — CSCRF (Aug 2024) overlap with BCP / DR.
-- [Compliance Blueprint — Audit cycles domain](/broking-kyc/operations/compliance-blueprint/#audit-cycles-21-entries) — concurrent / internal / system / cyber audits cover DR scope.
+- [Compliance Blueprint — Cyber security domain](/broking-kyc/operations/compliance-blueprint/) — CSCRF (Aug 2024) overlap with BCP / DR.
+- [Compliance Blueprint — Audit cycles domain](/broking-kyc/operations/compliance-blueprint/) — concurrent / internal / system / cyber audits cover DR scope.
 - [Broker Process Narrative](/broking-kyc/broker-process/narrative/) — Section 2 covers BOD operational health checks including DR-replication confirmation; Section 5 covers quarterly drill cadence.
 - [Integration DAG: BOD](/broking-kyc/operations/integration-dag/bod/) — BCP / DR health check sub-graph; pre-warming DR for BOD success.
 - [SEBI MIRSD Circulars](/broking-kyc/reference/circulars/sebi-mirsd/) — CSCRF (Aug 2024), CSCRF Clarifications (Dec 2024), Master Circular for Stock Brokers, Technical Glitch framework.

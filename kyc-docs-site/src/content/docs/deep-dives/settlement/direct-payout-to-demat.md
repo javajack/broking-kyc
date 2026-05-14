@@ -9,12 +9,12 @@ import { Aside } from '@astrojs/starlight/components';
 
 ## TL;DR
 
-- SEBI mandated direct payout of securities to client demat accounts under **[SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2024/75](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod1-p-cir-2024-75)** (5 June 2024). The objective: eliminate broker pool-account custody during settlement, reducing the broker as a point of failure.
-- Operational guidelines were issued by NSCCL via **[NCL/CMPT/63669](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-63669)** (30 Aug 2024), superseding the initial [NCL/CMPT/62339](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-62339) (Jun 2024) which had targeted 14 October 2024 go-live. ICCL launched a parallel pilot via [ICCL 20250214-69](/broking-kyc/reference/circulars/clearing-corps/#iccl-20250214-69) (Feb 2025).
-- **Rollout was phased.** Phase 1 (NSCCL): operational from 14 November 2024 for the cash segment under [SEBI/HO/MRD/MRD-PoD-2/P/CIR/2024/137](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-mrd-mrd-pod-2-p-cir-2024-137) (10 Oct 2024 — operationalisation). Phase 2: NSCCL Feb 2025 ([NCL/CMPT/66779](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-66779) effective 25 Feb 2025 from settlement 2425828); ICCL pilot from 25 Feb 2025; January – February 2025 extensions to additional segments under continuing updates.
+- SEBI mandated direct payout of securities to client demat accounts under **[SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2024/75](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-pod1pcir202475)** (5 June 2024). The objective: eliminate broker pool-account custody during settlement, reducing the broker as a point of failure.
+- Operational guidelines were issued by NSCCL via **[NCL/CMPT/63669](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt63669)** (30 Aug 2024), superseding the initial [NCL/CMPT/62339](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt62339) (Jun 2024) which had targeted 14 October 2024 go-live. ICCL launched a parallel pilot via [ICCL 20250214-69](/broking-kyc/reference/circulars/clearing-corps/) (Feb 2025).
+- **Rollout was phased.** Phase 1 (NSCCL): operational from 14 November 2024 for the cash segment under [SEBI/HO/MRD/MRD-PoD-2/P/CIR/2024/137](/broking-kyc/reference/circulars/sebi-other/#sebihomrdmrd-pod-2pcir2024137) (10 Oct 2024 — operationalisation). Phase 2: NSCCL Feb 2025 ([NCL/CMPT/66779](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt66779) effective 25 Feb 2025 from settlement 2425828); ICCL pilot from 25 Feb 2025; January – February 2025 extensions to additional segments under continuing updates.
 - **Three new pool-account types** govern post-mandate custody: TM CUSPA, CM CUSPA, TM CSMFA. Each has a specific permissible-balance rule and reporting requirement.
 - **Custodian-cleared clients excluded** from direct payout in both NSCCL and ICCL flows. Internal-shortage valuation = settlement price + 20% mark, payable by noon on settlement day.
-- A separate primary demat account for proprietary UCC distinct from the DP-ID-Client-ID associated to the NSDL CM pool account is required for direct-payout members ([NCL/CMPT/69455](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-69455) update, 1 Aug 2025).
+- A separate primary demat account for proprietary UCC distinct from the DP-ID-Client-ID associated to the NSDL CM pool account is required for direct-payout members ([NCL/CMPT/69455](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt69455) update, 1 Aug 2025).
 - Chart-of-accounts updates and reconciliation logic changes were the most consequential operational impact for back-office software.
 
 ## Conceptual overview
@@ -29,29 +29,29 @@ For operations, the cutover was non-trivial. The broker pool account did not dis
 
 ### 1.1 SEBI authority
 
-- **[SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2024/75](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod1-p-cir-2024-75)** (5 June 2024): The foundational circular. Mandates Clearing Corporations to directly credit securities to clients' demat accounts in pay-out, eliminating broker pool-account handling. Broker's Industry Standards Forum tasked with implementation standards. Effective 14 October 2024 (after extension from earlier date).
-- **[SEBI/HO/MRD/MRD-PoD-2/P/CIR/2024/137](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-mrd-mrd-pod-2-p-cir-2024-137)** (10 October 2024): Operationalises direct payout phased starting 14 Oct 2024 with the final pay-out time extended to 15:30 IST. Full direct payout effective for all settlements from 14 January 2025 in the phase 1 segment.
-- **Master Circular updates.** Master Circular for Stock Brokers [SEBI/HO/MIRSD/POD-1/P/CIR/2024/118](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-pod-1-p-cir-2024-118) (Aug 2024) and SE/CC Master Circular Dec 2024 both incorporated direct-payout provisions.
+- **[SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2024/75](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-pod1pcir202475)** (5 June 2024): The foundational circular. Mandates Clearing Corporations to directly credit securities to clients' demat accounts in pay-out, eliminating broker pool-account handling. Broker's Industry Standards Forum tasked with implementation standards. Effective 14 October 2024 (after extension from earlier date).
+- **[SEBI/HO/MRD/MRD-PoD-2/P/CIR/2024/137](/broking-kyc/reference/circulars/sebi-other/#sebihomrdmrd-pod-2pcir2024137)** (10 October 2024): Operationalises direct payout phased starting 14 Oct 2024 with the final pay-out time extended to 15:30 IST. Full direct payout effective for all settlements from 14 January 2025 in the phase 1 segment.
+- **Master Circular updates.** Master Circular for Stock Brokers [SEBI/HO/MIRSD/POD-1/P/CIR/2024/118](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir2024118) (Aug 2024) and SE/CC Master Circular Dec 2024 both incorporated direct-payout provisions.
 
 ### 1.2 Clearing-corp operational circulars
 
-- **[NCL/CMPT/62339](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-62339)** (6 June 2024): NSCCL initial implementation circular, originally targeted 14 October 2024 go-live. Superseded.
-- **[NCL/CMPT/63669](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-63669)** (30 August 2024): NSCCL full operational guidelines. Mandates the new account-type architecture (TM CUSPA, CM CUSPA, TM CSMFA), discontinues the legacy direct-payout-to-investor-accounts facility (NCL/CMPT/61800 Part C point 6), and provides the release-payout-with-pledge-in-favour-of-CUSPA(Unpaid) / CSMFA(MTF) facility. In-force 11 November 2024.
-- **[NCL/CMPT/65100](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-65100)** (14 November 2024): Reiterates that CMs must keep pool accounts active in both NSDL and CDSL at all times even if they opt to receive payout in a preferred depository; non-compliance impacts payout release.
-- **[NCL/CMPT/66779](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-66779)** (21 February 2025): Phase 2 — full direct-payout regime from settlement 2425828 (25 Feb 2025), excluding custodian-cleared clients. Gross pay-in to CC required. Internal-shortage valuation = settlement price + 20% with payment due noon on settlement day. Member identifies auction profits at client level.
-- **[ICCL 20250214-69](/broking-kyc/reference/circulars/clearing-corps/#iccl-20250214-69)** (14 February 2025): ICCL pilot of direct securities payout to client demat accounts; pilot from 25 February 2025 with normal-market settlements from settlement 2425828 onwards. Custodian-cleared clients excluded; gross pay-ins to ICCL; internal-shortage valuation at settlement price + 20% by noon on settlement day.
-- **[NCL/CMPT/67947](/broking-kyc/reference/circulars/clearing-corps/)** (9 May 2025) and **[NCL/CMPT/69455](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-69455)** (1 August 2025): Follow-up clarifications. Direct payout at NSDL is keyed on the CM BP ID and not the DP-ID-Client-ID linked to the NSDL CM pool account; members must open a separate demat account as primary for proprietary UCC, distinct from the DP-ID-Client-ID account associated with the NSDL CM pool account, to avoid mis-mapping during NSDL demat-verification with the exchanges.
+- **[NCL/CMPT/62339](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt62339)** (6 June 2024): NSCCL initial implementation circular, originally targeted 14 October 2024 go-live. Superseded.
+- **[NCL/CMPT/63669](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt63669)** (30 August 2024): NSCCL full operational guidelines. Mandates the new account-type architecture (TM CUSPA, CM CUSPA, TM CSMFA), discontinues the legacy direct-payout-to-investor-accounts facility (NCL/CMPT/61800 Part C point 6), and provides the release-payout-with-pledge-in-favour-of-CUSPA(Unpaid) / CSMFA(MTF) facility. In-force 11 November 2024.
+- **[NCL/CMPT/65100](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt65100)** (14 November 2024): Reiterates that CMs must keep pool accounts active in both NSDL and CDSL at all times even if they opt to receive payout in a preferred depository; non-compliance impacts payout release.
+- **[NCL/CMPT/66779](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt66779)** (21 February 2025): Phase 2 — full direct-payout regime from settlement 2425828 (25 Feb 2025), excluding custodian-cleared clients. Gross pay-in to CC required. Internal-shortage valuation = settlement price + 20% with payment due noon on settlement day. Member identifies auction profits at client level.
+- **[ICCL 20250214-69](/broking-kyc/reference/circulars/clearing-corps/)** (14 February 2025): ICCL pilot of direct securities payout to client demat accounts; pilot from 25 February 2025 with normal-market settlements from settlement 2425828 onwards. Custodian-cleared clients excluded; gross pay-ins to ICCL; internal-shortage valuation at settlement price + 20% by noon on settlement day.
+- **[NCL/CMPT/67947](/broking-kyc/reference/circulars/clearing-corps/)** (9 May 2025) and **[NCL/CMPT/69455](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt69455)** (1 August 2025): Follow-up clarifications. Direct payout at NSDL is keyed on the CM BP ID and not the DP-ID-Client-ID linked to the NSDL CM pool account; members must open a separate demat account as primary for proprietary UCC, distinct from the DP-ID-Client-ID account associated with the NSDL CM pool account, to avoid mis-mapping during NSDL demat-verification with the exchanges.
 
 ### 1.3 Rollout phasing
 
 | Phase | Effective date | Scope | Authority |
 | --- | --- | --- | --- |
 | Pilot (custody only) | Pre-2024 (legacy direct-payout-to-investor-account) | Limited demat credits; discontinued | NCL/CMPT/61800 Part C point 6 |
-| Phase 1 — NSCCL go-live | 11 / 14 November 2024 | Equity cash segment, normal settlement, excluding custodian-cleared | [NCL/CMPT/63669](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-63669), [SEBI/HO/MRD/MRD-PoD-2/P/CIR/2024/137](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-mrd-mrd-pod-2-p-cir-2024-137) |
-| Phase 1 — Full | 14 January 2025 | All settlements in equity cash segment | [SEBI/HO/MRD/MRD-PoD-2/P/CIR/2024/137](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-mrd-mrd-pod-2-p-cir-2024-137) |
-| Phase 2 — NSCCL | 25 February 2025 (settlement 2425828) | Phase 2 expansion; gross pay-in to CC; internal-shortage 120% valuation | [NCL/CMPT/66779](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-66779) |
-| Phase 2 — ICCL pilot | 25 February 2025 (settlement 2425828) | ICCL parallel pilot | [ICCL 20250214-69](/broking-kyc/reference/circulars/clearing-corps/#iccl-20250214-69) |
-| Update | 9 May 2025 / 1 August 2025 | NSDL CM BP ID keying clarification; proprietary-UCC separate demat | [NCL/CMPT/69455](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-69455) |
+| Phase 1 — NSCCL go-live | 11 / 14 November 2024 | Equity cash segment, normal settlement, excluding custodian-cleared | [NCL/CMPT/63669](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt63669), [SEBI/HO/MRD/MRD-PoD-2/P/CIR/2024/137](/broking-kyc/reference/circulars/sebi-other/#sebihomrdmrd-pod-2pcir2024137) |
+| Phase 1 — Full | 14 January 2025 | All settlements in equity cash segment | [SEBI/HO/MRD/MRD-PoD-2/P/CIR/2024/137](/broking-kyc/reference/circulars/sebi-other/#sebihomrdmrd-pod-2pcir2024137) |
+| Phase 2 — NSCCL | 25 February 2025 (settlement 2425828) | Phase 2 expansion; gross pay-in to CC; internal-shortage 120% valuation | [NCL/CMPT/66779](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt66779) |
+| Phase 2 — ICCL pilot | 25 February 2025 (settlement 2425828) | ICCL parallel pilot | [ICCL 20250214-69](/broking-kyc/reference/circulars/clearing-corps/) |
+| Update | 9 May 2025 / 1 August 2025 | NSDL CM BP ID keying clarification; proprietary-UCC separate demat | [NCL/CMPT/69455](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt69455) |
 
 <Aside type="note">
 **The legacy "direct payout to investor accounts" facility was different from the new direct-payout regime.** Before the June 2024 mandate, a legacy facility existed under NCL/CMPT/61800 Part C point 6 that allowed brokers to opt in to direct credit to investor accounts on a per-settlement basis. The post-mandate direct-payout regime made this *the default* (with explicit account-type architecture), discontinuing the legacy opt-in facility.
@@ -134,7 +134,7 @@ Issues with the legacy flow:
 Key behavioural differences:
 
 - **No pool transit.** Securities never enter a generic broker pool. The CC's allocation file maps each ISIN-quantity directly to a client's demat (per primary-demat UCC mapping).
-- **Gross pay-in.** Brokers do gross pay-in to the CC under Phase 2 ([NCL/CMPT/66779](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-66779)). The CC handles netting.
+- **Gross pay-in.** Brokers do gross pay-in to the CC under Phase 2 ([NCL/CMPT/66779](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt66779)). The CC handles netting.
 - **Conditional retention.** Where the client has not paid for purchased securities, the securities flow to the TM CUSPA(Unpaid) with a pledge in favour of the broker — providing the same economic protection as the legacy "unpaid" mechanism, but in a depository-tracked custody.
 - **MTF custody.** Securities funded under MTF flow to the TM CSMFA — the broker's MTF custody account — with the MTF pledge active. The economic substance is the same as the legacy MTF custody, but with a named depository account.
 - **Custodian flow unchanged.** Custodian-cleared clients (FPIs / MFs / portfolio-managed accounts) continue with the custodian's existing flow; the direct-payout regime explicitly excludes them.
@@ -155,13 +155,13 @@ Key behavioural differences:
 
 **Purpose.** Same as TM CUSPA but at the Clearing Member layer. Professional CMs (CMs that clear for other TMs, not for their own clients) maintain only CM CUSPA. TM-cum-CM members maintain both TM CUSPA and CM CUSPA.
 
-**Maintenance rules per [NCL/CMPT/63669](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-63669):**
+**Maintenance rules per [NCL/CMPT/63669](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt63669):**
 
 - TMs maintain TM CUSPA only.
 - TMs that are also CMs (TM-cum-CM) maintain both TM CUSPA and CM CUSPA.
 - Self-clearing TMs maintain only TM CUSPA.
 - Professional CMs (CMs clearing only for other TMs, no own client base) maintain only CM CUSPA.
-- A TM that clears via another CM must open TM pool accounts in both depositories (NSDL and CDSL) per [NCL/CMPT/65100](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-65100).
+- A TM that clears via another CM must open TM pool accounts in both depositories (NSDL and CDSL) per [NCL/CMPT/65100](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt65100).
 
 ### 3.3 TM CSMFA — Trading Member Client Securities Margin Funded Account
 
@@ -177,10 +177,10 @@ Key behavioural differences:
 
 The broker's legacy "pool account" — sub-status 30 / 31 / 32 in CDSL terminology — does not disappear. It continues to exist for proprietary trading positions (broker's own account, not client-facing), for failed-settlement remediation, and as a transitional account during corporate actions or internal-shortage close-out. But it no longer serves as the conduit for client securities during normal pay-out.
 
-[NCL/CMPT/69455](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-69455) (Aug 2025) added a further constraint: the broker's primary demat account for proprietary UCC must be distinct from the DP-ID-Client-ID account that is linked to the NSDL CM pool account. Direct payout at NSDL is keyed on CM BP ID rather than DP-ID-Client-ID, and mis-mapping causes the NSDL demat-verification with the exchanges to fail. Brokers that didn't separate their proprietary UCC account were forced to re-open a fresh primary demat account in the August – September 2025 window.
+[NCL/CMPT/69455](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt69455) (Aug 2025) added a further constraint: the broker's primary demat account for proprietary UCC must be distinct from the DP-ID-Client-ID account that is linked to the NSDL CM pool account. Direct payout at NSDL is keyed on CM BP ID rather than DP-ID-Client-ID, and mis-mapping causes the NSDL demat-verification with the exchanges to fail. Brokers that didn't separate their proprietary UCC account were forced to re-open a fresh primary demat account in the August – September 2025 window.
 
 <Aside type="caution">
-**The TM CUSPA / CM CUSPA / TM CSMFA distinction is not optional.** A broker offering direct-payout services must have the relevant accounts open at the relevant depositories, must keep them active even if direct-payout in a particular depository isn't currently used ([NCL/CMPT/65100](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-65100)), and must report on them daily. Operating the legacy single-pool model post-November 2024 is non-compliance with [SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2024/75](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod1-p-cir-2024-75) and triggers inspection findings.
+**The TM CUSPA / CM CUSPA / TM CSMFA distinction is not optional.** A broker offering direct-payout services must have the relevant accounts open at the relevant depositories, must keep them active even if direct-payout in a particular depository isn't currently used ([NCL/CMPT/65100](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt65100)), and must report on them daily. Operating the legacy single-pool model post-November 2024 is non-compliance with [SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2024/75](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-pod1pcir202475) and triggers inspection findings.
 </Aside>
 
 ## 4. Chart-of-accounts update guidance
@@ -200,7 +200,7 @@ The back-office software houses (TechExcel, Mihir, Aastha, Shilpi, Logo Sarva, P
 - **Daily.** Client demat credit confirmation against the clearing-corp allocation file. A pay-out present in the CC's allocation file but missing from the client's demat is a high-priority alert.
 - **Daily.** Pledged-balance in TM CUSPA matched to the client ledger debit. Mis-match suggests a pledge-creation or pledge-release error.
 - **Per settlement.** Internal-shortage clients vs. valuation paid (settlement price + 20%) by noon on settlement day.
-- **Per settlement.** Auction profits identified at client level (per [NCL/CMPT/66779](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-66779) Phase 2 — member identifies auction profits at client level).
+- **Per settlement.** Auction profits identified at client level (per [NCL/CMPT/66779](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt66779) Phase 2 — member identifies auction profits at client level).
 
 ### 4.3 New file flows
 
@@ -250,7 +250,7 @@ In the legacy flow, the broker controlled the broker-to-client push and the reco
 
 ### 5.3 Internal-shortage close-out
 
-Under Phase 2 ([NCL/CMPT/66779](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-66779), [ICCL 20250214-69](/broking-kyc/reference/circulars/clearing-corps/#iccl-20250214-69)), the member-internal shortage close-out works as follows:
+Under Phase 2 ([NCL/CMPT/66779](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt66779), [ICCL 20250214-69](/broking-kyc/reference/circulars/clearing-corps/)), the member-internal shortage close-out works as follows:
 
 1. Settlement day morning: CC publishes allocation file. The broker's net deliverable may include some clients with unpaid balances (internal shortage).
 2. The broker pays valuation = settlement price × 120% by noon on settlement day to the CC. This is the broker's internal-shortage close-out cost.
@@ -258,13 +258,13 @@ Under Phase 2 ([NCL/CMPT/66779](/broking-kyc/reference/circulars/clearing-corps/
 4. The broker recovers the internal-shortage cost from the relevant client.
 5. Failed-settlement-recovery files are submitted in the back-office reporting cycle.
 
-This replaces the legacy mechanism where the broker held the position briefly in pool and remediated via internal book entries; now the CC sees and charges the close-out directly. See [Settlement domain entry SETTLEMENT-009](/broking-kyc/operations/compliance-blueprint/#settlement-22-entries) for the obligation and the [Pay-in default + Core SGF deep dive](./payin-default-core-sgf/) for the failure cascade.
+This replaces the legacy mechanism where the broker held the position briefly in pool and remediated via internal book entries; now the CC sees and charges the close-out directly. See [Settlement domain entry SETTLEMENT-009](/broking-kyc/operations/compliance-blueprint/) for the obligation and the [Pay-in default + Core SGF deep dive](./payin-default-core-sgf/) for the failure cascade.
 
 ## 6. Sub-cases / edge cases
 
 ### 6.1 Corporate-action ex-date
 
-Securities crossing the ex-date for a corporate action (split, bonus, dividend) require the EPI / pay-out files to reflect the correct ISIN. Representative example: [NCL/CMPT/65498](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-65498) (10 Dec 2024) for the SHRADHA 5→2 face-value split — EPI on settlement 2024233 in Old ISIN, EPI on Dec 11 for settlements 2024233 and 2024234 in New ISIN. Direct payout must respect the ISIN per the corporate-action effective date.
+Securities crossing the ex-date for a corporate action (split, bonus, dividend) require the EPI / pay-out files to reflect the correct ISIN. Representative example: [NCL/CMPT/65498](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt65498) (10 Dec 2024) for the SHRADHA 5→2 face-value split — EPI on settlement 2024233 in Old ISIN, EPI on Dec 11 for settlements 2024233 and 2024234 in New ISIN. Direct payout must respect the ISIN per the corporate-action effective date.
 
 ### 6.2 Custodian-cleared clients (explicit exclusion)
 
@@ -272,15 +272,15 @@ FPIs, mutual funds, portfolio-managed accounts, insurance company books, and oth
 
 ### 6.3 Buyback / takeover / OTB (Offer-to-Buy) settlements
 
-Buyback (e.g., [NCL/CMPT/63561](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-63561)) and takeover settlements via the EPI Market Type "Buyback" / "Takeover" use a different settlement number flow. Direct payout for normal-market settlements; OTB settlements continue with the legacy depository-EPI mechanism (CDSL = direct client pay-in; NSDL = securities earmarking / blocking). See representative buyback / OTB circulars in the [clearing-corps circulars](/broking-kyc/reference/circulars/clearing-corps/) page.
+Buyback (e.g., [NCL/CMPT/63561](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt63561)) and takeover settlements via the EPI Market Type "Buyback" / "Takeover" use a different settlement number flow. Direct payout for normal-market settlements; OTB settlements continue with the legacy depository-EPI mechanism (CDSL = direct client pay-in; NSDL = securities earmarking / blocking). See representative buyback / OTB circulars in the [clearing-corps circulars](/broking-kyc/reference/circulars/clearing-corps/) page.
 
 ### 6.4 SGB (Sovereign Gold Bond) settlement
 
-SGB tranche settlements (e.g., [ICCL 20200706-1](/broking-kyc/reference/circulars/clearing-corps/#iccl-20200706-1)) continue to use the existing Equity Cash settlement account funding mechanism with the SGB-specific obligation file flow.
+SGB tranche settlements (e.g., [ICCL 20200706-1](/broking-kyc/reference/circulars/clearing-corps/)) continue to use the existing Equity Cash settlement account funding mechanism with the SGB-specific obligation file flow.
 
 ### 6.5 BSE StAR MF redemption (related but separate)
 
-[ICCL 20240613-52](/broking-kyc/reference/circulars/clearing-corps/#iccl-20240613-52) (Jun 2024) discontinued the use of pool accounts for non-demat MF redemptions on BSE StAR MF. Demat transactions still flow via AMC/RTA credits to the ICCL bank account; non-demat redemptions credit clients' bank accounts directly. The direct-payout-to-demat mandate is a separate change from this MF-specific change but reflects the same regulatory direction.
+[ICCL 20240613-52](/broking-kyc/reference/circulars/clearing-corps/) (Jun 2024) discontinued the use of pool accounts for non-demat MF redemptions on BSE StAR MF. Demat transactions still flow via AMC/RTA credits to the ICCL bank account; non-demat redemptions credit clients' bank accounts directly. The direct-payout-to-demat mandate is a separate change from this MF-specific change but reflects the same regulatory direction.
 
 ### 6.6 Mis-mapped UCC
 
@@ -288,7 +288,7 @@ If a client's primary demat UCC mapping in the exchange UCC database is incorrec
 
 ### 6.7 NSDL CM pool account separation
 
-[NCL/CMPT/69455](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-69455) (Aug 2025): direct payout at NSDL is keyed on CM BP ID, not DP-ID-Client-ID. Members must open a separate demat account as primary for proprietary UCC, distinct from the DP-ID-Client-ID associated with the NSDL CM pool account, to avoid mis-mapping during NSDL demat-verification with the exchanges. CDSL flow is unaffected (CDSL keys on DP-ID-Client-ID natively).
+[NCL/CMPT/69455](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt69455) (Aug 2025): direct payout at NSDL is keyed on CM BP ID, not DP-ID-Client-ID. Members must open a separate demat account as primary for proprietary UCC, distinct from the DP-ID-Client-ID associated with the NSDL CM pool account, to avoid mis-mapping during NSDL demat-verification with the exchanges. CDSL flow is unaffected (CDSL keys on DP-ID-Client-ID natively).
 
 ## 7. Common rollout-period issues
 
@@ -304,7 +304,7 @@ The November 2024 – February 2025 rollout windows surfaced a recurring set of 
 
 **Symptom:** Pay-out works for CDSL clients but fails for NSDL clients (or vice versa).
 **Cause:** TM CUSPA / TM CSMFA opened only in the broker's primary depository.
-**Remediation:** Open in the other depository per [NCL/CMPT/65100](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-65100) (which reiterates the requirement to keep pool accounts active in both depositories).
+**Remediation:** Open in the other depository per [NCL/CMPT/65100](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt65100) (which reiterates the requirement to keep pool accounts active in both depositories).
 
 ### 7.3 Chart-of-accounts not updated
 
@@ -328,7 +328,7 @@ The November 2024 – February 2025 rollout windows surfaced a recurring set of 
 
 **Symptom:** NSDL demat-verification with exchanges fails for proprietary trades.
 **Cause:** Proprietary UCC primary demat is the same DP-ID-Client-ID as the NSDL CM pool account.
-**Remediation:** Open a separate primary demat for proprietary UCC; re-submit UCC mapping. The [NCL/CMPT/69455](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-69455) requirement (Aug 2025) surfaced this for many brokers.
+**Remediation:** Open a separate primary demat for proprietary UCC; re-submit UCC mapping. The [NCL/CMPT/69455](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt69455) requirement (Aug 2025) surfaced this for many brokers.
 
 ### 7.7 Custodian-cleared clients erroneously included
 
@@ -340,7 +340,7 @@ The November 2024 – February 2025 rollout windows surfaced a recurring set of 
 
 **Symptom:** Client pays for unpaid securities but the pledge in TM CUSPA isn't released for hours / days.
 **Cause:** Manual / batch pledge-release process.
-**Remediation:** Automate pledge release on client payment confirmation. The Oct 2025 CDSL automation (IV-EP and IV-RD per [SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/82](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-p-cir-2025-82) and the CDSL/NSDL automated pledge mechanism — see [CDSL MTF & Pledge primer](/broking-kyc/vendors/depositories/cdsl-mtf-pledge/) sections 8.1 – 8.3) automates much of this.
+**Remediation:** Automate pledge release on client payment confirmation. The Oct 2025 CDSL automation (IV-EP and IV-RD per [SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/82](/broking-kyc/reference/circulars/sebi-mirsd/) and the CDSL/NSDL automated pledge mechanism — see [CDSL MTF & Pledge primer](/broking-kyc/vendors/depositories/cdsl-mtf-pledge/) sections 8.1 – 8.3) automates much of this.
 
 <Aside type="tip">
 **Direct payout changed the broker's risk model meaningfully.** Pre-mandate, a broker's failure mid-pay-out could expose client securities sitting in the pool. Post-mandate, that exposure window doesn't exist — securities flow directly from CC to client. What remains is the unpaid-client and MTF-client custody (in TM CUSPA / TM CSMFA), where the broker still has economic exposure to the client. This is consistent with the broader principle: client assets pre-paid (cash funds or paid-for securities) shouldn't sit with the broker; assets the broker has lent against (MTF) or that the client owes for (unpaid) can sit in a pledged-custody account because the broker has a corresponding claim.
@@ -351,17 +351,17 @@ The November 2024 – February 2025 rollout windows surfaced a recurring set of 
 - **[gotcha]** TM CUSPA, CM CUSPA, and TM CSMFA each have distinct sub-status codes at CDSL / NSDL. CDSL CUSPA uses sub-status code 40 per the [CDSL MTF & Pledge primer](/broking-kyc/vendors/depositories/cdsl-mtf-pledge/) Section 11. The CSMFA account has a separate sub-status. Brokers that didn't get the sub-status configuration right at account opening had to close and re-open accounts during the rollout window.
 - **[industry typical]** Most brokers ran their internal reconciliation in parallel — legacy pool flow and direct-payout flow — for the first one to two settlement cycles after each phase activation, to catch mapping issues. The parallel-run discipline is a standard pattern for regulatory-driven custody changes.
 - **[risk trade-off]** The direct-payout regime makes broker default less harmful to client securities but it doesn't eliminate broker risk entirely. Unpaid-client and MTF balances still sit in TM CUSPA / TM CSMFA, and the broker's invocation rights on those balances are economically the same as before. Risk shifted, didn't disappear.
-- **[gotcha]** [NCL/CMPT/69455](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-69455) (Aug 2025) — separating the proprietary-UCC primary demat from the NSDL CM pool DP-ID-Client-ID — surfaced an issue many brokers didn't realise existed until they started having NSDL pay-out verification failures. The fix is a separate demat account; the underlying lesson is that NSDL keys direct-payout differently from CDSL.
+- **[gotcha]** [NCL/CMPT/69455](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt69455) (Aug 2025) — separating the proprietary-UCC primary demat from the NSDL CM pool DP-ID-Client-ID — surfaced an issue many brokers didn't realise existed until they started having NSDL pay-out verification failures. The fix is a separate demat account; the underlying lesson is that NSDL keys direct-payout differently from CDSL.
 - **[cost optimization]** Brokers that did a clean chart-of-accounts cutover in the August – October 2024 window reported settlement reconciliation faster than pre-mandate (gross pay-in to CC + automated reconciliation of CC allocation against depository confirmation, vs. the legacy two-step push). Brokers that delayed the chart-of-accounts work or relied on the back-office vendor's default mapping had reconciliation breaks for weeks.
-- **[industry typical]** The Oct 2025 automated-pledge-release mechanism (IV-EP for invocation of pledged securities for early pay-in; IV-RD for invocation for redemption) under [SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/82](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-p-cir-2025-82) is the natural complement to direct-payout: when a client sells a pledged security, the pledge release and the early-pay-in block happen in a single automated instruction rather than via a manual unpledge-then-sell flow. See the CDSL primer Section 8 for the full PR-EP / IV-EP / IV-RD walkthrough.
-- **[gotcha]** Internal-shortage close-out under [NCL/CMPT/66779](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-66779) is settlement price + 20% — paid by noon on settlement day. Brokers that processed this manually via cheque or end-of-day NEFT missed the cut-off and faced additional penalties. Automate via the settlement bank's morning batch or via the CC's direct debit facility where available.
+- **[industry typical]** The Oct 2025 automated-pledge-release mechanism (IV-EP for invocation of pledged securities for early pay-in; IV-RD for invocation for redemption) under [SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/82](/broking-kyc/reference/circulars/sebi-mirsd/) is the natural complement to direct-payout: when a client sells a pledged security, the pledge release and the early-pay-in block happen in a single automated instruction rather than via a manual unpledge-then-sell flow. See the CDSL primer Section 8 for the full PR-EP / IV-EP / IV-RD walkthrough.
+- **[gotcha]** Internal-shortage close-out under [NCL/CMPT/66779](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt66779) is settlement price + 20% — paid by noon on settlement day. Brokers that processed this manually via cheque or end-of-day NEFT missed the cut-off and faced additional penalties. Automate via the settlement bank's morning batch or via the CC's direct debit facility where available.
 - **[industry typical]** Client communication templates were updated through the rollout: pay-out SMS / email now references "credited directly to your demat by [depository]" rather than "credited via your broker." Clients exposed to the change without communication briefly complained about not receiving the legacy broker-side credit confirmation; most brokers added an additional internal email confirming receipt by the broker's back-office as a transitional courtesy.
 
 ## Cross-references
 
-- [Broker Process Narrative — Section 3 (Settlement Cycle)](/broking-kyc/broker-process/narrative/#3-the-settlement-cycle) — chronological context
+- [Broker Process Narrative — Section 3 (Settlement Cycle)](/broking-kyc/broker-process/narrative/) — chronological context
 - [Integration DAG — EOD & settlement](/broking-kyc/operations/integration-dag/eod-settlement/) — SET-PAYOUT-RECV node detail
-- [Compliance Blueprint — Settlement domain](/broking-kyc/operations/compliance-blueprint/#settlement-22-entries) — obligations SETTLEMENT-004 / 005 / 022
+- [Compliance Blueprint — Settlement domain](/broking-kyc/operations/compliance-blueprint/) — obligations SETTLEMENT-004 / 005 / 022
 - [T+0 / T+1 settlement deep dive](./t0-t1-settlement/) — sibling page on the settlement cycle
 - [Client funds upstreaming deep dive](./client-funds-upstreaming/) — funds layer counterpart
 - [Payin default + Core SGF deep dive](./payin-default-core-sgf/) — what happens when the gross pay-in fails

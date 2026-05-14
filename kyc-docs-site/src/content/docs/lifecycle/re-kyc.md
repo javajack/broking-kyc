@@ -118,7 +118,7 @@ Re-KYC touches fields across master-dataset sections A (Personal Identity), B (A
 
 ## Cross-references
 
-- [Compliance Blueprint — KYC lifecycle domain](/broking-kyc/operations/compliance-blueprint/#kyc-lifecycle-41-entries)
+- [Compliance Blueprint — KYC lifecycle domain](/broking-kyc/operations/compliance-blueprint/)
 - [Integration DAG — lifecycle events page](/broking-kyc/operations/integration-dag/lifecycle-events/)
 - [Field Atlas — Section S (KRA Submission)](/broking-kyc/reference/field-atlas/sections/s-kra-submission/)
 - [Field Atlas — Section T (CKYC Submission)](/broking-kyc/reference/field-atlas/sections/t-ckyc-submission/)

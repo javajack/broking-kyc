@@ -17,7 +17,7 @@ When multiple sources provide the same field, the system uses a fixed precedence
 
 **Rule:** DigiLocker wins for identity fields. KRA/CKYC win for financial profile. User input only for data no source can provide (mobile, email, segment choice).
 
-Government-issued digital documents (DigiLocker) are treated as the highest-authority source per [SEBI/HO/MIRSD/DOP/CIR/P/2020/73](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-dop-cir-p-2020-73). Registry records (CKYC/KRA) take precedence over third-party verification services, which in turn take precedence over customer-entered data.
+Government-issued digital documents (DigiLocker) are treated as the highest-authority source per [SEBI/HO/MIRSD/DOP/CIR/P/2020/73](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddopcirp202073). Registry records (CKYC/KRA) take precedence over third-party verification services, which in turn take precedence over customer-entered data.
 
 ## Field Distribution (~454 Total)
 

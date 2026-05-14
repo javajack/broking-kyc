@@ -10,8 +10,8 @@ import { Aside } from '@astrojs/starlight/components';
 ## TL;DR
 
 - **Broker's role**: capture client bid → push to exchange bidding platform → orchestrate UPI Block mandate via sponsor bank → reconcile allotment file from RTA → release mandate / book security credit. The broker never holds client funds for IPO; funds stay blocked in the client's bank under the UPI / ASBA mechanism.
-- **Window**: standard book-built IPO opens for **3 working days** (T to T+2), revised application / withdrawal possible during the window, allotment finalised by RTA on T+2 evening, listing on T+3 ([SEBI/HO/CFD/TPD1/CIR/P/2023/140](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-cfd-tpd1-cir-p-2023-140), mandatory T+3 from 1 December 2023).
-- **UPI Block** is the default rail for retail bids up to **Rs.5 lakh** ([SEBI/HO/CFD/DIL2/CIR/P/2022/45](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-cfd-dil2-cir-p-2022-45)). Larger bids route via SCSB ASBA (paper / portal mandate).
+- **Window**: standard book-built IPO opens for **3 working days** (T to T+2), revised application / withdrawal possible during the window, allotment finalised by RTA on T+2 evening, listing on T+3 ([SEBI/HO/CFD/TPD1/CIR/P/2023/140](/broking-kyc/reference/circulars/sebi-other/#sebihocfdtpd1cirp2023140), mandatory T+3 from 1 December 2023).
+- **UPI Block** is the default rail for retail bids up to **Rs.5 lakh** ([SEBI/HO/CFD/DIL2/CIR/P/2022/45](/broking-kyc/reference/circulars/sebi-other/#sebihocfddil2cirp202245)). Larger bids route via SCSB ASBA (paper / portal mandate).
 - **Allocation method** depends on category: retail (Rs ≤ 2 lakh per bid) gets a **lottery** if oversubscribed, with each successful retail allottee receiving the minimum lot; HNI / NII (Rs > 2 lakh) gets **proportionate** allocation; QIB gets discretionary / proportionate per merchant-banker book-build.
 - **OFS** (Offer for Sale by promoters) is a one- or two-day exchange-window mechanism distinct from IPO — orders are placed during a 09:15–15:30 trading-day window via a separate OFS UI, and allocation is price-priority at a floor price.
 - **NCDs** (Non-Convertible Debentures) follow the public-issue rail with their own mandate flow — first-come-first-served allotment within tenor / category buckets.
@@ -23,7 +23,7 @@ The Indian primary market has consolidated around the **ASBA / UPI Block** mecha
 
 The broker plays a thinner role here than in secondary-market trading. The broker is a **bid aggregator and reconciliation operator**, not a custodian of client funds. The exchange (NSE / BSE) runs the bidding platform; the RTA (Link Intime, KFintech, MUFG Intime/Bigshare) consolidates allotment; the sponsor bank (one of ~14 banks empanelled by NPCI) issues the UPI mandate; the issuer's collection bank settles the post-allocation funds. The broker's value in this chain is (a) UX — making the bid easy for the retail client, (b) eligibility check — confirming the client has a valid demat / PAN / KYC before pushing the bid, and (c) grievance routing — sitting between the client and the RTA / sponsor bank for refund and credit-related complaints.
 
-The post-2023 trend has been an aggressive compression of the timeline. SEBI's August 2023 circular ([SEBI/HO/CFD/TPD1/CIR/P/2023/140](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-cfd-tpd1-cir-p-2023-140)) reduced public-issue listing from **T+6 to T+3** in two stages — voluntary from 1 September 2023, mandatory from 1 December 2023. The broker's reconciliation cadence has had to compress to match. SEBI's March 2025 rights-issue circular ([SEBI/HO/CFD/CFD-PoD-1/P/CIR/2025/31](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-cfd-cfd-pod-1-p-cir-2025-31)) followed with a parallel compression for rights issues to **23 working days** end-to-end.
+The post-2023 trend has been an aggressive compression of the timeline. SEBI's August 2023 circular ([SEBI/HO/CFD/TPD1/CIR/P/2023/140](/broking-kyc/reference/circulars/sebi-other/#sebihocfdtpd1cirp2023140)) reduced public-issue listing from **T+6 to T+3** in two stages — voluntary from 1 September 2023, mandatory from 1 December 2023. The broker's reconciliation cadence has had to compress to match. SEBI's March 2025 rights-issue circular ([SEBI/HO/CFD/CFD-PoD-1/P/CIR/2025/31](/broking-kyc/reference/circulars/sebi-other/#sebihocfdcfd-pod-1pcir202531)) followed with a parallel compression for rights issues to **23 working days** end-to-end.
 
 ## 1. The pre-IPO operational setup
 
@@ -110,7 +110,7 @@ The release shows up in the client's bank as "block released" or "amount availab
 
 The issuer's RTA submits the corporate-action file to NSDL / CDSL on T+2 evening. The depository credits the allotted shares to each successful allottee's BO ID on T+3 morning. The shares appear in the client's demat by mid-day T+3.
 
-Listing on the exchanges happens on **T+3** itself (mandatory listing day per [SEBI/HO/CFD/TPD1/CIR/P/2023/140](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-cfd-tpd1-cir-p-2023-140)). The stock is available for trading from market open on T+3.
+Listing on the exchanges happens on **T+3** itself (mandatory listing day per [SEBI/HO/CFD/TPD1/CIR/P/2023/140](/broking-kyc/reference/circulars/sebi-other/#sebihocfdtpd1cirp2023140)). The stock is available for trading from market open on T+3.
 
 ### Step 10 — Broker reconciliation
 
@@ -239,7 +239,7 @@ After the window closes, withdrawal is **not permitted** for retail (the bid is 
 
 If the sponsor bank's PSP gateway is down during the bidding window, mandates may fail to authorise even with the client correctly entering their UPI PIN. Failed mandates do not produce RC-100 — the bid sits in a pending state. The exchange has a **3-attempt retry window** within the bid day; brokers escalate to the sponsor bank's helpdesk if the third attempt fails.
 
-If a glitch on the bid day persists, SEBI's [grievance redressal mechanism](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-cfd-dil2-cir-p-2021-2480-1-m) for IPO-UPI applications applies — bidders affected by a documented gateway outage may be granted relaxation through the post-day window, but only if the outage is recognised by SEBI / NPCI. Brokers maintain incident logs for each bid day to support such relaxation claims.
+If a glitch on the bid day persists, SEBI's [grievance redressal mechanism](/broking-kyc/reference/circulars/sebi-other/#sebihocfddil2cirp202124801m) for IPO-UPI applications applies — bidders affected by a documented gateway outage may be granted relaxation through the post-day window, but only if the outage is recognised by SEBI / NPCI. Brokers maintain incident logs for each bid day to support such relaxation claims.
 
 ### Multiple applications by same PAN
 
@@ -275,7 +275,7 @@ If NSE IFM or BSE iBBS itself goes down during bidding hours, the exchange typic
 ## Cross-references
 
 - [Broker Process Narrative](/broking-kyc/broker-process/narrative/) — Section 4 covers daily reporting touchpoints including primary-market reconciliation.
-- [Compliance Blueprint — Investor servicing domain](/broking-kyc/operations/compliance-blueprint/#investor-servicing-15-entries) — investor-charter, complaint, contract-note obligations that also apply to IPO grievances.
+- [Compliance Blueprint — Investor servicing domain](/broking-kyc/operations/compliance-blueprint/) — investor-charter, complaint, contract-note obligations that also apply to IPO grievances.
 - [NPCI Circulars](/broking-kyc/reference/circulars/npci/) — UPI Block / AutoPay / SBMD circulars (OC No. 200, OC No. 185A, OC No. 76A).
 - [SEBI MRD / CFD Circulars](/broking-kyc/reference/circulars/sebi-other/) — IPO ASBA-UPI streamlining, T+3 listing, rights issue 23-day timeline.
 - [BSE Circulars](/broking-kyc/reference/circulars/bse/) — UCC structure for primary issues, ASBA UPI 5:00 PM cut-off.

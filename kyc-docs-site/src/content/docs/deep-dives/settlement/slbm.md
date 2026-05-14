@@ -10,15 +10,15 @@ import { Aside } from '@astrojs/starlight/components';
 ## TL;DR
 
 - **SLBM is the regulated mechanism for institutional and retail lending of equity shares.** A holder of eligible equity shares can lend them out for a fee; a borrower (typically to cover a short delivery or for arbitrage) borrows at the same fee plus a borrowing premium. Settlement is via the clearing corp; the depository tracks the lien.
-- **Regulatory baseline.** The current annual consolidated circular for NSCCL SLBS is [NCL/CMPT/67763](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-67763) (30 April 2025, FY 2024-25); the immediately prior was [NCL/CMPT/61810](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-61810) (FY 2023-24). ICCL operates a parallel SLBS framework. MCX commodities have separate Securities-as-Collateral mechanisms but no equity SLBM.
+- **Regulatory baseline.** The current annual consolidated circular for NSCCL SLBS is [NCL/CMPT/67763](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt67763) (30 April 2025, FY 2024-25); the immediately prior was [NCL/CMPT/61810](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt61810) (FY 2023-24). ICCL operates a parallel SLBS framework. MCX commodities have separate Securities-as-Collateral mechanisms but no equity SLBM.
 - **Two-leg settlement.** First Leg (Type L — borrow / lend at trade): T+1 settlement on the borrow side; borrower receives securities, lender receives lending fee. Reverse Leg (Type P — return at scheme close): securities return from borrower to lender; lending fee accrued in full. Reverse Leg Auction (Type Q): if borrower fails to return.
-- **Monthly settlement calendar.** Monthly circulars (e.g., [NCL/CMPT/71222](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-71222) for Dec 2025; [NCL/CMPT/67833](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-67833) for Jun 2025) publish the day-wise calendar of First-Leg Type L settlements, Reverse-Leg Type P series, and Reverse-Leg Auction Type Q.
-- **MWPL** (Market-Wide Position Limit) per security is set by SEBI / CC; monthly revision circulars (e.g., [NCL/CMPT/66597](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-66597) for JYOTISTRUC) update limits per scrip.
-- **Depository accounts.** CDSL SLB account and NSDL SLB account at the clearing-corp-prescribed sub-status; block mechanism per [NCL/CMPT/54401](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-54401) (Nov 2022) eliminates the need for CLNTEPI client-allocation upload when EPI is done via block.
+- **Monthly settlement calendar.** Monthly circulars (e.g., [NCL/CMPT/71222](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt71222) for Dec 2025; [NCL/CMPT/67833](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt67833) for Jun 2025) publish the day-wise calendar of First-Leg Type L settlements, Reverse-Leg Type P series, and Reverse-Leg Auction Type Q.
+- **MWPL** (Market-Wide Position Limit) per security is set by SEBI / CC; monthly revision circulars (e.g., [NCL/CMPT/66597](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt66597) for JYOTISTRUC) update limits per scrip.
+- **Depository accounts.** CDSL SLB account and NSDL SLB account at the clearing-corp-prescribed sub-status; block mechanism per [NCL/CMPT/54401](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt54401) (Nov 2022) eliminates the need for CLNTEPI client-allocation upload when EPI is done via block.
 - **Fees.** Lending fee + borrowing fee. Both are negotiated through the SLBM platform's quote-driven mechanism. Fees are subject to GST (intermediation service) and the lending income is taxable as business income / other income depending on the lender's status.
 - **No STT on SLBM leg settlements.** SLBM transactions are not subject to Securities Transaction Tax (the transaction is a loan, not a sale).
 - **Tax on capital gains** applies on the underlying sale (if any) post-borrow; the borrow itself doesn't create a taxable transfer.
-- **Auto-borrow** functionality (member-side feature) can automatically cover a short-delivery position via SLBM before the auction window. Not all brokers offer this; the [NCL/CMPT/55097](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-55097) framework and successors support the mechanism.
+- **Auto-borrow** functionality (member-side feature) can automatically cover a short-delivery position via SLBM before the auction window. Not all brokers offer this; the [NCL/CMPT/55097](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt55097) framework and successors support the mechanism.
 
 ## Conceptual overview
 
@@ -37,24 +37,24 @@ For most retail investors, SLBM is invisible — but for active traders, MTF cli
 SLBM operates under SEBI's stock exchange and clearing corporation regulations. Specific mechanism circulars include:
 
 - **SEBI Circular MRD/DoP/SE/Dep/Cir-14/2007** (20 December 2007): The original framework for stock-specific MWPL and position-limit restrictions for Clearing Members, Institutional Investors, and Clients under SLBS. Referenced as the foundational authority in CC SLBS framework circulars.
-- **[SEBI/HO/MRD2/PoD-2/CIR/P/2023/171](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-mrd2-pod-2-cir-p-2023-171)** (Oct 2023 Master Circular for Stock Exchanges and Clearing Corporations) and the Dec 2024 updated SE&CC Master Circular consolidate SLBM provisions among other clearing-corp framework items.
+- **[SEBI/HO/MRD2/PoD-2/CIR/P/2023/171](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2pod-2cirp2023171)** (Oct 2023 Master Circular for Stock Exchanges and Clearing Corporations) and the Dec 2024 updated SE&CC Master Circular consolidate SLBM provisions among other clearing-corp framework items.
 
 ### 1.2 Clearing corp annual consolidated circulars
 
-- **[NCL/CMPT/67763](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-67763)** (30 April 2025): Consolidated Circular for Securities Lending and Borrowing Scheme of NCL (FY 2024-25). Replaces [NCL/CMPT/61810](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-61810) (29 April 2024, FY 2023-24). Baseline for monthly settlement-calendar circulars and MWPL revisions.
-- **[NCL/CMPT/61810](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-61810)** (29 April 2024, FY 2023-24): Annual consolidated circular for SLBS. Forms operational baseline for monthly settlement-calendar circulars (First-Leg Type L, Reverse-Leg Type P, Reverse-Leg Auction Type Q) and MWPL / participant / institutional / non-institutional client-limit revision circulars.
+- **[NCL/CMPT/67763](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt67763)** (30 April 2025): Consolidated Circular for Securities Lending and Borrowing Scheme of NCL (FY 2024-25). Replaces [NCL/CMPT/61810](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt61810) (29 April 2024, FY 2023-24). Baseline for monthly settlement-calendar circulars and MWPL revisions.
+- **[NCL/CMPT/61810](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt61810)** (29 April 2024, FY 2023-24): Annual consolidated circular for SLBS. Forms operational baseline for monthly settlement-calendar circulars (First-Leg Type L, Reverse-Leg Type P, Reverse-Leg Auction Type Q) and MWPL / participant / institutional / non-institutional client-limit revision circulars.
 
 ### 1.3 File-format standardisation
 
-- **[NCL/CMPT/55103](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-55103)** (2 January 2023): SLBS-segment consolidated circular harmonising file nomenclature / format to ISO 20022-aligned standards.
-- **[NCL/CMPT/55119](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-55119)** (3 January 2023): Companion specifying upload / response file formats for client margin reporting, EPI of securities, and collateral release / transfer.
-- **[NCL/CMPT/56030](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-56030)** (17 March 2023) and **[NCL/CMPT/56211](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-56211)** (29 March 2023): Extended discontinuation of old-format reports to 3 July 2023.
-- **[NCL/CMPT/54401](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-54401)** (11 November 2022): Block mechanism in client demat account for SLBS sales — participants must NOT upload client-allocation details through CIM interface in CLNTEPI file where EPI is done via block.
+- **[NCL/CMPT/55103](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt55103)** (2 January 2023): SLBS-segment consolidated circular harmonising file nomenclature / format to ISO 20022-aligned standards.
+- **[NCL/CMPT/55119](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt55119)** (3 January 2023): Companion specifying upload / response file formats for client margin reporting, EPI of securities, and collateral release / transfer.
+- **[NCL/CMPT/56030](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt56030)** (17 March 2023) and **[NCL/CMPT/56211](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt56211)** (29 March 2023): Extended discontinuation of old-format reports to 3 July 2023.
+- **[NCL/CMPT/54401](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt54401)** (11 November 2022): Block mechanism in client demat account for SLBS sales — participants must NOT upload client-allocation details through CIM interface in CLNTEPI file where EPI is done via block.
 
 ### 1.4 Settlement calendar and MWPL
 
-- **Monthly settlement-calendar circulars** (e.g., [NCL/CMPT/71222](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-71222) for Dec 2025; [NCL/CMPT/67833](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-67833) for Jun 2025; [NCL/CMPT/62369](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-62369) for Jul 2024).
-- **Monthly MWPL / position-limit revision circulars** (e.g., [NCL/CMPT/66597](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-66597) for JYOTISTRUC, Feb 2025; [NCL/CMPT/63762](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-63762) for SAPPHIRE, Sep 2024; [ICCL 20211130-30](/broking-kyc/reference/circulars/clearing-corps/#iccl-20211130-30) representative ICCL MWPL).
+- **Monthly settlement-calendar circulars** (e.g., [NCL/CMPT/71222](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt71222) for Dec 2025; [NCL/CMPT/67833](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt67833) for Jun 2025; [NCL/CMPT/62369](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt62369) for Jul 2024).
+- **Monthly MWPL / position-limit revision circulars** (e.g., [NCL/CMPT/66597](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt66597) for JYOTISTRUC, Feb 2025; [NCL/CMPT/63762](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt63762) for SAPPHIRE, Sep 2024; [ICCL 20211130-30](/broking-kyc/reference/circulars/clearing-corps/) representative ICCL MWPL).
 
 ## 2. Eligible securities, members, and clients
 
@@ -101,8 +101,8 @@ Per security, position limits are set at three levels:
 
 Examples from monthly revisions:
 
-- [NCL/CMPT/66597](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-66597) (Feb 2025): JYOTISTRUC MWPL increased from 82,437,042 to 92,025,699; Institutional Client and Participant limits 8,243,704 → 9,202,569 each; Non-Institutional Client limit 824,370 → 920,256.
-- [NCL/CMPT/63762](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-63762) (Sep 2024): SAPPHIRE MWPL 4,410,741 → 22,053,709; Institutional / Participant 441,074 → 2,205,370; Non-Institutional Client 44,107 → 220,537.
+- [NCL/CMPT/66597](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt66597) (Feb 2025): JYOTISTRUC MWPL increased from 82,437,042 to 92,025,699; Institutional Client and Participant limits 8,243,704 → 9,202,569 each; Non-Institutional Client limit 824,370 → 920,256.
+- [NCL/CMPT/63762](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt63762) (Sep 2024): SAPPHIRE MWPL 4,410,741 → 22,053,709; Institutional / Participant 441,074 → 2,205,370; Non-Institutional Client 44,107 → 220,537.
 
 A trade exceeding the MWPL is blocked by the OMS / CC's pre-trade validation.
 
@@ -121,7 +121,7 @@ The first leg is the borrow / lend at trade execution. At trade match:
 
 Settlement: **T+1 on the trade day.** Per monthly settlement-calendar circulars (Annexure A — First Leg Settlement Type L), each trading day generates a First-Leg settlement on T+1.
 
-The transfer of securities is via the depository — the borrower's demat receives the securities; the lender's demat shows them as "lent under SLBS." The block-mechanism (per [NCL/CMPT/54401](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-54401)) handles the operational marking; explicit CLNTEPI client-allocation files are not required where the block mechanism applies.
+The transfer of securities is via the depository — the borrower's demat receives the securities; the lender's demat shows them as "lent under SLBS." The block-mechanism (per [NCL/CMPT/54401](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt54401)) handles the operational marking; explicit CLNTEPI client-allocation files are not required where the block mechanism applies.
 
 ### 3.2 Reverse Leg — Settlement Type P
 
@@ -131,7 +131,7 @@ The reverse leg is the return of securities at the scheme close. At reverse-leg 
 - **CC** delivers securities back to the lender.
 - **CC** retains the lending fee that the borrower paid up-front (the fee was already settled in the First Leg).
 
-Settlement: per the monthly settlement-calendar (Annexure B — Reverse Leg Type P series), each series has a defined Reverse-Leg date — typically aligned with the F&O monthly expiry calendar in the post-expiry-coding-scheme-refresh era. NCL's December 2025 SLBS calendar ([NCL/CMPT/71222](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-71222)) references series codes 12/XD, 01/X1, etc. reflecting the expiry-coding scheme.
+Settlement: per the monthly settlement-calendar (Annexure B — Reverse Leg Type P series), each series has a defined Reverse-Leg date — typically aligned with the F&O monthly expiry calendar in the post-expiry-coding-scheme-refresh era. NCL's December 2025 SLBS calendar ([NCL/CMPT/71222](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt71222)) references series codes 12/XD, 01/X1, etc. reflecting the expiry-coding scheme.
 
 ### 3.3 Reverse Leg Auction — Settlement Type Q
 
@@ -170,13 +170,13 @@ In addition to the lending fee, a borrowing premium may apply during high-demand
 
 ### 4.3 Margin requirements
 
-SLBM positions attract margin per [NCL/CMPT/67763](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-67763) and the monthly settlement-calendar circulars. Margin covers:
+SLBM positions attract margin per [NCL/CMPT/67763](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt67763) and the monthly settlement-calendar circulars. Margin covers:
 
 - VaR-based mark-to-market on the borrowed securities.
 - Coverage of potential reverse-leg auction shortfall.
 - Per-segment ELM (extreme loss margin).
 
-Margin is computed daily and reported via the MG-12 / MG-13 file flow (per [Margin compliance domain MARGIN-029](/broking-kyc/operations/compliance-blueprint/#margin-compliance-30-entries)).
+Margin is computed daily and reported via the MG-12 / MG-13 file flow (per [Margin compliance domain MARGIN-029](/broking-kyc/operations/compliance-blueprint/)).
 
 ### 4.4 Tax treatment
 
@@ -191,7 +191,7 @@ Margin is computed daily and reported via the MG-12 / MG-13 file flow (per [Marg
 The "no STT on SLBM" treatment is a long-standing CBDT clarification on the basis that SLBM is a loan transaction, not a sale. This makes SLBM materially cheaper than alternatives that involve actual sale-and-buyback.
 
 <Aside type="note">
-**SLBM as a short-cover mechanism is cheaper than auction.** A T+1 short delivery would otherwise trigger a T+2 auction with close-out cost = higher of (a) highest scrip price in settlement-to-auction window or (b) 20% above latest closing per [NCL/CMPT/71441](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-71441). The SLBM borrow alternative is the lending fee — typically a few hundred bps annualised — plus the borrowing premium. The economic advantage is usually significant; brokers with auto-borrow capability use SLBM to cover known shorts before the auction window.
+**SLBM as a short-cover mechanism is cheaper than auction.** A T+1 short delivery would otherwise trigger a T+2 auction with close-out cost = higher of (a) highest scrip price in settlement-to-auction window or (b) 20% above latest closing per [NCL/CMPT/71441](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt71441). The SLBM borrow alternative is the lending fee — typically a few hundred bps annualised — plus the borrowing premium. The economic advantage is usually significant; brokers with auto-borrow capability use SLBM to cover known shorts before the auction window.
 </Aside>
 
 ## 5. Operational mechanics
@@ -222,7 +222,7 @@ A SLBM transaction is bilaterally cancellable only in limited circumstances (e.g
 
 ### 5.4 Block mechanism
 
-Per [NCL/CMPT/54401](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-54401) (Nov 2022), where EPI of securities for SLBS is done via block mechanism, participants must NOT upload client-allocation details through the CIM interface in CLNTEPI file. The block mechanism handles the depository-side lien on the lender's BO account without requiring the EPI client-allocation file.
+Per [NCL/CMPT/54401](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt54401) (Nov 2022), where EPI of securities for SLBS is done via block mechanism, participants must NOT upload client-allocation details through the CIM interface in CLNTEPI file. The block mechanism handles the depository-side lien on the lender's BO account without requiring the EPI client-allocation file.
 
 This was a meaningful simplification — pre block mechanism, lenders had to upload a separate client-allocation file for SLBS EPI. The block mechanism uses the lender's BO account directly with a depository-managed block.
 
@@ -266,7 +266,7 @@ The CC publishes corporate-action specific updates for SLBM scheme series affect
 
 ### 6.2 Settlement holiday adjustment
 
-If a settlement holiday is declared on the scheduled SLBS settlement date (e.g., [ICCL 20240914-5](/broking-kyc/reference/circulars/clearing-corps/#iccl-20240914-5) declaring September 16 / 18, 2024 as settlement holidays for Equity and SLB), the CC publishes revised settlement schedules separately.
+If a settlement holiday is declared on the scheduled SLBS settlement date (e.g., [ICCL 20240914-5](/broking-kyc/reference/circulars/clearing-corps/) declaring September 16 / 18, 2024 as settlement holidays for Equity and SLB), the CC publishes revised settlement schedules separately.
 
 ### 6.3 Reverse-Leg failure recovery
 
@@ -297,11 +297,11 @@ Some institutional lenders use SLBM as a tax-management tool — temporarily tra
 
 ### 6.7 SLBM in T+0 era
 
-T+0 settlement (per [SEBI/HO/MRD/POD-3/P/CIR/2024/172](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-mrd-pod-3-p-cir-2024-172)) doesn't change SLBM mechanics directly. SLBM still settles T+1 First Leg even when underlying scrips are T+0 eligible. The same-day-settlement of T+0 trades reduces the urgency of SLBM for short-cover in T+0 trades (since T+0 settlement happens same evening), but the mechanism is unchanged.
+T+0 settlement (per [SEBI/HO/MRD/POD-3/P/CIR/2024/172](/broking-kyc/reference/circulars/sebi-other/#sebihomrdpod-3pcir2024172)) doesn't change SLBM mechanics directly. SLBM still settles T+1 First Leg even when underlying scrips are T+0 eligible. The same-day-settlement of T+0 trades reduces the urgency of SLBM for short-cover in T+0 trades (since T+0 settlement happens same evening), but the mechanism is unchanged.
 
 ### 6.8 Cross-segment offset
 
-Securities borrowed under SLBM can be used as margin collateral in the CM segment subject to the haircut framework. The collateral framework (per [NCL/CMPT/51657](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-51657) and successors) recognises borrowed-and-pledged securities subject to the appropriate sub-status tracking.
+Securities borrowed under SLBM can be used as margin collateral in the CM segment subject to the haircut framework. The collateral framework (per [NCL/CMPT/51657](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt51657) and successors) recognises borrowed-and-pledged securities subject to the appropriate sub-status tracking.
 
 ### 6.9 MWPL breach mid-borrow
 
@@ -333,17 +333,17 @@ If the MWPL is exceeded during the borrow period (e.g., aggregate open SLBM posi
 - **[risk trade-off]** SLBM auto-borrow capability is a meaningful broker differentiator. A broker that auto-borrows to cover known shorts avoids auction penalties and provides a cleaner client experience. The integration of SLBM into the RMS / OMS short-cover workflow has implementation cost but typically pays back via avoided penalties within months.
 - **[industry typical]** The lending fee is typically annualised but the actual borrow duration is short (days to weeks). The economic lending fee per borrow is thus modest, but at SLBM's volume, the cumulative lending revenue for large institutional desks is meaningful.
 - **[gotcha]** Corporate-action handling during a SLBM borrow has been a recurring source of issues. Dividend pass-through, bonus-quantity adjustment, and ex-date handling each have specific operational requirements that the CC publishes per corporate action. Brokers should monitor the SLBS-specific corporate-action circulars closely.
-- **[cost optimization]** The block mechanism per [NCL/CMPT/54401](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-54401) (Nov 2022) eliminated the need for CLNTEPI client-allocation upload in SLBS EPI flows where block is used. Brokers should ensure their SLBS workflow uses block mechanism by default rather than the legacy CLNTEPI flow.
+- **[cost optimization]** The block mechanism per [NCL/CMPT/54401](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt54401) (Nov 2022) eliminated the need for CLNTEPI client-allocation upload in SLBS EPI flows where block is used. Brokers should ensure their SLBS workflow uses block mechanism by default rather than the legacy CLNTEPI flow.
 - **[industry typical]** Tax treatment is broadly settled but specific positions (especially around dividend-strip arbitrage, FPI-specific borrow mechanics, etc.) require tax counsel. Mainstream SLBM use for short-cover doesn't have ambiguous tax treatment.
 - **[gotcha]** MWPL is per-scrip and revised monthly. Brokers that maintain pre-emptive borrow inventory should track MWPL availability before placing borrow orders; an OMS rejection at MWPL breach can leave a short position uncovered just before the auction window.
 - **[risk trade-off]** SLBM borrow cost vs. auction close-out cost calculation. The auction close-out is the higher of (a) highest scrip price in settlement-to-auction window or (b) latest closing + 20%. For a stable scrip in a normal market, the lending fee is typically far cheaper. For a fast-rising scrip in stress, the lending fee can spike to where it approaches the auction cost — in which case the close-out cost may be the better alternative. Real-time decision logic at the RMS / OMS layer is the typical pattern.
-- **[industry typical]** Reverse-Leg series typically aligns with the F&O monthly expiry calendar. The series codes (12/XD, 01/X1, etc. per [NCL/CMPT/71222](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-71222) Dec 2025) reflect the expiry-coding scheme refresh; back-office systems must keep the series-code mapping current.
+- **[industry typical]** Reverse-Leg series typically aligns with the F&O monthly expiry calendar. The series codes (12/XD, 01/X1, etc. per [NCL/CMPT/71222](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt71222) Dec 2025) reflect the expiry-coding scheme refresh; back-office systems must keep the series-code mapping current.
 
 ## Cross-references
 
-- [Broker Process Narrative — Section 3 (Settlement Cycle)](/broking-kyc/broker-process/narrative/#3-the-settlement-cycle) — settlement context
-- [Compliance Blueprint — Margin domain](/broking-kyc/operations/compliance-blueprint/#margin-compliance-30-entries) — MARGIN-029 SLBM margin entry
-- [Compliance Blueprint — Settlement domain](/broking-kyc/operations/compliance-blueprint/#settlement-22-entries) — SETTLEMENT-001 / 003 / 010 (T+1, auction, securities pay-in)
+- [Broker Process Narrative — Section 3 (Settlement Cycle)](/broking-kyc/broker-process/narrative/) — settlement context
+- [Compliance Blueprint — Margin domain](/broking-kyc/operations/compliance-blueprint/) — MARGIN-029 SLBM margin entry
+- [Compliance Blueprint — Settlement domain](/broking-kyc/operations/compliance-blueprint/) — SETTLEMENT-001 / 003 / 010 (T+1, auction, securities pay-in)
 - [T+0 / T+1 settlement deep dive](./t0-t1-settlement/) — settlement-cycle context
 - [Short-delivery auction deep dive](/broking-kyc/deep-dives/trading-day/short-delivery-auction/) — auction mechanism and close-out
 - [Payin default + Core SGF deep dive](./payin-default-core-sgf/) — what happens when a SLBM borrower defaults at Reverse Leg

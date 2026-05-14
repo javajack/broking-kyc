@@ -12,7 +12,7 @@ import { Aside } from '@astrojs/starlight/components';
 - **T+1 has been default for all listed scrips since 27 January 2023.** The migration from T+2 was phased starting 25 February 2022 under SEBI/HO/MRD2/DCAP/CIR/2021/0598 and SEBI's September 2021 optional-cycle circular SEBI/HO/MRD-1/DSAP/P/CIR/2021/628 (SEBI/HO/MRD2/PoD-2/CIR/P/2023/171 consolidated the framework into the Stock Exchanges & Clearing Corporations Master Circular).
 - **T+0 went live on 28 March 2024** as an optional rolling-settlement cycle covering the top 25 scrips under SEBI/HO/MRD/MRD-PoD-3/P/CIR/2024/20 and NCL/CMPT/61301; it was expanded to the top 500 scrips by market capitalisation in a phased manner under SEBI/HO/MRD/POD-3/P/CIR/2024/172 (10 December 2024, effective 31 January 2025).
 - **T+0 runs as a parallel session, not as an acceleration of T+1.** A scrip eligible for T+0 trades in *both* sessions on the same day; the broker tags which order belongs to which session, and the two settle through independent obligation files.
-- **Differential brokerage is permitted for T+0 trades** (SEBI/HO/MRD/POD-3/P/CIR/2024/172) but must be disclosed in the client kit and on the contract note — SETTLEMENT-018 in the [Settlement domain](/broking-kyc/operations/compliance-blueprint/#settlement-22-entries).
+- **Differential brokerage is permitted for T+0 trades** (SEBI/HO/MRD/POD-3/P/CIR/2024/172) but must be disclosed in the client kit and on the contract note — SETTLEMENT-018 in the [Settlement domain](/broking-kyc/operations/compliance-blueprint/).
 - **Pay-in cut-offs differ materially.** T+1 funds and securities pay-in is typically 10:30 / 11:30 IST next morning (final settlement 1 by ~10:00 / 15:30 IST; final settlement 2 by ~17:00 / 21:00 IST per NCL/CMPT/72224 January 2026 calendar). T+0 funds pay-in is 16:00 IST same-day; securities pay-in is 15:30 IST same-day; settlement complete by 16:30.
 - **Custodial participants** can settle in T+0 since 31 July 2024 (NCL/CMPT/63165), with the Family Account CP-code mechanism (FAMILYAC suffix, PAN FAMIL999999Y) activated 10 February 2025 (NCL/CMPT/66135).
 - Auction for short delivery in T+1 runs on T+2; auction close-out rate per SEBI Master Circular SEBI/HO/MRDPoD2/CIR/P/2024/00181 and FAQ NCL/CMPT/71441 = higher of (a) highest scrip price in the settlement-to-auction window or (b) latest closing + 20%.
@@ -32,14 +32,14 @@ The table below summarises the three cycles at the level of detail an operator n
 | Aspect | T+2 (legacy, retired) | T+1 (default since 27 Jan 2023) | T+0 (optional since 28 Mar 2024) |
 | --- | --- | --- | --- |
 | Status | Withdrawn for cash segment | Default for all listed scrips | Optional; broker + client opt-in; top 500 phased |
-| SEBI authority | SEBI Master Circulars prior to Sept 2021 | [SEBI/HO/MRD2/DCAP/CIR/2021/0598](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-mrd2-dcap-cir-2021-0598) (Sept 2021 + phased), consolidated in [SEBI/HO/MRD2/PoD-2/CIR/P/2023/171](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-mrd2-pod-2-cir-p-2023-171) (Master Oct 2023) and [Dec 2024 SE&CC Master](/broking-kyc/reference/circulars/sebi-other/) | [SEBI/HO/MRD/MRD-PoD-3/P/CIR/2024/20](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-mrd-mrd-pod-3-p-cir-2024-20) (Mar 2024, beta), [SEBI/HO/MRD/POD-3/P/CIR/2024/172](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-mrd-pod-3-p-cir-2024-172) (Dec 2024, top 500) |
-| Clearing-corp operational | Earlier consolidated circulars | [NCL/CMPT/67751](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-67751) (FY 2024-25 master) | [NCL/CMPT/61301](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-61301) (operational guidelines, 22 Mar 2024); [NCL/CMPT/63165](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-63165) (custodial CPs, Jul 2024); [NCL/CMPT/66135](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-66135) (Family Account CP, Feb 2025) |
+| SEBI authority | SEBI Master Circulars prior to Sept 2021 | [SEBI/HO/MRD2/DCAP/CIR/2021/0598](/broking-kyc/reference/circulars/sebi-other/) (Sept 2021 + phased), consolidated in [SEBI/HO/MRD2/PoD-2/CIR/P/2023/171](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2pod-2cirp2023171) (Master Oct 2023) and [Dec 2024 SE&CC Master](/broking-kyc/reference/circulars/sebi-other/) | [SEBI/HO/MRD/MRD-PoD-3/P/CIR/2024/20](/broking-kyc/reference/circulars/sebi-other/#sebihomrdmrd-pod-3pcir202420) (Mar 2024, beta), [SEBI/HO/MRD/POD-3/P/CIR/2024/172](/broking-kyc/reference/circulars/sebi-other/#sebihomrdpod-3pcir2024172) (Dec 2024, top 500) |
+| Clearing-corp operational | Earlier consolidated circulars | [NCL/CMPT/67751](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt67751) (FY 2024-25 master) | [NCL/CMPT/61301](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt61301) (operational guidelines, 22 Mar 2024); [NCL/CMPT/63165](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt63165) (custodial CPs, Jul 2024); [NCL/CMPT/66135](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt66135) (Family Account CP, Feb 2025) |
 | Trade window | Standard trading hours 09:15 – 15:30 | Standard trading hours 09:15 – 15:30 | 09:15 – 13:30 (separate session, parallel to T+1) |
 | Pay-in window | T+2 morning | T+1 morning (typically 10:30 / 11:30 funds / securities; final settlement 2 by ~16:30 – 21:00) | Same day: securities pay-in 15:30 IST, funds pay-in 16:00 IST, settlement complete 16:30 IST |
 | Price band | Standard scrip price band | Standard scrip price band | T+1 reference price ± 100 bps |
 | Block deal window | Two windows in T+1 trading day | 08:45 – 09:00 + 14:35 – 15:05 | Optional separate block deal window for T+0 (SEBI Dec 2024) |
 | Auction for short delivery | T+3 auction | T+2 auction; close-out per SEBI/HO/MRDPoD2/CIR/P/2024/00181 | Auction same-day if applicable; close-out per same rule |
-| Custodial participants | Eligible | Eligible | Eligible since Jul 2024 ([NCL/CMPT/63165](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-63165)); Family Account CP active Feb 2025 ([NCL/CMPT/66135](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-66135)) |
+| Custodial participants | Eligible | Eligible | Eligible since Jul 2024 ([NCL/CMPT/63165](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt63165)); Family Account CP active Feb 2025 ([NCL/CMPT/66135](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt66135)) |
 | Differential brokerage | Single brokerage | Single brokerage | Permitted, must be disclosed (SEBI Dec 2024) |
 | Eligible scrips | All listed (cash) | All listed (cash, default) | Top 500 by market cap, phased (Dec 2024); was top 25 at beta (Mar 2024) |
 
@@ -55,18 +55,18 @@ For every cash-segment trade executed today, two obligations crystallise tomorro
 
 A T+1 trade-day timeline (post-direct-payout regime):
 
-1. **09:15 – 15:30 IST.** Trading. Orders capture pre-trade margin; clearing corp captures four peak-margin snapshots at random windows in 11:00–11:30, 12:30–13:00, 13:30–14:00, 14:30–15:00 (per [NCL/CMPT/56502](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-56502) and the [MARGIN compliance domain](/broking-kyc/operations/compliance-blueprint/#margin-compliance-30-entries)).
+1. **09:15 – 15:30 IST.** Trading. Orders capture pre-trade margin; clearing corp captures four peak-margin snapshots at random windows in 11:00–11:30, 12:30–13:00, 13:30–14:00, 14:30–15:00 (per [NCL/CMPT/56502](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt56502) and the [MARGIN compliance domain](/broking-kyc/operations/compliance-blueprint/)).
 2. **15:30 – 15:40.** Closing auction. Settlement price discovered.
 3. **15:40 – 19:00.** EOD reconciliation per the [EOD & settlement DAG](/broking-kyc/operations/integration-dag/eod-settlement/). The clearing corp publishes the trade file and the obligation file; broker's back-office books trades, computes charges, generates ECNs, computes T+1 pay-in / pay-out per UCC.
-4. **19:00 – 21:00.** Early Pay-in (EPI) windows. Funds EPI cut-off 19:00 IST, Securities EPI cut-off 19:00 IST (UPI-Block clients 18:00 IST on quarterly running-account-settlement dates per [NCL/CMPT/72025](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-72025)). Margin-report download 21:00 IST. Cash / FDR / BG immediate release accepted until 19:00. Collateral-allocation window open until 22:00 IST.
+4. **19:00 – 21:00.** Early Pay-in (EPI) windows. Funds EPI cut-off 19:00 IST, Securities EPI cut-off 19:00 IST (UPI-Block clients 18:00 IST on quarterly running-account-settlement dates per [NCL/CMPT/72025](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt72025)). Margin-report download 21:00 IST. Cash / FDR / BG immediate release accepted until 19:00. Collateral-allocation window open until 22:00 IST.
 5. **T+1 morning.** Funds and securities pay-in execution; clearing corp settles; pay-out runs in parallel. Final settlement times for a typical T+1 day per NCL January 2026 calendar (NCL/CMPT/72224 reference): final settlement 1 (M, Z, B segments) — pay-in 10:30 / pay-out 15:30; final settlement 2 — pay-in 16:30 / pay-out 21:00.
 6. **T+1 afternoon.** Auction settlement for short delivery (settlement type A): pay-in 08:00 IST T+2, pay-out 10:00 IST T+2. UNPAIDMTF upload windows 15:30 – 22:00 (T-1 / T) and 06:30 – 13:00 (T pay-in day).
 
 ### 2.2 Pay-in / pay-out flow under direct-payout-to-demat
 
-Pre-June 2024, securities being paid out by the clearing corp landed in the broker's pool account first, then the broker pushed them to the client's demat. Post the June 2024 SEBI [direct-payout-to-demat](./direct-payout-to-demat/) mandate (SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2024/75, operational via [NCL/CMPT/63669](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-63669), [NCL/CMPT/66779](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-66779), ICCL 20250214-69 and ICCL 20250214-69 phase 2), securities flow directly from the clearing pool to the client's demat without the broker's intermediate custody. Funds still settle to the broker's client-funds bank account.
+Pre-June 2024, securities being paid out by the clearing corp landed in the broker's pool account first, then the broker pushed them to the client's demat. Post the June 2024 SEBI [direct-payout-to-demat](./direct-payout-to-demat/) mandate (SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2024/75, operational via [NCL/CMPT/63669](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt63669), [NCL/CMPT/66779](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt66779), ICCL 20250214-69 and ICCL 20250214-69 phase 2), securities flow directly from the clearing pool to the client's demat without the broker's intermediate custody. Funds still settle to the broker's client-funds bank account.
 
-This changes the pay-in side as well: the broker must do gross pay-in to the clearing corp under the direct-payout regime (per [NCL/CMPT/66779](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-66779) Phase 2 from settlement 2425828 / 25 Feb 2025). Internal-shortage valuation is settlement price + 20%, payable by noon on settlement day. Custodian-cleared clients are still excluded.
+This changes the pay-in side as well: the broker must do gross pay-in to the clearing corp under the direct-payout regime (per [NCL/CMPT/66779](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt66779) Phase 2 from settlement 2425828 / 25 Feb 2025). Internal-shortage valuation is settlement price + 20%, payable by noon on settlement day. Custodian-cleared clients are still excluded.
 
 ### 2.3 Peak-margin snapshots in T+1
 
@@ -134,11 +134,11 @@ For a broker to participate in T+0, the following must be in place:
 | Back-office | T+0 trade-file ingestion separate from T+1 | NCL/CMPT/61301 |
 | Back-office | T+0 obligation-file processing; gross pay-in to CC | NCL/CMPT/63669 (direct-payout regime) |
 | Back-office | T+0 contract-note generation reflecting T+0 cycle and applicable brokerage | SETTLEMENT-018 |
-| Custody | TM CUSPA, CM CUSPA, TM CSMFA accounts as applicable | [NCL/CMPT/63669](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-63669) — see the [direct-payout deep dive](./direct-payout-to-demat/) |
-| Custody | NSDL primary demat for proprietary UCC distinct from CM pool DP-ID-Client-ID | [NCL/CMPT/69455](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-69455) |
+| Custody | TM CUSPA, CM CUSPA, TM CSMFA accounts as applicable | [NCL/CMPT/63669](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt63669) — see the [direct-payout deep dive](./direct-payout-to-demat/) |
+| Custody | NSDL primary demat for proprietary UCC distinct from CM pool DP-ID-Client-ID | [NCL/CMPT/69455](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt69455) |
 | Settlement bank | Same-day funds pay-in capability (typically end-of-day NEFT / RTGS settlement window) | clearing-bank SOP |
 | Settlement bank | Same-day funds pay-out to client-funds bank account | clearing-bank SOP |
-| Reporting | T+0 margin reporting in MG-12 / MG-13 files reflecting same-day settlement | [NCL/CMPT/56502](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-56502) |
+| Reporting | T+0 margin reporting in MG-12 / MG-13 files reflecting same-day settlement | [NCL/CMPT/56502](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt56502) |
 | Client disclosure | Differential-brokerage and price-band disclosure in account kit and on T+0 contract notes | SEBI Dec 2024 |
 
 ### 3.6 T+0 custodian-cleared flow — Family Account CP
@@ -194,7 +194,7 @@ This parallel architecture is why the broker can't simply "switch on" T+0 — ev
 
 ### 5.1 Settlement-holiday handling
 
-Settlement holidays (state elections, RBI declarations under the Negotiable Instruments Act, etc.) generate revised T+1 and T+0 settlement calendars. The 15 January 2026 Maharashtra municipal-corporation elections holiday, formalised in [NCL/CMPT/72224](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-72224), illustrates the pattern: T+0 settlement 2026511 was suspended for the day; T+1 schedule for the next business day was published with auction pay-in 08:00 / pay-out 10:00 (settlement A), normal pay-in 10:30 / pay-out 15:30 (settlement 1), and a late-cycle pay-in 16:30 / pay-out 21:00 (settlement 2).
+Settlement holidays (state elections, RBI declarations under the Negotiable Instruments Act, etc.) generate revised T+1 and T+0 settlement calendars. The 15 January 2026 Maharashtra municipal-corporation elections holiday, formalised in [NCL/CMPT/72224](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt72224), illustrates the pattern: T+0 settlement 2026511 was suspended for the day; T+1 schedule for the next business day was published with auction pay-in 08:00 / pay-out 10:00 (settlement A), normal pay-in 10:30 / pay-out 15:30 (settlement 1), and a late-cycle pay-in 16:30 / pay-out 21:00 (settlement 2).
 
 UNPAIDMTF upload windows on holiday-affected days are typically widened: 15:30 – 22:00 on T-1 / T and 06:30 – 13:00 on the next pay-in day per the same circular. EPI of securities is allowed until 21:00 on the post-holiday settlement-eve.
 
@@ -204,12 +204,12 @@ A client can do both: a buy in T+0 (settled same evening) and a sell in T+1 (set
 
 ### 5.3 Auction for short delivery
 
-If a member fails to deliver securities on T+1, the auction runs on T+2 morning. The auction-offer price for successful auctions and the close-out price for unsuccessful auctions are used to charge the failing member. The close-out rate per SEBI Master Circular SEBI/HO/MRDPoD2/CIR/P/2024/00181 (Dec 2024) and FAQ [NCL/CMPT/71441](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-71441) (Nov 2025) = higher of:
+If a member fails to deliver securities on T+1, the auction runs on T+2 morning. The auction-offer price for successful auctions and the close-out price for unsuccessful auctions are used to charge the failing member. The close-out rate per SEBI Master Circular SEBI/HO/MRDPoD2/CIR/P/2024/00181 (Dec 2024) and FAQ [NCL/CMPT/71441](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt71441) (Nov 2025) = higher of:
 
 - the highest scrip price during the period from settlement day to auction day, or
 - 20% above the latest closing price on the auction-call day.
 
-This applies to both CC shortages and internal shortages per the Feb 2025 update [NCL/CMPT/66779](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-66779). Auction files: P_0000 for unsuccessful internal-shortage auctions; F_0000 for CC shortage close-out, CA close-out, non-actionable BL / G-Sec close-out, and auction pay-in shortage close-out. See the [Short-delivery auction deep dive](/broking-kyc/deep-dives/trading-day/short-delivery-auction/) for the full close-out and recovery walkthrough.
+This applies to both CC shortages and internal shortages per the Feb 2025 update [NCL/CMPT/66779](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt66779). Auction files: P_0000 for unsuccessful internal-shortage auctions; F_0000 for CC shortage close-out, CA close-out, non-actionable BL / G-Sec close-out, and auction pay-in shortage close-out. See the [Short-delivery auction deep dive](/broking-kyc/deep-dives/trading-day/short-delivery-auction/) for the full close-out and recovery walkthrough.
 
 ### 5.4 Settlement-driven margin swings
 
@@ -217,11 +217,11 @@ The four peak-margin snapshots are taken during 11:00 – 15:00 IST. If a T+0 pa
 
 ### 5.5 Corporate-action handling under direct-payout
 
-When a security is in the ex-date window, the clearing corp issues representative early-pay-in circulars (e.g., [NCL/CMPT/65498](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-65498) for a 5→2 face-value split). EPI is allowed in the old ISIN for the pre-ex settlement and in the new ISIN for the post-ex settlement. Direct payout to the client demat must reflect the correct ISIN per the corporate-action effective date.
+When a security is in the ex-date window, the clearing corp issues representative early-pay-in circulars (e.g., [NCL/CMPT/65498](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt65498) for a 5→2 face-value split). EPI is allowed in the old ISIN for the pre-ex settlement and in the new ISIN for the post-ex settlement. Direct payout to the client demat must reflect the correct ISIN per the corporate-action effective date.
 
 ### 5.6 What T+0 isn't (clarifying)
 
-T+0 is not the same as "Direct Market Access" same-day settlement of OTC trades, nor a derivative same-day settlement, nor a same-day mutual-fund subscription / redemption. The MF same-day settlement on BSE StAR MF (per [ICCL 20240613-52](/broking-kyc/reference/circulars/clearing-corps/#iccl-20240613-52) and monthly settlement-programme circulars) is a separate cycle. T+0 in this page means equity cash-segment T+0 only.
+T+0 is not the same as "Direct Market Access" same-day settlement of OTC trades, nor a derivative same-day settlement, nor a same-day mutual-fund subscription / redemption. The MF same-day settlement on BSE StAR MF (per [ICCL 20240613-52](/broking-kyc/reference/circulars/clearing-corps/) and monthly settlement-programme circulars) is a separate cycle. T+0 in this page means equity cash-segment T+0 only.
 
 ## Practical notes
 
@@ -229,15 +229,15 @@ T+0 is not the same as "Direct Market Access" same-day settlement of OTC trades,
 - **[gotcha]** The T+0 settlement number is independent of the T+1 settlement number on the same day. Back-office systems that key reconciliation off settlement-date-only will double-count obligations. Key off the explicit settlement number from the clearing-corp obligation file.
 - **[risk trade-off]** Differential T+0 brokerage is permitted (SEBI Dec 2024) but most brokers chose to keep T+0 brokerage equal to or lower than T+1 to encourage adoption; charging higher T+0 brokerage tested poorly in market response and is rarely seen.
 - **[industry typical]** Settlement-bank readiness is the single most common reason a smaller broker delays T+0 onboarding. Same-day funds pay-out (broker → client bank) at the 16:30 settlement-completion window requires either an IMPS-capable retail flow or an RTGS / NEFT settlement-bank account with cut-offs that comfortably absorb the 16:30 spike.
-- **[gotcha]** Custodian-cleared clients must use the Family Account CP code (FAMILYAC suffix) for T+0 since 10 February 2025 per [NCL/CMPT/66135](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-66135). Brokers running custodian flows without the FAMILYAC code mechanism encountered allocation rejections in the first weeks post effective date.
+- **[gotcha]** Custodian-cleared clients must use the Family Account CP code (FAMILYAC suffix) for T+0 since 10 February 2025 per [NCL/CMPT/66135](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt66135). Brokers running custodian flows without the FAMILYAC code mechanism encountered allocation rejections in the first weeks post effective date.
 - **[cost optimization]** Peak-margin and DMF treatment of T+0 trades did not change with the introduction of the parallel session — the snapshot windows still capture the T+0 portion of intraday positions. Brokers that pre-flagged T+0 trades in their internal margin-block ledger had cleaner DMF reconciliation than those that processed T+0 separately at EOD.
-- **[industry typical]** UPI Block (ASBA) clients have an earlier securities EPI cut-off on quarterly running-account settlement dates: 18:00 IST instead of 19:00 (per [NCL/CMPT/72025](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-72025) Dec 2025 for the 2 January 2026 settlement). Backend systems need to honour this per-client-type difference, not rely on a single cut-off.
+- **[industry typical]** UPI Block (ASBA) clients have an earlier securities EPI cut-off on quarterly running-account settlement dates: 18:00 IST instead of 19:00 (per [NCL/CMPT/72025](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt72025) Dec 2025 for the 2 January 2026 settlement). Backend systems need to honour this per-client-type difference, not rely on a single cut-off.
 
 ## Cross-references
 
-- [Broker Process Narrative — Section 3 (Settlement Cycle)](/broking-kyc/broker-process/narrative/#3-the-settlement-cycle) — chronological narrative
+- [Broker Process Narrative — Section 3 (Settlement Cycle)](/broking-kyc/broker-process/narrative/) — chronological narrative
 - [Integration DAG — EOD & settlement](/broking-kyc/operations/integration-dag/eod-settlement/) — node-level dependencies
-- [Compliance Blueprint — Settlement domain](/broking-kyc/operations/compliance-blueprint/#settlement-22-entries) — obligations 001 – 022
+- [Compliance Blueprint — Settlement domain](/broking-kyc/operations/compliance-blueprint/) — obligations 001 – 022
 - [Direct payout to demat deep dive](./direct-payout-to-demat/) — sibling page on the related rollout
 - [Payin default + Core SGF deep dive](./payin-default-core-sgf/) — what happens when T+1 pay-in fails
 - [Client funds upstreaming deep dive](./client-funds-upstreaming/) — funds layer behind the settlement

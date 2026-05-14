@@ -280,7 +280,7 @@ Account closure is a client right that SEBI has strengthened in recent years. Cl
 | Aspect | Details |
 |--------|---------|
 | **SEBI Mandate** | DPs with online services MUST provide online closure facility |
-| **Circular** | [SEBI/HO/MRD/MRD-PoD-1/P/CIR/2024/168](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-mrd-mrd-pod-1-p-cir-2024-168) (Dec 2024) |
+| **Circular** | [SEBI/HO/MRD/MRD-PoD-1/P/CIR/2024/168](/broking-kyc/reference/circulars/sebi-other/#sebihomrdmrd-pod-1pcir2024168) (Dec 2024) |
 | **Effective Date** | July 14, 2025 (new procedures) |
 | **Client Right** | BO shall NOT be required to give reasons for closure (online mode) |
 
