@@ -93,6 +93,11 @@ npm install
 
 See the [Regulatory Circulars master index](https://javajack.github.io/broking-kyc/reference/regulatory-circulars/) (curated highlights + per-issuer navigation), the [per-issuer sub-pages](https://javajack.github.io/broking-kyc/reference/circulars/sebi-mirsd/) (884 verified entries with primary URLs, in-force dates, supersession chains, and impact-area tags), the [circulars changelog](https://javajack.github.io/broking-kyc/reference/circulars-changelog/) (delta against the prior 37-entry list), and the [References & Sources](https://javajack.github.io/broking-kyc/reference/references-sources/) (130+ URLs) page for complete listings.
 
+## Compliance & Vendor Coverage
+
+- **[Compliance Blueprint](https://javajack.github.io/broking-kyc/operations/compliance-blueprint/)** — inventory of 400 verifiable operational, one-time, and edge-case compliance touchpoints a broker must address. Each row: regulator, frequency, owner role, trigger, evidence artefact, penalty, and linked circular(s). Domains: KYC lifecycle, AML/PMLA, margin, client funds, settlement, surveillance, cyber, BCP/DR, audit, reporting, grievance, DPDP, member compliance, investor servicing, exchange/depository registration, edge cases.
+- **[Vendor Atlas](https://javajack.github.io/broking-kyc/vendors/atlas/)** — named-product enumeration of 233 real products across 22 categories spanning the full broking technology stack: OMS/EMS/RMS, back-office, surveillance, AML, KYC verification, face/liveness, OCR, CKYC connectors, eSign, account aggregator, payment/mandate, DLT/SMS/WhatsApp, email, ITR/income, credit bureau, mutual fund platforms, IPO/OFS, pledge tech, algo/quant API, market data, CRM/comms. Endorsement-free; descriptive positioning only.
+
 ## Author
 
 **[Rakesh Waghela](https://www.linkedin.com/in/rakeshwaghela)** — Technology & Product Consultant

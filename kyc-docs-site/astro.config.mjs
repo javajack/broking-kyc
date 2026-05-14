@@ -206,6 +206,7 @@ export default defineConfig({
         {
           label: "Vendor Integrations",
           items: [
+            { label: "Vendor Atlas — All Products", slug: "vendors/atlas" },
             { label: "Vendor Strategy", slug: "vendors" },
             {
               label: "Identity",
@@ -277,6 +278,7 @@ export default defineConfig({
         {
           label: "Operations",
           items: [
+            { label: "Compliance Blueprint", slug: "operations/compliance-blueprint" },
             { label: "Batch Pipeline", slug: "operations/batch-pipeline" },
             {
               label: "Exchange Registration",
