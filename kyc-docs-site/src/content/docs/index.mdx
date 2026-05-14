@@ -1,60 +1,65 @@
 ---
-title: KYC Onboarding Specification
-description: Complete technical specification for individual customer KYC onboarding in an Indian stock broking firm.
+title: Indian Broking Operations Knowledge Base
+description: Comprehensive knowledge base for Indian stock broking operations — KYC onboarding, trading-day mechanics, settlement, compliance, audits, lifecycle events, integration architecture, vendor stack, and regulatory framework. 191 pages, 884 indexed circulars, 1,314 field-destination rows, persona-curated reading paths.
 template: splash
 hero:
-  tagline: A comprehensive KYC onboarding specification by <a href="https://www.linkedin.com/in/rakeshwaghela">Rakesh Waghela</a> — Technology & Product Consultant
+  tagline: Indian broking operations — onboarding, trading, settlement, compliance, audits, lifecycle. Verifiable, cross-linked, persona-curated. By <a href="https://www.linkedin.com/in/rakeshwaghela">Rakesh Waghela</a>.
   actions:
-    - text: Start with Architecture
-      link: /broking-kyc/architecture/design-principles/
+    - text: Choose Your Role
+      link: /broking-kyc/personas/
       icon: right-arrow
       variant: primary
-    - text: View User Journey
+    - text: Browse by Section
       link: /broking-kyc/journey/
       variant: minimal
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
 import Diagram from '../../components/Diagram.astro';
 
 :::danger[Disclaimer]
 This documentation was generated using **Claude Code**, an AI-powered LLM (Large Language Model) by Anthropic, as a research and capability estimation exercise. AI models can and do hallucinate — any information presented here may be inaccurate, incomplete, or outdated. Any resemblance to or overlap with the products, documentation, or intellectual property of any specific vendor, organization, or individual is **purely coincidental and unintended**. This project is **not directly inspired by any particular product, vendor, or proprietary system**, and no plagiarism is intended. All content is based on publicly available information, regulatory circulars, and vendor documentation that is freely accessible on the internet. **This is not legal, financial, or compliance advice.** Always verify with official sources before making any business or compliance decisions.
 :::
 
-Welcome to the KYC (Know Your Customer) onboarding specification. If you are new to the firm, this is the single most important system you need to understand. Every customer who wants to buy their first share, place their first F&O order, or simply open a demat account must pass through this gateway. Think of it as the bridge that transforms a stranger on the internet into a verified, regulation-compliant client who is authorized to trade on Indian stock exchanges. By the time you finish reading these docs, you will understand exactly how that transformation happens -- from the moment a user enters their mobile number to the moment their signed application reaches NSE, BSE, CDSL, and NSDL.
+Indian stock broking operations are an interlocking system: a 9-screen onboarding pipeline that culminates in 8 parallel regulatory batch uploads; a daily trading rhythm that runs from 06:00 BOD scripts through to overnight settlement; quarterly running-account settlements; half-yearly compliance certificates; an audit calendar that pulls together every previous cycle; a regulatory base of 884 circulars; a vendor stack of 233 named products. This site documents all of it, with verifiable citations and persona-curated reading paths for whoever shows up.
 
-## What Is This?
+## Pick your role and we'll point you at the right 5–10 pages
 
-A complete technical specification for **stock broking KYC onboarding** -- covering the regulatory data collection workflow, identity verification via government sources, batch submissions to KRA/CKYC/exchanges/depositories, maker-checker admin workflow, and full SEBI (Securities and Exchange Board of India) / KRA (KYC Registration Agency) / CKYC (Central KYC) regulatory compliance. Built for an Indian stock broking firm enabling individual customers to complete KYC onboarding and begin trading.
-
-:::tip[Where to start]
-If you are a new engineer, start with the [User Journey](/broking-kyc/journey/) section. Walk through all 9 screens in order. That will give you the clearest mental model of what the customer experiences and what the system does at each step. Come back here afterward to explore the architecture, vendor integrations, and operations sections.
-:::
-
-## Who Is This For?
-
-Whether you are building features, integrating vendors, or answering compliance queries, there is a reading path for you.
+Rather than read all 191 pages, [pick a role](/broking-kyc/personas/) and we'll suggest a curated path:
 
 <CardGrid>
-	<Card title="Product Managers" icon="rocket">
-		Understand the end-to-end user experience: multi-step identity verification and regulatory data capture.
+	<LinkCard title="Product Manager" description="End-to-end flow, vendor tradeoffs, lifecycle complexity, cost economics." href="/broking-kyc/personas/product-manager/" />
+	<LinkCard title="Backend Engineer" description="Integration DAG, field flows, retry policies, file formats, SLAs." href="/broking-kyc/personas/backend-engineer/" />
+	<LinkCard title="Frontend / UX Engineer" description="Journey screens, validation rules, error states, field-level mandatories." href="/broking-kyc/personas/frontend-ux-engineer/" />
+	<LinkCard title="Operations Lead" description="BOD/EOD playbooks, intraday surveillance, monthly cadences, lifecycle scenarios." href="/broking-kyc/personas/operations-lead/" />
+	<LinkCard title="Head of OMS / RMS" description="Pre-trade pipeline, SPAN methodology, peak margin, surveillance internals." href="/broking-kyc/personas/oms-rms-head/" />
+	<LinkCard title="Compliance Officer / CCO" description="400-row compliance blueprint, SCORES, IGRC, ODR, audits, CSCRF, AP framework." href="/broking-kyc/personas/compliance-officer/" />
+	<LinkCard title="Finance / CFO" description="BMC/ABC, client funds upstreaming, MTF economics, Core SGF, IPF, brokerage." href="/broking-kyc/personas/finance-cfo/" />
+	<LinkCard title="Internal Auditor" description="Defensible audit checklists, regulator-aligned tests, evidence trail patterns." href="/broking-kyc/personas/internal-auditor/" />
+	<LinkCard title="Statutory Auditor (CA firm)" description="Annual cycle prerequisites, capital adequacy, ECN format, citation traceability." href="/broking-kyc/personas/statutory-auditor/" />
+	<LinkCard title="Trainee / New Employee" description="30-day reading list with vocabulary glossary. Acronyms decoded sequentially." href="/broking-kyc/personas/trainee/" />
+	<LinkCard title="Regulator / Inspector" description="Broker's compliance posture, depth-vs-surface check, regulatory citation traceability." href="/broking-kyc/personas/regulator-inspector/" />
+	<LinkCard title="Vendor / Integration Partner" description="Atlas placement, field flows your product touches, broker-side SLA expectations." href="/broking-kyc/personas/vendor-partner/" />
+</CardGrid>
 
-		Start: [Journey Overview](/broking-kyc/journey/) → [Step-by-Step Flow](/broking-kyc/journey/01-mobile-registration/) → [Design Principles](/broking-kyc/architecture/design-principles/)
+Or [browse the sidebar](/broking-kyc/journey/) — the site works that way too.
+
+## What's covered
+
+A layered knowledge base that grew across nine focused sub-projects:
+
+<CardGrid>
+	<Card title="Breadth: Reference" icon="document">
+		884 regulatory circulars across 13 issuers, 233 named vendor products across 22 categories, 1,314 field-destination flows across 14 destinations, 400 verifiable compliance touchpoints across 16 domains. Downloadable [master CSV](/broking-kyc/field-atlas-master.csv).
 	</Card>
-	<Card title="Engineers" icon="document">
-		API specs, field mappings, async patterns, batch file formats, and error handling.
-
-		Start: [Flow Summary](/broking-kyc/architecture/flow-summary/) → [Vendor Integrations](/broking-kyc/vendors/) → [Batch Pipeline](/broking-kyc/operations/batch-pipeline/)
+	<Card title="Depth: Operator's view" icon="rocket">
+		End-to-end broker process narrative (8.2K words), 163-node integration DAG across 6 phases, 35 focused deep-dive pages (OMS, RMS/SPAN, surveillance, settlement, CSCRF, audits, AP framework, BMC/ABC, SGF/IPF, market manipulation typologies, segment rules, and more).
 	</Card>
-	<Card title="Compliance Teams" icon="list-format">
-		SEBI circulars, KRA/CKYC dual upload, 6-attribute matching, FATCA/CRS, audit trails.
-
-		Start: [Regulatory Circulars](/broking-kyc/reference/regulatory-circulars/) → [6-Attribute Matching](/broking-kyc/operations/six-attribute-matching/) → [Audit & Compliance](/broking-kyc/operations/audit-compliance/)
+	<Card title="Journey: Step-by-step" icon="puzzle">
+		9-screen onboarding journey with field-level coverage. 6 post-onboarding lifecycle walkthroughs (re-KYC, modifications, dormancy, closure, transmission, NRI conversion). All cross-linked back to the breadth and depth layers.
 	</Card>
-	<Card title="Vendor Integration" icon="puzzle">
-		Vendor comparison tables, recommended stack, pricing, and implementation checklists.
-
-		Start: [Vendor Strategy](/broking-kyc/vendors/) → [KRA](/broking-kyc/vendors/kra/) → [CKYC](/broking-kyc/vendors/identity/ckyc/) → [Exchanges](/broking-kyc/vendors/exchanges/nse/)
+	<Card title="Curated by role" icon="list-format">
+		12 persona pages with 5–10 page reading paths. From Product Manager to New Employee to Regulator. Each path skips what you don't need and explains the rationale for what you do.
 	</Card>
 </CardGrid>
 
