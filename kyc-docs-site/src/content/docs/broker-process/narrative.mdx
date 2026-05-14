@@ -167,7 +167,53 @@ Past 19:00, the broker's focus shifts to settlement and overnight prep.
 
 ## 3. The Settlement Cycle
 
-_[Section 3 content — drafted in Task 5.]_
+The trading day produces obligations; the settlement cycle clears them. India has been on T+1 (trade plus one business day) settlement for the cash segment by default since January 2023 — among the fastest cycles globally. A T+0 (same-day) beta began in March 2024 and expanded in December 2024 to the top 500 stocks. Derivatives, MTF positions, and corporate-action items follow their own settlement clocks.
+
+### T+1 mechanics
+
+For every trade executed today, settlement happens tomorrow. The broker has two obligations on T+1 morning: deliver funds for any net-buy positions, and deliver securities for any net-sell positions. Cut-offs are typically 11:00 IST for funds and 11:30 IST for securities; the clearing corporation then nets across all members, computes obligations, and runs the [pay-in / pay-out cycle](/broking-kyc/operations/compliance-blueprint/#settlement-22-entries) — funds out of paying brokers and into receiving brokers in the same session, securities similarly. By end of T+1 the client typically has the funds or securities they bought, though the broker's intermediate processing may push the visible settlement to T+1 close.
+
+### T+0 beta scope
+
+The T+0 segment runs as a *separate session*, not an acceleration of T+1. Orders flagged for T+0 trade in a defined window earlier in the day (currently 09:15–13:30 with settlement complete by EOD), match against T+0-eligible counter-orders, and settle the same evening. Only the top 500 stocks (as of December 2024) participate; the broker's OMS must explicitly support T+0-flagged orders. Most retail brokers default clients to T+1 unless the client opts in.
+
+### Short delivery and auction
+
+If a selling broker fails to deliver securities on T+1, the exchange auctions on T+2 morning to acquire the shortfall and complete the buyer's settlement. The auction price plus a penalty are recovered from the failing broker. This is one of the visible failure modes a broker must monitor closely — a chronic auction pattern is both a financial cost and a surveillance flag. Typical causes are mis-mapped client securities, pledge release failures, or short-selling without inventory; each has different remediation.
+
+### Give-up and take-up
+
+For institutional flow, the trade executor and the trade clearer are often different members. Give-up / take-up is the formal mechanism by which the execution member transfers the trade to the clearing member who will honour the settlement obligation. The exchange manages the give-up file format; the operational responsibility sits with both members to confirm the transfer within the day's cut-off.
+
+### MTF settlement
+
+Margin Trading Facility — where the broker funds the client's purchase against pledged collateral — has its own settlement nuances. The bought securities are pledged to the broker as collateral; the broker pays the seller (via clearing); funds owed by the client to the broker carry as a loan. The broker maintains an "unpaid MTF" file tracking client positions where funds haven't been received against MTF facility usage. SEBI's framework requires that MTF positions be settled or unwound within specified timeframes.
+
+### Direct payout to demat (post June 2024)
+
+Before June 2024, securities being paid out by the clearing corp landed first in the broker's pool account, then the broker pushed them to the client's demat. SEBI's [direct-payout-to-demat](/broking-kyc/reference/circulars/sebi-other/) circular changed this — securities now flow directly from the clearing pool to the client's demat, bypassing the broker's intermediate custody.
+
+The rollout was phased: phase 1 in November 2024 covering equity segment; phase 2 in January–February 2025 extending to additional segments. The change required restructuring broker pool accounts — TM CUSPA (Trading Member Client Unpaid Securities Pledgee Account, for trades where the client hasn't paid), CM CUSPA (Clearing Member equivalent), and TM CSMFA (Trading Member Client Securities Margin Funded Account, for MTF pledged securities). Each account has specific permissible balances and reporting requirements; the back-office chart of accounts had to be updated during the rollout windows.
+
+### MFOS / FDR upstreaming
+
+Margin Funded Order System (MFOS) instruments and Fixed Deposit Receipts pledged by the broker as collateral with the clearing corp are upstreamed daily per the [June 2023 client funds upstreaming mandate](/broking-kyc/operations/compliance-blueprint/#client-funds-21-entries). The intent of the mandate is to keep client funds off the broker's balance sheet — held with the clearing corp or in segregated bank accounts instead — so that broker default doesn't put client funds at risk. The broker submits collateral allocations to the clearing corp at EOD; the clearing corp confirms acceptance and applies the collateral against the broker's margin obligations for the next day.
+
+### ASBA-style UPI Block (mandatory for QSBs since Feb 2025)
+
+Qualified Stock Brokers — defined by SEBI based on client count, fund-base, and other thresholds — must offer ASBA-style UPI Block functionality, mandatory since 1 February 2025. The mechanism: the client's funds aren't actually transferred to the broker's pool ahead of trading; instead, an amount equal to the client's intended trading exposure is *blocked* in the client's own bank account via UPI. When a trade executes, only the executed amount is debited from the block — the rest releases back. The client's blocked funds earn interest in their own bank, and the broker's counterparty exposure is reduced because the broker doesn't hold client funds for the unutilised portion.
+
+### Payin default mechanics
+
+If a broker fails to honour payin on T+1 — typically because of an internal funds shortage or operational failure — the [clearing corp's](/broking-kyc/reference/circulars/clearing-corps/) default fund (Core Settlement Guarantee Fund, or Core SGF) covers the obligation to keep the rest of the market settling cleanly. The defaulting broker faces immediate consequences: position closure, member suspension or cancellation, and recovery action by the clearing corp against the broker's deposits and own funds. This is the worst-case outcome that the entire margin and upstreaming framework is designed to prevent.
+
+<Aside type="caution">
+**Auction penalty is asymmetric.** If a broker is on the failing side of a short delivery, the auction-acquired price plus a fixed-percent penalty are charged. The penalty rate is meaningful (typically several percent above the auction price), and the auction price itself can be substantially above the market price for an illiquid security. Repeated auctions in a month trigger surveillance and possible suspension. Most brokers prefer to buy in the open market to cover known shorts before the auction, even at a loss, rather than face the auction penalty.
+</Aside>
+
+<Aside type="note">
+**UPI Block changed the broker's funds-handling model.** Pre-Block, brokers held client funds in a pool account, earned float on it (within SEBI rules), and faced credit risk if a client defaulted on a trade. With UPI Block, the funds stay in the client's bank, earning interest for the client. The broker loses the float economics but gains a cleaner counterparty model — no funds to upstream for the unutilised portion, no segregation overhead for those amounts. For Qualified Stock Brokers the switch is mandatory; smaller brokers can offer it as an option, and several have done so to differentiate.
+</Aside>
 
 ## 4. Daily Reporting Touchpoints
 
