@@ -1,0 +1,176 @@
+---
+title: "Lifecycle: Modifications"
+description: Per-modification-type walkthroughs — address, bank account, nominee (SEBI Jan 2025 10-nominee revamp), segment add/drop, mobile/email (OTP re-verify), name/DOB (BSE Unfreeze + Protean 3-param re-check). Sequential KRA → CKYC → UCC → BO propagation rule with rejection-cascade recovery patterns.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Modifications all share a core ordering rule (KRA first, then CKYC, then exchange UCC, then depository BO — sequential, not parallel) but differ substantively in proof requirements and propagation specifics per modification type. The page is structured as one shared "ordering rule" section followed by per-modification-type sub-sections.
+
+## TL;DR
+
+- **Ordering rule** (the headline gotcha): modifications propagate **KRA → CKYC → UCC → BO**, sequentially. Firing them concurrently triggers rejection cascades because downstream systems validate against KRA's *new* state.
+- 7 modification types covered: address, bank, nominee, segment, mobile, email, name/DOB.
+- Typical timeline per modification: **1–3 business days** for the full propagation chain to settle.
+- Some modifications have special-case sub-flows (name/DOB requires BSE Unfreeze + Protean re-check; bank requires penny-drop; nominee uses the SEBI Jan 2025 10-nominee revamp).
+- All modifications are an `on-modify` event in the [Integration DAG](/broking-kyc/operations/integration-dag/lifecycle-events/) — there is no batch-style modification path.
+
+## Conceptual overview
+
+A modification is the broker's response to a client telling them "this thing about me changed". The broker's job: validate the change with appropriate proof, accept it into the broker's own master, then propagate it to every downstream registry and counterparty that holds a copy of that field. The complexity is in the propagation: KRA is the authority that exchanges and depositories trust, so KRA must be updated first; the exchange UCC update validates against the new KRA state; the depository BO update validates against KRA + UCC. Concurrent updates trigger rejection cascades because the downstream systems don't see the upstream change yet.
+
+## The shared ordering rule
+
+```
+Client request → Proof validation → Broker accepts → KRA upload → CKYC upload → UCC update → BO update
+```
+
+Each arrow is **wait-for-completion**, not fire-and-forget. The broker's orchestrator typically uses a state machine per modification with explicit transitions:
+
+| State | Action | Next |
+|---|---|---|
+| `requested` | Validate proof | `validated` or `rejected` |
+| `validated` | Broker accepts → KRA upload | `kra_pending` |
+| `kra_pending` | KRA ack received | `ckyc_pending` |
+| `ckyc_pending` | CKYC ack received | `ucc_pending` |
+| `ucc_pending` | All elected exchanges ack | `bo_pending` |
+| `bo_pending` | CDSL / NSDL ack received | `complete` |
+| `complete` | Client notified | end |
+
+<Aside type="caution">
+**The single most common operational mistake across all lifecycle scenarios** is parallelising the propagation chain. Engineers new to the domain see four independent integration calls (KRA, CKYC, UCC, BO) and assume they can fan out — they can't. Exchange UCC validates the modification against KRA's *new* state; if KRA hasn't reached the new state yet, the exchange rejects. Same for BO against UCC.
+</Aside>
+
+## Modification types
+
+### Address change
+
+**Trigger.** Client request, proof being one of: Aadhaar (preferred via DigiLocker re-fetch), utility bill < 3 months old, passport, recent bank statement.
+
+**Proof validation.** Verify proof document authenticity, name match against client master, address text extraction (OCR or DigiLocker structured).
+
+**Propagation.** Standard KRA → CKYC → UCC → BO chain. Depository updates the address used for physical communications (rare but exists).
+
+**Sub-case — partial address.** Only the correspondence address changes (permanent stays). Most brokers maintain both; the modification updates just the correspondence record.
+
+**Sub-case — NRI address.** Foreign address requires additional fields (country, ISO code); affects FATCA tax residency screening — sometimes the address change is actually a hidden NRI conversion. See [NRI Conversion](./nri-conversion/) for that path.
+
+### Bank account change
+
+**Trigger.** Client request with new bank account number + IFSC.
+
+**Proof validation.** **Penny drop verification** — Re.1 IMPS credit to the new account, name-match score against client master. If name match >= 90%, auto-accept; 70–90% manual review; <70% reject.
+
+**Propagation.**
+- KRA + CKYC updated with new bank linkage.
+- Exchange UCC updated.
+- **Depository BO** updated for direct-payout-to-demat routing (post Jun 2024 SEBI direct-payout phased rollout). This is critical — if the BO isn't updated, settlements may continue routing to the old bank.
+- Old bank account marked inactive but retained in client master for audit trail.
+
+<Aside type="tip">
+**Settlement-pending modifications need care.** If a settlement is in flight when the bank change request arrives, complete the pending settlements on the old account before switching. Otherwise the payout file references the old account and the new account's books won't reconcile.
+</Aside>
+
+### Nominee change (SEBI Jan 2025 revamp)
+
+**Trigger.** Client request to add / remove / modify nominees.
+
+**Key rule changes (SEBI Jan 2025).**
+- Up to **10 nominees** per account (previously 3).
+- Percentage allocation per nominee must sum to exactly 100%.
+- Opt-out (no nominee) requires a **video declaration** within 30 days.
+- Minor nominees require guardian details.
+
+**Proof validation.** Client identity re-verification via eSign. Nominee details captured but nominee KYC not required until transmission event.
+
+**Propagation.** Nominee data is held by the **depository** (CDSL / NSDL) primarily, with copy in broker master. KRA / CKYC don't store nominee data. Exchange UCC has a nominee flag but not the nominee details.
+
+So the propagation chain for nominee change is simpler:
+```
+Client request → eSign → Broker master → Depository BO update
+```
+
+KRA / CKYC / UCC don't receive the change.
+
+### Segment add / drop
+
+**Trigger.** Client toggles a segment (F&O / CD / COM / debt).
+
+**Proof validation.**
+- **Adding F&O or COM** requires income proof (via AA fetch, ITR upload, or HRMS payroll). Standard onboarding income-verification path.
+- **Adding CD or debt** is generally lighter — declaration only.
+- **Dropping any segment** requires confirmation of no open positions in that segment.
+
+**Propagation.** Exchange UCC update (segment activation flag) is the primary touchpoint. KRA / CKYC also updated with declared income or segment-elections list. BO at depository doesn't need segment data.
+
+**Sub-case — MCX segment add.** MCX requires income proof for ALL commodity-segment clients (not just F&O). The income proof requirement applies regardless of declared income level on MCX.
+
+**Sub-case — segment auto-disable from dormancy.** When a dormant account reactivates, segments are re-activated as a modification — but the income-proof requirement (for F&O/COM) re-applies per current rules, even if the client had F&O active before dormancy.
+
+### Mobile / email change
+
+**Trigger.** Client request.
+
+**Proof validation.** OTP re-verification — OTP sent to the **new** mobile / email, confirmed by the client. Some brokers also send a confirmation notice to the **old** mobile / email as an anti-fraud step.
+
+**Propagation.** Standard KRA → CKYC → UCC → BO chain. DLT comms templates also need updating with the new contact details for subsequent messaging.
+
+<Aside type="tip">
+**Mobile change is a fraud-vector.** Most account takeovers begin with a mobile-number change. Tighter brokers add a 24-hour cool-down on the new mobile before allowing high-value transactions; also block the change if any segment is being added concurrently.
+</Aside>
+
+### Name / DOB change
+
+**Trigger.** Client request, with legal proof (marriage certificate, court order, deed-poll, etc.).
+
+**Proof validation.** Manual review by compliance officer; document authenticity verified against issuing authority where possible.
+
+**Propagation.** This is the most complex modification path:
+
+- KRA + CKYC updated with new name / DOB.
+- **BSE specifically uses the "Unfreeze" process** — the existing UCC is frozen, the new identity is validated through Protean (PAN + Aadhaar + new DOB / new name 3-parameter check), and the UCC is re-opened in the new identity.
+- NSE / MCX have parallel modification flows that don't use "Unfreeze" terminology but require similar 3-parameter re-validation.
+- Depository BO updated.
+
+**Sub-case — PAN-Aadhaar link state changes.** If a name change reflects a real Aadhaar update (e.g., post-marriage), the PAN-Aadhaar link status at NSDL may need to refresh. Typical lag 5–7 days.
+
+## Common rejection-cascade patterns
+
+When the propagation fails partway, recovery follows specific patterns:
+
+- **KRA rejection** — modification doesn't propagate further. Resolve the KRA rejection (typical causes: format error, name-mismatch, document-quality issue), re-upload, then chain continues.
+- **CKYC rejection after KRA success** — CKYC has stricter character limits (55 per line for some address fields). Trim or normalize and re-upload.
+- **UCC rejection after KRA + CKYC success** — exchange validates against Protean's view of the new KRA state. If Protean hasn't caught up (typical lag a few hours), retry. If Protean shows mismatch, escalate to KRA reconciliation team.
+- **BO rejection after KRA + CKYC + UCC success** — typically a CDSL line-format or NSDL UDiFF schema issue. Fix format and re-upload.
+
+<Aside type="caution">
+**Don't roll back upstream successes on downstream failure.** If KRA + CKYC + UCC are green but BO is rejected, the recovery is to fix BO and re-submit BO only — not to roll back KRA / CKYC / UCC. The downstream registries operate independently and rolling back creates a temporary inconsistency that triggers other downstream rejections.
+</Aside>
+
+## Field-level callouts
+
+Modifications touch fields across master-dataset sections A (Identity), B (Address), C (Contact), G (Bank), H (Demat), I (Nomination), L (Trading Preferences). For per-destination flow see the [Field-level Data Flow Atlas modifications subset](/broking-kyc/reference/field-atlas/).
+
+## Practical notes
+
+- **[industry practice]** Most brokers route name/DOB changes through a separate "Identity Modifications" queue staffed by senior compliance officers, distinct from the general modifications queue. The legal-proof verification can take 1–2 weeks for non-standard cases.
+- **[gotcha]** The "Unfreeze" terminology is BSE-specific. NSE and MCX have similar processes under different names (NSE: "UCC modification request"; MCX: "Master modification"). Operationally identical; vocabulary differs.
+- **[risk trade-off]** Auto-accept thresholds on penny-drop name-match (typical 90%) directly affect both fraud risk (lower threshold = more attempts succeed) and customer experience (higher threshold = more legitimate modifications get held). Most brokers tune based on monthly false-positive rate analysis.
+- **[cost optimization]** Self-service modifications (client directly modifies in app, propagation orchestrated automatically) cost a fraction of assisted modifications. Investing in a polished self-service UI for the high-volume modifications (address, mobile, email) pays back quickly.
+
+## Cross-references
+
+- [Compliance Blueprint — KYC lifecycle domain](/broking-kyc/operations/compliance-blueprint/#kyc-lifecycle-41-entries)
+- [Integration DAG — modification path](/broking-kyc/operations/integration-dag/lifecycle-events/)
+- [Field Atlas](/broking-kyc/reference/field-atlas/)
+- [Circulars — SEBI MIRSD](/broking-kyc/reference/circulars/sebi-mirsd/) (KYC master + Jan 2025 nominee revamp)
+- [Circulars — BSE](/broking-kyc/reference/circulars/bse/) (Unfreeze)
+- [Circulars — CDSL](/broking-kyc/reference/circulars/cdsl/) and [NSDL](/broking-kyc/reference/circulars/nsdl/)
+
+## Verified through
+
+2026-05-14
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*
