@@ -404,7 +404,13 @@ Transmission flows are governed by depository operational circulars ([CDSL](/bro
 
 ## Practical notes
 
-_[Practical notes drafted in Task 9.]_
+- **[industry practice]** Compliance calendars: ops teams routinely build a master compliance calendar from the recurring cycles in Section 5 plus the daily reporting in Section 4. The day-of-the-week and day-of-the-month columns drive the weekly ops standup agenda and the month-end checklist.
+- **[gotcha]** The 4 intraday peak margin snapshots (11:30 / 12:30 / 13:30 / 14:30) are *snapshots*, not averages — a margin shortfall in even one snapshot triggers a DMF flag and possible penalty. RMS systems must hold the margin position stable across the full snapshot window, which means avoiding settlement-driven swings or fund-transfer-driven balance changes around the snapshot times.
+- **[industry practice]** Direct-payout-to-demat (post November 2024 / January–February 2025) significantly reduced broker pool-account complexity but introduced TM CUSPA / CM CUSPA / TM CSMFA distinctions that required careful chart-of-accounts updates and back-office reconciliation logic changes. Brokers that didn't get this right in the rollout windows faced settlement-confirmation discrepancies for weeks.
+- **[cost optimization]** Subscribing to exchange and clearing-corp email circular distribution lists costs nothing and saves the periodic site-scrape effort; for broker compliance teams this is the lowest-overhead reliable feed. The compliance officer should be on every relevant list (SEBI, NSE, BSE, MCX, CDSL, NSDL, NSCCL, ICCL, MCXCCL, NPCI, CERSAI, FIU-IND, MeitY where applicable).
+- **[risk trade-off]** Outsourcing back-office to TechExcel / Aastha / Shilpi / ProSarva reduces in-house ops headcount but increases dependence on the vendor's compliance refresh schedule. Large brokers retain in-house back-office partly for this reason — when a SEBI circular changes a contract-note format with two weeks' notice, an in-house team can adapt faster than a multi-tenant vendor coordinating the change across all clients.
+- **[gotcha]** Quarterly running-account settlement on calendar quarter-ends (April / July / October / January) is one of the most-penalty-attracting items in SEBI inspections. Explicit client authorization for retention is the only exception, and the authorization itself has format and periodic-renewal requirements. Most brokers run a strict end-of-quarter sweep with a per-client confirmation artefact.
+- **[industry practice]** The same trade file is evidence for multiple compliance domains (margin, settlement, surveillance). Mapping evidence-to-source once and reusing the map across compliance reports is one of the highest-leverage exercises a new compliance officer can do — it reduces both audit prep effort and the risk of citing inconsistent evidence across reports.
 
 ## Verified through
 
