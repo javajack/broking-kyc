@@ -93,6 +93,78 @@ The broker's OMS routes pre-open orders identically to continuous-trading orders
 
 For the operator, pre-open is mostly a watch-and-wait phase. If anything in the BOD ingestion was incomplete, the symptoms surface here: orders rejected with cryptic codes, the OMS reporting unrecognised contracts, surveillance flags firing on clean orders. The on-call team has roughly 15 minutes to triage anything visible at 09:00 before continuous trading begins.
 
+### Trading hours (09:15–15:30)
+
+Continuous trading runs from 09:15 to 15:30, six hours and fifteen minutes during which the OMS, RMS, and surveillance systems are operating at their highest load. Operationally, the broker's responsibilities in this window cluster around four things: pre-trade validation, intraday margin reporting, real-time surveillance, and intraday compliance events.
+
+**Pre-trade validation.** Every order goes through the same RMS pipeline described in Section 1 — segment / margin / MWPL / order-type / surveillance checks — applied at single-digit-millisecond latency. The OMS releases approved orders to the exchange; rejected orders return to the client with reason codes. Most large brokers process tens of thousands of order events per second at peak; performance and reliability of the RMS layer is one of the biggest investments in the broker's tech stack.
+
+**Intraday peak margin snapshots.** This is the most operator-load-heavy item in the trading window. The clearing corporation captures four peak-margin snapshots during the trading session — at **11:30, 12:30, 13:30, and 14:30 IST**. At each snapshot, every member-broker is expected to have sufficient client-collected margin covering all client positions. The broker generates and submits the [Daily Margin File](/broking-kyc/operations/compliance-blueprint/#margin-compliance-30-entries) (DMF) post-EOD reconciling these four snapshots; the clearing corp issues a peak-margin response file flagging any shortfall. Penalties for shortfall are real and material — they scale with the size and frequency of the breach and have suspension consequences for repeated patterns. The RMS must keep margin position stable across each snapshot window, which means avoiding settlement-driven swings (e.g., a payout received mid-day shouldn't relieve a position that needed margin at the 11:30 snapshot).
+
+**Real-time surveillance.** [NORMS](/broking-kyc/operations/compliance-blueprint/#surveillance-30-entries) at the exchange runs continuously; the broker's surveillance system mirrors much of this server-side. Order-to-Trade Ratio (OTR) accumulators tick up with every order entry / modification / cancellation; if a client's OTR breaches the threshold, additional margin or order-rate-limit is imposed. GSM / ASM list-based intervention happens at the order-entry layer — orders for stocks on the highest GSM stage may require 100% upfront margin or be restricted entirely. Social-media surveillance, mandated since April 2024, monitors public channels for evidence of manipulative coordination (pump-and-dump, ramping). Manipulative-trade flagging tags self-trades, wash trades, layering, and spoofing for post-EOD review.
+
+**Block-deal windows.** Two windows allow block deals: the morning window from 08:45 to 09:00 (before continuous trading) and the afternoon window from 14:35 to 15:05. Block deals have distinct reporting requirements — minimum quantity, price-band, and disclosure rules — and feed into a separate reporting flow.
+
+**MWPL checks.** Derivatives have Market-Wide Position Limits at the contract level. The OMS rejects orders that would breach MWPL; the surveillance layer monitors approach to MWPL and may issue advisories ahead of breach.
+
+**Intraday compliance events.** Some compliance items are time-bound during the trading window: a [technical glitch report](/broking-kyc/operations/compliance-blueprint/#cyber-security-27-entries) to SEBI within prescribed minutes if there's a member-side outage; surveillance alert escalation to the exchange within prescribed timing; CSCRF incident reporting to CERT-In within six hours.
+
+### Closing window (15:30–15:40)
+
+The market session ends at 15:30 with the trading bell. From 15:30 to 15:40 the closing auction runs — a brief call-auction window that produces the official settlement price for each security. The settlement price is the volume-weighted average of trades in the last half-hour for most stocks, or the closing-auction-determined price where the auction is active. This price is what feeds into MTM end-of-day, contract note brokerage computation, and overnight margin recomputation.
+
+The final peak-margin snapshot for the day is captured at 14:30, before the closing window, so margin behavior post-15:30 doesn't affect the day's peak-margin record. From the operator's view, the closing window is the cleanest part of the trading day — no new orders, no MTM swings of consequence, just price discovery.
+
+### EOD (15:40–19:00)
+
+EOD is reconciliation and reporting time. Three or four hours of back-office work to close out the trading day.
+
+**Trade booking.** Every trade executed during the day is reconciled in the broker's [back-office system](/broking-kyc/vendors/atlas/#back-office-15-products). The back-office receives end-of-day trade files from each exchange (CM, F&O, CD, COM trade files in their respective formats), matches them against orders captured by the OMS, computes brokerage and charges (brokerage per the client's schedule, STT, exchange transaction charges, SEBI turnover fee, GST on brokerage + exchange charges, stamp duty by state), and posts the trades to the client's ledger.
+
+**Contract note generation.** By T+24h (typically the evening of the trade day, though SEBI rules allow up to next-day-by-12-noon dispatch), the broker generates a signed [ECN](/broking-kyc/operations/compliance-blueprint/#investor-servicing-15-entries) (Electronic Contract Note) for each client who traded today. The format is prescribed (ICAI and SEBI specify the columns and disclosures); the broker's Digital Signature Certificate is applied to the PDF; the document is dispatched as a link via SMS (per [DLT-approved templates](/broking-kyc/vendors/atlas/#dlt--sms--whatsapp-12-products)) and as an attachment via email.
+
+**MTM end-of-day.** All outstanding derivative positions and pending-settlement equity positions are marked-to-market against the day's closing prices. MTM gains and losses are realized in the back-office ledger; the realized P&L feeds the next day's available-margin calculation.
+
+**Position files.** The back-office generates position files for each segment — open interest at the client level, the broker level, and aggregated for clearing-corp reporting. These flow to the clearing corp via SFTP.
+
+**Obligation files** flow inbound from the clearing corp — payin amounts the broker must deliver tomorrow morning (funds for buys settling, securities for sells settling), and payout amounts the broker will receive (funds for sells, securities for buys). The back-office processes these and prepares the next-day settlement instructions.
+
+**Peak margin response file.** The clearing corp publishes the peak-margin response file in the EOD window. The back-office reconciles this against the DMF the broker will submit, flags any shortfall to the compliance team, and computes the penalty exposure.
+
+**Member compliance reporting.** [CAR](/broking-kyc/operations/compliance-blueprint/#reporting-cadences-40-entries) (Compliance Audit Report) submissions, DPC (Designated Principal Compliance) updates, and any inspection-mandated reports are submitted to the exchange via BEFS (BSE) / ENIT (NSE) / MCX member portal. Some items are intraday; most batch out at EOD.
+
+### Settlement & overnight (19:00–06:00)
+
+Past 19:00, the broker's focus shifts to settlement and overnight prep.
+
+**Payin obligation.** For trades settling tomorrow (T+1), the broker must honour the payin obligation: funds from the client's funds bank account to the clearing bank, securities from the broker's depository pool (or, post-direct-payout, directly from the client's demat) to the clearing pool. Payin cut-off is typically 11:00 the next morning, but most brokers pre-stage instructions overnight.
+
+**Payout from clearing.** For trades the broker is owed (sells delivered, buys funded), the clearing corp releases funds and securities. Post the SEBI June 2024 [direct-payout-to-demat](/broking-kyc/reference/circulars/sebi-other/) mandate (phased in two stages — November 2024 phase 1, January-February 2025 phase 2), securities flow directly from the clearing pool to the client's demat without parking in the broker's pool account. Funds still settle to the broker's client-funds bank account.
+
+**Daily client funds upstreaming.** Per the June 2023 SEBI mandate, brokers upstream client funds to the clearing corp on a daily basis — funds, FDRs, MFOS instruments, or other eligible collateral. The intent is to remove client funds from the broker's balance sheet to the maximum possible extent, reducing client exposure to broker default. The actual upstreaming runs overnight or first-thing-next-morning depending on the broker's bank cut-offs.
+
+**Bank reconciliation.** The broker's client-funds bank book (three or four bank accounts: BA1 for client funds, BA2 for own funds, BA3 for settlement, etc., per the segregation framework) is reconciled against bank confirmations and clearing-corp acknowledgements. Discrepancies are flagged for compliance review the next morning.
+
+**KRA daily upload.** Any KYC modifications captured during the day — address changes, bank account updates, nominee changes, segment additions — are uploaded to the relevant KRA (CVL / NDML / DOTEX / CAMS / KFintech) overnight. Similarly, any new clients onboarded today (who flipped ACTIVE during business hours) are pushed to KRA.
+
+**CKYC upload.** Within seven days of any KYC change, the broker must upload to [CKYC](/broking-kyc/reference/circulars/cersai/) (Central KYC Registry, operated by CERSAI). Most brokers run a daily upload to stay within the seven-day window comfortably.
+
+**Ledger update.** The back-office runs a nightly batch updating every client's ledger with the day's trades, charges, MTM accruals, MTM realizations, settlement entries, and any corporate-action entries that fell on today's record date.
+
+**Prep for next BOD.** System health checks confirm overnight-batch completion. Log rotation runs (CSCRF retention rules typically require minimum 180 days of operational logs). Backup integrity verification confirms last night's full backup is restorable. DR-site replication confirmation closes out the day's compliance items. By 06:00 next morning, the cycle restarts.
+
+<Aside type="caution">
+**Peak-margin shortfall has compounding cost.** A single snapshot shortfall draws a percentage-based penalty (the exact slabs are in the clearing corp's penalty circular). Repeated shortfalls in a month escalate the penalty rate; sustained shortfalls trigger inspection and possible suspension. The compliance cost of a tight RMS during the four snapshot windows is dwarfed by the penalty cost of even moderate shortfall — which is why brokers invest heavily in real-time margin monitoring.
+</Aside>
+
+<Aside type="tip">
+**T+1 default versus T+0 beta.** T+1 became default in January 2023; T+0 began as a beta in March 2024 for the top 25 stocks and expanded to the top 500 in December 2024. T+0 is a *separate session* from the regular session — not an acceleration. Brokers participating in T+0 effectively run a parallel settlement cycle for the day's T+0-flagged trades. Most retail brokers default clients to T+1 unless the client opts in explicitly.
+</Aside>
+
+<Aside type="note">
+**Direct-payout-to-demat changed the broker pool-account structure.** Before June 2024, the broker held client-bought securities in a pool account briefly during settlement. SEBI's direct-payout-to-demat circular (phased Nov 2024 / Jan-Feb 2025) routes securities from clearing directly to the client's demat, eliminating the broker's intermediate custody. This required new pool-account designations — TM CUSPA (Trading Member Client Unpaid Securities Pledgee Account), CM CUSPA (Clearing Member equivalent), TM CSMFA (Trading Member Client Securities Margin Funded Account) — each with specific permissible balances. Brokers running their own chart of accounts had to update during the rollout windows.
+</Aside>
+
 ## 3. The Settlement Cycle
 
 _[Section 3 content — drafted in Task 5.]_
