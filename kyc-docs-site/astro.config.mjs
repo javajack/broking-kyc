@@ -204,6 +204,12 @@ export default defineConfig({
           ],
         },
         {
+          label: "Broker Process",
+          items: [
+            { label: "End-to-End Narrative", slug: "broker-process/narrative" },
+          ],
+        },
+        {
           label: "Vendor Integrations",
           items: [
             { label: "Vendor Atlas — All Products", slug: "vendors/atlas" },
