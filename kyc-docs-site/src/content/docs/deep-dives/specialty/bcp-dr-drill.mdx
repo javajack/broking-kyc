@@ -18,7 +18,7 @@ import { Aside } from '@astrojs/starlight/components';
   - Network failover (link redundancy, BGP / MPLS).
   - Tabletop exercises (paper-based scenarios — typically annual per CSCRF).
   - Backup integrity / restore-test (quarterly).
-- **RTO / RPO targets** — broker declares per-application RTO and RPO; SEBI doesn't prescribe specific numbers but expects them to be reasonable and anchored to the 45-minute technical-glitch threshold. Industry practice: trading engine RTO 30–45 min, RMS RTO 30 min, customer app RTO 60 min, data RPO near-zero (synchronous replication) for trade / ledger, < 15 min for analytics.
+- **RTO / RPO targets** — broker declares per-application RTO and RPO; SEBI doesn't prescribe specific numbers but expects them to be reasonable and anchored to the 45-minute technical-glitch threshold. Industry practice: trading engine RTO 30–45 min, RMS RTO 30 min, customer app RTO 60 min, data RPO near-zero (synchronous replication) for trade / ledger, &lt; 15 min for analytics.
 - **Geographic separation** — SEBI's BCP/DR for MIIs framework anchored at **near-site (within same city) + far-site (≥ 500 km separation)** for primary / DR. Mid-size REs may rely on cloud-region separation as a pragmatic equivalent.
 - **Reporting** — DR-drill report submitted to NSE / BSE / MCX (ENIT / BEFS portals); MII participation certificate captures member's involvement.
 - **Penalty grid** — per [NSE/INSP/53530](/broking-kyc/reference/circulars/nse/#nseinsp53530), late drill-report submission attracts Rs 5,000–10,000 per default; persistent default triggers terminal restriction.
@@ -179,7 +179,7 @@ Audit is signed off by CISO and Internal Audit jointly.
 Validates that BGP / MPLS / link-redundancy actually works:
 
 - Simulate primary uplink failure.
-- Confirm BGP / OSPF failover to secondary uplink within target time (typically < 60 seconds for trading-network paths).
+- Confirm BGP / OSPF failover to secondary uplink within target time (typically &lt; 60 seconds for trading-network paths).
 - Validate end-to-end latency on secondary path (latency typically higher; quantify the increase).
 - Failback to primary.
 

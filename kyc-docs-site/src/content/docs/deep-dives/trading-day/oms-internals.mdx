@@ -293,18 +293,18 @@ Latency budgets at each stage of the order pipeline. These are P95 targets at a 
 | Stage | Budget P95 | Notes |
 |---|---|---|
 | Client UI → broker gateway TLS termination | 50–200 ms | Dominated by network RTT; mobile is worse than web |
-| Broker gateway → OMS persistence | < 2 ms | In-memory cache plus async write to durable store |
-| OMS → RMS segment check | < 0.5 ms | Local cache lookup |
-| OMS → RMS margin lock | < 2 ms | Reservation write to margin store; SPAN computation if not cached |
-| OMS → RMS MWPL check | < 0.5 ms | Local counter |
-| OMS → RMS order-type check | < 0.5 ms | Local rules |
-| OMS → RMS surveillance check | < 1 ms | Local list lookups; async pattern compute |
-| OMS → FIX engine | < 1 ms | In-process or local-socket hop |
+| Broker gateway → OMS persistence | &lt; 2 ms | In-memory cache plus async write to durable store |
+| OMS → RMS segment check | &lt; 0.5 ms | Local cache lookup |
+| OMS → RMS margin lock | &lt; 2 ms | Reservation write to margin store; SPAN computation if not cached |
+| OMS → RMS MWPL check | &lt; 0.5 ms | Local counter |
+| OMS → RMS order-type check | &lt; 0.5 ms | Local rules |
+| OMS → RMS surveillance check | &lt; 1 ms | Local list lookups; async pattern compute |
+| OMS → FIX engine | &lt; 1 ms | In-process or local-socket hop |
 | FIX engine → exchange | 1–20 ms | Network RTT to exchange; colocation pulls this to sub-ms |
-| Exchange match → ExecReport back to broker | event-driven; typically < 5 ms after match | Exchange side |
+| Exchange match → ExecReport back to broker | event-driven; typically &lt; 5 ms after match | Exchange side |
 | OMS persist ExecReport → client UI update | 5–50 ms | Async fan-out via WebSocket or push notification |
 
-The cumulative pre-trade RMS budget — segment + margin + MWPL + order-type + surveillance — is the most tightly watched: most brokers target P99 < 5 ms for this entire chain. Slipping above 10 ms starts showing as visible order-placement latency that algo clients react to. Most brokers maintain per-node P99 dashboards with alerts at 3× baseline.
+The cumulative pre-trade RMS budget — segment + margin + MWPL + order-type + surveillance — is the most tightly watched: most brokers target P99 &lt; 5 ms for this entire chain. Slipping above 10 ms starts showing as visible order-placement latency that algo clients react to. Most brokers maintain per-node P99 dashboards with alerts at 3× baseline.
 
 ## 8. What fails and where
 

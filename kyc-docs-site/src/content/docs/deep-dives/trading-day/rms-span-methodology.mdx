@@ -13,7 +13,7 @@ import { Aside } from '@astrojs/starlight/components';
 - The SPAN scenario grid generates **16 scenarios** by combining 8 futures-price moves with 2 volatility moves. The worst-case loss across the 16 scenarios is the **scanrange-driven SPAN margin** before short-option / inter-month / inter-commodity adjustments.
 - Total upfront margin in derivatives = **SPAN + ELM (Extreme Loss Margin)**, with additional margin layers (delivery, tender, special, surveillance, event-driven) added contextually. CM-segment upfront margin = **VaR + ELM** (per [SEBI/HO/MRD2/DCAP/CIR/P/2020/127](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2dcapcirp2020127)).
 - The clearing corp captures **four random intraday peak-margin snapshots** during 11:00–11:30, 12:30–13:00, 13:30–14:00, 14:30–15:00 (per [NCL/CMPT/45516](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt45516), [NCL/CMPL/44977](/broking-kyc/reference/circulars/clearing-corps/#nclcmpl44977)). The **peak-margin requirement** for the day = max of the four snapshots; the DMF rows reflect this.
-- Margin shortfall penalty grid (per [NSE/INSP/64315](/broking-kyc/reference/circulars/nse/#nseinsp64315)): **0.5% for shortfall < ₹1 lakh AND < 10% of applicable margin; 1.0% otherwise**, with a max-of-four reconciliation (CM-level, Client-level, Intra-day, EOD).
+- Margin shortfall penalty grid (per [NSE/INSP/64315](/broking-kyc/reference/circulars/nse/#nseinsp64315)): **0.5% for shortfall &lt; ₹1 lakh AND &lt; 10% of applicable margin; 1.0% otherwise**, with a max-of-four reconciliation (CM-level, Client-level, Intra-day, EOD).
 - Cross-margin offsets reduce required margin on correlated positions: **25% same-expiry / 35% different-expiry** for index-constituent pairs; **30% same-expiry / 40% different-expiry** for correlated-index pairs (per [NCL/CMPT/62978](/broking-kyc/reference/circulars/clearing-corps/) effective Jul 29, 2024).
 - Worked examples below cover **equity** (Reliance buy with VaR+ELM), **F&O** (Nifty futures + Nifty option spread with SPAN scenario grid), **CD** (USDINR futures), and **COM** (Crude Oil futures with MCXCCL VSR and ELM 1.25%).
 
@@ -248,7 +248,7 @@ When the clearing corp finds a margin shortfall at any of the four intraday snap
 
 | Shortfall condition | Penalty |
 |---|---|
-| Shortfall < ₹1 lakh AND < 10% of applicable margin | **0.5%** of the shortfall |
+| Shortfall &lt; ₹1 lakh AND &lt; 10% of applicable margin | **0.5%** of the shortfall |
 | Shortfall ≥ ₹1 lakh OR ≥ 10% of applicable margin | **1.0%** of the shortfall |
 
 The penalty is computed using the **max-of-four method**: across the four snapshots plus EOD, the highest single shortfall determines the penalty rather than summing across snapshots. This was clarified via [NCL/CMPT/45516](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt45516).
