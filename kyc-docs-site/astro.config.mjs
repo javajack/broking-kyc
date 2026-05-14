@@ -204,6 +204,18 @@ export default defineConfig({
           ],
         },
         {
+          label: "Lifecycle",
+          items: [
+            { label: "Overview", slug: "lifecycle" },
+            { label: "Re-KYC", slug: "lifecycle/re-kyc" },
+            { label: "Modifications", slug: "lifecycle/modifications" },
+            { label: "Dormancy & Reactivation", slug: "lifecycle/dormancy-reactivation" },
+            { label: "Voluntary Closure", slug: "lifecycle/closure" },
+            { label: "Transmission", slug: "lifecycle/transmission" },
+            { label: "NRI Conversion", slug: "lifecycle/nri-conversion" },
+          ],
+        },
+        {
           label: "Broker Process",
           items: [
             { label: "End-to-End Narrative", slug: "broker-process/narrative" },
