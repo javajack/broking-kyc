@@ -327,7 +327,80 @@ The daily clock is the densest layer; on top of it sit weekly, monthly, quarterl
 
 ## 6. Lifecycle Events
 
-_[Section 6 content — drafted in Task 8.]_
+An account that's gone ACTIVE rarely stays static. Clients change address, change banks, add nominees, activate new segments. Some accounts go dormant; some close voluntarily; some pass to a nominee on death. Some clients become NRIs or stop being NRIs. Each event has its own flow, its own evidence trail, and its own constellation of regulatory touchpoints.
+
+### Modifications
+
+**Address change.** Triggered by client request with proof (Aadhaar / utility bill / bank statement under three months old). Updates flow to: KRA (daily upload), CKYC (within 7 days), exchange UCC (next daily upload), depository BO records (next batch). The change is treated as a re-KYC trigger for the address field only; the full re-KYC cycle is not restarted.
+
+**Bank account change.** Penny-drop verification on the new account (Re. 1 transfer with name-match validation). On success, the change is propagated to KRA, exchange UCC, and depository (for direct-payout-to-demat routing). Settlement must continue uninterrupted; if a settlement is pending when the change request arrives, the broker typically completes pending settlements on the old account before switching.
+
+**Nominee change.** Per the SEBI January 2025 nominee revamp (see [journey screen 7](/broking-kyc/journey/07-nominations/) for the onboarding-time capture), up to 10 nominees may be added with percentage allocation (must sum to 100%). The change is eSigned by the client. For demat accounts, the change flows to the depository; for trading accounts, to the broker's back-office. Opt-out (no nominee) requires a 30-day video declaration window — trading can continue pending the video, but the nomination status remains "pending opt-out" until the video is captured.
+
+**Segment additions.** Activating F&O / CD / COM post-onboarding requires the segment-specific risk acknowledgement and (for F&O and COM) income proof. The income proof flow is identical to the onboarding flow — AA-fetched bank statement, ITR upload, or salary slip. On activation, the [exchange UCC](/broking-kyc/operations/compliance-blueprint/#exchange--depository-registration-30-entries) is updated to reflect the new segment, and the broker's OMS enables order entry in that segment.
+
+**Mobile / email change.** Triggers OTP re-verification — the new number / address receives an OTP that the client confirms. Once verified, KRA, exchange, and depository records update. Some brokers also require physical-mail confirmation to the old address as an anti-fraud step (rare but seen at risk-averse brokers).
+
+**Name change.** Triggered by life events (marriage, court order, gender change). Requires legal proof. On exchange side, BSE specifically uses the "Unfreeze" process — the existing UCC is frozen, the new identity is validated through Protean (PAN-Aadhaar-DOB-Name), and the UCC is re-opened in the new name. NSE has a parallel modification flow. KRA records are updated with the new identity; CKYC reflects the change.
+
+### Re-KYC periodicity
+
+SEBI's [risk-based re-KYC framework](/broking-kyc/operations/compliance-blueprint/#kyc-lifecycle-41-entries) specifies refresh cycles by client risk category:
+
+- **High-risk clients** (PEP exposure, high-risk-country residency, large-value transaction patterns) — re-KYC every 2 years.
+- **Medium-risk clients** — every 8 years.
+- **Low-risk clients** — every 10 years.
+
+The refresh process: re-validate identity (PAN + Aadhaar / DigiLocker re-fetch), re-validate address (utility bill / Aadhaar re-fetch), update contact details (OTP re-verify), capture any segment / declaration changes. The artefact is a re-KYC record uploaded to KRA and CKYC. Failure to complete re-KYC by the anniversary triggers an account hold per SEBI guidelines.
+
+### Dormancy
+
+A trading account is treated as dormant after no trading activity for a defined window. Industry practice varies: some brokers flag at 12 months, exchange-level dormancy typically applies at 24 months. On dormancy:
+
+- Segment activations may auto-disable (especially F&O / COM where ongoing margin is required).
+- Modifications are restricted — client must reactivate before submitting modification requests.
+- The account is included in the broker's monthly dormant-account MIS to the exchange.
+
+### Reactivation
+
+Client-initiated, triggered by a written / digital request. If the account has been dormant beyond 12 months, a re-KYC is typically required (current address re-validated, current bank re-confirmed). Segment re-activation goes through the original-onboarding rules (income proof for F&O / COM). UCC unfreeze, BO reactivation, and KRA / CKYC updates follow.
+
+### Voluntary closure
+
+Client-initiated closure follows a structured flow:
+
+1. **Settle outstanding obligations.** Any pending trades, MTF positions, or unsettled payouts must clear.
+2. **Withdraw funds.** Client funds in the broker's client-funds account are refunded to the client's registered bank account.
+3. **Release pledged securities.** Margin pledges, MTF pledges, and any other holds on the demat account are released.
+4. **DP BO closure** with CDSL or NSDL — the depository closes the BO account with a formal closure intimation.
+5. **UCC deactivation** at each exchange the client was active on (NSE, BSE, MCX as applicable).
+6. **KRA closure intimation** — the KRA record is updated to "closed" status; CKYC is not closed (CKYC records persist as identity reference).
+
+### Transmission (deceased client)
+
+The most operationally sensitive lifecycle event.
+
+**Single holder deceased.** If a nominee is registered: the nominee submits death certificate, identity proof, and KYC (if not already KYC-registered). The BO account is transferred to the nominee's name; the nominee can then continue trading or close the account. If no nominee: succession path required — probate of will, succession certificate, or letters of administration. Operationally heavier and slower (months rather than weeks).
+
+**Joint account, one holder deceased.** Survivor mode — the surviving holder(s) continue with the BO. Death certificate and identity proof submitted; the deceased holder is removed from the BO records.
+
+**Joint account, all holders deceased.** Same succession path as single-holder-no-nominee.
+
+Transmission flows are governed by depository operational circulars ([CDSL](/broking-kyc/reference/circulars/cdsl/) and [NSDL](/broking-kyc/reference/circulars/nsdl/) each publish detailed transmission procedure guides) and SEBI investor protection guidelines. The [edge-case compliance domain](/broking-kyc/operations/compliance-blueprint/#edge-case-compliances-30-entries) enumerates the specific obligations.
+
+### NRI ↔ Resident conversion
+
+**Resident → NRI.** Triggered by the client moving abroad and acquiring NRI status. Requires: passport with visa / residency proof, new NRE / NRO bank accounts, PIS (Portfolio Investment Scheme) letter from an AD-Category-I bank. On conversion: existing positions may need to be unwound (some segments are PIS-restricted); UCC is updated to NRI client type; depository BO is re-mapped; segment restrictions apply (e.g., PIS-route NRI is delivery-only, no intraday or F&O).
+
+**NRI → Resident.** Triggered by the client returning to India. Requires: address and contact-detail re-validation, removal of PIS account linkage, full re-KYC as resident. Segment restrictions lift; the client can resume intraday and F&O / COM trading (subject to standard income-proof requirements).
+
+<Aside type="note">
+**The SEBI January 2025 nominee revamp.** Earlier rules limited nominees to three per account. The January 2025 framework expanded this to ten per account with percentage allocation. The opt-out path (no nominee) was tightened simultaneously — opt-out now requires a video declaration, completed within 30 days. The change has been industry-impactful: brokers had to update their nominee capture workflows, demat platforms had to extend their data models, and KRA / depository records gained new fields. Some brokers offer guided nominee setup flows during onboarding now; opt-out is intentionally a slightly higher-friction path.
+</Aside>
+
+<Aside type="caution">
+**Minor → age-18 conversion has a 30-day deadline.** A guardian-operated account for a minor must be converted to an individual account within 30 days of the minor turning 18, or the account is frozen by the broker / depository. The conversion is a re-KYC event — the now-adult must complete their own KYC, providing PAN, identity, address, and bank-account details under their own name. Brokers track upcoming birthdays in their dormancy / lifecycle MIS and trigger reminder notifications at 60 / 30 / 7 days before the 18th birthday to avoid forced freezes.
+</Aside>
 
 ## Practical notes
 
