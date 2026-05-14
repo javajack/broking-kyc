@@ -66,7 +66,7 @@ npm install
 
 ## Key Regulatory References
 
-37+ circulars across SEBI, RBI, NPCI, and MeitY are tracked. Here are the most critical ones:
+**884 circulars** tracked across 13 issuer groupings — SEBI (MIRSD + MRD + IMD + OIAE + LAD-NRO + CFD), RBI, NPCI, CERSAI, MeitY/CCA, FIU-IND, CDSL, NSDL, NSE, BSE, MCX, and clearing corps (NSCCL / ICCL / MCXCCL) — over the 2020-01-01 → 2026-05-14 window. Coverage spans regulatory norms AND operational/file-format circulars (BOD/EOD specs, settlement files, margin frameworks). Here are the most critical ones:
 
 | Regulation | Reference |
 |---|---|
@@ -91,7 +91,7 @@ npm install
 | DPDP Act 2023 + Rules 2025 | Notified Nov 13, 2025 — full compliance deadline May 2027 |
 | KYC Onboarding Consultation Paper | SEBI (Jan 16, 2026) — proposes centralized KYC, 5-year review cycle |
 
-See the full [Regulatory Circulars](https://javajack.github.io/broking-kyc/reference/regulatory-circulars/) (37 entries with official links) and [References & Sources](https://javajack.github.io/broking-kyc/reference/references-sources/) (130+ URLs) pages for complete listings.
+See the [Regulatory Circulars master index](https://javajack.github.io/broking-kyc/reference/regulatory-circulars/) (curated highlights + per-issuer navigation), the [per-issuer sub-pages](https://javajack.github.io/broking-kyc/reference/circulars/sebi-mirsd/) (884 verified entries with primary URLs, in-force dates, supersession chains, and impact-area tags), the [circulars changelog](https://javajack.github.io/broking-kyc/reference/circulars-changelog/) (delta against the prior 37-entry list), and the [References & Sources](https://javajack.github.io/broking-kyc/reference/references-sources/) (130+ URLs) page for complete listings.
 
 ## Author
 
