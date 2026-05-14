@@ -222,6 +222,83 @@ export default defineConfig({
           ],
         },
         {
+          label: "Deep Dives",
+          items: [
+            { label: "Overview", slug: "deep-dives" },
+            {
+              label: "Trading-day",
+              collapsed: true,
+              items: [
+                { label: "OMS Internals", slug: "deep-dives/trading-day/oms-internals" },
+                { label: "RMS / SPAN Methodology", slug: "deep-dives/trading-day/rms-span-methodology" },
+                { label: "Surveillance (NORMS/GSM/ASM)", slug: "deep-dives/trading-day/surveillance-norms-gsm-asm" },
+                { label: "Short-Delivery Auction", slug: "deep-dives/trading-day/short-delivery-auction" },
+                { label: "Block & Bulk Deals", slug: "deep-dives/trading-day/block-bulk-deals" },
+                { label: "Retail Algo Framework", slug: "deep-dives/trading-day/retail-algo-framework" },
+              ],
+            },
+            {
+              label: "Settlement",
+              collapsed: true,
+              items: [
+                { label: "T+0 / T+1 Settlement", slug: "deep-dives/settlement/t0-t1-settlement" },
+                { label: "Direct Payout to Demat", slug: "deep-dives/settlement/direct-payout-to-demat" },
+                { label: "Client Funds Upstreaming", slug: "deep-dives/settlement/client-funds-upstreaming" },
+                { label: "Payin Default + Core SGF", slug: "deep-dives/settlement/payin-default-core-sgf" },
+                { label: "SLBM", slug: "deep-dives/settlement/slbm" },
+                { label: "MTF Operational", slug: "deep-dives/settlement/mtf-operational" },
+              ],
+            },
+            {
+              label: "Compliance & Audit",
+              collapsed: true,
+              items: [
+                { label: "SCORES Procedure", slug: "deep-dives/compliance-audit/scores-procedure" },
+                { label: "IGRC", slug: "deep-dives/compliance-audit/igrc" },
+                { label: "ODR (Smart ODR)", slug: "deep-dives/compliance-audit/odr" },
+                { label: "Concurrent Audit", slug: "deep-dives/compliance-audit/concurrent-audit" },
+                { label: "System Audit", slug: "deep-dives/compliance-audit/system-audit" },
+                { label: "CSCRF Deep-Dive", slug: "deep-dives/compliance-audit/cscrf-deep-dive" },
+                { label: "Inspection Types", slug: "deep-dives/compliance-audit/inspection-types" },
+                { label: "AP Framework", slug: "deep-dives/compliance-audit/ap-framework" },
+              ],
+            },
+            {
+              label: "Specialty",
+              collapsed: true,
+              items: [
+                { label: "IPO / OFS Broker-Side", slug: "deep-dives/specialty/ipo-ofs-broker-side" },
+                { label: "Mutual Fund Platforms", slug: "deep-dives/specialty/mutual-fund-platforms" },
+                { label: "DLT Framework", slug: "deep-dives/specialty/dlt-framework" },
+                { label: "BCP / DR Drill", slug: "deep-dives/specialty/bcp-dr-drill" },
+              ],
+            },
+            {
+              label: "Member Compliance",
+              collapsed: true,
+              items: [
+                { label: "BMC / ABC", slug: "deep-dives/member-compliance/bmc-abc" },
+                { label: "Fit-and-Proper", slug: "deep-dives/member-compliance/fit-and-proper" },
+                { label: "KMP Changes", slug: "deep-dives/member-compliance/kmp-changes" },
+                { label: "Membership Renewal", slug: "deep-dives/member-compliance/membership-renewal" },
+                { label: "ECN & Investor Servicing", slug: "deep-dives/member-compliance/ecn-investor-servicing" },
+              ],
+            },
+            {
+              label: "Foundational",
+              collapsed: true,
+              items: [
+                { label: "SGF / Core SGF", slug: "deep-dives/foundational/sgf-core-sgf" },
+                { label: "IPF", slug: "deep-dives/foundational/ipf" },
+                { label: "Market Manipulation Typologies", slug: "deep-dives/foundational/market-manipulation-typologies" },
+                { label: "Pre-Open / Closing Auction", slug: "deep-dives/foundational/pre-open-closing-auction" },
+                { label: "Segment Rules Comparison", slug: "deep-dives/foundational/segment-rules-comparison" },
+                { label: "Member Default Recovery", slug: "deep-dives/foundational/member-default-recovery" },
+              ],
+            },
+          ],
+        },
+        {
           label: "Vendor Integrations",
           items: [
             { label: "Vendor Atlas — All Products", slug: "vendors/atlas" },
