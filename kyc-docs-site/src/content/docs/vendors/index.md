@@ -1,7 +1,9 @@
 ---
 title: Vendor Strategy
-description: Which vendors to invest in and which to skip — a strategic assessment of 25+ vendors across identity, payments, compliance, and back-office layers.
+description: Strategic assessment of the broking vendor stack — which to invest in, which to skip, and how the layers fit together. Onboarding focus on this page; full 233-product enumeration is on the Vendor Atlas.
 ---
+
+> **Where this fits.** This is the **Vendors** section. Two pages worth knowing about: this strategy page (curated picks for an onboarding-stack-first broker) and the [Vendor Atlas](/broking-kyc/vendors/atlas/) — a 233-product enumeration across 22 categories (OMS / EMS / RMS, back-office, surveillance, AML, KYC, eSign, AA, payments, DLT, MF platforms, IPO/OFS, pledge tech, algo APIs, market data, CRM). Strategy here; encyclopedic listing there. For where each vendor's data ends up, see [Field-level Data Flow Atlas](/broking-kyc/reference/field-atlas/). New here? Try [Choose Your Role](/broking-kyc/personas/) first.
 
 Building a <abbr title="Know Your Customer (process).">KYC</abbr> (Know Your Customer) onboarding system for an Indian stock broker requires integrating with a surprisingly large number of third-party vendors. From identity verification to bank account validation, from <abbr title="Anti-Money Laundering">AML</abbr> (Anti-Money Laundering) screening to e-Sign, from exchange connectivity to back-office trading systems — no single vendor covers everything. The challenge is not finding vendors; it is choosing the right combination that minimizes the number of contracts you manage, provides reliable uptime, meets regulatory requirements, and keeps costs predictable. This page is your strategic guide: which vendors are worth serious evaluation, which you can safely skip, and what the recommended final stack looks like.
 
