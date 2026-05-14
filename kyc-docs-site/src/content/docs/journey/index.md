@@ -28,7 +28,7 @@ Each screen has a single clear purpose. Every field maps directly to a regulator
 
 ## User Input Summary
 
-The user provides a minimal set of fields across all 9 screens. Remaining fields are pre-filled from DigiLocker (Government of India's digital document platform), KRA (KYC Registration Agency), CKYC (Central KYC registry), or IFSC lookup. The architecture maximises pre-fill from authoritative government and regulatory sources per the DigiLocker-first approach permitted under SEBI circular SEBI/HO/MIRSD/DOP/CIR/P/2020/73.
+The user provides a minimal set of fields across all 9 screens. Remaining fields are pre-filled from DigiLocker (Government of India's digital document platform), KRA (KYC Registration Agency), CKYC (Central KYC registry), or IFSC lookup. The architecture maximises pre-fill from authoritative government and regulatory sources per the DigiLocker-first approach permitted under SEBI circular [SEBI/HO/MIRSD/DOP/CIR/P/2020/73](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-dop-cir-p-2020-73).
 
 **User-typed fields:** Mobile, PAN (Permanent Account Number), DOB (Date of Birth), Email, Bank Account Number, IFSC, Account Type, Segment Toggles, Nominee details (if adding), Declaration checkboxes.
 

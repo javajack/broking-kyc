@@ -741,7 +741,7 @@ Per Master Dataset Section H:
 
 | Attribute | Details |
 |-----------|---------|
-| SEBI Circular | SEBI/HO/MIRSD/DoP/P/CIR/2022/44 (Nov 18, 2022) |
+| SEBI Circular | [SEBI/HO/MIRSD/DoP/P/CIR/2022/44](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-dop-p-cir-2022-44) (Nov 18, 2022) |
 | Effective Date | November 18, 2022 |
 | Replaces | Power of Attorney (POA) |
 | Nature | One-time authorization from BO to DP |
@@ -1225,7 +1225,7 @@ Response:
 
 | Circular | Details |
 |----------|---------|
-| SEBI/HO/MIRSD/POD-1/P/CIR/2023/193 | Up to 10 nominees allowed (effective Jan 2025) |
+| [SEBI/HO/MIRSD/POD-1/P/CIR/2023/193](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-pod-1-p-cir-2023-193) | Up to 10 nominees allowed (effective Jan 2025) |
 | SEBI circular Jun 10, 2024 | Simplified nomination: 3 mandatory fields (name, percentage, relationship) |
 | Deadline | March 1, 2025 for existing accounts to opt-in or opt-out |
 

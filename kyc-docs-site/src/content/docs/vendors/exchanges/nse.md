@@ -14,7 +14,7 @@ The National Stock Exchange of India (NSE) is where the vast majority of equity 
 | Batch Limit | Max 10,000 records per file |
 | PAN Verification | 3-parameter (PAN + Name + DOB) |
 | Activation SLA | Same day (5PM cutoff) |
-| Key Circular | NSE/ISC/61817 (Apr 2024) |
+| Key Circular | [NSE/ISC/61817](/broking-kyc/reference/circulars/nse/#nse-isc-61817) (Apr 2024) |
 | New Format Since | July 15, 2024 |
 
 :::
@@ -72,7 +72,7 @@ A UCC is not just a registration formality. It is the single identifier that tie
 | SEBI Stock Brokers Master Circular | SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90 (Jun 2025) |
 | SEBI Stock Brokers Regulations 2026 | Notified Jan 7, 2026 (replaces 1992 regulations) |
 | NSE UCC Master Circular | NSE/ISC/61817 (Apr 30, 2024) |
-| NSE UCC API Introduction | NSE/ISC/60418 (Jan 25, 2024) |
+| NSE UCC API Introduction | [NSE/ISC/60418](/broking-kyc/reference/circulars/nse/#nse-isc-60418) (Jan 25, 2024) |
 | UCC-Demat Mapping | SEBI/HO/MIRSD/DOP/CIR/P/2019/136 |
 
 Now that you understand the regulatory landscape, let us look at the trading infrastructure itself -- the systems that actually execute trades once a UCC is in place.

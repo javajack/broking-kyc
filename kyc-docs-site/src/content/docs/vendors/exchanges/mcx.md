@@ -133,7 +133,7 @@ CTCL allows trading members to connect their own software (or ISV-provided softw
 
 **Availability**: Only for registered trading members of MCX.
 
-**Master Circular**: MCX/CTCL/281/2024 (April 30, 2024)
+**Master Circular**: [MCX/CTCL/281/2024](/broking-kyc/reference/circulars/mcx/#mcx-ctcl-281-2024) (April 30, 2024)
 
 ### 4.2 API Types
 

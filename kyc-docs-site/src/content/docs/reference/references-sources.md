@@ -20,20 +20,20 @@ These are official government and regulatory portals whose publicly available ci
 | Circular / Regulation | Reference Number | Official Link |
 |---|---|---|
 | KYC Master Circular | SEBI/HO/MIRSD/MIRSD-SEC-2/P/CIR/2023/168 (Oct 2023) | [sebi.gov.in](https://www.sebi.gov.in/legal/master-circulars/oct-2023/master-circular-on-know-your-client-kyc-norms-for-the-securities-market_77945.html) |
-| KYC Process & Technology | SEBI/HO/MIRSD/DOP/CIR/P/2020/73 (Apr 2020) | [sebi.gov.in](https://www.sebi.gov.in/media/press-releases/apr-2020/sebi-eases-the-know-your-client-kyc-process-by-enabling-online-kyc-use-of-technology-app-by-the-registered-intermediary_46612.html) |
-| KYC Simplification at KRAs | SEBI/HO/MIRSD/FATF/P/CIR/2023/0144 (Aug 2023) | [sebi.gov.in](https://www.sebi.gov.in/legal/circulars/aug-2023/simplification-of-kyc-process-and-rationalisation-of-risk-management-framework-at-kras_75250.html) |
-| PAN-Aadhaar Linking Relaxation | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/41 (May 2024) | — |
-| KRA Upload to CKYC | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/79 (Jun 2024) | [sebi.gov.in](https://www.sebi.gov.in/legal/circulars/jun-2024/uploading-of-kyc-information-by-kyc-registration-agencies-kras-to-central-kyc-records-registry-ckycrr-_84006.html) |
-| FATCA/CRS Centralization at KRAs | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12 (Feb 2024) | [sebi.gov.in](https://www.sebi.gov.in/legal/circulars/feb-2024/centralization-of-certifications-under-foreign-account-tax-compliance-act-fatca-and-common-reporting-standard-crs-at-kyc-registration-agencies-kras-_81583.html) |
-| AML/CFT Guidelines | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78 (Jun 2024) | — |
+| KYC Process & Technology | [SEBI/HO/MIRSD/DOP/CIR/P/2020/73](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-dop-cir-p-2020-73) (Apr 2020) | [sebi.gov.in](https://www.sebi.gov.in/media/press-releases/apr-2020/sebi-eases-the-know-your-client-kyc-process-by-enabling-online-kyc-use-of-technology-app-by-the-registered-intermediary_46612.html) |
+| KYC Simplification at KRAs | [SEBI/HO/MIRSD/FATF/P/CIR/2023/0144](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-fatf-p-cir-2023-0144) (Aug 2023) | [sebi.gov.in](https://www.sebi.gov.in/legal/circulars/aug-2023/simplification-of-kyc-process-and-rationalisation-of-risk-management-framework-at-kras_75250.html) |
+| PAN-Aadhaar Linking Relaxation | [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/41](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-secfatf-p-cir-2024-41) (May 2024) | — |
+| KRA Upload to CKYC | [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/79](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-secfatf-p-cir-2024-79) (Jun 2024) | [sebi.gov.in](https://www.sebi.gov.in/legal/circulars/jun-2024/uploading-of-kyc-information-by-kyc-registration-agencies-kras-to-central-kyc-records-registry-ckycrr-_84006.html) |
+| FATCA/CRS Centralization at KRAs | [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-secfatf-p-cir-2024-12) (Feb 2024) | [sebi.gov.in](https://www.sebi.gov.in/legal/circulars/feb-2024/centralization-of-certifications-under-foreign-account-tax-compliance-act-fatca-and-common-reporting-standard-crs-at-kyc-registration-agencies-kras-_81583.html) |
+| AML/CFT Guidelines | [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-secfatf-p-cir-2024-78) (Jun 2024) | — |
 | Stock Brokers Master Circular | SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90 (Jun 2025) | — |
-| Stock Brokers Regulations 2026 | SEBI/LAD-NRO/GN/2026/291 (Jan 7, 2026) | [sebi.gov.in](https://www.sebi.gov.in/legal/regulations/jan-2026/securities-and-exchange-board-of-india-stock-brokers-regulations-2026_98974.html) |
-| DDPI Circular | SEBI/HO/MIRSD/DoP/P/CIR/2022/44 (Apr 2022) | — |
+| Stock Brokers Regulations 2026 | [SEBI/LAD-NRO/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebi-lad-nro-gn-2026-291) (Jan 7, 2026) | [sebi.gov.in](https://www.sebi.gov.in/legal/regulations/jan-2026/securities-and-exchange-board-of-india-stock-brokers-regulations-2026_98974.html) |
+| DDPI Circular | [SEBI/HO/MIRSD/DoP/P/CIR/2022/44](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-dop-p-cir-2022-44) (Apr 2022) | — |
 | Nomination Revamp | SEBI circular (Jan 10, 2025) | [sebi.gov.in](https://www.sebi.gov.in/legal/circulars/jan-2025/circular-on-revise-and-revamp-nomination-facilities-in-the-indian-securities-market_90698.html) |
 | Nomination Amendments | SEBI circular (Feb 28, 2025) | [sebi.gov.in](https://www.sebi.gov.in/legal/circulars/feb-2025/amendments-and-clarifications-to-circular-dated-january-10-2025-on-revise-and-revamp-nomination-facilities-in-the-indian-securities-market_92377.html) |
-| DigiLocker for Holdings | SEBI/HO/OIAE/OIAE_IAD-3/P/CIR/2025/32 (Mar 2025) | [sebi.gov.in](https://www.sebi.gov.in/legal/circulars/mar-2025/harnessing-digilocker-as-a-digital-public-infrastructure-for-reducing-unclaimed-assets-in-the-indian-securities-market_92769.html) |
+| DigiLocker for Holdings | [SEBI/HO/OIAE/OIAE_IAD-3/P/CIR/2025/32](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-oiae-oiae-iad-3-p-cir-2025-32) (Mar 2025) | [sebi.gov.in](https://www.sebi.gov.in/legal/circulars/mar-2025/harnessing-digilocker-as-a-digital-public-infrastructure-for-reducing-unclaimed-assets-in-the-indian-securities-market_92769.html) |
 | UPI Block Mechanism (Consultation) | SEBI consultation paper (Aug 2024) | [sebi.gov.in](https://www.sebi.gov.in/reports-and-statistics/reports/aug-2024/consultation-paper-on-the-facility-for-trading-in-the-secondary-market-using-upi-block-mechanism-to-be-mandatorily-offered-by-qualified-stock-brokers-qsbs-to-their-clients-asba-like-facility-for-_86226.html) |
-| T+0 Settlement | SEBI/HO/MRD/MRD-PoD-3/P/CIR/2024/20 (Mar 2024) | [sebi.gov.in](https://www.sebi.gov.in/legal/circulars/mar-2024/introduction-of-beta-version-of-t-0-rolling-settlement-cycle-on-optional-basis-in-addition-to-the-existing-t-1-settlement-cycle-in-equity-cash-markets_82455.html) |
+| T+0 Settlement | [SEBI/HO/MRD/MRD-PoD-3/P/CIR/2024/20](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-mrd-mrd-pod-3-p-cir-2024-20) (Mar 2024) | [sebi.gov.in](https://www.sebi.gov.in/legal/circulars/mar-2024/introduction-of-beta-version-of-t-0-rolling-settlement-cycle-on-optional-basis-in-addition-to-the-existing-t-1-settlement-cycle-in-equity-cash-markets_82455.html) |
 | T+0 Expansion | SEBI circular (Dec 2024) | [sebi.gov.in](https://www.sebi.gov.in/legal/circulars/dec-2024/enhancement-in-the-scope-of-optional-t-0-rolling-settlement-cycle-in-addition-to-the-existing-t-1-settlement-cycle-in-equity-cash-markets_89443.html) |
 | Client Fund Upstreaming | SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/84 (Jun 2023) | — |
 | AA for Depositories | SEBI/HO/MRD/DCAP/P/CIR/2022/110 (Aug 2022) | — |
@@ -206,7 +206,7 @@ The following vendor documentation portals and API references were consulted. Al
 - [NSE Circulars](https://www.nseindia.com/regulations/exchanges-circulars) — Regulatory circulars
 - [ENIT Portal](https://enit.nseindia.com) — Member services
 - [NSE UCC Circular ISC/61817 (Apr 2024)](https://nsearchives.nseindia.com/content/circulars/ISC66053.pdf) — KYC guidelines
-- NSE UCC Circular: NSE/ISC/61817 (Apr 2024) — New format Jul 15, 2024
+- NSE UCC Circular: [NSE/ISC/61817](/broking-kyc/reference/circulars/nse/#nse-isc-61817) (Apr 2024) — New format Jul 15, 2024
 
 ### BSE (Bombay Stock Exchange)
 

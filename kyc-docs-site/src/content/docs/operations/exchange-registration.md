@@ -21,7 +21,7 @@ NSE is the largest stock exchange in India by trading volume and is typically wh
 |--------|---------|
 | **Trading System** | NEAT / NOW (NEAT on Web) |
 | **Submission Methods** | UCI Online (web) \| API Upload (REST JSON) \| Batch Upload (pipe-delimited, no headers) |
-| **API Reference** | NSE/ISC/60418 (API), NSE/ISC/61817 (Apr 2024 — revised structure) |
+| **API Reference** | [NSE/ISC/60418](/broking-kyc/reference/circulars/nse/#nse-isc-60418) (API), [NSE/ISC/61817](/broking-kyc/reference/circulars/nse/#nse-isc-61817) (Apr 2024 — revised structure) |
 | **Batch Limit** | Max 10,000 records per file |
 | **Format Change** | New file structure effective Jul 15, 2024 |
 | **Segments** | CM (Cash/Equity), FNO (F&O), CD (Currency), COM (Commodity) |

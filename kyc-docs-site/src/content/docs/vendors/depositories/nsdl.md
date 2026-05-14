@@ -216,7 +216,7 @@ This is NSDL's modernized API for BO account operations, introduced in 2024.
 
 | Aspect | Details |
 |--------|---------|
-| **Circular** | NSDL/POLICY/2024/0012 |
+| **Circular** | [NSDL/POLICY/2024/0012](/broking-kyc/reference/circulars/nsdl/#nsdl-policy-2024-0012) |
 | **Purpose** | API integration between DP back-office and Local DPM/Cloud DPM for account opening and modification |
 | **Hosting** | API hosted on Local DPM or Cloud DPM (not directly on CDS) |
 | **Initiation** | From DP back-office system to DPM |
@@ -639,7 +639,7 @@ NSDL, as the older depository, built its systems in the late 1990s around a dist
 | **2024** | Client Maintenance API | NSDL/POLICY/2024/0012 - API for account opening and modification via DPM |
 | **2024** | UDiFF Adoption | ISO-tagged format mandatory from Mar 30, 2024 (SEBI mandate) |
 | **2024** | Cloud DPM | NSDL-hosted DPM eliminates on-premise infrastructure for DPs |
-| **2024** | Standardized File Formats | NSDL/POLICY/2024/0041 - Aligning with SEBI's format standardization |
+| **2024** | Standardized File Formats | [NSDL/POLICY/2024/0041](/broking-kyc/reference/circulars/nsdl/#nsdl-policy-2024-0041) - Aligning with SEBI's format standardization |
 | **2025** | Master Circular Update | Apr 2025 - Consolidated operational guidelines, streamlined procedures |
 | **2025** | Online Account Closure | DPM Plus enhanced for online closure including joint and NIL balance accounts |
 | **2025** | UIP (Unified Investor Platform) | Cross-depository consolidated view (with CDSL) |
@@ -761,20 +761,20 @@ NSDL does not charge investors directly. It charges DPs, who set their own clien
 | Circular Reference | Date | Subject |
 |-------------------|------|---------|
 | NSDL/POLICY/2024/0012 | 2024 | Client Maintenance API - API integration for account opening and modification |
-| NSDL/POLICY/2024/0026 | 2024 | Standardization of File Formats (UDiFF) |
+| [NSDL/POLICY/2024/0026](/broking-kyc/reference/circulars/nsdl/#nsdl-policy-2024-0026) | 2024 | Standardization of File Formats (UDiFF) |
 | NSDL/POLICY/2024/0041 | 2024 | Additional UDiFF standardization across all MIIs |
-| NSDL/POLICY/2024/0083 | Jun 2024 | Auditor details update on e-pass portal |
+| [NSDL/POLICY/2024/0083](/broking-kyc/reference/circulars/nsdl/#nsdl-policy-2024-0083) | Jun 2024 | Auditor details update on e-pass portal |
 | NSDL Master Circular | Apr 30, 2025 | Master Circular for Participants (DPs) - consolidated operational guidelines |
 | NSDL/POLICY/2025/0139 | Jul 2025 | Internal and Concurrent Audit of Depository Operations |
 | NSDL DPM Plus Enhancement | Jul 2025 | Online demat account closure for joint and NIL balance accounts |
-| NSDL/POLICY/2026/0001 | Feb 2026 | Availability of SPEED-e facility on Sunday, February 01, 2026 |
+| [NSDL/POLICY/2026/0001](/broking-kyc/reference/circulars/nsdl/#nsdl-policy-2026-0001) | Feb 2026 | Availability of SPEED-e facility on Sunday, February 01, 2026 |
 | NSDL Account Closure | Jan 2026 | Processing of "To Be Closed" requests in Account Closure module of DPM (EOD Jan 2, 2026) |
 
 ### 13.2 SEBI Circulars Applicable to Both Depositories
 
 | Circular | Date | Impact |
 |----------|------|--------|
-| SEBI Master Circular for Depositories | Dec 3, 2024 | SEBI/HO/MRD/MRD-PoD-1/P/CIR/2024/168 - consolidated guidelines |
+| SEBI Master Circular for Depositories | Dec 3, 2024 | [SEBI/HO/MRD/MRD-PoD-1/P/CIR/2024/168](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-mrd-mrd-pod-1-p-cir-2024-168) - consolidated guidelines |
 | SEBI Nomination Rules | Jan 10, 2025 | Up to 10 nominees; simplified transmission |
 | SEBI Online Closure | Jul 14, 2025 | Mandatory online closure for DPs with online services |
 | SEBI BSDA Revised Criteria | Jun 28, 2024 | SEBI/HO/MIRSD/MIRSDPoD1/P/CIR/2024/91 |

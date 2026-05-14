@@ -480,7 +480,7 @@ The final section of this guide is a comprehensive reference of all SEBI circula
 
 | Circular Number | Date | Subject |
 |-----------------|------|---------|
-| SEBI/HO/MIRSD/DoP/P/CIR/2022/44 | Apr 4, 2022 | DDPI for settlement + pledge (original) |
+| [SEBI/HO/MIRSD/DoP/P/CIR/2022/44](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-dop-p-cir-2022-44) | Apr 4, 2022 | DDPI for settlement + pledge (original) |
 | SEBI/HO/MIRSD/DoP/P/CIR/2022/119 | Jun 2022 | Implementation timeline extension |
 | SEBI/HO/MIRSD-PoD-1/P/CIR/2022/137 | Oct 6, 2022 | DDPI scope expanded: MF + open offer |
 | SEBI/HO/MIRSD/DoP/P/CIR/2022/153 | Nov 2022 | Further implementation extension |
@@ -489,7 +489,7 @@ The final section of this guide is a comprehensive reference of all SEBI circula
 
 | Circular Number | Date | Subject |
 |-----------------|------|---------|
-| SEBI/HO/MIRSD/DOP/CIR/P/2020/28 | Feb 25, 2020 | Margin pledge/re-pledge in depository system |
+| [SEBI/HO/MIRSD/DOP/CIR/P/2020/28](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-dop-cir-p-2020-28) | Feb 25, 2020 | Margin pledge/re-pledge in depository system |
 | SEBI/HO/MIRSD/DOP/CIR/P/2020/88 | Jun 1, 2020 | Extension to Aug 1, 2020 |
 | SEBI/HO/MIRSD/DOP/CIR/P/2020/144 | Sep 22, 2020 | MTF securities as maintenance margin |
 | SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/82 | Jun 3, 2025 | Automated pledge release + invocation |

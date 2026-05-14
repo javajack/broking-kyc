@@ -367,7 +367,7 @@ Nomination rules changed significantly in 2024-2025. Previously, nomination was 
 
 ## 11. Section J: FATCA/CRS Declaration
 
-**Regulatory Basis**: SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12 (Feb 20, 2024) - Centralization at KRAs
+**Regulatory Basis**: [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-secfatf-p-cir-2024-12) (Feb 20, 2024) - Centralization at KRAs
 **Required By**: KRA (upload mandatory since Jul 1, 2024), All SEBI intermediaries
 
 FATCA (Foreign Account Tax Compliance Act) and CRS (Common Reporting Standard) are international tax compliance frameworks. India participates in both. For the vast majority of Indian-resident customers, the declaration is straightforward -- they check "tax resident of India only" and move on. The complexity arises for NRIs (Non-Resident Indians) and dual citizens who have tax residency in other countries.
@@ -404,7 +404,7 @@ FATCA (Foreign Account Tax Compliance Act) and CRS (Common Reporting Standard) a
 
 ## 12. Section K: PEP & AML Declaration
 
-**Regulatory Basis**: SEBI AML/CFT Master Circular (SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78)
+**Regulatory Basis**: SEBI AML/CFT Master Circular ([SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-secfatf-p-cir-2024-78))
 
 A PEP (Politically Exposed Person) is anyone who holds or has recently held a prominent public function -- a minister, a senior government official, or a high-ranking military officer. Their immediate family members and close associates are also classified as PEP-related. If a customer declares PEP status, the application triggers EDD (Enhanced Due Diligence), which involves additional manual review by the compliance team.
 
@@ -506,7 +506,7 @@ IPV (In-Person Verification) is a regulatory requirement to confirm that the per
 
 ## 16. Section O: DDPI Authorization
 
-**Regulatory Basis**: SEBI/HO/MIRSD/DoP/P/CIR/2022/44 (replaces POA since Nov 18, 2022)
+**Regulatory Basis**: [SEBI/HO/MIRSD/DoP/P/CIR/2022/44](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-dop-p-cir-2022-44) (replaces POA since Nov 18, 2022)
 **Required By**: CDSL/NSDL, Broker
 **Note**: DDPI is **optional** - broker cannot deny services if client refuses
 
@@ -1125,14 +1125,14 @@ In day-to-day operations, you will mostly care about "KYC Registered" and "On Ho
 | 1 | KYC Master Circular | SEBI/HO/MIRSD/MIRSD-SEC-2/P/CIR/2023/168 | Oct 12, 2023 | Consolidated KYC norms, CERSAI templates |
 | 2 | AML/CFT Guidelines | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78 | Jun 6, 2024 | Anti-Money Laundering standards |
 | 3 | FATCA/CRS at KRAs | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12 | Feb 20, 2024 | Mandatory FATCA upload to KRA from Jul 1, 2024 |
-| 4 | KRA Validation Review | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/41 | May 14, 2024 | On-Hold -> KYC Registered relaxation |
-| 5 | KRA Upload to CKYCRR | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/79 | Jun 6, 2024 | Mandatory CKYC upload from Aug 1, 2024 |
-| 6 | e-KYC & DigiLocker | SEBI/HO/MIRSD/DOP/CIR/P/2020/73 | Apr 24, 2020 | Aadhaar e-KYC + DigiLocker permitted |
+| 4 | KRA Validation Review | [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/41](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-secfatf-p-cir-2024-41) | May 14, 2024 | On-Hold -> KYC Registered relaxation |
+| 5 | KRA Upload to CKYCRR | [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/79](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-secfatf-p-cir-2024-79) | Jun 6, 2024 | Mandatory CKYC upload from Aug 1, 2024 |
+| 6 | e-KYC & DigiLocker | [SEBI/HO/MIRSD/DOP/CIR/P/2020/73](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-dop-cir-p-2020-73) | Apr 24, 2020 | Aadhaar e-KYC + DigiLocker permitted |
 | 7 | e-KYC Setu (NPCI) | SEBI press release | Jun 30, 2025 | Aadhaar e-KYC without sharing Aadhaar number |
 | 8 | DDPI replacing POA | SEBI/HO/MIRSD/DoP/P/CIR/2022/44 | Apr 4, 2022 | DDPI mandatory from Nov 18, 2022 |
 | 9 | Nomination Revamp | SEBI circular | Jan 10, 2025 | Up to 10 nominees, video opt-out |
 | 10 | Nomination Simplification | SEBI circular | Jun 10, 2024 | Only 3 mandatory fields for nomination |
-| 11 | DigiLocker for Assets | SEBI/HO/OIAE/OIAE_IAD-3/P/CIR/2025/32 | Mar 19, 2025 | Demat statements in DigiLocker |
+| 11 | DigiLocker for Assets | [SEBI/HO/OIAE/OIAE_IAD-3/P/CIR/2025/32](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-oiae-oiae-iad-3-p-cir-2025-32) | Mar 19, 2025 | Demat statements in DigiLocker |
 | 12 | Stock Brokers Master | SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90 | Jun 17, 2025 | Consolidated broker operations circular |
 | 13 | KYC Overhaul Consultation | SEBI consultation paper | Jan 16, 2026 | Proposed: centralized supplementary KYC, 5-yr review cycle |
 

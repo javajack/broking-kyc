@@ -19,7 +19,7 @@ The margin pledge framework was introduced by SEBI to eliminate the older title-
 
 | Circular | Date | Subject |
 |----------|------|---------|
-| SEBI/HO/MIRSD/DOP/CIR/P/2020/28 | Feb 25, 2020 | Margin obligations by way of Pledge/Re-pledge in Depository System |
+| [SEBI/HO/MIRSD/DOP/CIR/P/2020/28](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-dop-cir-p-2020-28) | Feb 25, 2020 | Margin obligations by way of Pledge/Re-pledge in Depository System |
 | SEBI/HO/MIRSD/DOP/CIR/P/2020/88 | Jun 1, 2020 | Extension of timeline to August 1, 2020 |
 | CDSL Communique DP-234 | May 22, 2020 | Operational modalities and file formats for margin pledge/re-pledge |
 | CDSL Communique DP-412 | August 2020 | Margin Pledge/Re-Pledge implementation |
