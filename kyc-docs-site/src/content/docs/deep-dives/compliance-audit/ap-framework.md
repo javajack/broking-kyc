@@ -1,0 +1,535 @@
+---
+title: "Deep Dive: Authorised Person (AP) Framework"
+description: Walkthrough and reference for the Authorised Person framework — AP registration, AP supervision (NSE/COMP chain 2021-2024), AP turnover reporting, penalty schedule, AP-broker relationship structure, AP onboarding flow, AP NISM certification, AP compliance audit, and AP termination.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Authorised Persons (APs) replaced sub-brokers in 2018-2019 as the SEBI-permitted distribution channel for brokers. The supervisory framework evolved across multiple NSE/COMP circulars (2009 → 2024). The page first explains the regulatory chain, then maps the registration / onboarding / supervision / termination lifecycle, then practical operational considerations including AMC, penalty matrix, and incident reporting.
+
+## TL;DR
+
+- **Regulatory chain:**
+  - **2009** — SEBI MIRSD/DR-1/Cir-16/09 (6 November 2009) — Foundational framework for "market access through Authorised Persons" replacing the sub-broker concept
+  - **`NSE/COMP/48536`** (9 June 2021) — Foundational NSE COMP-department circular operationalising the SEBI 2009 framework — AP role, prohibitions, supervisory obligations
+  - **`NSE/COMP/49509`** — Update
+  - **`NSE/COMP/50030`** — Update
+  - **`NSE/COMP/55716`** (22 Feb 2023) — Restriction on use of certain words (Bank, Investment, Wealth) by TM / Authorised Person
+  - **`NSE/COMP/56947`** (2 Jun 2023) — Strengthens AP supervisory framework — incident reporting, terminal monitoring, AMC framework
+  - **`NSE/COMP/58438`** (18 Sep 2023) — Operationalises identification and removal of inactive AP terminals
+  - **`NSE/COMP/60859`** (26 Feb 2024) — Annual Maintenance Charge (AMC) of Rs 5,000 per AP per year from FY 2024-25
+  - **`NSE/COMP/63628`** (28 Aug 2024) — Revised joint-exchange framework for supervision of APs and Branches; Annexure A inspection scope, criteria, methodology
+  - **`NSE/INSP/63425`** (14 Aug 2024) — Reinforces that any referrer to a broker must be registered as AP
+  - **`NSE/INSP/66284`** (24 Jan 2025) — Keeps NSE/INSP/63425 in abeyance pending Brokers' ISF representation
+- AP is **registered as a market participant of a specific trading member** (broker); cannot have multiple broker affiliations (with limited exceptions)
+- AP **cannot collect funds or securities** from clients directly; client account is with the broker
+- AP earns a **commission** from the broker as per agreed terms; commission is reported and tracked under SEBI brokerage transparency rules
+- **AMC** Rs 5,000 per active AP per year (per `NSE/COMP/60859`)
+- **AP supervision** — broker must conduct periodic inspections, monitor terminal activity, report incidents within 2 working days for assured-return / unauthorised scheme observations
+
+## Conceptual overview
+
+Before 2018, brokers used "sub-brokers" — distribution agents who could deal with clients on the broker's behalf. The sub-broker framework had governance issues — sub-broker frauds (unauthorised schemes, fund misuse) plagued the industry. SEBI restructured: the sub-broker concept was deprecated and replaced by **Authorised Person (AP)**.
+
+The AP is structurally different from a sub-broker:
+
+- AP is registered by the broker with the exchange — not directly with SEBI as an intermediary
+- AP cannot accept funds or securities — client's funds/securities flow through the broker only
+- AP's compensation is commission-based, transparent, and reported
+- AP is subject to broker's supervision, not independently licensed
+
+The NSE COMP-department circular chain (`NSE/COMP/48536` → `49509` → `50030` → `56947` → `58438` → `60859` → `63628`) progressively tightened the framework. Each circular addressed gaps identified through inspection findings and investor complaints.
+
+<Aside type="caution">
+**Broker is principal; AP is agent.** Operationally and legally, the broker is the principal — responsible for all client interactions, all regulatory obligations, all compensation for AP-related misconduct. AP's actions bind the broker. A broker cannot deflect AP-related grievances to "we'll route this to the AP"; the regulatory obligation is broker-level. This is the foundational principle from `NSE/COMP/48536` and reaffirmed in every successor circular.
+</Aside>
+
+## 1. AP definition and scope
+
+### 1.1 Who can be an AP
+
+- Individual (typically with required NISM certification)
+- Partnership firm (with at least one NISM-certified partner)
+- Limited Liability Partnership (LLP)
+- Body corporate (with required NISM-certified person)
+- Cooperative society (with restrictions)
+
+### 1.2 AP can do
+
+- Refer prospective clients to the broker
+- Distribute broker's products (broking, MTF, DP services, mutual fund distribution if registered separately, etc.)
+- Provide investor education (within SEBI / exchange permissible limits)
+- Communicate with clients on broker's behalf within prescribed limits
+- Operate broker-provided terminal at AP's office (with mandatory broker-side controls per `NSE/COMP/56947`)
+- Receive commission as per agreed terms
+
+### 1.3 AP cannot do
+
+- Accept funds or securities from clients (per `NSE/COMP/48536` foundational restriction)
+- Operate any kind of client account (bank / demat / trading)
+- Provide investment advisory unless separately registered under SEBI IA Regulations
+- Conduct PMS-like activities
+- Operate off-market schemes
+- Issue assured return / guaranteed profit communications
+- Use restricted words in firm name (per `NSE/COMP/55716` — "Bank", "Investment", "Wealth", "Asset Management")
+- Have multiple broker affiliations (with limited exceptions specified in NSE Compliance bye-laws)
+
+### 1.4 Permitted activities under separate registration
+
+- AP that is separately registered as SEBI Investment Adviser (IA) — can provide advisory
+- AP that is separately registered as Portfolio Manager (PMS) — can provide PMS (rare)
+- AP that is mutual fund distributor (AMFI registered) — can distribute MFs
+- These are independent registrations and do not blur the AP role
+
+<Aside type="note">
+**Sub-broker terminology is deprecated.** The SEBI Stock Brokers (Amendment) Regulations 2018 phased out the sub-broker category. Existing sub-brokers were given a transition window to either become Authorised Persons (registered under broker) or apply for fresh stock broker registration. Communications, account-opening forms, and internal documents referring to "sub-brokers" instead of "APs" are inappropriate post the 2018-2019 transition and may surface as inspection findings. Industry-typical: legacy material is rewritten as part of the periodic Master Circular update cycles.
+</Aside>
+
+## 2. AP registration
+
+### 2.1 Pre-requisites for AP applicant
+
+- Application form per exchange-specified format
+- PAN of AP entity (individual / firm / LLP / body corporate)
+- Proof of existence (incorporation certificate, partnership deed, etc.)
+- KYC documents (address proof, identity proof)
+- Education / experience documents (typically minimum 12th standard for individuals, 5+ years experience preferred)
+- NISM Series-VIII (Equity Derivatives) or relevant NISM certification for the designated person
+- No conflict-of-interest declaration with other brokers
+- No pending regulatory action declaration
+- Net-worth declaration (per exchange bye-laws; threshold varies by exchange and AP type)
+
+### 2.2 Application route
+
+- AP applies through the principal broker (the broker is the applicant on AP's behalf)
+- Broker conducts due diligence
+- Application uploaded to NSE / BSE / MCX AP registration portal
+- Exchange reviews — typically 15-30 working days
+- Approved APs receive registration number
+
+### 2.3 Documentation
+
+- AP-Broker agreement — defines roles, responsibilities, commission, termination
+- Compliance officer letter — designating the AP-engagement compliance owner at broker side
+- AP code of conduct acknowledgement
+- AP terminal allocation (if applicable)
+
+### 2.4 Activation
+
+- Once registered, AP appears on broker's AP register at exchange
+- AP can start referring clients
+- Terminal (if assigned) connected to broker systems with monitoring controls
+
+## 3. NISM certification
+
+### 3.1 Required certifications
+
+- **NISM Series-VIII (Equity Derivatives Certification Examination)** — for derivatives segment AP
+- **NISM Series-V-A (Mutual Fund Distributors)** — if AP distributes mutual funds (independent registration with AMFI)
+- **NISM Series-V-C (Mutual Fund Foundation)** — alternative MF certification
+- **NISM Series-VII (Securities Operations and Risk Management)** — for operational understanding
+- **NISM Series-XV-A (Investment Adviser - Level 1)** — if separately registered as IA
+- Exchange may require specific certification based on segments
+
+### 3.2 Validity and renewal
+
+- NISM certifications valid for 3 years
+- Renewal via Continuing Professional Education (CPE) — typically online refresher modules
+- Renewal certificate must be on AP file with broker
+
+### 3.3 Certification verification
+
+- Broker verifies NISM certification at registration and at renewal
+- Lapsed certification — AP cannot continue activities until renewal
+
+## 4. AP supervision (NSE/COMP chain 2021-2024)
+
+### 4.1 Supervisory framework evolution
+
+**`NSE/COMP/48536` (9 Jun 2021)** — Foundational. Defines AP role, prohibitions (no incentive sharing beyond approved rates, no PMS-like activity, no off-market schemes), and members' supervisory obligations. Implements SEBI MIRSD/DR-1/Cir-16/09 (6 Nov 2009).
+
+**`NSE/COMP/49509`** — Update. Operational refinements.
+
+**`NSE/COMP/50030`** — Update. Reinforcement of supervisory obligations.
+
+**`NSE/COMP/56947` (2 Jun 2023)** — Strengthens framework. Adds:
+- **Incident reporting** — 2 working days for assured-return / unauthorised-scheme observations
+- **AP inspection methodology**
+- **Terminal monitoring requirements**
+- **AMC framework** (operationalised via `NSE/COMP/58438` and `NSE/COMP/60859`)
+
+**`NSE/COMP/58438` (18 Sep 2023)** — Operationalises identification and removal of inactive AP terminals. Inactive AP = no trades in last 6 months. Members must identify, classify, and act on inactive APs. Introduces foundation for AP AMC effective FY 2024-25.
+
+**`NSE/COMP/60859` (26 Feb 2024)** — AMC of Rs 5,000 per registered AP per year across segments from April 1, 2024 (FY 2024-25). Payable in April of each FY based on March-31 AP register. AMC once charged is non-refundable.
+
+**`NSE/COMP/63628` (28 Aug 2024)** — Revised joint-exchange framework for supervision of APs and Branches by members. Annexure A prescribes:
+- Minimum / indicative scope of AP/Branch inspections
+- Criteria for inspection prioritisation
+- Methodology — sample selection, on-site visit obligations, documentation
+- Harmonisation of inspection cadence across NSE / BSE / MCX
+
+### 4.2 Broker's supervisory obligations
+
+Per the supervisory framework chain:
+
+- **Periodic inspections** of APs — annual at minimum; quarterly for higher-risk APs
+- **Terminal monitoring** — surveillance of trading from AP terminals; flag-unusual patterns
+- **Incident reporting** — 2 working days for material observations (assured return, unauthorised schemes, regulatory breach)
+- **Annual visits** to AP premises (industry-typical at large brokers; can be remote for low-risk APs)
+- **Inactive AP management** — identify, classify, terminate or reactivate
+- **AMC payment** — Rs 5,000 per AP per year as per FY24-25 onwards
+- **Termination procedure** — formal process with notice, recovery, exchange intimation
+
+### 4.3 AP inspection scope
+
+Per `NSE/COMP/63628` Annexure A:
+
+- **AP premises** — physical inspection of office
+- **Records** — client referral records, communication logs, marketing material
+- **Terminal use** — login history, order entries, trade patterns
+- **Client interactions** — sample review of AP-led client onboardings
+- **Conflict of interest** — verify AP not pursuing prohibited activities
+- **Compliance documentation** — NISM certification, KYC of AP staff, premises lease
+- **Complaint history** — investor complaints involving the AP
+
+### 4.4 Sample-size for AP inspection
+
+- Industry-typical:
+  - 100% of APs inspected annually for QSBs and large brokers
+  - 50% annually for mid-size brokers; remaining 50% biennially
+  - Risk-based prioritisation — APs with higher trade volume, recent complaints, AP-tagged client losses get inspected first
+
+### 4.5 AP inspection report
+
+- Per-AP report with observations
+- Compliance Officer review
+- Remediation tracking
+- Aggregated quarterly to Compliance Officer / Designated Director
+
+## 5. AP turnover reporting
+
+### 5.1 What is reported
+
+- AP-tagged trade volume (by segment, by exchange)
+- AP-tagged client count (active / inactive / dormant)
+- AP-tagged brokerage earned
+- AP-tagged commission paid
+
+### 5.2 Reporting cadence
+
+- Monthly to broker's compliance MIS
+- Quarterly to exchange (where required by AP-supervisory framework)
+- Annually consolidated into broker's Annual Compliance Report
+
+### 5.3 Use of turnover data
+
+- Supervisory prioritisation (high-volume APs inspected more often)
+- AMC payment validation (active APs)
+- AP commission verification
+- Regulator inspection support
+- AP terminations for inactive APs
+
+## 6. AP penalty schedule
+
+Per `NSE/INSP/53530` (Enforcement Actions) penalty grid as applicable to AP-related violations + `NSE/COMP/63628` and successor amendments:
+
+| Violation | Penalty (industry-typical; verify in current bye-laws) |
+| --- | --- |
+| AP information not updated in exchange systems | Financial disincentive per AP per delay-day |
+| AP inactive but not terminated (per `NSE/COMP/58438`) | Financial disincentive; potential supervisory action |
+| AP AMC not paid (per `NSE/COMP/60859`) | Financial disincentive; AP cannot operate till AMC paid |
+| Material observation not reported within 2 working days | Financial disincentive; SEBI inspection finding |
+| AP conducting prohibited activity | Termination of AP; broker disciplinary action; potential refund to client |
+| Unauthorised AP referrals (per `NSE/INSP/63425`) | Compliance action against broker; broker may need to register all referrers as APs |
+| AP using restricted words (per `NSE/COMP/55716`) | AP name change required; disciplinary action |
+| AP terminal misuse | Termination; supervisory action |
+| AP-tagged unauthorised trade | Disciplinary action; client refund; AP termination; potential AP-broker contractual recovery |
+
+## 7. AP-broker relationship structure
+
+### 7.1 Contractual
+
+- Master AP-Broker agreement
+- Commission structure — flat per trade, slab, fixed monthly, or hybrid
+- Term and termination clauses
+- Indemnification — AP indemnifies broker for AP's own breaches; broker remains primary for regulatory liabilities
+- Confidentiality
+- Data ownership — broker owns client data; AP has limited access
+
+### 7.2 Commission
+
+- Pre-agreed transparent rates
+- Subject to SEBI brokerage rules / cap (where applicable)
+- Tax — AP receives commission net of TDS
+- Reported under broker's Section 194H / 194J TDS regime
+
+### 7.3 Financial controls
+
+- AP does not access client accounts
+- AP-allocated funds (if any, for marketing reimbursement) handled separately
+- No comingling
+
+### 7.4 Liability
+
+- Broker primary for client losses arising from AP misconduct
+- AP secondary; broker may recover from AP via contractual indemnification
+- SEBI / exchange enforcement targets the broker; AP may face separate action
+
+## 8. AP onboarding flow
+
+### 8.1 Step 1 — Prospect identification
+
+- Broker identifies AP candidate (referral, advertising, direct approach)
+- Initial due diligence (background, credentials, references)
+- Discussion of commercial terms
+
+### 8.2 Step 2 — Due diligence
+
+- Background check (criminal record, prior SEBI action, prior financial issues)
+- Reference check (prior employer / business associates)
+- KYC of AP entity (PAN, address, identity)
+- NISM certification verification
+- Net-worth verification (if applicable per exchange bye-laws)
+- Financial / banking history check
+
+### 8.3 Step 3 — Documentation
+
+- AP-Broker agreement signed
+- AP code of conduct acknowledged
+- Compliance officer assignment
+- Terminal allocation (if applicable)
+- Marketing material approval
+
+### 8.4 Step 4 — Exchange registration
+
+- Application uploaded to NSE / BSE / MCX AP registration portal
+- Exchange review (15-30 working days)
+- Registration number issued
+
+### 8.5 Step 5 — Activation
+
+- AP can start referring clients
+- Terminal connected with monitoring controls (per `NSE/COMP/56947`)
+- Initial training / orientation by broker
+- Compliance kit handover
+
+### 8.6 Step 6 — Ongoing
+
+- Periodic inspections
+- Commission payments
+- AMC payment
+- Renewals (NISM, agreements)
+- Performance reviews
+- Termination / continuation decisions
+
+## 9. AP compliance audit
+
+### 9.1 Annual review
+
+- Each AP audited at least annually (industry-typical at most brokers; mandatory at QSBs)
+- Audit scope per `NSE/COMP/63628` Annexure A
+- Findings documented and remediated
+- Audit reports retained 5-10 years (industry-typical; some bye-laws may prescribe specific retention)
+
+### 9.2 Random / event-triggered review
+
+- Random audits of selected APs (e.g. 10% sample monthly)
+- Event-triggered (complaint received, surveillance alert, regulatory inquiry)
+- Spot inspections without prior notice
+
+### 9.3 AP inspection report
+
+- Per-AP review noting:
+  - Premises and identification
+  - Terminal use and access
+  - Client referral records
+  - Communication / marketing material
+  - NISM certification status
+  - Open complaints / regulatory issues
+  - Conflict of interest declarations
+  - Recommendations
+
+### 9.4 Aggregate review
+
+- Aggregated quarterly to Compliance Officer
+- Annual summary to Designated Director / Audit Committee
+- Repeat observations escalated
+
+## 10. AP termination procedure
+
+### 10.1 Voluntary termination by AP
+
+- AP gives notice per contract (typically 30 days)
+- Broker processes deactivation
+- Final commission settlement
+- Pending issues addressed
+- Exchange intimation
+
+### 10.2 Termination for cause
+
+- Material breach by AP (regulatory violation, fraud, off-market scheme, etc.)
+- Broker conducts internal investigation
+- AP given opportunity to explain
+- Termination notice issued
+- Recovery from AP (where contractually possible)
+- Exchange intimation with reason
+- Client communication regarding AP changeover
+
+### 10.3 Termination for inactivity
+
+- Per `NSE/COMP/58438` — inactive APs (no trades 6 months) must be flagged
+- After classification, AP can be reactivated (renewed agreements, recertification) or terminated
+- AMC continues to apply till termination
+
+### 10.4 Post-termination
+
+- Client accounts transition to broker's direct servicing (or to another AP)
+- Pending settlements completed
+- AP terminal access revoked
+- AP-tagged trading code retired
+- Records retained per regulatory minimum
+- AP cannot transition clients to another broker without separate process
+
+### 10.5 Client communication
+
+- Clients informed of AP change
+- Service continuity assured (broker continues as principal)
+- Alternative service contact provided
+
+## 11. Edge cases
+
+### 11.1 AP migration between brokers
+
+- AP cannot simultaneously serve multiple brokers (with limited exceptions in exchange bye-laws)
+- AP termination at old broker → fresh registration at new broker
+- Clients may migrate via voluntary closure-and-reopen at new broker
+
+### 11.2 AP entity changes (firm reconstitution, partner change)
+
+- Material reconstitution requires fresh review and reactivation
+- Partner addition / departure requires intimation; recertification may be needed
+
+### 11.3 AP succession (death of individual AP)
+
+- Operations transfer to broker pending re-registration with new AP
+- Estate of AP receives outstanding commission per agreement
+- Clients informed and serviced directly by broker
+
+### 11.4 AP financial distress
+
+- Broker has obligation to monitor AP financial health
+- Distressed APs may need replacement
+- Client accounts unaffected (broker remains principal)
+
+### 11.5 AP fraud
+
+- Material AP-led fraud requires:
+  - Immediate AP termination
+  - Internal investigation report
+  - FIU-IND STR (if money-laundering pattern)
+  - SEBI intimation
+  - Exchange intimation
+  - Client compensation (broker primary liability)
+  - Civil / criminal action against AP
+  - Industry information sharing
+- Industry-typical recovery from AP rarely matches actual client losses
+
+### 11.6 AP-tagged trades requiring complaint resolution
+
+- AP-related complaints route to broker (SCORES / IGRC / ODR)
+- Broker is respondent
+- AP-internal disciplinary action separate from regulator-facing response
+
+### 11.7 AP commissions and TDS
+
+- Commissions subject to TDS under Section 194H
+- AP receives commission net of TDS
+- TDS certificate issued by broker (Form 16A)
+
+### 11.8 Referral by non-AP entity
+
+- Per `NSE/INSP/63425` — any referrer must be registered as AP
+- Per `NSE/INSP/66284` (Jan 2025) — kept in abeyance pending Brokers' ISF representation
+- Operational reality: brokers may have informal referral arrangements; current regulatory state is in flux
+
+## 12. Practical notes
+
+- **[gotcha]** Don't engage AP without completing exchange registration — operating an unregistered AP is a serious violation under NSE / BSE / MCX bye-laws. Penalty is significant and may trigger broker-side enforcement.
+
+- **[industry practice]** Most large brokers (>50k UCC) operate AP networks of 100-1000 APs across India. AP supervision team is a dedicated compliance function at QSBs.
+
+- **[risk trade-off]** Aggressive AP recruitment for distribution speed increases supervisory burden. Mature brokers calibrate AP count to supervisory capacity.
+
+- **[cost optimization]** AP AMC (Rs 5,000 per AP per year per `NSE/COMP/60859`) is one of many AP-related costs. Industry-typical total cost per AP: Rs 25,000-50,000 per year including AMC, supervisory effort, system access, training. Cost per AP should align with AP productivity (commission revenue).
+
+- **[gotcha]** Annual AP audit is not optional. Failure to inspect APs is an exchange inspection finding under `NSE/INSP/57394` / `NSE/INSP/67804` framework.
+
+- **[industry practice]** AP onboarding due diligence typically includes credit check + criminal record check + SEBI / RBI defaulter list check. Mid-size brokers use third-party background-check services for scale.
+
+- **[gotcha]** AP cannot accept funds. Any complaint indicating an AP collected money from client should trigger immediate investigation — this is a serious regulatory breach with potential criminal implications.
+
+- **[gotcha]** AP-tagged trading volume should be tracked at the order level. The order-tagging architecture (in OMS) should preserve AP-source even when modifications happen.
+
+- **[industry practice]** AP training is annual; refresher modules cover regulatory changes, new products, compliance updates. NISM certification renewal cycles align with this.
+
+- **[gotcha]** AP termination must be communicated to clients. Clients have right to choose continuing with broker (most do) or migrating. Migration is not automatic.
+
+- **[industry practice]** Some brokers don't engage APs at all; they distribute through digital channels or direct sales. Both models work; AP model has higher distribution reach in semi-urban / rural India.
+
+- **[gotcha]** AP terminal monitoring must be substantive — login patterns, order patterns, profitability of AP-tagged clients. Boilerplate monitoring fails inspection.
+
+- **[risk trade-off]** AP commissions paid more competitively attract better APs but reduce broker margin. Industry-typical commission: 30-50% of brokerage for AP-tagged trades.
+
+- **[gotcha]** AP cannot operate as a separate brand. AP must use broker's brand for client-facing communications. Independent AP brand is a violation per `NSE/COMP/55716`.
+
+- **[industry practice]** Sub-broker terminology is deprecated. Communications referring to "sub-brokers" instead of "APs" are inappropriate post 2018-2019 transition. Some legacy material may still use it; should be cleaned up.
+
+- **[gotcha]** AP referrals of non-clients (e.g. AP referring potential PMS clients to a partner PMS) is a grey area. Verify the activity is legitimate per AP framework and PMS regulation.
+
+- **[industry practice]** Most brokers maintain an AP register with each AP's registration number, NISM certification status, AMC payment, complaint history, last audit date. This drives operational decisions.
+
+## 13. AP-related operational metrics
+
+Industry-typical KPIs for AP supervision teams:
+
+- **AP utilisation rate** — % of APs actively tagging trades
+- **AP turnover per AP** — average annual turnover per AP
+- **Inactive AP rate** — % of APs flagged inactive
+- **AP complaint rate** — complaints per AP per year
+- **AP inspection completion rate** — % audited within 12 months
+- **AP NISM renewal compliance rate** — % with current NISM certification
+- **AP commission accuracy** — commissions paid match contractual rate
+
+## 14. Adjacent regimes
+
+- **SCORES / IGRC / ODR** — AP-related complaints route to broker; broker handles
+- **AML / PMLA** — AP-onboarded clients have same AML scrutiny; AP transactions reviewed for unusual patterns
+- **Surveillance / Chapter IVA** — AP-tagged trades within surveillance scope
+- **Inspection** — AP supervision is a standard inspection area
+- **System audit** — AP terminal controls reviewed by system auditor
+- **KYC** — AP-onboarded clients still must complete full broker-level KYC; AP cannot complete KYC themselves except for incidental document collection per agreement
+- **Brokers' institutional mechanism (Chapter IVA)** — AP supervision is part of fraud-detection framework
+
+## Cross-references
+
+- [Deep Dive — SCORES Procedure](/broking-kyc/deep-dives/compliance-audit/scores-procedure/)
+- [Deep Dive — IGRC](/broking-kyc/deep-dives/compliance-audit/igrc/)
+- [Deep Dive — ODR](/broking-kyc/deep-dives/compliance-audit/odr/)
+- [Deep Dive — Concurrent Audit](/broking-kyc/deep-dives/compliance-audit/concurrent-audit/)
+- [Deep Dive — System Audit](/broking-kyc/deep-dives/compliance-audit/system-audit/)
+- [Deep Dive — Inspection Types](/broking-kyc/deep-dives/compliance-audit/inspection-types/)
+- [Deep Dive — Surveillance NORMS / GSM / ASM](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/)
+- [Deep Dive — Fit-and-Proper](/broking-kyc/deep-dives/member-compliance/fit-and-proper/)
+- [Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/)
+- [Circulars — NSE](/broking-kyc/reference/circulars/nse/)
+- [Circulars — SEBI MIRSD](/broking-kyc/reference/circulars/sebi-mirsd/)
+- [Circulars — BSE](/broking-kyc/reference/circulars/bse/)
+- [Circulars — MCX](/broking-kyc/reference/circulars/mcx/)
+
+## Verified through
+
+2026-05-14
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for the full disclaimer.*

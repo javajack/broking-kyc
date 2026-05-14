@@ -1,0 +1,556 @@
+---
+title: "Deep Dive: Segment rules comparison"
+description: Side-by-side reference of segment rules across Cash Market, Equity F&O, Currency Derivatives, Interest Rate Derivatives, Commodity Derivatives, and Debt — trading hours, settlement cycle, margin framework, position limits, lot sizes, expiry conventions, retail / NRI eligibility, dispute resolution.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** A segment-rules deep dive is fundamentally a *reference matrix*. The reader looking for "what's the trading hours of currency derivatives?" or "can NRIs trade commodities?" needs an at-a-glance table that aligns rules across segments. The page is therefore organised as: (1) a high-level overview matrix; (2) per-segment detailed sub-section drilling into the eight key dimensions (hours, settlement, margin, position, lot, expiry, retail, NRI, dispute) for each segment; (3) cross-segment topics that don't fit cleanly per-segment (cross-margin, segment add/drop, conversion procedures). Per-segment sections use a consistent eight-row sub-matrix for easy comparison.
+
+## TL;DR
+
+- **Six primary segments** for Indian retail / institutional trading: **Cash Market (CM / equity delivery, intraday, BTST)**, **Equity F&O** (futures and options on indices and single-stocks), **Currency Derivatives (CD)** (USD/INR, EUR/INR, GBP/INR, JPY/INR, cross-currency pairs), **Interest Rate Derivatives (IRD)** (G-Sec futures), **Commodity Derivatives (MCX / NSE / BSE Commodity)** (agri, base metals, bullion, energy), **Debt** (corporate bonds, G-Sec retail, T-Bills, SGB secondary).
+- **Trading hours vary widely**: equity cash and F&O 09:15-15:30 IST (with pre-open / closing extensions); currency derivatives 09:00-17:00 IST; commodities MCX 09:00-23:30 / 23:55 IST (with evening session to align with international markets); debt 10:00-17:00 IST (NDS-OM); GIFT IFSC venues 24x6.
+- **Settlement cycle**: equity cash T+1 default with T+0 beta optional (extended to top 500 scrips per SEBI/HO/MRD/MRD-PoD-2/P/CIR/2024/02 dated Dec 10, 2024); F&O T+1 cash settlement and physical delivery on expiry for stock derivatives; commodities physical delivery (compulsory or option) per contract specification; currency / IRD cash settlement.
+- **Margin framework**: SPAN + ELM in derivatives (computed at CC: NSCCL, ICCL, MCXCCL); VaR-based margin in cash (with peak margin reporting); upfront option premium collection (per SEBI Oct 2024 reforms). Each segment has segment-specific add-ons.
+- **Retail participation**: open in cash, F&O, CD, commodities (with income / suitability proofs for F&O / commodities under broker KYC). IRD limited retail. Debt mostly institutional with retail access via NSE goBID / BSE Direct.
+- **NRI eligibility**: open in cash market (PIS route, delivery-only; non-PIS route with NRO for broader access); **NRIs prohibited from commodities (MCX)**; CD and IRD with specific conditions. See [NRI conversion](/broking-kyc/lifecycle/nri-conversion/) for procedural side.
+- **Dispute resolution**: SEBI's three-tier — Investor Service Centre / IGRC (Investor Grievance Redressal Committee) → Arbitration (exchange-administered) → **Smart ODR** (post Aug 2023) → SAT (appellate) → Supreme Court. SCORES is the parallel SEBI-administered complaint platform.
+
+## Master comparison matrix
+
+| Dimension | Cash Market | Equity F&O | Currency Derivatives | Interest Rate Derivatives | Commodity Derivatives | Debt |
+|---|---|---|---|---|---|---|
+| Primary exchange | NSE, BSE | NSE, BSE | NSE, BSE | NSE | MCX (primary), NSE, BSE | NSE NDS-OM, BSE NDS-OM, retail platforms |
+| Clearing corp | NSCCL, ICCL | NSCCL, ICCL | NSCCL, ICCL | NSCCL | MCXCCL, NCL, ICCL | NSCCL, ICCL |
+| Trading hours (IST) | 09:00-15:40 (incl. pre-open / closing) | 09:15-15:30 | 09:00-17:00 | 09:00-17:00 (varies by contract) | 09:00-23:30/55 (split session) | 10:00-17:00 (NDS-OM); retail platforms per market hours |
+| Settlement cycle | T+1 default; T+0 optional for top 500 | T+1 cash settle; physical delivery on stock expiry | T+2 cash settle | T+2 cash settle | T+1 to T+5+ per contract; physical delivery for many | T+1 / T+2 |
+| Margin framework | VaR-based + Peak margin + UPI block / 3-in-1 for QSB | SPAN + ELM + premium upfront + intraday position-limit monitoring | SPAN + ELM | SPAN + ELM | SPAN + SOMM + commodity-specific Volatility Scan Range | RBI-driven; haircut on G-Sec collateral |
+| Position limits | Per-scrip ceilings; client / member / aggregate; surveillance-triggered | Per-instrument MWPL; client / member / aggregate; intraday monitoring | Per-pair limits; member / participant / client | Per-instrument limits | Per-commodity / category limits | Mostly institutional; retail limits per scheme |
+| Lot size | 1 share (unit) | Min Rs 15 lakh contract notional (post Oct 2024) | Standard pair-specific (USD/INR = 1000 USD) | Standard contract size | Commodity-specific (Gold 1 kg, Silver Micro 1 kg, Crude Oil Mini 10 bbl, Gold Ten 10 g, etc.) | Standard face value Rs 1000 |
+| Expiry conventions | N/A (cash) | Monthly + weekly index; monthly stock; rationalised to one benchmark weekly per exchange | Monthly | Quarterly (mostly) | Monthly + special quarterly contracts; tender period for delivery | N/A (open-ended for most) |
+| Retail eligibility | Open | Open (with income proof) | Open (with income proof) | Limited retail (mostly institutional) | Open (with income proof) | Limited retail (some via direct retail platforms) |
+| NRI eligibility | Yes (PIS or non-PIS) | Non-PIS only (NRO) | Limited (FEMA-compliant) | Limited | **Prohibited** | Limited |
+| Dispute resolution | IGRC → Arbitration → Smart ODR → SAT | Same | Same | Same | Same (MCX has its own IGRC / arbitration framework) | Same |
+
+The detailed per-segment sub-sections follow.
+
+## Segment 1: Cash Market (CM)
+
+### Overview
+
+The equity cash market is the primary segment for retail and institutional equity trading on NSE and BSE. It covers **equity delivery** (T+1 settled with delivery of shares to the buyer's BO), **intraday trading** (positions opened and closed on the same day with no delivery), and **BTST** (Buy Today Sell Tomorrow — buying on Day 1 and selling on Day 2 before payout-day delivery).
+
+### Trading hours
+
+- **Pre-open auction**: 09:00-09:15 IST (see [Pre-open / closing auction](./pre-open-closing-auction/)).
+- **Continuous trading**: 09:15-15:30 IST.
+- **Closing session**: 15:30-15:40 IST (continuous trading with closing-auction call for eligible scrips 15:40-15:50 on NSE).
+- **T+0 session** (for eligible scrips): 09:15-13:30 IST only; no pre-open / closing for T+0.
+- **AMO acceptance**: post-close (16:00) to next-day 08:59 IST.
+
+### Settlement cycle
+
+- **T+1 default**: as of 2026-05-14, T+1 is the default rolling-settlement cycle. NCL/CMPT (FY 2024-25 consolidated, NCL/CMPT/67751 dated 2025-04-29) and ICCL consolidated circulars define the day-by-day T+1 settlement schedule.
+- **T+0 optional**: per SEBI/HO/MRD/MRD-PoD-2/P/CIR/2024/02 dated 2024-12-10 ("Enhancement in the scope of optional T+0 rolling settlement cycle"), T+0 was expanded from 25 scrips to **top 500 scrips by market capitalisation** in a phased manner, with custodian-cleared clients also permitted, extended trading window, and differential brokerage allowed. T+0 scrips identified by "#" suffix.
+- **Settlement reports**: daily pay-in / pay-out files per CC; direct-payout-to-demat regime in force per NCL/CMPT/66779 (Feb 21, 2025), NCL/CMPT/67947 (May 9, 2025), and subsequent NCL/CMPT/69455 (Aug 1, 2025).
+- **Internal-shortage auction**: T+2 auction for shortfall delivery; rules per NCL/CMPT/71045 (Oct 30, 2025) and FAQ NCL/CMPT/71441 (Nov 24, 2025).
+
+### Margin framework
+
+- **VaR-based margin** at the clearing corporation; member-level margin reporting daily.
+- **Peak margin** — intraday peak-margin reporting introduced via SEBI to capture intraday margin compliance.
+- **UPI block / 3-in-1 facility for QSB**: per SEBI circular SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/175 (Dec 17, 2024) — every Qualified Stock Broker must offer either the UPI-block facility (ASBA-like protection in cash segment) or 3-in-1 trading account, effective February 1, 2025.
+- **Margin pledge / repledge framework** at depositories — see CDSL and NSDL circulars.
+
+### Position limits
+
+- Per-scrip ceilings (client-level, member-level, aggregate).
+- Surveillance-triggered restrictions: GSM (Graded Surveillance Measure) Stage I-IV; ASM (Additional Surveillance Measure); ESM (Enhanced — for SMEs); STASM (Short-Term).
+- Concentration limits per exchange master surveillance circular (NSE/SURV/61970 dated 2024-05-02).
+
+### Lot size
+
+- 1 share (unit). Equity scrips trade in single-unit lots.
+- Surveillance-tagged scrips may have minimum-quantity restrictions (e.g., periodic call-auction scrips trade in pre-defined quantities).
+
+### Expiry / contract conventions
+
+- N/A — cash market trades are spot transactions; no expiry.
+
+### Retail eligibility
+
+- Open to all individual retail investors with KYC completion and bank-account linkage.
+- No income proof required for cash equity trading.
+- Aadhaar / PAN / bank-account verification per onboarding KYC.
+
+### NRI eligibility
+
+- **PIS route**: cash market only (delivery-only — intraday not permitted under PIS). NRE / NRO bank linkage. AD-Category-I bank issues PIS letter.
+- **Non-PIS route**: NRO bank account; broader access including intraday in some setups, subject to broker policy.
+- F&O for NRIs is via non-PIS NRO route per broker policy; PIS does not permit F&O.
+- See [NRI conversion](/broking-kyc/lifecycle/nri-conversion/) for procedural side.
+
+### Dispute resolution
+
+- **IGRC** (Investor Grievance Redressal Committee) at exchange — first level.
+- **Arbitration** under exchange bye-laws — second level.
+- **Smart ODR** (post Aug 2023) — online dispute resolution.
+- **SAT** (Securities Appellate Tribunal) — appellate.
+- **SCORES** — SEBI-administered complaint platform; runs in parallel.
+- **IPF** (Investor Protection Fund) — for broker-default claims; see [IPF](./ipf/).
+
+## Segment 2: Equity F&O (Futures and Options)
+
+### Overview
+
+Equity Futures & Options covers **index futures** (Nifty 50, Bank Nifty, Fin Nifty, Sensex, Bankex, etc.), **index options** (on the same indices with weekly and monthly expiries — rationalised to one weekly per exchange per SEBI Oct 2024 reforms), **single-stock futures**, and **single-stock options** (monthly expiry, physical delivery on expiry).
+
+### Trading hours
+
+- **Continuous trading**: 09:15-15:30 IST.
+- No separate pre-open / closing auction for derivatives (derivatives open with cash-market opening).
+- No AMO for F&O.
+
+### Settlement cycle
+
+- **Daily MTM** in cash (variation margin) for futures during the contract life.
+- **Final settlement on expiry**: index futures and options cash-settled to underlying index closing value; stock futures cash-settled or physically settled (post 2018, stock derivatives moved to physical delivery on expiry); stock options expire to physical delivery if ITM.
+- Reference price for settlement: underlying's cash-market closing (call-auction or 30-min VWAP — see [Pre-open / closing auction](./pre-open-closing-auction/)).
+
+### Margin framework
+
+- **SPAN (Standardised Portfolio Analysis of Risk)** + **ELM (Extreme Loss Margin)** as the baseline.
+- **Upfront premium collection** for options — buyers' premium collected upfront, removed leverage on the buyer side, per SEBI/HO/MRD/MRD-PoD-2/P/CIR/2024/137 dated 2024-10-01.
+- **Intraday position-limit monitoring** — same SEBI Oct 2024 circular.
+- **Calendar-spread benefit removed on expiry day** — same SEBI Oct 2024 circular.
+- **Increased tail-risk coverage on expiry day** — same SEBI Oct 2024 circular.
+- **Minimum contract size Rs 15 lakh** for index derivatives — per same SEBI Oct 2024 circular, rationalising lot sizes upward.
+
+### Position limits
+
+- **MWPL** (Market-Wide Position Limit) per scrip / instrument.
+- **Client-level limits** per instrument.
+- **Member / Participant limits** per instrument.
+- **Aggregate FII / DII limits** at the segment level.
+- Monitoring at clearing corp; reported daily.
+
+### Lot size
+
+- Minimum Rs 15 lakh contract notional per SEBI Oct 2024.
+- Tick size: per scrip (typical Rs 0.05 or finer per NSE/CMTR/63594 / NSE/FAOP/67134 tick-size revisions).
+
+### Expiry conventions
+
+- **Index options weekly**: rationalised to one per exchange (per SEBI Oct 2024). NSE: Nifty (or Bank Nifty — per current SEBI calibration). BSE: Sensex (per current SEBI calibration). Other indices retained as monthly only.
+- **Index options monthly**: last Thursday of the month for NSE Nifty; last Tuesday for BSE Sensex (per recent calibration); confirm per current exchange-side circulars.
+- **Index futures**: monthly + roll-over windows.
+- **Stock options / futures**: monthly only; physical delivery on expiry.
+
+### Retail eligibility
+
+- Open with **income proof** (ITR, salary slips, bank statement) per broker's KYC / suitability framework.
+- Trading-preference election at onboarding per **SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/127** (the trading-preferences circular replacing 2011 framework) — new clients are registered on all active exchanges by default after obtaining trading preferences.
+
+### NRI eligibility
+
+- Non-PIS NRO route; PIS does not permit F&O.
+- Specific broker-level eligibility checks; some brokers restrict NRI F&O participation to particular client tiers.
+
+### Dispute resolution
+
+- IGRC → Arbitration → Smart ODR → SAT (same as cash market).
+
+## Segment 3: Currency Derivatives (CD)
+
+### Overview
+
+Currency Derivatives include **INR-pairs futures and options** (USD/INR, EUR/INR, GBP/INR, JPY/INR), and **cross-currency pairs** (EUR/USD, GBP/USD, USD/JPY — these are non-INR pairs settled in INR equivalent). Trading on NSE Currency Derivatives Segment and BSE Currency Derivatives Segment. Clearing at NSCCL and ICCL respectively.
+
+### Trading hours
+
+- **09:00-17:00 IST** for most contracts. Cross-currency pair extended hours may apply.
+- No pre-open / closing call auction.
+
+### Settlement cycle
+
+- **T+2 cash settlement** for both INR-pairs and cross-currency contracts.
+- All currency derivatives are **cash-settled** (no physical delivery of currency).
+
+### Margin framework
+
+- SPAN + ELM at CC.
+- Currency-specific margin parameters reflecting FX volatility.
+- Member-level and client-level margin reporting daily.
+
+### Position limits
+
+- Per-pair limits for member, participant, client.
+- Aggregate limits per scheme per SEBI guidelines.
+- Penalty structure per BSE 20230118-23 (Feb 1, 2023) for ICCL-administered position-limit violations: Equity Derivatives and Currency Derivatives have specific tiers.
+
+### Lot size
+
+- Per-pair standard contract:
+  - USD/INR: 1000 USD per lot.
+  - EUR/INR: 1000 EUR per lot.
+  - GBP/INR: 1000 GBP per lot.
+  - JPY/INR: 100000 JPY per lot.
+  - Cross-currency pairs: similar standardised lot sizes.
+
+### Expiry conventions
+
+- Monthly expiry — last working day or last-but-one working day of the month, per exchange specifications.
+
+### Retail eligibility
+
+- Open with **income proof** per broker KYC.
+- Restricted underlying-exposure documentation may apply where currency derivatives are used for hedging by exporters / importers — per RBI guidance on hedging of foreign-exchange risk.
+
+### NRI eligibility
+
+- Limited; FEMA route considerations apply. PIS does not generally permit currency derivatives speculation.
+
+### Dispute resolution
+
+- IGRC → Arbitration → Smart ODR → SAT (same framework).
+
+## Segment 4: Interest Rate Derivatives (IRD)
+
+### Overview
+
+Interest Rate Derivatives include **G-Sec futures** (futures contracts on Government Securities of various tenures). Trading primarily on NSE. Clearing at NSCCL.
+
+### Trading hours
+
+- 09:00-17:00 IST for IRD trading. Varies by contract.
+
+### Settlement cycle
+
+- T+2 cash settlement.
+
+### Margin framework
+
+- SPAN + ELM at NSCCL.
+- IR-specific margin parameters reflecting bond volatility.
+
+### Position limits
+
+- Per-instrument limits per RBI / SEBI guidelines.
+- Aggregate limits per category (FPI / domestic).
+
+### Lot size
+
+- Standard contract size in face value (e.g., Rs 2 lakh face value per contract for G-Sec futures).
+
+### Expiry conventions
+
+- Quarterly expiry — March, June, September, December cycle.
+
+### Retail eligibility
+
+- Limited retail interest; predominantly institutional (banks, primary dealers, insurance companies, mutual funds).
+
+### NRI eligibility
+
+- Limited; per FEMA framework.
+
+### Dispute resolution
+
+- IGRC → Arbitration → Smart ODR → SAT (same framework).
+
+## Segment 5: Commodity Derivatives (MCX, NSE Commodity, BSE Commodity)
+
+### Overview
+
+Commodity Derivatives covers four broad categories on **MCX** (the primary commodity-derivatives exchange in India) and to a lesser extent on NSE Commodity and BSE Commodity:
+
+- **Bullion**: Gold (1 kg, compulsory delivery from December 2023 — per Gold contract specs), Gold Mini (100 g — per MCX/MEM/707/2022 baseline), Gold Micro, Gold Petal, **Gold Ten (10 g — launched per MCX/TRD/134/2025 dated 2025-03-18 with delivery and settlement procedure per MCX/MCXCCL/148/2025 dated 2025-03-25**), Silver (variants).
+- **Base Metals**: Aluminium, Copper, Lead, Zinc, Nickel — compulsory delivery on expiry; staggered tender period typically 3-5 working days per **SEBI/HO/MRD/MRD-PoD-1/P/CIR/2024/57** dated 2024-05 (reducing from 5 to 3 days).
+- **Energy**: Crude Oil (cash-settled), Crude Oil Mini (10 barrels — per **MCX/RIS/146/2023** dated 2023-02-17), Natural Gas.
+- **Agri**: Spices, oilseeds, pulses, grains (where SEBI-approved — list periodically refreshed per SEBI commodity derivatives master circular SEBI/HO/MRD/MRD-PoD-1/P/CIR/2024/172 dated 2024-12-03).
+
+### Trading hours
+
+- **Morning session**: 09:00-17:00 IST.
+- **Evening session**: 17:00-23:30 IST (winter) / 17:00-23:55 IST (summer — when international commodity markets are open later).
+- Evening session aligned to international commodity reference (London / NYMEX / COMEX) for international-priced commodities (bullion, base metals, energy).
+
+### Settlement cycle
+
+- **Daily MTM** during contract life.
+- **Final settlement on expiry**:
+  - **Compulsory-delivery contracts** (Gold 1kg, Silver, Gold Ten — per MCX/MCXCCL/148/2025, base metals): physical delivery via MCXCCL Accredited Warehouses (MAW).
+  - **Cash-settled contracts** (Crude Oil, Natural Gas, Gold Mini in some variants): cash settlement to Due Date Rate.
+- **Tender period / delivery period**: 3-5 working days before expiry depending on contract; staggered tender intentions submitted via MCXCCL eClear.
+- **Delivery-period margin**: higher of 3% + 5-day 99% VaR of spot price volatility, or 25% — per MCX/MCXCCL/148/2025 for Gold Ten.
+
+### Margin framework
+
+- **SPAN methodology** with VaR over MPOR (Margin Period of Risk) per **MCXCCL/RISK/045/2025** dated 2025-03-05 / superseding circulars.
+- **SOMM** (Self-Originated Member Margin) — segment-specific add-on per MCX framework.
+- **MSBA** (Margin Shortfall Block Amount).
+- **Volatility Scan Range (VSR)** — commodity-category-specific parameters per **MCXCCL/RISK/187/2025** dated 2025-09-05 (Copper VSR 5, Crude Oil 33, Gold 4, Natural Gas 6, Silver 6, Zinc 6 — illustrative). Three categories of commodities based on realised volatility.
+- **Agri-commodity additional lean-period margin**: 2% on contracts expiring during lean period (lead Exchange website lists).
+- **Staggered tender-period margin**: 5% additional on outstanding positions over IM / special / additional, during the tender period.
+
+### Position limits
+
+- Per-commodity ceilings (member-level, client-level).
+- Penalty structure for position-limit violation in equity derivative and currency derivative segment (BSE 20230118-23 dated 2023-01-18, in-force date 2023-02-01) issued by ICCL — parallel to MCXCCL frameworks for commodity-derivative position limits.
+
+### Lot size
+
+- Contract-specific:
+  - Gold (1 kg) — 1 kg per lot.
+  - Gold Mini — 100 g per lot.
+  - Gold Ten — 10 g per lot.
+  - Silver (variants) — varies (5 kg / 1 kg / 250 g).
+  - Crude Oil — 100 bbl per lot.
+  - Crude Oil Mini — 10 bbl per lot.
+  - Natural Gas — contract-specific.
+  - Base Metals — kilogram-specific per metal.
+  - Agri — quintal / metric ton-specific per commodity.
+
+### Expiry conventions
+
+- **Monthly expiry** for most contracts (5th of the month or last working day of the month per contract spec).
+- **Quarterly special contracts** for some commodities.
+- **Tender period** starts before expiry; staggered-tender-period intentions submitted during this window.
+
+### Retail eligibility
+
+- Open with **income proof** per broker KYC.
+- Source-of-funds review for large commodity positions.
+
+### NRI eligibility
+
+- **Prohibited**. NRI clients cannot trade commodity derivatives on MCX per FEMA / SEBI framework. Existing NRI positions must be closed before NRI conversion. See [NRI conversion](/broking-kyc/lifecycle/nri-conversion/).
+
+### Dispute resolution
+
+- **MCX IGRC** — MCX's own Investor Grievance Redressal Committee.
+- Arbitration under MCX bye-laws.
+- Smart ODR.
+- SAT → Supreme Court.
+- **MCX IPF**: per MCX Master Circular — Investor Protection Fund / Investor Service Fund and corrigendum MCX/IPF/109/2026 dated 2026-03-05; per-investor cap typically Rs 10 lakh. See [IPF](./ipf/).
+- **MCX Default Master Circular**: MCX/ISD Master Circular (Default) Version 3 dated 2025-04-29 — defaulter handling and client claims.
+
+## Segment 6: Debt
+
+### Overview
+
+Debt segment includes:
+- **NDS-OM** (Negotiated Dealing System — Order Matching) for G-Sec / T-Bills / SDLs — primarily institutional.
+- **Corporate bond trading** on NSE / BSE platforms — primarily institutional via RFQ.
+- **Retail debt platforms**: NSE goBID, BSE Direct — retail-friendly G-Sec auctions.
+- **Sovereign Gold Bonds (SGB)** secondary market trading on NSE / BSE cash segment alongside equity trading.
+
+### Trading hours
+
+- **NDS-OM**: 10:00-17:00 IST for G-Sec.
+- **NSE goBID / BSE Direct**: aligned to auction-cycle timings published by RBI.
+- **SGB secondary trading**: 09:15-15:30 IST (alongside equity cash session).
+
+### Settlement cycle
+
+- **NDS-OM G-Sec**: T+1 settlement via CCIL.
+- **Corporate bond**: T+1 / T+2 per exchange specification.
+- **SGB secondary**: T+1 alongside equity cash.
+
+### Margin framework
+
+- For NDS-OM trades: RBI-driven margin via CCIL.
+- For exchange-traded debt: standard exchange margin framework.
+- G-Sec / T-Bills / SGBs are widely **accepted as approved collateral** for margin purposes in other segments (per approved-collateral circulars, e.g., MCX/MCXCCL/094/2026 dated 2026-02-26 and successor lists for MCX commodities; equivalent NCL and ICCL approved-collateral circulars). Margin benefit is withdrawn two days prior to maturity per the standard collateral framework. RBI-issued SGB / T-Bill all accepted.
+
+### Position limits
+
+- Per-scheme / per-instrument limits per RBI / SEBI guidelines.
+- FPI sub-limits in G-Sec / corporate bond per RBI framework.
+
+### Lot size
+
+- Standard face value Rs 1000 / Rs 10000 per bond depending on issue.
+- Round-lot conventions per platform.
+
+### Expiry conventions
+
+- N/A — bonds have maturity dates but not expiry in the derivatives sense. Tenor varies.
+
+### Retail eligibility
+
+- Limited direct retail access via dedicated retail platforms (NSE goBID, BSE Direct).
+- SGB secondary trading is open to retail through standard cash market accounts.
+
+### NRI eligibility
+
+- Limited; per FEMA / RBI route.
+
+### Dispute resolution
+
+- IGRC → Arbitration → Smart ODR → SAT (same framework where exchange-traded).
+- NDS-OM has separate CCIL-administered grievance route.
+
+## Cross-segment topics
+
+### Cross-margin benefits
+
+- Some cross-margin benefits exist within a CC (e.g., index futures vs underlying stocks at NSCCL) per the SPAN methodology recognising offsetting positions.
+- Cross-margining *across CCs* is not standard; would require bilateral inter-CC agreements.
+- Calendar-spread benefit on expiry day in equity index derivatives was **removed** per SEBI/HO/MRD/MRD-PoD-2/P/CIR/2024/137 dated 2024-10-01.
+
+### Segment add / drop modifications
+
+- Clients add or drop segments via the segment modification procedure — see [Modifications: segment add/drop](/broking-kyc/lifecycle/modifications/).
+- Income proof required for F&O, CD, IRD, commodities.
+- NRI segment restrictions are applied automatically at conversion — see [NRI conversion](/broking-kyc/lifecycle/nri-conversion/).
+- Trading preferences framework per SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/127 — new clients registered on all active exchanges by default after obtaining trading preferences; existing clients get all-active-exchange access after 3-month negative-consent window.
+
+### Tax treatment differences
+
+- **Equity delivery** (CM): held >12 months → LTCG @ 12.5% on gains above Rs 1.25 lakh; held <12 months → STCG @ 20%. STT applicable on each side.
+- **Equity intraday** (CM): treated as speculative business income; taxed at slab rate.
+- **F&O** (Equity, CD, IRD): treated as business income (non-speculative); taxed at slab rate.
+- **Commodities**: treated as business income (non-speculative); slab rate. CTT (Commodity Transaction Tax) applicable.
+- **NRI**: TDS at source on capital gains and dividends — see [NRI conversion](/broking-kyc/lifecycle/nri-conversion/).
+- **STT, CTT, GST, exchange charges, SEBI turnover fee, stamp duty** — all segment-specific; published in broker's tariff schedule.
+
+### Segment registration at exchange
+
+- Each segment requires a separate exchange UCC registration — see [Exchange registration](/broking-kyc/operations/exchange-registration/).
+- Member-level membership required; trading-cum-self-clearing or trading-member-only categories.
+- Segment-specific capital requirements (BMC / ABC) — see [BMC / ABC](/broking-kyc/deep-dives/member-compliance/bmc-abc/).
+
+<Aside type="tip">
+**Segment activation isn't all-at-once.** A client opening with a broker may activate Cash + F&O on Day 1 (with income proof) and add CD / commodities later as their trading evolves. Each addition is a modification (Section S of the master dataset) and triggers a fresh segment-eligibility check at the broker plus a UCC update at the relevant exchange. See [Modifications — segment add / drop](/broking-kyc/lifecycle/modifications/).
+</Aside>
+
+### Common compliance touchpoints across segments
+
+- **Margin pledge / repledge framework** — applies across CM and F&O for client securities pledged as collateral.
+- **Client funds upstreaming** — applies across all segments; client funds segregated at broker and upstreamed to CC daily. See [Client funds upstreaming](/broking-kyc/deep-dives/settlement/client-funds-upstreaming/).
+- **Peak margin reporting** — applies across CM and derivatives.
+- **Investor charter** — published per segment by exchanges and SEBI.
+- **Risk disclosure document** — segment-specific; client signs at segment activation.
+
+### Surveillance across segments
+
+- **NORMS / GSM / ASM / ESM / STASM** — applies to cash market predominantly; derivatives have their own surveillance frameworks.
+- **Spoofing detection** — applies to CM and Equity Derivatives per **NSE/SURV** May 2019 ASM circular.
+- **MWPL / position-limit monitoring** — applies to derivatives.
+- **Pump-and-dump** — primarily CM (penny stocks, SME).
+- **Marking-the-close** — CM with derivative-expiry correlation.
+- See [Market manipulation typologies](./market-manipulation-typologies/).
+
+### Outage SOP across segments
+
+- **Equity / F&O outage SOP**: SEBI Master Circular for Stock Exchanges and Clearing Corporations covers exchange-outage SOP.
+- **Commodity outage SOP**: per **SEBI/HO/MRD/MRD-PoD-1/P/CIR/2024/57** dated 2024-05 — Standard Operating Procedure for handling of Stock Exchange outage and extension of trading hours in Commodity Derivatives segment.
+
+## Sub-cases and edge cases
+
+### IPO listing day in cash market
+
+- Special pre-open call-auction with extended duration per NSE/CMTR/63594.
+- Transparency disclosure of indicative price / quantity.
+- See [Pre-open / closing auction](./pre-open-closing-auction/).
+
+### T+0 settlement series in cash market
+
+- Top 500 scrips eligible per expanded SEBI framework.
+- "#" suffix.
+- 09:15-13:30 trading window; no pre-open / closing.
+- See [T+0 / T+1 settlement nuances](/broking-kyc/deep-dives/settlement/t0-t1-settlement/).
+
+### Expiry-day mechanics in equity F&O
+
+- Settlement reference: underlying cash-market closing.
+- Tail-risk margin increase on expiry day per SEBI Oct 2024.
+- Calendar-spread benefit removed.
+- Marking-the-close surveillance intensified.
+
+### Compulsory-delivery vs cash-settled commodities
+
+- **Compulsory delivery**: Gold 1 kg, Gold Ten 10 g, Silver, all base metals, agri-commodities — physical delivery via MAW.
+- **Cash-settled**: Crude Oil, Natural Gas (specific variants), some indices.
+- Tender intentions submitted during staggered tender period per MCX/MCXCCL/148/2025-type circulars.
+
+### G-Sec collateral in non-debt segments
+
+- G-Sec / T-Bills / SGBs are approved collateral in CM, F&O, CD, IRD, commodities per approved-collateral circulars.
+- Margin benefit withdrawn 2 days prior to maturity.
+- VaR-rate haircut applied.
+
+### Member registered across multiple exchanges
+
+- Same broker as a member at NSE + BSE + MCX + others requires separate UCC at each exchange, separate BMC / ABC, separate IPF claim windows (per defaulting-broker default).
+- Cross-MII intimation framework for defaults / suspensions.
+- See [Exchange registration](/broking-kyc/operations/exchange-registration/) and [Member default recovery](./member-default-recovery/).
+
+### NRI segment access table
+
+| Segment | NRI access (PIS) | NRI access (Non-PIS NRO) |
+|---|---|---|
+| Cash Market — delivery | Yes | Yes |
+| Cash Market — intraday | No | Yes (broker-permissive) |
+| Equity F&O | No | Yes (broker-permissive) |
+| Currency Derivatives | Limited | Limited |
+| Interest Rate Derivatives | Limited | Limited |
+| Commodity Derivatives (MCX) | **No** | **No** |
+| Debt (retail) | Limited | Limited |
+
+### Mutual Fund segment
+
+- BSE StAR MF and NSE NMF II — distinct from the above six trading segments. Different settlement and operational framework; covered in [Mutual Fund platforms](/broking-kyc/deep-dives/specialty/mutual-fund-platforms/) deep-dive.
+
+### Tri-Party Repo (TREPS)
+
+- Separate segment at the CC (NSCCL, ICCL) for G-Sec triparty repo. Primarily institutional; out of scope for retail trading discussion here.
+
+### GIFT IFSC venues
+
+- NSE IFSC, India INX (BSE IFSC) operate in GIFT City IFSC with a separate regulatory framework under IFSCA.
+- 24x6 trading.
+- Out of scope for this page; covered briefly in [Compliance Blueprint — Member compliance section](/broking-kyc/operations/compliance-blueprint/).
+
+<Aside type="caution">
+**Rules change frequently.** This comparison reflects rules in force as of 2026-05-14 verified against circulars cited in the project's circular index. SEBI / exchange / CC updates occur monthly; always reconfirm specific provisions against the current master circular before acting on the information here.
+</Aside>
+
+## Practical notes
+
+- **[industry practice]** Most full-service brokers offer all six segments at onboarding; discount brokers may offer fewer (e.g., CM + F&O only) and require segment-specific activation. The trading-preferences framework per SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/127 has shifted the default toward all-active-exchange registration — broker UI must capture preferences explicitly.
+- **[gotcha]** New ops engineers often assume a single segment = single regulator. In fact, every segment has multi-layer regulation: SEBI (broker / exchange), the relevant CC (clearing / margin), the exchange (trading rules / surveillance), and where applicable RBI (currency / IRD / SGB) or FMC (legacy commodities, pre-merger with SEBI). Tracking circulars per segment requires monitoring all these issuers.
+- **[risk trade-off]** Offering more segments at onboarding is a customer-experience win but introduces segment-specific risk-of-loss disclosures, suitability assessments, and ongoing compliance touchpoints. Tighter brokers segment-gate by net-worth / income / experience; looser brokers offer broad access subject to capital adequacy.
+- **[cost optimization]** Segment-specific margin and approved-collateral circulars (MCX/MCXCCL/094/2026, NCL approved-collateral revisions) refresh quarterly; broker treasury can optimise collateral mix by re-running the approved-list against the broker's collateral inventory each quarter to maximise margin efficiency.
+- **[regulatory direction]** The SEBI Oct 2024 framework for equity-index-derivatives (SEBI/HO/MRD/MRD-PoD-2/P/CIR/2024/137) signals continued tightening of derivatives surveillance and structural risk-management; expect comparable calibrations in commodity and currency derivatives over coming cycles.
+
+## Cross-references
+
+- [Deep Dive: Pre-open / closing auction](./pre-open-closing-auction/) — equity cash session structure.
+- [Deep Dive: Market manipulation typologies](./market-manipulation-typologies/) — surveillance across segments.
+- [Deep Dive: SGF / Core SGF framework](./sgf-core-sgf/) — segment-specific SGFs.
+- [Deep Dive: IPF](./ipf/) — exchange IPFs (NSE, BSE, MCX) and per-investor caps.
+- [Deep Dive: Member default recovery](./member-default-recovery/) — default propagation across segments.
+- [Deep Dive: T+0 / T+1 settlement nuances](/broking-kyc/deep-dives/settlement/t0-t1-settlement/) — settlement cycle details.
+- [Deep Dive: RMS / SPAN methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/) — margin computation across segments.
+- [Deep Dive: BMC / ABC](/broking-kyc/deep-dives/member-compliance/bmc-abc/) — member capital across segments.
+- [Lifecycle: NRI conversion](/broking-kyc/lifecycle/nri-conversion/) — NRI segment restrictions.
+- [Lifecycle: Modifications](/broking-kyc/lifecycle/modifications/) — segment add / drop procedure.
+- [Operations: Exchange registration](/broking-kyc/operations/exchange-registration/) — UCC registration per segment.
+- [Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/) — segment-specific compliance domains.
+- [Circulars — SEBI Other](/broking-kyc/reference/circulars/sebi-other/) — segment master circulars and the Oct 2024 equity-index-derivatives framework.
+- [Circulars — SEBI MIRSD](/broking-kyc/reference/circulars/sebi-mirsd/) — trading preferences and broker-side segment registration framework.
+- [Circulars — NSE](/broking-kyc/reference/circulars/nse/) and [BSE](/broking-kyc/reference/circulars/bse/) — exchange-specific segment circulars.
+- [Circulars — MCX](/broking-kyc/reference/circulars/mcx/) — commodity-specific contract specifications and tender procedures.
+- [Circulars — Clearing Corporations](/broking-kyc/reference/circulars/clearing-corps/) — NSCCL / ICCL / MCXCCL margin and settlement.
+- [Circulars — RBI](/broking-kyc/reference/circulars/rbi/) — debt / G-Sec / NDS-OM framework.
+
+## Verified through
+
+2026-05-14
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

@@ -1,0 +1,428 @@
+---
+title: "Deep Dive: Concurrent Audit"
+description: Walkthrough and reference for the concurrent audit of stock-broker funds, securities, margin compliance, and DP operations — scope, frequency, auditor empanelment, observation cycle, common findings, sample-size norms, and remediation procedure.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Concurrent audit is the broker's "always-on" audit — a continuous mirror of operations by an external auditor with reporting cycles measured in days or weeks, not annual. The page first scopes what's covered, then walks the cycle: empanelment → observation → reporting → remediation. Treats DP-side concurrent audit (mandatory for DPs) as a parallel track.
+
+## TL;DR
+
+- Concurrent audit is the **continuous-mirror audit** of broker client-funds, securities-handling, margin-compliance, and account-opening operations conducted by an independent auditor. The auditor reviews near-real-time samples and reports observations on a weekly / fortnightly cycle.
+- Master framework: **SEBI Master Circular for Stock Brokers** `SEBI/HO/MIRSD/POD-1/P/CIR/2025/94` (current; supersedes `2024/118`, `2024/37`, and `2023/71`); chapter on "Books, accounts, audit, and inspection" and "Client funds and securities handling".
+- DP-side concurrent audit is mandated under **CDSL** and **NSDL** bye-laws; cycle is monthly, audit scope covers account opening, BO modifications, delivery instructions, transmissions, and reconciliation. Linked to the Master Circular for RTAs / DPs (`SEBI/HO/MIRSD/POD-1/P/CIR/2024/81` June 2024).
+- Concurrent auditor must be a **practising Chartered Accountant** (or CA firm), with prescribed independence — typically not the same auditor as the statutory audit; rotation rules apply.
+- Observation cycle: typically **monthly closing-cycle for DPs**, **fortnightly for client-funds review at brokers**. Each observation is logged, classified by severity (high / medium / low), and tracked to remediation closure.
+- Common observation categories include: client-fund segregation breaches, margin-collection gaps, KYC defects, BO modification audit-trail gaps, settlement aberrations.
+- Sample-size norms: typically **10–20% of weekly-volume account-opening cases**, **all high-value pay-ins / pay-outs**, **100% of dormant-reactivation cases**, **sampled BO modifications**.
+
+## Conceptual overview
+
+Stock brokers and DPs hold investor funds and securities continuously. Errors and irregularities here have direct, large monetary consequences for clients. Annual statutory audit catches problems retrospectively; system audit catches infrastructure issues; **concurrent audit catches operational defects close to occurrence**.
+
+The framework dates back to the SEBI Master Circular for Stock Brokers (which has been progressively updated). The current master `SEBI/HO/MIRSD/POD-1/P/CIR/2025/94` (in force as the regulatory state at the time of writing — verify on SEBI's master-circular page) consolidates client-funds-handling, securities-handling, segregation requirements, daily upstreaming (`SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/187`), direct payout (`SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2024/75`), and brokers' institutional mechanism (`SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/96`). All of these are concurrent-audit-relevant.
+
+DP-side concurrent audit is older and more codified — CDSL communiques (e.g. `CDSL/OPS/DP/POLCY/...` chain) and NSDL policy circulars (`NSDL/POLICY/...` chain) prescribe DP concurrent audit scope, frequency, and reporting.
+
+<Aside type="caution">
+**Concurrent audit ≠ system audit ≠ statutory audit ≠ internal audit.** All four exist concurrently and are distinct. Statutory audit (CA / firm under Companies Act) covers financial reporting. Internal audit (half-yearly per NSE/INSP/54080) covers operations. System audit (per CSCRF `SEBI/HO/ITD-1/ITD_CSC_EXT/P/CIR/2024/113` and ancillary circulars) covers IT systems. Concurrent audit covers operations on a near-real-time basis. See [System Audit deep dive](/broking-kyc/deep-dives/compliance-audit/system-audit/).
+</Aside>
+
+## 1. Scope of concurrent audit
+
+### 1.1 Broker-side (TM/CM)
+
+**Client funds handling** (Master Circular Chapter):
+
+- Daily upstreaming compliance (`SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/187` — daily 100% upstreaming, USCNBA / DSCNBA structure)
+- Running-account settlement compliance (per `SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2025/1` for 30-day-no-trade settlement and `SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2023/197` for quarterly/monthly cycle)
+- Client-bank-account designation as "Client" account (TDS, segregation)
+- Suspense / unidentified credit handling (per NSE/INSP/64053 "SUSPE1234N" UCC mechanism)
+- Pay-in / pay-out reconciliation
+
+**Securities handling**:
+
+- Direct payout to demat (effective 14 Oct 2024 per `SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2024/75`)
+- Client-securities pledge / re-pledge audit
+- Margin-pledge audit trail
+- Holding-statement reconciliation (CC vs broker vs DP vs UCC)
+
+**Margin compliance**:
+
+- Upfront margin collection (`SEBI/HO/MRD2/DCAP/CIR/P/2020/127` + `NSE/INSP/64315`)
+- Peak-margin reporting (4 random intraday snapshots)
+- Margin pass-through (penalties not passed to clients except per `NSE/INSP/64315` carve-outs)
+- MTF margin maintenance
+- F&O / CD / commodity segment margins
+
+**Account opening / KYC**:
+
+- KRA / CKYC compliance per `SEBI/HO/MIRSD/SECFATF/P/CIR/2023/169`
+- Six-attribute completeness
+- IPV / VIPV completeness
+- FATCA / CRS self-cert per `SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12`
+- KYC modification audit trail
+
+**Other**:
+
+- Surveillance Obligation Report submission (per Chapter IVA, `SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/96`)
+- AP supervision (per NSE/COMP chain `48536` → `63628`)
+- Dormancy / inactive-account handling (NSE/INSP/43488 / 46506 / 49743)
+- Beneficial-owner tracking (per AML Master `SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78`)
+- ATR submission on SCORES (per `SEBI/HO/OIAE/IGRD/CIR/P/2023/156`)
+
+### 1.2 DP-side concurrent audit
+
+**Account opening**:
+
+- BO master creation audit trail
+- KRA-CKYC dual-fetch / dual-upload
+- BO master fields completeness
+- Nominee capture per `SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/04`, `2025/15`
+
+**BO operations**:
+
+- Delivery instruction processing (physical / electronic)
+- Off-market transfer review (per `SEBI/HO/MRD/POD-3/P/CIR/2024/172` and depository policies)
+- Pledge / unpledge processing
+- BO modification audit trail (Aadhaar masking per `CDSL/OPS/DP/POLCY/2024/580`)
+- Closure procedures
+- Transmission processing per `SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/04`
+
+**Reconciliation**:
+
+- Daily reconciliation between depository, RTA, broker, and client records
+- Settlement-pay-out direct-to-demat reconciliation
+- BO-level holdings vs UCC vs broker back-office
+
+## 2. Frequency / cadence
+
+### 2.1 Broker concurrent audit
+
+- **Continuous** scope — auditor reviews operations regularly
+- **Periodic reporting** — typically **fortnightly** or **monthly** observation reports
+- **Quarterly summary** to broker compliance + Audit Committee (where applicable for QSBs / corporate brokers)
+- **Annual summary** consolidated into the Annual Compliance Report
+- **Half-yearly internal audit** of trading members per NSE/INSP/54080 (independent CA / CS / CMA in practice); separate but adjacent to concurrent audit
+
+### 2.2 DP concurrent audit
+
+- **Monthly** observation cycle per CDSL / NSDL communique chain
+- **Monthly report** submitted to compliance + DP-supervisory committee
+- **Annual concurrent audit certificate** filed with the depository
+
+The DP-side cadence is more codified in CDSL / NSDL bye-laws and operating circulars.
+
+### 2.3 Reporting timelines
+
+- Observation logged within typically **3 working days** of identification (industry-typical at large brokers; some prescribe 1 working day for high-severity)
+- Compliance Officer notified within same cycle
+- Remediation start within 5 working days of observation
+- Closure within 30 working days (for medium severity); 15 working days (for high severity)
+
+## 3. Auditor empanelment
+
+### 3.1 Eligibility criteria
+
+- **Practising Chartered Accountant** with valid Certificate of Practice
+- **Firm-level empanelment** preferred; sole-proprietorship CA also possible for smaller brokers
+- **Experience** — typically 5+ years post-qualification with audit experience in securities / banking / financial services
+- **Independence** — must not be the broker's statutory auditor; cooling-off period applies post statutory audit rotation
+- **Conflict-of-interest declaration** — annual declaration of no financial / family / business relationship with broker
+
+### 3.2 DP-specific empanelment
+
+DPs additionally require:
+
+- **NISM Series-VI DOCE certification** (Depository Operations Certification Examination) for the concurrent auditor or the lead engagement partner — under CDSL / NSDL bye-laws
+- Depository's empanelled-auditor list inclusion (some DPs maintain their own empanelled auditor lists)
+
+### 3.3 Rotation rules
+
+- Audit firm rotation typically **3 years**; cooling-off **2 years** before re-engagement
+- Engagement partner rotation typically annually within the firm (similar to statutory audit firm rotation under SEBI LODR and Companies Act 2013 governance norms)
+
+<Aside type="tip">
+**Don't conflate concurrent audit independence rules with statutory audit independence rules.** Statutory audit rotation (under Companies Act 139) and concurrent audit rotation (under SEBI Master Circular and exchange bye-laws) operate independently. A firm rotating off statutory audit can sometimes be engaged for concurrent audit only after cooling-off — verify with the exchange / depository before engagement.
+</Aside>
+
+### 3.4 Auditor change procedure
+
+- Broker board approves auditor change
+- Outgoing auditor's NOC obtained
+- Incoming auditor's appointment letter with scope and tenure
+- Intimation to exchange / depository
+- Compliance officer files change-of-auditor notice on ENIT-NEW-COMPLIANCE (NSE) and equivalent on BSE / MCX
+
+## 4. Observation cycle
+
+### 4.1 Sample selection
+
+Concurrent auditor samples operations based on risk:
+
+- **Risk-based** — high-volume days, high-value transactions, segments with prior observations
+- **Random** — random sample to detect systemic issues
+- **Threshold-based** — all transactions above value threshold (e.g. all pay-ins > Rs 25 lakh)
+- **Census** — 100% review for select high-risk categories (e.g. dormancy reactivation, suspense-account credits)
+
+### 4.2 Sample-size norms (industry-typical)
+
+| Category | Sample |
+| --- | --- |
+| New account openings | 10–20% of weekly volume; 100% for non-individual / NRI / minor / non-resident |
+| Pay-ins (single transaction) | All > Rs 25 lakh; 10% random of < Rs 25 lakh |
+| Pay-outs (single transaction) | All > Rs 10 lakh; 5% random of < Rs 10 lakh |
+| Dormancy reactivation | 100% |
+| BO modifications | 10–20% random; 100% for material modifications (PAN change, name change, bank-account change) |
+| Off-market transfers | 100% above Rs 5 lakh; 10% random of < Rs 5 lakh |
+| Margin shortfalls | 100% of penalty-triggering shortfalls |
+| KRA / CKYC failures | 100% |
+| KYC modification audit trail | 5–10% random |
+| Surveillance alerts (Chapter IVA) | 100% high-severity alerts |
+| AP-supervision findings | 100% AP-related complaints; 10% random AP-terminals |
+
+These are not codified by SEBI as fixed; the Master Circular requires "adequate sampling to provide meaningful assurance" — auditor judgment + industry practice fills in.
+
+### 4.3 Observation logging
+
+Each observation captured with:
+
+- **Observation ID** (sequential)
+- **Date**
+- **Category** (e.g. client-funds, margin, KYC, BO-ops)
+- **Severity** (High / Medium / Low; sometimes a 4th tier — Informational / Process-improvement)
+- **Description** with specifics — UCC, transaction reference, amount
+- **Root cause** (where identifiable)
+- **Regulatory citation** (specific clause of Master Circular or other circular)
+- **Recommendation**
+- **Status** (Open / In remediation / Closed)
+
+### 4.4 Severity classification
+
+- **High** — direct regulatory breach with monetary impact, client harm, or attribute of fraud (e.g. client-funds misuse, margin pass-through to client)
+- **Medium** — process gap with regulatory exposure but limited monetary / client impact (e.g. audit-trail gap, KYC defect with manageable remediation)
+- **Low** — process improvement opportunity (e.g. documentation hygiene)
+
+### 4.5 Compliance Officer review
+
+- Compliance Officer reviews observations within 5 working days
+- Categorises follow-up action (immediate remediation / process change / training / governance escalation)
+- Updates the observation tracker
+
+## 5. Remediation procedure
+
+### 5.1 Per-observation workflow
+
+1. **Acknowledgement** — Compliance Officer acknowledges within 5 working days
+2. **Root cause analysis** — Identify whether single-event or systemic; assign owner
+3. **Remediation plan** — Define what will be done by when, who owns, what evidence will close the observation
+4. **Execution** — Operational team executes (e.g. update procedure, train staff, refund client, escalate to senior management)
+5. **Evidence capture** — Documentary evidence (system screenshot, ledger correction, communication to client)
+6. **Verification** — Concurrent auditor re-checks at next observation cycle
+7. **Closure** — Observation closed once auditor satisfied
+
+### 5.2 Remediation timelines
+
+- **High severity** — typically 15 working days to closure
+- **Medium severity** — typically 30 working days to closure
+- **Low severity** — typically 60 working days to closure
+- **Recurring observations** — escalation to Designated Director and Audit Committee
+
+### 5.3 Escalation on non-remediation
+
+- **First missed deadline** — Compliance Officer escalates internally
+- **Second missed deadline** — escalation to Designated Director / CEO
+- **Third missed deadline** — Audit Committee review; reported in Annual Compliance Report
+- **Repeat pattern across observations** — SEBI / exchange inspection finding; potential penalty
+
+## 6. Common observation categories
+
+From inspection consolidated circulars (`NSE/INSP/57394` / `NSE/INSP/67804`) and industry practice:
+
+### 6.1 Client-funds / segregation
+
+- Client-funds remained at broker overnight (upstreaming failure)
+- Unidentified credits not parked in suspense-UCC
+- Client-bank-account incorrectly designated
+- Mixing of own funds with client funds
+- Running-account settlement delays
+
+### 6.2 Margin
+
+- Upfront margin not collected from client
+- Peak-margin penalty passed to client without `NSE/INSP/64315` carve-out
+- Margin reporting file errors
+- F&O / CD margin not collected before order
+- MTF margin not maintained
+
+### 6.3 Securities-handling
+
+- Direct-payout-to-demat exceptions not properly flagged
+- Client-securities used as collateral without proper authorisation
+- Off-market transfer to unrelated demat (without safeguards per `SEBI/HO/MRD/POD-3/P/CIR/2024/172`)
+
+### 6.4 KYC / onboarding
+
+- Six-attribute KYC incomplete at activation
+- KRA validation pending past 30 days
+- CKYC upload missed (post 1 Aug 2024 dual-upload mandate)
+- IPV / VIPV documentation gap
+- FATCA self-cert missing
+
+### 6.5 BO / DP operations
+
+- BO modification without proper authentication
+- Nominee data inconsistencies
+- AMC slab calculation error (BSDA threshold breach)
+- Aadhaar masking failure (post `CDSL/OPS/DP/POLCY/2024/580`)
+- Dormancy flag not applied
+
+### 6.6 Reporting
+
+- Monthly grievance MIS submission delayed
+- Holding-statement / bank-balance API submission missing days
+- Annual Compliance Report delays
+- Surveillance Obligation Report missing fields
+
+### 6.7 Governance / Chapter IVA institutional mechanism
+
+- Fraud-detection policy gaps
+- Whistleblower mechanism not operational
+- Surveillance dashboard alerts not investigated
+
+<Aside type="note">
+**The observation frequency is not the same as failure rate.** A broker may have 50 observations per quarter but if all are quickly remediated, the broker's compliance score is healthy. What hurts is recurring observations (same gap repeating across cycles) — signals systemic weakness. Auditor reports must distinguish single-occurrence from recurring; Compliance Officer's response to recurring matters is the inspection focus.
+</Aside>
+
+## 7. Reporting and certificate
+
+### 7.1 Periodic reports
+
+- **Per-cycle observation report** — fortnightly / monthly; circulated to Compliance Officer, Designated Director, Audit Committee (where applicable)
+- **Quarterly summary** — categorised observations, severity distribution, remediation status
+- **Annual report** — feeds into Annual Compliance Report and statutory audit interaction
+
+### 7.2 Concurrent audit certificate
+
+- **DP-side** — annual concurrent audit certificate filed with depository, attesting compliance with bye-laws
+- **Broker-side** — referenced in Annual Compliance Report; system-audit / inspection draws on concurrent audit findings
+
+### 7.3 Disclosure / inspection
+
+- Concurrent audit reports made available during exchange / SEBI / depository inspection
+- Internal-audit firm (half-yearly per NSE/INSP/54080) often reviews concurrent audit observation logs
+- System auditor (per CSCRF) typically reviews IT-system controls implementing concurrent audit findings
+
+## 8. Edge cases
+
+### 8.1 Multi-segment broker
+
+A broker active across CM, F&O, CD, COM, MTF, SLBM, DP — concurrent audit scope must cover each segment. Some brokers split into separate auditor engagements (one for broking operations, one for DP); others use a single multi-disciplinary auditor.
+
+### 8.2 New-segment activation
+
+When a broker activates a new segment (e.g. adds commodity, or adds DP business), concurrent audit scope must expand. Auditor's engagement letter amended; first observation cycle in new segment may have higher observation density.
+
+### 8.3 Cross-exchange membership
+
+Brokers with NSE + BSE + MCX memberships have triple inspection / audit exposure. Concurrent audit covers all; coordination required for consistent sampling.
+
+### 8.4 Auditor's adverse finding
+
+If concurrent auditor finds material fraud / misuse of client funds — they have **escalation duty** to report to:
+
+- Broker's Audit Committee (immediately)
+- SEBI / exchange (if internal escalation is obstructed)
+- FIU-IND (if money-laundering pattern surfaces, via STR pathway)
+
+This is reinforced by Chapter IVA Brokers' Institutional Mechanism (`SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/96`).
+
+### 8.5 Broker under enhanced supervision
+
+A broker placed under enhanced supervision (high SCORES pendency, repeat inspection findings, technical-glitch recurrence) sees concurrent audit scope expand — typically more frequent observation cycles and higher sampling.
+
+### 8.6 Vendor / outsourcing
+
+Brokers outsource back-office (e.g. settlement processing) to vendors. Concurrent audit scope must include vendor activities; auditor reviews outsourcing contracts and vendor SOC reports.
+
+## 9. Sample-size norms in detail
+
+(industry-typical; verify in current exchange and depository policies)
+
+### 9.1 Broker-side weekly samples
+
+- 100% pay-ins > Rs 25 lakh (review for source-of-funds match with KYC)
+- 100% pay-outs > Rs 10 lakh (review for ledger reconciliation, no withholding)
+- 100% off-market transfers (depository-side audit; concurrent auditor cross-checks)
+- 10–20% sampled UCC records updated during the week
+- 10–20% sampled trade-modification entries
+
+### 9.2 Broker-side monthly samples
+
+- 100% margin-penalty pass-through cases
+- 5–10% random review of dormant-flag application
+- All KRA-validation failures
+- All Chapter IVA Surveillance Obligation Report submissions
+
+### 9.3 DP-side monthly samples
+
+- 100% account openings
+- 100% modifications classified as material (PAN, name, bank, address)
+- 10–20% delivery instructions
+- 100% transmissions
+- 100% off-market transfers above threshold
+- 10–20% pledge / re-pledge entries
+
+## 10. Practical notes
+
+- **[gotcha]** Engaging the same firm for statutory audit + concurrent audit + DP audit creates independence concerns. Industry-typical: split into 2–3 firms with formal independence declarations.
+
+- **[industry practice]** Large brokers (>500k UCC) maintain in-house concurrent-audit-management software that tracks observations end-to-end. Mid-size brokers use spreadsheets. Both work; the software approach scales better past ~50 active observations.
+
+- **[risk trade-off]** Pushing the auditor for "no observations this cycle" creates pressure that erodes audit quality. Mature brokers welcome observations as risk-management input. SEBI inspection commonly notes brokers with very low observation counts as suspicious.
+
+- **[cost optimization]** Concurrent audit costs scale with broker size and segment count. Industry-typical fee: Rs 5–25 lakh per annum for mid-size brokers; QSBs may spend Rs 50 lakh+ per annum across concurrent + statutory + internal + system + DP audits combined.
+
+- **[gotcha]** Observation tracker must persist across auditor rotations. New auditor inherits previous observations and verifies remediation; missing handover is a common inspection-finding precursor.
+
+- **[gotcha]** Annual concurrent audit certificate (DP-side) must be filed by the depository-prescribed cut-off; late filing attracts financial disincentive under depository policy.
+
+- **[industry practice]** Concurrent auditor's quarterly summary to the Audit Committee should map observations to (a) regulatory citation, (b) financial exposure, (c) remediation status, (d) governance escalation. Auditors that present "raw observation count" without categorisation are seen as transactional.
+
+- **[gotcha]** Concurrent audit observations must reconcile with internal-audit observations (half-yearly per NSE/INSP/54080) and with system-audit observations. Three audit streams catching the same issue but differently classified is a common inspection finding.
+
+- **[industry practice]** DP-side concurrent audit is more codified than broker-side; CDSL / NSDL communiques are explicit on scope and frequency. Broker-side relies more on auditor judgment within the Master Circular framework.
+
+## 11. Adjacent compliance regimes
+
+- **Statutory audit** — annual, under Companies Act; concurrent auditor sometimes feeds findings into statutory audit
+- **Internal audit (half-yearly)** — per NSE/INSP/54080; independent CA / CS / CMA; covers wider scope
+- **System audit (every 2 years)** — per `SEBI/HO/ITD-1/ITD_CSC_EXT/P/CIR/2024/113` and ancillary CSCRF circulars; IT-systems focus
+- **Cyber audit (annual)** — per CSCRF clause 4.4; CERT-In empanelled
+- **Inspection (annual rolling)** — exchange + depository + SEBI per `NSE/INSP/67804` and equivalent
+- **Investor-grievance review** — per SCORES MIS submission and `SEBI/HO/OIAE/IGRD/CIR/P/2023/156`
+
+All six layers are designed to be complementary, not redundant. Concurrent audit is the most operational / real-time of the bunch.
+
+## Cross-references
+
+- [Deep Dive — System Audit](/broking-kyc/deep-dives/compliance-audit/system-audit/)
+- [Deep Dive — CSCRF](/broking-kyc/deep-dives/compliance-audit/cscrf-deep-dive/)
+- [Deep Dive — Inspection Types](/broking-kyc/deep-dives/compliance-audit/inspection-types/)
+- [Deep Dive — SCORES Procedure](/broking-kyc/deep-dives/compliance-audit/scores-procedure/)
+- [Deep Dive — AP Framework](/broking-kyc/deep-dives/compliance-audit/ap-framework/)
+- [Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/)
+- [Operations — Audit & Compliance](/broking-kyc/operations/audit-compliance/)
+- [Circulars — SEBI MIRSD](/broking-kyc/reference/circulars/sebi-mirsd/)
+- [Circulars — NSE](/broking-kyc/reference/circulars/nse/)
+- [Circulars — CDSL](/broking-kyc/reference/circulars/cdsl/)
+- [Circulars — NSDL](/broking-kyc/reference/circulars/nsdl/)
+
+## Verified through
+
+2026-05-14
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for the full disclaimer.*

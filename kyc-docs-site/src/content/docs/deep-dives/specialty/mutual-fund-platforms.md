@@ -1,0 +1,442 @@
+---
+title: "Deep Dive: Mutual Fund Platforms (BSE StAR MF, NSE NMF II, MF Utility)"
+description: Broker-as-distributor walkthrough of exchange-led mutual fund order platforms — BSE StAR MF, NSE NMF II, industry-utility MF Utility — covering order capture, payment cycle (T-day to T+1/T+3 NAV unit allocation), redemption, SIP automation via UPI AutoPay / eNACH mandates, MF KYC (distinct from broking KYC), and broker compensation models.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Mutual-fund distribution sits parallel to but distinct from broking. The broker's MF activity flows through one of three transaction rails (BSE StAR MF, NSE NMF II, or MFU's MFD framework), each with its own onboarding, order capture, payment, and reporting nuances. This page walks through both the per-platform mechanics and the cross-cutting concerns (MF KYC, AMFI registration, broker compensation, mandate management, settlement). It follows the operator-perspective tone of the [lifecycle/](/broking-kyc/lifecycle/) pages, with reference-style tables for platform comparisons.
+
+## TL;DR
+
+- The broker acts as an **AMFI-registered Mutual Fund Distributor (MFD)** when selling MF schemes — a regulatory role distinct from stock broker. Most stock brokers register as MFDs to offer MFs alongside equities.
+- **Three transaction platforms** dominate: **BSE StAR MF** (exchange-led, ~60% market share by transaction count), **NSE NMF II** (exchange-led), and **MF Utility (MFU)** (industry-utility, AMC-promoted, runs the CAN — Common Account Number — framework). Plus direct-from-AMC and aggregator routes (Kuvera, ET Money historically).
+- **Cycle**: T-day order before AMC cut-off → T+1 NAV allocation (equity / hybrid) or T+1 / T+2 (debt funds with varying tenor), units credited to investor folio on T+2 / T+3.
+- **SIP automation** runs on **UPI AutoPay** (preferred, since 2021–22) or **eNACH** (older NACH rail, still in use). Mandate is collected once during SIP setup, debits run on each SIP date.
+- **MF KYC is separate from broking KYC** — the same client has *two* KYC records, one with KRA (broking) and one with KYC Registration Agencies (MF, but typically the same KRAs handle both — CVL, NDML, CAMS, KFintech, DotEx). Distinct attributes: AMFI registration, FATCA self-cert, FIRC for foreign clients.
+- **Broker compensation**: trail commission (typical 0.25–1.0% p.a. of AUM, paid by AMC) for regular plans; **zero commission** for direct plans (the investor saves the trail); some platforms also charge a per-transaction fee in addition.
+- **Two-Factor Authentication mandatory** for non-demat MF subscriptions on BSE StAR MF since 1 April 2023 ([BSE 20230109-49](/broking-kyc/reference/circulars/bse/#20230109-49)).
+- AI-generated synthesis. **Verify any specific provision against the linked circulars before acting.**
+
+## Conceptual overview
+
+Mutual fund distribution by a stock broker happens through one of two paradigms:
+
+- **Exchange-led** — the broker pushes the client's MF order onto an exchange-operated transaction platform (BSE StAR MF or NSE NMF II), which then orchestrates the funds debit, NAV allocation, units credit, and broker payout. The exchange acts as the central counterparty for the order; AMCs and RTAs settle through the exchange's MF clearing layer.
+- **Direct-AMC / Industry-utility** — the broker connects to AMCs individually (cumbersome — 40+ AMCs) or via the MF Utility (MFU) network, where one MFU account (the CAN — Common Account Number) gives access to all MFU-participating AMCs.
+
+For most retail brokers, the **exchange-led** model dominates because it offers a single-API integration to 40+ AMCs and uses the broker's existing trading account / payment rails. BSE StAR MF is the larger of the two by transaction count (BSE has historically been more aggressive in MF infrastructure), with NSE NMF II growing share since the mid-2010s.
+
+The MF segment runs on **T-day order → T+1 NAV → T+2 unit allocation → T+1 funds debit** for typical equity / hybrid schemes (subject to AMC's specific cut-off). Debt schemes have longer cycles. Liquid / overnight schemes have T-day NAV if the order is received before 1:30 PM. The broker's role is to capture the order before cut-off, ensure funds availability (via UPI / eNACH / direct debit / linked-bank pull), and reconcile NAV allocation and unit credit through the exchange / RTA.
+
+## 1. Platform comparison — BSE StAR MF, NSE NMF II, MF Utility
+
+| Dimension | BSE StAR MF | NSE NMF II | MF Utility (MFU) |
+|---|---|---|---|
+| **Operator** | BSE (Indian Clearing Corporation Ltd / ICCL for clearing) | NSE (NSE Clearing Ltd for clearing) | MF Utilities India Pvt Ltd — industry utility, jointly promoted by AMCs |
+| **Launch** | 2009 (re-launched as StAR MF 2010) | 2009 (re-launched as NMF II ~2015) | 2014–15 |
+| **Participation by AMC** | 40+ AMCs participate | 40+ AMCs participate | All AMFI member AMCs participate |
+| **Member type** | Trading Member (exchange) + MF segment activation | Trading Member (exchange) + MF segment activation | Distributor with MFU registration; CAN-issuance to clients |
+| **Order types** | Lumpsum, SIP, SWP, STP, Switch, Redemption | Lumpsum, SIP, SWP, STP, Switch, Redemption | Lumpsum, SIP, SWP, STP, Switch, Redemption, NFO |
+| **Order routing** | Member terminal / API / Mobile app to BSE StAR MF → AMC | Member terminal / API to NSE NMF II → AMC | MFU-issued portal / API → AMC |
+| **Settlement** | Through ICCL; broker's pay-in / pay-out cycles aligned | Through NCL; broker's pay-in / pay-out cycles aligned | Pooled AMC accounts at MFU's settlement bank; broker not on funds path |
+| **2FA requirement** | Mandatory for non-demat subscription per [BSE 20230109-49](/broking-kyc/reference/circulars/bse/#20230109-49) | Equivalent 2FA via NSE NMF II from 2023 | OTP-based authentication on MFU portal |
+| **Demat vs SoA holding** | Both supported — demat (held in DP) or Statement of Account (held with RTA) | Both supported | Both supported |
+| **Direct vs Regular plans** | Both — broker tags the ARN to identify regular; absence of ARN routes to direct | Both | Both |
+| **Holiday calendar** | Aligns with exchange CM segment holiday calendar | Same | Aligns with AMC holiday calendar (typically same as exchanges) |
+
+### BSE StAR MF mechanics
+
+BSE StAR MF (Stock Exchange Platform for Allotment and Redemption of Mutual Funds) is the largest mutual-fund exchange platform in India by transaction count. The broker (acting as Trading Member with MF segment activation) submits orders via:
+
+- **Terminal-based entry** — member terminal connected to BSE's MF gateway; manual entry for individual orders.
+- **API-based entry** — broker's mobile app / web app calls BSE StAR MF API directly; preferred for retail-scale orders.
+- **Bulk file upload** — broker uploads daily order CSV / fixed-width file; preferred for SIP execution.
+
+The order types supported include Purchase (lumpsum or first SIP), Redemption (full / partial / units / amount), Switch (between schemes within same AMC), STP (Systematic Transfer Plan), and SWP (Systematic Withdrawal Plan). Each order has a unique BSE order ID; the AMC returns a unit-allotment confirmation against this order ID.
+
+The funds debit happens via the **broker's pay-in obligation** to ICCL (the BSE clearing affiliate) at T+1 morning. The broker has the client's funds either upfront (transferred to broker's MF settlement account at order time) or via UPI / eNACH mandate that hits the client's bank overnight. ICCL nets the broker's MF obligation across all clients and orders for the day.
+
+### NSE NMF II mechanics
+
+NSE NMF II (National Mutual Fund II) is structured analogously to BSE StAR MF but with NSE's clearing infrastructure. The same broker can be a member of both platforms — most large brokers are dual-member. Distinctions:
+
+- **Member onboarding** is parallel — Trading Member registration at NSE plus MF segment activation.
+- **Clearing** flows through NCL (NSE Clearing Ltd) rather than ICCL.
+- **API differences** — NMF II's API surface differs from StAR MF in payload structure, status codes, and error semantics. Brokers running both platforms maintain separate adapter layers.
+
+Market-share trends since the mid-2010s have seen NSE NMF II growing share, particularly for SIP volumes, though BSE StAR MF retains lead for lumpsum and switch transactions.
+
+### MF Utility (MFU) mechanics
+
+MF Utility is fundamentally different from the exchange platforms. It's an **industry utility** owned by AMFI-member AMCs, designed to give distributors and direct investors a single point of access to all AMCs without requiring exchange membership.
+
+The defining concept is the **CAN (Common Account Number)** — a single 11-digit identifier issued by MFU that maps to a client across all AMCs. The CAN replaces the multi-folio model where a client had one folio per AMC. With CAN, the client transacts under one identifier across all 40+ AMCs.
+
+For brokers, MFU is an alternative or complement to exchange platforms. Some brokers use MFU as the primary platform; others use it for specific use cases (e.g., NFO subscriptions where the exchange platforms have known limitations).
+
+MFU's settlement runs through a **pooled AMC bank account** — the broker is **not** on the funds path. The client pays MFU; MFU credits the relevant AMC; the AMC allocates units. The broker's role is order origination and grievance redressal, not fund handling.
+
+<Aside type="note">
+**Why three platforms persist.** Each platform has structural advantages. BSE StAR MF is mature with high reliability and the largest AMC participation. NSE NMF II's clearing infrastructure integrates with the broker's existing NSE membership, so the broker can avoid maintaining two separate clearing relationships. MFU's CAN simplifies the client view across AMCs and includes a few AMCs that lag on exchange-platform support. Large brokers run all three; smaller brokers pick one.
+</Aside>
+
+## 2. Broker as Mutual Fund Distributor (MFD) — the regulatory layer
+
+Before any of the platform mechanics matter, the broker must be registered as a Mutual Fund Distributor.
+
+### AMFI registration (ARN)
+
+The broker (the legal entity, not the individual) obtains an **AMFI Registration Number (ARN)** by:
+
+1. Passing the **NISM Series V-A: Mutual Fund Distributors Certification** at the entity level (the broker's authorised individuals).
+2. Applying to AMFI for an ARN, paying the registration fee (~Rs 1,500 + GST for initial; renewal every 3 years).
+3. AMFI issues the ARN — a 6-character alphanumeric identifier (e.g., ARN-123456).
+
+The ARN is the broker's identifier in the MF distribution ecosystem. Every MF transaction routed by the broker tags the ARN — this is how the AMC knows where to pay the trail commission. Direct-plan orders are submitted without an ARN tag; the absence of ARN routes the order to the "Direct" plan variant of the same scheme.
+
+### EUIN — Employee Unique Identification Number
+
+Each individual employee / authorised person of the broker who advises on or transacts MF orders must hold an **EUIN** (a separate AMFI identifier). The EUIN is captured against each transaction along with the ARN. A transaction made without EUIN is tagged "execution-only" and is recorded as such by AMFI; this affects the commission attribution and the regulatory treatment of the transaction (execution-only attracts lower distributor obligations).
+
+### KYD — Know Your Distributor
+
+AMFI maintains a **Know Your Distributor (KYD)** process — biometric verification, AML-style KYC of the distributor entity. Every ARN holder must complete KYD; the KYD record is renewed periodically.
+
+### SEBI rules on broker MF distribution
+
+Brokers who act as MFDs are subject to:
+
+- **Mutual Fund Master Circular** [SEBI/HO/IMD/IMD-PoD-1/P/CIR/2024/90](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-imd-imd-pod-1-p-cir-2024-90) (consolidated MF circulars to March 2024).
+- **Distributor code of conduct** under AMFI bye-laws — disclosures, suitability checks, complaint handling.
+- **MF Lite framework** [SEBI/HO/IMD/PoD2/P/CIR/2024/183](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-imd-pod2-p-cir-2024-183) (Dec 2024) for passively-managed schemes — lower compliance burden for index funds, ETFs, FoFs investing in passives.
+- **MF nomination revamp** [BSE 20250411-43](/broking-kyc/reference/circulars/bse/#20250411-43) (Apr 2025) — UCC structure updated for MF nominee fields.
+
+## 3. The MF transaction lifecycle — step by step (lumpsum purchase)
+
+The standard equity lumpsum purchase via BSE StAR MF illustrates the cycle. Variations for SIP, redemption, and other order types follow in later sections.
+
+### Step 1 — Pre-purchase eligibility
+
+The broker's app checks:
+
+- Client has **MF KYC** complete (KRA-validated, CKYC-uploaded, FATCA / CRS self-cert on file). MF KYC requirements overlap broking KYC but include AMFI-specific declarations.
+- Client has **demat account** (if demat-mode purchase) or **bank account** linked with name-match (if SoA-mode purchase).
+- Client's **AML risk score** allows the transaction (typical: no PEP hit, no sanctions hit, transaction within client's declared income bracket).
+- The selected **AMC and scheme are open for fresh purchase** — checks against AMC's daily subscription status (some schemes close for new subscriptions during NFO blackouts).
+
+### Step 2 — Order capture
+
+The client (or operator on behalf) selects the AMC, scheme, plan (Direct / Regular), option (Growth / IDCW reinvestment / IDCW payout), and enters the purchase amount. Minimum-amount validation runs against the AMC's scheme-specific minimum (typically Rs 100 for SIP-eligible equity, Rs 1,000–5,000 for lumpsum). The broker's app shows the **cut-off time** for the same-day NAV (typically 3:00 PM for equity / hybrid, 1:30 PM for liquid / overnight) and computes whether the order will get today's NAV or tomorrow's.
+
+### Step 3 — Payment authorisation
+
+For lumpsum orders, three payment routes are common:
+
+- **UPI Collect** — broker's app initiates a UPI collect to the client's UPI ID for the order amount. Client authorises via UPI PIN. Funds flow to broker's MF settlement account (or directly to the AMC via direct-debit-style flow if the broker's setup supports it).
+- **Net banking / bank pull** — client logs into their bank account, authorises a NEFT / IMPS transfer to the broker's MF account.
+- **Demat balance debit** — for clients with a linked broker trading account, the broker can debit the available balance directly (typical for one-platform brokers offering integrated equity + MF).
+
+The 2FA mandate from [BSE 20230109-49](/broking-kyc/reference/circulars/bse/#20230109-49) applies — non-demat MF subscriptions need 2FA (OTP-based) before submission. Demat-mode subscriptions, where the units credit to demat and the audit trail flows through the DP, are typically subject to the broker's general 2FA for sensitive transactions.
+
+### Step 4 — Order submission to BSE StAR MF
+
+The broker's MF system pushes the order to BSE StAR MF API with order parameters (ARN, EUIN, client PAN, scheme code, plan, option, amount, mode, payment indicator). BSE returns a BSE order ID and acknowledgement status. The order enters the BSE's overnight processing queue.
+
+### Step 5 — Funds reconciliation
+
+By end-of-day T, the broker reconciles funds collected against orders submitted. Any order without confirmed funds is **cancelled** before BSE's cut-off — typically 4:00 PM same day for equity / hybrid. The reconciliation is one of the most operationally consequential items in MF distribution; a stale collection rate triggers downstream issues including non-allotment for the client.
+
+### Step 6 — BSE StAR MF settlement to AMC
+
+By 7:00 PM on T-day (or early T+1 morning), BSE StAR MF nets the broker's pay-in obligation across all orders for the day. The funds debit from the broker's settlement bank account; BSE's clearing layer routes the funds to the respective AMC's collection bank, scheme-wise.
+
+### Step 7 — NAV allocation by AMC
+
+The AMC's transfer agent (CAMS or KFintech for ~95% of AMCs) processes the funds receipt against the order list. Equity / hybrid orders received before T-day's 3:00 PM cut-off get **T-day NAV** (computed at the AMC's close-of-day NAV based on T-day's portfolio prices). Orders after cut-off get T+1 NAV.
+
+The RTA generates the **unit allotment file** on T+1 evening — order-by-order list of allotted units, price (NAV), and the corresponding folio number. For first-time investors in an AMC, a new folio is created; for repeat investors, the existing folio is used.
+
+### Step 8 — Unit credit and statement of account
+
+The allotment file flows back to BSE StAR MF, which routes it to the broker. For **demat-mode** allotments, the depository (CDSL / NSDL) credits units to the client's demat BO on T+2 morning. For **SoA-mode** allotments, the RTA dispatches a statement of account to the client by email / physical mail; the units are held in the RTA's books, not in a demat.
+
+### Step 9 — Client notification
+
+The broker pushes a transaction confirmation to the client (DLT-approved SMS + email), typically within 24 hours of allotment. The notification includes BSE order ID, folio number (new or existing), allotted units, NAV at allotment, and the running balance in the folio.
+
+### Step 10 — Broker reconciliation and post-trade
+
+The broker reconciles, by EOD T+2:
+
+- Orders submitted to BSE (from broker's logs).
+- Orders accepted (from BSE acknowledgements).
+- Allotments confirmed (from AMC / RTA allotment file).
+- Units credited to demat (from depository confirmation).
+- Funds debits effected at the broker's settlement bank.
+
+Any mismatch — an order submitted but not allotted, units credited but no AMC confirmation — triggers a reconciliation entry and grievance ticket. Most mismatches stem from **late funds pay-in** (the broker missed BSE's clearing cut-off) or **mis-mapped folio** (client's existing folio at the AMC wasn't matched, creating a new folio when one already existed).
+
+<Aside type="caution">
+**Cut-off time discipline matters.** Equity / hybrid NAV cut-off is 3:00 PM, but this is the time the AMC must **receive funds**, not the time the order must be submitted. The broker's internal cut-off is typically 1:00–1:30 PM to allow for BSE / NSE clearing-cycle lag. A client placing an order at 2:55 PM via the broker's app may technically still get T-day NAV, but only if the broker's settlement bank can transmit the funds to BSE / NSE in time. Brokers typically display the cut-off conservatively and update real-time as the day progresses.
+</Aside>
+
+## 4. SIP automation — UPI AutoPay vs eNACH
+
+### SIP mechanics
+
+A Systematic Investment Plan is a recurring purchase order placed on a defined date (e.g., 10th of every month) for a defined amount, into a specified scheme. The broker captures the SIP at setup; the SIP date triggers a debit on the client's mandate; the order is automatically submitted on the SIP date.
+
+### UPI AutoPay
+
+Since 2021–22, UPI AutoPay has become the preferred SIP mandate rail for retail clients. Mechanics:
+
+- The client creates a UPI AutoPay mandate via the broker's app — selecting the SIP scheme, amount, frequency, start date, end date, and authorising via UPI PIN.
+- The mandate is registered with NPCI's UPI AutoPay framework, with the client's bank as the issuer, the broker (or sponsor bank) as the mandate creator.
+- On each SIP date, NPCI's AutoPay engine triggers a debit on the client's bank account for the SIP amount. Funds arrive at the broker's MF settlement account by 10:00 AM (typical).
+- The broker submits the SIP order to BSE StAR MF / NSE NMF II / MFU as the funds confirmation arrives.
+
+Critical NPCI circulars:
+
+- [NPCI/UPI/OC No. 200/2024-25](/broking-kyc/reference/circulars/npci/) — Single Block Multiple Debits enabling, 30 November 2024.
+- NPCI UPI AutoPay Additional Factor of Authentication (AFA / UPI PIN) limit raised to **Rs 1 lakh** for select categories — material for high-value SIPs.
+- [NPCI/UPI/OC No. 207](/broking-kyc/reference/circulars/npci/) — User Experience standards for mandate display (amount cap, frequency, auto-renewal indicators).
+- [NPCI/NACH/OC No. 012/2023-24](/broking-kyc/reference/circulars/npci/) — Maximum mandate duration **40 years**, "until cancelled" option removed, explicit final collection date required. This caps even very long-tenor SIPs at 40 years from setup.
+
+### eNACH (legacy / parallel rail)
+
+For clients without UPI or for cases where UPI AutoPay isn't supported (e.g., specific bank exceptions), eNACH (electronic National Automated Clearing House) is the alternative. Mechanics:
+
+- The client signs an eNACH mandate via Aadhaar OTP eSign on the broker's app, capturing bank account number, IFSC, amount, frequency, start / end dates.
+- The mandate flows through NPCI's NACH rail; the client's bank receives and acknowledges the mandate within 2–5 business days.
+- On each SIP date, the broker's sponsor bank debits the client's account via NACH presentment; settlement to the broker by T+1.
+
+eNACH is slower (T+1 instead of intraday), has higher failure rates (typical 4–7% vs UPI's <2%), and is being progressively replaced by UPI AutoPay. Most brokers offer both for client choice, but default new SIPs to UPI AutoPay.
+
+### Mandate cancellation
+
+Per [NPCI/NACH/OC No. 001/2024-25](/broking-kyc/reference/circulars/npci/) (Master Circular on mandate cancellation), brokers must offer clients an **online / electronic channel to amend, cancel, or suspend** their mandates. Compliance was due by 30 September 2024; non-compliance attracts bar from registering new mandates. Brokers' app SIP-management screens now typically show "Modify SIP / Pause / Cancel" controls.
+
+### SIP failure handling
+
+When a SIP debit fails (insufficient funds, bank-side outage), the broker:
+
+- Logs the failure with reason code (NACH return code).
+- Notifies the client (SMS / email via DLT template).
+- Retries per the mandate's retry rules (typically 1–2 retries within 5 business days).
+- After max retries, the SIP installment is marked **missed**; the SIP continues to the next scheduled date.
+
+A pattern of repeated failures may trigger the broker to **pause** the SIP (with client confirmation) or escalate to the client for mandate / bank-account issues. AMFI rules require disclosure of SIP failure rates in distributor reports.
+
+## 5. Redemption cycle
+
+A redemption order is the inverse of a purchase. The client requests redemption of units; the AMC processes the redemption against the next-applicable NAV; funds credit to the client's bank account.
+
+### Mechanics
+
+- **Order submission** — client places redemption order via broker's app, specifying scheme, units (or amount), and bank account for credit. Cut-off times mirror purchase (3:00 PM equity / hybrid; 1:30 PM liquid).
+- **NAV allocation** — orders before cut-off get same-day NAV; after cut-off, next-day NAV.
+- **Unit debit** — the RTA debits the units from the client's folio at the NAV.
+- **Funds payout** — the AMC's payout bank credits the client's bank via NEFT / RTGS / IMPS. Equity / hybrid: T+2 / T+3. Debt: T+1 / T+2. Liquid / overnight: T+1.
+- **Tax handling** — STCG / LTCG withholding (where applicable, especially for foreign clients) is captured by the RTA / AMC. For Indian retail clients, no TDS on redemption (capital gains are self-reported in ITR).
+
+### Demat-held units vs SoA units
+
+- **Demat-held units** — redemption order routes through the broker → depository → RTA. The depository confirms unit availability before the redemption is submitted to the AMC. Settlement funds flow to the client's bank via the depository's payout cycle.
+- **SoA units** — order routes directly from broker → BSE/NSE platform → RTA. Funds flow to the client's bank via the AMC's payout bank.
+
+### Partial redemption, switch, STP, SWP
+
+- **Partial redemption** — same as full redemption but specifies units / amount less than total. Remaining units stay in folio.
+- **Switch** — equivalent to redemption from Scheme A + purchase into Scheme B within the same AMC, executed atomically by the RTA. Tax treatment: switch is a taxable event (treated as redemption then purchase). Net result: same client, different scheme; funds don't leave the AMC.
+- **STP (Systematic Transfer Plan)** — periodic switch from one scheme to another. Used for "averaging into equity" — clients park lumpsum in a liquid fund and STP into an equity fund over 6–12 months.
+- **SWP (Systematic Withdrawal Plan)** — periodic redemption of a defined amount or unit count. Used by clients drawing regular income from MF holdings.
+
+## 6. MF KYC — distinct from broking KYC
+
+Mutual fund KYC is administered separately from broking KYC at the regulatory layer, though both flow through the same KRAs (CVL, NDML, CAMS, KFintech, DotEx). For most retail brokers, MF KYC validation is the broker's responsibility before order submission.
+
+### What MF KYC validates
+
+- **PAN** — mandatory; AMC rejects orders without PAN-validated KYC.
+- **Aadhaar / address proof** — KYC-validated, KRA-acknowledged.
+- **Bank account** — name-matched, IFSC validated.
+- **FATCA / CRS self-cert** — for non-resident clients and clients with potential foreign tax residency.
+- **AMFI-specific declarations** — investment objective, risk profile, declarations on PEP / sanctions.
+
+### MF KYC "ON HOLD" status
+
+[SEBI/HO/MIRSD/SECFATF/P/CIR/2024/41](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-secfatf-p-cir-2024-41) (May 2024) reviewed KRA validation. Clients with KYC marked "ON HOLD" by the KRA cannot transact MFs — the AMC rejects the order. The broker's app must check KRA status before order submission. [BSE 20241202-5](/broking-kyc/reference/circulars/bse/#20241202-5) extended this to demat freezing for KRA-invalid KYC records.
+
+### Re-KYC for MF
+
+Per the SEBI risk-based re-KYC framework, MF KYC re-validation follows the same cycle as broking KYC — 2 years (high-risk), 8 years (medium-risk), 10 years (low-risk). The broker tracks the same anniversary date for MF and broking purposes.
+
+### Nominee for MF — recent revamp
+
+[BSE 20250411-43](/broking-kyc/reference/circulars/bse/#20250411-43) (April 2025) revised the UCC structure to incorporate nominee-related fields for the MF segment. Per [SEBI/HO/IMD/IMD-PoD-1/P/CIR/2024/29](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-imd-imd-pod-1-p-cir-2024-29) (April 2024), **jointly-held MF folios are exempt** from mandatory nomination — joint holding gives survivorship.
+
+For single-holder folios, nomination is mandatory or the client must explicitly opt out. The SEBI January 2025 nominee revamp extends to MF folios — up to 10 nominees with percentage allocation, opt-out requires video declaration.
+
+## 7. Broker compensation models
+
+The broker is compensated for MF distribution in three structural ways:
+
+### Trail commission
+
+The dominant compensation model. The AMC pays the broker a **trail commission**, typically **0.25–1.0% per annum** of the client's AUM in regular plans, calculated daily and paid monthly / quarterly. The trail continues as long as the client holds the units and the broker remains the registered ARN holder for that folio.
+
+Trail commission rates vary by scheme category:
+
+- Equity (large-cap) — 0.4–0.8% p.a.
+- Equity (mid-cap / small-cap / sectoral) — 0.6–1.0% p.a.
+- Hybrid — 0.4–0.7% p.a.
+- Debt (long-duration) — 0.2–0.5% p.a.
+- Debt (short / liquid) — 0.1–0.3% p.a.
+- Direct plans — **zero** trail commission paid to broker.
+
+### Per-transaction fee
+
+Some platforms (especially the exchange platforms) levy a per-transaction fee on the broker (typically Rs 5–20 per transaction). The broker may absorb this or pass through to the client.
+
+### Volume-based incentives
+
+AMCs run promotional schemes — "bring N new SIPs and earn X bonus", "achieve Y AUM growth and earn Z" — that supplement trail commission. SEBI has progressively tightened rules around such incentives to prevent mis-selling; current AMFI rules require disclosure of any incentive-driven sales.
+
+### Disclosure obligations
+
+SEBI's MF distributor framework requires the broker to disclose commission earned in two places:
+
+- **Common Account Statement (CAS)** — periodic statement showing commission paid to the distributor.
+- **AMFI-mandated annual disclosure** — broker publishes total commission earned by category on broker website.
+
+### Direct vs Regular plans
+
+For each MF scheme, the AMC offers two variants:
+
+- **Regular plan** — embeds the trail commission in the expense ratio (TER). The investor's NAV is reduced by the commission.
+- **Direct plan** — no commission embedded; lower TER by 0.5–1.5% p.a. The investor saves the commission.
+
+When the broker submits an order without an ARN tag, the order routes to the Direct plan automatically. Many advisor-style brokers offer Direct plans (especially RIA-licensed advisors charging a separate advisory fee); transaction-broker style brokers offer Regular plans by default. SEBI prevents commingling of the two roles — a SEBI-Registered Investment Advisor (RIA) cannot also be an MFD for the same client.
+
+<Aside type="note">
+**Direct-plan growth and the broker compensation squeeze.** The Direct plan share of MF AUM has grown from ~5% in 2013 (when introduced) to 50%+ in 2024–25 for many AMCs. This squeezes broker compensation; brokers responding with hybrid models — flat advisory fee (Rs 999–4,999 / year) combined with Direct-plan execution, or stay on Regular plans with full-service support. Each has trade-offs. SEBI's MF Lite framework ([SEBI/HO/IMD/PoD2/P/CIR/2024/183](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-imd-pod2-p-cir-2024-183)) introduced in Dec 2024 lowers compliance burden for passive schemes, which may further squeeze trail commissions for passively-managed funds.
+</Aside>
+
+## 8. NFO subscriptions and special order types
+
+### NFO (New Fund Offer)
+
+When an AMC launches a new scheme, a defined **NFO period** (typically 15 days) allows fresh subscriptions at the scheme's launch NAV (Rs 10 by default). Mechanics:
+
+- The exchange platforms (BSE StAR MF, NSE NMF II) and MFU surface the NFO with the open / close dates.
+- Orders during the NFO period are captured and held; funds are debited per the AMC's collection schedule.
+- The AMC allots units at the launch NAV on the **scheme allotment date** (typically T+5 from NFO close).
+- Per [SEBI/HO/IMD/IMD-PoD-1/P/CIR/2025/23](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-imd-imd-pod-1-p-cir-2025-23) (Feb 2025), AMCs must deploy NFO proceeds within **30 business days** from allotment as per declared asset allocation, extendable once by 30 business days with investment-committee justification.
+
+### Cut-off NAV variations
+
+The standard 3:00 PM equity / hybrid cut-off has variations:
+
+- **Liquid / Overnight funds** — 1:30 PM cut-off. Orders before 1:30 PM get same-day NAV (or day-before NAV for overnight schemes per repurchase valuation rules).
+- **Debt schemes** — typically 3:00 PM cut-off, same as equity.
+- **International / fund-of-funds investing offshore** — typically 3:00 PM, but NAV computation runs on T+1 / T+2 due to overnight foreign-market data lag.
+
+### Cut-off updates effective January 2024
+
+The MF cut-off framework was revised effective from January 2024 — same-day NAV requires not just order submission before cut-off but **funds receipt by the AMC** before the cut-off. This pushed broker internal cut-offs earlier (e.g., 1:30 PM for an outward 3:00 PM AMC cut-off) to allow for the exchange-platform clearing cycle.
+
+## 9. SoA-mode vs Demat-mode holding
+
+A client's MF units can be held in either:
+
+- **Statement of Account (SoA) mode** — units held in the AMC's books (with the RTA as the technical custodian). The client receives a statement of account from the RTA / AMC. Transactions: purchase / redemption flow direct through the AMC's books.
+- **Demat mode** — units held in the client's depository BO account, just like equities. The client sees MF units alongside their equity holdings. Transactions flow through the depository.
+
+The choice affects:
+
+- **Convenience** — demat consolidates equity + MF in one statement.
+- **Cost** — demat AMC charges apply on MF units; SoA is free.
+- **Tax reporting** — both produce capital-gains statements at year-end; the format differs.
+- **Pledging** — demat MFs can be pledged for margin or against loans; SoA cannot.
+
+Most retail brokers default to demat-mode for clients who already have a broker demat. SoA-mode is more common for MF-only investors who don't have a trading account.
+
+## 10. Edge cases and sub-cases
+
+### Folio consolidation
+
+A client who has invested across multiple AMCs over years often ends up with many folios (one per AMC, sometimes multiple per AMC if different distributors were used). The CAS (Common Account Statement) consolidates the view but the folios remain separate. MFU's CAN unifies the view; an existing CAS-style consolidation is also offered by CAMS / KFintech.
+
+### KYC modification mid-cycle
+
+If a client modifies KYC (address change, bank change) during an active SIP, the broker propagates the change to:
+
+- KRA / CKYC (next daily upload).
+- Each AMC where the client has folios (typically via AMFI's `Mandatory KYC modification` workflow at the RTA).
+- The active mandate — bank changes may require fresh mandate (UPI handle / NACH) authorisation.
+
+The SIP continues debiting on the existing mandate until the new mandate is authorised. If the existing bank account is closed, SIP debits fail and trigger the standard failure-handling flow.
+
+### Death of MF unit holder
+
+For SoA-mode units:
+
+- **Nominee registered** — nominee submits death certificate, identity proof, and KYC to the AMC. Folio is transferred to the nominee's name.
+- **No nominee** — succession path required (probate, succession certificate, or letters of administration). Heavier and slower.
+
+For demat-mode units — flows through the depository's transmission process (see [Lifecycle: Transmission](/broking-kyc/lifecycle/transmission/)). The depository routes the unit-credit to the nominee / heir; the AMC's books are updated by the RTA accordingly.
+
+### Foreign tax residency (FATCA / CRS)
+
+Clients with foreign tax residency (US persons, OECD-country residents) must complete FATCA / CRS self-certification annually. The AMC reports these holdings to the Income Tax Department, which transmits to the foreign tax authority via inter-government agreement. [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-secfatf-p-cir-2024-12) (Feb 2024) centralised FATCA collection at KRAs effective 1 July 2024.
+
+### NRI MF investments
+
+NRIs can invest in MFs subject to RBI / FEMA constraints. Some categories are restricted (e.g., NRIs from FATF / UN sanctioned jurisdictions). Investments typically flow through NRE / NRO accounts. Tax withholding (TDS on capital gains) applies — typical 10% LTCG, 15% STCG for equity-oriented schemes. The broker's MF platform must support NRI client categorisation and route the order with appropriate flags.
+
+### Closed-end / interval schemes
+
+Some schemes are **closed-end** (one-time subscription during NFO, redemption only at maturity or via stock-exchange listed units) or **interval funds** (subscription / redemption available only in specified windows). The broker's app must surface the scheme's open-period and reject orders outside it.
+
+### Off-platform AMC
+
+Not every AMC is on every exchange platform. If a client wants a scheme from an AMC not on BSE StAR MF, the broker may route via NSE NMF II (if available there) or via MFU. If neither carries the AMC, the broker may direct the client to the AMC's portal — losing the trail commission but completing the transaction.
+
+### Disrupted NAV calculation
+
+If an AMC's NAV computation is disrupted (rare — typically a portfolio-side IT outage or pricing-feed failure), the AMC announces an extension. Orders submitted with same-day NAV expectations may get tomorrow's NAV instead. The broker passes through the AMC's communication to clients.
+
+### Two-Factor Authentication failures
+
+Per [BSE 20230109-49](/broking-kyc/reference/circulars/bse/#20230109-49), 2FA is mandatory for non-demat MF subscriptions on BSE StAR MF. If the OTP delivery is delayed or fails (DLT-template issue, telecom outage), the order may not submit before cut-off. The broker should have backup OTP delivery (voice OTP, in-app push notification) for retries.
+
+## Practical notes
+
+- **[industry practice]** Most brokers run both BSE StAR MF and NSE NMF II concurrently. The broker's app intelligently routes the order to the platform with better latency / lower per-transaction fee / preferred-AMC support. Clients see a unified UI; the routing happens server-side.
+- **[gotcha]** SIP-mandate failures due to insufficient funds have downstream effects — the client misses the NAV they wanted, and the missed installment cannot be back-dated. Brokers should warn clients about insufficient-fund risk and let them top-up via UPI ad-hoc to compensate.
+- **[risk trade-off]** Direct plans deprive the broker of trail commission but attract advisor-style clients. Brokers can offer Direct plans alongside Regular plans with appropriate disclosures; some run hybrid models with flat advisory fees on Direct plans.
+- **[cost optimization]** Bulk file upload for daily SIPs is substantially cheaper than per-order API calls at scale (each API call has a fixed cost). Brokers running >10,000 daily SIPs typically use bulk upload.
+- **[industry practice]** AMFI publishes monthly distributor-wise commission data; brokers report total commission earned. This is part of MFD transparency framework.
+- **[gotcha]** Switch transactions are taxable events for the client (treated as redemption + purchase). Brokers should display the tax implication clearly during the switch flow — for clients in higher tax brackets, a switch can trigger material STCG / LTCG.
+- **[industry practice]** Most brokers offer **goal-based** investing flows on top of the transactional MF platform — risk-profile questionnaire, goal-corpus calculation, scheme recommendation, automated SIP setup. These are UI layers; the underlying transactions flow through BSE StAR MF or NSE NMF II as standard MF orders.
+- **[gotcha]** MFU integration requires the broker to issue **CAN** to clients — a separate identifier from PAN / BO. Some clients find this confusing; the broker UI should explain CAN once during setup.
+
+## Cross-references
+
+- [Broker Process Narrative](/broking-kyc/broker-process/narrative/) — Section 4 covers daily reporting touchpoints that include MF transaction reporting.
+- [Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/) — KYC lifecycle and investor servicing domains apply to MF as well as equity.
+- [SEBI Other Circulars](/broking-kyc/reference/circulars/sebi-other/) — MF master circular ([SEBI/HO/IMD/IMD-PoD-1/P/CIR/2024/90](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-imd-imd-pod-1-p-cir-2024-90)), NFO deployment timelines, MF Lite framework.
+- [BSE Circulars](/broking-kyc/reference/circulars/bse/) — StAR MF 2FA mandate, MF nominee revamp.
+- [NPCI Circulars](/broking-kyc/reference/circulars/npci/) — UPI AutoPay enhancement, NACH mandate cancellation, 40-year mandate cap.
+- [SEBI MIRSD Circulars](/broking-kyc/reference/circulars/sebi-mirsd/) — FATCA / CRS centralisation at KRAs, AML master circular.
+- [Vendor Atlas](/broking-kyc/vendors/atlas/) — payment / mandate vendor category for sponsor banks; back-office vendor category for MF order management.
+- [Lifecycle: Transmission](/broking-kyc/lifecycle/transmission/) — applies to demat-held MF units on the death of a unit holder.
+
+## Verified through
+
+2026-05-14
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

@@ -1,0 +1,344 @@
+---
+title: "Deep Dive: Client Funds Upstreaming"
+description: SEBI June 2023 client funds upstreaming mandate, daily upstreaming flow, MFOS / FDR / cash collateral, asset-class acceptance by clearing corp, allocation / de-allocation procedure, bank cut-offs, reconciliation, and partial upstreaming handling.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Upstreaming is a daily flow with three permitted asset classes (cash, FDR, MFOS), specific cut-offs at the clearing corp, and consequential treatment of unutilised collateral. The page walks first through the regulatory framework, then through each asset class and its operational mechanics, then the daily flow timeline, allocation / de-allocation, reconciliation, and edge cases including partial upstreaming.
+
+## TL;DR
+
+- **SEBI mandated daily upstreaming of all client funds to clearing corporations** under [SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/084](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-1-p-cir-2023-084) (8 June 2023, effective 1 July 2023). The principle: **no client funds remain with stock brokers or clearing members on an end-of-day basis.**
+- **Three permitted forms** of upstreaming: (a) cash, (b) lien on FDR (Fixed Deposit Receipt) under specific conditions, (c) pledge of Mutual Fund Overnight Scheme (MFOS) units. Implementation circulars: [NCL/CMPT/57223](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-57223) (21 June 2023), [ICCL 20231214-1](/broking-kyc/reference/circulars/clearing-corps/#iccl-20231214-1) (14 Dec 2023), [MCXCCL/C&S/295/2023](/broking-kyc/reference/circulars/clearing-corps/#mcxccl-c-s-295-2023) (13 Dec 2023).
+- **Operational refinement** under [SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/187](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-1-p-cir-2023-187) (12 December 2023): introduced the Upstreaming Client Nodal Bank Account (USCNBA) and Downstreaming Client Nodal Bank Account (DSCNBA); expanded MFOS pledge; reaffirmed the EOD no-retention principle.
+- **Daily cut-offs.** Cash upstream: 19:00 IST; downstream: 19:00 IST. On quarterly running-account-settlement dates, the cut-off is 20:00 IST per [NCL/CMPT/72025](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-72025) (Dec 2025 revision effective 2 Jan 2026). UPI-block clients have an earlier securities EPI cut-off (18:00 IST).
+- **Asset-class acceptance** is governed by the CC's quarterly approved-collateral list (e.g., [MCX/MCXCCL/094/2026](/broking-kyc/reference/circulars/clearing-corps/#mcx-mcxccl-094-2026)): equity shares as non-cash collateral subject to 25% per-security cap; physical FDR minimum 7-day tenure; G-Sec / T-Bill / SGB margin-benefit withdrawn 2 days before maturity; LIFO bank-exposure adjustments.
+- **MFOS units** are re-pledged via the depository margin pledge-repledge from TMCM Margin Pledge accounts. Overnight MFOS haircut: 5% per [ICCL 20240710-11](/broking-kyc/reference/circulars/clearing-corps/#iccl-20240710-11); other MF schemes: VaR-based 6σ with minimum 9%.
+- **Partial upstreaming** is permitted operationally but creates compliance exposure. Reason codes for collateral withdrawal are mandated per [NCL/CMPT/57223](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-57223) Section G.
+- Bank-CM exemption applies: a bank that is also a clearing member is exempt from certain upstreaming requirements because the funds are already with a regulated bank.
+
+## Conceptual overview
+
+Before June 2023, client funds sat on the broker's balance sheet, in pooled bank accounts ("BA2" client funds account in the segregation framework), often for days or weeks at a time. The broker had statutory obligations to ring-fence those funds, daily reconciliation, weekly client-funding reports, and quarterly running-account settlement — but the funds were physically held by the broker, exposing them to broker default risk.
+
+The June 2023 upstreaming mandate shifted this. From 1 July 2023, every broker is required, on an EOD basis, to upstream all client funds to the clearing corporation — except for the portion needed to cover the next day's settlement obligation. The clearing corp accepts the upstreaming in three permitted forms (cash, lien on FDR, pledge of MFOS units) and the broker's overnight client-funds bank balance must, in principle, be near-zero. The intent is unambiguous: client funds should never sit unutilised with a broker overnight.
+
+For operations, the change required a new daily cycle. Every EOD, the broker computes client clear credit balances, sets aside next-day settlement obligation, and upstreams the rest to the CC. Every BOD, the broker downstreams the amounts required to fund the day's outflows. The cycle runs reliably enough that most brokers no longer track "client funds bank balance overnight" as a meaningful balance — it's a near-zero passthrough.
+
+The mandate has economic consequences for brokers. Pre-mandate, the broker earned float on pooled client funds (subject to SEBI restrictions). Post-mandate, that float largely accrues to the CC (or to the client if held in interest-bearing FDR / MFOS instruments). For Qualified Stock Brokers (QSBs), the offsetting development is UPI Block (ASBA-style), which leaves client funds in the client's bank account altogether, earning interest for the client. The two changes together — upstreaming for non-blocked funds and UPI Block for blocked funds — have largely eliminated the broker as a custodian of client cash.
+
+## 1. Regulatory authority
+
+### 1.1 SEBI authorities
+
+- **[SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/084](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-1-p-cir-2023-084)** (8 June 2023, effective 1 July 2023): The foundational mandate. Daily upstreaming of all client funds to clearing corporations such that no client funds remain with stock brokers or clearing members on an EOD basis. Permits upstreaming in cash, lien on FDR (under conditions), or pledge of MFOS units. Introduces matching downstreaming for next-day client obligations.
+- **[SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/187](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-1-p-cir-2023-187)** (12 December 2023, effective 1 January 2024): Refined framework. Operationalised Upstreaming Client Nodal Bank Account (USCNBA) and Downstreaming Client Nodal Bank Account (DSCNBA); expanded MFOS pledge; reaffirmed EOD no-retention. Issued following Industry Standards Forum representations.
+- **Master Circular for Stock Brokers** [SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/71](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-1-p-cir-2023-71) (May 2023) and subsequent master circulars consolidate upstreaming provisions alongside other client-funds chapters.
+
+### 1.2 Clearing-corp implementation circulars
+
+- **[NCL/CMPT/57223](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-57223)** (21 June 2023, effective 1 July 2023): NSCCL operational procedure. Cash, lien on FDR (precedence over all stakeholders including bank; tenure ≤ 1 year, pre-terminable, principal protected, no funded / non-funded facility against the FDR), and MFOS (re-pledged via depository margin pledge-repledge from TMCM Margin Pledge accounts). Cash upstream / release cut-offs: 19:00 IST upstream; 16:30 IST immediate release; 19:00 IST EOD / value-date release. **Section G** of this circular mandates TM-wise reason codes for collateral withdrawal — client unpaid securities / MTF, sale of unpaid securities, penalties, statutory levies, brokerage, DP charges, running-account settlement, withdrawal request, CM / TM prop, conversion, transfer to other CC, pay-in. Reporting cut-off 23:59:59 on member portal Inspection → Statement Upload → Collateral Segregation → Reason for Collateral Release.
+- **[ICCL 20231214-1](/broking-kyc/reference/circulars/clearing-corps/#iccl-20231214-1)** (14 December 2023): ICCL communicates the upstreaming framework. Operational details aligned with SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/187.
+- **[MCXCCL/C&S/295/2023](/broking-kyc/reference/circulars/clearing-corps/#mcxccl-c-s-295-2023)** (13 December 2023): MCXCCL operational procedure. SBs / CMs upstream all client clear credit balances to CC on EOD basis via cash, lien on FDR (created out of client funds, residual maturity ≤ 1 year + 1 day, lien marked to MCXCCL, pre-terminable, principal protected), or pledge of MFOS units.
+- **[NCL/CMPT/72025](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-72025)** (26 December 2025, effective 2 January 2026): Revises EPI / release / upstream cut-offs for the 2 January 2026 quarterly running-account-settlement date — funds EPI 19:00 IST; securities EPI 19:00 IST (UPI-block clients 18:00 IST); margin-report download 21:00 IST; upstreaming of cash / FDR 20:00 IST (revised from 19:00); downstreaming of cash / FDR 20:00 IST; collateral allocation window 22:00 IST (revised from 20:00). Cash / FDR / BG release within one hour subject to free-collateral availability.
+
+## 2. The three permitted asset classes
+
+The SEBI mandate specifies three forms of upstreaming. The broker can use any combination, subject to the CC's acceptance rules and the operational constraints of each class.
+
+### 2.1 Cash
+
+**Mechanism.** Direct bank transfer from the broker's client-funds Upstreaming Client Nodal Bank Account (USCNBA) to the clearing-corp's settlement bank account. The CC credits the amount to the broker's CM collateral balance.
+
+**Acceptance.** Universal — every clearing corp accepts cash collateral.
+
+**Downstreaming.** Reverse flow next morning from CC to broker's Downstreaming Client Nodal Bank Account (DSCNBA) for next-day client obligations.
+
+**Cut-offs (NSCCL standard, per [NCL/CMPT/57223](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-57223)):**
+- Upstream: 19:00 IST.
+- Immediate release: 16:30 IST.
+- EOD / value-date release: 19:00 IST.
+- On quarterly running-account-settlement dates (per [NCL/CMPT/72025](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-72025) Jan 2026): upstream 20:00 IST; collateral allocation window 22:00 IST.
+
+**Risk.** Lowest. Cash held with the CC is fully fungible and the CC bears it on its own settlement-grade balance sheet.
+
+### 2.2 Fixed Deposit Receipts (FDR)
+
+**Mechanism.** The broker (or the client through the broker) creates an FDR with a CC-empanelled bank, the bank marks a lien in favour of the CC, and the FDR is "upstreamed" by way of the lien. The broker can demand pre-termination subject to FDR conditions.
+
+**Acceptance conditions (per [NCL/CMPT/57223](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-57223) and per the quarterly approved-collateral list):**
+
+- FDR must be created from client funds (not broker proprietary funds).
+- Lien marked in favour of the CC (NSCCL / ICCL / MCXCCL).
+- The CC's lien takes precedence over all other stakeholders including the bank.
+- Tenure ≤ 1 year (MCXCCL: ≤ 1 year + 1 day).
+- Pre-terminable on demand.
+- Principal protected.
+- No funded or non-funded facility against the FDR.
+- Physical FDR minimum tenure 7 days (per quarterly approved-collateral list).
+- Margin benefit withdrawn 2 business days before maturity (per quarterly list; G-Sec / T-Bill / SGB analogous rule).
+- Bank-exposure limits applied per CC (e.g., MCXCCL LIFO bank-exposure adjustments if 3-month average exposure drops; RBI-issued SGB / T-Bill / SGB all accepted; no own-group / associate-entity issued collateral).
+
+**Downstreaming.** Cash equivalent of the lien value is downstreamed by the CC; the FDR itself remains in lien.
+
+**Risk.** Low. FDRs with marked-lien-and-precedence are bank-grade instruments; client funds inside the FDR are de facto held by the bank, but the lien gives the CC priority claim.
+
+### 2.3 Mutual Fund Overnight Scheme (MFOS) units
+
+**Mechanism.** Client invests in an MFOS unit (a money-market-fund variant with daily liquidity and overnight maturity); the broker takes a pledge on the MFOS unit; the pledge is re-pledged to the CC via the depository's margin pledge / re-pledge framework from the TMCM Margin Pledge account.
+
+**Acceptance.** All major CCs accept MFOS units as upstreamed collateral. Quarterly approved-collateral list specifies eligibility per scheme.
+
+**Haircut (per [ICCL 20240710-11](/broking-kyc/reference/circulars/clearing-corps/#iccl-20240710-11) effective 1 August 2024):**
+- Overnight MFOS: 5% haircut.
+- Other MF schemes: VaR-based 6σ with minimum 9% haircut.
+
+**Mechanics of re-pledge:**
+
+1. Client pledges MFOS units to broker via the standard depository pledge flow (CDSL TPIN + OTP or DDPI; NSDL equivalent). Pledge sits in the broker's TMCM Margin Pledge account (sub-status as applicable per depository).
+2. Broker re-pledges from the TMCM Margin Pledge account to the CC's collateral pool via the depository's re-pledge file.
+3. CC accepts the re-pledge and credits margin equivalent (haircut applied).
+4. Daily mark-to-market of MFOS unit value; haircut applied to NAV-implied value.
+
+**Downstreaming.** On reduction of upstreaming requirement, CC releases the re-pledge; broker releases the pledge on the client's MFOS units.
+
+**Risk.** Low-to-moderate. MFOS is overnight-redeemable with daily NAV; the underlying assets are typically short-term money-market instruments. Haircut covers intraday NAV volatility.
+
+### 2.4 Combined upstreaming
+
+A broker typically upstreams via a combination — for example, cash for the bulk of the next-day obligation buffer, FDR for the medium-term portion (where the broker can monetise the float through FDR interest passed to clients), and MFOS for a smaller portion where MFOS NAV upside is shared with clients. The choice of mix is partly economic (interest passed through) and partly operational (FDR creation has a lag; cash is fastest; MFOS requires client opt-in to the MFOS scheme).
+
+<Aside type="note">
+**Bank-CM exemption.** A clearing member that is itself a bank (i.e., a bank-CM, like HDFC, ICICI, Axis in their clearing-bank capacity) is exempt from certain upstreaming requirements because client funds are already with a regulated bank under its own prudential regime. The bank-CM continues to maintain client funds in segregated bank accounts; the upstreaming flow is internal-to-bank rather than a transfer to the CC. The exemption is operational; the principle of EOD no-retention still applies through the bank's segregation framework.
+</Aside>
+
+## 3. The USCNBA / DSCNBA bank-account architecture
+
+Per [SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/187](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-1-p-cir-2023-187) (December 2023), the upstreaming framework operationally uses two named nodal accounts:
+
+### 3.1 USCNBA — Upstreaming Client Nodal Bank Account
+
+The bank account from which the broker upstreams client funds to the CC's settlement bank account at EOD. Receives credits from:
+
+- Client fund transfers into the broker.
+- Pay-out from CC for sells on T+1.
+
+Sends debits to:
+
+- Upstream to CC at EOD.
+- Pay-in to CC at T+1 morning.
+- Client running-account-settlement disbursements at the chosen quarterly / monthly cycle.
+
+### 3.2 DSCNBA — Downstreaming Client Nodal Bank Account
+
+The bank account to which the CC downstreams client funds first thing next morning, for the broker to fund next-day client obligations. Receives credits from:
+
+- CC downstream of previous EOD upstreamed amount.
+- Other internal-broker reconciliation entries.
+
+Sends debits to:
+
+- Next-day client pay-in via the broker's CM ledger to CC.
+
+In practice, many brokers operate USCNBA and DSCNBA as a single nodal account with the directional flow tracked via accounting tags rather than physically separate accounts. The SEBI framework allows this provided the directional flows are auditable.
+
+### 3.3 Suspense UCC for unidentified credits
+
+Per [NCL/CMPL/64088](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpl-64088) (23 September 2024, effective 19 December 2024) follow-up to SEBI/HO/MRD2_DCAP/CIR/2021/0598: brokers may use a designated UCC "SUSPE1234N" on member PAN for unidentified / suspense-account funds. The member must not create this UCC in the Exchange UCC database; orders are not permitted under it. Such funds must still be upstreamed to CCs. Reporting clarifications: EPI of funds for settlement obligation (incl. OFS) is reported in column 46 "Cash placed with CC" on days prior to settlement, not column 22; not reported on settlement day as funds no longer in clear ledger.
+
+This addresses the "received but unidentified" case — funds credited to the broker's USCNBA without clear client attribution. They get the SUSPE1234N tag, are upstreamed like any other client funds, and are reconciled / allocated to the correct UCC on identification.
+
+## 4. Daily flow timeline
+
+For a typical (non-quarterly-running-account-settlement) day:
+
+| Time | Activity | Reference |
+| --- | --- | --- |
+| 09:15 – 15:30 IST | Trading session. Client trades generate client-funds-bank credits (deposits) and debits (pay-ins). | Standard trading day |
+| 15:40 – 19:00 IST | EOD reconciliation. Broker computes client clear credit balances; computes T+1 settlement obligation; computes upstreaming requirement. | [Integration DAG — EOD & settlement](/broking-kyc/operations/integration-dag/eod-settlement/) |
+| 16:30 IST | Cash immediate-release cut-off (for re-allocation across CCs / segments). | [NCL/CMPT/57223](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-57223) |
+| 19:00 IST | Cash upstream cut-off; FDR / MFOS pledge submission cut-off (standard days). | [NCL/CMPT/57223](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-57223), [NCL/CMPT/72025](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-72025) |
+| 20:00 IST (Q-end) | Upstream cut-off on quarterly running-account-settlement dates. | [NCL/CMPT/72025](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-72025) |
+| 21:00 IST | Margin report download from CC (post-upstream snapshot). | [NCL/CMPT/72025](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-72025) |
+| 22:00 IST | Collateral allocation window close (Q-end). | [NCL/CMPT/72025](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-72025) |
+| 23:59:59 IST | Reporting cut-off for collateral release reason codes via member portal. | [NCL/CMPT/57223](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-57223) Section G |
+| T+1 morning | Downstream from CC to DSCNBA for next-day client obligations. | [Integration DAG — EOD & settlement](/broking-kyc/operations/integration-dag/eod-settlement/) (SET-UPSTREAM / SET-PAYIN nodes) |
+
+## 5. Allocation / de-allocation procedure
+
+The clearing corp's collateral allocation framework (per the [NCL/CMPT/51657](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-51657) / [NCL/CMPT/52000](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-52000) collateral-segregation-at-client-level circulars) requires the broker to allocate upstreamed collateral across:
+
+- TM proprietary (own positions).
+- CM proprietary (if TM-cum-CM).
+- Client-level allocations per UCC.
+- Custodial Participant (CP) level if applicable.
+
+### 5.1 Allocation order
+
+Per [NCL/CMPT/51657](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-51657): the order of margin blocking is **client collateral → TM prop → CM prop**. That is, a TM / CM cannot use its own collateral to cover a client's margin requirement until the client's own collateral is exhausted.
+
+### 5.2 50% cash equivalent rule
+
+At the CM level, at least 50% of the collateral must be in cash or cash-equivalents (e.g., G-Sec). Excess CM-prop cash can count for clients, but excess client cash cannot count for CM-prop. This rule reduces the operational drag of using only non-cash collateral.
+
+### 5.3 Risk Reduction Mode (RRM)
+
+Collateral utilisation is monitored at 90% at both TM and CM levels (per [NCL/CMPT/51657](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-51657)). On crossing 90%, the member is put into Risk Reduction Mode — only order modifications and cancellations are permitted, no new exposure. RRM exits when utilisation falls below the threshold.
+
+### 5.4 De-allocation and release
+
+A broker may request release of upstreamed collateral via the member portal with one of the eleven prescribed reason codes per [NCL/CMPT/57223](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-57223) Section G:
+
+1. Client unpaid securities / MTF.
+2. Sale of unpaid securities.
+3. Penalties.
+4. Statutory levies.
+5. Brokerage.
+6. DP charges.
+7. Running-account settlement.
+8. Withdrawal request.
+9. CM / TM prop.
+10. Conversion.
+11. Transfer to other CC.
+12. Pay-in.
+
+Reporting cut-off 23:59:59 on the member portal under Inspection → Statement Upload → Collateral Segregation → Reason for Collateral Release. False reporting attracts the same penalty schedule as false margin reporting.
+
+### 5.5 Short allocation monitoring
+
+Short allocation = minimum client upfront margin less client collateral value (allocated + re-pledged after prudential haircuts, excluding the 50:50 rule). Monitored intraday at peak-margin snapshots and at EOD via SA01 / 02 / 03 (intraday, file naming SA01/02_P_<member>_DDMMYYYY_i01/02) and SA04 / 05 / 06 (EOD / max) reports per [NCL/CMPT/55381](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-55381). Five permitted reason codes for legitimate short allocation: excess collateral at another CC, EPI of securities, wrong-client trades, NRI trades, late allocation acceptance. Effective from 13 February 2023.
+
+## 6. Reconciliation
+
+### 6.1 Daily reconciliation streams
+
+A broker's funds operations team reconciles three streams daily:
+
+| Stream | Source | Verifies |
+| --- | --- | --- |
+| USCNBA bank book | Bank statement | Every credit / debit traceable to a client action or settlement flow |
+| Client ledger | Back-office | Every client's cumulative balance + transaction history |
+| CC collateral file | CC member portal | Upstreamed amount + allocation per UCC + reason for any release |
+
+Three-way reconciliation flags any inconsistency. The typical issue: a client running-account-settlement amount paid out from USCNBA but not reflected in the client ledger or in the CC allocation file as a release.
+
+### 6.2 Bank-balance API submission
+
+Per [NSE/INSP/55039](/broking-kyc/reference/circulars/nse/#nse-insp-55039), brokers submit daily holding statement and bank balances via API to the exchange (effective 30 January 2023, replacing the legacy weekly submission). The bank-balance feed covers all client-funds bank accounts and is the basis for compliance monitoring of client-funds-bank-balance EOD positions.
+
+### 6.3 Suspense-account drift
+
+The SUSPE1234N UCC accumulates funds where the broker cannot immediately allocate to a specific client. Drift in this balance is a compliance signal — material balance indicates an unresolved allocation problem. Most compliance teams set a threshold (e.g., 0.5% of total client-funds balance) above which the suspense account triggers a remediation queue.
+
+### 6.4 Collateral-segregation file mismatches
+
+Per [NCL/CMPL/53287](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpl-53287), two checks are enforced between client-collateral reporting and allocation at CC:
+
+- Allocation ≤ collateral received from client.
+- Allocation at CC ≥ collateral (excluding re-pledged securities) reported as passed on by CM to CC.
+
+Discrepancies surface on the member portal (ENIT) under "Allocation Mismatch Details." User manual in the appendix to [NCL/CMPL/53287](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpl-53287). Resolution requires a corrective file submission, usually within T+1.
+
+## 7. Partial upstreaming and edge cases
+
+### 7.1 Partial upstreaming
+
+Operationally, a broker may upstream less than 100% of EOD client funds because of:
+
+- Timing — funds received post 19:00 cut-off remain in USCNBA overnight.
+- Allocation pending — funds awaiting allocation to a specific UCC.
+- Bank cut-offs — bank's own RTGS / NEFT cut-offs preceding the CC cut-off.
+- Reconciliation breaks — funds against which the broker cannot complete the CC's allocation file in time.
+
+The mandate is "no client funds remain with stock brokers or clearing members on EOD basis." Partial upstreaming therefore is non-compliant in principle but operationally tolerated for small residuals due to timing reasons, provided:
+
+- The residual is reconciled and upstreamed the next day.
+- The residual is reported in the SEBI master-circular reporting cycle.
+- The reason is captured (e.g., late client deposit, post-cut-off bank credit).
+
+Persistent material partial upstreaming triggers inspection findings under the [client funds compliance domain](/broking-kyc/operations/compliance-blueprint/#client-funds-21-entries) (CLIENT-FUNDS-002).
+
+### 7.2 Funds received after cut-off
+
+A client deposits funds at 20:00 IST. The cash upstream cut-off was 19:00. Operationally:
+
+- Funds sit in USCNBA overnight.
+- Next-day BOD: funds are upstreamed in the BOD flow, or held against the client's expected pay-in for the day's trades.
+- Reported in the EOD reconciliation as a post-cut-off credit; not a compliance issue if upstreamed next day.
+
+### 7.3 Running-account settlement day
+
+On quarterly running-account-settlement dates (Friday / Saturday of the chosen settlement week per [SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2023/197](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod1-p-cir-2023-197), Dec 2023), the broker settles all client running-account credit balances to the client's registered bank. This generates a one-day spike in USCNBA outflow. The CC accordingly extends upstream / release cut-offs (per [NCL/CMPT/72025](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-72025) and similar quarterly circulars).
+
+### 7.4 UPI-Block (ASBA) interaction
+
+For QSB clients using UPI Block (per [NCL/CMPT/58895](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-58895) operating guidelines and [SEBI/HO/MRD/MRD-PoD-2/P/CIR/2024/153](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-mrd-mrd-pod-2-p-cir-2024-153) mandatory from 1 February 2025 for QSBs), client funds are blocked in the client's own bank account; they never enter the broker's USCNBA in the first place. The upstreaming flow doesn't apply for the blocked portion. UPI-Block clients have an earlier securities EPI cut-off (18:00 IST on quarterly running-account-settlement dates per [NCL/CMPT/72025](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-72025)).
+
+### 7.5 NRI client funds
+
+NRI clients (PIS-route in particular) have additional banking constraints. Their funds typically flow via NRE / NRO accounts with PIS-bank reconciliation; the broker may not have direct authority to upstream from these accounts without PIS-bank coordination. NRI client trade short-allocation is one of the five permitted reason codes per [NCL/CMPT/55381](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-55381). Operational handling is by the individual broker's NRI desk; many maintain a separate NRI-segregated USCNBA flow.
+
+### 7.6 Cross-CC offsets
+
+If a broker is a member at multiple CCs (NSCCL, ICCL, MCXCCL), and a client's net position is offsetting across CCs, the broker may have excess collateral at one CC. The collateral can be re-allocated across CCs subject to the immediate-release cut-off (16:30 IST per [NCL/CMPT/57223](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-57223)).
+
+### 7.7 FDR pre-termination on client request
+
+If a client requests withdrawal of funds underlying an FDR that has been upstreamed, the broker must pre-terminate the FDR (FDR conditions allow this), release the lien with the CC, downstream the cash from the CC, and pay the client. Operational lag: typically T+1 because pre-termination and lien release require coordination with the bank and the CC.
+
+### 7.8 MFOS NAV haircut and intraday volatility
+
+MFOS NAV updates daily. If NAV drops materially overnight, the haircut may need adjustment; the CC re-prices the collateral and may issue a margin call. Brokers using a significant MFOS portion of upstreaming hedge against this by maintaining a slight excess in cash or by sizing the MFOS portion conservatively.
+
+<Aside type="caution">
+**The "EOD no-retention" principle is binding and inspected for.** Pre-2023 practices of holding client funds overnight to absorb operational variability are now non-compliant. SEBI inspections check the EOD USCNBA balance against the prior day's net inflows; persistent positive balances trigger findings. Brokers that didn't migrate fully to the upstreaming flow in 2023 faced enforcement action in 2024 inspections.
+</Aside>
+
+## 8. Asset-class quarterly approved-collateral list
+
+The CC publishes a quarterly approved-collateral list. The list governs which specific instruments are accepted, the haircut, the per-issuer cap, and operational constraints. The most-recent NSCCL / ICCL / MCXCCL lists (e.g., [MCX/MCXCCL/094/2026](/broking-kyc/reference/circulars/clearing-corps/#mcx-mcxccl-094-2026) effective 2 March 2026; quarterly precursors) follow a standard structure:
+
+| Annexure | Asset class | Operational rules |
+| --- | --- | --- |
+| 1.1 | Equity shares as non-cash collateral | 25% per-security cap of total collateral; VaR-rate haircut; no own-group / associate-entity-issued |
+| 1.2 | ETF cash / non-cash | Per ETF; lower haircut for liquid bees / liquid ETFs |
+| 1.3 | Cash MF units | Per scheme; includes MFOS (5% haircut) |
+| 1.4 | Non-cash MF units | VaR-based 6σ minimum 9% haircut |
+| 2 | G-Sec / T-Bills / SGB cash collaterals | Margin-benefit withdrawn 2 days prior to maturity; RBI-issued accepted |
+| 3 | Approved commodities (MCX) | Per commodity quality / location specs |
+| 4 | Approved banks for FDR / BG | LIFO bank-exposure adjustments; physical FDR min 7-day tenure |
+
+Quarterly revision dates: typically March, June, September, December effective dates. Brokers update their RMS and back-office collateral-acceptance rules within each revision window.
+
+## Practical notes
+
+- **[industry typical]** Most brokers upstream a mix: ~60-70% cash, ~20-30% FDR (where client funds are large enough to justify the FDR creation overhead), and the balance in MFOS for clients that opt in to MFOS. The exact mix is broker-specific and driven by client mix and interest-passthrough economics.
+- **[gotcha]** FDR pre-termination has a settlement lag — typically T+1. Clients requesting same-day full withdrawal of running-account-settled funds may be limited by the FDR-pre-termination cycle if the upstreaming was via FDR. Brokers communicate this through running-account-settlement T-Dn reminders.
+- **[risk trade-off]** The MFOS pledge route is operationally lighter than FDR (no bank-coordination required for pre-termination) but introduces NAV-volatility exposure. Brokers offering MFOS as part of upstreaming generally pass through the NAV-implied interest to the client and absorb a small operational margin for the daily haircut adjustment.
+- **[gotcha]** The 11 reason codes for collateral withdrawal per [NCL/CMPT/57223](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-57223) Section G are not interchangeable — each implies a different downstream treatment by the CC. Reason code "running-account settlement" releases collateral with a different audit trail than "withdrawal request." False reporting attracts the same penalty schedule as false margin reporting; brokers maintain a strict reason-code-mapping table in their EOD process.
+- **[industry typical]** Bank-balance API submission per [NSE/INSP/55039](/broking-kyc/reference/circulars/nse/#nse-insp-55039) means the exchange knows the broker's USCNBA balance daily — there is no hiding a persistent EOD residual. The visibility has been the single biggest enforcement driver behind clean upstreaming compliance.
+- **[cost optimization]** The 50% cash-equivalent rule at CM level means a broker holding only equity-shares as non-cash collateral effectively loses access to half its collateral value for margin purposes. Brokers typically keep at least 60% of CM-level collateral in cash or G-Sec to preserve full deployment flexibility.
+- **[gotcha]** SUSPE1234N UCC must not be created in the exchange UCC database; orders are not permitted under it. Brokers that mistakenly created a UCC with that code in the exchange UCC database had to deregister. The SUSPE1234N tag is purely an internal back-office tag for the broker's funds segregation, not a tradable UCC.
+- **[industry typical]** Quarterly running-account-settlement dates require careful pre-staging. Most brokers begin client communication 5-7 days ahead, freeze net-deposits-vs-settle calculation 1 day ahead, run the settlement payout on the Friday / Saturday, and reconcile post-cut-off (20:00 IST upstream window) the same evening.
+- **[risk trade-off]** Bank-CM members operating under the bank-CM exemption have a different reconciliation profile — funds are bank-internal rather than upstreamed to a CC settlement account. Inspections of bank-CM members focus on intra-bank segregation evidence rather than CC upstreaming files.
+
+## Cross-references
+
+- [Broker Process Narrative — Section 3 (Settlement Cycle)](/broking-kyc/broker-process/narrative/#3-the-settlement-cycle) — chronological narrative
+- [Integration DAG — EOD & settlement](/broking-kyc/operations/integration-dag/eod-settlement/) — SET-UPSTREAM node
+- [Compliance Blueprint — Client funds domain](/broking-kyc/operations/compliance-blueprint/#client-funds-21-entries) — obligations CLIENT-FUNDS-001 / 002 / 003
+- [Compliance Blueprint — Settlement domain](/broking-kyc/operations/compliance-blueprint/#settlement-22-entries) — SETTLEMENT-007 upstreaming entry
+- [Direct payout to demat deep dive](./direct-payout-to-demat/) — securities-side counterpart
+- [T+0 / T+1 settlement deep dive](./t0-t1-settlement/) — settlement cycle for which the upstreaming funds the obligation
+- [Payin default + Core SGF deep dive](./payin-default-core-sgf/) — what happens when downstreamed funds are inadequate
+- [Circulars — SEBI MIRSD](/broking-kyc/reference/circulars/sebi-mirsd/) — upstreaming authorities (June 2023 / Dec 2023)
+- [Circulars — Clearing corps](/broking-kyc/reference/circulars/clearing-corps/) — implementation circulars
+
+## Verified through
+
+2026-05-14
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

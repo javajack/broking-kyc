@@ -1,0 +1,283 @@
+---
+title: "Deep Dive: Fit-and-proper criteria for stockbrokers"
+description: Reference and walkthrough of the fit-and-proper framework that governs continuing eligibility of brokers, directors, KMPs, and senior management — disqualifying conditions under SEBI (Intermediaries) Regulations and SEBI (Stock Brokers) Regulations 2026, annual self-certification cycle, regulatory-action handling, and the procedure when an individual loses fit-and-proper status.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Fit-and-proper sits at the intersection of three regulatory layers — SEBI (Intermediaries) Regulations 2008 (Schedule II is the canonical fit-and-proper test), SEBI (Stock Brokers) Regulations 2026 ([SEBI/LAD-NRO/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebi-lad-nro-gn-2026-291), the broker-specific overlay), and the SEBI Stock Broker Master Circular ([SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-pod-1-p-cir-2025-94)). This page knits them together so a compliance officer can answer: "what does fit-and-proper actually require, who does it apply to, how often is it tested, and what happens when an individual fails the test?".
+
+## TL;DR
+
+- **Fit-and-proper is a continuing eligibility test**, not a one-time admission gate. Brokers must demonstrate ongoing fit-and-proper status of (a) the broker entity, (b) every director on the board, (c) every Key Managerial Person (KMP) under Section 2(51) of the Companies Act 2013, and (d) senior management with material control over operations.
+- The legal source is **Schedule II of SEBI (Intermediaries) Regulations 2008**, applied to brokers through **Regulation 9 of SEBI (Stock Brokers) Regulations 2026 ([SEBI/LAD-NRO/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebi-lad-nro-gn-2026-291))** and reiterated in the **SEBI Stock Broker Master Circular ([SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-pod-1-p-cir-2025-94))**.
+- **Disqualifying conditions** include: criminal conviction involving moral turpitude or economic offence; SEBI / RBI / other-regulator debarment or specific enforcement action; insolvency; declared NPA on a financial-services account; orders restraining the person from accessing the securities market; ongoing inquiry where adverse findings are likely; and inadequate integrity, reputation, or character.
+- **Cadence: annual self-certification** at minimum, plus event-triggered re-verification when an adverse regulatory action, criminal proceeding, or other disqualifying condition arises. The annual self-certification is one of the named recurring cycles ([CYC-AN-FIT_PROPER](/broking-kyc/operations/integration-dag/recurring-cycles/#per-node-detail)).
+- The **2026 Regulations introduce a resident-director requirement**: at least one designated director must be resident in India for 182+ days per financial year (MEMBER-COMP-018 in the [Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/#member-compliance-23-entries)).
+- **Loss of fit-and-proper** at the individual level triggers immediate removal from the role; at the entity level it triggers proceedings that may lead to **registration suspension or cancellation**.
+- AI-generated synthesis. **Verify any specific disqualifying condition or procedural step against the linked regulations and circulars before acting.**
+
+## Conceptual overview
+
+A securities-market intermediary is a trust-bearing role. Investors hand over funds, securities, and identity data to brokers expecting that the people running the broker firm are not just operationally competent but also trustworthy in a regulatory sense — they have not been criminally convicted, have not been debarred from the securities market, have not previously absconded with client funds, and are not currently under inquiry where adverse findings appear likely. SEBI captures this expectation in two layers:
+
+1. **Schedule II of SEBI (Intermediaries) Regulations 2008** — the canonical fit-and-proper test. It enumerates the specific conditions an applicant or continuing intermediary must satisfy. Schedule II applies across all SEBI-registered intermediary categories (brokers, depository participants, custodians, RTAs, AMCs, portfolio managers, investment advisors).
+2. **Broker-specific overlay under [SEBI (Stock Brokers) Regulations 2026 (SEBI/LAD-NRO/GN/2026/291)](/broking-kyc/reference/circulars/sebi-other/#sebi-lad-nro-gn-2026-291)** — Reg 9 (eligibility, including fit-and-proper) plus broker-specific obligations like the **resident designated director** requirement, the **two-year-securities-trading-experience** mandate for fresh registration (Reg 7), and the codification of senior management and KMP coverage.
+
+The framework is *continuing*. Brokers do not pass a fit-and-proper test once at admission and ride that test forever. The annual self-certification refresh, the event-triggered re-test on adverse events, and the operational requirement to intimate the exchange / SEBI within prescribed windows on KMP changes all combine to keep fit-and-proper alive year-round.
+
+<Aside type="note">
+**Schedule II is the same test across intermediary categories.** A SEBI-registered RTA, broker, depository participant, mutual fund, investment advisor, and portfolio manager all answer to the same Schedule II framework, with category-specific overlays. The shared test exists because the underlying concern is the same: are the persons in control of a regulated securities-market entity worthy of investor trust? The category-specific overlays then add what each role demands — brokers need securities-trading experience and resident-director presence; AMCs need fund-management expertise; advisors need fee-only-vs-distribution disclosure; and so on.
+</Aside>
+
+## Schedule II — the canonical fit-and-proper test
+
+Schedule II of SEBI (Intermediaries) Regulations 2008 enumerates the conditions under which a person — natural or juridical — is deemed fit and proper. The test applies at admission and as a continuing requirement; failing any one condition is, in principle, sufficient to make the person not fit-and-proper. The substantive elements are:
+
+### Integrity, reputation, character
+
+A general standard, satisfied by demonstrating that the person has not engaged in actions injurious to investor protection or market integrity. The "general" nature of the standard is intentional — it allows SEBI to apply judgement on facts and circumstances beyond the specific items below.
+
+### Absence of criminal conviction involving moral turpitude or economic offences
+
+The person must not have been convicted of:
+
+- offences involving **moral turpitude** (broadly: dishonesty, fraud, theft, breach of trust, embezzlement);
+- offences under the **Income-tax Act 1961**, **Prevention of Money Laundering Act 2002 (PMLA)**, **Foreign Exchange Management Act 1999 (FEMA)**, **Companies Act**, **SEBI Act**, **Depositories Act**, **Banking Regulation Act**;
+- offences relating to **bribery, fraud, breach of trust, falsification, misrepresentation, abetment, conspiracy** in connection with the above.
+
+A conviction is a disqualifying event from the date of the conviction order; an acquittal restores fit-and-proper. A pending criminal proceeding is not, by itself, a disqualification unless SEBI concludes that adverse findings are likely on existing evidence.
+
+### Absence of SEBI / regulator debarment
+
+The person must not be:
+
+- **debarred from accessing the securities market** under an order of SEBI, IRDAI, RBI, PFRDA, MCA, or a foreign regulator with reciprocal arrangement;
+- subject to an **order restraining from acting as a director or senior management** of a listed or registered entity;
+- subject to a **prohibitory order** under section 11, 11B, or 11D of the SEBI Act, or under analogous provisions of the Depositories Act or Securities Contracts (Regulation) Act 1956 (SCRA).
+
+The debarment is checked against the public orders of SEBI (and reciprocal regulators); SEBI's order database is the authoritative source. Industry practice is to screen names quarterly against the SEBI orders portal.
+
+### Solvency and financial standing
+
+The person must not be:
+
+- **an undischarged insolvent** (declared bankrupt and not subsequently discharged);
+- declared a **wilful defaulter** by any bank or financial institution;
+- subject to a **non-performing asset (NPA)** classification on a financial-services account where the person was a borrower, director, or guarantor.
+
+For corporate brokers, the entity-level solvency test extends to the promoter group and persons in control.
+
+### Ongoing inquiry / regulatory action
+
+The person must not have a **pending inquiry** before SEBI / RBI / IRDAI / other regulator where, on the available evidence, an adverse finding appears likely. This is a forward-looking standard: SEBI may, after due notice, find a person not fit-and-proper on the basis of pending inquiry without waiting for the final order. The condition is rarely invoked because of the procedural safeguards (notice, hearing, recorded reasons) but exists.
+
+### Specific securities-market disqualifications
+
+The person must not have been:
+
+- found guilty of **insider trading** under SEBI (PIT) Regulations 2015;
+- found guilty of **market manipulation** under SEBI (PFUTP) Regulations 2003;
+- removed from membership of any **stock exchange or clearing corporation** for default, fraud, or misconduct.
+
+A historic violation cured by completion of the prescribed remedy (e.g., serving the prescribed debarment period and obtaining the SEBI discharge) restores fit-and-proper, subject to the broader integrity standard.
+
+## Broker-specific overlay under SEBI (Stock Brokers) Regulations 2026
+
+[SEBI/LAD-NRO/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebi-lad-nro-gn-2026-291) (in force from 7 January 2026) consolidates and updates the broker-specific layer that sits on top of Schedule II. The 2026 Regulations replace the 1992 framework with a wholesale rewrite, and the fit-and-proper-adjacent provisions worth knowing in detail are:
+
+### Eligibility (Reg 7) — two-year securities-trading experience
+
+Fresh registration applications under the 2026 Regulations require evidence of **at least two years of securities-trading experience** at the entity or in the persons in control. The intent is to prevent under-prepared new entrants from inducting client funds. Operational evidence includes prior exchange-membership history, employer certificates from regulated entities, or director CVs showing relevant trading or operations roles. See [MEMBER-COMP-019 in the Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/#member-compliance-23-entries).
+
+### Resident designated director (Reg requirement)
+
+The 2026 Regulations require at least **one designated director resident in India for 182+ days per financial year**. The Designated Director under PMLA is the same person used here; the residency standard is the income-tax definition (182 days physical presence in India during the FY). The director's residency status is evidenced through:
+
+- Director residency declaration on file with the broker.
+- Passport / immigration record (entries / exits).
+- Board resolution confirming the designation.
+
+A loss of residency mid-year (e.g., a designated director takes an overseas posting) is a fit-and-proper trigger: the board must designate a replacement and intimate the exchange / SEBI within the prescribed window before the residency-loss threshold is breached. See [MEMBER-COMP-018](/broking-kyc/operations/compliance-blueprint/#member-compliance-23-entries).
+
+### Continuing fit-and-proper (Reg 9 + ongoing obligation)
+
+Brokers are required to maintain fit-and-proper continuously — not only of the entity but of every director, KMP, and senior management person. The continuing obligation is evidenced by:
+
+- **Annual fit-and-proper declaration** from each director, KMP, and senior-management person, in the format prescribed by the exchange / SEBI master circular.
+- **Criminal-record / regulatory-debarment register** maintained by the compliance function, refreshed at each annual cycle and on event.
+- **KMP-changes intimation log** that reflects fit-and-proper validations done at each appointment, change, or removal. See the [KMP changes deep dive](/broking-kyc/deep-dives/member-compliance/kmp-changes/) for the procedure.
+
+### KMP coverage scope
+
+The Companies Act 2013 Section 2(51) defines KMP as the Chief Executive Officer (CEO) or the Managing Director or the Manager; the Whole-time Director; the Company Secretary; the Chief Financial Officer; and "such other officer, not more than one level below the directors who is in whole-time employment, designated as Key Managerial Personnel". SEBI's broker-specific scope explicitly adds:
+
+- **Compliance Officer** — the SEBI-designated person responsible for the compliance function. Must hold a valid **NISM Series III-A** certification ([MEMBER-COMP-006](/broking-kyc/operations/compliance-blueprint/#member-compliance-23-entries)).
+- **Principal Officer (PMLA)** — the PMLA-designated AML officer. Holds NISM Series I or VII as applicable ([MEMBER-COMP-007](/broking-kyc/operations/compliance-blueprint/#member-compliance-23-entries)).
+- **Designated Director (PMLA)** — the senior manager designated under PMLA for AML responsibility. Often co-located with the resident-director requirement under the 2026 Regulations.
+- **MD / CEO** — managing director or chief executive who heads the broker entity.
+- **Designated Persons (DP)** under SEBI (PIT) Regulations 2015 — persons in possession of UPSI or having reasonable expectation of access to UPSI ([MEMBER-COMP-013](/broking-kyc/operations/compliance-blueprint/#member-compliance-23-entries)). Designated Persons must also be on the structured digital database (SDD).
+- **Senior management** — broadly defined as the layer one level below the board with material operational control. Compliance officers should adopt a generous reading of this layer rather than the narrow.
+
+### Promoters and persons in control
+
+For corporate brokers, fit-and-proper extends to the promoter group and any person exercising control directly or indirectly. The 2026 Regulations require disclosure of the shareholding chain up to the ultimate beneficial owner; SEBI may decline registration or take action if the chain reveals persons not fit-and-proper.
+
+<Aside type="caution">
+**Pending SEBI / regulator inquiry against a director is an immediate compliance event.** Even if the inquiry has not concluded with an adverse order, the compliance officer must (a) log it in the fit-and-proper register, (b) consider whether continued service of the director in role is consistent with broader integrity expectations, and (c) prepare for SEBI / exchange queries on the firm's response. Hiding pending inquiries from the compliance register is itself a serious lapse in continuing fit-and-proper.
+</Aside>
+
+## Operational mechanics
+
+### Annual self-certification cycle
+
+The annual fit-and-proper refresh is one of the named recurring cycles ([CYC-AN-FIT_PROPER](/broking-kyc/operations/integration-dag/recurring-cycles/#per-node-detail)). The mechanics typically run as follows:
+
+1. **Trigger** — calendar-driven; most brokers schedule the cycle in Q1 of the financial year (April–June) so that the refreshed declarations are on file before the half-yearly compliance certificate (CYC-HY-COMPLIANCE_CERT) is filed at September-end.
+2. **Distribution** — compliance circulates the prescribed self-certification format to each director, KMP, and senior-management person. The format typically includes:
+   - Personal details (name, PAN, DIN, address, contact).
+   - Declaration against each disqualifying condition (criminal conviction; SEBI / regulator debarment; insolvency / NPA; pending inquiry; etc.).
+   - Director / KMP roles held in the firm and any other regulated entities.
+   - Other directorships / KMP roles in non-regulated entities.
+   - Acknowledgement of the obligation to immediately notify the compliance officer of any adverse event during the year.
+3. **Independent verification** — compliance does not just rely on the self-declaration; the compliance officer cross-checks against:
+   - SEBI orders database (public).
+   - Stock exchange disciplinary action database (member portal access).
+   - Companies Act DIN status (MCA portal) for directorial disqualification.
+   - SEBI's KYC database for KRA-flagged adverse status.
+4. **Compilation** — the compliance officer compiles a fit-and-proper register for the firm, signed by the compliance officer and the designated director.
+5. **Storage and audit trail** — declarations and the verification trail are preserved for at least 8 years per SEBI books-and-records retention, longer if PMLA retention windows apply.
+
+### Event-triggered re-verification
+
+The annual cycle is the floor; the operative test is event-triggered. The compliance function maintains a watch on:
+
+- **Criminal proceedings** against any director, KMP, or senior management — captured via the periodic self-declaration plus an obligation to report immediately on any new development.
+- **SEBI / regulator actions** — including show-cause notices, interim orders, and final orders against named persons. The compliance officer subscribes to SEBI orders feed and reviews weekly.
+- **NPA classifications** on the broker's promoter group, directors, or KMPs in their personal capacities — typically learned through bank disclosures, board minutes, or media reports.
+- **Insolvency / bankruptcy filings** — public records in the Insolvency and Bankruptcy Code (IBC) cases at NCLT.
+
+When an event surfaces, the compliance function (a) re-tests fit-and-proper for the affected person, (b) determines whether continued role is consistent with the regulation, (c) recommends to the board on action (suspension from role, replacement, etc.), and (d) intimates SEBI / exchange within the prescribed window if action is taken.
+
+### Declaration format
+
+While SEBI does not prescribe a single mandatory format, the substantive content is required. A typical declaration includes:
+
+1. **Personal particulars** — name, PAN, DIN (if applicable), date of birth, nationality, address.
+2. **Designation** — role at the broker firm, date of appointment, reporting line.
+3. **Criminal record declaration** — categorical statement that the person has not been convicted of (and is not currently facing prosecution for) offences enumerated in Schedule II.
+4. **Regulatory action declaration** — statement that the person is not subject to any SEBI / RBI / IRDAI / PFRDA / MCA / foreign-regulator debarment or restraint order.
+5. **Insolvency declaration** — statement of solvency and absence of NPA classifications.
+6. **Other directorships / employments** — list of other directorial / KMP / senior-management roles in regulated and unregulated entities.
+7. **Acknowledgement** — the person commits to immediately notify the compliance officer of any change to any of the above.
+8. **Signature** — physical or eSign, dated.
+
+The declaration is typically refreshed annually and on any KMP change. The compliance officer counter-signs to confirm independent verification.
+
+### Regulatory-action handling
+
+When SEBI, an exchange, a depository, or another regulator initiates action against a director or KMP of the broker firm, the compliance officer takes a sequence of actions:
+
+1. **Acknowledge the notice** within the prescribed window (typically 7–15 days, depending on the notice).
+2. **Review the substance** — what is alleged, what is the evidence, what is the proposed action.
+3. **Convene a compliance review** — discuss with the named person, the legal advisor, and (if appropriate) the chairman of the board.
+4. **Assess fit-and-proper impact** — does the alleged act, if proven, render the person not fit-and-proper under Schedule II?
+5. **Recommend action** — temporary recusal during inquiry, replacement of the person in role, or continuation with monitoring.
+6. **Intimate the exchange / SEBI** — within the prescribed window, file the KMP-change or status-change intimation. Coordinate with [KMP-changes deep dive procedure](/broking-kyc/deep-dives/member-compliance/kmp-changes/).
+7. **Update the fit-and-proper register** — record the event, the firm's response, and the outcome.
+
+The principle is: the firm is not obligated to find the person guilty before acting; if the alleged conduct, if proven, would render the person not fit-and-proper, the compliance function should treat it as a re-verification trigger. Continuing a director in role through a serious SEBI inquiry without compliance review is itself a fit-and-proper concern for the firm.
+
+### Procedure when an individual loses fit-and-proper
+
+If a director / KMP / senior manager is found not fit-and-proper — through a regulatory order, a criminal conviction, an NPA classification, or otherwise — the firm must:
+
+1. **Immediate removal from role** — the person ceases to function in the named capacity. For directors, this is a board action with effect from the date of the disqualifying event (or as soon as practicable); for KMPs, it is a board / appointing-authority action.
+2. **Replacement** — appoint a replacement within the prescribed window. The replacement must be fit-and-proper independently.
+3. **Exchange / SEBI intimation** — file the KMP-change intimation via [ENIT (NSE)](/broking-kyc/reference/circulars/nse/#nse-comp-56766) / equivalent BSE / MCX channels. Provide the reasons for change.
+4. **Update KRA, depository, and other registrations** as applicable.
+5. **Audit trail** — document the disqualifying event, the firm's response, the removal, the replacement, and the intimations. Preserve for the 8-year retention period.
+6. **Self-disclose on next fit-and-proper cycle** — the next annual declaration must reflect the change in the firm's history.
+
+If the **broker entity itself** is found not fit-and-proper — typically when a critical mass of directors / KMPs fall, when promoter-group fit-and-proper is impaired, or when the firm itself is the subject of SEBI action — the proceedings escalate to **registration suspension** or **cancellation**. The procedure is:
+
+- **Show-cause notice** from SEBI to the broker entity, citing the basis.
+- **Hearing** before SEBI's adjudicating authority or designated panel.
+- **Order** — registration may be suspended (temporary, with conditions for restoration) or cancelled (permanent). Trading rights at the exchange cascade accordingly.
+- **Appeal** to the Securities Appellate Tribunal (SAT) within the prescribed window.
+
+## Sub-cases / edge cases
+
+### Promoter-group fit-and-proper
+
+For corporate brokers, fit-and-proper extends through the shareholding chain to the ultimate beneficial owner. If the promoter's promoter is found not fit-and-proper, the broker entity is at risk regardless of its own directors / KMPs being clean. The 2026 Regulations require disclosure of the full chain.
+
+### Ex-employees and information barriers
+
+A person previously employed by a broker against whom SEBI took action does not, by default, lose fit-and-proper if the SEBI action did not name the individual. However, if the action names the individual or is for conduct attributable to the individual, fit-and-proper is impaired even after departure.
+
+### Foreign jurisdictions
+
+Convictions or regulatory action in foreign jurisdictions are recognised under the Schedule II framework where the foreign offence corresponds to an Indian offence or where the foreign regulator is one with which SEBI has reciprocal cooperation. Compliance officers screening foreign directors should ask for self-declarations on overseas actions in addition to Indian ones.
+
+### Time-barred convictions
+
+Convictions older than a prescribed period (typically more than 10 years and where the sentence has been served / discharged) may be considered cured for fit-and-proper purposes, subject to the broader integrity standard. The decision is fact-specific and SEBI retains discretion.
+
+### Spouses and immediate relatives
+
+Schedule II does not, by itself, attribute the fit-and-proper failings of a relative to the person being tested. However, where the relative's failings indicate a pattern of conduct or a flow of funds back to the person being tested (e.g., a spouse declared insolvent in connection with the person's business activities), SEBI may treat the relative's record as relevant evidence. Compliance officers should ask about close-family circumstances in the self-declaration without making them automatically disqualifying.
+
+### NISM-certification implications
+
+A compliance officer's loss of fit-and-proper has knock-on effects on the firm's NISM-certified-role coverage. The replacement compliance officer must have a valid NISM Series III-A certificate (or obtain it within the cure window) — see [MEMBER-COMP-006](/broking-kyc/operations/compliance-blueprint/#member-compliance-23-entries) and the [KMP changes deep dive](/broking-kyc/deep-dives/member-compliance/kmp-changes/). Similarly for the Principal Officer's NISM I / VII coverage.
+
+### PMLA Designated Director overlap
+
+The PMLA Designated Director and the SEBI (Stock Brokers) Regulations 2026 resident-designated-director are typically the same person but need not be. The PMLA role is mandatory by statute; the SEBI 2026 role is mandatory by Regulation. Compliance officers usually combine them in one director for operational simplicity.
+
+### Whistleblower-revealed fit-and-proper concerns
+
+When a whistleblower or insider raises a fit-and-proper concern against a director / KMP — typically through the firm's whistleblower mechanism or anonymously to SEBI — the compliance officer must investigate even in the absence of a formal regulatory action. Failure to investigate is itself a fit-and-proper concern for the firm.
+
+### Re-application after cancellation
+
+A broker entity whose registration was cancelled may re-apply after the SEBI-prescribed cooling period, demonstrating that the underlying fit-and-proper concerns have been cured. The fresh application is treated as a new registration under [SEBI/LAD-NRO/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebi-lad-nro-gn-2026-291) including the two-year-experience and resident-director tests.
+
+<Aside type="tip">
+**The single highest-leverage practical step** for a compliance officer is to subscribe to SEBI's orders feed (https://www.sebi.gov.in/sebiweb/home/HomeAction.do?doListing=yes&sid=1&ssid=6&smid=0) and run a weekly name match against the firm's directors, KMPs, senior management, and promoters. A weekly check catches a regulatory action within 5–7 days, allowing the firm to respond within the typical 15-day intimation window. Quarterly or annual checks routinely miss the window.
+</Aside>
+
+## Practical notes
+
+- **[industry practice]** Maintain a single fit-and-proper register as a "source of truth" — most large brokers run it in their GRC tool with workflow for annual refresh, event-triggered re-verification, and director-by-director status. Smaller brokers use a structured spreadsheet refreshed quarterly.
+- **[gotcha]** The PMLA Designated Director is a specific PMLA-statute appointment; the SEBI 2026 resident-director is a Regulation 2026 requirement; the Companies Act Whole-time Director is a Companies-Act appointment. These are different definitions with different bases. Many compliance officers conflate them and produce a single declaration that incompletely satisfies any of the three.
+- **[risk trade-off]** Removing a director on the basis of a pending inquiry (before final order) protects the firm's fit-and-proper standing but may create labour or contractual exposure. Most large brokers maintain board-approved guidelines on when interim suspension applies and when the firm can wait for the final order.
+- **[gotcha]** A change in a director's residency status mid-year (foreign posting, extended overseas leave) can quietly breach the 2026 Regulations 182-day rule. Most firms run the residency check at every quarter-end and on every passport-event report from the director.
+- **[industry practice]** The annual fit-and-proper self-certification is often bundled into a single board-level "compliance affirmation pack" that also covers PIT Designated Persons, employee code of conduct, and conflict-of-interest declarations. Done once, it produces a year's worth of evidence.
+- **[cost optimization]** SEBI orders database, SEBI debarred persons list, MCA DIN status, and stock-exchange disciplinary databases are public and free. A weekly name-match script is cheap to build and saves the cost of a single missed-intimation penalty.
+- **[gotcha]** Fit-and-proper is a continuing test even outside the formal annual cycle. A director who was fit-and-proper in April but is convicted of an offence in July becomes not fit-and-proper from July. The firm cannot wait for the next annual cycle to act.
+- **[industry practice]** Where a senior person is the subject of pending inquiry, many firms record a board-noted "interim conduct" decision — typically that the person will continue in role but recuse from related decisions and submit to enhanced supervision. The arrangement is documented, time-bound, and reviewed quarterly.
+
+## Cross-references
+
+- [Compliance Blueprint — Member compliance (23 entries)](/broking-kyc/operations/compliance-blueprint/#member-compliance-23-entries) — MEMBER-COMP-005 (continuing fit-and-proper), MEMBER-COMP-017 (KMP change intimation), MEMBER-COMP-018 (resident designated director), MEMBER-COMP-019 (two-year experience).
+- [SEBI (Stock Brokers) Regulations 2026 — SEBI/LAD-NRO/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebi-lad-nro-gn-2026-291) — primary Regulation effective 7 January 2026.
+- [SEBI Stock Broker Master Circular — SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-pod-1-p-cir-2025-94) — operational layer for continuing compliance.
+- [SEBI Master AML Circular — SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](/broking-kyc/reference/circulars/sebi-mirsd/#sebi-ho-mirsd-secfatf-p-cir-2024-78) — Principal Officer and Designated Director under PMLA.
+- [KMP changes deep dive](/broking-kyc/deep-dives/member-compliance/kmp-changes/) — operational procedure for changes triggered by fit-and-proper events.
+- [Membership renewal deep dive](/broking-kyc/deep-dives/member-compliance/membership-renewal/) — fit-and-proper attestations bundled into annual renewal.
+- [NSE compliance — KMP intimation — NSE/COMP/56766](/broking-kyc/reference/circulars/nse/#nse-comp-56766) — KMP-change intimation circular.
+- [NSE inspection penalty grid — NSE/INSP/53530](/broking-kyc/reference/circulars/nse/#nse-insp-53530) — penalty matrix that catches delayed or missing KMP intimations.
+- [Recurring cycles — CYC-AN-FIT_PROPER](/broking-kyc/operations/integration-dag/recurring-cycles/#per-node-detail) — node in the cadence DAG.
+- [Broker process narrative — Section 5 Recurring Cycles](/broking-kyc/broker-process/narrative/#5-recurring-cycles) — narrative context for the annual cycle.
+- [Authorized Person framework deep dive](/broking-kyc/deep-dives/compliance-audit/ap-framework/) — APs are subject to a parallel (lighter) fit-and-proper standard.
+- [Inspection types deep dive](/broking-kyc/deep-dives/compliance-audit/inspection-types/) — fit-and-proper findings often surface in SEBI / exchange inspections.
+
+## Verified through
+
+2026-05-14
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

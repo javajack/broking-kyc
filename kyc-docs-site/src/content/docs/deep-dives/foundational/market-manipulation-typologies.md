@@ -1,0 +1,441 @@
+---
+title: "Deep Dive: Market manipulation typologies"
+description: Reference catalogue of market manipulation typologies — wash trade, front running, layering, spoofing, pump-and-dump, marking-the-close, circular trading — with detection signatures, NORMS alert patterns, broker surveillance rules, SEBI precedents, and FIU-IND STR obligations.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Market-manipulation surveillance is rule-based detection of *behavioural patterns* in trade and order data. The page is therefore a *catalogue* — one entry per typology, with each entry standardised to the same five fields: definition, detection signature, NORMS / exchange-surveillance flag pattern, broker-side surveillance system rule (the rule a broker's RMS / surveillance engine implements to catch the typology), regulatory action precedents (SEBI orders / SAT decisions where citeable), and reporting obligations (FIU-IND STR triggers, exchange penalty cascade, internal escalation). The introductory sections summarise the regulatory framework that underlies all the typologies; the catalogue then provides the working operational reference.
+
+## TL;DR
+
+- The Indian market-manipulation framework rests primarily on **SEBI (Prohibition of Fraudulent and Unfair Trade Practices Relating to Securities Market) Regulations, 2003** (the FUTP Regulations), the **SEBI (Prohibition of Insider Trading) Regulations, 2015** (PIT Regulations), and **PMLA-driven FIU-IND alert indicators** (for capital markets, refreshed in 2023-24 per FIU-IND Annual Report 2022-23).
+- **Detection happens at three layers**: (1) exchange-side surveillance — NORMS at NSE, equivalent at BSE / MCX — generates alerts on cross-broker patterns; (2) broker-side surveillance — proprietary RMS rules running on the broker's own order / trade book to catch own-clients' suspicious patterns; (3) regulator-side investigation — SEBI uses its data warehouse and intermediary reports to investigate cross-broker, cross-segment patterns.
+- **Seven canonical typologies** covered here: wash trade, front running, layering, spoofing, pump-and-dump, marking-the-close, circular trading. (Other typologies — e.g., insider trading, fraudulent disclosure-based schemes, GDR manipulation — exist but fall under PIT / disclosure-based regulations rather than trade-pattern surveillance and are mentioned in the cross-references.)
+- **Reporting obligations**: detected manipulation patterns trigger (a) automatic exchange penalty / Additional Surveillance Margin where applicable, (b) broker's mandatory escalation to Compliance Officer, (c) STR (Suspicious Transaction Report) filing to FIU-IND where AML-relevant flags are present, (d) intimation to SEBI in serious cases, (e) potential client-account suspension and UCC freeze.
+- **NORMS** (NSE's market-surveillance system — see NSE Master Surveillance Circular NSE/SURV/61970 dated 2024-05-02) is the central exchange-side detection engine. It aggregates alerts across persistent-noise-creator, OTR, ASM Spoofing, position-limit, and abnormal-trade categories.
+- **Broker surveillance** is mandated by SEBI's broker-surveillance circular and by exchange-specific circulars (e.g., NSE/ISS surveillance circulars). Each broker maintains a written Broker Surveillance Policy approved by its Compliance Officer / Board.
+
+## Regulatory framework — the common foundation
+
+Every typology below derives from one or more of the following primary regulations / circulars. They are cited per typology, but at a glance:
+
+- **SEBI (PFUTP) Regulations, 2003** — the core prohibition regulation against fraudulent and unfair trade practices. Regulation 4(2) enumerates non-exhaustive examples of manipulation, including circular trading, wash trades, marking the close, and synchronised trading.
+- **SEBI (PIT) Regulations, 2015** — prohibition of insider trading and unpublished-price-sensitive-information misuse. Touches front running where the manipulator is a fiduciary with access to client orders.
+- **SEBI Investigation Manual / SEBI Adjudication framework** — operational machinery for surveillance, investigation, and penalty.
+- **NSE / BSE / MCX Surveillance Master Circulars** — exchange-side detection rules and consequences (penalty cascade, GSM / ESM / ASM / STASM stages, additional surveillance margin for spoofing).
+- **PMLA, 2002 and PML Rules, 2005** + FIU-IND Alert Indicators for Capital Markets — the AML / counter-financing dimension; manipulation patterns linked to money-laundering or terror-financing flagged for STR filing.
+- **NSE Master Surveillance Circular NSE/SURV/61970** dated 2024-05-02 — master consolidated circular compiling all NSE Surveillance and Investigation Department circulars up to April 30, 2024, covering Periodic Call Auction, GSM/ESM/ASM/STASM, Persistent Noise Creators, OTR, Position Limits, ASM Spoofing, Penalty Structure, Cautionary Messages, IBC measures, ICA, CCM, Client Due Diligence, Abnormal Trades Penalty.
+- **NSE Additional Surveillance Margin for Order Spoofing** — NSE/SURV (May 23, 2019) levying 5% additional surveillance margin on trading members shortlisted for order spoofing in CM and Equity Derivatives segments.
+- **FIU-IND Alert Indicators for Capital Markets (2023-24)** — FIU-IND fresh alert indicators per its Annual Report 2022-23 (publicised April 2024) covering synchronised / manipulative trade practices, order spoofing, suspicious off-market transfers (depositories), and client-funds misuse during inspections.
+- **FIU-IND × SEBI MoU dated 16 April 2026** — formalises structured intelligence exchange and joint red-flag-indicator development between FIU-IND and SEBI.
+
+<Aside type="caution">
+**SEBI orders cited below are illustrative, not exhaustive.** SEBI's quasi-judicial determinations are voluminous; each typology has dozens of representative orders. Citations included are well-known orders that have been frequently referenced in subsequent SEBI orders, SAT decisions and academic / professional commentary. Always consult the SEBI website's adjudication orders search and SAT website for current case law.
+</Aside>
+
+## Surveillance architecture: three layers
+
+### Layer 1 — Exchange surveillance (NORMS at NSE; equivalents at BSE, MCX)
+
+The exchange's surveillance engine receives all order and trade messages in real time, runs pattern-detection algorithms, and produces alerts that move into the surveillance staging stack:
+
+1. **Cautionary message (CCM)** — first-level intimation to the trading member that a pattern was observed; no immediate financial consequence; member is expected to investigate and respond.
+2. **Persistent noise creator (PNC) action** — for clients with repeated order-modification / cancellation behaviour, increased monitoring and potential PSM placement.
+3. **Surveillance margin** — additional margin levied on the trading member where patterns persist (e.g., the 5% Additional Surveillance Margin for Order Spoofing per the May 2019 NSE circular).
+4. **Reporting to SEBI** — serious or unresolved alerts escalated to SEBI's surveillance team.
+5. **Penalty / disgorgement / debarment** — SEBI investigation may follow, with eventual adjudication.
+
+### Layer 2 — Broker surveillance
+
+The broker (in trading-member capacity) is obligated to run *its own* surveillance on its order and trade book per:
+- SEBI broker-regulation framework (SEBI Stock Brokers Regulations, 1992).
+- SEBI's circulars on broker-surveillance system (specific circulars on surveillance system at the broker, periodically reissued).
+- Exchange-specific Client Due Diligence (CDD) circulars (part of NSE/SURV/61970 master circular and equivalents).
+- The broker's own approved Surveillance Policy.
+
+Broker surveillance is rule-based — pattern detection on the broker's own clients' orders and trades, with each rule producing alerts that flow to the broker's Compliance Officer. Detected alerts are:
+- Investigated internally.
+- Escalated to NSE / BSE / MCX surveillance team if pattern is severe.
+- Filed as STR to FIU-IND if AML-relevant.
+- Reported in the broker's quarterly surveillance reports to the exchange.
+
+### Layer 3 — Regulator investigation
+
+SEBI's surveillance team consumes:
+- Exchange surveillance alerts.
+- Broker quarterly surveillance reports.
+- Direct complaints (SCORES).
+- Whistleblower reports.
+- Inter-MII intelligence sharing.
+
+For serious cases, SEBI initiates a formal investigation, summons records, conducts hearings, and issues adjudication orders. Appeals lie to SAT and onward to the Supreme Court.
+
+## The typologies
+
+### 1. Wash trade (self-trade for volume / price manipulation)
+
+**Definition.** A trade in which the same beneficial owner is both the buyer and the seller. No change in beneficial ownership occurs, but the trade appears in the public market as a *bona fide* trade, creating a false impression of liquidity, volume, or price discovery.
+
+**Prohibition basis.** SEBI (PFUTP) Regulations, 2003 — Regulation 4(2)(a), (b), (g) explicitly prohibit indulging in any act, practice or course of business that creates a false or misleading appearance of trading in the securities market.
+
+**Detection signature**:
+- Buy order and matching sell order in the same security, same quantity (or near-equal), with the same beneficial owner identified via:
+  - Same UCC (the simplest case — same client trading both sides; should be auto-rejected pre-trade at exchange via SOR (self-order-prevention) for the same UCC).
+  - Different UCCs but same PAN (e.g., HUF and karta accounts).
+  - Different UCCs but same financial controller (corporate parent / common board / beneficial owner per BO documentation).
+  - Different brokers but coordinated timing — caught only at exchange / SEBI level.
+- Repetitive pattern across the same security or related securities.
+- Often coincides with thin-liquidity windows (immediately post-open, pre-close, illiquid mid-day periods in low-float stocks).
+
+**NORMS / exchange flag pattern**:
+- Self-trade prevention at exchange-OMS level for same-UCC (rejects matching orders).
+- Cross-UCC same-PAN flag in NORMS daily alerts.
+- "Synchronised trade" pattern across multiple UCCs in NORMS.
+- Abnormal-trade alert triggering Abnormal Trades Penalty (per NSE/SURV master circular).
+
+**Broker surveillance rule (typical)**:
+- Daily reconciliation of orders / trades across UCCs sharing same PAN, same beneficial-owner declarations (per CDD), same family / group linkage flagged at onboarding.
+- Pattern detection — "matched-volume" within a configurable window (e.g., buy and sell of >X% match on same scrip within 60 seconds across own-broker UCCs sharing same PAN).
+- Alert escalation — Compliance Officer review within 24 hours; if pattern confirmed, freeze the involved UCCs pending investigation.
+
+**Regulatory action precedents**:
+- SEBI has issued multiple adjudication orders against brokers and clients for wash trades, particularly in penny stocks and low-float scrips. Common penalties include disgorgement of the manipulation-derived profits, monetary penalty under SEBI Act Section 15HA / 15HB, and debarment from the securities market for 1-5 years.
+- SEBI's enforcement against operators in illiquid scrips frequently combines wash trade with circular trading and synchronised trading; orders typically cite Regulation 4(2)(a), (b), (g) of PFUTP.
+
+**Reporting obligations**:
+- **Broker → exchange**: monthly surveillance report; alert-flagged trades disclosed quarterly.
+- **Broker → FIU-IND**: STR if the wash-trade pattern is linked to suspected layering of money-laundering proceeds (a common rationale for wash trades is to "launder" funds through fictitious trading gains).
+- **Broker → SEBI**: only on direct enquiry or in serious cases via the exchange's escalation.
+- **Broker → internal**: Compliance Officer escalation; UCC freeze; client-account review.
+
+### 2. Front running
+
+**Definition.** Trading by a fiduciary (broker, employee of broker, employee of asset-management entity, or any person with prior knowledge of a pending client order) *ahead* of the client's order, exploiting the price impact the client's order will create. Variations include:
+- **Pure front running**: broker / employee trades for own account ahead of client.
+- **Tipped front running**: broker / employee tips a related party who trades ahead.
+- **Client-on-client front running**: broker, knowing of a large client's order, allocates favourable price to a preferred client.
+
+**Prohibition basis.** SEBI (PFUTP) Regulations, 2003 — Regulation 4(2)(q) explicitly prohibits a person dealing in securities on the basis of knowledge of a client's prospective order. SEBI (PIT) Regulations, 2015 — where the front runner is an "insider" in the broader sense relevant to the security in question.
+
+**Detection signature**:
+- Order pattern: broker / dealer / employee account *opens a position in scrip X* shortly before a *large client order* in scrip X.
+- The pre-positioning is in the *same direction* as the client order's expected price impact (buy ahead of a large client-buy; sell ahead of a large client-sell).
+- The pre-positioning is *closed shortly after the client order executes*, realising the price-impact gain.
+- The client order is typically large enough to cause an observable price move; the front-running profit aligns with the move.
+
+**NORMS / exchange flag pattern**:
+- Cross-account pattern detection looking at proprietary / employee accounts of broker against same-broker client orders in same scrip within tight time window.
+- Alert combining: (a) directional pre-positioning in scrip; (b) subsequent large client order in same scrip; (c) post-execution unwinding.
+- Reported via NSE Investigation Department and SEBI's data warehouse for pattern correlation.
+
+**Broker surveillance rule (typical)**:
+- Daily reconciliation of proprietary / employee / dealer / related-party UCC activity against client-order activity in same scrip.
+- Rule: any proprietary / employee position in scrip X within N minutes before a large client order (>Y notional value or >Z% of average daily traded volume) in scrip X triggers a front-running alert.
+- Mandatory pre-trade compliance check — proprietary / employee trading desk segregated by Chinese wall from client-order intake; access to pending-client-order book restricted.
+- Alert escalation — Compliance Officer review same day; HR escalation if the alert points to a specific employee.
+
+**Regulatory action precedents**:
+- SEBI has issued multiple high-profile orders against brokers, dealers, and AMC fund managers for front running. Penalties include disgorgement, monetary penalty under Section 15HA of SEBI Act, and prohibition from the securities market for the individual.
+- The mutual-fund segment has seen several front-running orders where fund managers traded ahead of their own scheme's orders — culminating in SEBI's tighter rules on fund-manager personal-trading disclosure.
+
+**Reporting obligations**:
+- **Broker → exchange**: surveillance report; UCC linkage of proprietary / employee accounts disclosed.
+- **Broker → SEBI**: in serious cases (employee front running, systematic abuse), reported with the broker's preliminary findings.
+- **Broker → FIU-IND**: STR if proceeds are laundered; not all front-running automatically triggers STR (it's a market-abuse offence rather than a pure AML offence).
+- **Broker → internal**: HR action, suspension of the trading right of the involved dealer / employee; client notification (the harmed client may have a civil claim for restitution).
+- **Mandatory CDD review** of the client / employee involved.
+
+### 3. Layering
+
+**Definition.** Placing multiple orders at various price levels on one side of the order book to create a false impression of order-book depth and direction, *without intent to execute*. The manipulator then trades on the opposite side at a now-favourable price; the layered orders are cancelled after the favourable execution. Closely related to (but distinct from) **spoofing** below; layering uses multiple price-tier orders while spoofing typically uses a single large order.
+
+**Prohibition basis.** SEBI (PFUTP) Regulations, 2003 — Regulation 4(2)(g), (k), (l) — creation of false or misleading appearance, manipulation of price by placing orders without intent to execute.
+
+**Detection signature**:
+- Multiple orders on one side (buy or sell) at successive price tiers, accumulating large displayed depth.
+- Opposite-side execution by the same UCC / same beneficial owner — small in size but at an advantageous price made possible by the displayed depth.
+- Cancellation of the layered orders shortly after the opposite-side execution.
+- Pattern repetition — same client repeatedly produces layer-cancel-execute cycles across scrips.
+
+**NORMS / exchange flag pattern**:
+- High OTR (Order-to-Trade Ratio) — a primary measure in NSE's surveillance suite. Per NSE Master Surveillance Circular NSE/SURV/61970, persistent high-OTR clients are flagged as "Persistent Noise Creators" (PNC).
+- Pattern algorithms detecting layered order placement followed by counter-trade and order cancellation within tight time windows.
+- Listed in NSE / BSE / MCX surveillance circulars on OTR; specific OTR thresholds vary by segment and by liquidity tier of the security.
+
+**Broker surveillance rule (typical)**:
+- Per-UCC OTR computation by day, by scrip, by segment.
+- Rule: any UCC with OTR above exchange-prescribed threshold flagged for review.
+- Pattern detection: layered orders followed by counter-trade within configurable window; cancellation of layered orders within configurable window.
+- Penalty cascade per NSE / BSE / MCX penalty structure: warning → monetary penalty → trading right restriction.
+
+**Regulatory action precedents**:
+- SEBI orders on layering / spoofing are typically grouped with broader market-abuse cases. The 5% Additional Surveillance Margin for Order Spoofing (NSE, May 23, 2019) is a precedent-setting exchange-level intervention.
+- SAT has occasionally narrowed SEBI's findings of layering in cases where intent-to-execute could not be conclusively established — courts require evidence that the layered orders were never intended to be executed (e.g., consistent cancellation pattern, repetitive structure).
+
+**Reporting obligations**:
+- **Broker → exchange**: PNC status disclosure; quarterly surveillance report.
+- **Broker → SEBI**: serious cases.
+- **Broker → FIU-IND**: STR if linked to AML / money-laundering pattern.
+- **Broker → internal**: Compliance Officer escalation; UCC review; possible trading restriction.
+
+### 4. Spoofing
+
+**Definition.** Placing one or more large orders without intent to execute, to create artificial depth on one side of the book; counter-trading on the opposite side at the artificially-supported price; cancelling the spoofing order(s) before they execute. Often used in derivatives, especially around news events or expiry.
+
+**Prohibition basis.** SEBI (PFUTP) Regulations, 2003 — same provisions as layering — Regulation 4(2)(g), (k), (l).
+
+**Detection signature**:
+- Large order placed at or near the top of the book, displayed as a *visible quote*.
+- Counter-side execution by the same UCC (or related beneficial owner) at the now-influenced price.
+- Spoofing order cancelled before execution — typically before any meaningful execution of the spoofing order itself.
+- Repetition: same UCC or related accounts produce spoofing patterns repeatedly across scrips / contracts.
+- Time signature: spoof-cancel-counter-trade cycles often in sub-second to few-second windows; correlation between order placement, modification, and cancellation timestamps is a strong forensic input.
+
+**NORMS / exchange flag pattern**:
+- Dedicated **spoofing detection algorithm** in NORMS — produces a daily "shortlist of trading members for order spoofing" (referenced in NSE/SURV May 23, 2019 ASM circular).
+- Persistent-Noise-Creator listing per NSE master surveillance circular.
+- Additional 5% surveillance margin on the trading member's open positions for shortlisted spoofing patterns — risk-containment measure to incentivise the broker's internal action.
+
+**Broker surveillance rule (typical)**:
+- Real-time detection at the broker's OMS / RMS layer of placement-cancellation patterns with high cancellation-to-placement ratio in concentrated time windows.
+- Rule: any UCC placing orders of size above threshold (e.g., > Rs X lakh notional) that are cancelled within Y seconds, repeatedly across the day or session, flagged.
+- The broker may apply its own pre-trade controls (delay on order modification / cancellation for flagged UCCs; reduction of order-rate limits; enhanced manual review of orders from flagged UCCs).
+
+**Regulatory action precedents**:
+- NSE's 5% Additional Surveillance Margin for Order Spoofing (May 23, 2019; in-force date 2019-05-23) is the seminal exchange intervention. The mechanism: NSE Investigation Department identifies a list of TMs with spoofing patterns from NORMS, levies 5% ASM on their open positions, requires written explanation, and reports persistent offenders to SEBI for adjudication.
+- SEBI has issued orders against algorithmic traders engaging in spoofing; penalties include disgorgement, monetary penalty, and prohibition from algorithmic trading.
+
+**Reporting obligations**:
+- **Exchange → broker**: ASM levy notification.
+- **Broker → exchange**: written explanation; remedial action plan.
+- **Broker → SEBI**: through the exchange escalation chain.
+- **Broker → FIU-IND**: STR if AML relevance.
+- **Broker → internal**: UCC review; potential client suspension.
+
+### 5. Pump-and-dump
+
+**Definition.** Coordinated promotion (the "pump") of a security to create artificial demand and inflate the price, followed by sale (the "dump") of the manipulator's pre-positioned long inventory at the inflated price, leaving subsequent buyers with losses when the price corrects. The "pump" can use false / misleading information (price-target tips, fabricated company news, social-media coordinated promotion).
+
+**Prohibition basis.** SEBI (PFUTP) Regulations, 2003 — Regulation 4(2)(c), (e), (k) — disseminating misleading information; manipulation of price. SEBI (PIT) Regulations, 2015 where insider information is involved.
+
+**Detection signature**:
+- Pre-position phase: target operator quietly accumulates a large position in a thin / low-float security over days / weeks — often through multiple related UCCs to evade UCC-level large-position alerts.
+- Pump phase: coordinated buying activity across multiple UCCs in compressed window; social-media promotion (Telegram channels, WhatsApp groups, paid Twitter "tips"); fabricated or exaggerated company news.
+- Dump phase: the pre-positioned long inventory is sold into the artificial demand; price collapses as the manipulator unwinds.
+- Trailing: unsuspecting retail buyers, having bought during the pump, hold the bag through the price collapse.
+
+**NORMS / exchange flag pattern**:
+- **GSM (Graded Surveillance Measure)** — multi-stage surveillance framework that places securities into successive surveillance stages (Stage I to Stage IV) based on abnormal price / volume patterns; restrictions include reduced trading frequency, periodic call auction, additional surveillance margin.
+- **ASM (Additional Surveillance Measure)** — similar staged framework for securities showing abnormal price patterns.
+- **ESM (Enhanced Surveillance Measure)** — for SME-segment scrips.
+- **STASM** — Short-Term ASM for specific short-term patterns.
+- Per NSE Master Surveillance Circular NSE/SURV/61970 — all of GSM / ESM / ASM / STASM consolidated.
+- Coordinated cross-UCC trade pattern detection during the pump and dump phases.
+
+**Broker surveillance rule (typical)**:
+- Per-scrip price-and-volume anomaly detection on broker's own clients' activity.
+- Rule: client UCCs trading in GSM / ASM / ESM securities flagged for enhanced CDD; additional pre-trade reasonableness checks; potential client-suitability review.
+- Rule: clients accumulating large positions in low-float / low-cap securities flagged for source-of-funds review.
+- Rule: clients participating in coordinated social-media-driven activity (where detectable) escalated to Compliance Officer.
+
+**Regulatory action precedents**:
+- SEBI has issued numerous orders against pump-and-dump operators, often combining PFUTP Regulation 4 with insider-trading allegations where applicable. Penalties include disgorgement of unlawful gains, monetary penalty, multi-year market debarment, and asset attachment.
+- Recent SEBI focus on **social-media-driven pump-and-dump** has led to investigations and orders against Telegram channel operators and "tip providers" who coordinate pump activity.
+- SEBI's Investigation Department surveillance framework explicitly references social-media patterns in its alert indicators.
+
+**Reporting obligations**:
+- **Broker → exchange**: trades in GSM / ASM / ESM securities reported per the master surveillance circular's reporting framework.
+- **Broker → SEBI**: serious cases; cross-broker coordination patterns.
+- **Broker → FIU-IND**: STR if profits are laundered or if the manipulator's funding source is suspect. The FIU-IND 2023-24 alert indicators specifically list synchronised trade practices, which would include coordinated pump-and-dump.
+- **Broker → internal**: enhanced CDD for clients trading in surveillance-tagged securities; source-of-funds review; potential client suspension.
+
+### 6. Marking-the-close
+
+**Definition.** Trading in a security in the last minutes of the trading day (or in the closing auction window) with the intent to influence the closing price — typically to:
+- Cause derivative settlement at a favourable price (where the index or stock closing price is the settlement reference).
+- Show a favourable end-of-day price for fund NAV / mark-to-market valuation purposes.
+- Trigger or avoid trigger of stop-loss orders set at specific closing-price levels.
+
+**Prohibition basis.** SEBI (PFUTP) Regulations, 2003 — Regulation 4(2)(d), (g) — manipulation of closing price; creation of false appearance of price.
+
+**Detection signature**:
+- Concentrated trading activity by a UCC (or related UCCs) in the last 15-30 minutes of the trading session, particularly in the closing-auction window (15:30-15:40 IST in equity cash; see [Pre-open / closing auction](./pre-open-closing-auction/)).
+- Volume in the closing window is disproportionate to the day's broader trading by the same UCC.
+- The closing-window trades have observable price impact pushing the closing-VWAP or call-auction price in a specific direction.
+- Frequent on derivative-expiry days where settlement-price discovery uses last-30-min VWAP.
+
+**NORMS / exchange flag pattern**:
+- Closing-window concentration alerts: NORMS flags UCCs whose closing-window participation exceeds threshold percentage of their day's volume.
+- Pre-expiry-day enhanced surveillance — derivative expiry days have tightened surveillance on cash-market closing window because the same closing price drives derivative settlement.
+- **Abnormal Trades Penalty** per NSE master surveillance circular applies for closing-window manipulation.
+- Last-30-minute trading-pattern alerts for client-account positions that align with derivative-expiry positions of the same beneficial owner.
+
+**Broker surveillance rule (typical)**:
+- Closing-window volume concentration ratio per UCC per scrip per day.
+- Rule: UCCs whose last-30-min closing-window trading exceeds X% of day's total or whose closing-window orders show concentrated directional bias flagged.
+- Rule: cross-segment correlation — UCC with cash-market closing-window activity *and* derivative position in the same underlying (or index) flagged for expiry-related manipulation review.
+- Enhanced surveillance on expiry days; pre-expiry briefings to Compliance Officer.
+
+**Regulatory action precedents**:
+- SEBI has issued orders for closing-price manipulation, particularly in cases involving derivative-settlement leverage. Penalties include disgorgement of derivative gains arising from manipulated closing, monetary penalty, and market debarment.
+- SEBI's measures to strengthen the equity-index-derivatives framework (SEBI/HO/MRD/MRD-PoD-2/P/CIR/2024/137 dated 2024-10-01) — including expiry-day tail-risk-margin increase and removal of calendar-spread benefits on expiry day — partly address closing-price-manipulation incentives.
+
+**Reporting obligations**:
+- **Broker → exchange**: surveillance report.
+- **Broker → SEBI**: serious cases of closing-price manipulation, especially expiry-related.
+- **Broker → FIU-IND**: STR if profits are laundered or if part of a larger scheme.
+- **Broker → internal**: Compliance Officer escalation; client review.
+
+### 7. Circular trading
+
+**Definition.** A group of accounts (typically related or coordinated) trading among themselves to create the appearance of volume and price activity, without change in beneficial ownership across the group as a whole. Distinct from wash trades (which involve the same beneficial owner on both sides of a single trade) — circular trading involves multiple coordinated accounts trading in a closed loop.
+
+**Prohibition basis.** SEBI (PFUTP) Regulations, 2003 — Regulation 4(2)(a), (b), (g) — creation of false or misleading appearance; coordinated manipulation.
+
+**Detection signature**:
+- Closed loop: account A sells to B; B sells to C; C sells back to A — or similar coordinated round-tripping.
+- The trading group is identifiable via:
+  - Same KYC details / contact information / address (caught at onboarding CDD).
+  - Same beneficial owner declaration.
+  - Same authorised signatory.
+  - Same operating IP address on online platforms.
+  - Same bank account funding.
+  - Same demat-DP.
+- Repetitive pattern over days / weeks in the same illiquid scrip.
+- Disproportionate ratio of trades within the loop to bona-fide market trades in the same scrip.
+
+**NORMS / exchange flag pattern**:
+- Cross-UCC pattern detection identifying coordinated trading among related UCCs.
+- **Synchronised-trade alert** in NORMS — specifically the FIU-IND-flagged "synchronised and manipulative trade practices" in the 2023-24 alert indicators.
+- Combination with abnormal-trade alerts on the underlying scrip (illiquid securities show disproportionate impact from circular-trading patterns).
+- Reported via NSE Investigation Department to SEBI.
+
+**Broker surveillance rule (typical)**:
+- Daily reconciliation across UCCs at the broker for relationship clusters — same PAN, same bank account, same IP, same contact, same beneficial owner.
+- Rule: trades among the broker's clients in same-cluster UCCs in same scrip, especially in illiquid scrips, flagged for circular-trade review.
+- Rule: where same-cluster UCCs show net-zero or near-zero position change but high gross-traded volume in same scrip, escalate.
+- The broker's CDD framework at onboarding (per the NSE/SURV/61970 Client Due Diligence guidance) is the first preventive line — cluster identification.
+
+**Regulatory action precedents**:
+- SEBI orders on circular trading are among the most common market-abuse orders, particularly in penny stocks and illiquid SME-segment scrips. Penalties include disgorgement, monetary penalty under Section 15HA of SEBI Act, market debarment for the operators, and orders for the broker (where the broker was complicit or negligent in CDD).
+- SAT case law has clarified that mere related-party trading is not automatically circular trading — the regulator must establish (a) coordinated intent and (b) creation of false appearance of market activity. Routine related-party portfolio rebalancing without manipulation intent is not circular trading.
+
+**Reporting obligations**:
+- **Broker → exchange**: surveillance report.
+- **Broker → SEBI**: serious cases, particularly cross-broker patterns.
+- **Broker → FIU-IND**: **STR is highly likely** for circular trading — the FIU-IND 2023-24 alert indicators explicitly include "synchronised and manipulative trade practices" and circular trading is a paradigmatic example. The pattern frequently has an underlying money-laundering or tax-evasion rationale that triggers PMLA reporting.
+- **Broker → internal**: cluster review; potential suspension of all UCCs in the cluster pending investigation.
+
+## Related typologies (cross-referenced rather than catalogued here)
+
+The above seven are the *trade-pattern* manipulation typologies most directly within day-to-day surveillance. Several other forms of market abuse are governed by separate regulatory frameworks and are summarised here for completeness with cross-references:
+
+- **Insider trading** — trading on the basis of unpublished price-sensitive information (UPSI). Governed by SEBI (PIT) Regulations, 2015. Detection is primarily through trading-window monitoring, designated-person reporting, and STT-style structural surveillance. Front running is a subset of insider trading in some interpretations. See SEBI PIT regulations.
+- **Disclosure-based manipulation** — material non-disclosure or selective disclosure by listed companies. Governed by SEBI (LODR) Regulations, 2015. Detection is via listed-company disclosure analysis, whistleblower input, and forensic financial review.
+- **GDR / ADR manipulation** — pump activity in overseas-listed depositary receipts. Cross-jurisdictional; SEBI coordinates with overseas regulators.
+- **Bear raid / coordinated short attack** — pattern of coordinated short selling with negative-news dissemination. Subset of pump-and-dump in reverse direction.
+- **Margin abuse / phantom trading** — manipulation of margin and position-limit mechanisms; addressed under SEBI's margin-framework circulars (see [RMS / SPAN methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/)).
+
+## Sub-cases and edge cases
+
+### Algorithm-driven manipulation
+
+Manipulation via algorithmic trading (whether at the broker's prop desk or a client's algo) is treated more severely because the patterns are repeatable, the order rate is higher, and the manipulation intent is harder to disguise as routine trading. The SEBI Retail Algo framework (August 2025 onwards — see [Retail algo framework](/broking-kyc/deep-dives/trading-day/retail-algo-framework/)) requires registered algorithms, audit trails, and exchange approval — partly to deter algo-based manipulation.
+
+<Aside type="tip">
+**Time-stamping matters.** Many manipulation patterns are detected primarily through micro-time-window correlation (e.g., spoofing requires precise placement-modification-cancellation timestamps). Exchanges enforce nanosecond-precision time-stamping at the OMS / order-gateway level; broker surveillance systems must consume these timestamps unaltered to enable accurate detection. A broker that downstreams orders with coarse millisecond timestamps weakens its own surveillance capability.
+</Aside>
+
+### Cross-broker manipulation
+
+Where the manipulation spans multiple brokers (different UCCs at different brokers all coordinated by one operator), the *broker-level* surveillance cannot detect the full pattern; only *exchange-level* surveillance has the cross-broker view. This is why exchange surveillance is the primary detection layer for cross-broker patterns, and why broker surveillance can be a "necessary but not sufficient" control — broker surveillance catches own-clients' patterns but relies on exchange surveillance for cross-broker coordination.
+
+### Manipulation in SME / illiquid scrips
+
+The majority of manipulation orders by volume target SME-segment scrips, illiquid mid- and small-caps, and recently-listed scrips. Liquidity gaps make manipulation cheaper. The Enhanced Surveillance Measure (ESM) framework specifically targets SME-segment surveillance.
+
+### Manipulation around corporate-action events
+
+Bonus issues, rights, splits, mergers, and demergers create attractive manipulation windows because:
+- Reference prices are recalculated.
+- Position-limit baselines are adjusted.
+- Surveillance algorithms may have brief blind windows during the recalibration.
+
+Pre- and post-corporate-action surveillance is therefore tightened by exchanges.
+
+### Manipulation around expiry / settlement windows
+
+Expiry-day manipulation (closing-price marking, settlement-price manipulation) is a focused surveillance area. SEBI's October 2024 framework on equity-index-derivatives (SEBI/HO/MRD/MRD-PoD-2/P/CIR/2024/137) introduces structural disincentives to expiry-day manipulation through tail-risk margin and calendar-spread changes.
+
+### Manipulation in commodity derivatives
+
+MCXCCL operates surveillance for commodity-derivative manipulation, including:
+- Squeeze / corner manipulation in physical-delivery contracts.
+- Open-interest manipulation around tender period.
+- Cross-contract manipulation (manipulating spot to influence futures settlement).
+
+The MCX Master Circular on Investor Services Department (Default) Version 3 dated 2025-04-29 references manipulation-related defaulter handling.
+
+### Manipulation involving off-market transfers
+
+Per FIU-IND's 2023-24 alert indicators, "suspicious off-market transfers" at depositories are a recognised typology. Off-market transfers move securities between BO accounts without a market trade — a legitimate use case (gifting, family-account consolidation, demat-to-demat transfer) but also a vector for transferring tainted securities, washing manipulation proceeds, or moving inventory between coordinated accounts pre- and post-manipulation. Depositories must generate STRs on suspicious off-market transfers per the FIU-IND alert framework.
+
+### Penny-stock manipulation network
+
+A network-style manipulation in which multiple operators coordinate across multiple penny stocks, executing wash trades, circular trades, and pump-and-dump cycles simultaneously to evade single-scrip detection. Identifying the network requires:
+- Cross-scrip pattern detection at SEBI / exchange level.
+- IP-address / device-fingerprint correlation.
+- Bank-account / fund-flow tracing (FIU-IND data).
+- Beneficial-owner network analysis.
+
+This is the most resource-intensive form of investigation and typically takes 12-36 months.
+
+## STR triggers — quick reference
+
+The following manipulation patterns commonly trigger STR filing to FIU-IND:
+
+| Typology | STR trigger likelihood | Rationale |
+|---|---|---|
+| Wash trade | High when funds-laundering pattern observed | Wash trades often used to generate fictitious gains for laundering |
+| Front running | Low to medium | Market-abuse but not always money-laundering |
+| Layering | Medium | High OTR often correlates with concealed manipulation |
+| Spoofing | Medium | Spoofing as part of broader scheme |
+| Pump-and-dump | High | Pump-and-dump frequently launders pre-positioned long inventory |
+| Marking-the-close | Medium | When linked to derivative settlement gain laundering |
+| Circular trading | Very high | Per FIU-IND 2023-24 indicators — explicitly flagged |
+| Suspicious off-market transfers | Very high | Per FIU-IND 2023-24 indicators — depositories must STR |
+| Misuse of client funds by broker | Very high | Per FIU-IND 2023-24 indicators — explicitly flagged |
+
+## Practical notes
+
+- **[industry practice]** Large brokers maintain a Surveillance team of 5-15 personnel (varies with client base size) who run daily alert triage, weekly thematic reviews, and monthly compliance-officer reporting. The team's rules engine is typically a hybrid of in-house rules + vendor surveillance product (FIS, Eze, Surveyor, Nasdaq SMARTS variants). Tighter brokers also run a "manipulation simulator" to red-team their own surveillance rules.
+- **[gotcha]** Many manipulation patterns are *near-legitimate* trading — wash trades can resemble portfolio rebalancing; layering can resemble price-discovery activity; circular trading can resemble related-party portfolio adjustments. Surveillance rules with high false-positive rates burn out the compliance team; well-designed rules combine *multi-factor pattern detection* with *intent indicators* (repetition, time concentration, correlation with subsequent profitable trade) to reduce false positives.
+- **[risk trade-off]** Strict rules with low false-positive rates miss novel patterns; broad rules with high false-positive rates flood the Compliance team. Most mature broker surveillance frameworks use *graded-severity* output — low-severity informational, medium-severity for analyst review, high-severity for immediate Compliance escalation — to balance the trade-off.
+- **[cost optimization]** Broker surveillance ROI is highest where automation handles 95%+ of alert generation and triage, freeing the Compliance team to focus on the residual 5% of high-severity / ambiguous alerts and on rule-evolution. Investment in time-stamping fidelity, data-quality (clean UCC-PAN-beneficial-owner mapping), and rule-versioning yields disproportionate returns.
+- **[regulatory cooperation]** The April 2026 FIU-IND × SEBI MoU explicitly aims to accelerate red-flag-indicator development for the securities sector. Brokers and depositories should expect updated alert indicators in 2026-27 with potentially new typologies added.
+
+## Cross-references
+
+- [Deep Dive: Surveillance — NORMS / GSM / ASM / OTR / social-media](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/) — the day-to-day operational surveillance procedure.
+- [Deep Dive: Member default recovery](./member-default-recovery/) — how serious manipulation can lead to member default.
+- [Deep Dive: IPF](./ipf/) — investor recovery when manipulation by a broker leads to default.
+- [Deep Dive: RMS / SPAN methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/) — margin framework that interacts with surveillance-margin levies.
+- [Deep Dive: Pre-open / closing auction](./pre-open-closing-auction/) — the closing-auction surveillance window specifically.
+- [Deep Dive: Retail algo framework](/broking-kyc/deep-dives/trading-day/retail-algo-framework/) — algorithm-driven manipulation considerations.
+- [Deep Dive: SCORES procedure](/broking-kyc/deep-dives/compliance-audit/scores-procedure/) — investor complaint route for manipulation-suspected dealings.
+- [Compliance Blueprint — Surveillance domain](/broking-kyc/operations/compliance-blueprint/) — broader surveillance obligation map.
+- [Circulars — NSE](/broking-kyc/reference/circulars/nse/) — NSE/SURV/61970 master surveillance circular; NSE/SURV May 2019 ASM for spoofing.
+- [Circulars — BSE](/broking-kyc/reference/circulars/bse/) — BSE penalty / surveillance circulars including 20230105-59 / penalty structures.
+- [Circulars — MCX](/broking-kyc/reference/circulars/mcx/) — MCX/ISD Master Circular on Default and surveillance.
+- [Circulars — FIU-IND](/broking-kyc/reference/circulars/fiu-ind/) — alert indicators, FIU-IND × SEBI MoU April 2026.
+- [Circulars — SEBI MIRSD](/broking-kyc/reference/circulars/sebi-mirsd/) — broker AML/surveillance.
+- [Circulars — SEBI Other](/broking-kyc/reference/circulars/sebi-other/) — equity-index-derivatives framework, broader market structure.
+
+## Verified through
+
+2026-05-14
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

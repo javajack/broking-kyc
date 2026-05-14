@@ -1,0 +1,361 @@
+---
+title: "Deep Dive: SLBM (Securities Lending and Borrowing Mechanism)"
+description: Full mechanics of SLBM — lending leg, borrowing leg, T+1 settlement on borrow, return on reverse leg, fees (lending fee + borrowing fee), tax treatment, CDSL / NSDL SLB accounts, eligible securities, borrow window timing, reversal mechanism, role in covering short positions, and tax implications.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** SLBM is operationally a two-leg flow (first leg = borrow / lend; reverse leg = return / reclaim) with a settlement type for each leg, monthly settlement calendars, MWPL limits, and tax / fee complexity. The page is structured as: regulatory baseline → eligible scope → the two legs and their settlement → fees and tax → operational mechanics (auto-borrow, reversal, auction) → edge cases.
+
+## TL;DR
+
+- **SLBM is the regulated mechanism for institutional and retail lending of equity shares.** A holder of eligible equity shares can lend them out for a fee; a borrower (typically to cover a short delivery or for arbitrage) borrows at the same fee plus a borrowing premium. Settlement is via the clearing corp; the depository tracks the lien.
+- **Regulatory baseline.** The current annual consolidated circular for NSCCL SLBS is [NCL/CMPT/67763](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-67763) (30 April 2025, FY 2024-25); the immediately prior was [NCL/CMPT/61810](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-61810) (FY 2023-24). ICCL operates a parallel SLBS framework. MCX commodities have separate Securities-as-Collateral mechanisms but no equity SLBM.
+- **Two-leg settlement.** First Leg (Type L — borrow / lend at trade): T+1 settlement on the borrow side; borrower receives securities, lender receives lending fee. Reverse Leg (Type P — return at scheme close): securities return from borrower to lender; lending fee accrued in full. Reverse Leg Auction (Type Q): if borrower fails to return.
+- **Monthly settlement calendar.** Monthly circulars (e.g., [NCL/CMPT/71222](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-71222) for Dec 2025; [NCL/CMPT/67833](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-67833) for Jun 2025) publish the day-wise calendar of First-Leg Type L settlements, Reverse-Leg Type P series, and Reverse-Leg Auction Type Q.
+- **MWPL** (Market-Wide Position Limit) per security is set by SEBI / CC; monthly revision circulars (e.g., [NCL/CMPT/66597](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-66597) for JYOTISTRUC) update limits per scrip.
+- **Depository accounts.** CDSL SLB account and NSDL SLB account at the clearing-corp-prescribed sub-status; block mechanism per [NCL/CMPT/54401](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-54401) (Nov 2022) eliminates the need for CLNTEPI client-allocation upload when EPI is done via block.
+- **Fees.** Lending fee + borrowing fee. Both are negotiated through the SLBM platform's quote-driven mechanism. Fees are subject to GST (intermediation service) and the lending income is taxable as business income / other income depending on the lender's status.
+- **No STT on SLBM leg settlements.** SLBM transactions are not subject to Securities Transaction Tax (the transaction is a loan, not a sale).
+- **Tax on capital gains** applies on the underlying sale (if any) post-borrow; the borrow itself doesn't create a taxable transfer.
+- **Auto-borrow** functionality (member-side feature) can automatically cover a short-delivery position via SLBM before the auction window. Not all brokers offer this; the [NCL/CMPT/55097](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-55097) framework and successors support the mechanism.
+
+## Conceptual overview
+
+SLBM (Securities Lending and Borrowing Mechanism) is the equity-market equivalent of a securities-lending market familiar from global markets. A holder of eligible shares can lend them out — temporarily transferring beneficial ownership via a pledge-style mechanism — for a return (the lending fee). A borrower picks up the loan at the same fee plus an applicable premium, uses the shares for their purpose (covering a short, arbitrage, settlement-of-failed-delivery), and returns them at the scheme's reverse leg date.
+
+The mechanism predates current Indian markets; SEBI introduced the modern SLBM framework in the early 2000s and has periodically refined it. Today the most operationally important SLBM application is short-delivery cover — a member who fails to deliver in a normal T+1 settlement can borrow under SLBM (before the T+2 auction) and avoid the auction-penalty cost. The reverse leg of that borrow returns the shares to the lender on the predefined date, with the lender having earned the lending fee in the interim.
+
+The clearing corp (NSCCL for NSE; ICCL for BSE) is the central counterparty for SLBM. The transactions match through the exchange's SLBS segment (NSE SLBS; BSE SLBS); the clearing corp clears via the NSCCL / ICCL SLBS settlement system. The depository (CDSL or NSDL) tracks the temporary transfer of beneficial ownership via specific account-types and block mechanisms.
+
+For most retail investors, SLBM is invisible — but for active traders, MTF clients, and institutional desks, the SLBM platform is a routine tool. The lending side is mostly institutional (long-only equity holders monetising their inventory); the borrowing side is more diverse (short-position covers, dividend-strip arbitrage, settlement-of-failed-delivery, etc.).
+
+## 1. Regulatory framework
+
+### 1.1 SEBI authority
+
+SLBM operates under SEBI's stock exchange and clearing corporation regulations. Specific mechanism circulars include:
+
+- **SEBI Circular MRD/DoP/SE/Dep/Cir-14/2007** (20 December 2007): The original framework for stock-specific MWPL and position-limit restrictions for Clearing Members, Institutional Investors, and Clients under SLBS. Referenced as the foundational authority in CC SLBS framework circulars.
+- **[SEBI/HO/MRD2/PoD-2/CIR/P/2023/171](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-mrd2-pod-2-cir-p-2023-171)** (Oct 2023 Master Circular for Stock Exchanges and Clearing Corporations) and the Dec 2024 updated SE&CC Master Circular consolidate SLBM provisions among other clearing-corp framework items.
+
+### 1.2 Clearing corp annual consolidated circulars
+
+- **[NCL/CMPT/67763](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-67763)** (30 April 2025): Consolidated Circular for Securities Lending and Borrowing Scheme of NCL (FY 2024-25). Replaces [NCL/CMPT/61810](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-61810) (29 April 2024, FY 2023-24). Baseline for monthly settlement-calendar circulars and MWPL revisions.
+- **[NCL/CMPT/61810](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-61810)** (29 April 2024, FY 2023-24): Annual consolidated circular for SLBS. Forms operational baseline for monthly settlement-calendar circulars (First-Leg Type L, Reverse-Leg Type P, Reverse-Leg Auction Type Q) and MWPL / participant / institutional / non-institutional client-limit revision circulars.
+
+### 1.3 File-format standardisation
+
+- **[NCL/CMPT/55103](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-55103)** (2 January 2023): SLBS-segment consolidated circular harmonising file nomenclature / format to ISO 20022-aligned standards.
+- **[NCL/CMPT/55119](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-55119)** (3 January 2023): Companion specifying upload / response file formats for client margin reporting, EPI of securities, and collateral release / transfer.
+- **[NCL/CMPT/56030](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-56030)** (17 March 2023) and **[NCL/CMPT/56211](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-56211)** (29 March 2023): Extended discontinuation of old-format reports to 3 July 2023.
+- **[NCL/CMPT/54401](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-54401)** (11 November 2022): Block mechanism in client demat account for SLBS sales — participants must NOT upload client-allocation details through CIM interface in CLNTEPI file where EPI is done via block.
+
+### 1.4 Settlement calendar and MWPL
+
+- **Monthly settlement-calendar circulars** (e.g., [NCL/CMPT/71222](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-71222) for Dec 2025; [NCL/CMPT/67833](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-67833) for Jun 2025; [NCL/CMPT/62369](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-62369) for Jul 2024).
+- **Monthly MWPL / position-limit revision circulars** (e.g., [NCL/CMPT/66597](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-66597) for JYOTISTRUC, Feb 2025; [NCL/CMPT/63762](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-63762) for SAPPHIRE, Sep 2024; [ICCL 20211130-30](/broking-kyc/reference/circulars/clearing-corps/#iccl-20211130-30) representative ICCL MWPL).
+
+## 2. Eligible securities, members, and clients
+
+### 2.1 Eligible securities
+
+SLBM is permitted on a defined list of equity shares. The eligibility criteria (per CC SLBS framework circular) include:
+
+- Listed on the exchange (NSE for NSCCL SLBS; BSE for ICCL SLBS).
+- Permitted in the F&O segment or otherwise eligible as per SEBI norms.
+- Not on the GSM / ASM Stage 4+ surveillance lists with trade restrictions.
+- Above defined liquidity / impact-cost thresholds.
+
+The list is reviewed and updated; current eligibility is per the CC's published SLBS scrip list.
+
+### 2.2 Eligible members
+
+Trading Members and Clearing Members registered with the CC's SLBS segment can participate. The TM accesses the SLBS through the exchange's SLBS trading window; the CM clears settlements with the CC. Most TMs that participate in SLBM clear directly through the CC's SLBS segment.
+
+### 2.3 Eligible clients
+
+| Client category | Eligibility |
+| --- | --- |
+| Retail individual | Permitted on both sides (lend and borrow) |
+| HUF | Permitted |
+| Domestic corporate | Permitted |
+| Mutual fund | Permitted, subject to MF scheme documents and SEBI MF regulations |
+| FPI | Permitted, subject to FPI investment guidelines |
+| Insurance company | Permitted, subject to IRDAI guidelines |
+| NRI | Permitted, subject to PIS conditions |
+| Bank | Permitted, subject to RBI guidelines |
+| Pension fund | Permitted, subject to PFRDA guidelines |
+
+The eligibility is broad; the practical participation skews toward institutional lenders (MFs, insurance companies, pension funds) on the lend side and brokers / institutional desks on the borrow side.
+
+### 2.4 Position limits — MWPL
+
+Per security, position limits are set at three levels:
+
+| Limit type | Cap |
+| --- | --- |
+| Market-Wide Position Limit (MWPL) | Stock-specific; published monthly per CC monthly MWPL circular |
+| Participant / Institutional limit | 10% of MWPL (typical) |
+| Non-Institutional Client limit | 1% of MWPL (typical) |
+
+Examples from monthly revisions:
+
+- [NCL/CMPT/66597](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-66597) (Feb 2025): JYOTISTRUC MWPL increased from 82,437,042 to 92,025,699; Institutional Client and Participant limits 8,243,704 → 9,202,569 each; Non-Institutional Client limit 824,370 → 920,256.
+- [NCL/CMPT/63762](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-63762) (Sep 2024): SAPPHIRE MWPL 4,410,741 → 22,053,709; Institutional / Participant 441,074 → 2,205,370; Non-Institutional Client 44,107 → 220,537.
+
+A trade exceeding the MWPL is blocked by the OMS / CC's pre-trade validation.
+
+## 3. The two-leg settlement model
+
+SLBM is a two-leg transaction with distinct settlement types at the CC.
+
+### 3.1 First Leg — Settlement Type L
+
+The first leg is the borrow / lend at trade execution. At trade match:
+
+- **Borrower** pays the lending fee + borrowing premium (if any) to the CC.
+- **Lender** delivers securities to the CC.
+- **CC** delivers securities to the borrower.
+- **Lender** receives the lending fee (net of CC margin / fee adjustments).
+
+Settlement: **T+1 on the trade day.** Per monthly settlement-calendar circulars (Annexure A — First Leg Settlement Type L), each trading day generates a First-Leg settlement on T+1.
+
+The transfer of securities is via the depository — the borrower's demat receives the securities; the lender's demat shows them as "lent under SLBS." The block-mechanism (per [NCL/CMPT/54401](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-54401)) handles the operational marking; explicit CLNTEPI client-allocation files are not required where the block mechanism applies.
+
+### 3.2 Reverse Leg — Settlement Type P
+
+The reverse leg is the return of securities at the scheme close. At reverse-leg settlement:
+
+- **Borrower** delivers securities back to the CC.
+- **CC** delivers securities back to the lender.
+- **CC** retains the lending fee that the borrower paid up-front (the fee was already settled in the First Leg).
+
+Settlement: per the monthly settlement-calendar (Annexure B — Reverse Leg Type P series), each series has a defined Reverse-Leg date — typically aligned with the F&O monthly expiry calendar in the post-expiry-coding-scheme-refresh era. NCL's December 2025 SLBS calendar ([NCL/CMPT/71222](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-71222)) references series codes 12/XD, 01/X1, etc. reflecting the expiry-coding scheme.
+
+### 3.3 Reverse Leg Auction — Settlement Type Q
+
+If the borrower fails to deliver securities at Reverse-Leg settlement (Type P), the CC conducts a Reverse-Leg Auction (Type Q):
+
+- **Auction** runs to acquire the shortfall securities from the open market.
+- **Auction price + penalty** is charged to the failing borrower.
+- **Lender** receives the auction-acquired securities or, where acquisition fails, the close-out cash equivalent.
+
+Per monthly settlement-calendar circulars (Annexure C — Reverse-Leg Auction Type Q), each series has a corresponding Type Q calendar.
+
+### 3.4 Custodial confirmation timing
+
+For CP-coded (Custodial Participant) flows, the SLBS calendar references the Custodial Confirmation Date — when the custodian confirms the trade on behalf of the underlying institutional client. The Settlement Date typically matches the transaction date for each series in the monthly Annexure C.
+
+## 4. Fees and economics
+
+### 4.1 Lending fee
+
+The lending fee is the return paid by the borrower to the lender for the loan duration. It is:
+
+- Quoted as a percentage per annum (annualised).
+- Determined by the order book — both lender and borrower place quotes; the SLBS matching engine matches at the order-driven price.
+- Settled in the First Leg (the borrower pays up-front; the lender receives net of CC fees).
+- Subject to GST (typically 18% on the intermediation service).
+
+Lending fees vary by security, demand-supply on the SLBS platform, and the duration to the reverse leg.
+
+### 4.2 Borrowing premium
+
+In addition to the lending fee, a borrowing premium may apply during high-demand windows. The premium covers:
+
+- Operational margin for the lending intermediary.
+- Counterparty risk premium where applicable.
+- Demand-supply pricing during stress windows (e.g., heavy short-cover demand around expiry / index inclusion).
+
+### 4.3 Margin requirements
+
+SLBM positions attract margin per [NCL/CMPT/67763](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-67763) and the monthly settlement-calendar circulars. Margin covers:
+
+- VaR-based mark-to-market on the borrowed securities.
+- Coverage of potential reverse-leg auction shortfall.
+- Per-segment ELM (extreme loss margin).
+
+Margin is computed daily and reported via the MG-12 / MG-13 file flow (per [Margin compliance domain MARGIN-029](/broking-kyc/operations/compliance-blueprint/#margin-compliance-30-entries)).
+
+### 4.4 Tax treatment
+
+| Item | Tax treatment |
+| --- | --- |
+| Lending fee (lender's receipt) | Business income (for traders), Other income (for non-traders), subject to applicable income-tax slabs. GST on the intermediation service. |
+| Lending fee (borrower's payment) | Expense, deductible as business / other expense per the borrower's tax filing position. |
+| STT on First Leg / Reverse Leg | **No STT** — SLBM is a loan, not a sale. |
+| Capital gains on borrowed securities (after sale) | Capital gains apply on the *sale* of borrowed securities, computed normally. STT applies on the sale. |
+| Capital gains on lender's securities | The temporary transfer for SLBM does not create a taxable event for the lender. Cost basis and holding period are preserved. |
+
+The "no STT on SLBM" treatment is a long-standing CBDT clarification on the basis that SLBM is a loan transaction, not a sale. This makes SLBM materially cheaper than alternatives that involve actual sale-and-buyback.
+
+<Aside type="note">
+**SLBM as a short-cover mechanism is cheaper than auction.** A T+1 short delivery would otherwise trigger a T+2 auction with close-out cost = higher of (a) highest scrip price in settlement-to-auction window or (b) 20% above latest closing per [NCL/CMPT/71441](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-71441). The SLBM borrow alternative is the lending fee — typically a few hundred bps annualised — plus the borrowing premium. The economic advantage is usually significant; brokers with auto-borrow capability use SLBM to cover known shorts before the auction window.
+</Aside>
+
+## 5. Operational mechanics
+
+### 5.1 The trading flow
+
+1. **Order placement.** Lender places a lend-side order on the exchange's SLBS segment (NSE SLBS / BSE SLBS) specifying scrip, quantity, lending fee, and series (which reverse-leg date). Borrower places a borrow-side order with matching parameters.
+2. **Matching.** The exchange's SLBS order book matches lender and borrower quotes. The matched trade is reported to the CC's SLBS settlement system.
+3. **Margin block.** Both lender and borrower margin (per the SLBS scheme) is blocked. Margin computation per the SLBM-segment SPAN risk parameter file.
+4. **First Leg settlement on T+1.** Securities delivered from lender's demat to borrower's demat; lending fee paid by borrower to lender (net of CC fees).
+5. **Borrower uses securities.** Borrower's demat has the securities; can be sold (in T+1), pledged, or held until reverse leg.
+6. **Reverse Leg settlement.** Borrower delivers securities back to lender. Lender's demat returns to pre-borrow state. CC handles the netting.
+7. **Auction (if needed).** If borrower fails to deliver at reverse leg, CC conducts Type Q auction.
+
+### 5.2 Auto-borrow
+
+Several brokers offer "auto-borrow" functionality — the broker's OMS automatically places a SLBM borrow order to cover a known short position in the broker's pool. This:
+
+- Reduces the broker's auction-penalty risk.
+- Provides better economics than auction close-out cost.
+- Requires SLBM-eligible scrip and available borrow inventory at acceptable lending fee.
+
+Brokers offering auto-borrow integrate the SLBM order entry into their RMS / OMS short-cover workflow. The decision logic typically checks borrow inventory and cost against expected auction penalty.
+
+### 5.3 Reversal / cancellation
+
+A SLBM transaction is bilaterally cancellable only in limited circumstances (e.g., trade error, system failure). Once the First Leg is settled, the borrower has the securities and the reverse-leg obligation. Early return of securities (before the scheduled reverse leg) is operationally complex — the standard SLBS framework doesn't support early return without bilateral agreement.
+
+### 5.4 Block mechanism
+
+Per [NCL/CMPT/54401](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-54401) (Nov 2022), where EPI of securities for SLBS is done via block mechanism, participants must NOT upload client-allocation details through the CIM interface in CLNTEPI file. The block mechanism handles the depository-side lien on the lender's BO account without requiring the EPI client-allocation file.
+
+This was a meaningful simplification — pre block mechanism, lenders had to upload a separate client-allocation file for SLBS EPI. The block mechanism uses the lender's BO account directly with a depository-managed block.
+
+### 5.5 SLBM and short-selling
+
+SLBM is the regulated route for short-selling in the Indian equity cash segment. SEBI's short-selling guidelines require:
+
+- Disclosure of short position at trade entry.
+- Margin / collateral cover.
+- Settlement via SLBM or other regulated mechanism — naked short-selling is prohibited.
+
+Institutional clients short-selling typically pre-borrow via SLBM to ensure delivery; the borrow inventory and lending fee are the operational cost.
+
+### 5.6 Settlement and short-delivery interaction
+
+If a member is short on a normal T+1 settlement (failed to deliver in CM segment), the member can:
+
+1. **Auto-borrow** via SLBM (if scrip and inventory available) — cover the short before T+2 auction.
+2. **Buy in the open market** before T+2 auction — cover the short with own funds.
+3. **Allow auction** — accept the auction penalty (close-out cost per SEBI / CC rule).
+
+The decision depends on:
+
+- SLBM lending fee + borrowing premium for the scrip vs. the expected auction close-out cost.
+- Availability of SLBM inventory.
+- Time available before auction.
+
+Most brokers code these decisions into RMS rules and execute automatically.
+
+## 6. Sub-cases / edge cases
+
+### 6.1 Reverse-Leg coordination with corporate actions
+
+If a corporate action (bonus, dividend, split) falls during the SLBM borrow period:
+
+- **Dividend** accrues to the borrower (who holds the securities at record date) per standard equity-holding rules. However, the lender is typically compensated via a "dividend pass-through" arranged through the SLBS scheme — the borrower pays a cash amount equivalent to the dividend back to the lender.
+- **Bonus / split** modifies the borrowed quantity. The reverse-leg obligation adjusts to reflect the corporate-action effect.
+- **Buyback / takeover offer** — if the borrowed shares are tendered, the borrower has to manage the obligation; typically the SLBS scheme requires return of the underlying or cash equivalent at the prevailing price.
+
+The CC publishes corporate-action specific updates for SLBM scheme series affected.
+
+### 6.2 Settlement holiday adjustment
+
+If a settlement holiday is declared on the scheduled SLBS settlement date (e.g., [ICCL 20240914-5](/broking-kyc/reference/circulars/clearing-corps/#iccl-20240914-5) declaring September 16 / 18, 2024 as settlement holidays for Equity and SLB), the CC publishes revised settlement schedules separately.
+
+### 6.3 Reverse-Leg failure recovery
+
+When the borrower fails to return at the Reverse-Leg date:
+
+- Type Q Auction is conducted on the next business day.
+- Auction price + penalty charged to failing borrower.
+- Lender receives auction-acquired securities or close-out cash.
+- The lender's economic position is preserved (subject to the close-out cash adequacy).
+
+The Type Q auction process is operationally similar to the CM-segment auction with adjustments for SLBS specifics.
+
+### 6.4 Lender opting out
+
+A lender who placed an SLBM lend order can cancel before match. Once matched and First-Leg-settled, the securities are with the borrower and the lender cannot reclaim before the Reverse Leg date except via bilateral agreement.
+
+### 6.5 Borrower default during borrow period
+
+If the borrower defaults on a margin call or otherwise faces clearing-corp action during the borrow period:
+
+- The CC's default procedure (see [Payin default + Core SGF deep dive](./payin-default-core-sgf/)) applies.
+- The borrowed securities are part of the defaulting member's position; the CC's default cascade handles the recovery for both the SLBS scheme and the broader member-default loss.
+- The lender's reverse-leg claim is effectively guaranteed by the CC's Core SGF.
+
+### 6.6 Tax-loss harvesting via SLBM
+
+Some institutional lenders use SLBM as a tax-management tool — temporarily transferring securities (via borrow) doesn't create a tax event, while the borrower's sale and buyback may create capital-gains harvesting opportunities. The operational mechanics need careful design and tax counsel; the SLBM framework permits the structure within the regulatory framework.
+
+### 6.7 SLBM in T+0 era
+
+T+0 settlement (per [SEBI/HO/MRD/POD-3/P/CIR/2024/172](/broking-kyc/reference/circulars/sebi-other/#sebi-ho-mrd-pod-3-p-cir-2024-172)) doesn't change SLBM mechanics directly. SLBM still settles T+1 First Leg even when underlying scrips are T+0 eligible. The same-day-settlement of T+0 trades reduces the urgency of SLBM for short-cover in T+0 trades (since T+0 settlement happens same evening), but the mechanism is unchanged.
+
+### 6.8 Cross-segment offset
+
+Securities borrowed under SLBM can be used as margin collateral in the CM segment subject to the haircut framework. The collateral framework (per [NCL/CMPT/51657](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-51657) and successors) recognises borrowed-and-pledged securities subject to the appropriate sub-status tracking.
+
+### 6.9 MWPL breach mid-borrow
+
+If the MWPL is exceeded during the borrow period (e.g., aggregate open SLBM position across all participants exceeds MWPL), no new borrow orders are accepted for that scrip in that period. Existing borrows continue to their scheduled reverse leg; MWPL is reset at the monthly revision.
+
+<Aside type="caution">
+**SLBM is not a substitute for fundamental short-position risk management.** While SLBM provides the mechanism to deliver against a short, the borrower retains all economic risk of price movement during the borrow period. A borrower covering a short via SLBM still loses if the price rises before the reverse leg — they have to return shares acquired at a higher price. SLBM solves delivery, not price.
+</Aside>
+
+## 7. Comparative summary
+
+| Aspect | SLBM borrow | T+1 CM normal | Auction close-out | SLBM lend (counterparty) |
+| --- | --- | --- | --- | --- |
+| Settlement timing | T+1 First Leg | T+1 | T+2 from short delivery | T+1 First Leg / Reverse Leg series |
+| Settlement type | Type L (first) / Type P (reverse) / Type Q (auction-reverse) | M / Z / B | A | Type L / P / Q |
+| Securities movement | Lender → Borrower (T+1); reverse on Type P | Seller → Buyer | Auction-acquired → Buyer | Lender → Borrower |
+| Cost | Lending fee + borrowing premium + margin | Brokerage / charges | Close-out cost: max(highest in settlement-to-auction, latest closing + 20%) + penalty | Net: lending fee (income) - GST and other charges |
+| STT | No STT on SLBM legs | STT applies | STT applies on auction transactions | No STT on lending |
+| Tax on capital gains | Applies on borrower's sale of borrowed securities | Applies normally | Applies normally | Lender's cost basis / holding period preserved (no taxable transfer) |
+| MWPL applies | Yes | No MWPL (cash) but stock-specific position limit | n/a | Yes |
+| Margin | SLBM-segment SPAN margin | CM-segment VaR + ELM | n/a | SLBM-segment margin |
+| Reverse leg / return | Required at Type P series | n/a | n/a | Received at Type P |
+| Use case | Short-cover; arbitrage; failed-delivery cover | Normal buy / sell | Penalty cover after short delivery | Yield-generation on long inventory |
+
+## Practical notes
+
+- **[industry typical]** Institutional lenders (mutual funds, insurance companies, pension funds) form the bulk of SLBM lend-side supply; they monetise long-only inventory through the SLBM lending fee. Most large institutional desks have an "SLBM lending program" that automatically participates on the SLBS platform based on scrip eligibility and minimum acceptable lending fee.
+- **[gotcha]** SLBM is not the same as "stock lending" in OTC markets. SLBM is exchange-regulated, clearing-corp-settled, and reported via the SLBS framework. OTC stock lending (e.g., between two non-broker entities) is governed differently and not the focus of this page.
+- **[risk trade-off]** SLBM auto-borrow capability is a meaningful broker differentiator. A broker that auto-borrows to cover known shorts avoids auction penalties and provides a cleaner client experience. The integration of SLBM into the RMS / OMS short-cover workflow has implementation cost but typically pays back via avoided penalties within months.
+- **[industry typical]** The lending fee is typically annualised but the actual borrow duration is short (days to weeks). The economic lending fee per borrow is thus modest, but at SLBM's volume, the cumulative lending revenue for large institutional desks is meaningful.
+- **[gotcha]** Corporate-action handling during a SLBM borrow has been a recurring source of issues. Dividend pass-through, bonus-quantity adjustment, and ex-date handling each have specific operational requirements that the CC publishes per corporate action. Brokers should monitor the SLBS-specific corporate-action circulars closely.
+- **[cost optimization]** The block mechanism per [NCL/CMPT/54401](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-54401) (Nov 2022) eliminated the need for CLNTEPI client-allocation upload in SLBS EPI flows where block is used. Brokers should ensure their SLBS workflow uses block mechanism by default rather than the legacy CLNTEPI flow.
+- **[industry typical]** Tax treatment is broadly settled but specific positions (especially around dividend-strip arbitrage, FPI-specific borrow mechanics, etc.) require tax counsel. Mainstream SLBM use for short-cover doesn't have ambiguous tax treatment.
+- **[gotcha]** MWPL is per-scrip and revised monthly. Brokers that maintain pre-emptive borrow inventory should track MWPL availability before placing borrow orders; an OMS rejection at MWPL breach can leave a short position uncovered just before the auction window.
+- **[risk trade-off]** SLBM borrow cost vs. auction close-out cost calculation. The auction close-out is the higher of (a) highest scrip price in settlement-to-auction window or (b) latest closing + 20%. For a stable scrip in a normal market, the lending fee is typically far cheaper. For a fast-rising scrip in stress, the lending fee can spike to where it approaches the auction cost — in which case the close-out cost may be the better alternative. Real-time decision logic at the RMS / OMS layer is the typical pattern.
+- **[industry typical]** Reverse-Leg series typically aligns with the F&O monthly expiry calendar. The series codes (12/XD, 01/X1, etc. per [NCL/CMPT/71222](/broking-kyc/reference/circulars/clearing-corps/#ncl-cmpt-71222) Dec 2025) reflect the expiry-coding scheme refresh; back-office systems must keep the series-code mapping current.
+
+## Cross-references
+
+- [Broker Process Narrative — Section 3 (Settlement Cycle)](/broking-kyc/broker-process/narrative/#3-the-settlement-cycle) — settlement context
+- [Compliance Blueprint — Margin domain](/broking-kyc/operations/compliance-blueprint/#margin-compliance-30-entries) — MARGIN-029 SLBM margin entry
+- [Compliance Blueprint — Settlement domain](/broking-kyc/operations/compliance-blueprint/#settlement-22-entries) — SETTLEMENT-001 / 003 / 010 (T+1, auction, securities pay-in)
+- [T+0 / T+1 settlement deep dive](./t0-t1-settlement/) — settlement-cycle context
+- [Short-delivery auction deep dive](/broking-kyc/deep-dives/trading-day/short-delivery-auction/) — auction mechanism and close-out
+- [Payin default + Core SGF deep dive](./payin-default-core-sgf/) — what happens when a SLBM borrower defaults at Reverse Leg
+- [MTF operational deep dive](./mtf-operational/) — alternative settlement workflow for funded purchases
+- [CDSL MTF & Pledge primer](/broking-kyc/vendors/depositories/cdsl-mtf-pledge/) — depository-side pledge / SLBM account mechanics
+- [Circulars — Clearing corps](/broking-kyc/reference/circulars/clearing-corps/) — NCL / ICCL SLBS framework circulars
+- [Circulars — SEBI other](/broking-kyc/reference/circulars/sebi-other/) — SE&CC master circulars
+
+## Verified through
+
+2026-05-14
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

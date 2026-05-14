@@ -1,0 +1,500 @@
+---
+title: "Deep Dive: Inspection Types"
+description: Walkthrough and reference for the inspection regime affecting Indian stock brokers — exchange inspection (annual rolling), SEBI inspection (event-triggered + risk-based), depository inspection (annual for DPs), inspection-response procedure, common observation categories, and remediation review.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Brokers face three concurrent inspection regimes — exchange-level (NSE / BSE / MCX), SEBI-level (event-triggered + risk-based + thematic), depository-level (CDSL / NSDL for DPs). Each has its own cadence, scope, observation tradition, and remediation cycle. The page covers each separately, then synthesises common patterns.
+
+## TL;DR
+
+- **Three inspection layers** for a typical broker: (a) exchange inspection at NSE / BSE / MCX (annual rolling for active members), (b) SEBI inspection (event-triggered, risk-based, thematic), (c) depository inspection at CDSL / NSDL (annual for DPs).
+- **Exchange inspection** is the most frequent. NSE consolidated inspection framework is documented in `NSE/INSP/57394` (Jun 2023) and its successor `NSE/INSP/67804` (30 April 2025). NSE inspection covers KYC, PMLA, client funds, margin, settlement, system / cyber audit, surveillance, governance.
+- **SEBI inspection** is risk-based or thematic — focuses on specific themes (e.g. retail algo, client funds, AP supervision). Less frequent than exchange but with deeper scope. Powers under SEBI Act 1992 and Stock Brokers Regulations.
+- **Depository inspection** for DPs — CDSL annual inspection per CDSL bye-laws (DP code `DP-ADM-...`); NSDL annual inspection per NSDL Inspection framework. Scope: BO operations, KYC modifications, instruction handling, reconciliation.
+- **Response procedure** uniform across regimes: notice → broker prepares → inspection (on-site / virtual / hybrid) → preliminary observations → broker response → final inspection report (FIR) → Action Taken Report (ATR) → follow-on review.
+- **Response windows:** Preliminary observations typically 15 working days for broker response; ATR typically 30–60 days from FIR.
+- **Common observations:** Client-funds segregation, KYC defects, margin reporting, AP supervision gaps, surveillance system gaps, governance lapses, technology controls gaps.
+
+## Conceptual overview
+
+Inspection is the regulator's most direct supervisory tool. Unlike audits (which are commissioned by the broker and conducted by independent auditors), inspections are commissioned and conducted by the regulator (exchange / SEBI / depository) itself.
+
+Each regulator's inspection has distinct statutory basis:
+
+- **SEBI inspection** — under SEBI Act 1992 Section 11 and Stock Brokers Regulations
+- **Exchange inspection** — under SEBI (Stock Exchanges and Clearing Corporations) Regulations 2018 and the exchange's own bye-laws / rules
+- **Depository inspection** — under SEBI Depositories Regulations and depository bye-laws
+
+Functionally, all three are similar — a team examines books, records, systems, and procedures, generates observations, and tracks remediation.
+
+<Aside type="caution">
+**Inspection findings have real teeth.** Unlike audit observations (which are auditor judgments), inspection findings are regulator determinations. A finding can lead to: penalty under SEBI / Stock Exchange disciplinary rules, public warning, enhanced supervision, AP termination, Designated Director personal liability, business suspension. Treat inspection process with the gravity it deserves; have a senior compliance lead own it end-to-end.
+</Aside>
+
+## 1. Exchange inspection
+
+### 1.1 Cadence
+
+- **Annual rolling** — Each exchange conducts annual inspection of its active members in a rolling cycle
+- **Risk-based scheduling** — Higher-risk members (more clients, recent complaints, higher trade volume) inspected earlier in the cycle
+- **Re-inspection** — Members with significant findings may be re-inspected within the year
+- **QSB enhanced inspection** — per QSB expansion circular (`SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/14`), QSBs face annual inspection by exchanges with enhanced scope
+
+### 1.2 Scope (NSE Consolidated Inspection Circular `NSE/INSP/67804`)
+
+The Consolidated Inspection Circular is the comprehensive scope reference. Key chapters (referencing the framework from `NSE/INSP/57394` and successor):
+
+- **KYC compliance** — six-attribute, KRA, CKYC, IPV / VIPV, KYC modifications, FATCA / CRS
+- **PMLA / AML** — STR / CTR / NTR / CBWTR / CCR filings, BO identification, PEP screening, sanctions screening, EDD, ongoing monitoring
+- **Client funds segregation** — daily upstreaming, USCNBA / DSCNBA, running-account settlement, suspense-UCC handling
+- **Margin compliance** — upfront margin collection, peak-margin reporting, pass-through restrictions, MTF margin maintenance
+- **Trade reporting** — UCC, T+1 reporting, peak-margin snapshots
+- **Books and records** — physical / electronic; retention; audit trail
+- **System / cyber audit ATR** — closure of past audit observations
+- **Surveillance / Chapter IVA** — SOR submission, fraud-detection policy
+- **Investor grievance** — SCORES disposal, IGRC orders compliance, ODR compliance
+- **AP / branch** — AP supervision, branch operations, AP-AMC payment
+- **Technical glitch** — glitch reports, capacity planning, ATR closure
+- **Reporting matrix** — periodic submissions (monthly / quarterly / annual)
+
+### 1.3 Inspection sequence
+
+1. **Notice** — typically 15 working days advance (sometimes shorter for risk-triggered)
+2. **Pre-inspection submission** — broker submits requested documents in advance
+3. **On-site inspection** — typically 3–10 working days at the broker's premises
+4. **Preliminary observations** — issued at end of on-site visit or within 5 working days
+5. **Broker response** — within 15 working days (sometimes 30)
+6. **Final Inspection Report (FIR)** — within 30 working days of broker response
+7. **Action Taken Report (ATR)** — broker submits within 30–60 days of FIR
+8. **Follow-on review** — typically 6 months later, verifies ATR remediation
+9. **Closure** — observation closed when verifier satisfied
+
+### 1.4 Inspection teams
+
+- Typically 2–5 inspectors per inspection
+- Mix of expertise — KYC / AML, client funds, margin, IT, surveillance
+- Visiting in pairs / trios per area
+- May be on-site, on-call, or hybrid
+
+### 1.5 Penalty matrix
+
+`NSE/INSP/53530` (Enforcement Actions, 2 Sep 2022) consolidates penalty categories. Categories include:
+
+- Networth certificate delay / non-submission
+- Internal audit delay
+- System audit delay
+- Cyber audit delay
+- KMP information update delay
+- AP information update delay
+- MITC compliance gap
+- MTF reporting delay
+- Holding-statement / bank-balance API submission delay
+- Segregation / monitoring submission gap
+- And ~25 more categories
+
+Each carries a financial disincentive grid plus disciplinary action paths.
+
+### 1.6 BSE / MCX equivalents
+
+BSE inspection — equivalent framework under BSE Member Compliance and Surveillance department; consolidated circular per BSE bye-laws.
+
+MCX inspection — for commodity derivatives, equivalent under MCX bye-laws.
+
+## 2. SEBI inspection
+
+### 2.1 Trigger
+
+- **Event-triggered** — Following specific incident (broker default, technical glitch, market-manipulation allegation, investor grievance escalation, whistleblower complaint, media reports)
+- **Risk-based** — Periodic risk-based selection (based on size, complaint history, prior findings)
+- **Thematic** — SEBI may inspect a particular theme across multiple brokers (e.g. retail algo compliance, client-funds upstreaming, AP supervision)
+- **Periodic** — QSBs subject to annual SEBI thematic inspection
+- **Follow-up to exchange inspection** — SEBI may conduct deeper inspection on themes raised by exchange inspection
+
+### 2.2 Authority
+
+- SEBI Act 1992 Section 11 (Powers and Functions of Board)
+- SEBI Act Section 11C (Investigation)
+- Stock Brokers Regulations Chapter on Inspection
+- Master Circular for Stock Brokers (current `SEBI/HO/MIRSD/POD-1/P/CIR/2025/94`)
+
+### 2.3 Scope
+
+- Broader than exchange inspection — can encompass any aspect of broker operations
+- Often theme-specific in execution
+- May cover multi-year period
+- May extend to affiliates, group companies, AP network
+
+### 2.4 Inspection sequence
+
+1. **Notice** — typically 15–30 working days advance for periodic; shorter for event-triggered
+2. **Document request** — extensive pre-inspection submission
+3. **On-site inspection** — typically 5–15 working days
+4. **Preliminary observations / Show Cause Notice (SCN)** — for material findings
+5. **Broker response** — typically 21–30 working days
+6. **Final SCN / FIR**
+7. **Penalty / direction** — under SEBI Act Section 11B
+8. **Appellate route** — SAT (Securities Appellate Tribunal); Supreme Court for substantial questions of law
+
+### 2.5 Common SEBI thematic inspections (illustrative)
+
+- Algorithmic trading / retail algo compliance (post Aug 2025)
+- Client-funds upstreaming compliance (post Jul 2023)
+- Direct-payout-to-demat (post Oct 2024)
+- AP supervision (across NSE/COMP chain)
+- CSCRF readiness (post Aug 2024)
+- Surveillance / Chapter IVA institutional mechanism (per `SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/96`)
+- KYC validation (KRA / CKYC dual upload, post Aug 2024)
+
+### 2.6 Powers during inspection
+
+- Examine books, records, documents (physical and electronic)
+- Take copies / extracts
+- Summon and examine persons under oath
+- Seize documents (rare)
+- Access IT systems (with appropriate notice and legal process)
+- Issue interim directions to preserve evidence or status quo
+
+### 2.7 Outcomes
+
+- **No further action** — closure of inspection
+- **Warning** — formal warning issued
+- **Penalty under SEBI Act Section 15HB** — up to Rs 1 crore for general non-compliance; specific section provisions for specific violations
+- **Directions under Section 11B** — corrective directions
+- **Investigation referral** — for prima facie market manipulation / insider trading / fraud
+- **Public adjudication order** — published on SEBI website
+- **Suspension / cancellation of registration** — extreme cases
+- **Adjudication officer / SEBI member action** — for serious cases
+
+<Aside type="tip">
+**Thematic inspections are the fastest-moving regulatory pressure.** When SEBI initiates a thematic inspection (e.g. retail-algo compliance Aug 2025, CSCRF readiness Aug 2024, upstreaming Jul 2023), brokers in scope typically receive notice within weeks of the theme's launch. Compliance teams should track SEBI consultation papers (e.g. `NSE/COMP/70434` Sep 2025 forwarding the SEBI Technical Glitch consultation) and be ready for thematic inspection on each emerging theme. Industry-typical: a "Thematic Inspection Readiness Tracker" maps current SEBI themes to broker-side scope and pre-positions evidence.
+</Aside>
+
+## 3. Depository inspection
+
+### 3.1 CDSL inspection
+
+- Annual inspection per CDSL bye-laws
+- Scope: BO operations (account opening, modifications, closures, transmissions), DP fund handling, reconciliation, technology controls, KYC modifications
+- Conducted by CDSL inspection team
+- Findings and remediation tracked via CDSL communique-based reporting
+- Reference circulars: CDSL inspection chapter in operating circulars
+
+### 3.2 NSDL inspection
+
+- Annual inspection per NSDL Inspection framework
+- Scope similar to CDSL
+- Conducted by NSDL inspection team
+- Findings and remediation tracked via NSDL policy circulars
+- Reference circulars: NSDL inspection-framework circulars
+
+### 3.3 Common DP inspection scope
+
+- BO account opening per `SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/95` Trading Preferences and KYC norms
+- Six-attribute completeness (under depository bye-laws)
+- IPV / VIPV documentation
+- Nominee capture per `SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/04` revamp
+- BO modification audit trail
+- Delivery instruction handling (physical + electronic)
+- Off-market transfer review per `SEBI/HO/MRD/POD-3/P/CIR/2024/172`
+- Pledge / unpledge processing
+- Transmission per `SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/04`
+- AMC slab and BSDA conversion per `SEBI/HO/MIRSD/POD-1/P/CIR/2024/91`
+- Closure procedures
+- Reconciliation (DP ↔ depository ↔ RTA ↔ broker BO)
+
+## 4. Inspection-response procedure
+
+### 4.1 Pre-inspection preparation
+
+When notice received:
+
+1. **Project mode** — designate Inspection Liaison (typically Compliance Officer or senior compliance lead)
+2. **Document collation** — gather requested documents per inspection scope
+3. **Cross-team coordination** — KYC, settlement, RMS, IT, surveillance, customer service, AP / branch teams
+4. **Internal review** — quick gap-assessment; address obvious gaps before on-site
+5. **Workspace** — dedicated room at broker premises for inspectors
+6. **Senior management briefing** — Compliance Officer / CEO / Designated Director briefed
+
+### 4.2 During on-site inspection
+
+- Daily liaison with inspection team
+- Document production within reasonable time
+- Witness coordination (interviews with operations, RMS, surveillance staff)
+- Daily wrap-up — discuss observations at end of day
+- Issue management — escalation of complex / sensitive observations to Compliance Officer
+
+### 4.3 Preliminary observations
+
+- Inspector communicates observations at end of inspection or shortly thereafter
+- Broker may respond verbally or in writing
+- Preliminary observations may be modified before FIR
+
+### 4.4 Broker response
+
+- Written response within prescribed window (typically 15 working days)
+- Address each observation: agree / disagree / partial agree
+- Provide context, additional evidence
+- Indicate remediation plan if accepted
+
+### 4.5 Final Inspection Report (FIR)
+
+- Issued after considering broker response
+- Categorises findings by severity
+- Includes regulator's view on broker's response
+
+### 4.6 Action Taken Report (ATR)
+
+- Broker submits within 30–60 days of FIR (cadence varies by regulator)
+- Per-finding remediation plan
+- Evidence for each closed item
+- Timeline for in-progress items
+
+### 4.7 Follow-on review
+
+- Typically 6 months later (varies)
+- Verifies ATR remediation
+- May trigger follow-up observations / re-inspection
+
+## 5. Common observation categories
+
+From `NSE/INSP/57394` consolidated circular, exchange inspection notices, and SEBI public orders:
+
+### 5.1 Client funds
+
+- Daily upstreaming non-compliance — funds remained at broker overnight
+- Running-account settlement delay
+- Unidentified credit handling
+- Client-bank-account designation issue
+- Mixing own funds with client funds
+
+### 5.2 KYC
+
+- Six-attribute incomplete at activation
+- KRA / CKYC dual-upload gap (post Aug 2024)
+- IPV / VIPV documentation gaps
+- KYC modification audit trail missing
+- FATCA / CRS self-certification missing
+- Re-KYC cadence not adhered to
+
+### 5.3 PMLA / AML
+
+- BO identification gap (post Mar 2023 10% threshold)
+- PEP screening gaps
+- Sanctions screening delays / failures
+- STR delays (beyond 7 working days)
+- CTR / NTR / CBWTR nil-filing missed
+- Group-wide AML policy missing (for groups)
+- AML training non-compliance
+
+### 5.4 Margin
+
+- Upfront margin not collected
+- Peak-margin penalty passed to client without `NSE/INSP/64315` carve-out
+- Margin reporting file errors
+- F&O margin not collected before order
+- MTF margin maintenance gap
+
+### 5.5 Trade reporting
+
+- UCC submission gaps
+- T+1 reporting delays
+- Peak-margin snapshot reporting errors
+- Surveillance Obligation Report gaps
+
+### 5.6 Books and records
+
+- Physical record retention gaps
+- Electronic record audit trail missing
+- Books not maintained in prescribed format
+
+### 5.7 System / cyber audit
+
+- ATR closure delays
+- Recurring observations not addressed
+- CSCRF compliance gaps (post Aug 2024)
+
+### 5.8 Surveillance / Chapter IVA
+
+- Fraud-detection policy missing or inadequate
+- Surveillance system rule library not tuned
+- Alert disposition gaps
+- Whistleblower mechanism not exercised
+- SOR submission gaps
+
+### 5.9 Investor grievance
+
+- SCORES disposal delays
+- ATR quality issues
+- IGRC order non-compliance
+- Investor charter compliance gaps
+
+### 5.10 AP / branch
+
+- AP supervision gaps (per NSE/COMP chain)
+- Inactive AP terminals not flagged
+- AP AMC not paid
+- Branch operations gaps
+
+### 5.11 Technical glitch
+
+- Glitch reports delayed
+- Capacity planning inadequate
+- Change management not followed
+- Pre-trade risk controls (per `NSE/FAOP/69296`) not implemented
+
+### 5.12 Governance
+
+- Designated Director / Compliance Officer role gaps
+- KMP update delays
+- Audit Committee functioning gaps (at QSBs)
+- Board oversight inadequate
+
+## 6. Post-inspection remediation review
+
+### 6.1 Internal action plan
+
+- Compliance Officer owns the plan
+- Each finding has named owner, deadline, evidence requirement
+- Senior management review monthly until closure
+- Audit Committee review at QSBs
+
+### 6.2 Cross-regulatory implications
+
+- Same observation may appear in multiple inspections (exchange + depository + SEBI)
+- Coordinated remediation is industry-typical at large brokers
+- One-time remediation closes multiple observations
+
+### 6.3 Recurring observations
+
+- Recurring findings are a "soft suspension" trigger
+- Repeat findings across years indicate systemic weakness
+- SEBI may escalate to Section 11B direction
+
+### 6.4 Public adjudication
+
+- Material findings may lead to public adjudication order
+- Penalty under Section 15HB or specific section provisions
+- Published on SEBI website (named in order)
+
+## 7. Edge cases
+
+### 7.1 Inspection during enforcement / investigation
+
+- If SEBI investigation is ongoing, inspection may be deferred or coordinated
+- Statements made during inspection may be used in subsequent enforcement (with appropriate protections)
+
+### 7.2 Inspection of suspended broker
+
+- Suspended brokers may still face inspection for wind-up activities
+- IPF claim verification often triggers post-suspension inspection
+
+### 7.3 Inspection of QSB
+
+- Enhanced scope per QSB framework
+- Board / Audit Committee functioning reviewed
+- Governance committees structure verified
+- BCP / DR readiness deeply tested
+
+### 7.4 Cross-jurisdictional broker
+
+- Brokers operating across multiple exchanges face coordinated multi-exchange inspection
+- Cross-exchange auditor recognition (per `NSE/INSP/60986`) similarly applies for inspectors at some scope levels
+
+### 7.5 Group inspection
+
+- Brokers part of larger NBFC / bank group may face coordinated inspection by SEBI + RBI
+- Group-wide policies reviewed
+- Cross-entity transactions scrutinised
+
+### 7.6 Whistleblower-triggered inspection
+
+- Higher confidentiality requirements
+- Identity of whistleblower protected
+- Scope often narrower / theme-focused
+
+### 7.7 Media-attention-triggered inspection
+
+- Tightly scoped to the reported issue
+- High visibility — outcome often published
+
+## 8. Inspection response best practice
+
+- **[gotcha]** Do not destroy / alter / withhold documents post-inspection notice. This is statutorily an offence under SEBI Act and Stock Brokers Regulations. Discovered concealment becomes far worse than the underlying observation.
+
+- **[industry practice]** Most large brokers maintain "Inspection Readiness Files" — pre-compiled documentation per inspection scope area, refreshed quarterly. When notice arrives, only delta-changes need fresh compilation.
+
+- **[risk trade-off]** Aggressive disagreement with preliminary observations creates adversarial dynamic; conciliatory acceptance + remediation evidence often closes observations faster. Mature brokers concede minor observations + push back on incorrect ones with documentary evidence.
+
+- **[cost optimization]** Inspection response uses senior compliance team time. Industry-typical: Rs 25 lakh – 1 crore in internal effort per major inspection (compliance team + legal + IT engagement). Plan capacity accordingly.
+
+- **[gotcha]** ATR submission must be substantively responsive. Boilerplate "noted, will comply" is rejected; SEBI / exchange expects per-observation specific action.
+
+- **[industry practice]** Most brokers retain external legal counsel for SEBI inspections involving show-cause notices or potential Section 11B directions. Routine exchange inspections handled in-house.
+
+- **[gotcha]** Inspection observations sometimes refer to circulars / clauses that may have been superseded. Don't argue technicalities — address the substantive intent.
+
+- **[gotcha]** Once SEBI Show Cause Notice is issued, parallel public-adjudication track begins. Engage early; respond on schedule; avoid technical-pleading-only responses.
+
+## 9. Reporting / disclosure
+
+- **Internal** — Audit Committee, Board, CEO, Designated Director receive inspection reports
+- **Regulator** — FIR + ATR + Follow-on Audit report
+- **External** — Material adverse findings disclosed per SEBI LODR for listed brokers; QSB compliance score reflects inspection performance
+- **Inspection history** — typically retained 10 years per SEBI Stock Brokers Regulations
+
+## 10. Inter-regulator coordination
+
+Exchanges share findings with SEBI; SEBI may share findings with RBI for broker-bank hybrids; depositories coordinate with exchanges. Common observations across regulators feed into broker's compliance score.
+
+## 11. Adjacent regimes
+
+- **Concurrent audit** — auditor's own observations inform inspection; inspection draws on concurrent audit findings
+- **System audit / cyber audit** — inspection reviews audit ATR closure
+- **Internal audit** — half-yearly internal audit observations reviewed by inspectors
+- **Investor grievance** — SCORES / IGRC / ODR pattern feeds inspection focus
+- **PMLA / AML** — STR pattern, sanctions hit pattern, BO compliance reviewed
+- **Brokers' institutional mechanism** — Chapter IVA compliance is now a standard inspection scope
+
+## 12. Practical notes
+
+- **[gotcha]** ENIT-NEW-COMPLIANCE (NSE) and equivalent portals at other exchanges are the formal submission channels — emails / informal submissions are not accepted for regulatory filings.
+
+- **[industry practice]** Most QSBs and Mid-size brokers have a "Compliance Calendar" — annual schedule with all expected inspection windows, audit cycles, report submissions, training cycles. Helps prevent overlap-driven capacity crises.
+
+- **[risk trade-off]** Engaging external consultants for inspection response is expensive but valuable for complex SEBI inspections. Industry-typical: in-house for routine exchange inspections; external for SEBI / material findings.
+
+- **[gotcha]** Inspection report findings often become public via adjudication orders. Public orders are searchable on SEBI website; brokers' inspection history is therefore publicly visible to some extent.
+
+- **[industry practice]** Compliance Officer often presents inspection findings + ATR to Board / Audit Committee. Board takes a "compliance score" view (how many findings, severity, remediation rate) — this can affect Designated Director / Compliance Officer KPIs.
+
+- **[gotcha]** When the same observation appears in concurrent audit AND inspection AND internal audit — the broker has a clear signal that the issue is systemic, not transactional. Address the root cause, not just the specific instance.
+
+- **[industry practice]** Smaller brokers (< 10k UCC) often face less frequent SEBI inspection but the same exchange / depository inspection cycle. Plan for exchange / depository inspection as the routine baseline.
+
+- **[gotcha]** Inspection observations don't always cite the most current circular — circulars get superseded but inspection scope references the in-force-at-time-of-inspection text. Verify which version the inspector is citing.
+
+## Cross-references
+
+- [Deep Dive — System Audit](/broking-kyc/deep-dives/compliance-audit/system-audit/)
+- [Deep Dive — CSCRF](/broking-kyc/deep-dives/compliance-audit/cscrf-deep-dive/)
+- [Deep Dive — Concurrent Audit](/broking-kyc/deep-dives/compliance-audit/concurrent-audit/)
+- [Deep Dive — AP Framework](/broking-kyc/deep-dives/compliance-audit/ap-framework/)
+- [Deep Dive — SCORES Procedure](/broking-kyc/deep-dives/compliance-audit/scores-procedure/)
+- [Deep Dive — IGRC](/broking-kyc/deep-dives/compliance-audit/igrc/)
+- [Deep Dive — ODR](/broking-kyc/deep-dives/compliance-audit/odr/)
+- [Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/)
+- [Circulars — NSE](/broking-kyc/reference/circulars/nse/)
+- [Circulars — SEBI MIRSD](/broking-kyc/reference/circulars/sebi-mirsd/)
+- [Circulars — SEBI Other](/broking-kyc/reference/circulars/sebi-other/)
+- [Circulars — CDSL](/broking-kyc/reference/circulars/cdsl/)
+- [Circulars — NSDL](/broking-kyc/reference/circulars/nsdl/)
+
+## Verified through
+
+2026-05-14
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for the full disclaimer.*
