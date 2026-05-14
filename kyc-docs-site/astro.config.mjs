@@ -152,6 +152,24 @@ export default defineConfig({
       customCss: ["./src/styles/custom.css"],
       sidebar: [
         {
+          label: "Choose Your Role",
+          items: [
+            { label: "All Roles", slug: "personas" },
+            { label: "Product Manager", slug: "personas/product-manager" },
+            { label: "Backend Engineer", slug: "personas/backend-engineer" },
+            { label: "Frontend / UX Engineer", slug: "personas/frontend-ux-engineer" },
+            { label: "Operations Lead", slug: "personas/operations-lead" },
+            { label: "Head of OMS / RMS", slug: "personas/oms-rms-head" },
+            { label: "Compliance Officer / CCO", slug: "personas/compliance-officer" },
+            { label: "Finance / CFO", slug: "personas/finance-cfo" },
+            { label: "Internal Auditor", slug: "personas/internal-auditor" },
+            { label: "Statutory Auditor", slug: "personas/statutory-auditor" },
+            { label: "Trainee", slug: "personas/trainee" },
+            { label: "Regulator / Inspector", slug: "personas/regulator-inspector" },
+            { label: "Vendor / Integration Partner", slug: "personas/vendor-partner" },
+          ],
+        },
+        {
           label: "Getting Started",
           items: [{ label: "Overview", slug: "" }],
         },
