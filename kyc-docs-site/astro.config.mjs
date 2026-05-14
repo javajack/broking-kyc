@@ -285,6 +285,19 @@ export default defineConfig({
           label: "Operations",
           items: [
             { label: "Compliance Blueprint", slug: "operations/compliance-blueprint" },
+            {
+              label: "Integration DAG",
+              collapsed: true,
+              items: [
+                { label: "Overview", slug: "operations/integration-dag" },
+                { label: "Onboarding", slug: "operations/integration-dag/onboarding" },
+                { label: "BOD", slug: "operations/integration-dag/bod" },
+                { label: "Trading Hours", slug: "operations/integration-dag/trading-hours" },
+                { label: "EOD & Settlement", slug: "operations/integration-dag/eod-settlement" },
+                { label: "Recurring Cycles", slug: "operations/integration-dag/recurring-cycles" },
+                { label: "Lifecycle Events", slug: "operations/integration-dag/lifecycle-events" },
+              ],
+            },
             { label: "Batch Pipeline", slug: "operations/batch-pipeline" },
             {
               label: "Exchange Registration",
