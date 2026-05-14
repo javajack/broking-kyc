@@ -269,7 +269,61 @@ UNSC and India MEA UAPA lists update periodically. Brokers are required to scree
 
 ## 5. Recurring Cycles
 
-_[Section 5 content — drafted in Task 7.]_
+The daily clock is the densest layer; on top of it sit weekly, monthly, quarterly, half-yearly, and annual cycles. Each cycle has its own owner role and evidence artefacts. Most operations teams build a master compliance calendar from these cadences and slot recurring items into the weekly ops standup agenda.
+
+### Weekly
+
+- **Client Funding Report (CFR)** submission to the exchange, typically with a Friday cut-off, covering the prior week's client funding positions. Owner: Compliance Officer.
+- **Internal reconciliation** — broker's client funds bank books reconciled against bank statements, clearing-corp confirmations, and the broker's back-office ledger. A reconciliation break flagged late in the week becomes a compliance event by the next weekly cycle if not closed.
+
+### Monthly
+
+- **Client funding to exchange** — monthly aggregated submission of client-level funding positions per exchange-prescribed format. Different from the weekly CFR; deeper aggregation.
+- **GST returns** — monthly under the regular regime (GSTR-1 by 11th, GSTR-3B by 20th). GST applies on brokerage and exchange charges; the broker must collect and remit. Owner: Finance / Accounts.
+- **TDS deposit** — monthly deposit by 7th of next month for tax deducted at source (typically TDS on dividends paid via the demat account, NRI client payouts, etc.).
+- **STT monthly deposit** — Securities Transaction Tax collected on every trade is remitted monthly. Reconciled to exchange records.
+- **Complaint MIS** — monthly grievance summary to the exchange and SCORES; counts of complaints received, disposed, pending, by category. Owner: Customer Service Lead / Compliance.
+- **Networth maintenance check** — minimum networth (Rs.3 crore for a stockbroker, segment-specific higher thresholds for clearing membership) must be maintained; a monthly check ensures no breach has occurred since the last quarterly statement. Owner: Finance / Compliance.
+
+### Quarterly
+
+- **[Running-account settlement](/broking-kyc/operations/compliance-blueprint/#client-funds-21-entries)** at calendar quarter-ends (April, July, October, January) — SEBI mandates that all funds and securities lying with the broker beyond the client's actual exposure be returned to the client unless the client has explicitly authorized retention. The authorization itself has format requirements (specific consent text, periodic renewal). This is one of the most-penalty-attracting items in SEBI inspections; brokers run the settlement on the 31st / 30th of the quarter-end month and produce a per-client artefact (statement of account confirming zero-balance or authorized retention).
+- **FATCA / CRS refresh** — for foreign-tax-residency clients, quarterly self-certification refresh and reporting cycle.
+- **[BCP drill](/broking-kyc/operations/compliance-blueprint/#bcp--dr-15-entries)** — quarterly disaster-recovery test (some member categories require half-yearly; clearing corp mandates quarterly). The broker runs failover from primary to DR site, validates trading-system continuity, documents the drill, submits the report to the exchange / clearing corp. Owner: CISO / IT / Compliance.
+- **Quarterly statement of accounts** — issued to every active client; covers trades, charges, ledger entries, holding positions. Mandatory dispatch via email per SEBI [investor servicing](/broking-kyc/operations/compliance-blueprint/#investor-servicing-15-entries) framework.
+
+### Half-yearly
+
+- **Compliance certificate to SEBI** — signed by the broker's Compliance Officer attesting to compliance with all applicable SEBI / exchange / depository rules for the period. Submitted to SEBI via the prescribed portal.
+- **Internal audit report submission** — the broker's appointed internal auditor (independent CA firm) submits a half-yearly internal audit report to SEBI, covering broker funds, securities, operational controls, and compliance evidence. Owner: Internal Auditor / Compliance.
+
+### Annual
+
+- **[Statutory audit](/broking-kyc/operations/compliance-blueprint/#audit-cycles-21-entries)** — annual audit by an independent CA firm; produces the broker's audited financial statements. Filed with SEBI, exchanges, and tax authorities.
+- **KRA audit** — annual audit of the broker's KYC processes, KRA upload accuracy, and CKYC compliance. Conducted by a SEBI-empanelled auditor; report submitted to SEBI.
+- **System audit** — every two years per SEBI (alternate annual cycle); covers IT systems, RMS, OMS, back-office, surveillance, cybersecurity. Conducted by a CERT-In-empanelled auditor.
+- **DP audit** — annual audit of the broker's depository participant function (CDSL or NSDL or both). Covers BO opening / modification / transmission / pledge processes.
+- **Cyber audit per CSCRF** — annual or biennial depending on the broker's CSCRF category (Qualified RE / Mid-size RE / Small RE per the August 2024 framework).
+- **[Fit-and-proper refresh](/broking-kyc/operations/compliance-blueprint/#member-compliance-23-entries)** — annual self-certification by directors, KMPs, and senior management; continuing fit-and-proper compliance per SEBI Intermediaries Regulations.
+- **NISM re-certification** — for compliance officer, principal officer, authorized persons, dealers; NISM certifications have validity windows (typically 3 years) and re-certification cycles. Tracking and ensuring no certifications expire is an ongoing task with annual visibility.
+- **ITR Form-16A dispatch** — annual TDS certificates dispatched to clients who had TDS deducted by the broker.
+- **Advertisement approval renewal cycles** — running advertising programs require periodic re-approval by the exchange / SEBI; the broker maintains the active-approvals register.
+- **Exchange membership renewal** — NSE, BSE, MCX membership fees and compliance attestations renewed annually.
+
+### Event-triggered (briefly)
+
+- **Loss events** — operational losses (system failure, fraud, settlement default) require reporting within prescribed windows.
+- **Technical glitches** — reported intraday (mentioned in Section 4) plus a post-incident review cycle.
+- **KMP changes** — director, compliance officer, principal officer changes intimated to SEBI and exchanges within prescribed days.
+- **Segment additions / branch openings** — new segment activation, new branch location, new authorized person each have their own intimation flows.
+
+<Aside type="caution">
+**Quarterly running-account settlement is strictly enforced.** This is the single most-frequently-penalized item in SEBI broker inspections. The rule is unambiguous: funds and securities beyond the client's actual exposure must be returned at the end of each calendar quarter unless the client has explicitly authorized retention in the prescribed format. Implicit "convenience" retention by the broker — even if the client doesn't object — is a violation. The authorization itself has periodic renewal requirements. Most brokers run a strict end-of-quarter sweep with a per-client artefact and a follow-up confirmation cycle.
+</Aside>
+
+<Aside type="tip">
+**Build the compliance calendar.** The single highest-leverage exercise a new compliance officer can do is to take every item in Section 4 and Section 5 of this page, plus every row in the [Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/), and slot them into a master calendar by day-of-week / day-of-month / date-of-quarter. The calendar drives the weekly standup agenda, the month-end checklist, the quarter-end project plan. Done well, this calendar is one of the most-referenced documents in the compliance function and survives staff turnover better than most operational systems.
+</Aside>
 
 ## 6. Lifecycle Events
 
