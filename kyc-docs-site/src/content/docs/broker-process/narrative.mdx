@@ -217,7 +217,55 @@ If a broker fails to honour payin on T+1 — typically because of an internal fu
 
 ## 4. Daily Reporting Touchpoints
 
-_[Section 4 content — drafted in Task 6.]_
+Most of the day's compliance evidence is produced by side-effect of normal operations. A few items, though, need explicit reporting submissions — daily or near-daily flows to regulators and clearing infrastructure. Each item below is one of those touchpoints, with the artefact that proves it was done.
+
+### Daily Margin File (DMF)
+
+The DMF is the most operationally consequential daily report. Generated post-EOD from the day's four intraday peak-margin snapshots (11:30 / 12:30 / 13:30 / 14:30), it is submitted to the clearing corp and reconciled against the clearing-corp's peak-margin response file. Shortfalls trigger penalties. The DMF format is prescribed by [NSCCL / ICCL / MCXCCL](/broking-kyc/reference/circulars/clearing-corps/) with member-segment-specific columns. See the [Margin compliance domain](/broking-kyc/operations/compliance-blueprint/#margin-compliance-30-entries) for the full row.
+
+### Client Funding Report (CFR)
+
+A weekly submission (typical Friday cut-off), not daily — but mentioned here because the data collection is daily. The CFR captures client-by-client funding positions (funds collected, deployed, free, blocked) across the week. Submitted to the exchange in the prescribed format.
+
+### UCC daily upload
+
+New clients onboarded today (any client whose application reached ACTIVE in business hours) and modifications to existing clients (address, bank, segment activation) feed the daily UCC upload to [NSE](/broking-kyc/reference/circulars/nse/), [BSE](/broking-kyc/reference/circulars/bse/), and MCX. The exchange acknowledges with status codes per client; rejections require manual remediation the next morning.
+
+### KRA daily upload
+
+Any KYC modification or new KYC record from the day is uploaded to the relevant [KRA](/broking-kyc/operations/compliance-blueprint/#kyc-lifecycle-41-entries) (CVL, NDML, DOTEX, CAMS, KFintech). The submission is typically batched overnight. KRA acknowledges within its own SLA — most return "Registered" same day, with "Validated" status following in 2–3 days.
+
+### Peak margin snapshots
+
+The four intraday snapshots are themselves the evidence — the broker's RMS preserves snapshot-time client position and margin state for clearing-corp inspection. The DMF is the consolidated daily artefact, but each snapshot is a discrete compliance event.
+
+### Surveillance reports
+
+[NORMS-driven surveillance](/broking-kyc/operations/compliance-blueprint/#surveillance-30-entries) produces a slate of daily reports: Order-to-Trade Ratio breaches, GSM-list trade reports, abnormal-trade flags, social-media surveillance findings, manipulative-trade tags. Some flow real-time to the exchange (technical glitches, system outages); most batch out at EOD.
+
+### CSCRF logs
+
+The cyber security framework mandates retention of operational logs — typically 180 days minimum, longer for specific log categories. The daily touchpoint isn't a submission but a verification: the log feed is intact, rotation has run, the backup is restorable. Auditors will sample these during the annual cyber audit.
+
+### Technical glitch reports
+
+If any operational glitch caused order rejection, system downtime, or material customer impact, SEBI requires intraday reporting within prescribed minutes. The exchange has a dedicated channel for these reports. False alarms still get logged but with lower escalation.
+
+### CTR (Cash Transaction Report) to FIU-IND
+
+Mandatory under PMLA whenever cash transactions cross the Rs.10 lakh threshold per client per month — relatively rare in pure broking but possible. Reported via [FIU-IND's FINnet 2.0 portal](/broking-kyc/reference/circulars/fiu-ind/) using the prescribed XML format. See the [AML domain](/broking-kyc/operations/compliance-blueprint/#aml--pmla--sanctions-25-entries).
+
+### STR (Suspicious Transaction Report) to FIU-IND
+
+Event-triggered, not daily — but the operational flow is daily. The broker's surveillance team reviews flagged trades and customer patterns daily; if a pattern crosses the threshold for suspicion (per the broker's documented STR policy), the report is filed within the prescribed window. Most days produce zero STRs; the systematic part is the daily review itself.
+
+### Sanctions list re-check
+
+UNSC and India MEA UAPA lists update periodically. Brokers are required to screen their active client base against the current list — typical implementation is a daily delta check (new additions to the list vs. existing client base). Hits trigger immediate action under PMLA / UAPA frameworks.
+
+<Aside type="tip">
+**Evidence trails: which file proves which compliance?** Operators sometimes find themselves in audits where the same trade file is cited as evidence for margin compliance, settlement compliance, and surveillance — and that's correct. The trade file is the primary record; downstream artefacts (DMF, position file, surveillance report) all derive from it. Mapping evidence-to-source once and reusing that map across compliance domains is one of the highest-leverage exercises a new compliance officer can do.
+</Aside>
 
 ## 5. Recurring Cycles
 
