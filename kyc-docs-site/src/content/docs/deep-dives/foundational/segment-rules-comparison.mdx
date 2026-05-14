@@ -5,32 +5,32 @@ description: Side-by-side reference of segment rules across Cash Market, Equity 
 
 import { Aside } from '@astrojs/starlight/components';
 
-> **Why this page is structured this way:** A segment-rules deep dive is fundamentally a *reference matrix*. The reader looking for "what's the trading hours of currency derivatives?" or "can NRIs trade commodities?" needs an at-a-glance table that aligns rules across segments. The page is therefore organised as: (1) a high-level overview matrix; (2) per-segment detailed sub-section drilling into the eight key dimensions (hours, settlement, margin, position, lot, expiry, retail, NRI, dispute) for each segment; (3) cross-segment topics that don't fit cleanly per-segment (cross-margin, segment add/drop, conversion procedures). Per-segment sections use a consistent eight-row sub-matrix for easy comparison.
+> **Why this page is structured this way:** A segment-rules deep dive is fundamentally a *reference matrix*. The reader looking for "what's the trading hours of currency derivatives?" or "can NRIs trade commodities?" needs an at-a-glance table that aligns rules across segments. The page is therefore organised as: (1) a high-level overview matrix; (2) per-segment detailed sub-section drilling into the eight key dimensions (hours, settlement, margin, position, lot, expiry, retail, <abbr title="Non-Resident Indian">NRI</abbr>, dispute) for each segment; (3) cross-segment topics that don't fit cleanly per-segment (cross-margin, segment add/drop, conversion procedures). Per-segment sections use a consistent eight-row sub-matrix for easy comparison.
 
 ## TL;DR
 
-- **Six primary segments** for Indian retail / institutional trading: **Cash Market (CM / equity delivery, intraday, BTST)**, **Equity F&O** (futures and options on indices and single-stocks), **Currency Derivatives (CD)** (USD/INR, EUR/INR, GBP/INR, JPY/INR, cross-currency pairs), **Interest Rate Derivatives (IRD)** (G-Sec futures), **Commodity Derivatives (MCX / NSE / BSE Commodity)** (agri, base metals, bullion, energy), **Debt** (corporate bonds, G-Sec retail, T-Bills, SGB secondary).
-- **Trading hours vary widely**: equity cash and F&O 09:15-15:30 IST (with pre-open / closing extensions); currency derivatives 09:00-17:00 IST; commodities MCX 09:00-23:30 / 23:55 IST (with evening session to align with international markets); debt 10:00-17:00 IST (NDS-OM); GIFT IFSC venues 24x6.
-- **Settlement cycle**: equity cash T+1 default with T+0 beta optional (extended to top 500 scrips per SEBI/HO/MRD/MRD-PoD-2/P/CIR/2024/02 dated Dec 10, 2024); F&O T+1 cash settlement and physical delivery on expiry for stock derivatives; commodities physical delivery (compulsory or option) per contract specification; currency / IRD cash settlement.
-- **Margin framework**: SPAN + ELM in derivatives (computed at CC: NSCCL, ICCL, MCXCCL); VaR-based margin in cash (with peak margin reporting); upfront option premium collection (per SEBI Oct 2024 reforms). Each segment has segment-specific add-ons.
-- **Retail participation**: open in cash, F&O, CD, commodities (with income / suitability proofs for F&O / commodities under broker KYC). IRD limited retail. Debt mostly institutional with retail access via NSE goBID / BSE Direct.
-- **NRI eligibility**: open in cash market (PIS route, delivery-only; non-PIS route with NRO for broader access); **NRIs prohibited from commodities (MCX)**; CD and IRD with specific conditions. See [NRI conversion](/broking-kyc/lifecycle/nri-conversion/) for procedural side.
-- **Dispute resolution**: SEBI's three-tier — Investor Service Centre / IGRC (Investor Grievance Redressal Committee) → Arbitration (exchange-administered) → **Smart ODR** (post Aug 2023) → SAT (appellate) → Supreme Court. SCORES is the parallel SEBI-administered complaint platform.
+- **Six primary segments** for Indian retail / institutional trading: **Cash Market (<abbr title="Clearing Member">CM</abbr> / equity delivery, intraday, BTST)**, **Equity F&O** (futures and options on indices and single-stocks), **Currency Derivatives (CD)** (USD/INR, EUR/INR, GBP/INR, JPY/INR, cross-currency pairs), **Interest Rate Derivatives (IRD)** (G-Sec futures), **Commodity Derivatives (<abbr title="Multi Commodity Exchange of India">MCX</abbr> / <abbr title="National Stock Exchange of India">NSE</abbr> / <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> Commodity)** (agri, base metals, bullion, energy), **Debt** (corporate bonds, G-Sec retail, T-Bills, SGB secondary).
+- **Trading hours vary widely**: equity cash and F&O 09:15-15:30 <abbr title="Indian Standard Time (UTC+05:30)">IST</abbr> (with pre-open / closing extensions); currency derivatives 09:00-17:00 IST; commodities MCX 09:00-23:30 / 23:55 IST (with evening session to align with international markets); debt 10:00-17:00 IST (NDS-OM); GIFT <abbr title="Indian Financial System Code.">IFSC</abbr> venues 24x6.
+- **Settlement cycle**: equity cash <abbr title="Trade-date Plus N settlement">T+1</abbr> default with <abbr title="Trade-date Plus N settlement">T+0</abbr> beta optional (extended to top 500 scrips per <abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>/MRD-PoD-2/P/CIR/2024/02 dated Dec 10, 2024); F&O T+1 cash settlement and physical delivery on expiry for stock derivatives; commodities physical delivery (compulsory or option) per contract specification; currency / IRD cash settlement.
+- **Margin framework**: <abbr title="Standard Portfolio Analysis of Risk">SPAN</abbr> + <abbr title="Extreme Loss Margin">ELM</abbr> in derivatives (computed at <abbr title="Clearing Corporation (NCL, ICCL, MCXCCL — context-dependent).">CC</abbr>: <abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NSCCL</abbr>, <abbr title="Indian Clearing Corporation Limited">ICCL</abbr>, <abbr title="Multi Commodity Exchange Clearing Corporation Limited">MCXCCL</abbr>); VaR-based margin in cash (with peak margin reporting); upfront option premium collection (per SEBI Oct 2024 reforms). Each segment has segment-specific add-ons.
+- **Retail participation**: open in cash, F&O, CD, commodities (with income / suitability proofs for F&O / commodities under broker <abbr title="Know Your Customer (process).">KYC</abbr>). IRD limited retail. Debt mostly institutional with retail access via NSE goBID / BSE Direct.
+- **NRI eligibility**: open in cash market (<abbr title="Portfolio Investment Scheme (RBI / NRI)">PIS</abbr> route, delivery-only; non-PIS route with <abbr title="Non-Resident Ordinary (Rupee) account">NRO</abbr> for broader access); **NRIs prohibited from commodities (MCX)**; CD and IRD with specific conditions. See [NRI conversion](/broking-kyc/lifecycle/nri-conversion/) for procedural side.
+- **Dispute resolution**: SEBI's three-tier — Investor Service Centre / <abbr title="Investor Grievance Redressal Committee">IGRC</abbr> (Investor Grievance Redressal Committee) → Arbitration (exchange-administered) → **Smart <abbr title="Online Dispute Resolution">ODR</abbr>** (post Aug 2023) → SAT (appellate) → Supreme Court. <abbr title="SEBI Complaints Redress System">SCORES</abbr> is the parallel SEBI-administered complaint platform.
 
 ## Master comparison matrix
 
 | Dimension | Cash Market | Equity F&O | Currency Derivatives | Interest Rate Derivatives | Commodity Derivatives | Debt |
 |---|---|---|---|---|---|---|
 | Primary exchange | NSE, BSE | NSE, BSE | NSE, BSE | NSE | MCX (primary), NSE, BSE | NSE NDS-OM, BSE NDS-OM, retail platforms |
-| Clearing corp | NSCCL, ICCL | NSCCL, ICCL | NSCCL, ICCL | NSCCL | MCXCCL, NCL, ICCL | NSCCL, ICCL |
+| Clearing corp | NSCCL, ICCL | NSCCL, ICCL | NSCCL, ICCL | NSCCL | MCXCCL, <abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr>, ICCL | NSCCL, ICCL |
 | Trading hours (IST) | 09:00-15:40 (incl. pre-open / closing) | 09:15-15:30 | 09:00-17:00 | 09:00-17:00 (varies by contract) | 09:00-23:30/55 (split session) | 10:00-17:00 (NDS-OM); retail platforms per market hours |
-| Settlement cycle | T+1 default; T+0 optional for top 500 | T+1 cash settle; physical delivery on stock expiry | T+2 cash settle | T+2 cash settle | T+1 to T+5+ per contract; physical delivery for many | T+1 / T+2 |
-| Margin framework | VaR-based + Peak margin + UPI block / 3-in-1 for QSB | SPAN + ELM + premium upfront + intraday position-limit monitoring | SPAN + ELM | SPAN + ELM | SPAN + SOMM + commodity-specific Volatility Scan Range | RBI-driven; haircut on G-Sec collateral |
-| Position limits | Per-scrip ceilings; client / member / aggregate; surveillance-triggered | Per-instrument MWPL; client / member / aggregate; intraday monitoring | Per-pair limits; member / participant / client | Per-instrument limits | Per-commodity / category limits | Mostly institutional; retail limits per scheme |
+| Settlement cycle | T+1 default; T+0 optional for top 500 | T+1 cash settle; physical delivery on stock expiry | <abbr title="Trade-date Plus N settlement">T+2</abbr> cash settle | T+2 cash settle | T+1 to T+5+ per contract; physical delivery for many | T+1 / T+2 |
+| Margin framework | VaR-based + Peak margin + <abbr title="Unified Payments Interface">UPI</abbr> block / 3-in-1 for <abbr title="Qualified Stock Broker">QSB</abbr> | SPAN + ELM + premium upfront + intraday position-limit monitoring | SPAN + ELM | SPAN + ELM | SPAN + SOMM + commodity-specific Volatility Scan Range | <abbr title="Reserve Bank of India">RBI</abbr>-driven; haircut on G-Sec collateral |
+| Position limits | Per-scrip ceilings; client / member / aggregate; surveillance-triggered | Per-instrument <abbr title="Market Wide Position Limit">MWPL</abbr>; client / member / aggregate; intraday monitoring | Per-pair limits; member / participant / client | Per-instrument limits | Per-commodity / category limits | Mostly institutional; retail limits per scheme |
 | Lot size | 1 share (unit) | Min Rs 15 lakh contract notional (post Oct 2024) | Standard pair-specific (USD/INR = 1000 USD) | Standard contract size | Commodity-specific (Gold 1 kg, Silver Micro 1 kg, Crude Oil Mini 10 bbl, Gold Ten 10 g, etc.) | Standard face value Rs 1000 |
 | Expiry conventions | N/A (cash) | Monthly + weekly index; monthly stock; rationalised to one benchmark weekly per exchange | Monthly | Quarterly (mostly) | Monthly + special quarterly contracts; tender period for delivery | N/A (open-ended for most) |
 | Retail eligibility | Open | Open (with income proof) | Open (with income proof) | Limited retail (mostly institutional) | Open (with income proof) | Limited retail (some via direct retail platforms) |
-| NRI eligibility | Yes (PIS or non-PIS) | Non-PIS only (NRO) | Limited (FEMA-compliant) | Limited | **Prohibited** | Limited |
+| NRI eligibility | Yes (PIS or non-PIS) | Non-PIS only (NRO) | Limited (<abbr title="Foreign Exchange Management Act 1999">FEMA</abbr>-compliant) | Limited | **Prohibited** | Limited |
 | Dispute resolution | IGRC → Arbitration → Smart ODR → SAT | Same | Same | Same | Same (MCX has its own IGRC / arbitration framework) | Same |
 
 The detailed per-segment sub-sections follow.
@@ -39,7 +39,7 @@ The detailed per-segment sub-sections follow.
 
 ### Overview
 
-The equity cash market is the primary segment for retail and institutional equity trading on NSE and BSE. It covers **equity delivery** (T+1 settled with delivery of shares to the buyer's BO), **intraday trading** (positions opened and closed on the same day with no delivery), and **BTST** (Buy Today Sell Tomorrow — buying on Day 1 and selling on Day 2 before payout-day delivery).
+The equity cash market is the primary segment for retail and institutional equity trading on NSE and BSE. It covers **equity delivery** (T+1 settled with delivery of shares to the buyer's <abbr title="Beneficial Owner">BO</abbr>), **intraday trading** (positions opened and closed on the same day with no delivery), and **BTST** (Buy Today Sell Tomorrow — buying on Day 1 and selling on Day 2 before payout-day delivery).
 
 ### Trading hours
 
@@ -60,13 +60,13 @@ The equity cash market is the primary segment for retail and institutional equit
 
 - **VaR-based margin** at the clearing corporation; member-level margin reporting daily.
 - **Peak margin** — intraday peak-margin reporting introduced via SEBI to capture intraday margin compliance.
-- **UPI block / 3-in-1 facility for QSB**: per SEBI circular SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/175 (Dec 17, 2024) — every Qualified Stock Broker must offer either the UPI-block facility (ASBA-like protection in cash segment) or 3-in-1 trading account, effective February 1, 2025.
-- **Margin pledge / repledge framework** at depositories — see CDSL and NSDL circulars.
+- **UPI block / 3-in-1 facility for QSB**: per SEBI circular SEBI/HO/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD-1/P/CIR/2024/175 (Dec 17, 2024) — every Qualified Stock Broker must offer either the UPI-block facility (<abbr title="Applications Supported by Blocked Amount">ASBA</abbr>-like protection in cash segment) or 3-in-1 trading account, effective February 1, 2025.
+- **Margin pledge / repledge framework** at depositories — see <abbr title="Central Depository Services (India) Limited">CDSL</abbr> and <abbr title="National Securities Depository Limited">NSDL</abbr> circulars.
 
 ### Position limits
 
 - Per-scrip ceilings (client-level, member-level, aggregate).
-- Surveillance-triggered restrictions: GSM (Graded Surveillance Measure) Stage I-IV; ASM (Additional Surveillance Measure); ESM (Enhanced — for SMEs); STASM (Short-Term).
+- Surveillance-triggered restrictions: <abbr title="Graded Surveillance Measure">GSM</abbr> (Graded Surveillance Measure) Stage I-IV; <abbr title="Additional Surveillance Measure">ASM</abbr> (Additional Surveillance Measure); <abbr title="Enhanced Surveillance Measure">ESM</abbr> (Enhanced — for SMEs); STASM (Short-Term).
 - Concentration limits per exchange master surveillance circular (NSE/SURV/61970 dated 2024-05-02).
 
 ### Lot size
@@ -82,11 +82,11 @@ The equity cash market is the primary segment for retail and institutional equit
 
 - Open to all individual retail investors with KYC completion and bank-account linkage.
 - No income proof required for cash equity trading.
-- Aadhaar / PAN / bank-account verification per onboarding KYC.
+- Aadhaar / <abbr title="Permanent Account Number">PAN</abbr> / bank-account verification per onboarding KYC.
 
 ### NRI eligibility
 
-- **PIS route**: cash market only (delivery-only — intraday not permitted under PIS). NRE / NRO bank linkage. AD-Category-I bank issues PIS letter.
+- **PIS route**: cash market only (delivery-only — intraday not permitted under PIS). <abbr title="Non-Resident External (Rupee) account">NRE</abbr> / NRO bank linkage. AD-Category-I bank issues PIS letter.
 - **Non-PIS route**: NRO bank account; broader access including intraday in some setups, subject to broker policy.
 - F&O for NRIs is via non-PIS NRO route per broker policy; PIS does not permit F&O.
 - See [NRI conversion](/broking-kyc/lifecycle/nri-conversion/) for procedural side.
@@ -98,7 +98,7 @@ The equity cash market is the primary segment for retail and institutional equit
 - **Smart ODR** (post Aug 2023) — online dispute resolution.
 - **SAT** (Securities Appellate Tribunal) — appellate.
 - **SCORES** — SEBI-administered complaint platform; runs in parallel.
-- **IPF** (Investor Protection Fund) — for broker-default claims; see [IPF](./ipf/).
+- **<abbr title="Investor Protection Fund">IPF</abbr>** (Investor Protection Fund) — for broker-default claims; see [IPF](./ipf/).
 
 ## Segment 2: Equity F&O (Futures and Options)
 
@@ -114,7 +114,7 @@ Equity Futures & Options covers **index futures** (Nifty 50, Bank Nifty, Fin Nif
 
 ### Settlement cycle
 
-- **Daily MTM** in cash (variation margin) for futures during the contract life.
+- **Daily <abbr title="Mark-to-Market">MTM</abbr>** in cash (variation margin) for futures during the contract life.
 - **Final settlement on expiry**: index futures and options cash-settled to underlying index closing value; stock futures cash-settled or physically settled (post 2018, stock derivatives moved to physical delivery on expiry); stock options expire to physical delivery if ITM.
 - Reference price for settlement: underlying's cash-market closing (call-auction or 30-min VWAP — see [Pre-open / closing auction](./pre-open-closing-auction/)).
 
@@ -418,9 +418,9 @@ Debt segment includes:
 
 ### Segment registration at exchange
 
-- Each segment requires a separate exchange UCC registration — see [Exchange registration](/broking-kyc/operations/exchange-registration/).
+- Each segment requires a separate exchange <abbr title="Unique Client Code">UCC</abbr> registration — see [Exchange registration](/broking-kyc/operations/exchange-registration/).
 - Member-level membership required; trading-cum-self-clearing or trading-member-only categories.
-- Segment-specific capital requirements (BMC / ABC) — see [BMC / ABC](/broking-kyc/deep-dives/member-compliance/bmc-abc/).
+- Segment-specific capital requirements (<abbr title="Base Minimum Capital">BMC</abbr> / <abbr title="Additional Base Capital">ABC</abbr>) — see [BMC / ABC](/broking-kyc/deep-dives/member-compliance/bmc-abc/).
 
 <Aside type="tip">
 **Segment activation isn't all-at-once.** A client opening with a broker may activate Cash + F&O on Day 1 (with income proof) and add CD / commodities later as their trading evolves. Each addition is a modification (Section S of the master dataset) and triggers a fresh segment-eligibility check at the broker plus a UCC update at the relevant exchange. See [Modifications — segment add / drop](/broking-kyc/lifecycle/modifications/).
@@ -485,7 +485,7 @@ Debt segment includes:
 ### Member registered across multiple exchanges
 
 - Same broker as a member at NSE + BSE + MCX + others requires separate UCC at each exchange, separate BMC / ABC, separate IPF claim windows (per defaulting-broker default).
-- Cross-MII intimation framework for defaults / suspensions.
+- Cross-<abbr title="Market Infrastructure Institution">MII</abbr> intimation framework for defaults / suspensions.
 - See [Exchange registration](/broking-kyc/operations/exchange-registration/) and [Member default recovery](./member-default-recovery/).
 
 ### NRI segment access table
@@ -502,7 +502,7 @@ Debt segment includes:
 
 ### Mutual Fund segment
 
-- BSE StAR MF and NSE NMF II — distinct from the above six trading segments. Different settlement and operational framework; covered in [Mutual Fund platforms](/broking-kyc/deep-dives/specialty/mutual-fund-platforms/) deep-dive.
+- BSE StAR MF and NSE NMF <abbr title="—">II</abbr> — distinct from the above six trading segments. Different settlement and operational framework; covered in [Mutual Fund platforms](/broking-kyc/deep-dives/specialty/mutual-fund-platforms/) deep-dive.
 
 ### Tri-Party Repo (TREPS)
 
@@ -521,7 +521,7 @@ Debt segment includes:
 ## Practical notes
 
 - **[industry practice]** Most full-service brokers offer all six segments at onboarding; discount brokers may offer fewer (e.g., CM + F&O only) and require segment-specific activation. The trading-preferences framework per SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/127 has shifted the default toward all-active-exchange registration — broker UI must capture preferences explicitly.
-- **[gotcha]** New ops engineers often assume a single segment = single regulator. In fact, every segment has multi-layer regulation: SEBI (broker / exchange), the relevant CC (clearing / margin), the exchange (trading rules / surveillance), and where applicable RBI (currency / IRD / SGB) or FMC (legacy commodities, pre-merger with SEBI). Tracking circulars per segment requires monitoring all these issuers.
+- **[gotcha]** New ops engineers often assume a single segment = single regulator. In fact, every segment has multi-layer regulation: SEBI (broker / exchange), the relevant CC (clearing / margin), the exchange (trading rules / surveillance), and where applicable RBI (currency / IRD / SGB) or <abbr title="Forward Markets Commission">FMC</abbr> (legacy commodities, pre-merger with SEBI). Tracking circulars per segment requires monitoring all these issuers.
 - **[risk trade-off]** Offering more segments at onboarding is a customer-experience win but introduces segment-specific risk-of-loss disclosures, suitability assessments, and ongoing compliance touchpoints. Tighter brokers segment-gate by net-worth / income / experience; looser brokers offer broad access subject to capital adequacy.
 - **[cost optimization]** Segment-specific margin and approved-collateral circulars (MCX/MCXCCL/094/2026, NCL approved-collateral revisions) refresh quarterly; broker treasury can optimise collateral mix by re-running the approved-list against the broker's collateral inventory each quarter to maximise margin efficiency.
 - **[regulatory direction]** The SEBI Oct 2024 framework for equity-index-derivatives (SEBI/HO/MRD/MRD-PoD-2/P/CIR/2024/137) signals continued tightening of derivatives surveillance and structural risk-management; expect comparable calibrations in commodity and currency derivatives over coming cycles.
@@ -530,11 +530,11 @@ Debt segment includes:
 
 - [Deep Dive: Pre-open / closing auction](./pre-open-closing-auction/) — equity cash session structure.
 - [Deep Dive: Market manipulation typologies](./market-manipulation-typologies/) — surveillance across segments.
-- [Deep Dive: SGF / Core SGF framework](./sgf-core-sgf/) — segment-specific SGFs.
+- [Deep Dive: <abbr title="Settlement Guarantee Fund">SGF</abbr> / Core SGF framework](./sgf-core-sgf/) — segment-specific SGFs.
 - [Deep Dive: IPF](./ipf/) — exchange IPFs (NSE, BSE, MCX) and per-investor caps.
 - [Deep Dive: Member default recovery](./member-default-recovery/) — default propagation across segments.
 - [Deep Dive: T+0 / T+1 settlement nuances](/broking-kyc/deep-dives/settlement/t0-t1-settlement/) — settlement cycle details.
-- [Deep Dive: RMS / SPAN methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/) — margin computation across segments.
+- [Deep Dive: <abbr title="Risk Management System">RMS</abbr> / SPAN methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/) — margin computation across segments.
 - [Deep Dive: BMC / ABC](/broking-kyc/deep-dives/member-compliance/bmc-abc/) — member capital across segments.
 - [Lifecycle: NRI conversion](/broking-kyc/lifecycle/nri-conversion/) — NRI segment restrictions.
 - [Lifecycle: Modifications](/broking-kyc/lifecycle/modifications/) — segment add / drop procedure.

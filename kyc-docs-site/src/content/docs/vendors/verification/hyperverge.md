@@ -3,9 +3,9 @@ title: HyperVerge
 description: OCR document extraction, face match, video-in-person verification (VIPV), and liveness detection for KYC onboarding.
 ---
 
-HyperVerge is an AI-powered identity verification platform specializing in document OCR (Optical Character Recognition), face matching, liveness detection, and Video In-Person Verification (VIPV). For the broking KYC system, HyperVerge handles the critical visual verification layer -- extracting data from identity documents, matching the applicant's live face against document photos, and conducting SEBI-compliant video KYC sessions. Founded in India and serving major banks, fintechs, and stock brokers, HyperVerge offers both REST APIs and native SDKs across Android, iOS, and Web.
+HyperVerge is an AI-powered identity verification platform specializing in document <abbr title="Optical Character Recognition.">OCR</abbr> (Optical Character Recognition), face matching, liveness detection, and Video In-Person Verification (<abbr title="Video In-Person Verification (sometimes &quot;Video CIP&quot; / V-CIP)">VIPV</abbr>). For the broking <abbr title="Know Your Customer (process).">KYC</abbr> system, HyperVerge handles the critical visual verification layer -- extracting data from identity documents, matching the applicant's live face against document photos, and conducting <abbr title="Securities and Exchange Board of India">SEBI</abbr>-compliant video KYC sessions. Founded in India and serving major banks, fintechs, and stock brokers, HyperVerge offers both REST APIs and native SDKs across Android, iOS, and Web.
 
-SEBI's KYC norms require In-Person Verification (IPV) for all new demat and trading accounts. HyperVerge's liveness-certified face match satisfies the IPV requirement digitally, eliminating the need for physical branch visits. Their iBeta Level 2 certified liveness detection -- tested against printed photos, digital screens, video replays, 3D masks, and deepfakes -- prevents spoofing attempts and provides a defensible audit trail for regulatory inspections. For the estimated 15-20% of applicants who do not complete DigiLocker-based Aadhaar eKYC, HyperVerge's VIPV module provides a fully compliant fallback path with tamper-proof recording and geo-tagged activity logs.
+SEBI's KYC norms require In-Person Verification (<abbr title="In-Person Verification">IPV</abbr>) for all new demat and trading accounts. HyperVerge's liveness-certified face match satisfies the IPV requirement digitally, eliminating the need for physical branch visits. Their iBeta Level 2 certified liveness detection -- tested against printed photos, digital screens, video replays, 3D masks, and deepfakes -- prevents spoofing attempts and provides a defensible audit trail for regulatory inspections. For the estimated 15-20% of applicants who do not complete DigiLocker-based Aadhaar eKYC, HyperVerge's VIPV module provides a fully compliant fallback path with tamper-proof recording and geo-tagged activity logs.
 
 This page covers HyperVerge's API specifications for OCR, face match, liveness detection, and VIPV workflows, including SDK integration for mobile and web, response field mappings, confidence score thresholds, and quality handling strategies. The integration details at the end describe how HyperVerge fits into our broader KYC pipeline alongside DigiLocker, Decentro, and the KYC Admin back-office.
 
@@ -45,7 +45,7 @@ HyperVerge is an AI-powered identity verification platform founded in India, ser
 | **Face Match** | Compare DigiLocker Aadhaar photo vs live selfie | Phase 6: Verification |
 | **Liveness Detection** | Ensure live person (not spoof) during selfie/video | Phase 6: Verification |
 | **VIPV** | Video In-Person Verification when DigiLocker not used | Phase 6: Verification |
-| **Document OCR** | Extract fields from PAN, Aadhaar, cheque, passport, DL | Phase 2: Document Capture |
+| **Document OCR** | Extract fields from <abbr title="Permanent Account Number">PAN</abbr>, Aadhaar, cheque, passport, DL | Phase 2: Document Capture |
 
 ### Key Metrics
 
@@ -206,7 +206,7 @@ HyperVerge supports two modes of liveness detection.
 | Use Case | High-value accounts, regulatory requirement, enhanced security |
 
 **When to use Active Liveness**:
-- Customer flagged for enhanced due diligence (PEP, high-risk)
+- Customer flagged for enhanced due diligence (<abbr title="Politically Exposed Person">PEP</abbr>, high-risk)
 - Passive liveness confidence score falls in borderline range
 - Regulatory audit requires demonstrable active verification
 
@@ -285,7 +285,7 @@ For production use, configure the passive liveness auto-approve threshold at 0.9
 
 ---
 
-When a customer does not complete DigiLocker-based Aadhaar eKYC, the IPV exemption does not apply, and a Video In-Person Verification session becomes mandatory. VIPV combines face match, liveness, document OCR, and OTP verification into a single recorded video session that satisfies SEBI's IPV requirements.
+When a customer does not complete DigiLocker-based Aadhaar eKYC, the IPV exemption does not apply, and a Video In-Person Verification session becomes mandatory. VIPV combines face match, liveness, document OCR, and <abbr title="One-Time Password">OTP</abbr> verification into a single recorded video session that satisfies SEBI's IPV requirements.
 
 ## 4. VIPV (Video In-Person Verification) - SEBI Compliant
 
@@ -302,7 +302,7 @@ When a customer does not complete DigiLocker-based Aadhaar eKYC, the IPV exempti
 
 ### SEBI VIPV Requirements Checklist
 
-Per SEBI KYC Master Circular (SEBI/HO/MIRSD/MIRSD-SEC-2/P/CIR/2023/168) and Stock Brokers Master Circular (SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90):
+Per SEBI KYC Master Circular (SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-SEC-2/P/CIR/2023/168) and Stock Brokers Master Circular (SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90):
 
 | # | Requirement | HyperVerge Implementation |
 |---|------------|---------------------------|
@@ -312,7 +312,7 @@ Per SEBI KYC Master Circular (SEBI/HO/MIRSD/MIRSD-SEC-2/P/CIR/2023/168) and Stoc
 | 4 | Live face match vs document photo | Video frame compared against Aadhaar/PAN photo during session |
 | 5 | Liveness detection during video | Passive liveness runs continuously during video session |
 | 6 | Geo-location capture | SDK captures GPS coordinates (lat/long) at session start |
-| 7 | Tamper-proof recording storage (7-year retention per RBI) | Recording encrypted (AES-256), SHA-256 hash generated, stored in India DC |
+| 7 | Tamper-proof recording storage (7-year retention per <abbr title="Reserve Bank of India">RBI</abbr>) | Recording encrypted (AES-256), SHA-256 hash generated, stored in India DC |
 | 8 | Activity log with timestamps | Every action timestamped: session start, document shown, question asked, OTP read, etc. |
 
 ### VIPV Flow
@@ -618,7 +618,7 @@ Body:
 | Field | Key | Description | Typical Confidence |
 |-------|-----|-------------|-------------------|
 | Account Number | `account_no` | Bank account number | 0.92-0.98 |
-| IFSC Code | `ifsc` | 11-character IFSC | 0.95-0.99 |
+| <abbr title="Indian Financial System Code.">IFSC</abbr> Code | `ifsc` | 11-character IFSC | 0.95-0.99 |
 | Bank Name | `bank_name` | Name of the bank | 0.95-0.99 |
 | Branch | `branch` | Branch name | 0.85-0.95 |
 | MICR Code | `micr` | 9-digit MICR code | 0.90-0.97 |
@@ -739,7 +739,7 @@ HyperVerge's OCR capabilities extend beyond individual KYC documents to support 
 |----------|------------|-----------------|
 | Karta's Aadhaar | Yes (standard Aadhaar OCR) | Name, DOB, gender, address, photo |
 | Karta's PAN | Yes (standard PAN OCR) | PAN number, name, DOB |
-| HUF PAN | Yes (standard PAN OCR) | HUF PAN number, HUF name |
+| <abbr title="Hindu Undivided Family">HUF</abbr> PAN | Yes (standard PAN OCR) | HUF PAN number, HUF name |
 | HUF Deed | Partial (generic document OCR) | HUF name, Karta name (accuracy varies) |
 
 ### Partnership Documents
@@ -1058,7 +1058,7 @@ Beyond pricing, the choice of a verification vendor in the Indian broking contex
 | Certification | Scope | Status |
 |--------------|-------|--------|
 | **ISO 27001** | Information Security Management System | Certified |
-| **SOC 2 Type II** | Security, Availability, Processing Integrity controls | Certified |
+| **SOC 2 Type <abbr title="—">II</abbr>** | Security, Availability, Processing Integrity controls | Certified |
 | **ISO 30107-3 Level 2** | Presentation Attack Detection (Liveness) | iBeta certified |
 | **GDPR** | Data protection (for international operations) | Compliant |
 
@@ -1069,9 +1069,9 @@ Beyond pricing, the choice of a verification vendor in the Indian broking contex
 | **SEBI VIPV** | Fully compliant with SEBI KYC Master Circular requirements for Video IPV |
 | **RBI V-CIP** | Compliant with RBI Video-based Customer Identification Process guidelines |
 | **IRDAI VBIP** | Compliant with Insurance Regulatory Authority Video-Based Identification Process |
-| **DPDP Act 2023** | Data Protection Digital Privacy Act compliance (India) |
+| **<abbr title="Digital Personal Data Protection Act 2023 (and Rules 2025)">DPDP</abbr> Act 2023** | Data Protection Digital Privacy Act compliance (India) |
 | **IT Act 2000** | Electronic record and digital signature compliance |
-| **PMLA** | Prevention of Money Laundering Act - KYC verification support |
+| **<abbr title="Prevention of Money Laundering Act 2002">PMLA</abbr>** | Prevention of Money Laundering Act - KYC verification support |
 
 ### Data Residency
 

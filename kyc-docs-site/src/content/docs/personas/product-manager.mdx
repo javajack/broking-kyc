@@ -25,13 +25,13 @@ You'll lean heaviest on the depth and operator layers. The breadth-first referen
 
 2. **[Flow Summary](/broking-kyc/architecture/flow-summary/)** — short complement to the narrative; covers the onboarding pipeline (the 9 customer screens + maker-checker + 8 batch pipelines).
 
-3. **[Vendor Atlas](/broking-kyc/vendors/atlas/)** — 233 real products across 22 categories. Skim by category; come back to the categories that matter for your build (OMS / RMS / back-office are the big ones; KYC verification / eSign / AA are the per-onboarding-cost drivers).
+3. **[Vendor Atlas](/broking-kyc/vendors/atlas/)** — 233 real products across 22 categories. Skim by category; come back to the categories that matter for your build (<abbr title="Order Management System">OMS</abbr> / <abbr title="Risk Management System">RMS</abbr> / back-office are the big ones; <abbr title="Know Your Customer (process).">KYC</abbr> verification / eSign / <abbr title="Account Aggregator (RBI-licensed NBFC-AA)">AA</abbr> are the per-onboarding-cost drivers).
 
-4. **[Lifecycle Overview](/broking-kyc/lifecycle/)** — the six post-onboarding scenarios (re-KYC, modifications, dormancy, closure, transmission, NRI conversion). These shape your support cost and your edge-case backlog. Read the [Modifications](/broking-kyc/lifecycle/modifications/) page in full — the KRA → CKYC → UCC → BO ordering rule is the single most common bug class.
+4. **[Lifecycle Overview](/broking-kyc/lifecycle/)** — the six post-onboarding scenarios (re-KYC, modifications, dormancy, closure, transmission, <abbr title="Non-Resident Indian">NRI</abbr> conversion). These shape your support cost and your edge-case backlog. Read the [Modifications](/broking-kyc/lifecycle/modifications/) page in full — the <abbr title="KYC Registration Agency">KRA</abbr> → <abbr title="Central KYC (records registry)">CKYC</abbr> → <abbr title="Unique Client Code">UCC</abbr> → <abbr title="Beneficial Owner">BO</abbr> ordering rule is the single most common bug class.
 
 5. **[Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/)** — skim the domain headers. You won't memorize 400 rows but you'll know what kinds of obligations exist. Come back to specific domains when your roadmap intersects them.
 
-6. **[Integration DAG Overview](/broking-kyc/operations/integration-dag/)** — gives you the dependency structure of all the integrations. Useful for stage-gate planning ("when can we cut over from old back-office to new").
+6. **[Integration <abbr title="Directed Acyclic Graph.">DAG</abbr> Overview](/broking-kyc/operations/integration-dag/)** — gives you the dependency structure of all the integrations. Useful for stage-gate planning ("when can we cut over from old back-office to new").
 
 7. **[Regulatory Circulars master](/broking-kyc/reference/regulatory-circulars/)** — skim the highlight panel of 12 most-impactful circulars. Bookmark; this is where regulatory changes are tracked.
 
@@ -44,12 +44,12 @@ That's the foundation. Once you have it, the rest of the site is searchable.
 ## Common questions in your role
 
 - **How much does a single client onboarding cost in API/vendor fees?** → [Cost Analysis](/broking-kyc/reference/cost-analysis/) (₹85–175 per client per the recommended stack).
-- **How long from a client tapping "Sign up" to first trade?** → [Flow Summary](/broking-kyc/architecture/flow-summary/) (24–72 hours, gated by NSDL BO opening).
+- **How long from a client tapping "Sign up" to first trade?** → [Flow Summary](/broking-kyc/architecture/flow-summary/) (24–72 hours, gated by <abbr title="National Securities Depository Limited">NSDL</abbr> BO opening).
 - **What changes next year I need to plan for now?** → [Circulars Changelog](/broking-kyc/reference/circulars-changelog/) — recent and upcoming regulatory changes.
 - **Build vs buy: should we build our own back-office?** → [Vendor Atlas — Back-office category](/broking-kyc/vendors/atlas/#back-office-15-products) plus [BCP/DR Drill](/broking-kyc/deep-dives/specialty/bcp-dr-drill/) (vendor concentration risk).
-- **What's the cost of MTF as a feature?** → [MTF Operational deep-dive](/broking-kyc/deep-dives/settlement/mtf-operational/) plus [BMC/ABC](/broking-kyc/deep-dives/member-compliance/bmc-abc/) (additional capital).
-- **What's blocking the T+0 settlement rollout for our clients?** → [T+0 / T+1 deep-dive](/broking-kyc/deep-dives/settlement/t0-t1-settlement/) — broker readiness checklist included.
-- **What's the worst-case operational failure I should design against?** → [Member Default Recovery](/broking-kyc/deep-dives/foundational/member-default-recovery/) and [Payin Default + Core SGF](/broking-kyc/deep-dives/settlement/payin-default-core-sgf/).
+- **What's the cost of <abbr title="Margin Trading Facility">MTF</abbr> as a feature?** → [MTF Operational deep-dive](/broking-kyc/deep-dives/settlement/mtf-operational/) plus [<abbr title="Base Minimum Capital">BMC</abbr>/<abbr title="Additional Base Capital">ABC</abbr>](/broking-kyc/deep-dives/member-compliance/bmc-abc/) (additional capital).
+- **What's blocking the <abbr title="Trade-date Plus N settlement">T+0</abbr> settlement rollout for our clients?** → [T+0 / <abbr title="Trade-date Plus N settlement">T+1</abbr> deep-dive](/broking-kyc/deep-dives/settlement/t0-t1-settlement/) — broker readiness checklist included.
+- **What's the worst-case operational failure I should design against?** → [Member Default Recovery](/broking-kyc/deep-dives/foundational/member-default-recovery/) and [Payin Default + Core <abbr title="Settlement Guarantee Fund">SGF</abbr>](/broking-kyc/deep-dives/settlement/payin-default-core-sgf/).
 - **How big is the compliance team I need?** → [Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/) — count obligations by frequency × owner role; the result is a rough team-size sanity check.
 
 ## What to skip (and why)

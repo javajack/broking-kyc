@@ -3,7 +3,7 @@ title: "FATCA / CRS Reports — Fields consumed"
 description: "Every field consumed by FATCA / CRS Reports, with source section, destination format, update frequency, transformation rule, and quirks. Use this when building an integration with this destination."
 ---
 
-> **Why this page is structured this way:** This is the destination-first view for FATCA / CRS Reports. Engineers building an integration with this destination get the complete field list on one page. To see where each field originated in onboarding, follow the per-section links via the [atlas overview](/broking-kyc/reference/field-atlas/).
+> **Why this page is structured this way:** This is the destination-first view for <abbr title="Foreign Account Tax Compliance Act (US)">FATCA</abbr> / <abbr title="Common Reporting Standard">CRS</abbr> Reports. Engineers building an integration with this destination get the complete field list on one page. To see where each field originated in onboarding, follow the per-section links via the [atlas overview](/broking-kyc/reference/field-atlas/).
 
 ## TL;DR
 
@@ -17,14 +17,14 @@ Sorted by `source_section`, then `field_id`.
 
 | source_section | field_id | field_name | destination_field_name | destination_format | frequency | transformation | quirks_notes | spec_source |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| A | A-ckyc_number | CKYC Number | CKYC_KIN | CHAR(14) | on-event | [direct] | annual cadence; CKYC KIN linked to FATCA record at KRA; helps dedupe across intermediaries | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12 |
+| A | A-ckyc_number | <abbr title="Central KYC (records registry)">CKYC</abbr> Number | CKYC_KIN | CHAR(14) | on-event | [direct] | annual cadence; CKYC <abbr title="KYC Identification Number">KIN</abbr> linked to FATCA record at <abbr title="KYC Registration Agency">KRA</abbr>; helps dedupe across intermediaries | <abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/SECFATF/P/CIR/2024/12 |
 | A | A-country_of_birth | Country of Birth (Section A duplicate) | COB_ALT | CHAR(2) | on-event | [direct] | same as J05; broker captures in both places; ISO-3166 alpha-2; reconciled at upload | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12 |
 | A | A-date_of_birth | Date of Birth | DOB | DATE YYYYMMDD | on-event | formatted | converted to YYYY-MM-DD per CRS XML schema; passed in OECD ReportableAccount block | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12 |
-| A | A-full_name | Full Name | ACCOUNT_HOLDER_NAME | VARCHAR(200) | on-event | [direct] | must match PAN-name; CRS XML requires "ResCountryCode + TIN + Name" key | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12 |
+| A | A-full_name | Full Name | ACCOUNT_HOLDER_NAME | VARCHAR(200) | on-event | [direct] | must match <abbr title="Permanent Account Number">PAN</abbr>-name; CRS XML requires "ResCountryCode + <abbr title="Taxpayer Identification Number (in FATCA / CRS context)">TIN</abbr> + Name" key | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12 |
 | A | A-nationality | Nationality | NATIONALITY_ISO | CHAR(2) | on-event | [direct] | ISO-3166 alpha-2; not the same as tax residence in FATCA/CRS; separate field on KRA template | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12 |
 | A | A-pan_number | PAN Number | INDIA_TIN_PAN | CHAR(10) | on-event | uppercase | PAN serves as India TIN for FATCA/CRS; uploaded as primary tax-identifier with country=IN | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12 |
 | A | A-place_of_birth | Place of Birth (Section A) | POB_ALT | VARCHAR(50) | on-event | [direct] | same as J06; FATCA template uses Section J entry; Section A entry used for KRA | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12 |
-| A | A-residential_status | Residential Status | RES_STATUS_CODE | CHAR(2) | on-event | lookup against R | RI/NRI/FN/PIO drives whether self-certification mandatory and which template variant | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12 |
+| A | A-residential_status | Residential Status | RES_STATUS_CODE | CHAR(2) | on-event | lookup against R | RI/<abbr title="Non-Resident Indian">NRI</abbr>/FN/PIO drives whether self-certification mandatory and which template variant | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12 |
 | B | B-corr_address_line1 | Correspondence Address Line1 | RES_ADDR_L1 | VARCHAR(100) | on-event | [direct] | captured in CRS XML AddressFix.Street; required for ReportableAccount block | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12 |
 | B | B-corr_city | Correspondence City | RES_CITY | VARCHAR(50) | on-event | [direct] | CRS City field | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12 |
 | B | B-corr_country | Correspondence Country | RES_ADDRESS_COUNTRY | CHAR(2) | on-event | lookup against R | address country used as indicia under CRS; non-IN addr triggers self-cert review even if J01=Y | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12 |

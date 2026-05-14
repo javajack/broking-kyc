@@ -3,7 +3,7 @@ title: Vendor Roadmap
 description: Vendors not yet fully specified — Income/ITR (Perfios), Back-Office/RMS (ODIN), Communications (SMS/Email), Credit Bureau (CIBIL).
 ---
 
-Not every vendor integration is needed on day one. This page documents the integrations that are planned for future phases or serve supplementary purposes beyond the core KYC onboarding flow. Each section covers the vendor landscape, current status, and why the integration matters. When these phases come up on the roadmap, this page gives you a head start on understanding the options.
+Not every vendor integration is needed on day one. This page documents the integrations that are planned for future phases or serve supplementary purposes beyond the core <abbr title="Know Your Customer (process).">KYC</abbr> onboarding flow. Each section covers the vendor landscape, current status, and why the integration matters. When these phases come up on the roadmap, this page gives you a head start on understanding the options.
 
 ## V11: Income / ITR Verification
 
@@ -19,12 +19,12 @@ Income verification becomes relevant when a customer wants to activate F&O (Futu
 
 ## V14: Back-Office / RMS
 
-The back-office and RMS (Risk Management System) is where the client master record lives after onboarding is complete. It handles trading limits, margin calculations, and compliance monitoring. The KYC system pushes the client master record to the back-office after checker approval.
+The back-office and <abbr title="Risk Management System">RMS</abbr> (Risk Management System) is where the client master record lives after onboarding is complete. It handles trading limits, margin calculations, and compliance monitoring. The KYC system pushes the client master record to the back-office after checker approval.
 
 | Vendor | Product | Market Share | Key Features |
 |--------|---------|-------------|-------------|
-| **63 Moons** (Recommended) | ODIN | 70-80% | Multi-exchange (NSE/BSE/MCX). Front + Mid + Back + RMS. 1M+ licensees. |
-| Symphony Fintech | XTS | Growing | OMS + RMS + Compliance. XTS OTIS. |
+| **63 Moons** (Recommended) | ODIN | 70-80% | Multi-exchange (<abbr title="National Stock Exchange of India">NSE</abbr>/<abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr>/<abbr title="Multi Commodity Exchange of India">MCX</abbr>). Front + Mid + Back + RMS. 1M+ licensees. |
+| Symphony Fintech | XTS | Growing | <abbr title="Order Management System">OMS</abbr> + RMS + Compliance. XTS OTIS. |
 | TCS | BaNCS | ~30% volume | Integrated trading, clearing, surveillance. |
 | OmneNEST | OmneNEST | 200+ brokers | Powers Zerodha Kite, Upstox, Finvasia. |
 
@@ -36,7 +36,7 @@ The back-office and RMS (Risk Management System) is where the client master reco
 
 ## V15: Communications
 
-The communications layer handles OTP delivery, welcome kits, transaction alerts, and regulatory notifications. SMS and email are mandatory per SEBI (Securities and Exchange Board of India); WhatsApp and push notifications are supplementary.
+The communications layer handles <abbr title="One-Time Password">OTP</abbr> delivery, welcome kits, transaction alerts, and regulatory notifications. <abbr title="Short Message Service.">SMS</abbr> and email are mandatory per <abbr title="Securities and Exchange Board of India">SEBI</abbr> (Securities and Exchange Board of India); WhatsApp and push notifications are supplementary.
 
 | Channel | Vendor | Key Features | Regulatory |
 |---------|--------|-------------|-----------|
@@ -61,5 +61,5 @@ Credit bureau checks are not required for standard stock broking KYC, but they c
 **Status**: Credit bureau integration is optional for stock broking KYC. May be useful for margin funding eligibility assessment or loan against securities products.
 
 :::tip[When to consider credit bureau integration]
-If the broker plans to offer MTF (Margin Trading Facility), a credit score check during onboarding can help set appropriate credit limits and reduce risk. Otherwise, this integration can be safely deferred to a much later phase.
+If the broker plans to offer <abbr title="Margin Trading Facility">MTF</abbr> (Margin Trading Facility), a credit score check during onboarding can help set appropriate credit limits and reduce risk. Otherwise, this integration can be safely deferred to a much later phase.
 :::

@@ -3,10 +3,10 @@ title: Admin Workflow
 description: The maker-checker review process — how applications are auto-approved, when they need manual review, and the checker's role as the final gate.
 ---
 
-Every KYC (Know Your Customer) application that flows through the system must pass a dual review before any data is submitted to regulators, exchanges, or depositories. This dual review is called the "maker-checker" process — a concept borrowed from banking operations where no single person can both initiate and approve a transaction. In our context, the "maker" is often the system itself (automatically verifying data against thresholds), and the "checker" is a human supervisor who gives the final sign-off. Think of it as the quality control station on the assembly line: the maker inspects each item against a checklist, and the checker does a final spot-check before the item ships. This page explains when applications sail through automatically, when they get flagged for human review, and what the checker is ultimately responsible for.
+Every <abbr title="Know Your Customer (process).">KYC</abbr> (Know Your Customer) application that flows through the system must pass a dual review before any data is submitted to regulators, exchanges, or depositories. This dual review is called the "maker-checker" process — a concept borrowed from banking operations where no single person can both initiate and approve a transaction. In our context, the "maker" is often the system itself (automatically verifying data against thresholds), and the "checker" is a human supervisor who gives the final sign-off. Think of it as the quality control station on the assembly line: the maker inspects each item against a checklist, and the checker does a final spot-check before the item ships. This page explains when applications sail through automatically, when they get flagged for human review, and what the checker is ultimately responsible for.
 
 :::note[Why Maker-Checker Matters]
-SEBI (Securities and Exchange Board of India) regulations require that no KYC submission to a KRA (KYC Registration Agency), exchange, or depository happens without appropriate review. The maker-checker model provides this dual control while keeping the process fast — the majority of applications need zero human intervention.
+<abbr title="Securities and Exchange Board of India">SEBI</abbr> (Securities and Exchange Board of India) regulations require that no KYC submission to a <abbr title="KYC Registration Agency">KRA</abbr> (KYC Registration Agency), exchange, or depository happens without appropriate review. The maker-checker model provides this dual control while keeping the process fast — the majority of applications need zero human intervention.
 :::
 
 The workflow has three tiers: automated approval (the majority of cases), manual review by operations staff (the maker), and final sign-off by a supervisor (the checker). Let us walk through each.
@@ -18,7 +18,7 @@ The workflow has three tiers: automated approval (the majority of cases), manual
 | 10 | **Maker (System)** | Auto-verify all checks against thresholds. If ALL pass → auto-approve. | Auto-approved (majority of cases) |
 | 10 | **Maker (Ops)** | If any check is marginal (e.g., name partially matches), manually review flagged fields. | Approved / Escalated / Rejected |
 | 11 | **Checker (Supervisor)** | Review maker's decision. Final approval or rejection. Mandatory — no batch processing without it. | **Checker Approved** → batch pipelines fire |
-| Esc | **Compliance** | AML (Anti-Money Laundering) HIGH risk, PEP (Politically Exposed Person) matches, sanctions hits escalated from maker. Enhanced CDD (Customer Due Diligence) required. | Approved with conditions / Rejected |
+| Esc | **Compliance** | <abbr title="Anti-Money Laundering">AML</abbr> (Anti-Money Laundering) HIGH risk, <abbr title="Politically Exposed Person">PEP</abbr> (Politically Exposed Person) matches, sanctions hits escalated from maker. Enhanced CDD (Customer Due Diligence) required. | Approved with conditions / Rejected |
 
 In plain English: Step 10 is where the system (or an operations team member) reviews the application. Step 11 is where a supervisor gives the final green light. Only after Step 11 does the batch pipeline start submitting data to KRAs, exchanges, and depositories.
 
@@ -30,7 +30,7 @@ Application is auto-approved if ALL conditions are met:
 
 | Check | Required Outcome |
 |-------|-----------------|
-| PAN (Permanent Account Number) status | Status = E (valid) |
+| <abbr title="Permanent Account Number">PAN</abbr> (Permanent Account Number) status | Status = E (valid) |
 | PAN-Aadhaar linked | Linked (= Y) |
 | PAN name vs DigiLocker name | Name matches government records with high confidence |
 | Penny drop name match | Bank account name verification passes |
@@ -67,7 +67,7 @@ Once the maker (whether automated or human) has made a decision, the checker per
 
 | Checker Action | When | Result |
 |----------------|------|--------|
-| **Approve** | Maker auto-approved or manually approved | Batch pipelines fire (KRA, CKYC, UCC, BO) |
+| **Approve** | Maker auto-approved or manually approved | Batch pipelines fire (KRA, <abbr title="Central KYC (records registry)">CKYC</abbr>, <abbr title="Unique Client Code">UCC</abbr>, <abbr title="Beneficial Owner">BO</abbr>) |
 | **Reject** | Fraud indicators, compliance red flags | Application rejected, client notified |
 | **Send Back** | Missing information, unclear documentation | Returns to maker for re-review |
 

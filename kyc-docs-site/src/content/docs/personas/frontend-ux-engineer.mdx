@@ -27,15 +27,15 @@ You don't need most of the operational and regulatory machinery beneath the surf
 
 3. **[Field Summary](/broking-kyc/reference/field-summary/)** — section counts and prefill ratios. Useful for prioritizing which sections need the most polish (the high-prefill sections are mostly read-only; the user-input sections are where UX matters).
 
-4. **[Code Tables](/broking-kyc/reference/code-tables/)** — enumerations (occupation codes, income ranges, KRA status codes, MCX client categories). Useful for dropdown content.
+4. **[Code Tables](/broking-kyc/reference/code-tables/)** — enumerations (occupation codes, income ranges, <abbr title="KYC Registration Agency">KRA</abbr> status codes, <abbr title="Multi Commodity Exchange of India">MCX</abbr> client categories). Useful for dropdown content.
 
-5. **[Lifecycle: Modifications](/broking-kyc/lifecycle/modifications/)** — if you're building modification screens, this is the spec for what each modification requires (penny drop for bank, OTP for mobile/email, eSign for nominee, etc.).
+5. **[Lifecycle: Modifications](/broking-kyc/lifecycle/modifications/)** — if you're building modification screens, this is the spec for what each modification requires (penny drop for bank, <abbr title="One-Time Password">OTP</abbr> for mobile/email, eSign for nominee, etc.).
 
-6. **[Lifecycle: Re-KYC](/broking-kyc/lifecycle/re-kyc/)** — the re-KYC flow. Similar to onboarding but lighter because of prefill.
+6. **[Lifecycle: Re-<abbr title="Know Your Customer (process).">KYC</abbr>](/broking-kyc/lifecycle/re-kyc/)** — the re-KYC flow. Similar to onboarding but lighter because of prefill.
 
-7. **[Error Handling page](/broking-kyc/operations/error-handling/)** — what error codes appear when an async operation fails (PAN invalid, penny drop name mismatch, AML high-risk, KRA reject, etc.). Useful for writing the error-state UI.
+7. **[Error Handling page](/broking-kyc/operations/error-handling/)** — what error codes appear when an async operation fails (<abbr title="Permanent Account Number">PAN</abbr> invalid, penny drop name mismatch, <abbr title="Anti-Money Laundering">AML</abbr> high-risk, KRA reject, etc.). Useful for writing the error-state UI.
 
-8. **[OMS Internals deep-dive](/broking-kyc/deep-dives/trading-day/oms-internals/)** — if you're building order-placement screens, skip to the pre-trade RMS pipeline section. You need to know what gets rejected and why.
+8. **[<abbr title="Order Management System">OMS</abbr> Internals deep-dive](/broking-kyc/deep-dives/trading-day/oms-internals/)** — if you're building order-placement screens, skip to the pre-trade <abbr title="Risk Management System">RMS</abbr> pipeline section. You need to know what gets rejected and why.
 
 That's most of what you need. The rest is reference.
 
@@ -45,27 +45,27 @@ That's most of what you need. The rest is reference.
 
 ## Common questions in your role
 
-- **What's mandatory in screen 5 (bank account)?** → [Master Dataset section G](/broking-kyc/reference/master-dataset/) — account number, IFSC, type are required; bank name auto-fills from IFSC.
+- **What's mandatory in screen 5 (bank account)?** → [Master Dataset section G](/broking-kyc/reference/master-dataset/) — account number, <abbr title="Indian Financial System Code.">IFSC</abbr>, type are required; bank name auto-fills from IFSC.
 - **What error states can the user land in on screen 8 (declarations gate)?** → [Journey screen 8](/broking-kyc/journey/08-declarations-gate/) — AND-gate fails on: PAN invalid, AML high risk, penny drop name mismatch, etc.
 - **What validation should fire on PAN entry?** → 10 chars, alphanumeric, 4th char identifies entity type (P = individual). [Master Dataset section A](/broking-kyc/reference/master-dataset/).
 - **What's the format for nominee percentage allocation?** → Must sum to 100% across up to 10 nominees. [Journey screen 7](/broking-kyc/journey/07-nominations/) + [Lifecycle modifications — nominee change](/broking-kyc/lifecycle/modifications/#nominee-change-sebi-jan-2025-revamp).
 - **What does the user see while DigiLocker is fetching?** → They're on DigiLocker's site, not yours. They come back to your Screen 4 with prefilled identity. [Journey screen 3](/broking-kyc/journey/03-digilocker-consent/) explains the redirect.
 - **How long can the user expect the OTP to be valid?** → 5 minutes typical; broker policy. [Journey screen 1](/broking-kyc/journey/01-mobile-registration/).
-- **What's the DSC signature on the contract note about?** → Backend artefact; the user just receives a signed PDF. [ECN & Investor Servicing deep-dive](/broking-kyc/deep-dives/member-compliance/ecn-investor-servicing/) for the format.
+- **What's the <abbr title="Digital Signature Certificate (CCA-licensed; aka Class 2/3 DSC).">DSC</abbr> signature on the contract note about?** → Backend artefact; the user just receives a signed PDF. [<abbr title="Electronic Contract Note.">ECN</abbr> & Investor Servicing deep-dive](/broking-kyc/deep-dives/member-compliance/ecn-investor-servicing/) for the format.
 
 ## What to skip (and why)
 
-- **Integration DAG, Compliance Blueprint, Field Atlas destination view** — backend-engineer territory. You don't need them unless you're debugging an async issue.
+- **Integration <abbr title="Directed Acyclic Graph.">DAG</abbr>, Compliance Blueprint, Field Atlas destination view** — backend-engineer territory. You don't need them unless you're debugging an async issue.
 - **All Deep Dives except OMS Internals and possibly Surveillance** — these are operations-team and engineer reference.
 - **Vendor Atlas** — backend-engineer territory.
 - **All persona pages except this one and possibly Product Manager** — you don't need them.
-- **`appendix/*`** — unless you're explicitly building NRI / minor / joint screens, skip.
+- **`appendix/*`** — unless you're explicitly building <abbr title="Non-Resident Indian">NRI</abbr> / minor / joint screens, skip.
 
 ## When you'd hand off
 
 - **"Why is my async call failing?"** → [Backend Engineer reading path](/broking-kyc/personas/backend-engineer/).
 - **"What should the post-onboarding dashboard look like?"** → Product decision; involve [Product Manager](/broking-kyc/personas/product-manager/).
-- **"Are we DLT-compliant for these SMS templates?"** → [Compliance Officer](/broking-kyc/personas/compliance-officer/) — DLT framework deep-dive.
+- **"Are we DLT-compliant for these <abbr title="Short Message Service.">SMS</abbr> templates?"** → [Compliance Officer](/broking-kyc/personas/compliance-officer/) — DLT framework deep-dive.
 
 ## Verified through
 

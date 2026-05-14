@@ -3,7 +3,7 @@ title: DigiLocker
 description: Consent-based document fetch from DigiLocker — Aadhaar eKYC XML, PAN, driving license via OAuth 2.0 flow.
 ---
 
-If you are joining the KYC engineering team, DigiLocker is one of the first systems you must understand deeply. DigiLocker is a government-issued digital wallet for your documents -- instead of carrying physical copies of your Aadhaar, PAN (Permanent Account Number), and driving license, customers share verified digital originals directly from the issuing authority. In the context of stock broker onboarding, DigiLocker is the single most impactful integration because it eliminates the need for Video KYC (known as VIPV, or Video In-Person Verification) for the vast majority of customers, saving both time and money. Around 80-85% of customers will complete their identity verification through this path. The remaining 15-20% who cannot use DigiLocker fall back to a more expensive and slower process involving document uploads, OCR (Optical Character Recognition), and video verification.
+If you are joining the <abbr title="Know Your Customer (process).">KYC</abbr> engineering team, DigiLocker is one of the first systems you must understand deeply. DigiLocker is a government-issued digital wallet for your documents -- instead of carrying physical copies of your Aadhaar, <abbr title="Permanent Account Number">PAN</abbr> (Permanent Account Number), and driving license, customers share verified digital originals directly from the issuing authority. In the context of stock broker onboarding, DigiLocker is the single most impactful integration because it eliminates the need for Video KYC (known as <abbr title="Video In-Person Verification (sometimes &quot;Video CIP&quot; / V-CIP)">VIPV</abbr>, or Video In-Person Verification) for the vast majority of customers, saving both time and money. Around 80-85% of customers will complete their identity verification through this path. The remaining 15-20% who cannot use DigiLocker fall back to a more expensive and slower process involving document uploads, <abbr title="Optical Character Recognition.">OCR</abbr> (Optical Character Recognition), and video verification.
 
 ## Table of Contents
 
@@ -12,7 +12,7 @@ If you are joining the KYC engineering team, DigiLocker is one of the first syst
 3. [OAuth 2.0 Consent Flow](#3-oauth-20-consent-flow)
 4. [Document Types for Broking KYC](#4-document-types-for-broking-kyc)
 5. [Aadhaar eKYC via DigiLocker (Critical)](#5-aadhaar-ekyc-via-digilocker-critical)
-6. [NPCI e-KYC Setu (New - Jun 2025)](#6-npci-e-kyc-setu-new---jun-2025)
+6. [<abbr title="National Payments Corporation of India">NPCI</abbr> e-KYC Setu (New - Jun 2025)](#6-npci-e-kyc-setu-new---jun-2025)
 7. [Aadhaar Offline XML (Fallback)](#7-aadhaar-offline-xml-fallback)
 8. [Non-Individual Entities](#8-non-individual-entities)
 9. [Data Privacy and Compliance](#9-data-privacy-and-compliance)
@@ -50,17 +50,17 @@ In plain English, DigiLocker is the government's official digital document repos
 
 ### Why DigiLocker Matters for Broking KYC
 
-1. **IPV (In-Person Verification) Exemption**: SEBI (Securities and Exchange Board of India) circular explicitly allows **In-Person Verification exemption** when Aadhaar eKYC (electronic Know Your Customer) is obtained via DigiLocker. This eliminates the need for Video KYC (VIPV), saving Rs. 30-50 per customer and dramatically simplifying the onboarding flow.
+1. **<abbr title="In-Person Verification">IPV</abbr> (In-Person Verification) Exemption**: <abbr title="Securities and Exchange Board of India">SEBI</abbr> (Securities and Exchange Board of India) circular explicitly allows **In-Person Verification exemption** when Aadhaar eKYC (electronic Know Your Customer) is obtained via DigiLocker. This eliminates the need for Video KYC (VIPV), saving Rs. 30-50 per customer and dramatically simplifying the onboarding flow.
 
-2. **Consent-Based**: Documents are fetched only with explicit user consent via OAuth 2.0. The user sees exactly which documents are being requested and can grant or deny access. This aligns with DPDP (Digital Personal Data Protection) Act 2023 principles.
+2. **Consent-Based**: Documents are fetched only with explicit user consent via OAuth 2.0. The user sees exactly which documents are being requested and can grant or deny access. This aligns with <abbr title="Digital Personal Data Protection Act 2023 (and Rules 2025)">DPDP</abbr> (Digital Personal Data Protection) Act 2023 principles.
 
 3. **Government-Issued, Digitally Signed**: Documents fetched from DigiLocker carry the digital signature of the issuing authority (e.g., UIDAI for Aadhaar, Income Tax Dept for PAN). No separate document verification or forgery detection is needed.
 
-4. **Auto-Fill Capability**: Aadhaar XML from DigiLocker provides ~25 structured fields (name, DOB, gender, full address, photo) that can be used to auto-fill KYC forms, KRA (KYC Registration Agency) submissions, CKYC (Central KYC) uploads, and exchange UCC registrations.
+4. **Auto-Fill Capability**: Aadhaar XML from DigiLocker provides ~25 structured fields (name, DOB, gender, full address, photo) that can be used to auto-fill KYC forms, <abbr title="KYC Registration Agency">KRA</abbr> (KYC Registration Agency) submissions, <abbr title="Central KYC (records registry)">CKYC</abbr> (Central KYC) uploads, and exchange <abbr title="Unique Client Code">UCC</abbr> registrations.
 
 5. **Cost Efficiency**: DigiLocker is a government service with minimal per-transaction cost (Rs. 0-5 depending on integration path), compared to OCR-based extraction (Rs. 1-3 per doc) plus manual verification overhead.
 
-6. **Coverage**: With 200M+ registered users, a significant portion of the target customer base already has DigiLocker accounts. For those who do not, account creation takes approximately 2 minutes using Aadhaar OTP (One-Time Password).
+6. **Coverage**: With 200M+ registered users, a significant portion of the target customer base already has DigiLocker accounts. For those who do not, account creation takes approximately 2 minutes using Aadhaar <abbr title="One-Time Password">OTP</abbr> (One-Time Password).
 
 :::tip[Why This Matters for You]
 As a junior engineer, remember this: DigiLocker is the "happy path" for KYC onboarding. If a customer uses DigiLocker, the entire onboarding can complete in 5-7 minutes at a cost of Rs. 30-50. Without it, the same process takes 10-15 minutes and costs Rs. 80-120. Every design decision in the system is optimized around maximizing DigiLocker adoption.
@@ -373,10 +373,10 @@ The following documents are relevant for stock broker KYC onboarding and can be 
 | Document | Issuer | Document URI | Format | Fields Returned | Use in KYC |
 |----------|--------|-------------|--------|-----------------|------------|
 | **Aadhaar (e-Aadhaar XML)** | UIDAI | `in.gov.uidai-ADHAR` | XML | Name, DOB, Gender, Full Address (house, street, landmark, locality, vtc, district, state, pincode), Photo (base64), Masked Aadhaar | **Primary identity**; IPV exemption; face match reference; address proof |
-| **PAN Card** | Income Tax Dept (Protean/NSDL) | `in.gov.cbdt-PANCR` | PDF/XML | PAN Number, Name, DOB, Father's Name | PAN verification; cross-reference with Decentro PAN API |
+| **PAN Card** | Income Tax Dept (Protean/<abbr title="National Securities Depository Limited">NSDL</abbr>) | `in.gov.cbdt-PANCR` | PDF/XML | PAN Number, Name, DOB, Father's Name | PAN verification; cross-reference with Decentro PAN API |
 | **Driving License** | State Transport Dept (via Parivahan/Sarathi) | `in.gov.transport-DL` | XML/PDF | DL Number, Name, DOB, Address, Issue Date, Validity, Vehicle Classes | Address proof (alternative) |
 | **Voter ID (EPIC)** | Election Commission of India | `in.gov.eci-EPIC` | PDF | Name, Address, Voter ID Number, Father/Husband Name | Address proof (alternative) |
-| **Passport** | Ministry of External Affairs | `in.gov.mea-PASSPORT` | PDF | Passport Number, Name, DOB, Nationality, Gender, Issue/Expiry Dates | Identity + address proof; required for NRI clients |
+| **Passport** | Ministry of External Affairs | `in.gov.mea-PASSPORT` | PDF | Passport Number, Name, DOB, Nationality, Gender, Issue/Expiry Dates | Identity + address proof; required for <abbr title="Non-Resident Indian">NRI</abbr> clients |
 | **Vehicle Registration (RC)** | Transport Dept (Vahan) | `in.gov.transport-VAHAN` | XML | Vehicle details, Owner name, Address | Not typically used in broking KYC |
 | **Class 10 Marksheet** | CBSE/State Board | Varies by board | PDF | Name, DOB, Father's Name, Roll Number | DOB verification (fallback) |
 | **Class 12 Marksheet** | CBSE/State Board | Varies by board | PDF | Name, DOB, Father's Name | Not typically used |
@@ -412,7 +412,7 @@ This is the most important section of this document. DigiLocker-based Aadhaar eK
 
 ### IPV Exemption - SEBI Regulatory Basis
 
-**SEBI Circular**: SEBI/HO/MIRSD/SEC-2/P/CIR/2023/37
+**SEBI Circular**: SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/SEC-2/P/CIR/2023/37
 
 **Key Provision**: When Aadhaar eKYC data is obtained through DigiLocker (or equivalent government electronic mechanism), the requirement for In-Person Verification (IPV) is **exempted**. This means:
 
@@ -533,7 +533,7 @@ Pincode:        122001
 Country:        India
 ```
 
-**BSE UCC Address Rules**: Address Line 1 must NOT start with client name. Address Lines 1, 2, and 3 must all be distinct. The concatenation logic above naturally satisfies these rules.
+**<abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> UCC Address Rules**: Address Line 1 must NOT start with client name. Address Lines 1, 2, and 3 must all be distinct. The concatenation logic above naturally satisfies these rules.
 
 :::tip[Implementation Tip]
 Some Aadhaar XML fields may be empty (for example, `lm` or `loc`). Your address concatenation logic should handle empty fields gracefully -- skip them rather than producing strings like "123, MG Road, , Sector 5". Also, trim extra whitespace and commas.
@@ -739,10 +739,10 @@ DigiLocker is primarily designed for individual citizens. Its applicability for 
 |-------------|----------------------|--------------------|-----------------------|----------|
 | **Individual** | Yes (full support) | Aadhaar, PAN, DL, Voter ID, Passport | - | Offline XML + OCR |
 | **Corporate (Company)** | Partial (directors only) | Individual directors' Aadhaar/PAN via their personal DigiLocker | CIN, MOA, AOA, Board Resolution, Authorized Signatory Letter | Manual upload + OCR (HyperVerge) |
-| **HUF** | Partial (Karta only) | Karta's personal Aadhaar/PAN | HUF PAN card, HUF declaration, co-parcener details | Manual upload |
-| **NRI** | Conditional | Aadhaar/PAN if Indian mobile linked to Aadhaar is still active | Passport (if not on DigiLocker), overseas address proof, PIS permission | Manual upload + consular attestation |
+| **<abbr title="Hindu Undivided Family">HUF</abbr>** | Partial (Karta only) | Karta's personal Aadhaar/PAN | HUF PAN card, HUF declaration, co-parcener details | Manual upload |
+| **NRI** | Conditional | Aadhaar/PAN if Indian mobile linked to Aadhaar is still active | Passport (if not on DigiLocker), overseas address proof, <abbr title="Portfolio Investment Scheme (RBI / NRI)">PIS</abbr> permission | Manual upload + consular attestation |
 | **Partnership Firm** | Partial (partners only) | Individual partners' Aadhaar/PAN | Partnership deed, firm PAN, authorized signatory | Manual upload |
-| **LLP** | Partial (designated partners only) | Individual DPs' Aadhaar/PAN | LLP Agreement, LLPIN certificate | Manual upload |
+| **<abbr title="—">LLP</abbr>** | Partial (designated partners only) | Individual DPs' Aadhaar/PAN | LLP Agreement, LLPIN certificate | Manual upload |
 | **Trust** | Partial (trustees only) | Individual trustees' Aadhaar/PAN | Trust deed, registration certificate | Manual upload |
 | **Minor (on behalf of)** | Partial (guardian only) | Guardian's Aadhaar/PAN | Minor's birth certificate (may be on DigiLocker if issued digitally) | Manual upload |
 
@@ -797,7 +797,7 @@ Handling the data fetched from DigiLocker carries significant privacy and compli
 | **IT Act 2000** | Electronic documents | DigiLocker documents are legally equivalent to originals (Section 9, Rule 9A) |
 | **DPDP Act 2023** | Personal data processing | Consent management, purpose limitation, data minimization, data principal rights |
 | **SEBI KYC Master Circular** | KYC data retention | 8 years post account closure (SEBI Stock Brokers Regulations 2026) |
-| **PMLA (Prevention of Money Laundering Act) 2002** | Customer due diligence | KYC records for AML (Anti-Money Laundering) compliance |
+| **<abbr title="Prevention of Money Laundering Act 2002">PMLA</abbr> (Prevention of Money Laundering Act) 2002** | Customer due diligence | KYC records for <abbr title="Anti-Money Laundering">AML</abbr> (Anti-Money Laundering) compliance |
 
 ### Aadhaar Number Handling - Critical Rules
 
@@ -1030,7 +1030,7 @@ Now that you know how the API works, let us prepare for what can go wrong. Edge 
 ```
 
 :::caution[Name Mismatch is a Common Source of KYC Rejections]
-Name mismatches between Aadhaar and PAN are one of the top 3 reasons for KRA (KYC Registration Agency) rejections. Always use the PAN name as the canonical name for all financial submissions (KRA, CKYC, exchange UCC, depository BO). The PAN name is the legal name for securities market purposes.
+Name mismatches between Aadhaar and PAN are one of the top 3 reasons for KRA (KYC Registration Agency) rejections. Always use the PAN name as the canonical name for all financial submissions (KRA, CKYC, exchange UCC, depository <abbr title="Beneficial Owner">BO</abbr>). The PAN name is the legal name for securities market purposes.
 :::
 
 ### 11.5: DigiLocker Service Downtime
@@ -1213,7 +1213,7 @@ Fields auto-filled into CKYC upload payload (Decentro CKYC API):
 
 ### 12.5: DigiLocker Data -> Exchange UCC Registration
 
-| DigiLocker Field | NSE UCC Field | BSE UCC Field |
+| DigiLocker Field | <abbr title="National Stock Exchange of India">NSE</abbr> UCC Field | BSE UCC Field |
 |-----------------|--------------|--------------|
 | `Poi/@name` | `client_name` | `Client Name (First + Last)` |
 | `Poi/@dob` | `dob` | `Date of Birth` (DD/MM/YYYY) |
@@ -1236,7 +1236,7 @@ The regulatory landscape around DigiLocker has evolved significantly over the pa
 |------|--------|--------------------------------|
 | **Oct 2023** | SEBI KYC Master Circular (SEBI/HO/MIRSD/MIRSD-SEC-2/P/CIR/2023/168) | Confirmed DigiLocker as valid eKYC mechanism; IPV exemption codified |
 | **Feb 2023** | SEBI circular on Aadhaar eKYC (SEBI/HO/MIRSD/SEC-2/P/CIR/2023/37) | Explicit IPV exemption when Aadhaar eKYC via DigiLocker |
-| **Nov 2022** | DDPI (Demat Debit and Pledge Instruction) replaces POA (Power of Attorney) | No direct impact on DigiLocker; DDPI is a separate consent |
+| **Nov 2022** | <abbr title="Demat Debit and Pledge Instruction">DDPI</abbr> (Demat Debit and Pledge Instruction) replaces <abbr title="Power of Attorney">POA</abbr> (Power of Attorney) | No direct impact on DigiLocker; DDPI is a separate consent |
 | **Jan 2025** | CKYC Search returns masked CKYC number | No impact on DigiLocker; affects downstream CKYC integration |
 | **Jan 2025** | Up to 10 nominees (SEBI mandate) | No impact on DigiLocker; nominee data collected in KYC form |
 | **Mar 2025** | NPCI e-KYC Setu launched | New alternative to DigiLocker Aadhaar eKYC (Section 6) |
@@ -1253,7 +1253,7 @@ The regulatory landscape around DigiLocker has evolved significantly over the pa
 | v1.0 | Deprecated | Original XML-based API |
 | v1.1 | Current (production) | OAuth 2.0 consent flow; JSON + XML responses; partner spec v1.11 |
 | v2.0 | Upcoming (announced) | Enhanced API; additional document types; improved error handling |
-| v3.0 | Planned | Potential integration with Account Aggregator (AA) ecosystem |
+| v3.0 | Planned | Potential integration with Account Aggregator (<abbr title="Account Aggregator (RBI-licensed NBFC-AA)">AA</abbr>) ecosystem |
 
 ### What to Watch
 
@@ -1318,7 +1318,7 @@ At 10,000 onboardings/month, DigiLocker path saves approximately **Rs. 3-5 lakh/
 | Bank Verification (Penny Drop) | Decentro | 2-5 |
 | KRA Lookup | Digio | 3-5 |
 | Face Match + Liveness | HyperVerge | 2-4 |
-| AML/PEP (Anti-Money Laundering / Politically Exposed Person) Screening | TrackWizz | 5-15 |
+| AML/<abbr title="Politically Exposed Person">PEP</abbr> (Anti-Money Laundering / Politically Exposed Person) Screening | TrackWizz | 5-15 |
 | eSign | Digio | 15-25 |
 | CKYC Upload | Decentro | 5-10 |
 | **Total (DigiLocker path)** | | **Rs. 36-72** |

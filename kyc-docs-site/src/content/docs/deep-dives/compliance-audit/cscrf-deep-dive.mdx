@@ -5,7 +5,7 @@ description: Walkthrough and reference for SEBI's August 2024 CSCRF — categori
 
 import { Aside } from '@astrojs/starlight/components';
 
-> **Why this page is structured this way:** CSCRF is the single most-cited cyber framework for Indian SEBI-regulated entities. The page first explains the framework chronology (Aug 2024 launch → multiple clarification circulars), then maps the categorisation logic (which broker falls in which tier), then the operational obligations domain-by-domain (governance, identification, protection, detection, response, recovery), and finally the practical aspects — VAPT cadence, incident reporting, audit cycle, vendor due diligence.
+> **Why this page is structured this way:** <abbr title="Cybersecurity and Cyber Resilience Framework">CSCRF</abbr> is the single most-cited cyber framework for Indian <abbr title="Securities and Exchange Board of India">SEBI</abbr>-regulated entities. The page first explains the framework chronology (Aug 2024 launch → multiple clarification circulars), then maps the categorisation logic (which broker falls in which tier), then the operational obligations domain-by-domain (governance, identification, protection, detection, response, recovery), and finally the practical aspects — VAPT cadence, incident reporting, audit cycle, vendor due diligence.
 
 ## TL;DR
 
@@ -17,11 +17,11 @@ import { Aside } from '@astrojs/starlight/components';
   - **FAQ dated 11 June 2025**
   - `SEBI/HO/ITD-1/ITD_CSC_EXT/P/CIR/2025/119` (28 Aug 2025) — Latest clarifications
 - **Five-goal framework:** Anticipate, Withstand, Contain, Recover, Evolve
-- **Categorisation:** **MII** (Market Infrastructure Institution) → **Qualified RE** → **Mid-size RE** → **Small RE** → **Self-Certification RE**. Categorisation is computed annually using clauses 2.1.1 and 2.1.2 — for stock brokers based on total registered clients (clause 2.1.1) and trade value handled (clause 2.1.2).
+- **Categorisation:** **<abbr title="Market Infrastructure Institution">MII</abbr>** (Market Infrastructure Institution) → **Qualified RE** → **Mid-size RE** → **Small RE** → **Self-Certification RE**. Categorisation is computed annually using clauses 2.1.1 and 2.1.2 — for stock brokers based on total registered clients (clause 2.1.1) and trade value handled (clause 2.1.2).
 - **VAPT** quarterly cadence for critical systems; annual for others; submission to exchange (per `NSE/INSP/70471` FY26 VAPT operationalisation).
 - **CERT-In incident reporting** — 6-hour rule for any cyber incident from CERT-In Directions dated 28 April 2022 (Sec 70B of Information Technology Act 2000). SEBI cyber audit also requires same-day intimation to SEBI / exchange.
-- **Audit cycles:** Type-I (annual cyber audit per CSCRF clause 4.4 — 100% critical + 25% non-critical), Type-II (VAPT — quarterly critical / annual others), Type-III (special / event-triggered).
-- **Evidence retention:** Minimum **180 days** for security logs (some categories longer — trade-related 5+ years); some categories longer per RBI / PMLA cross-reference.
+- **Audit cycles:** Type-I (annual cyber audit per CSCRF clause 4.4 — 100% critical + 25% non-critical), Type-<abbr title="—">II</abbr> (VAPT — quarterly critical / annual others), Type-<abbr title="—">III</abbr> (special / event-triggered).
+- **Evidence retention:** Minimum **180 days** for security logs (some categories longer — trade-related 5+ years); some categories longer per <abbr title="Reserve Bank of India">RBI</abbr> / <abbr title="Prevention of Money Laundering Act 2002">PMLA</abbr> cross-reference.
 - **Vendor due diligence** — supply-chain security with formal vendor risk assessment, contractual safeguards, SOC reports from vendors.
 
 ## Conceptual overview
@@ -61,7 +61,7 @@ The framework is structured around the **five-goal cyber-resilience model**:
 ### 1.2 CSCRF era
 
 - **20 Aug 2024** — `SEBI/HO/ITD-1/ITD_CSC_EXT/P/CIR/2024/113` — CSCRF launched; applies to all REs
-- **20 Aug 2024** — `NSE/INSP/63502` — NSE forwarding to brokers; compliance deadline 1 Jan 2025 (existing REs) / 1 Apr 2025 (newly regulated)
+- **20 Aug 2024** — `NSE/INSP/63502` — <abbr title="National Stock Exchange of India">NSE</abbr> forwarding to brokers; compliance deadline 1 Jan 2025 (existing REs) / 1 Apr 2025 (newly regulated)
 - **31 Dec 2024** — `SEBI/HO/ITD-1/ITD_CSC_EXT/P/CIR/2024/184` — Clarifications; Mid-size / Small / Self-Cert REs given extended timelines
 - **28 Mar 2025** — Further clarifications
 - **30 Apr 2025** — Further clarifications
@@ -88,7 +88,7 @@ For stock brokers:
 | Tier | Threshold (computed annually) |
 | --- | --- |
 | MII | Stock exchange, clearing corp, depository (not applicable to brokers) |
-| Qualified RE | Brokers meeting QSB criteria per `SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/24` and `2024/14` (size of operations, active clients > X, trade volume > Y, client funds handled > Z) |
+| Qualified RE | Brokers meeting <abbr title="Qualified Stock Broker">QSB</abbr> criteria per `SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/24` and `2024/14` (size of operations, active clients > X, trade volume > Y, client funds handled > Z) |
 | Mid-size RE | Brokers with significant but sub-QSB scale — typically 10k–500k registered clients (industry-typical interpretation) |
 | Small RE | Brokers with smaller scale — 1k–10k registered clients (industry-typical) |
 | Self-Cert RE | Smallest brokers — &lt; 1k registered clients (industry-typical) |
@@ -220,7 +220,7 @@ Per CSCRF clause 4.3:
 | --- | --- | --- |
 | CERT-In | 6 hours | CERT-In Incident Reporting Form via https://www.cert-in.org.in |
 | SEBI | Same day (6 hours) | Email / SEBI Cyber Incident Reporting Portal |
-| Exchange / Depository | Same day (6 hours) | ENIT-NEW-COMPLIANCE (NSE), equivalent at BSE / MCX, CDSL / NSDL communique channel |
+| Exchange / Depository | Same day (6 hours) | ENIT-NEW-COMPLIANCE (NSE), equivalent at <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> / <abbr title="Multi Commodity Exchange of India">MCX</abbr>, <abbr title="Central Depository Services (India) Limited">CDSL</abbr> / <abbr title="National Securities Depository Limited">NSDL</abbr> communique channel |
 | NCIIPC (where applicable) | As per NCIIPC Directions | If critical information infrastructure |
 
 ### 5.4 Quarterly reporting
@@ -283,7 +283,7 @@ Per CSCRF clause 4.3:
 - **Audit logs (system / application):** 1 year minimum
 - **Trade-related logs:** 5 years (per SEBI Stock Brokers Master Circular)
 - **Client communication logs:** 5–8 years (per SEBI broker regulation overlap)
-- **KYC artefacts:** 10 years post relationship termination (per SEBI AML Master + PMLA)
+- **<abbr title="Know Your Customer (process).">KYC</abbr> artefacts:** 10 years post relationship termination (per SEBI <abbr title="Anti-Money Laundering">AML</abbr> Master + PMLA)
 - **Incident response logs:** 3 years (industry-typical)
 - **VAPT reports:** 3 years (industry-typical)
 
@@ -307,7 +307,7 @@ Per CSCRF clause 4.3:
 CSCRF includes supply-chain security obligations. Vendors with system access or holding RE data are in scope:
 
 - Cloud-services providers
-- Software-as-a-Service vendors (CRM, OMS, RMS, surveillance, compliance tools)
+- Software-as-a-Service vendors (CRM, <abbr title="Order Management System">OMS</abbr>, <abbr title="Risk Management System">RMS</abbr>, surveillance, compliance tools)
 - Outsourced operations (back-office, KYC processing, customer support)
 - Hardware / network vendors
 - Managed-security-service providers (SOC, VAPT, threat intelligence)
@@ -438,9 +438,9 @@ Per `SEBI/HO/ITD-1/ITD_CSC_EXT/P/CIR/2024/184`:
 - **Inspection** — exchange / SEBI / depository inspection (per [Inspection Types deep dive](/broking-kyc/deep-dives/compliance-audit/inspection-types/)) reviews CSCRF compliance
 - **CERT-In** — incident reporting, advisory subscription, audit
 - **NCIIPC** (National Critical Information Infrastructure Protection Centre) — for entities designated as critical information infrastructure
-- **DPDP Act** — Digital Personal Data Protection Act 2023 cross-references; CSCRF privacy controls support DPDP compliance
+- **<abbr title="Digital Personal Data Protection Act 2023 (and Rules 2025)">DPDP</abbr> Act** — Digital Personal Data Protection Act 2023 cross-references; CSCRF privacy controls support DPDP compliance
 - **RBI cyber framework** — for broker-bank hybrid groups, harmonisation needed
-- **PMLA / AML** — incident may surface STR-triggering facts; coordination with PMLA team
+- **PMLA / AML** — incident may surface <abbr title="Suspicious Transaction Report">STR</abbr>-triggering facts; coordination with PMLA team
 
 ## Cross-references
 
@@ -452,7 +452,7 @@ Per `SEBI/HO/ITD-1/ITD_CSC_EXT/P/CIR/2024/184`:
 - [Deep Dive — OMS Internals](/broking-kyc/deep-dives/trading-day/oms-internals/)
 - [Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/)
 - [Operations — Audit & Compliance](/broking-kyc/operations/audit-compliance/)
-- [Circulars — SEBI MIRSD](/broking-kyc/reference/circulars/sebi-mirsd/)
+- [Circulars — SEBI <abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>](/broking-kyc/reference/circulars/sebi-mirsd/)
 - [Circulars — NSE](/broking-kyc/reference/circulars/nse/)
 - [Circulars — SEBI Other](/broking-kyc/reference/circulars/sebi-other/)
 - [Circulars — MeitY (CERT-In)](/broking-kyc/reference/circulars/meity/)

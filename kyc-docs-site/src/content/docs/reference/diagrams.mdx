@@ -5,7 +5,7 @@ description: Visual architecture of the onboarding system — three SVG diagrams
 
 import Diagram from '../../../components/Diagram.astro';
 
-This page collects all the architecture diagrams in one place. If you are the kind of engineer who thinks visually, start here. Each diagram corresponds to a major section of the documentation, and together they give you a complete picture of the KYC (Know Your Customer) onboarding system -- from the customer-facing screens to the back-office batch pipelines. You will find these same diagrams embedded in their respective sections throughout the docs, but having them all on a single page makes it easy to reference them during discussions or print them for a whiteboard session.
+This page collects all the architecture diagrams in one place. If you are the kind of engineer who thinks visually, start here. Each diagram corresponds to a major section of the documentation, and together they give you a complete picture of the <abbr title="Know Your Customer (process).">KYC</abbr> (Know Your Customer) onboarding system -- from the customer-facing screens to the back-office batch pipelines. You will find these same diagrams embedded in their respective sections throughout the docs, but having them all on a single page makes it easy to reference them during discussions or print them for a whiteboard session.
 
 :::tip[How to use these diagrams]
 Each diagram is designed to answer a specific question. Diagram 1 answers "what is the end-to-end flow?" Diagram 2 answers "where does each piece of data come from?" Diagram 3 answers "what happens after the customer is done?" Diagram 4 answers "what are all the possible states an application can be in?" When someone asks you a question about the system, start by pointing them to the right diagram.
@@ -13,7 +13,7 @@ Each diagram is designed to answer a specific question. Diagram 1 answers "what 
 
 ## Diagram 1: Complete Onboarding Flow
 
-The full 9-screen user journey, maker-checker review, and batch agency pipelines. This is the "big picture" diagram -- it shows everything from the customer's first mobile OTP (One-Time Password) to the moment their account becomes active. Start here if you are new to the system.
+The full 9-screen user journey, maker-checker review, and batch agency pipelines. This is the "big picture" diagram -- it shows everything from the customer's first mobile <abbr title="One-Time Password">OTP</abbr> (One-Time Password) to the moment their account becomes active. Start here if you are new to the system.
 
 <Diagram src="/diagrams/01-onboarding-flow.svg" label="Complete Onboarding Flow (9 Screens + Maker-Checker + Batch)" />
 
@@ -21,7 +21,7 @@ The next diagram zooms into the data layer. While Diagram 1 shows what happens a
 
 ## Diagram 2: Data Source Mapping
 
-Where each field comes from -- resolution priority across DigiLocker (Government of India's digital document platform), CKYC (Central KYC), KRA (KYC Registration Agency), vendor APIs, and user input. This diagram is essential for understanding the pre-fill architecture. When you need to know whether a field comes from DigiLocker, CKYC, KRA, or the customer's manual input, this is the reference.
+Where each field comes from -- resolution priority across DigiLocker (Government of India's digital document platform), <abbr title="Central KYC (records registry)">CKYC</abbr> (Central KYC), <abbr title="KYC Registration Agency">KRA</abbr> (KYC Registration Agency), vendor APIs, and user input. This diagram is essential for understanding the pre-fill architecture. When you need to know whether a field comes from DigiLocker, CKYC, KRA, or the customer's manual input, this is the reference.
 
 <Diagram src="/diagrams/02-data-source-mapping.svg" label="Data Source Mapping — Where Each Field Comes From" />
 
@@ -33,12 +33,12 @@ Diagram 3 focuses on what happens after the customer finishes their journey. Thi
 
 ## Diagram 3: Async Batch Processing Pipeline
 
-The multi-agency batch pipeline that runs after maker-checker approval -- KRA, CKYC, NSE, BSE, MCX, CDSL, NSDL pipelines in parallel. Each pipeline has its own submission format, processing timeline, and success/failure handling. See the [Batch Pipeline](/broking-kyc/operations/batch-pipeline/) documentation for the detailed specification of each pipeline.
+The multi-agency batch pipeline that runs after maker-checker approval -- KRA, CKYC, <abbr title="National Stock Exchange of India">NSE</abbr>, <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr>, <abbr title="Multi Commodity Exchange of India">MCX</abbr>, <abbr title="Central Depository Services (India) Limited">CDSL</abbr>, <abbr title="National Securities Depository Limited">NSDL</abbr> pipelines in parallel. Each pipeline has its own submission format, processing timeline, and success/failure handling. See the [Batch Pipeline](/broking-kyc/operations/batch-pipeline/) documentation for the detailed specification of each pipeline.
 
 <Diagram src="/diagrams/03-async-batch-processing.svg" label="Async Batch Processing Pipeline" />
 
 :::caution[Pipeline timelines vary widely]
-CDSL (Central Depository Services Limited) can activate a BO (Beneficiary Owner) account in 1-2 hours via API, while NSDL (National Securities Depository Limited) takes approximately 15 days via the UDiFF batch format. NSE and BSE process UCC (Unique Client Code) registrations on the same day. KRA takes 2-3 days, and CKYC takes 4-5 days. The total time to "ACTIVE" is determined by the slowest pipeline that is required for the customer's account type.
+CDSL (Central Depository Services Limited) can activate a <abbr title="Beneficial Owner">BO</abbr> (Beneficiary Owner) account in 1-2 hours via API, while NSDL (National Securities Depository Limited) takes approximately 15 days via the UDiFF batch format. NSE and BSE process <abbr title="Unique Client Code">UCC</abbr> (Unique Client Code) registrations on the same day. KRA takes 2-3 days, and CKYC takes 4-5 days. The total time to "ACTIVE" is determined by the slowest pipeline that is required for the customer's account type.
 :::
 
 The final diagram shows the application status lifecycle -- the state machine that tracks every application from creation to completion.

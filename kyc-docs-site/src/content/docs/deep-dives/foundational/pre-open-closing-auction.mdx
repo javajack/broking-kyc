@@ -5,19 +5,19 @@ description: Pre-open session (09:00-09:15 IST) order-entry / matching / buffer 
 
 import { Aside } from '@astrojs/starlight/components';
 
-> **Why this page is structured this way:** The auction windows at the start and end of the equity cash trading day are *call-auction* sessions — fundamentally different from the continuous limit-order-book trading that occupies the bulk of the day. The page therefore separates: (1) the pre-open session — opening-price discovery, order-entry / matching / buffer phases, AMO release, surveillance considerations; (2) the closing session — settlement-price discovery, closing call-auction, eligibility. Each section walks through the mechanics chronologically with the broker's routing and OMS-level considerations called out.
+> **Why this page is structured this way:** The auction windows at the start and end of the equity cash trading day are *call-auction* sessions — fundamentally different from the continuous limit-order-book trading that occupies the bulk of the day. The page therefore separates: (1) the pre-open session — opening-price discovery, order-entry / matching / buffer phases, AMO release, surveillance considerations; (2) the closing session — settlement-price discovery, closing call-auction, eligibility. Each section walks through the mechanics chronologically with the broker's routing and <abbr title="Order Management System">OMS</abbr>-level considerations called out.
 
 ## TL;DR
 
-- Indian equity cash market trading day on NSE / BSE runs **09:00 IST to 15:40 IST**, split into: pre-open auction (09:00-09:15) → continuous trading (09:15-15:30) → closing session (15:30-15:40).
+- Indian equity cash market trading day on <abbr title="National Stock Exchange of India">NSE</abbr> / <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> runs **09:00 <abbr title="Indian Standard Time (UTC+05:30)">IST</abbr> to 15:40 IST**, split into: pre-open auction (09:00-09:15) → continuous trading (09:15-15:30) → closing session (15:30-15:40).
 - **Pre-open session (09:00-09:15)** is a *call auction*: orders accumulate during the order-entry window; an opening price is discovered by matching demand and supply at maximum tradable volume; trades execute at the discovered opening price; the continuous session opens with the discovered price as the reference.
 - Pre-open phases (NSE / BSE): **09:00-09:08 order entry** → **09:08-09:12 order matching and trade confirmation** → **09:12-09:15 buffer** (transition to continuous trading at 09:15).
-- **Eligible securities for pre-open**: as of 2026-05-14, pre-open call-auction applies across the equity universe with specific rules for IPO / SME-IPO / relisted scrips per **NSE/CMTR/63594** dated 2024-09-17 (and supersession trail). For IPOs and relisted scrips, NSE modified call-auction duration and added transparency disclosure of indicative quantity and indicative price (per SEBI Circular SEBI/HO/MRD/MRD-PoD-3/P/CIR/2024/85 dated 2024-06-20).
+- **Eligible securities for pre-open**: as of 2026-05-14, pre-open call-auction applies across the equity universe with specific rules for <abbr title="Initial Public Offering">IPO</abbr> / SME-IPO / relisted scrips per **NSE/CMTR/63594** dated 2024-09-17 (and supersession trail). For IPOs and relisted scrips, NSE modified call-auction duration and added transparency disclosure of indicative quantity and indicative price (per <abbr title="Securities and Exchange Board of India">SEBI</abbr> Circular SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>/MRD-PoD-3/P/CIR/2024/85 dated 2024-06-20).
 - **AMO (After Market Orders)** placed between previous close and 08:59 IST are released into the pre-open at 09:00 — entering the order-entry queue at 09:00.
 - **Closing session (15:30-15:40)** uses the last 30 minutes of continuous trading (15:00-15:30) to compute a **VWAP** that becomes the closing price for most securities; for eligible securities, a separate **closing call auction** between 15:40-15:50 may be applicable (BSE / NSE specific rules apply; not all securities qualify for call-auction closing).
-- **Settlement-price reference**: cash market closing price (VWAP / call-auction price) is referenced for (a) corporate-action ex-date computations, (b) F&O settlement reference on expiry day, (c) MTM end-of-day for client positions, (d) MTF margin computations, (e) fund NAV computation.
+- **Settlement-price reference**: cash market closing price (VWAP / call-auction price) is referenced for (a) corporate-action ex-date computations, (b) F&O settlement reference on expiry day, (c) <abbr title="Mark-to-Market">MTM</abbr> end-of-day for client positions, (d) <abbr title="Margin Trading Facility">MTF</abbr> margin computations, (e) fund NAV computation.
 - **Broker routing**: orders intended for pre-open or closing-auction must be sent with the correct session-type tag in the exchange-bound order message; the broker's OMS routes by session tag.
-- **No pre-open / closing auction on T+0 settlement series**: per **20240321-3** (BSE March 21, 2024) and **NSE/CMTR/61813** (NSE April 29, 2024) introducing T+0 beta, T+0 scrips do not participate in pre-open / block / auction sessions.
+- **No pre-open / closing auction on <abbr title="Trade-date Plus N settlement">T+0</abbr> settlement series**: per **20240321-3** (BSE March 21, 2024) and **NSE/CMTR/61813** (NSE April 29, 2024) introducing T+0 beta, T+0 scrips do not participate in pre-open / block / auction sessions.
 
 ## Conceptual overview
 
@@ -67,8 +67,8 @@ Both auctions are *call auctions* (also known as *batch auctions* or *single-pri
 - The indicative-price disclosure helps participants converge on a fair opening price by exposing the current cross-clearing computation.
 
 **Broker OMS routing**:
-- Order session-type tag: "pre-open" in the FIX / proprietary exchange-bound message.
-- Order validation: price within day's circuit limit; quantity within client position limit; margin sufficient (pre-trade RMS).
+- Order session-type tag: "pre-open" in the <abbr title="Financial Information eXchange protocol">FIX</abbr> / proprietary exchange-bound message.
+- Order validation: price within day's circuit limit; quantity within client position limit; margin sufficient (pre-trade <abbr title="Risk Management System">RMS</abbr>).
 - Order modification / cancellation accepted any time within this 8-minute window.
 
 ### Phase 2: Order matching (09:08-09:12)
@@ -114,7 +114,7 @@ Standard continuous limit-order-book trading with double-sided matching. Out of 
 
 ## Pre-open: special handling for IPO / relisted scrips
 
-Per **NSE/CMTR/61813** dated 2024-04-29 (consolidated CM-segment circular for FY 2024-25) and subsequent **NSE/CMTR/63594** dated 2024-09-17 modifying Section 1.2 of NSE/CMTR/61813:
+Per **NSE/CMTR/61813** dated 2024-04-29 (consolidated <abbr title="Clearing Member">CM</abbr>-segment circular for FY 2024-25) and subsequent **NSE/CMTR/63594** dated 2024-09-17 modifying Section 1.2 of NSE/CMTR/61813:
 
 - **IPO listing day**: the IPO scrip lists in a special call-auction window with extended duration (per the modified rule). The auction provides robust price discovery for the first time the scrip trades publicly. After the call-auction, the IPO transitions to continuous trading at the discovered price.
 - **SME-IPO**: equivalent special call-auction with SME-specific parameters.
@@ -131,14 +131,14 @@ The underlying SEBI authority is **SEBI/HO/MRD/MRD-PoD-3/P/CIR/2024/85** dated 2
 - Released into the pre-open queue at 09:00 IST when the order-entry phase opens.
 
 **Validation at release**:
-- Day's circuit limits applied (AMO order price must be within day's circuit limit — typically 5%, 10%, 20% based on scrip's GSM / ASM / surveillance category).
+- Day's circuit limits applied (AMO order price must be within day's circuit limit — typically 5%, 10%, 20% based on scrip's <abbr title="Graded Surveillance Measure">GSM</abbr> / <abbr title="Additional Surveillance Measure">ASM</abbr> / surveillance category).
 - Client margin sufficiency re-validated at release.
 - Quantity within client position limit.
 
 **Rejection scenarios**:
 - AMO order price outside day's circuit limit → rejected at release.
 - Client margin insufficient at 09:00 → rejected.
-- Client UCC suspended or frozen → rejected.
+- Client <abbr title="Unique Client Code">UCC</abbr> suspended or frozen → rejected.
 
 **Broker OMS handling**:
 - AMOs are queued in the broker's pending-order book overnight.
@@ -152,8 +152,8 @@ As of 2026-05-14, the pre-open call-auction applies broadly across the equity-ca
 - **All actively-traded equity scrips** in the NSE / BSE main board participate in pre-open.
 - **Special call-auction** for IPO / SME-IPO / relisted scrips per the NSE/CMTR/63594 framework.
 - **Periodic call auction** for low-liquidity scrips (per the NSE master surveillance circular NSE/SURV/61970) — these scrips trade only via periodic call auctions through the day rather than continuous trading.
-- **GSM / ESM / ASM** surveillance-tagged scrips may have additional restrictions (e.g., trade-for-trade settlement, reduced trading frequency) that affect pre-open eligibility for some stages.
-- **T+0 settlement series** scrips — per **NSE/CMTR/61813** and BSE's equivalent T+0 introduction circular (BSE 20240321-3 dated 2024-03-21), **T+0 scrips do not have pre-open / block / auction sessions**. T+0 trading window is 09:15-13:30 with price band of ±1% and recalibration after ±0.5%. T+0 and T+1 trade in parallel for the same scrip; the T+0 series is identified by "#" suffix (e.g., HINDMOTORS#).
+- **GSM / <abbr title="Enhanced Surveillance Measure">ESM</abbr> / ASM** surveillance-tagged scrips may have additional restrictions (e.g., trade-for-trade settlement, reduced trading frequency) that affect pre-open eligibility for some stages.
+- **T+0 settlement series** scrips — per **NSE/CMTR/61813** and BSE's equivalent T+0 introduction circular (BSE 20240321-3 dated 2024-03-21), **T+0 scrips do not have pre-open / block / auction sessions**. T+0 trading window is 09:15-13:30 with price band of ±1% and recalibration after ±0.5%. T+0 and <abbr title="Trade-date Plus N settlement">T+1</abbr> trade in parallel for the same scrip; the T+0 series is identified by "#" suffix (e.g., HINDMOTORS#).
 - **Suspended scrips** — no pre-open until suspension lifted.
 - **Pre-listing scrips** — out of scope until listing day.
 
@@ -205,16 +205,16 @@ For eligible scrips, NSE operates a **post-close call-auction session** between 
 
 ### Post-close (after 15:50)
 
-- Trade confirmations, EOD files, settlement reports.
+- Trade confirmations, <abbr title="End Of Day">EOD</abbr> files, settlement reports.
 - AMO acceptance window opens at 16:00 (per NSE / BSE).
-- Margin reports, MTM reports, settlement-cycle reports flow downstream (see [BOD/EOD processing](/broking-kyc/operations/batch-pipeline/)).
+- Margin reports, MTM reports, settlement-cycle reports flow downstream (see [<abbr title="Beginning Of Day">BOD</abbr>/EOD processing](/broking-kyc/operations/batch-pipeline/)).
 
 ## Eligible securities for closing call-auction
 
 The closing call-auction is an *eligible-scrip-only* facility. Scrips currently in the closing call-auction window are listed by the exchange in a published list, typically:
 - Top liquid scrips by average daily traded volume.
 - Scrips in major indices (Nifty 50, Bank Nifty, BSE Sensex constituents and select large-caps).
-- Specifically *excluded*: T+0 settlement-series scrips, surveillance-tagged scrips at higher stages, suspended scrips, GSM Stage III/IV scrips.
+- Specifically *excluded*: T+0 settlement-series scrips, surveillance-tagged scrips at higher stages, suspended scrips, GSM Stage <abbr title="—">III</abbr>/IV scrips.
 
 The eligibility list is periodically refreshed by the exchange.
 
@@ -288,7 +288,7 @@ The above is for **NSE / BSE equity cash market**. Other segments have variation
 
 ### Commodity Derivatives (MCX)
 
-- MCX session timing: 09:00-23:30 / 23:55 IST (extended for international commodity reference, with morning session and evening session split).
+- <abbr title="Multi Commodity Exchange of India">MCX</abbr> session timing: 09:00-23:30 / 23:55 IST (extended for international commodity reference, with morning session and evening session split).
 - No pre-open call-auction.
 - Closing price: per MCX's settlement-price methodology — typically based on weighted-average of the last 30 minutes of the morning session (Daily Settlement Price methodology varies by contract type; see MCX contract specifications).
 - Tender period / delivery procedure: separate from continuous trading and not auction-based.
@@ -359,9 +359,9 @@ The above is for **NSE / BSE equity cash market**. Other segments have variation
 
 ### Auction-market session (T+2 short-delivery auction)
 
-- A *separate* auction-market session operates during the trading day for **T+2 short-delivery auctions** — when a seller fails to deliver securities on T+1 settlement, the CC conducts an auction on T+2 to source the securities, with the buyer's payout linked to the auction outcome.
+- A *separate* auction-market session operates during the trading day for **<abbr title="Trade-date Plus N settlement">T+2</abbr> short-delivery auctions** — when a seller fails to deliver securities on T+1 settlement, the <abbr title="Clearing Corporation (NCL, ICCL, MCXCCL — context-dependent).">CC</abbr> conducts an auction on T+2 to source the securities, with the buyer's payout linked to the auction outcome.
 - This is **distinct from the pre-open / closing call auction** and is operated separately. See [Short-delivery auction](/broking-kyc/deep-dives/trading-day/short-delivery-auction/) for the full T+2 auction mechanics.
-- The NCL/CMPT/71045 (Oct 30, 2025) and NCL/CMPT/71441 (Nov 24, 2025) FAQ circulars detail the internal-shortage auction mechanics.
+- The <abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr>/CMPT/71045 (Oct 30, 2025) and NCL/CMPT/71441 (Nov 24, 2025) FAQ circulars detail the internal-shortage auction mechanics.
 
 <Aside type="tip">
 **Three different "auctions" — don't confuse them.** The Indian market has (a) the *pre-open call auction* (09:00-09:15) — price discovery at the start of day; (b) the *closing call auction* (15:40-15:50 NSE) — closing-price discovery; (c) the *short-delivery / internal-shortage auction* (T+2) — settlement-default remedy. All three are called "auction" but operate under fundamentally different rules and at different times. Operationally, ensure your OMS, surveillance, and reconciliation systems clearly distinguish them.

@@ -3,13 +3,13 @@ title: Exchange & Depository Registration
 description: How client data flows to NSE, BSE, MCX, CDSL, and NSDL — file formats, field requirements, submission sequences, and intermediate statuses.
 ---
 
-Before a customer can buy or sell a single share, their identity must be registered with two fundamentally different types of institutions: exchanges and depositories. Exchanges — such as the NSE (National Stock Exchange), BSE (Bombay Stock Exchange), and MCX (Multi Commodity Exchange) — are where trades happen. Depositories — CDSL (Central Depository Services Limited) and NSDL (National Securities Depository Limited) — are where securities are held in electronic form. Think of it this way: the exchange is the marketplace where you buy vegetables, and the depository is the refrigerator where you store them. This page covers the file formats, field requirements, and submission sequences for registering a new client at each of these five institutions.
+Before a customer can buy or sell a single share, their identity must be registered with two fundamentally different types of institutions: exchanges and depositories. Exchanges — such as the <abbr title="National Stock Exchange of India">NSE</abbr> (National Stock Exchange), <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> (Bombay Stock Exchange), and <abbr title="Multi Commodity Exchange of India">MCX</abbr> (Multi Commodity Exchange) — are where trades happen. Depositories — <abbr title="Central Depository Services (India) Limited">CDSL</abbr> (Central Depository Services Limited) and <abbr title="National Securities Depository Limited">NSDL</abbr> (National Securities Depository Limited) — are where securities are held in electronic form. Think of it this way: the exchange is the marketplace where you buy vegetables, and the depository is the refrigerator where you store them. This page covers the file formats, field requirements, and submission sequences for registering a new client at each of these five institutions.
 
 :::note
-After checker approval, the system submits client data to exchanges (NSE/BSE/MCX) for UCC (Unique Client Code) registration and to depositories (CDSL/NSDL) for BO (Beneficial Owner) account opening. Each agency has its own multi-step pipeline. All agencies run in parallel.
+After checker approval, the system submits client data to exchanges (NSE/BSE/MCX) for <abbr title="Unique Client Code">UCC</abbr> (Unique Client Code) registration and to depositories (CDSL/NSDL) for <abbr title="Beneficial Owner">BO</abbr> (Beneficial Owner) account opening. Each agency has its own multi-step pipeline. All agencies run in parallel.
 :::
 
-The PAN (Permanent Account Number) is the universal linking key across all five systems. Every exchange and every depository uses PAN as the primary identifier to tie a customer's trading activity to their demat holdings to their KYC (Know Your Customer) record. If PAN data is inconsistent across any of these systems, things break — settlements get blocked, accounts get frozen. That is why getting registration right the first time matters so much.
+The <abbr title="Permanent Account Number">PAN</abbr> (Permanent Account Number) is the universal linking key across all five systems. Every exchange and every depository uses PAN as the primary identifier to tie a customer's trading activity to their demat holdings to their <abbr title="Know Your Customer (process).">KYC</abbr> (Know Your Customer) record. If PAN data is inconsistent across any of these systems, things break — settlements get blocked, accounts get frozen. That is why getting registration right the first time matters so much.
 
 Let us start with the three exchange registrations, each of which creates a UCC for the customer.
 
@@ -21,10 +21,10 @@ NSE is the largest stock exchange in India by trading volume and is typically wh
 |--------|---------|
 | **Trading System** | NEAT / NOW (NEAT on Web) |
 | **Submission Methods** | UCI Online (web) \| API Upload (REST JSON) \| Batch Upload (pipe-delimited, no headers) |
-| **API Reference** | [NSE/ISC/60418](/broking-kyc/reference/circulars/nse/#nseisc60418) (API), [NSE/ISC/61817](/broking-kyc/reference/circulars/nse/#nseisc61817) (Apr 2024 — revised structure) |
+| **API Reference** | [NSE/<abbr title="Investor Service Centre.">ISC</abbr>/60418](/broking-kyc/reference/circulars/nse/#nseisc60418) (API), [NSE/ISC/61817](/broking-kyc/reference/circulars/nse/#nseisc61817) (Apr 2024 — revised structure) |
 | **Batch Limit** | Max 10,000 records per file |
 | **Format Change** | New file structure effective Jul 15, 2024 |
-| **Segments** | CM (Cash/Equity), FNO (F&O), CD (Currency), COM (Commodity) |
+| **Segments** | <abbr title="Clearing Member">CM</abbr> (Cash/Equity), FNO (F&O), CD (Currency), COM (Commodity) |
 | **Activation SLA** | Same day (batch 5PM cutoff) |
 
 In plain English: if you submit a customer's data to NSE before 5 PM, they should have an active trading code by end of day.
@@ -56,7 +56,7 @@ MCX is the third exchange, but it only applies to customers who want to trade in
 
 ## MCX UCC Registration
 
-MCX has a unique requirement that the other exchanges do not: income proof is mandatory for all commodity traders. Additionally, every MCX client must be assigned a client category — Hedger (HE), Speculator (SP), or Arbitrageur (AR) — which affects their margin requirements and position limits. The connectivity uses a proprietary protocol called CTCL (Computer-to-Computer Link), which communicates via TCP/IP.
+MCX has a unique requirement that the other exchanges do not: income proof is mandatory for all commodity traders. Additionally, every MCX client must be assigned a client category — Hedger (HE), Speculator (SP), or Arbitrageur (AR) — which affects their margin requirements and position limits. The connectivity uses a proprietary protocol called <abbr title="Computer-to-Computer Link.">CTCL</abbr> (Computer-to-Computer Link), which communicates via TCP/IP.
 
 | Aspect | Details |
 |--------|---------|
@@ -74,7 +74,7 @@ Now let us move to the depositories. While exchanges handle where trades happen,
 
 ## CDSL BO Account Opening
 
-CDSL, promoted by BSE, is where the majority of India's retail demat accounts are held — over 11 crore accounts as of early 2026. The BO (Beneficial Owner) account is the electronic equivalent of a physical share certificate locker. CDSL uses a fixed-length positional file format with numbered "lines," where Line 01 carries the header and DP (Depository Participant) ID, Line 02 carries contact and KYC data, Line 05 carries bank details, and Line 07 carries nomination information. All four of these lines are mandatory for a new account.
+CDSL, promoted by BSE, is where the majority of India's retail demat accounts are held — over 11 crore accounts as of early 2026. The BO (Beneficial Owner) account is the electronic equivalent of a physical share certificate locker. CDSL uses a fixed-length positional file format with numbered "lines," where Line 01 carries the header and <abbr title="Depository Participant">DP</abbr> (Depository Participant) ID, Line 02 carries contact and KYC data, Line 05 carries bank details, and Line 07 carries nomination information. All four of these lines are mandatory for a new account.
 
 | Aspect | Details |
 |--------|---------|
@@ -82,7 +82,7 @@ CDSL, promoted by BSE, is where the majority of India's retail demat accounts ar
 | **BO ID Format** | 16 digits (numeric): 8-digit DP ID + 8-digit Client ID |
 | **Submission** | API (BO Setup) \| Portal (one-by-one) \| Batch (fixed-length positional) |
 | **File Lines** | 01: Header/DP ID (mandatory), 02: Contact/KYC (mandatory), 03-04: Joint holders, 05: Bank (mandatory), 06: Additional, 07: Nomination (mandatory) |
-| **DDPI** | Optional, replaces PoA. Activation within 24 hours (online). |
+| **<abbr title="Demat Debit and Pledge Instruction">DDPI</abbr>** | Optional, replaces PoA. Activation within 24 hours (online). |
 | **Activation SLA** | 1-2 hours (API). 1-3 days (batch). |
 
 :::tip[DDPI Replaces Power of Attorney]
@@ -99,7 +99,7 @@ NSDL, promoted by NSE, was India's first depository (established 1996) and tends
 
 | Aspect | Details |
 |--------|---------|
-| **Core System** | DPM (Depository Participant Module) |
+| **Core System** | <abbr title="Depository Participant Module (CDSL terminology).">DPM</abbr> (Depository Participant Module) |
 | **BO ID Format** | "IN" + 14 chars (alphanumeric): IN + 6 DP ID + 8 Client ID |
 | **Submission** | Via Insta Interface → CDS → Local/Cloud DPM |
 | **File Format** | UDiFF (Unified Distilled File Formats) — ISO-tagged since Mar 2024 |

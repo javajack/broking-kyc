@@ -17,21 +17,21 @@ Sorted by `field_id`, then `destination`.
 
 | field_id | field_name | destination | destination_field_name | destination_format | frequency | transformation | quirks_notes | spec_source |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| I-guardian_address | Guardian Address | cdsl-bo | GUARDIAN_ADDRESS | CHAR(255) | on-modify | truncate to N | Mandatory if minor nominee; right-padded | CDSL/OPS/DP/POLCY/2025/289 |
-| I-guardian_address | Guardian Address | nsdl-bo | GdnAdr | VARCHAR(255) UDiFF | on-modify | truncate to N | ISO 20022 address structure | NSDL/POLICY/2025/0030 |
+| I-guardian_address | Guardian Address | cdsl-bo | GUARDIAN_ADDRESS | CHAR(255) | on-modify | truncate to N | Mandatory if minor nominee; right-padded | <abbr title="Central Depository Services (India) Limited">CDSL</abbr>/OPS/<abbr title="Depository Participant">DP</abbr>/POLCY/2025/289 |
+| I-guardian_address | Guardian Address | nsdl-bo | GdnAdr | VARCHAR(255) UDiFF | on-modify | truncate to N | ISO 20022 address structure | <abbr title="National Securities Depository Limited">NSDL</abbr>/POLICY/2025/0030 |
 | I-guardian_name | Guardian Name | back-office | guardian_nm | VARCHAR(100) | on-modify | [direct] | conditional on minor nominee; transmission custodian | [industry typical] |
 | I-guardian_name | Guardian Name (Minor Nominee) | cdsl-bo | GUARDIAN_NAME | CHAR(100) | on-modify | uppercase | Conditional in line 07; mandatory if nominee_is_minor=Y | CDSL/OPS/DP/POLCY/2025/289 |
 | I-guardian_name | Guardian Name (Minor Nominee) | nsdl-bo | GdnNm | VARCHAR(100) UDiFF | on-modify | uppercase | Conditional ISO-tagged element | NSDL/POLICY/2025/0030 |
-| I-guardian_pan | Guardian PAN | back-office | guardian_pan | CHAR(10) | on-modify | uppercase | conditional; mandatory KYC of guardian | [industry typical] |
+| I-guardian_pan | Guardian <abbr title="Permanent Account Number">PAN</abbr> | back-office | guardian_pan | CHAR(10) | on-modify | uppercase | conditional; mandatory <abbr title="Know Your Customer (process).">KYC</abbr> of guardian | [industry typical] |
 | I-guardian_pan | Guardian PAN | cdsl-bo | GUARDIAN_PAN | CHAR(10) | on-modify | uppercase | Conditional on nominee_is_minor=Y | CDSL/OPS/DP/POLCY/2025/289 |
 | I-guardian_pan | Guardian PAN | nsdl-bo | GdnPANNb | CHAR(10) UDiFF | on-modify | uppercase | Conditional element | NSDL/POLICY/2025/0030 |
 | I-guardian_relationship | Guardian Relationship | cdsl-bo | GUARDIAN_RELATION | CHAR(2) | on-modify | lookup against R | Relationship code FA/MO/CG; conditional on nominee_is_minor=Y | CDSL/OPS/DP/POLCY/2025/289 |
 | I-guardian_relationship | Guardian Relationship | nsdl-bo | GdnRltnshp | CHAR(2) UDiFF | on-modify | lookup against R | Conditional element | NSDL/POLICY/2025/0030 |
-| I-nomination_opted | Nomination Opted | back-office | nom_opted_flg | CHAR(1) | on-modify | [direct] | Y/N; N requires video opt-out per Jan 2025 revamp | SEBI circular Jan 10, 2025 |
+| I-nomination_opted | Nomination Opted | back-office | nom_opted_flg | CHAR(1) | on-modify | [direct] | Y/N; N requires video opt-out per Jan 2025 revamp | <abbr title="Securities and Exchange Board of India">SEBI</abbr> circular Jan 10, 2025 |
 | I-nomination_opted | Nomination Opted | cdsl-bo | NOMINATION_OPTED | CHAR(1) | one-time | [direct] | Y/N; line 07 mandatory; per SEBI Jun 10, 2024 simplification 3 fields minimum at opt-in | CDSL/OPS/DP/POLCY/2024/317 |
 | I-nomination_opted | Nomination Opted | nsdl-bo | NomFlg | CHAR(1) UDiFF | one-time | [direct] | Y/N element; ISO-tagged; can be changed any number of times per SEBI Jan 10, 2025 | NSDL/POLICY/2025/0006 |
 | I-nominee_aadhaar | Nominee Aadhaar (Last 4) | cdsl-bo | NOMINEE_AADHAAR_L4 | CHAR(4) | on-modify | formatted | Last 4 digits only; first 8 must be 'X' if full Aadhaar captured per CDSL/OPS/DP/SYSTM/2024/628 | CDSL/OPS/DP/SYSTM/2024/628 |
-| I-nominee_aadhaar | Nominee Aadhaar (Last 4) | nsdl-bo | NomAdhaarL4 | CHAR(4) UDiFF | on-modify | formatted | Last 4 digits only; masked per DPDP | NSDL/POLICY/2025/0030 |
+| I-nominee_aadhaar | Nominee Aadhaar (Last 4) | nsdl-bo | NomAdhaarL4 | CHAR(4) UDiFF | on-modify | formatted | Last 4 digits only; masked per <abbr title="Digital Personal Data Protection Act 2023 (and Rules 2025)">DPDP</abbr> | NSDL/POLICY/2025/0030 |
 | I-nominee_address | Nominee Address | back-office | nom_addr | VARCHAR(255) | on-modify | [direct] | transmission documents lookup | [industry typical] |
 | I-nominee_address | Nominee Address | cdsl-bo | NOMINEE_ADDRESS | CHAR(255) | on-modify | truncate to N | Mandatory at opening per SEBI revamp; line 07 nominee block; truncated to 255 | CDSL/OPS/DP/POLCY/2025/289 |
 | I-nominee_address | Nominee Address | nsdl-bo | NomAdr | VARCHAR(255) UDiFF | on-modify | truncate to N | ISO 20022 address structure; address/state made optional from V2.0.0.0 (Apr 4, 2025) | NSDL/POLICY/2025/0042 |
@@ -55,9 +55,9 @@ Sorted by `field_id`, then `destination`.
 | I-nominee_pan | Nominee PAN | back-office | nom_pan | CHAR(10) | on-modify | uppercase | conditional; one unique ID per nominee mandatory | [industry typical] |
 | I-nominee_pan | Nominee PAN | cdsl-bo | NOMINEE_PAN | CHAR(10) | on-modify | uppercase | One of PAN/last-4-Aadhaar/DL/Passport mandatory per SEBI Jun 10, 2024 simplification; right-padded | CDSL/OPS/DP/POLCY/2024/317 |
 | I-nominee_pan | Nominee PAN | nsdl-bo | NomPANNb | CHAR(10) UDiFF | on-modify | uppercase | At least one identifier (PAN/Aadhaar-last4/DL/Passport) mandatory | NSDL/POLICY/2025/0030 |
-| I-nominee_passport | Nominee Passport | cdsl-bo | NOMINEE_PASSPORT | CHAR(8) | on-modify | uppercase | Passport for NRI nominee; one of the unique IDs per SEBI Jun 2024 simplification | CDSL/OPS/DP/POLCY/2024/317 |
+| I-nominee_passport | Nominee Passport | cdsl-bo | NOMINEE_PASSPORT | CHAR(8) | on-modify | uppercase | Passport for <abbr title="Non-Resident Indian">NRI</abbr> nominee; one of the unique IDs per SEBI Jun 2024 simplification | CDSL/OPS/DP/POLCY/2024/317 |
 | I-nominee_passport | Nominee Passport | nsdl-bo | NomPsprtNb | CHAR(8) UDiFF | on-modify | uppercase | Passport identifier element | NSDL/POLICY/2025/0030 |
-| I-nominee_percentage | Nominee Percentage | back-office | nom_pct | NUMBER(5,2) | on-modify | [direct] | must sum to 100 across nominees; validated at BO ingestion | SEBI circular Jan 10, 2025 |
+| I-nominee_percentage | Nominee Percentage | back-office | nom_pct | NUMBER(5,2) | on-modify | [direct] | must sum to 100 across nominees; validated at <abbr title="Beneficial Owner">BO</abbr> ingestion | SEBI circular Jan 10, 2025 |
 | I-nominee_percentage | Nominee Percentage | cdsl-bo | NOMINEE_PCT | CHAR(6) | on-modify | formatted | Format 999.99 zero-padded; sum across nominees must equal 100.00; rejection if mismatch | CDSL/OPS/DP/POLCY/2025/32 |
 | I-nominee_percentage | Nominee Percentage | nsdl-bo | NomShrPctg | Decimal(5,2) UDiFF | on-modify | formatted | Percentage element; sum=100 validated; if not specified, distributed equally per SEBI Jan 2025 | NSDL/POLICY/2025/0006 |
 | I-nominee_pincode | Nominee Pincode | back-office | nom_pin | CHAR(6) | on-modify | [direct] | physical dispatch on transmission | [industry typical] |

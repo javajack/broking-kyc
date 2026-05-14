@@ -5,17 +5,17 @@ description: Settlement Guarantee Fund and Core SGF — segment-specific contrib
 
 import { Aside } from '@astrojs/starlight/components';
 
-> **Why this page is structured this way:** The Settlement Guarantee Fund is best understood as a *funded financial waterfall* — a multi-layer stack of capital that a clearing corporation can pull from when a member fails to honour a settlement obligation. The page therefore opens with the conceptual stack, then drills into the contribution side (who pays in, how much, in what form), the draw side (the strict sequence in which capital is consumed during a default), the replenishment side (what happens after a draw), and finally cross-segment and cross-clearing-corp variations. A 2014 SEBI circular reframed the entire framework around a "Core SGF" minimum corpus; the page reflects that as the organising principle and traces variations by segment from there.
+> **Why this page is structured this way:** The Settlement Guarantee Fund is best understood as a *funded financial waterfall* — a multi-layer stack of capital that a clearing corporation can pull from when a member fails to honour a settlement obligation. The page therefore opens with the conceptual stack, then drills into the contribution side (who pays in, how much, in what form), the draw side (the strict sequence in which capital is consumed during a default), the replenishment side (what happens after a draw), and finally cross-segment and cross-clearing-corp variations. A 2014 <abbr title="Securities and Exchange Board of India">SEBI</abbr> circular reframed the entire framework around a "Core <abbr title="Settlement Guarantee Fund">SGF</abbr>" minimum corpus; the page reflects that as the organising principle and traces variations by segment from there.
 
 ## TL;DR
 
-- The **Settlement Guarantee Fund (SGF)** is the funded financial waterfall a clearing corporation (CC) uses when a clearing member (CM) fails to meet a settlement obligation. The SGF guarantees settlement to non-defaulting members and to the market as a whole.
+- The **Settlement Guarantee Fund (SGF)** is the funded financial waterfall a clearing corporation (<abbr title="Clearing Corporation (NCL, ICCL, MCXCCL — context-dependent).">CC</abbr>) uses when a clearing member (<abbr title="Clearing Member">CM</abbr>) fails to meet a settlement obligation. The SGF guarantees settlement to non-defaulting members and to the market as a whole.
 - Since 2014, the SEBI framework distinguishes a minimum mandatory **Core SGF** corpus (sized by stress-test methodology, contributed by CC, exchange and members) from any non-core SGF or member-margins layer above it.
-- **Draw sequence is mandatory and ordered**: (1) defaulter's own resources at the CC — margins (initial, MTM, special, additional, exposure), pay-in shortfall recoveries, plus the **defaulter's contribution to the SGF / Core SGF**; (2) defaulter's deposits at the exchange — **Base Minimum Capital (BMC)** plus any **Additional Base Capital (ABC)** deposited with the exchange or held as CC collateral; (3) insurance proceeds where applicable; (4) **CC's "skin-in-the-game" Core SGF contribution** (minimum 25% of the Core SGF corpus required by SEBI); (5) remaining **non-defaulter member SGF contributions** including non-defaulter Core SGF on a pro-rata basis; (6) **CC's residual capital / loss-allocation tools** under its waterfall, which may include cash calls on non-defaulting members ("further capital contribution"), pro-rata variation-margin haircuts, partial tear-up, and ultimately invocation of the CC's recovery / resolution mechanism.
+- **Draw sequence is mandatory and ordered**: (1) defaulter's own resources at the CC — margins (initial, <abbr title="Mark-to-Market">MTM</abbr>, special, additional, exposure), pay-in shortfall recoveries, plus the **defaulter's contribution to the SGF / Core SGF**; (2) defaulter's deposits at the exchange — **Base Minimum Capital (<abbr title="Base Minimum Capital">BMC</abbr>)** plus any **Additional Base Capital (<abbr title="Additional Base Capital">ABC</abbr>)** deposited with the exchange or held as CC collateral; (3) insurance proceeds where applicable; (4) **CC's "skin-in-the-game" Core SGF contribution** (minimum 25% of the Core SGF corpus required by SEBI); (5) remaining **non-defaulter member SGF contributions** including non-defaulter Core SGF on a pro-rata basis; (6) **CC's residual capital / loss-allocation tools** under its waterfall, which may include cash calls on non-defaulting members ("further capital contribution"), pro-rata variation-margin haircuts, partial tear-up, and ultimately invocation of the CC's recovery / resolution mechanism.
 - **Core SGF corpus** is dimensioned by SEBI's stress-test methodology and reviewed monthly — a CC must be capitalised to withstand the simultaneous default of the two largest clearing members at the segment level under stress scenarios ("Cover 2").
 - **Segment-specific SGFs**: each CC maintains a separate SGF per segment — Capital Market (CM), Futures & Options (F&O), Currency Derivatives (CD), Commodity Derivatives, Tri-party Repo and others. A draw in one segment does not consume the SGF of another segment.
 - **Replenishment** of any drawn-down member contribution is mandatory within a SEBI-prescribed window (typically T+3 working days); failure to replenish triggers member-default consequences in its own right.
-- **CCs in scope**: NSE Clearing (NCL / NSCCL), Indian Clearing Corporation (ICCL — BSE group), Multi Commodity Exchange Clearing Corporation (MCXCCL), Metropolitan Clearing Corporation of India (MCCIL — limited segments), NSE IFSC Clearing Corporation (NICCL — GIFT IFSC).
+- **CCs in scope**: <abbr title="National Stock Exchange of India">NSE</abbr> Clearing (<abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr> / <abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NSCCL</abbr>), Indian Clearing Corporation (<abbr title="Indian Clearing Corporation Limited">ICCL</abbr> — <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> group), Multi Commodity Exchange Clearing Corporation (<abbr title="Multi Commodity Exchange Clearing Corporation Limited">MCXCCL</abbr>), Metropolitan Clearing Corporation of India (MCCIL — limited segments), NSE <abbr title="Indian Financial System Code.">IFSC</abbr> Clearing Corporation (NICCL — GIFT IFSC).
 - **Disclosure and transparency**: Core SGF corpus, monthly stress-test results, and broad waterfall description are published periodically — quarterly disclosures by NSCCL/ICCL/MCXCCL on Core SGF size, MPOR assumptions, and stress test outcomes.
 
 ## Conceptual overview
@@ -28,7 +28,7 @@ The framework rests on three philosophical pillars:
 2. **The CC has skin in the game.** A CC may not push 100% of losses to non-defaulting members. SEBI requires CCs to maintain a "skin-in-the-game" contribution to the Core SGF — currently a minimum of 25% of the required Core SGF corpus, exclusive of penalty interest accruals — and this is consumed *before* non-defaulter member contributions.
 3. **Mutualisation has limits.** Beyond the Core SGF, the CC's default-management framework includes loss-allocation tools (assessment, haircut, tear-up) that are mutualised across surviving members — but each tool has caps and rules to prevent unbounded liability on any one member.
 
-The framework was substantially reformed by SEBI circular **CIR/MRD/DRMNP/25/2014 dated August 27, 2014** ("Core Settlement Guarantee Fund, Default Waterfall and Stress Test"), which introduced the Core SGF concept, mandated the stress-test sizing methodology, defined the standard waterfall, and prescribed contribution shares. This page tracks the framework as in force as of 2026-05-14, with subsequent amendments tracked through SEBI master circulars on stock-exchanges / clearing-corps and clearing-corp-specific circulars (NCL/CMPT, ICCL, MCXCCL/RISK).
+The framework was substantially reformed by SEBI circular **CIR/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>/DRMNP/25/2014 dated August 27, 2014** ("Core Settlement Guarantee Fund, Default Waterfall and Stress Test"), which introduced the Core SGF concept, mandated the stress-test sizing methodology, defined the standard waterfall, and prescribed contribution shares. This page tracks the framework as in force as of 2026-05-14, with subsequent amendments tracked through SEBI master circulars on stock-exchanges / clearing-corps and clearing-corp-specific circulars (NCL/CMPT, ICCL, MCXCCL/RISK).
 
 <Aside type="caution">
 **Read primary sources before acting.** SEBI's 2014 Core SGF framework has been amended multiple times in subsequent SEBI master circulars (including the master circular for stock exchanges and clearing corporations periodically reissued) and through individual clearing-corp circulars (e.g., MCXCCL/RISK series, NCL/CMPT series). The summary below reflects the framework's structure; specific percentages and limits may have been calibrated since the page was verified. Always cross-check the current SEBI Master Circular for Stock Exchanges and Clearing Corporations and the specific CC's risk-management circular.
@@ -41,7 +41,7 @@ A clearing corporation's default waterfall comprises *funded* and *unfunded* lay
 ### Funded layers (in draw order)
 
 1. **Defaulting member's resources at the CC**
-   - Initial Margin (IM), Variation / MTM Margin, Special / Additional Margins, Extreme Loss Margin (ELM), Premium Margin (options), Tender / Delivery-period margins (commodities, physical-delivery scrips).
+   - Initial Margin (IM), Variation / MTM Margin, Special / Additional Margins, Extreme Loss Margin (<abbr title="Extreme Loss Margin">ELM</abbr>), Premium Margin (options), Tender / Delivery-period margins (commodities, physical-delivery scrips).
    - Premium pledged collaterals — cash, FDR, BG, government securities, approved equity, ETFs, MF units — held at the CC for the defaulting member's account.
    - Defaulter's mandatory contribution to the Core SGF (member share).
    - Defaulter's non-core SGF contribution and any voluntary deposits.
@@ -51,7 +51,7 @@ A clearing corporation's default waterfall comprises *funded* and *unfunded* lay
    - Base Minimum Capital (BMC) at the exchange — the mandatory minimum capital prescribed by SEBI (currently Rs 50 lakh for trading-cum-self-clearing members in capital market and Rs 75 lakh / Rs 1 crore tiers based on category in derivatives, with variations in the commodities space).
    - Additional Base Capital (ABC) — voluntary additional capital deposited at the exchange beyond BMC, typically to support higher exposure limits.
    - Other exchange deposits — admission fees, exchange security deposit, segment-specific deposits.
-   - These exchange-level deposits are transferred to the CC for application against the default loss per the inter-MII agreement.
+   - These exchange-level deposits are transferred to the CC for application against the default loss per the inter-<abbr title="Market Infrastructure Institution">MII</abbr> agreement.
 
 3. **Insurance proceeds**
    - Where the CC maintains an insurance policy against catastrophic clearing losses, proceeds payable on a default loss flow into the waterfall before mutualised member SGF is consumed.
@@ -111,7 +111,7 @@ Acceptable forms include:
 - **Fixed deposits** with approved banks, pledged to the CC.
 - **Bank guarantees** from approved banks, in the CC's favour.
 - **Government securities** (G-Sec / T-Bills / SDLs / Sovereign Gold Bonds) with VaR-rate haircut.
-- For the *defaulter's contribution* layer specifically, the defaulter's pledged equity / ETF / mutual fund collateral may also count subject to per-security and per-issuer concentration caps (see clearing-corp approved collateral lists, e.g., MCX/MCXCCL/094/2026 and successor lists).
+- For the *defaulter's contribution* layer specifically, the defaulter's pledged equity / ETF / mutual fund collateral may also count subject to per-security and per-issuer concentration caps (see clearing-corp approved collateral lists, e.g., <abbr title="Multi Commodity Exchange of India">MCX</abbr>/MCXCCL/094/2026 and successor lists).
 
 A given CC's risk-management circular specifies the acceptable forms and haircuts.
 
@@ -121,7 +121,7 @@ Each CC maintains a **separate SGF per segment**. A draw in one segment does not
 
 | Clearing corp | Segments with separate SGF / Core SGF |
 |---|---|
-| NSE Clearing (NCL / NSCCL) | Capital Market (CM), Futures & Options (F&O), Currency Derivatives (CD), Commodity Derivatives (CDS — limited), Tri-Party Repo (TREPS), Securities Lending and Borrowing (SLBM uses CM SGF) |
+| NSE Clearing (NCL / NSCCL) | Capital Market (CM), Futures & Options (F&O), Currency Derivatives (CD), Commodity Derivatives (CDS — limited), Tri-Party Repo (TREPS), Securities Lending and Borrowing (<abbr title="Securities Lending and Borrowing Mechanism">SLBM</abbr> uses CM SGF) |
 | Indian Clearing Corporation (ICCL — BSE) | Capital Market (CM), Equity Derivatives (EQD), Currency Derivatives (CD), Commodity Derivatives, Mutual Funds (BSE StAR MF), Tri-Party Repo |
 | MCX Clearing Corporation (MCXCCL) | Commodity Derivatives (CD — primary), Bullion, Energy, Base Metals, Agri (these are within the single commodity-derivatives Core SGF but with sub-stress-tests by category) |
 | Metropolitan Clearing Corporation (MCCIL) | Capital Market, Currency Derivatives (limited) |
@@ -133,7 +133,7 @@ NSCCL's consolidated annual master circular for the Capital Market segment (NCL/
 
 ### MCX CDS segment (MCXCCL) — illustrative
 
-MCXCCL's annual master circular for the commodity-derivatives segment (referenced by MCXCCL/RISK/045/2025 dated March 5, 2025 and successor MCXCCL/RISK/184/2025 dated September 4, 2025 on margin framework, both implementing SEBI Master Circular SEBI/HO/MRD/MRD-PoD-1/P/CIR/2023/136 (Aug 4, 2023) for commodity derivatives), describes the segment-specific Core SGF, member margin / SOMM (Self-Originated Member Margin) collection, and the commodity-category-specific (agri / base metals / bullion / energy) volatility-scan-range calibration that feeds the stress test.
+MCXCCL's annual master circular for the commodity-derivatives segment (referenced by MCXCCL/RISK/045/2025 dated March 5, 2025 and successor MCXCCL/RISK/184/2025 dated September 4, 2025 on margin framework, both implementing SEBI Master Circular SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/MRD/MRD-PoD-1/P/CIR/2023/136 (Aug 4, 2023) for commodity derivatives), describes the segment-specific Core SGF, member margin / SOMM (Self-Originated Member Margin) collection, and the commodity-category-specific (agri / base metals / bullion / energy) volatility-scan-range calibration that feeds the stress test.
 
 ## The draw side: the mandatory sequence during a member default
 
@@ -213,7 +213,7 @@ The mutualisation feature of the SGF / Core SGF means surviving members are expo
 
 ### Capital Market (CM) SGFs
 
-- **NSCCL CM Core SGF**: sized for two-largest-default stress in cash market settlement, considering T+1 default cycle (and T+0 optional cycle post 2024 expansion). Settlement is largely DVP / DVP3 with funds and securities netted within the cycle; SGF dimension reflects fund-side and securities-side payin shortfalls.
+- **NSCCL CM Core SGF**: sized for two-largest-default stress in cash market settlement, considering <abbr title="Trade-date Plus N settlement">T+1</abbr> default cycle (and <abbr title="Trade-date Plus N settlement">T+0</abbr> optional cycle post 2024 expansion). Settlement is largely DVP / DVP3 with funds and securities netted within the cycle; SGF dimension reflects fund-side and securities-side payin shortfalls.
 - **ICCL CM Core SGF**: equivalent for BSE cash market.
 - Cash-segment SGFs do not include derivative-style margin-shortfall scenarios but include early-pay-in failures, internal-shortage auction losses, and direct-payout-to-demat operational failures.
 
@@ -240,7 +240,7 @@ The mutualisation feature of the SGF / Core SGF means surviving members are expo
 
 ### MCXCCL specifics
 
-The MCXCCL Master Circular for FY 2023-24 (referenced in the project's circular index as the annual master circular consolidating all circulars in force as of June 30, 2023) consolidates the segment-specific Core SGF framework, contribution methodology, stress-test methodology, and member-margining (including SPAN, SOMM, MSBA) into a single operational baseline.
+The MCXCCL Master Circular for FY 2023-24 (referenced in the project's circular index as the annual master circular consolidating all circulars in force as of June 30, 2023) consolidates the segment-specific Core SGF framework, contribution methodology, stress-test methodology, and member-margining (including <abbr title="Standard Portfolio Analysis of Risk">SPAN</abbr>, SOMM, MSBA) into a single operational baseline.
 
 ## Inter-clearing-corp arrangements
 
@@ -248,7 +248,7 @@ Inter-CC arrangements exist primarily for cross-segment and cross-CC operational
 
 - **Inter-CC margin pledge / cross-margin benefits**: where SEBI permits cross-margining (e.g., index futures vs underlying stocks at the same CC), the benefit is internal to the CC. Cross-margining *across* CCs is not standard and would require bilateral CC agreements.
 - **Common members**: a clearing member registered across multiple CCs (e.g., the same broker as a clearing member at NSCCL and ICCL) maintains separate SGF contributions at each CC. Default at one CC does not, by default, consume deposits at another CC; however, the defaulter's *trading* (non-clearing) deposits across segments may be transferred to support the defaulting CC's loss-recovery via inter-MII coordination — this is non-trivial and requires regulator approval.
-- **MII coordination during member default**: SEBI's master circulars on default management require all the MIIs (exchanges, CCs, depositories) at which the defaulting member is registered to coordinate disclosure (member-default declaration shared across MIIs), claim filing (Investor Protection Fund claims at each relevant exchange — see [IPF](./ipf/)), and asset preservation.
+- **MII coordination during member default**: SEBI's master circulars on default management require all the MIIs (exchanges, CCs, depositories) at which the defaulting member is registered to coordinate disclosure (member-default declaration shared across MIIs), claim filing (Investor Protection Fund claims at each relevant exchange — see [<abbr title="Investor Protection Fund">IPF</abbr>](./ipf/)), and asset preservation.
 
 ## Transparency and disclosures
 
@@ -300,7 +300,7 @@ A nuance: the SGF / Core SGF is *pre-funded* — contributions are paid in *befo
 - [Deep Dive: Payin default + Core SGF draw](/broking-kyc/deep-dives/settlement/payin-default-core-sgf/) — the specific scenario where a settlement payin failure invokes the Core SGF draw.
 - [Deep Dive: Investor Protection Fund (IPF)](./ipf/) — the *investor-facing* protection (separate from the CC's SGF), administered by the exchange.
 - [Deep Dive: BMC / ABC](/broking-kyc/deep-dives/member-compliance/bmc-abc/) — the member-deposit layer below the SGF in the draw waterfall.
-- [Deep Dive: RMS / SPAN methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/) — the margin framework that sets the SGF baseline.
+- [Deep Dive: <abbr title="Risk Management System">RMS</abbr> / SPAN methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/) — the margin framework that sets the SGF baseline.
 - [Compliance Blueprint — Settlement domain](/broking-kyc/operations/compliance-blueprint/) — the broader compliance obligation map within which SGF sits.
 - [Circulars — Clearing Corporations](/broking-kyc/reference/circulars/clearing-corps/) — primary source circulars (NCL/CMPT, ICCL, MCXCCL).
 - [Circulars — SEBI Other](/broking-kyc/reference/circulars/sebi-other/) — the SEBI master circulars on stock exchanges / clearing corporations and the original 2014 Core SGF framework (CIR/MRD/DRMNP/25/2014).

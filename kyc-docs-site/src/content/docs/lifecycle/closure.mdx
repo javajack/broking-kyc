@@ -5,13 +5,13 @@ description: 6-step voluntary account closure procedure — settle pending oblig
 
 import { Aside } from '@astrojs/starlight/components';
 
-> **Why this page is structured this way:** Closure is a clean sequential 6-step procedure (no parallel paths) because each step releases what the next step needs to operate on. Settlement must complete before fund withdrawal; fund withdrawal before pledge release; pledge release before BO closure; etc. The walkthrough follows the sequence.
+> **Why this page is structured this way:** Closure is a clean sequential 6-step procedure (no parallel paths) because each step releases what the next step needs to operate on. Settlement must complete before fund withdrawal; fund withdrawal before pledge release; pledge release before <abbr title="Beneficial Owner">BO</abbr> closure; etc. The walkthrough follows the sequence.
 
 ## TL;DR
 
-- **6 steps, sequential**: (1) pending obligations check → (2) fund withdrawal → (3) pledge release → (4) DP BO closure → (5) UCC deactivation → (6) KRA closure intimation.
+- **6 steps, sequential**: (1) pending obligations check → (2) fund withdrawal → (3) pledge release → (4) <abbr title="Depository Participant">DP</abbr> BO closure → (5) <abbr title="Unique Client Code">UCC</abbr> deactivation → (6) <abbr title="KYC Registration Agency">KRA</abbr> closure intimation.
 - Typical timeline: **5–7 business days** end-to-end.
-- **CKYC record is retained** as identity reference post-closure; KRA record marked "closed".
+- **<abbr title="Central KYC (records registry)">CKYC</abbr> record is retained** as identity reference post-closure; KRA record marked "closed".
 - Two important sub-cases: **closure-with-securities-transfer** (transfer to another broker without selling, saves STT and capital-gains realization) and **failed closure under freeze orders**.
 - Some clients close voluntarily but leave residual balances (forgotten holdings, small unclaimed dividends). These follow a separate "unclaimed funds" path.
 
@@ -26,8 +26,8 @@ When a client wants out, the broker's job is to wind down the account cleanly �
 Trigger: client submits closure request via app, web, or written form.
 
 Verification:
-- **Open trades**: any T+1 / T+0 settlements pending? Wait for settlement to complete.
-- **MTF positions**: any outstanding funding owed to broker? Settle before closure.
+- **Open trades**: any <abbr title="Trade-date Plus N settlement">T+1</abbr> / <abbr title="Trade-date Plus N settlement">T+0</abbr> settlements pending? Wait for settlement to complete.
+- **<abbr title="Margin Trading Facility">MTF</abbr> positions**: any outstanding funding owed to broker? Settle before closure.
 - **Unsettled payouts**: any payouts in flight? Allow them to complete.
 - **Open orders**: any GTC / AMO / pending orders? Cancel them.
 - **Margin pledge / MTF pledge**: any securities pledged that need to be unpledged before transfer-or-sale?
@@ -36,7 +36,7 @@ If any of these are open, the closure request is put on **hold** with a note to 
 
 ### Step 2 — Fund withdrawal
 
-Once all pending obligations are clear, the broker initiates a refund of the client funds bank balance to the client's registered bank account. Standard IMPS / NEFT transfer with the broker as payer.
+Once all pending obligations are clear, the broker initiates a refund of the client funds bank balance to the client's registered bank account. Standard <abbr title="Immediate Payment Service">IMPS</abbr> / <abbr title="National Electronic Funds Transfer">NEFT</abbr> transfer with the broker as payer.
 
 If the bank account on file is the one being closed alongside the broking relationship (rare but happens), the broker may require the client to update the payout bank account first — a modification request that completes before closure proceeds.
 
@@ -46,7 +46,7 @@ If the bank account on file is the one being closed alongside the broking relati
 
 ### Step 3 — Pledge release
 
-For any margin pledge or MTF pledge held against the client's demat securities, the broker initiates release at the depository (CDSL or NSDL). The pledge release is an operational instruction sent via the depository's CDAS (CDSL) or DPM (NSDL) interface.
+For any margin pledge or MTF pledge held against the client's demat securities, the broker initiates release at the depository (<abbr title="Central Depository Services (India) Limited">CDSL</abbr> or <abbr title="National Securities Depository Limited">NSDL</abbr>). The pledge release is an operational instruction sent via the depository's CDAS (CDSL) or <abbr title="Depository Participant Module (CDSL terminology).">DPM</abbr> (NSDL) interface.
 
 Once pledges are released, the securities are fully owned by the client without broker encumbrance.
 
@@ -61,7 +61,7 @@ The depository processes the closure typically within 1–2 business days. After
 
 ### Step 5 — UCC deactivation
 
-The Unique Client Code at each elected exchange (NSE / BSE / MCX) is deactivated:
+The Unique Client Code at each elected exchange (<abbr title="National Stock Exchange of India">NSE</abbr> / <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> / <abbr title="Multi Commodity Exchange of India">MCX</abbr>) is deactivated:
 - NSE UCC update with status "closed".
 - BSE UCC similarly via BEFS.
 - MCX UCC similarly.
@@ -72,7 +72,7 @@ UCC deactivation prevents any future order placement under that UCC. Historical 
 
 The final step: KRA record is updated with status "closed". CKYC record is **retained** as identity reference — not deactivated.
 
-The closure-status flag at KRA prevents future financial intermediaries from accepting the client's KYC record as fresh; any new account at another broker would require a fresh KYC initiation.
+The closure-status flag at KRA prevents future financial intermediaries from accepting the client's <abbr title="Know Your Customer (process).">KYC</abbr> record as fresh; any new account at another broker would require a fresh KYC initiation.
 
 Client receives final confirmation: account closed, all balances refunded, all linkages severed.
 
@@ -93,7 +93,7 @@ A common variant: instead of selling all securities before closure (which trigge
 
 ### Failed closure under freeze orders
 
-If the client's account is subject to a **court freeze, tax authority freeze, or regulatory freeze** (e.g., SEBI debarment), closure cannot proceed without lifting the freeze. The broker continues to hold the account in frozen state until the freeze is lifted or the underlying litigation is resolved.
+If the client's account is subject to a **court freeze, tax authority freeze, or regulatory freeze** (e.g., <abbr title="Securities and Exchange Board of India">SEBI</abbr> debarment), closure cannot proceed without lifting the freeze. The broker continues to hold the account in frozen state until the freeze is lifted or the underlying litigation is resolved.
 
 Typical handling:
 - Closure request remains pending in the ops queue.
@@ -106,7 +106,7 @@ Typical handling:
 The mirror scenario: broker forcing closure of a client account (typically for compliance reasons — sanctions hit, sustained non-cooperation with re-KYC, repeated suspicious activity). Procedure parallels voluntary closure but with regulatory intimation paths:
 
 - Compliance Officer approval before initiating.
-- Possible STR filing to FIU-IND if suspicious activity drove the decision.
+- Possible <abbr title="Suspicious Transaction Report">STR</abbr> filing to <abbr title="Financial Intelligence Unit — India">FIU-IND</abbr> if suspicious activity drove the decision.
 - Client notification with reason and recourse path.
 - Same 6 operational steps after the regulatory intimation.
 
@@ -128,11 +128,11 @@ Closure touches master-dataset Section Y (Account Lifecycle) primarily, with rev
 ## Cross-references
 
 - [Compliance Blueprint — KYC lifecycle domain](/broking-kyc/operations/compliance-blueprint/)
-- [Integration DAG — closure path](/broking-kyc/operations/integration-dag/lifecycle-events/)
+- [Integration <abbr title="Directed Acyclic Graph.">DAG</abbr> — closure path](/broking-kyc/operations/integration-dag/lifecycle-events/)
 - [Field Atlas — Section Y (Account Lifecycle)](/broking-kyc/reference/field-atlas/sections/y-account-lifecycle/)
 - [Lifecycle: Re-KYC](./re-kyc/)
 - [Lifecycle: Transmission](./transmission/)
-- [Circulars — SEBI MIRSD](/broking-kyc/reference/circulars/sebi-mirsd/)
+- [Circulars — SEBI <abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>](/broking-kyc/reference/circulars/sebi-mirsd/)
 - [Circulars — CDSL](/broking-kyc/reference/circulars/cdsl/) and [NSDL](/broking-kyc/reference/circulars/nsdl/)
 
 ## Verified through

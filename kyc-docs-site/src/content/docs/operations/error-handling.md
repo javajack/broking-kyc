@@ -3,7 +3,7 @@ title: Error Handling
 description: What happens when things go wrong — fallback flows for DigiLocker failures, verification timeouts, KRA/CKYC edge cases, and API errors.
 ---
 
-In a KYC (Know Your Customer) onboarding pipeline that depends on a dozen external services — DigiLocker, PAN (Permanent Account Number) verification, Aadhaar, bank account validation, face matching, AML (Anti-Money Laundering) screening — things will go wrong. Services go down, APIs (Application Programming Interfaces) time out, customers enter incorrect data, and third-party systems return unexpected responses. The mark of a well-built system is not that it never encounters errors, but that it handles every error gracefully: showing the customer a clear message, logging the details for debugging, and retrying or falling back automatically wherever possible. This page catalogs every known error scenario, the user-facing message it should trigger, and the system action that should follow.
+In a <abbr title="Know Your Customer (process).">KYC</abbr> (Know Your Customer) onboarding pipeline that depends on a dozen external services — DigiLocker, <abbr title="Permanent Account Number">PAN</abbr> (Permanent Account Number) verification, Aadhaar, bank account validation, face matching, <abbr title="Anti-Money Laundering">AML</abbr> (Anti-Money Laundering) screening — things will go wrong. Services go down, APIs (Application Programming Interfaces) time out, customers enter incorrect data, and third-party systems return unexpected responses. The mark of a well-built system is not that it never encounters errors, but that it handles every error gracefully: showing the customer a clear message, logging the details for debugging, and retrying or falling back automatically wherever possible. This page catalogs every known error scenario, the user-facing message it should trigger, and the system action that should follow.
 
 :::note[Design Principle: Never Leave the Customer Stranded]
 Every error in this catalog has both a user-facing message (what the customer sees) and a system action (what the back-end does). The goal is to never show a generic "Something went wrong" screen. Specific, actionable messages dramatically reduce support ticket volume and improve onboarding completion rates.
@@ -25,7 +25,7 @@ DigiLocker is the government's digital document wallet, and it is the primary so
 In plain English: DigiLocker failures are usually temporary or user-initiated. The system should always offer a retry first, and fall back to manual document upload only after three failed attempts. Never force the customer to start over from scratch.
 
 :::tip[Manual Upload Fallback]
-When DigiLocker is unavailable, the fallback flow asks the customer to upload photos of their PAN card and Aadhaar card. These are then processed through OCR (Optical Character Recognition) to extract the same data that DigiLocker would have provided. The data quality is slightly lower (OCR can misread characters), which is why DigiLocker is always preferred.
+When DigiLocker is unavailable, the fallback flow asks the customer to upload photos of their PAN card and Aadhaar card. These are then processed through <abbr title="Optical Character Recognition.">OCR</abbr> (Optical Character Recognition) to extract the same data that DigiLocker would have provided. The data quality is slightly lower (OCR can misread characters), which is why DigiLocker is always preferred.
 :::
 
 Beyond DigiLocker, several other verification steps can fail during the user journey. Each has its own failure mode and user message.
@@ -38,13 +38,13 @@ These are failures that occur during the identity verification steps — PAN val
 |-------|---------|-------------|
 | PAN Invalid | Status != E | "Your PAN appears to be inactive. Contact nearest PAN center." |
 | PAN-Aadhaar not linked | Not seeded | "PAN-Aadhaar linking is mandatory. Visit incometax.gov.in" |
-| AML High Risk | Sanctions/PEP (Politically Exposed Person) | "Your application requires additional review." |
-| Penny Drop Failed | Wrong a/c | "Bank verification failed. Check account number and IFSC (Indian Financial System Code)." |
+| AML High Risk | Sanctions/<abbr title="Politically Exposed Person">PEP</abbr> (Politically Exposed Person) | "Your application requires additional review." |
+| Penny Drop Failed | Wrong a/c | "Bank verification failed. Check account number and <abbr title="Indian Financial System Code.">IFSC</abbr> (Indian Financial System Code)." |
 | Face match failed | Poor selfie | "Face verification unsuccessful. Try again in good lighting." |
-| e-Sign OTP failed | Wrong OTP | "OTP verification failed. Click to resend." (3 attempts) |
+| e-Sign <abbr title="One-Time Password">OTP</abbr> failed | Wrong OTP | "OTP verification failed. Click to resend." (3 attempts) |
 
 :::caution[AML High Risk Is Deliberately Vague]
-Notice that the AML High Risk message says "Your application requires additional review" — it does not tell the customer why. This is intentional. Revealing that a sanctions or PEP hit triggered the flag could compromise the integrity of the screening process and may violate PMLA (Prevention of Money Laundering Act) requirements around tipping off.
+Notice that the AML High Risk message says "Your application requires additional review" — it does not tell the customer why. This is intentional. Revealing that a sanctions or PEP hit triggered the flag could compromise the integrity of the screening process and may violate <abbr title="Prevention of Money Laundering Act 2002">PMLA</abbr> (Prevention of Money Laundering Act) requirements around tipping off.
 :::
 
 In plain English: PAN and bank verification failures are the customer's responsibility to fix (by linking PAN-Aadhaar or correcting their account details). Face match failures can often be resolved by simply retaking the selfie in better lighting. AML flags are handled internally by the compliance team.
@@ -59,14 +59,14 @@ Each external API has an expected response time and a maximum timeout. If the AP
 |-----|----------|---------|----------|
 | DigiLocker | 60s | 120s | Retry button. After 3 fails, manual flow. |
 | PAN Verify | 3s | 15s | Queue async. Don't block user. |
-| KRA (KYC Registration Agency) Lookup | 5s | 20s | Pre-fill without KRA. Submit fresh. |
+| <abbr title="KYC Registration Agency">KRA</abbr> (KYC Registration Agency) Lookup | 5s | 20s | Pre-fill without KRA. Submit fresh. |
 | AML Screen | 10s | 30s | Mark "pending" in gate. |
 | Penny Drop | 20s | 60s | Must resolve before gate. |
 
 In plain English: the PAN verification timeout is generous (15 seconds) because it can be processed asynchronously — the customer can continue filling in other fields while the PAN check completes in the background. The Penny Drop, however, must resolve before the customer can proceed, because bank account verification is a hard gate in the onboarding flow.
 
 :::note[Why Penny Drop Cannot Be Async]
-Unlike PAN verification, the Penny Drop (a Rs.1 IMPS credit to the customer's bank account) returns the account holder's name, which the system uses for name matching. This name match is a critical input to the maker-checker decision, so the system cannot let the customer proceed without it. If the Penny Drop keeps timing out, ops should investigate whether the customer's bank is experiencing IMPS downtime.
+Unlike PAN verification, the Penny Drop (a Rs.1 <abbr title="Immediate Payment Service">IMPS</abbr> credit to the customer's bank account) returns the account holder's name, which the system uses for name matching. This name match is a critical input to the maker-checker decision, so the system cannot let the customer proceed without it. If the Penny Drop keeps timing out, ops should investigate whether the customer's bank is experiencing IMPS downtime.
 :::
 
 Finally, here is the general strategy for handling HTTP error codes from any vendor API.

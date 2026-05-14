@@ -5,7 +5,7 @@ description: Walkthrough and reference for SEBI's SMART ODR portal — conciliat
 
 import { Aside } from '@astrojs/starlight/components';
 
-> **Why this page is structured this way:** ODR replaced multiple legacy exchange-arbitration silos with a single SEBI-administered portal. The page first explains the framework chronology (Jul 2023 launch → Dec 2023 master circular → operational refinements 2024–25), then walks the broker's view: how to onboard, how a case proceeds, what the broker pays, and what the client experiences.
+> **Why this page is structured this way:** <abbr title="Online Dispute Resolution">ODR</abbr> replaced multiple legacy exchange-arbitration silos with a single <abbr title="Securities and Exchange Board of India">SEBI</abbr>-administered portal. The page first explains the framework chronology (Jul 2023 launch → Dec 2023 master circular → operational refinements 2024–25), then walks the broker's view: how to onboard, how a case proceeds, what the broker pays, and what the client experiences.
 
 ## TL;DR
 
@@ -21,19 +21,19 @@ import { Aside } from '@astrojs/starlight/components';
 
 Before SMART ODR, investor-broker disputes flowed through fragmented arbitration channels:
 
-- NSE Arbitration (with regional panels)
-- BSE Arbitration
-- MCX Arbitration (commodities)
-- CDSL / NSDL Arbitration (depository disputes)
+- <abbr title="National Stock Exchange of India">NSE</abbr> Arbitration (with regional panels)
+- <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> Arbitration
+- <abbr title="Multi Commodity Exchange of India">MCX</abbr> Arbitration (commodities)
+- <abbr title="Central Depository Services (India) Limited">CDSL</abbr> / <abbr title="National Securities Depository Limited">NSDL</abbr> Arbitration (depository disputes)
 - Consumer court (parallel civil pathway)
 
-Each had separate rules, separate fee structures, separate timelines, and varying outcomes. The SEBI Master Circular for SE & CC `SEBI/HO/MRD-PoD2/CIR/P/2024/00181` and the predecessor exchange-arbitration provisions framed each separately.
+Each had separate rules, separate fee structures, separate timelines, and varying outcomes. The SEBI Master Circular for SE & <abbr title="Clearing Corporation (NCL, ICCL, MCXCCL — context-dependent).">CC</abbr> `SEBI/HO/MRD-PoD2/CIR/P/2024/00181` and the predecessor exchange-arbitration provisions framed each separately.
 
-The 2023 SMART ODR rollout consolidated this. The August 2023 launch (`SEBI/HO/OIAE/OIAE_IAD-1/P/CIR/2023/131`) established the framework. The December 2023 Master Circular (`SEBI/HO/OIAE/OIAE_IAD-3/P/CIR/2023/195`) consolidated procedures, fees, and timelines into a single operating document. The MIRSD-side version (`SEBI/HO/OIAE/OIAE_IAD-1/P/CIR/2023/0182` dated 20 December 2023) addresses intermediaries directly. SCORES 2.0 (`SEBI/HO/OIAE/IGRD/CIR/P/2023/156`) wired SCORES → ODR escalation linkage.
+The 2023 SMART ODR rollout consolidated this. The August 2023 launch (`SEBI/HO/OIAE/OIAE_IAD-1/P/CIR/2023/131`) established the framework. The December 2023 Master Circular (`SEBI/HO/OIAE/OIAE_IAD-3/P/CIR/2023/195`) consolidated procedures, fees, and timelines into a single operating document. The <abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>-side version (`SEBI/HO/OIAE/OIAE_IAD-1/P/CIR/2023/0182` dated 20 December 2023) addresses intermediaries directly. <abbr title="SEBI Complaints Redress System">SCORES</abbr> 2.0 (`SEBI/HO/OIAE/IGRD/CIR/P/2023/156`) wired SCORES → ODR escalation linkage.
 
 For the broker, ODR is now a major operational obligation:
 
-- One-time onboarding (PAN/registration mapped to portal)
+- One-time onboarding (<abbr title="Permanent Account Number">PAN</abbr>/registration mapped to portal)
 - Per-dispute case management (intake → response → conciliation participation → arbitration response → award compliance)
 - Annual fee structure participation
 - Disclosure on broker website (ODR Institution details, fee structures, etc.)
@@ -47,7 +47,7 @@ For the broker, ODR is now a major operational obligation:
 ### 1.1 Roles on the portal
 
 - **Investor / Complainant** — files dispute, uploads supporting documents, accepts / contests resolutions
-- **Market Participant / Respondent** — broker / DP / MF / IA / RA who is the subject of the dispute
+- **Market Participant / Respondent** — broker / <abbr title="Depository Participant">DP</abbr> / MF / <abbr title="Investment Adviser">IA</abbr> / <abbr title="Research Analyst">RA</abbr> who is the subject of the dispute
 - **ODR Institution** — empanelled SEBI institution that administers the dispute (assigns conciliator, arbitrator, manages workflow)
 - **Conciliator** — facilitates conciliation between parties
 - **Arbitrator** — adjudicates if conciliation fails
@@ -77,7 +77,7 @@ Panel members serve 2–3 year terms (industry-typical at empanelled institution
 - Designated officer (ODR Nodal Officer) with PAN, mobile, email
 - Bank account for fee remittance and award disbursement
 - Authorised signatory list (Compliance Officer + Designated Director typically)
-- DSC for authenticating digital submissions
+- <abbr title="Digital Signature Certificate (CCA-licensed; aka Class 2/3 DSC).">DSC</abbr> for authenticating digital submissions
 
 ### 2.2 Registration steps
 
@@ -201,12 +201,12 @@ Notes on these tiers — actual fees vary by ODR Institution. SEBI sets the fram
 
 | Dispute type | Recommended route |
 | --- | --- |
-| Pure grievance, non-monetary or small monetary (&lt; Rs 50,000) | SCORES → broker ATR |
-| Monetary fee / refund dispute (Rs 50,000 — Rs 5 lakh) | SCORES first; if unresolved, IGRC; or directly ODR |
+| Pure grievance, non-monetary or small monetary (&lt; Rs 50,000) | SCORES → broker <abbr title="Action Taken Report.">ATR</abbr> |
+| Monetary fee / refund dispute (Rs 50,000 — Rs 5 lakh) | SCORES first; if unresolved, <abbr title="Investor Grievance Redressal Committee">IGRC</abbr>; or directly ODR |
 | Mid-large monetary dispute (Rs 5 lakh — Rs 25 lakh) | SCORES, IGRC, or ODR |
 | Large monetary dispute (Rs 25 lakh+) | ODR (IGRC monetary cap typically exceeded) |
 | Substantive interpretation of regulations (e.g. unauthorised trading allegation) | ODR (full arbitral framework) |
-| Recoveries from suspended broker | IPF + ODR / civil court for residual |
+| Recoveries from suspended broker | <abbr title="Investor Protection Fund">IPF</abbr> + ODR / civil court for residual |
 
 See [SCORES Procedure](/broking-kyc/deep-dives/compliance-audit/scores-procedure/) and [IGRC](/broking-kyc/deep-dives/compliance-audit/igrc/) for the alternative routes.
 
@@ -216,7 +216,7 @@ See [SCORES Procedure](/broking-kyc/deep-dives/compliance-audit/scores-procedure
 
 1. **Discovery** — investor visits https://smartodr.in; system shows market participants searchable by name / registration
 2. **Filing** — selects broker; enters PAN; describes dispute; uploads supporting documents; pays investor fee online
-3. **Acknowledgement** — receives CRN; SMS / email confirmation
+3. **Acknowledgement** — receives CRN; <abbr title="Short Message Service.">SMS</abbr> / email confirmation
 4. **Conciliation tracking** — receives session schedules; attends sessions virtually
 5. **Conciliation outcome** — either consent settlement or moves to arbitration
 6. **Arbitration tracking** — attends hearings; receives award
@@ -253,7 +253,7 @@ Per `SEBI/HO/OIAE/OIAE_IAD-3/P/CIR/2023/195` clauses on transparency:
 
 ### 9.1 Class action (multi-investor) dispute
 
-If multiple investors file similar complaints (systemic over-charging, AP-fraud pattern), ODR Institution may consolidate. Consolidated awards apply uniformly.
+If multiple investors file similar complaints (systemic over-charging, <abbr title="Authorized Person">AP</abbr>-fraud pattern), ODR Institution may consolidate. Consolidated awards apply uniformly.
 
 ### 9.2 Broker bankruptcy / suspension during ODR pendency
 
@@ -265,7 +265,7 @@ Legal heir substitutes. Estate-administration proof required.
 
 ### 9.4 Cross-border investor
 
-NRI / foreign investor disputes flow through ODR identically. ODR hearings are virtual; jurisdictional issues addressed through PIS / FEMA compliance evidence.
+<abbr title="Non-Resident Indian">NRI</abbr> / foreign investor disputes flow through ODR identically. ODR hearings are virtual; jurisdictional issues addressed through <abbr title="Portfolio Investment Scheme (RBI / NRI)">PIS</abbr> / <abbr title="Foreign Exchange Management Act 1999">FEMA</abbr> compliance evidence.
 
 ### 9.5 Disputes between intermediaries
 
@@ -296,7 +296,7 @@ If IGRC has already issued an order and the period for appeal has lapsed, ODR ma
 
 - **[cost optimization]** Pre-conciliation negotiation directly with investor (informal call between Compliance Officer and investor) often resolves disputes before formal conciliation triggers. ODR Institution can record such early settlements without proceeding to formal conciliation hearings.
 
-- **[gotcha]** Document everything. ODR awards turn heavily on documentary evidence — KYC trail, contract notes, audio recordings, surveillance alerts. Brokers who haven't kept proper records lose disputes they would otherwise win.
+- **[gotcha]** Document everything. ODR awards turn heavily on documentary evidence — <abbr title="Know Your Customer (process).">KYC</abbr> trail, contract notes, audio recordings, surveillance alerts. Brokers who haven't kept proper records lose disputes they would otherwise win.
 
 - **[gotcha]** Section 34 challenge to ODR award has 90-day window; filing in High Court costs significant legal fees (Rs 5–20 lakh for material disputes). Most brokers don't challenge unless the dispute is large (above Rs 50 lakh) or contains substantive jurisdictional error.
 
@@ -310,7 +310,7 @@ If IGRC has already issued an order and the period for appeal has lapsed, ODR ma
 
 ## 12. Adjacent regimes
 
-- **PMLA / STR** — ODR proceedings may surface suspicious-transaction facts triggering an STR to FIU-IND. Compliance Officer must coordinate.
+- **<abbr title="Prevention of Money Laundering Act 2002">PMLA</abbr> / <abbr title="Suspicious Transaction Report">STR</abbr>** — ODR proceedings may surface suspicious-transaction facts triggering an STR to <abbr title="Financial Intelligence Unit — India">FIU-IND</abbr>. Compliance Officer must coordinate.
 - **Income-tax** — Settlement amounts may have TDS implications under Section 194 / 195. Tax-team review of settlements > Rs 1 lakh is industry-typical.
 - **Stamp duty** — Settlement agreements may attract stamp duty under State Stamp Acts. Some states exempt SEBI-ODR settlements; verify with State Stamp Office.
 - **GST** — Brokerage refunds may attract GST adjustment under CGST Section 34 (credit note). Tax compliance team coordinates.
@@ -324,7 +324,7 @@ If IGRC has already issued an order and the period for appeal has lapsed, ODR ma
 - [Deep Dive — IPF](/broking-kyc/deep-dives/foundational/ipf/)
 - [Deep Dive — AP Framework](/broking-kyc/deep-dives/compliance-audit/ap-framework/)
 - [Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/)
-- [Circulars — SEBI Other (OIAE)](/broking-kyc/reference/circulars/sebi-other/)
+- [Circulars — SEBI Other (<abbr title="Office of Investor Assistance and Education (SEBI)">OIAE</abbr>)](/broking-kyc/reference/circulars/sebi-other/)
 - [Circulars — SEBI MIRSD](/broking-kyc/reference/circulars/sebi-mirsd/)
 - [Circulars — NSE](/broking-kyc/reference/circulars/nse/)
 

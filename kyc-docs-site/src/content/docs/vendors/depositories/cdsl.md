@@ -3,17 +3,17 @@ title: CDSL BO Integration
 description: CDSL Beneficiary Owner (BO) account opening — CDAS system, fixed-length positional file format, and DDPI.
 ---
 
-Every share your client owns, every dividend they receive, every trade that settles — it all flows through a demat account at CDSL. If your firm's trading platform is the storefront, CDSL is the vault in the back. This document is your complete guide to integrating with that vault: opening accounts, managing securities, handling pledges, and staying compliant. By the time you finish reading, you will understand not just the *how* of CDSL integration, but the *why* behind every file format quirk, every maker-checker requirement, and every circular reference number your compliance team will throw at you.
+Every share your client owns, every dividend they receive, every trade that settles — it all flows through a demat account at <abbr title="Central Depository Services (India) Limited">CDSL</abbr>. If your firm's trading platform is the storefront, CDSL is the vault in the back. This document is your complete guide to integrating with that vault: opening accounts, managing securities, handling pledges, and staying compliant. By the time you finish reading, you will understand not just the *how* of CDSL integration, but the *why* behind every file format quirk, every maker-checker requirement, and every circular reference number your compliance team will throw at you.
 
 :::tip[How to read this document]
-If you are new to depository operations, read sections 1-5 first — they build the foundational concepts (what CDSL is, how CDAS works, and how accounts are opened). Sections 6-8 cover the day-to-day authorization mechanisms your clients will interact with. Sections 9-22 go deeper into edge cases, reporting, and compliance. The [deep-dive guides](#deep-dive-guides) at the end cover DDPI, pledge operations, modifications, and integration setup in dedicated pages.
+If you are new to depository operations, read sections 1-5 first — they build the foundational concepts (what CDSL is, how CDAS works, and how accounts are opened). Sections 6-8 cover the day-to-day authorization mechanisms your clients will interact with. Sections 9-22 go deeper into edge cases, reporting, and compliance. The [deep-dive guides](#deep-dive-guides) at the end cover <abbr title="Demat Debit and Pledge Instruction">DDPI</abbr>, pledge operations, modifications, and integration setup in dedicated pages.
 :::
 
 ## Table of Contents
 
 1. [Overview](#1-overview)
 2. [CDAS (Central Depository Accounting System)](#2-cdas-central-depository-accounting-system)
-3. [BO Account Opening - API Method](#3-bo-account-opening---api-method)
+3. [<abbr title="Beneficial Owner">BO</abbr> Account Opening - API Method](#3-bo-account-opening---api-method)
 4. [BO Account Opening - File Upload Method](#4-bo-account-opening---file-upload-method)
 5. [BO ID Format](#5-bo-id-format)
 6. [DDPI (Demat Debit and Pledge Instruction)](#6-ddpi-demat-debit-and-pledge-instruction)
@@ -21,12 +21,12 @@ If you are new to depository operations, read sections 1-5 first — they build 
 8. [easi / easiest](#8-easi--easiest)
 9. [Non-Individual Entities](#9-non-individual-entities)
 10. [Nomination](#10-nomination)
-11. [KYC Linkage](#11-kyc-linkage)
+11. [<abbr title="Know Your Customer (process).">KYC</abbr> Linkage](#11-kyc-linkage)
 12. [Transaction APIs](#12-transaction-apis)
 13. [Modification & Closure](#13-modification--closure)
 14. [Status Codes](#14-status-codes)
 15. [Reconciliation & Reports](#15-reconciliation--reports)
-16. [UCC-Demat Mapping](#16-ucc-demat-mapping)
+16. [<abbr title="Unique Client Code">UCC</abbr>-Demat Mapping](#16-ucc-demat-mapping)
 17. [Security & Compliance](#17-security--compliance)
 18. [Charges](#18-charges)
 19. [Timeline & SLA](#19-timeline--sla)
@@ -40,9 +40,9 @@ If you are new to depository operations, read sections 1-5 first — they build 
 
 ### 1.1 What is CDSL
 
-CDSL (Central Depository Services Limited) is one of two central depositories in India, regulated by SEBI under the **Depositories Act, 1996** and the **SEBI (Depositories and Participants) Regulations, 2018**. CDSL facilitates holding securities in electronic (dematerialized) form and enables settlement of trades executed on stock exchanges.
+CDSL (Central Depository Services Limited) is one of two central depositories in India, regulated by <abbr title="Securities and Exchange Board of India">SEBI</abbr> under the **Depositories Act, 1996** and the **SEBI (Depositories and Participants) Regulations, 2018**. CDSL facilitates holding securities in electronic (dematerialized) form and enables settlement of trades executed on stock exchanges.
 
-- **Established**: 1999 (promoted by BSE)
+- **Established**: 1999 (promoted by <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr>)
 - **Regulator**: SEBI
 - **Governing Law**: Depositories Act, 1996
 - **BO Accounts**: 12+ crore (as of 2025)
@@ -52,7 +52,7 @@ CDSL (Central Depository Services Limited) is one of two central depositories in
 
 ### 1.2 Depository Participant (DP) Model
 
-CDSL operates through a **DP (Depository Participant) model**. A stock broker acting as a DP is the intermediary between the investor and the depository.
+CDSL operates through a **<abbr title="Depository Participant">DP</abbr> (Depository Participant) model**. A stock broker acting as a DP is the intermediary between the investor and the depository.
 
 ```
 Investor (BO) <---> DP (Broker) <---> CDSL <---> Clearing Corporation <---> Exchange
@@ -75,7 +75,7 @@ Investor (BO) <---> DP (Broker) <---> CDSL <---> Clearing Corporation <---> Exch
 ### 1.3 CDSL Ventures Limited (CVL)
 
 CVL is a wholly-owned subsidiary of CDSL that operates:
-- **CVL KRA**: KYC Registration Agency (one of 5 SEBI-registered KRAs)
+- **CVL <abbr title="KYC Registration Agency">KRA</abbr>**: KYC Registration Agency (one of 5 SEBI-registered KRAs)
 - **CVL MF Services**: Mutual fund servicing
 - **CVL Academic**: Certification programs
 
@@ -96,7 +96,7 @@ CDAS is CDSL's core technology platform through which all depository operations 
 | Access | Browser (Internet Explorer/Edge for legacy, Chrome for newer modules) |
 | URL | https://cdas.cdslindia.com (production) |
 | Connectivity | Leased line / VPN / Internet with certificate-based auth |
-| Uptime SLA | 99.5% during market hours (9:00 AM - 5:00 PM IST, Mon-Fri) |
+| Uptime SLA | 99.5% during market hours (9:00 AM - 5:00 PM <abbr title="Indian Standard Time (UTC+05:30)">IST</abbr>, Mon-Fri) |
 | Maintenance Window | Saturday 6:00 PM - Sunday 6:00 AM (typically) |
 
 ### 2.2 CDAS Modules
@@ -174,27 +174,27 @@ POST /v1/auth/token
 
 | # | Field | Type | Size | Mandatory | Validation | Notes |
 |---|-------|------|------|-----------|------------|-------|
-| 1 | `account_type` | String | 2 | **Y** | `IN`=Individual, `JO`=Joint, `CO`=Corporate, `HU`=HUF, `TR`=Trust, `PA`=Partnership, `MN`=Minor | Primary account classification |
-| 2 | `holder_first_name` | String | 50 | **Y** | Alpha + space only | As per PAN card |
+| 1 | `account_type` | String | 2 | **Y** | `IN`=Individual, `JO`=Joint, `CO`=Corporate, `HU`=<abbr title="Hindu Undivided Family">HUF</abbr>, `TR`=Trust, `PA`=Partnership, `MN`=Minor | Primary account classification |
+| 2 | `holder_first_name` | String | 50 | **Y** | Alpha + space only | As per <abbr title="Permanent Account Number">PAN</abbr> card |
 | 3 | `holder_middle_name` | String | 50 | N | Alpha + space | |
 | 4 | `holder_last_name` | String | 50 | **Y** | Alpha + space only | |
 | 5 | `holder_full_name` | String | 150 | **Y** | Concatenation of first+middle+last | Must match PAN/KRA name exactly |
-| 6 | `pan` | String | 10 | **Y** | `[A-Z]{5}[0-9]{4}[A-Z]` | Validated against NSDL/Protean DB |
+| 6 | `pan` | String | 10 | **Y** | `[A-Z]{5}[0-9]{4}[A-Z]` | Validated against <abbr title="National Securities Depository Limited">NSDL</abbr>/Protean DB |
 | 7 | `dob` | String | 10 | **Y** | `DD/MM/YYYY` | Must match PAN DOB |
 | 8 | `gender` | String | 1 | **Y** | `M`=Male, `F`=Female, `T`=Transgender | |
 | 9 | `father_husband_name` | String | 100 | **Y** | As per KYC documents | |
 | 10 | `mother_name` | String | 100 | N | | |
 | 11 | `marital_status` | String | 1 | N | `M`=Married, `S`=Single, `W`=Widowed, `D`=Divorced | |
 | 12 | `nationality` | String | 2 | **Y** | ISO 3166-1 alpha-2; `IN` for Indian | |
-| 13 | `residential_status` | String | 2 | **Y** | `RI`=Resident Indian, `NR`=NRI, `FN`=Foreign National | |
+| 13 | `residential_status` | String | 2 | **Y** | `RI`=Resident Indian, `NR`=<abbr title="Non-Resident Indian">NRI</abbr>, `FN`=Foreign National | |
 | 14 | `occupation_code` | String | 2 | **Y** | CDSL occupation code table (01-15) | See Section 3.3g |
 | 15 | `annual_income_range` | String | 2 | **Y** | `01`=<1L, `02`=1-5L, `03`=5-10L, `04`=10-25L, `05`=25L-1Cr, `06`=>1Cr | |
 | 16 | `mobile_number` | String | 10 | **Y** | Indian 10-digit mobile | Must match KRA-registered mobile |
 | 17 | `email` | String | 100 | **Y** | Valid email format | Must match KRA-registered email |
 | 18 | `aadhaar_number` | String | 12 | Cond. | 12-digit Verhoeff check | Masked storage; last 4 digits only stored at CDSL |
-| 19 | `ckyc_number` | String | 14 | Cond. | 14-digit CKYC ID (KIN) | If available from CKYC registry |
+| 19 | `ckyc_number` | String | 14 | Cond. | 14-digit <abbr title="Central KYC (records registry)">CKYC</abbr> ID (<abbr title="KYC Identification Number">KIN</abbr>) | If available from CKYC registry |
 | 20 | `kra_status` | String | 2 | **Y** | `KR`=Registered, `KV`=Validated | Must be KR or KV to proceed |
-| 21 | `politically_exposed` | String | 1 | **Y** | `Y`/`N` | PEP flag |
+| 21 | `politically_exposed` | String | 1 | **Y** | `Y`/`N` | <abbr title="Politically Exposed Person">PEP</abbr> flag |
 | 22 | `related_to_pep` | String | 1 | **Y** | `Y`/`N` | Related to PEP flag |
 | 23 | `tax_status` | String | 2 | **Y** | `01`=Individual, `02`=NRI, `03`=HUF, etc. | CDSL tax status code table |
 
@@ -229,11 +229,11 @@ POST /v1/auth/token
 | # | Field | Type | Size | Mandatory | Validation | Notes |
 |---|-------|------|------|-----------|------------|-------|
 | 40 | `bank_account_number` | String | 20 | **Y** | Alphanumeric | Primary bank account |
-| 41 | `bank_ifsc` | String | 11 | **Y** | `[A-Z]{4}0[A-Z0-9]{6}` | RBI IFSC directory validated |
+| 41 | `bank_ifsc` | String | 11 | **Y** | `[A-Z]{4}0[A-Z0-9]{6}` | <abbr title="Reserve Bank of India">RBI</abbr> <abbr title="Indian Financial System Code.">IFSC</abbr> directory validated |
 | 42 | `bank_micr` | String | 9 | Cond. | 9-digit numeric | Required if MICR available |
 | 43 | `bank_name` | String | 100 | **Y** | Auto-derived from IFSC | |
 | 44 | `bank_branch` | String | 100 | N | Auto-derived from IFSC | |
-| 45 | `bank_account_type` | String | 2 | **Y** | `SB`=Savings, `CA`=Current, `NR`=NRE, `NO`=NRO | |
+| 45 | `bank_account_type` | String | 2 | **Y** | `SB`=Savings, `CA`=Current, `NR`=<abbr title="Non-Resident External (Rupee) account">NRE</abbr>, `NO`=<abbr title="Non-Resident Ordinary (Rupee) account">NRO</abbr> | |
 | 46 | `bank_verified` | String | 1 | **Y** | `Y` only | Must be penny-drop verified before submission |
 
 **Additional Bank Accounts** (up to 5 total):
@@ -275,7 +275,7 @@ POST /v1/auth/token
 
 | # | Field | Type | Size | Mandatory | Validation | Notes |
 |---|-------|------|------|-----------|------------|-------|
-| 79 | `si_auto_credit` | String | 1 | **Y** | `Y`/`N` | Auto-credit securities from IPO/corporate actions |
+| 79 | `si_auto_credit` | String | 1 | **Y** | `Y`/`N` | Auto-credit securities from <abbr title="Initial Public Offering">IPO</abbr>/corporate actions |
 | 80 | `si_auto_pledge` | String | 1 | N | `Y`/`N` | Default: `N` |
 | 81 | `si_auto_delivery` | String | 1 | N | `Y`/`N` | Default: `N`; only if DDPI |
 | 82 | `si_sms_alert` | String | 1 | **Y** | `Y` | Mandatory for all accounts |
@@ -288,7 +288,7 @@ POST /v1/auth/token
 |---|-------|------|------|-----------|------------|-------|
 | 85 | `bsda_flag` | String | 1 | N | `Y`/`N` | Basic Services Demat Account (for small investors) |
 | 86 | `fatca_country` | String | 2 | Cond. | ISO country code | Required if US/foreign tax obligations |
-| 87 | `fatca_tax_id` | String | 20 | Cond. | Foreign TIN | Required if fatca_country is not IN |
+| 87 | `fatca_tax_id` | String | 20 | Cond. | Foreign <abbr title="Taxpayer Identification Number (in FATCA / CRS context)">TIN</abbr> | Required if fatca_country is not IN |
 | 88 | `crs_country_of_birth` | String | 2 | **Y** | ISO country code | |
 | 89 | `crs_country_of_citizenship` | String | 2 | **Y** | ISO country code | |
 | 90 | `gross_annual_income` | String | 15 | N | Numeric | Actual income (optional; range is mandatory) |
@@ -321,9 +321,9 @@ POST /v1/auth/token
 | 92 | `poi_number` | String | 20 | **Y** | Document number | |
 | 93 | `poa_type` | String | 2 | **Y** | `AA`=Aadhaar, `PP`=Passport, `UT`=Utility, `BA`=BankStatement | Proof of Address type |
 | 94 | `poa_number` | String | 20 | **Y** | Document number | |
-| 95 | `ipv_done` | String | 1 | **Y** | `Y` | In-Person Verification / Video IPV completed |
+| 95 | `ipv_done` | String | 1 | **Y** | `Y` | In-Person Verification / Video <abbr title="In-Person Verification">IPV</abbr> completed |
 | 96 | `ipv_date` | String | 10 | **Y** | DD/MM/YYYY | Date of IPV |
-| 97 | `ipv_mode` | String | 2 | **Y** | `VP`=Video, `IP`=In-person | SEBI VIPV or physical |
+| 97 | `ipv_mode` | String | 2 | **Y** | `VP`=Video, `IP`=In-person | SEBI <abbr title="Video In-Person Verification (sometimes &quot;Video CIP&quot; / V-CIP)">VIPV</abbr> or physical |
 | 98 | `photo_attached` | String | 1 | **Y** | `Y` | Client photograph uploaded |
 
 ### 3.4 Response
@@ -367,7 +367,7 @@ POST /v1/auth/token
 | BO_ERR_060 | Nominee percentage does not sum to 100 | Adjust nominee percentages |
 | BO_ERR_070 | Minor nominee without guardian | Provide guardian details |
 | BO_ERR_080 | Invalid state code | Use CDSL state code table |
-| BO_ERR_090 | FATCA details incomplete | Provide tax residency details |
+| BO_ERR_090 | <abbr title="Foreign Account Tax Compliance Act (US)">FATCA</abbr> details incomplete | Provide tax residency details |
 | BO_ERR_100 | Certificate authentication failed | Renew/re-register certificate |
 | BO_ERR_110 | IP not whitelisted | Register IP with CDSL admin |
 | BO_ERR_120 | Rate limit exceeded | Retry after 60 seconds |
@@ -503,7 +503,7 @@ Example: `BO_SETUP_12345678_20260213_001.txt`
 | 11-11 | 1 | Auto Credit | Alpha | **Y** | Y/N |
 | 12-12 | 1 | Auto Pledge | Alpha | N | Y/N; default N |
 | 13-13 | 1 | Auto Delivery | Alpha | N | Y/N; default N |
-| 14-14 | 1 | SMS Alert | Alpha | **Y** | Must be Y |
+| 14-14 | 1 | <abbr title="Short Message Service.">SMS</abbr> Alert | Alpha | **Y** | Must be Y |
 | 15-15 | 1 | Email Alert | Alpha | **Y** | Must be Y |
 | 16-17 | 2 | RAS Frequency | Alpha | **Y** | Q1/M1 |
 
@@ -536,7 +536,7 @@ Example: `BO_SETUP_12345678_20260213_001.txt`
 | 3-10 | 8 | DP ID | Numeric | **Y** | |
 | 11-12 | 2 | POI Type | Alpha | **Y** | PA/PP/DL/VI |
 | 13-32 | 20 | POI Number | Alphanumeric | **Y** | |
-| 33-34 | 2 | POA Type | Alpha | **Y** | AA/PP/UT/BA |
+| 33-34 | 2 | <abbr title="Power of Attorney">POA</abbr> Type | Alpha | **Y** | <abbr title="Account Aggregator (RBI-licensed NBFC-AA)">AA</abbr>/PP/UT/BA |
 | 35-54 | 20 | POA Number | Alphanumeric | **Y** | |
 | 55-55 | 1 | IPV Done | Alpha | **Y** | Must be Y |
 | 56-65 | 10 | IPV Date | DD/MM/YYYY | **Y** | |
@@ -741,7 +741,7 @@ Per Master Dataset Section H:
 
 | Attribute | Details |
 |-----------|---------|
-| SEBI Circular | [SEBI/HO/MIRSD/DoP/P/CIR/2022/44](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddoppcir202244) (Nov 18, 2022) |
+| SEBI Circular | [SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/DoP/P/CIR/2022/44](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddoppcir202244) (Nov 18, 2022) |
 | Effective Date | November 18, 2022 |
 | Replaces | Power of Attorney (POA) |
 | Nature | One-time authorization from BO to DP |
@@ -749,7 +749,7 @@ Per Master Dataset Section H:
 
 ### 6.2 DDPI Scope
 
-DDPI authorizes the DP (broker) to perform the following without per-trade TPIN+OTP:
+DDPI authorizes the DP (broker) to perform the following without per-trade TPIN+<abbr title="One-Time Password">OTP</abbr>:
 
 | Authorization | Code | Description |
 |---------------|------|-------------|
@@ -840,7 +840,7 @@ POST /v1/ddpi/revoke
 | Sell trade settlement | Automatic debit | Requires eDIS (TPIN+OTP) per trade |
 | Margin pledging | Automatic pledge | Requires eDIS per pledge |
 | MF redemption | Automatic | Requires eDIS per redemption |
-| Buyback/OFS tendering | Automatic | Requires eDIS per tender |
+| Buyback/<abbr title="Offer for Sale (through stock exchange)">OFS</abbr> tendering | Automatic | Requires eDIS per tender |
 | Off-market transfer | eDIS required (always) | eDIS required (always) |
 
 ---
@@ -1132,8 +1132,8 @@ Response:
 | Account Type Suffix | Account sub-type indicates NRI status |
 | Account Sub-Types | NRE (Non-Resident External), NRO (Non-Resident Ordinary), SNRE (Special NRE), SNRO (Special NRO) |
 | PAN | Indian PAN mandatory for NRIs |
-| PIS Permission | Portfolio Investment Scheme permission from designated bank (RBI mandate) |
-| FEMA Compliance | Investments subject to FEMA limits; FDI sectoral caps apply |
+| <abbr title="Portfolio Investment Scheme (RBI / NRI)">PIS</abbr> Permission | Portfolio Investment Scheme permission from designated bank (RBI mandate) |
+| <abbr title="Foreign Exchange Management Act 1999">FEMA</abbr> Compliance | Investments subject to FEMA limits; FDI sectoral caps apply |
 | Bank Account Type | Must match: NRE demat → NRE bank account, NRO demat → NRO bank account |
 | Repatriation | NRE = fully repatriable; NRO = restricted repatriation (up to USD 1M/year) |
 | RBI Reporting | Broker must report NRI holdings to RBI via designated bank |
@@ -1179,7 +1179,7 @@ Response:
 | Requirement | Details |
 |-------------|---------|
 | Account Type | `LP` (or treated as `PA` variant) |
-| LLPIN | LLP Identification Number from MCA |
+| LLPIN | <abbr title="—">LLP</abbr> Identification Number from MCA |
 | Designated Partners | At least 2, with DPIN (Designated Partner Identification Number) |
 | LLP Agreement | Copy required |
 
@@ -1314,13 +1314,13 @@ Before opening a BO account, the client's KRA status must be one of:
 |-----------|---------|
 | Field | `ckyc_number` in BO record |
 | Length | 14 digits (KIN - KYC Identification Number) |
-| Source | CKYC registry (CERSAI) |
+| Source | CKYC registry (<abbr title="Central Registry of Securitisation Asset Reconstruction and Security Interest of India">CERSAI</abbr>) |
 | Mandatory | Not mandatory for BO opening, but must be updated once available |
 | Update | Via BO modification API after CKYC upload is processed |
 
 ### 11.3 Six KYC Attributes Consistency
 
-SEBI mandates that the following 6 attributes must match across KRA, Exchange (NSE/BSE), and Depository (CDSL):
+SEBI mandates that the following 6 attributes must match across KRA, Exchange (<abbr title="National Stock Exchange of India">NSE</abbr>/BSE), and Depository (CDSL):
 
 | # | Attribute | Notes |
 |---|-----------|-------|
@@ -1401,7 +1401,7 @@ POST /v1/transaction/inter-depository
 }
 ```
 
-**Timeline**: T+1 (next working day)
+**Timeline**: <abbr title="Trade-date Plus N settlement">T+1</abbr> (next working day)
 
 ### 12.5 Pledge/Unpledge
 
@@ -1529,7 +1529,7 @@ POST /v1/bo/reactivate
 | `REG_ORD` | Regulatory order (SEBI/Court) | SEBI/Court | Comply with order; file application |
 | `DP_REQ` | DP-initiated suspension | DP | DP lifts suspension |
 | `NOM_NC` | Nomination non-compliance (post Mar 2025 deadline) | CDSL (auto) | Submit nomination or opt-out |
-| `FATCA_NC` | FATCA/CRS non-compliance | CDSL | Submit FATCA declaration |
+| `FATCA_NC` | FATCA/<abbr title="Common Reporting Standard">CRS</abbr> non-compliance | CDSL | Submit FATCA declaration |
 | `PAN_INV` | PAN invalidated by NSDL/Protean | CDSL (auto) | Resolve PAN status with IT dept |
 
 ### 14.3 Freeze Types
@@ -1749,9 +1749,9 @@ CDSL requires DPs to maintain audit trails for:
 | SEBI (Depositories and Participants) Regulations 2018 | Primary governing regulation for DPs |
 | SEBI Circular on Cyber Security (Jul 2024) | Mandatory SOC-2 / ISO 27001 for DPs processing >1L accounts |
 | SEBI Circular on Business Continuity (Dec 2023) | DR site mandatory; RTO < 4 hours, RPO < 1 hour |
-| SEBI Circular on Investor Grievance (ongoing) | SCORES integration mandatory; resolve within 21 days |
+| SEBI Circular on Investor Grievance (ongoing) | <abbr title="SEBI Complaints Redress System">SCORES</abbr> integration mandatory; resolve within 21 days |
 | CDSL DP Operating Instructions | Detailed operational guidelines (updated periodically) |
-| PMLA (Prevention of Money Laundering Act) | AML/CFT compliance for all demat transactions |
+| <abbr title="Prevention of Money Laundering Act 2002">PMLA</abbr> (Prevention of Money Laundering Act) | <abbr title="Anti-Money Laundering">AML</abbr>/<abbr title="Combating the Financing of Terrorism">CFT</abbr> compliance for all demat transactions |
 
 ---
 
@@ -1779,7 +1779,7 @@ CDSL requires DPs to maintain audit trails for:
 | Charge Type | Typical Range | Notes |
 |-------------|---------------|-------|
 | Account Opening | Rs. 0 (free) | Most brokers offer free opening |
-| Annual Maintenance Charge (AMC) | Rs. 0 - 300/year | Many discount brokers: Rs. 0 |
+| Annual Maintenance Charge (<abbr title="Asset Management Company (mutual funds context) / Annual Maintenance Charges (depository context).">AMC</abbr>) | Rs. 0 - 300/year | Many discount brokers: Rs. 0 |
 | Transaction (Sell) | Rs. 5 - 25 per scrip | Per scrip per day |
 | Pledge/Unpledge | Rs. 0 - 30 | Per instruction |
 | Off-Market Transfer | Rs. 25 - 50 | Per instruction |
@@ -1807,7 +1807,7 @@ For small investors, SEBI mandates free/low-cost demat accounts:
 | Operation | SLA | Best Case | Worst Case |
 |-----------|-----|-----------|------------|
 | BO Opening (API) | 1-2 hours | 5-10 minutes | 4 hours |
-| BO Opening (File) | Next working day | Same day (if before cutoff) | T+2 (if Friday submission) |
+| BO Opening (File) | Next working day | Same day (if before cutoff) | <abbr title="Trade-date Plus N settlement">T+2</abbr> (if Friday submission) |
 | DDPI Activation | 24 hours | 4-6 hours | 48 hours |
 | eDIS Authorization | Real-time | Instant (after TPIN+OTP) | N/A (client-dependent) |
 | Off-Market Transfer | Same day | 30 minutes | End of day |
@@ -1847,7 +1847,7 @@ For small investors, SEBI mandates free/low-cost demat accounts:
 | Jul 2024 | SEBI FATCA/CRS to KRA | FATCA/CRS upload to KRA mandatory | Include FATCA fields in BO setup; sync with KRA |
 | Dec 2024 | SEBI distinct mobile/email circular | Unique mobile and email per client | Validate at BO opening; reject duplicates |
 | Nov 18, 2022 | SEBI/HO/MIRSD/DoP/P/CIR/2022/44 | DDPI replaces POA | Implement DDPI flow; stop accepting POA |
-| Feb 1, 2025 | UPI Block Mechanism mandatory for QSBs | ASBA-like for secondary market | May affect settlement flow for qualifying brokers |
+| Feb 1, 2025 | <abbr title="Unified Payments Interface">UPI</abbr> Block Mechanism mandatory for QSBs | <abbr title="Applications Supported by Blocked Amount">ASBA</abbr>-like for secondary market | May affect settlement flow for qualifying brokers |
 
 ### 20.2 CDSL System Updates (2024-2025)
 
@@ -2008,7 +2008,7 @@ Corporate account opening is more complex than individual:
 ### 22.5 T+0 and T+1 Settlement
 
 - T+1 settlement is now standard (since Jan 2023)
-- T+0 (instant settlement) is being piloted for select stocks
+- <abbr title="Trade-date Plus N settlement">T+0</abbr> (instant settlement) is being piloted for select stocks
 - Impact on eDIS: faster authorization cycles needed
 - Impact on pledge: real-time margin checks become critical
 
@@ -2028,7 +2028,7 @@ For detailed coverage of specific CDSL topics, see these dedicated pages:
 | Guide | Topics Covered |
 |-------|---------------|
 | [DDPI Deep Dive](/broking-kyc/vendors/depositories/cdsl-ddpi/) | DDPI lifecycle, 4 authorization types, vs POA comparison, file format, revocation |
-| [MTF & Pledge Operations](/broking-kyc/vendors/depositories/cdsl-mtf-pledge/) | Margin pledge, re-pledge, MTF funding, eLAS, automated release, CUSPA, file formats |
+| [<abbr title="Margin Trading Facility">MTF</abbr> & Pledge Operations](/broking-kyc/vendors/depositories/cdsl-mtf-pledge/) | Margin pledge, re-pledge, MTF funding, eLAS, automated release, <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr>, file formats |
 | [BO Modifications](/broking-kyc/vendors/depositories/cdsl-modifications/) | Address, bank, nominee, PAN, email/mobile changes, account closure, dormancy |
 | [Integration Guide](/broking-kyc/vendors/depositories/cdsl-integration-guide/) | UAT/production environments, request tracking, security architecture, SEBI circulars |
 
@@ -2039,7 +2039,7 @@ For detailed coverage of specific CDSL topics, see these dedicated pages:
 | Code | State |
 |------|-------|
 | AN | Andaman and Nicobar Islands |
-| AP | Andhra Pradesh |
+| <abbr title="Authorized Person">AP</abbr> | Andhra Pradesh |
 | AR | Arunachal Pradesh |
 | AS | Assam |
 | BR | Bihar |

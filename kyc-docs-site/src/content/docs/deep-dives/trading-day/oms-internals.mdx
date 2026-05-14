@@ -5,15 +5,15 @@ description: Walkthrough plus reference for the Order Management System at an In
 
 import { Aside } from '@astrojs/starlight/components';
 
-> **Why this page is structured this way:** The OMS is the broker's single most performance-critical system — it sits in the millisecond-scale hot path between the customer and the exchange. The page first walks through the architecture and component split, then drills into the pre-trade pipeline in fine grain, then provides reference tables for FIX message types, order types, CTCL approval, and latency budgets, and closes with failure modes and the operator's debugging playbook.
+> **Why this page is structured this way:** The <abbr title="Order Management System">OMS</abbr> is the broker's single most performance-critical system — it sits in the millisecond-scale hot path between the customer and the exchange. The page first walks through the architecture and component split, then drills into the pre-trade pipeline in fine grain, then provides reference tables for <abbr title="Financial Information eXchange protocol">FIX</abbr> message types, order types, <abbr title="Computer-to-Computer Link.">CTCL</abbr> approval, and latency budgets, and closes with failure modes and the operator's debugging playbook.
 
 ## TL;DR
 
-- The OMS receives orders from five entry paths (web, mobile, dealer terminal, REST/WebSocket API, FIX) and unifies them onto a single internal order schema before handing off to a pre-trade RMS pipeline.
-- The pre-trade RMS pipeline is a strictly sequential six-stage chain — **segment / margin / MWPL / order-type / surveillance / release** — with a combined budget of single-digit milliseconds per order at P99 (see [Integration DAG: Trading hours](/broking-kyc/operations/integration-dag/trading-hours/)).
+- The OMS receives orders from five entry paths (web, mobile, dealer terminal, REST/WebSocket API, FIX) and unifies them onto a single internal order schema before handing off to a pre-trade <abbr title="Risk Management System">RMS</abbr> pipeline.
+- The pre-trade RMS pipeline is a strictly sequential six-stage chain — **segment / margin / <abbr title="Market Wide Position Limit">MWPL</abbr> / order-type / surveillance / release** — with a combined budget of single-digit milliseconds per order at P99 (see [Integration <abbr title="Directed Acyclic Graph.">DAG</abbr>: Trading hours](/broking-kyc/operations/integration-dag/trading-hours/)).
 - Three systems share responsibility for a trading day: the **OMS** routes and persists orders, the **RMS** validates margin and risk gates, the **back-office** books trades and produces contract notes plus regulatory files. Misallocating any one responsibility is a recurring source of operational defects.
-- The exchange edge runs on **FIX 4.4 (with NSE / BSE / MCX dialect extensions)** for institutional flow or **CTCL** (NEAT-IXS / IML / BOLT-IML / MCX-TWS) for retail trading-software paths. Each requires segment-level **CTCL approval** before any production order can be routed.
-- Order-type matrix is segment-specific: cash supports NRML / MIS / CO / BO / AMO / GTT; derivatives add carry-forward and bracket limits; commodities have their own intraday vs delivery distinctions. Each order type has a distinct risk profile and time-cut.
+- The exchange edge runs on **FIX 4.4 (with <abbr title="National Stock Exchange of India">NSE</abbr> / <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> / <abbr title="Multi Commodity Exchange of India">MCX</abbr> dialect extensions)** for institutional flow or **CTCL** (NEAT-IXS / IML / BOLT-IML / MCX-TWS) for retail trading-software paths. Each requires segment-level **CTCL approval** before any production order can be routed.
+- Order-type matrix is segment-specific: cash supports NRML / MIS / CO / <abbr title="Beneficial Owner">BO</abbr> / AMO / GTT; derivatives add carry-forward and bracket limits; commodities have their own intraday vs delivery distinctions. Each order type has a distinct risk profile and time-cut.
 - Latency budgets are tighter than they look: the entire chain from order-receive to FIX-out must fit in roughly 5 ms at P95 for a credible retail OMS, and well below 1 ms at the exchange edge for an institutional one.
 - The failure surfaces are well-known and worth memorising: scanrange-not-loaded, FIX-session-disconnect, RMS-stale-parameter, CTCL-approval-revoked, AMO-overnight-margin-shift, and the dealer-terminal-trust-boundary class of bugs.
 
@@ -21,9 +21,9 @@ import { Aside } from '@astrojs/starlight/components';
 
 The OMS — Order Management System — is the broker's traffic controller. Whatever a client types on their phone or dictates to a dealer or fires from an algorithmic Python script eventually arrives at the OMS as an order object. The OMS is responsible for: persisting the order with an internal ID, running it through the pre-trade RMS gates, releasing it to the exchange via the appropriate technical channel, persisting the exchange acknowledgement, persisting the trade confirmation if it matches, and reflecting all of this back to the originating client surface. Every step writes to the persistent store; every step is observable from operations dashboards; every step has a P99 latency budget that traders feel in their guts within hours if it slips.
 
-Around the OMS sit two siblings with sharply separated responsibilities. The **RMS** (Risk Management System) is consulted by the OMS at every gate — segment activation, margin availability, MWPL headroom, order-type rules, surveillance filters. The RMS owns the per-client risk picture: SPAN scanrange, ELM ratios, exposure margins, position limits, surveillance flags. The OMS holds the order; the RMS holds the risk. Together they make the release decision in single-digit milliseconds.
+Around the OMS sit two siblings with sharply separated responsibilities. The **RMS** (Risk Management System) is consulted by the OMS at every gate — segment activation, margin availability, MWPL headroom, order-type rules, surveillance filters. The RMS owns the per-client risk picture: <abbr title="Standard Portfolio Analysis of Risk">SPAN</abbr> scanrange, <abbr title="Extreme Loss Margin">ELM</abbr> ratios, exposure margins, position limits, surveillance flags. The OMS holds the order; the RMS holds the risk. Together they make the release decision in single-digit milliseconds.
 
-The **back-office** comes in once trades happen. Where the OMS-RMS pair runs in milliseconds, the back-office runs in seconds-to-minutes — booking trades against the contract files received from each exchange, computing brokerage / STT / GST / stamp duty / SEBI turnover fee, producing the day's contract notes, generating the [DMF](/broking-kyc/operations/compliance-blueprint/), feeding the [surveillance](/broking-kyc/operations/compliance-blueprint/) and settlement pipelines. The clean split — OMS for orders, RMS for risk, back-office for books — is one of the most important architectural lines in a broking stack, and the one most often blurred by accident in smaller deployments.
+The **back-office** comes in once trades happen. Where the OMS-RMS pair runs in milliseconds, the back-office runs in seconds-to-minutes — booking trades against the contract files received from each exchange, computing brokerage / STT / GST / stamp duty / <abbr title="Securities and Exchange Board of India">SEBI</abbr> turnover fee, producing the day's contract notes, generating the [DMF](/broking-kyc/operations/compliance-blueprint/), feeding the [surveillance](/broking-kyc/operations/compliance-blueprint/) and settlement pipelines. The clean split — OMS for orders, RMS for risk, back-office for books — is one of the most important architectural lines in a broking stack, and the one most often blurred by accident in smaller deployments.
 
 ## 1. Order capture paths
 
@@ -37,7 +37,7 @@ The web path is also the most exposed surface to client-side bugs. Most operatio
 
 ### 1.2 Mobile
 
-The mobile path is structurally similar to web — REST/WebSocket over TLS, session-bound — but layered with the additional security expectations of CSCRF's mobile-app testing requirements (see [Compliance blueprint: cyber security](/broking-kyc/operations/compliance-blueprint/) row CYBER-023 on OWASP MASVS L1/L2 assessment). Most brokers run the same backend gateway for mobile and web, distinguishing only at the User-Agent / token-issuance layer.
+The mobile path is structurally similar to web — REST/WebSocket over TLS, session-bound — but layered with the additional security expectations of <abbr title="Cybersecurity and Cyber Resilience Framework">CSCRF</abbr>'s mobile-app testing requirements (see [Compliance blueprint: cyber security](/broking-kyc/operations/compliance-blueprint/) row CYBER-023 on OWASP MASVS L1/L2 assessment). Most brokers run the same backend gateway for mobile and web, distinguishing only at the User-Agent / token-issuance layer.
 
 Two operational wrinkles are mobile-specific. First, push-notification ack of order placement is part of the user experience contract — the OMS must publish to the broker's push provider within a tight budget so the buzz on the user's phone correlates with the user's mental model of "the order went through". Second, mobile networks are noisier than home wifi; the OMS sees more partially-failed posts and TLS resets from mobile than from web, and must idempotently handle retries.
 
@@ -45,7 +45,7 @@ Two operational wrinkles are mobile-specific. First, push-notification ack of or
 
 The dealer terminal is the path for the broker's own dealers — call-and-trade desks, branch dealers, relationship-manager floors. Operationally this is the most-trusted entry path: orders come from authenticated employees on the broker's internal network, typically through a thick-client Windows or web-based application that talks to the OMS over the LAN or a private VPN.
 
-Dealer terminals carry their own compliance burden — the dealer must be **NISM-certified** (Series VIII or relevant series), the broker must maintain a dealer roster with NISM certificate IDs, and dealer-placed orders must carry a dealer ID in the audit trail per SEBI's institutional-mechanism circular ([SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/96](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-pod-1pcir202496)). Orders placed by a dealer on a client's behalf are simultaneously the broker's most-frequent fraud surface — front-running, unauthorised trading, and impersonation are all dealer-terminal-risk patterns that the surveillance system (see [surveillance deep-dive](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/)) must catch.
+Dealer terminals carry their own compliance burden — the dealer must be **NISM-certified** (Series VIII or relevant series), the broker must maintain a dealer roster with NISM certificate IDs, and dealer-placed orders must carry a dealer ID in the audit trail per SEBI's institutional-mechanism circular ([SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD-1/P/CIR/2024/96](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-pod-1pcir202496)). Orders placed by a dealer on a client's behalf are simultaneously the broker's most-frequent fraud surface — front-running, unauthorised trading, and impersonation are all dealer-terminal-risk patterns that the surveillance system (see [surveillance deep-dive](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/)) must catch.
 
 ### 1.4 API (REST / WebSocket)
 
@@ -65,16 +65,16 @@ Whatever entry path delivered the order, the OMS hands it to the pre-trade RMS a
 
 ### 2.1 Segment activation check
 
-The OMS holds, per client per segment, an activation flag: CM (cash), F&O (equity derivatives), CD (currency derivatives), COM (commodity), SLB (securities lending). The check is a local lookup against the in-memory client-master cache — single-digit microseconds. Failure mode: the client elected only CM at onboarding but their app form-renders a F&O order entry by mistake; the RMS catches it and returns "segment not active". Cumulative segment-activation hit rate is in the high 99-percent range; most rejects here are client-app bugs rather than client confusion.
+The OMS holds, per client per segment, an activation flag: <abbr title="Clearing Member">CM</abbr> (cash), F&O (equity derivatives), CD (currency derivatives), COM (commodity), SLB (securities lending). The check is a local lookup against the in-memory client-master cache — single-digit microseconds. Failure mode: the client elected only CM at onboarding but their app form-renders a F&O order entry by mistake; the RMS catches it and returns "segment not active". Cumulative segment-activation hit rate is in the high 99-percent range; most rejects here are client-app bugs rather than client confusion.
 
 ### 2.2 Margin lock
 
 The OMS computes the **required margin** for the proposed order and **reserves it against the client's available margin** before any further validation. The computation differs by segment:
 
 - **CM buy:** required margin = VaR + ELM (per [SEBI/HO/MRD2/DCAP/CIR/P/2020/127](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2dcapcirp2020127)). The 20% alternative — a flat 20% upfront margin in place of VaR+ELM — is acceptable per [NSE/INSP/45534](/broking-kyc/reference/circulars/nse/#nseinsp45565) and is a common simplification at retail brokers.
-- **CM sell of holding:** margin requirement is partly waived against the holding; the RMS validates that the holding is unencumbered (not under a pledge, not in a CSMFA / MTF lock).
-- **F&O / CD:** SPAN + ELM, with the client's margin recomputed from the SPAN scanrange and ELM ratios loaded at BOD (see [SPAN methodology deep-dive](/broking-kyc/deep-dives/trading-day/rms-span-methodology/)).
-- **Commodity:** SPAN + ELM via MCXCCL's commodity SPAN, plus any additional / event-driven margins.
+- **CM sell of holding:** margin requirement is partly waived against the holding; the RMS validates that the holding is unencumbered (not under a pledge, not in a CSMFA / <abbr title="Margin Trading Facility">MTF</abbr> lock).
+- **F&O / CD:** SPAN + ELM, with the client's margin recomputed from the SPAN scanrange and ELM ratios loaded at <abbr title="Beginning Of Day">BOD</abbr> (see [SPAN methodology deep-dive](/broking-kyc/deep-dives/trading-day/rms-span-methodology/)).
+- **Commodity:** SPAN + ELM via <abbr title="Multi Commodity Exchange Clearing Corporation Limited">MCXCCL</abbr>'s commodity SPAN, plus any additional / event-driven margins.
 
 The margin lock writes a reservation row to the client's margin ledger so that subsequent orders don't double-spend the same headroom. Reservations are released on order rejection (anywhere downstream), on order cancellation, on partial fill (released proportional to unfilled), or on full fill (converted from reservation to consumed). The lock-and-release flow is the most defect-rich part of the RMS: stale reservations from order-not-cancelled-properly events accumulate over the day and look exactly like a margin shortage to the customer.
 
@@ -96,10 +96,10 @@ Each order type has its own rules around price, quantity, time-cut, and product 
 
 The order is screened against the day's surveillance lists:
 
-- **GSM** (Graded Surveillance Measure) stages I–IV per [NSE/SURV/74008](/broking-kyc/reference/circulars/nse/#nsesurv74008). Stage III restricts to 100% upfront margin; stage IV restricts to periodic call auction only.
-- **ASM** (Additional Surveillance Measure) Short-term and Long-term lists. ASM positions typically require 100% upfront margin in higher stages.
+- **<abbr title="Graded Surveillance Measure">GSM</abbr>** (Graded Surveillance Measure) stages I–IV per [NSE/SURV/74008](/broking-kyc/reference/circulars/nse/#nsesurv74008). Stage <abbr title="—">III</abbr> restricts to 100% upfront margin; stage IV restricts to periodic call auction only.
+- **<abbr title="Additional Surveillance Measure">ASM</abbr>** (Additional Surveillance Measure) Short-term and Long-term lists. ASM positions typically require 100% upfront margin in higher stages.
 - **T2T** (Trade-to-Trade) — securities in T2T must settle gross (no intraday netting). The OMS must restrict order-type to NRML and reject any MIS / intraday variant.
-- **ESM** (Enhanced Surveillance Measure) for SME / micro-cap segments per [NSE/SURV/61848](/broking-kyc/reference/circulars/nse/#nsesurv61848).
+- **<abbr title="Enhanced Surveillance Measure">ESM</abbr>** (Enhanced Surveillance Measure) for SME / micro-cap segments per [NSE/SURV/61848](/broking-kyc/reference/circulars/nse/#nsesurv61848).
 - **Broker-internal restricted lists** — securities the broker has flagged for its own reasons (employee designated person list per PIT, MOU-based restrictions, client-segregation rules).
 
 Any surveillance flag on the order returns a typed reject ("surveillance: GSM stage III, 100% margin required") that the client UI translates to a customer-friendly explanation.
@@ -125,16 +125,16 @@ A consistent source of confusion in broking architecture is the boundary between
 | SPAN / ELM parameter loading at BOD | consumes | owns | no |
 | Per-client margin envelope (available, blocked, free) | consumes | owns | reads (for ledger) |
 | Order release to exchange (FIX / CTCL) | yes | no | no |
-| Exchange ack and trade confirmation | yes | no | reads (after EOD) |
+| Exchange ack and trade confirmation | yes | no | reads (after <abbr title="End Of Day">EOD</abbr>) |
 | Trade booking against exchange contract file | no | no | yes |
 | Brokerage / STT / GST / stamp duty computation | no | no | yes |
-| Contract note generation and dispatch (ECN) | no | no | yes |
+| Contract note generation and dispatch (<abbr title="Electronic Contract Note.">ECN</abbr>) | no | no | yes |
 | Intraday peak-margin snapshot capture | no | yes | reads (for DMF aggregation) |
 | Daily Margin File (DMF) generation | no | partial | yes (aggregation) |
 | Position file generation per segment | no | partial | yes (aggregation) |
 | Surveillance OTR / pattern computation (intraday) | feeds | partial | reads (EOD) |
-| Client ledger update (trade entries, MTM realized) | feeds | no | yes |
-| KRA / CKYC / UCC / DLT integrations | no | no | yes |
+| Client ledger update (trade entries, <abbr title="Mark-to-Market">MTM</abbr> realized) | feeds | no | yes |
+| <abbr title="KYC Registration Agency">KRA</abbr> / <abbr title="Central KYC (records registry)">CKYC</abbr> / <abbr title="Unique Client Code">UCC</abbr> / DLT integrations | no | no | yes |
 | Auction obligation, short-delivery remediation | no | no | yes |
 | Bank reconciliation, client funds upstreaming | no | no | yes |
 
@@ -249,8 +249,8 @@ Order types vary by segment, product, and exchange. The matrix below covers the 
 
 | Order type | Description | Time-cut | Margin profile | Notes |
 |---|---|---|---|---|
-| NRML | Normal carry-forward order; settles T+1 (or T+0 if eligible) | None within trading hours; AMO 15:45–08:59 | VaR + ELM upfront on buy; against holding on sell | Default product type |
-| MIS | Margin Intraday Square-off; auto-closed by RMS before market close | Auto-square-off typically 15:20 IST | Leverage permitted intraday (per broker RMS policy) | Position must square off; otherwise RMS auto-squares with charges |
+| NRML | Normal carry-forward order; settles <abbr title="Trade-date Plus N settlement">T+1</abbr> (or <abbr title="Trade-date Plus N settlement">T+0</abbr> if eligible) | None within trading hours; AMO 15:45–08:59 | VaR + ELM upfront on buy; against holding on sell | Default product type |
+| MIS | Margin Intraday Square-off; auto-closed by RMS before market close | Auto-square-off typically 15:20 <abbr title="Indian Standard Time (UTC+05:30)">IST</abbr> | Leverage permitted intraday (per broker RMS policy) | Position must square off; otherwise RMS auto-squares with charges |
 | CO | Cover Order; entry order with mandatory stop-loss | Same as MIS | Reduced margin owing to capped loss via SL | SEBI restrictions on leverage apply |
 | BO | Bracket Order; entry with stop-loss and target | Same as MIS | Reduced margin owing to capped both sides | Heavily used by retail; bracket of three orders per "bracket" |
 | AMO | After-Market Order; queued for next day's pre-open | Captured 15:45 evening → 08:59 next morning; released at pre-open | Margin lock at capture; re-validated at release | Margin position may change overnight; re-validation can reject |
@@ -342,12 +342,12 @@ When an OMS issue surfaces, run through this checklist before diving into code:
 ## Sub-cases / edge cases
 
 - **Co-located OMS** — institutional shops that colocate at NSE / BSE / MCX colo (Mahape, Bandra-Kurla, etc.) run their order-routing inside the exchange's data centre. The CTCL approval still applies; latency drops from low single-digit ms to sub-millisecond. Operationally, the BOD / EOD batch flows are network-isolated and need their own connectivity plan.
-- **Multi-exchange smart-order-routing** — when a stock is dual-listed (e.g., on both NSE and BSE), the OMS may include an SOR module that splits an order across exchanges based on best-price liquidity. SOR has its own CTCL approval requirement (NSE / BSE each); the back-office must reconcile across both exchanges' trade files.
+- **Multi-exchange smart-order-routing** — when a stock is dual-listed (e.g., on both NSE and BSE), the OMS may include an <abbr title="Smart Order Routing">SOR</abbr> module that splits an order across exchanges based on best-price liquidity. SOR has its own CTCL approval requirement (NSE / BSE each); the back-office must reconcile across both exchanges' trade files.
 - **Custodian-cleared institutional flow** — the trade is executed by the broker but cleared by the institutional client's custodian (e.g., HDFC Custody Services). The OMS captures the trade with the custodian's clearing-member code; the broker's clearing flow is split between the broker's own positions and the custodian-flagged ones.
-- **API access for AP / sub-broker chains** — the broker exposes a constrained API to its authorised persons (APs) for their own client flow. The AP's orders pass through the same pre-trade pipeline but with additional `AP-ID` tagging in the audit trail.
-- **NRI flow post Sep 2025 CP-code removal** — NRI orders no longer route via CP code; direct broker-side handling replaces it ([SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/109](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir2025109)). The OMS must validate the NRI client's PIS letter, NRE / NRO bank tagging, and segment restrictions on every order.
+- **API access for <abbr title="Authorized Person">AP</abbr> / sub-broker chains** — the broker exposes a constrained API to its authorised persons (APs) for their own client flow. The AP's orders pass through the same pre-trade pipeline but with additional `AP-ID` tagging in the audit trail.
+- **<abbr title="Non-Resident Indian">NRI</abbr> flow post Sep 2025 CP-code removal** — NRI orders no longer route via CP code; direct broker-side handling replaces it ([SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/109](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir2025109)). The OMS must validate the NRI client's <abbr title="Portfolio Investment Scheme (RBI / NRI)">PIS</abbr> letter, <abbr title="Non-Resident External (Rupee) account">NRE</abbr> / <abbr title="Non-Resident Ordinary (Rupee) account">NRO</abbr> bank tagging, and segment restrictions on every order.
 - **Algo orders from in-house algos vs vendor-empanelled algos** — see the [retail algo framework deep dive](/broking-kyc/deep-dives/trading-day/retail-algo-framework/).
-- **Cross-margin orders** — orders that benefit from spread-margin offsets (correlated index / constituent pairs, calendar spreads). The RMS margin computation must apply the cross-margin rule from [NCL/CMPT/62978](/broking-kyc/reference/circulars/clearing-corps/) (same-expiry 25–30%, different-expiry 35–40% spread margins). Misapplied cross-margin is a frequent source of audit findings.
+- **Cross-margin orders** — orders that benefit from spread-margin offsets (correlated index / constituent pairs, calendar spreads). The RMS margin computation must apply the cross-margin rule from [<abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr>/CMPT/62978](/broking-kyc/reference/circulars/clearing-corps/) (same-expiry 25–30%, different-expiry 35–40% spread margins). Misapplied cross-margin is a frequent source of audit findings.
 
 ## Practical notes
 
@@ -371,8 +371,8 @@ When an OMS issue surfaces, run through this checklist before diving into code:
 - [Deep Dive: Surveillance, GSM, ASM](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/) — sibling page on the surveillance gate's rule library.
 - [Deep Dive: Retail algo framework](/broking-kyc/deep-dives/trading-day/retail-algo-framework/) — sibling page on the API and algo-specific OMS controls.
 - [Deep Dive: Block / bulk deals](/broking-kyc/deep-dives/trading-day/block-bulk-deals/) — sibling page on the dedicated-window order flow.
-- [Deep Dive: Short-delivery auction](/broking-kyc/deep-dives/trading-day/short-delivery-auction/) — sibling page on the T+2 morning auction the OMS may need to source liquidity from.
-- [Vendor Atlas — OMS / EMS / Trading Platforms](/broking-kyc/vendors/atlas/) — concrete vendor products in this category.
+- [Deep Dive: Short-delivery auction](/broking-kyc/deep-dives/trading-day/short-delivery-auction/) — sibling page on the <abbr title="Trade-date Plus N settlement">T+2</abbr> morning auction the OMS may need to source liquidity from.
+- [Vendor Atlas — OMS / <abbr title="Execution Management System">EMS</abbr> / Trading Platforms](/broking-kyc/vendors/atlas/) — concrete vendor products in this category.
 - [Vendor Atlas — Risk Management Systems](/broking-kyc/vendors/atlas/) — concrete RMS vendor products.
 - [NSE circulars](/broking-kyc/reference/circulars/nse/) — CTCL, NEAT, IBT, DMA, algo circulars referenced through the page.
 - [Clearing-corp circulars](/broking-kyc/reference/circulars/clearing-corps/) — SPAN scanrange, ELM, peak-margin spec circulars.

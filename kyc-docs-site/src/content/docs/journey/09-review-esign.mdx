@@ -13,7 +13,7 @@ import ScreenCard from '../../../components/ScreenCard.astro';
 import StatusFlow from '../../../components/StatusFlow.astro';
 import { Aside } from '@astrojs/starlight/components';
 
-This is the finish line. The customer has passed the blocking gate, and all their data is verified and ready. Now they need to do three final things: review the complete application, take a selfie for face matching against their Aadhaar photo, and sign the application digitally using an Aadhaar OTP (One-Time Password). When this screen is complete, the customer is done. They close the app and wait for their account to be activated -- typically within 24-72 hours. Everything that follows (maker-checker review, KRA submission, exchange registration, depository account opening) happens entirely in the background.
+This is the finish line. The customer has passed the blocking gate, and all their data is verified and ready. Now they need to do three final things: review the complete application, take a selfie for face matching against their Aadhaar photo, and sign the application digitally using an Aadhaar <abbr title="One-Time Password">OTP</abbr> (One-Time Password). When this screen is complete, the customer is done. They close the app and wait for their account to be activated -- typically within 24-72 hours. Everything that follows (maker-checker review, <abbr title="KYC Registration Agency">KRA</abbr> submission, exchange registration, depository account opening) happens entirely in the background.
 
 <ScreenCard number={9} title="Review + Face Match + e-Sign (Final)">
 
@@ -29,7 +29,7 @@ This screen has three distinct steps, presented sequentially. The customer canno
 Scroll-through review of the complete pre-filled application. All data from Screens 1-8 is presented in a read-only summary. User confirms everything is correct.
 
 :::note[Why a full review is required]
-The review step is not just good UX -- it is a regulatory requirement. The customer must see and confirm all the data that will be submitted to KRA (KYC Registration Agency), CKYC (Central KYC), and the exchanges before they sign. This is the "informed consent" step. If a customer later claims they did not agree to certain information in their application, the signed PDF with the review confirmation is the audit trail.
+The review step is not just good UX -- it is a regulatory requirement. The customer must see and confirm all the data that will be submitted to KRA (<abbr title="Know Your Customer (process).">KYC</abbr> Registration Agency), <abbr title="Central KYC (records registry)">CKYC</abbr> (Central KYC), and the exchanges before they sign. This is the "informed consent" step. If a customer later claims they did not agree to certain information in their application, the signed PDF with the review confirmation is the audit trail.
 :::
 
 ### Step 2: Face Match
@@ -46,33 +46,33 @@ The face match step includes a liveness check to prevent spoofing -- someone hol
 :::
 
 ### Step 3: Aadhaar OTP e-Sign
-Digital signature on the complete application PDF per IT Act 2000, Section 3A. This is the legally binding moment -- the customer's Aadhaar-authenticated signature is embedded in the PDF along with a CCA-compliant (Controller of Certifying Authorities) digital certificate.
+Digital signature on the complete application PDF per IT Act 2000, Section 3A. This is the legally binding moment -- the customer's Aadhaar-authenticated signature is embedded in the PDF along with a <abbr title="Controller of Certifying Authorities">CCA</abbr>-compliant (Controller of Certifying Authorities) digital certificate.
 
 | Parameter | Detail |
 |-----------|--------|
 | Auth mode | Aadhaar OTP |
 | Hash | SHA-256 |
-| Certificate | CCA-compliant DSC |
+| Certificate | CCA-compliant <abbr title="Digital Signature Certificate (CCA-licensed; aka Class 2/3 DSC).">DSC</abbr> |
 | Output | Signed PDF with embedded certificate |
 
 <Aside type="tip" title="IPV/VIPV: EXEMPTED">
-Aadhaar eKYC (DigiLocker) was used on Screen 3. No video call needed per SEBI circular [SEBI/HO/MIRSD/DOP/CIR/P/2020/73](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddopcirp202073).
+Aadhaar eKYC (DigiLocker) was used on Screen 3. No video call needed per <abbr title="Securities and Exchange Board of India">SEBI</abbr> circular [SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/DOP/CIR/P/2020/73](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddopcirp202073).
 </Aside>
 
 ---
 
 ## VIPV Fallback Scenarios
 
-VIPV (Video In-Person Verification) is normally not needed in this flow because DigiLocker provides the IPV (In-Person Verification) exemption. However, there are two scenarios where it becomes necessary:
+<abbr title="Video In-Person Verification (sometimes &quot;Video CIP&quot; / V-CIP)">VIPV</abbr> (Video In-Person Verification) is normally not needed in this flow because DigiLocker provides the <abbr title="In-Person Verification">IPV</abbr> (In-Person Verification) exemption. However, there are two scenarios where it becomes necessary:
 
 1. The user opted out of nominations on Screen 7 and needs a video declaration
 2. DigiLocker was unavailable and manual Aadhaar verification was used, which does not qualify for the IPV exemption
 
-In these cases, a SEBI VIPV-compliant and RBI V-CIP-compliant video verification must be conducted. The video recording must be stored for the period mandated by SEBI regulations.
+In these cases, a SEBI VIPV-compliant and <abbr title="Reserve Bank of India">RBI</abbr> V-CIP-compliant video verification must be conducted. The video recording must be stored for the period mandated by SEBI regulations.
 
 ## OCR Fallback
 
-In rare cases where the DigiLocker flow was not used (e.g., DigiLocker downtime), document OCR (Optical Character Recognition) becomes necessary as a fallback for identity verification. The OCR service must support PAN, Aadhaar, Passport, Voter ID, Driving Licence, and cheque documents with tampering detection capabilities.
+In rare cases where the DigiLocker flow was not used (e.g., DigiLocker downtime), document <abbr title="Optical Character Recognition.">OCR</abbr> (Optical Character Recognition) becomes necessary as a fallback for identity verification. The OCR service must support <abbr title="Permanent Account Number">PAN</abbr>, Aadhaar, Passport, Voter ID, Driving Licence, and cheque documents with tampering detection capabilities.
 
 For vendor implementation options for eSign, face match, VIPV, and OCR, see [Vendor Integrations](/broking-kyc/vendors/).
 
@@ -84,7 +84,7 @@ The customer's part of the journey is complete. But the system's work is just be
 
 :::note[User Is Done -- Backend Takes Over]
 After e-Sign, the application enters **maker-checker review**. Once the checker approves, parallel batch pipelines fire:
-KRA (2-3 days), CKYC (4-5 days), NSE/BSE/MCX (same day), CDSL (1-2 hrs), NSDL (~15 days), Income (1-2 hrs if F&O).
+KRA (2-3 days), CKYC (4-5 days), <abbr title="National Stock Exchange of India">NSE</abbr>/<abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr>/<abbr title="Multi Commodity Exchange of India">MCX</abbr> (same day), <abbr title="Central Depository Services (India) Limited">CDSL</abbr> (1-2 hrs), <abbr title="National Securities Depository Limited">NSDL</abbr> (~15 days), Income (1-2 hrs if F&O).
 
 Full pipeline spec: [Batch Pipeline](/broking-kyc/operations/batch-pipeline/)
 :::

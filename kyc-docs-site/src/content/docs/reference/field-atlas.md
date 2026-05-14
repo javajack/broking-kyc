@@ -3,7 +3,7 @@ title: Field-level Data Flow Atlas
 description: "Bidirectional mapping of every KYC field to its downstream destinations — KRA, CKYC, exchange UCC, depository BO, back-office, RMS, contract notes, regulatory reports, DLT comms, FATCA/CRS, AML/FIU. Browse by section (field-first view) or by destination (system-first view). Includes downloadable master CSV."
 ---
 
-> **Who reads this section?** Backend engineers building an integration with a specific destination (NSE UCC, NSDL BO, FIU-IND, etc.). Product / compliance readers tracing where each onboarded field ends up. Vendors checking which fields flow through their touchpoint. New to the site? Try [Choose Your Role](/broking-kyc/personas/) first.
+> **Who reads this section?** Backend engineers building an integration with a specific destination (<abbr title="National Stock Exchange of India">NSE</abbr> <abbr title="Unique Client Code">UCC</abbr>, <abbr title="National Securities Depository Limited">NSDL</abbr> <abbr title="Beneficial Owner">BO</abbr>, <abbr title="Financial Intelligence Unit — India">FIU-IND</abbr>, etc.). Product / compliance readers tracing where each onboarded field ends up. Vendors checking which fields flow through their touchpoint. New to the site? Try [Choose Your Role](/broking-kyc/personas/) first.
 
 Two views on the same dataset. Engineers building an integration with a specific destination land here, scan the destination sub-pages, and pull the master CSV for programmatic use. Product / compliance readers scan the per-section sub-pages to see where each onboarded field ends up.
 
@@ -19,7 +19,7 @@ Two views on the same dataset. Engineers building an integration with a specific
 
 Every field captured during onboarding (or generated during operations) ends up in multiple downstream systems with potentially different field names, formats, lengths, and update frequencies. This atlas maps those flows explicitly. The per-section view (below) groups by where the field is captured; the per-destination view groups by where it is consumed. The [Master Dataset](/broking-kyc/reference/master-dataset/) is the canonical source for field definitions; this atlas adds the downstream picture.
 
-Some rows use **bracket pseudo-sections** like `[trade]`, `[margin]`, `[dmf]` for fields that are computed or generated at operations time (not captured during onboarding) and therefore have no home in the KYC-oriented master-dataset's A–AC sections.
+Some rows use **bracket pseudo-sections** like `[trade]`, `[margin]`, `[dmf]` for fields that are computed or generated at operations time (not captured during onboarding) and therefore have no home in the <abbr title="Know Your Customer (process).">KYC</abbr>-oriented master-dataset's A–AC sections.
 
 ## Browse by section (field-first)
 
@@ -52,7 +52,7 @@ Sections A through AC follow the [Master Dataset](/broking-kyc/reference/master-
 | X | 20 | [X](./field-atlas/sections/x-margin-pledge/) |
 | Y | 25 | [Y](./field-atlas/sections/y-account-lifecycle/) |
 | Z | 19 | [Z](./field-atlas/sections/z-audit-trail/) |
-| AA | 13 | [AA](./field-atlas/sections/aa-dpdp-consent/) |
+| <abbr title="Account Aggregator (RBI-licensed NBFC-AA)">AA</abbr> | 13 | [AA](./field-atlas/sections/aa-dpdp-consent/) |
 | AB | 17 | [AB](./field-atlas/sections/ab-communication-preferences/) |
 | AC | 11 | [AC](./field-atlas/sections/ac-running-account-settlement/) |
 | [cfr] | 7 | [[cfr]](./field-atlas/sections/computed-cfr/) |
@@ -73,25 +73,25 @@ Each destination's page shows the fields it consumes with format / frequency / q
 | Destination | Field-destination rows | Page |
 | --- | --- | --- |
 | Back-office (vendor-neutral) | 260 | [back-office](./field-atlas/destinations/back-office/) |
-| KRA (Identity Registry) | 124 | [kra](./field-atlas/destinations/kra/) |
-| CKYC (Central KYC Registry) | 122 | [ckyc](./field-atlas/destinations/ckyc/) |
-| CDSL BO Opening | 108 | [cdsl-bo](./field-atlas/destinations/cdsl-bo/) |
+| <abbr title="KYC Registration Agency">KRA</abbr> (Identity Registry) | 124 | [kra](./field-atlas/destinations/kra/) |
+| <abbr title="Central KYC (records registry)">CKYC</abbr> (Central KYC Registry) | 122 | [ckyc](./field-atlas/destinations/ckyc/) |
+| <abbr title="Central Depository Services (India) Limited">CDSL</abbr> BO Opening | 108 | [cdsl-bo](./field-atlas/destinations/cdsl-bo/) |
 | NSDL BO Opening | 108 | [nsdl-bo](./field-atlas/destinations/nsdl-bo/) |
-| BSE UCC | 86 | [bse-ucc](./field-atlas/destinations/bse-ucc/) |
-| MCX UCC | 86 | [mcx-ucc](./field-atlas/destinations/mcx-ucc/) |
+| <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> UCC | 86 | [bse-ucc](./field-atlas/destinations/bse-ucc/) |
+| <abbr title="Multi Commodity Exchange of India">MCX</abbr> UCC | 86 | [mcx-ucc](./field-atlas/destinations/mcx-ucc/) |
 | NSE UCC | 86 | [nse-ucc](./field-atlas/destinations/nse-ucc/) |
-| Contract Notes / ECN | 81 | [contract-notes](./field-atlas/destinations/contract-notes/) |
-| RMS (Risk Management System) | 72 | [rms](./field-atlas/destinations/rms/) |
-| Regulatory Reports (DMF / CFR / Peak Margin) | 67 | [regulatory-reports](./field-atlas/destinations/regulatory-reports/) |
-| AML Reports to FIU-IND | 55 | [aml-fiu](./field-atlas/destinations/aml-fiu/) |
-| FATCA / CRS Reports | 33 | [fatca-crs](./field-atlas/destinations/fatca-crs/) |
-| DLT Comms (SMS / Email) | 26 | [dlt-comms](./field-atlas/destinations/dlt-comms/) |
+| Contract Notes / <abbr title="Electronic Contract Note.">ECN</abbr> | 81 | [contract-notes](./field-atlas/destinations/contract-notes/) |
+| <abbr title="Risk Management System">RMS</abbr> (Risk Management System) | 72 | [rms](./field-atlas/destinations/rms/) |
+| Regulatory Reports (DMF / <abbr title="Client Funding Report.">CFR</abbr> / Peak Margin) | 67 | [regulatory-reports](./field-atlas/destinations/regulatory-reports/) |
+| <abbr title="Anti-Money Laundering">AML</abbr> Reports to <abbr title="Financial Intelligence Unit">FIU</abbr>-IND | 55 | [aml-fiu](./field-atlas/destinations/aml-fiu/) |
+| <abbr title="Foreign Account Tax Compliance Act (US)">FATCA</abbr> / <abbr title="Common Reporting Standard">CRS</abbr> Reports | 33 | [fatca-crs](./field-atlas/destinations/fatca-crs/) |
+| DLT Comms (<abbr title="Short Message Service.">SMS</abbr> / Email) | 26 | [dlt-comms](./field-atlas/destinations/dlt-comms/) |
 
 ## Practical notes
 
 - **[industry practice]** For any integration build, start at the destination sub-page — it lists every field the destination needs, its format, and its quirks. Then map back to the master-dataset to confirm source fields exist.
 - **[gotcha]** Same field can have different names at different destinations (`PAN` at KRA, `PAN_NO` at NSE UCC, `pan_number` in back-office). The `destination_field_name` column is the destination's literal name; the `field_id` is the source canonical ID.
-- **[cost optimization]** Use the master CSV programmatically for impact analysis: `grep -E '"A-pan_number"' field-atlas-master.csv` lists every destination that consumes PAN.
+- **[cost optimization]** Use the master CSV programmatically for impact analysis: `grep -E '"A-pan_number"' field-atlas-master.csv` lists every destination that consumes <abbr title="Permanent Account Number">PAN</abbr>.
 - **[risk trade-off]** Rows tagged `[industry typical]` are best-guess descriptions of vendor-specific behavior; they're useful for design but require vendor confirmation before production use.
 - **[industry practice]** Bracket pseudo-sections (`[trade]`, `[margin]`, `[dmf]`, etc.) cover computed or operations-generated fields that don't exist at KYC onboarding time. The Field Atlas covers them; the master-dataset doesn't.
 

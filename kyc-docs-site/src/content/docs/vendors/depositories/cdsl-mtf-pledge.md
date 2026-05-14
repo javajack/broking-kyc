@@ -3,7 +3,7 @@ title: CDSL MTF & Pledge Operations
 description: Margin pledge, re-pledge, MTF funding, eLAS, pledge invocation, automated pledge release, CUSPA accounts, and pledge file formats.
 ---
 
-In India's securities market, when a client wants to use their existing shares as collateral for trading, they do not hand over the shares to their broker. Instead, a "pledge" is created — a lien recorded in the depository system that says "these shares belong to the client, but the broker has a claim on them for margin purposes." This mechanism, introduced by SEBI (Securities and Exchange Board of India) in 2020, replaced the older and riskier practice of physically transferring shares to the broker's account. As an engineer building or maintaining a broking platform, you will implement pledge creation, re-pledge to clearing corporations, unpledge flows, and the newer automated pledge mechanisms. This page covers the full lifecycle of pledge operations in CDSL (Central Depository Services Limited), including MTF (Margin Trading Facility) pledges, eLAS (Electronic Loan Against Shares), and the tag-based file formats you will work with.
+In India's securities market, when a client wants to use their existing shares as collateral for trading, they do not hand over the shares to their broker. Instead, a "pledge" is created — a lien recorded in the depository system that says "these shares belong to the client, but the broker has a claim on them for margin purposes." This mechanism, introduced by <abbr title="Securities and Exchange Board of India">SEBI</abbr> (Securities and Exchange Board of India) in 2020, replaced the older and riskier practice of physically transferring shares to the broker's account. As an engineer building or maintaining a broking platform, you will implement pledge creation, re-pledge to clearing corporations, unpledge flows, and the newer automated pledge mechanisms. This page covers the full lifecycle of pledge operations in <abbr title="Central Depository Services (India) Limited">CDSL</abbr> (Central Depository Services Limited), including <abbr title="Margin Trading Facility">MTF</abbr> (Margin Trading Facility) pledges, eLAS (Electronic Loan Against Shares), and the tag-based file formats you will work with.
 
 > Back to [CDSL Overview](/broking-kyc/vendors/depositories/cdsl/)
 
@@ -19,9 +19,9 @@ The margin pledge framework was introduced by SEBI to eliminate the older title-
 
 | Circular | Date | Subject |
 |----------|------|---------|
-| [SEBI/HO/MIRSD/DOP/CIR/P/2020/28](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddopcirp202028) | Feb 25, 2020 | Margin obligations by way of Pledge/Re-pledge in Depository System |
+| [SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/DOP/CIR/P/2020/28](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddopcirp202028) | Feb 25, 2020 | Margin obligations by way of Pledge/Re-pledge in Depository System |
 | SEBI/HO/MIRSD/DOP/CIR/P/2020/88 | Jun 1, 2020 | Extension of timeline to August 1, 2020 |
-| CDSL Communique DP-234 | May 22, 2020 | Operational modalities and file formats for margin pledge/re-pledge |
+| CDSL Communique <abbr title="Depository Participant">DP</abbr>-234 | May 22, 2020 | Operational modalities and file formats for margin pledge/re-pledge |
 | CDSL Communique DP-412 | August 2020 | Margin Pledge/Re-Pledge implementation |
 | CDSL/OPS/DP/POLCY/2024/314 | Jun 7, 2024 | Revised file format with mandatory rejection reason code field |
 | SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/82 | Jun 3, 2025 | Automated pledge release + invocation mechanism |
@@ -63,7 +63,7 @@ Now that you know the regulatory basis, the next step is understanding the archi
 
 **Key Principle**: Securities NEVER leave the client's demat account. Only pledge liens are created in the depository system, maintaining full audit trail. Client continues to receive dividends, bonuses, and other corporate action benefits.
 
-In plain English: the diagram above shows a two-hop chain. The client pledges to the broker's CUSPA (Client Securities Margin Pledge Account), and the broker then re-pledges to the CC (Clearing Corporation). The CC is the one that actually grants margin credit. Your system needs to manage both hops.
+In plain English: the diagram above shows a two-hop chain. The client pledges to the broker's <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr> (Client Securities Margin Pledge Account), and the broker then re-pledges to the <abbr title="Clearing Corporation (NCL, ICCL, MCXCCL — context-dependent).">CC</abbr> (Clearing Corporation). The CC is the one that actually grants margin credit. Your system needs to manage both hops.
 
 :::note[Why two hops?]
 You might wonder why the client does not pledge directly to the clearing corporation. The answer is that the broker is the intermediary — the CC (Clearing Corporation) only deals with its clearing members (the broker), not with individual clients. The broker aggregates margin from multiple clients and presents it to the CC. This two-hop design also lets the broker track which client's securities back which margin obligation.
@@ -75,14 +75,14 @@ CDSL supports three distinct types of pledges, each serving a different business
 
 ## 3. Three Types of Pledges in CDSL
 
-| Pledge Type | Purpose | Pledgor --> Pledgee | OTP Required |
+| Pledge Type | Purpose | Pledgor --> Pledgee | <abbr title="One-Time Password">OTP</abbr> Required |
 |-------------|---------|---------------------|--------------|
 | **Normal Pledge** | Loan Against Shares (eLAS) | Client --> NBFC/Bank | Yes (TPIN+OTP) |
-| **Margin Pledge** | Margin collateral for trading | Client --> TM/CM CUSPA | Yes (TPIN+OTP) or DDPI (Demat Debit and Pledge Instruction) |
+| **Margin Pledge** | Margin collateral for trading | Client --> <abbr title="Trading Member">TM</abbr>/<abbr title="Clearing Member">CM</abbr> CUSPA | Yes (TPIN+OTP) or <abbr title="Demat Debit and Pledge Instruction">DDPI</abbr> (Demat Debit and Pledge Instruction) |
 | **MTF Pledge** | Margin Trading Facility funding | Client --> TM/CM Funding Account | Yes (TPIN+OTP) or DDPI |
 
 :::tip[DDPI changes the client experience]
-For margin and MTF pledges, if the client has activated DDPI, the pledge happens automatically without any action from the client. Without DDPI, the client receives an SMS/email link from CDSL and must enter their TPIN (Transaction PIN) and OTP (One-Time Password) to authorize each pledge. This is why DDPI activation during onboarding directly impacts the pledge flow's user experience.
+For margin and MTF pledges, if the client has activated DDPI, the pledge happens automatically without any action from the client. Without DDPI, the client receives an <abbr title="Short Message Service.">SMS</abbr>/email link from CDSL and must enter their TPIN (Transaction PIN) and OTP (One-Time Password) to authorize each pledge. This is why DDPI activation during onboarding directly impacts the pledge flow's user experience.
 :::
 
 ---
@@ -193,12 +193,12 @@ Step 7: Once pledged, broker re-pledges to CC for margin benefit
 ```
 
 :::caution[The T+3 deadline is hard]
-If a client buys shares on MTF and does not accept the pledge by T+3 at 5:00 PM, the broker is required by SEBI to square off the position on T+4. This is not optional — it is a regulatory mandate. Your system must track pending MTF pledge acceptances and trigger alerts well before the deadline. Build escalation notifications at T+1, T+2, and T+3 morning to give the client every opportunity to accept.
+If a client buys shares on MTF and does not accept the pledge by T+3 at 5:00 PM, the broker is required by SEBI to square off the position on T+4. This is not optional — it is a regulatory mandate. Your system must track pending MTF pledge acceptances and trigger alerts well before the deadline. Build escalation notifications at <abbr title="Trade-date Plus N settlement">T+1</abbr>, <abbr title="Trade-date Plus N settlement">T+2</abbr>, and T+3 morning to give the client every opportunity to accept.
 :::
 
 ---
 
-Having understood the business flows, it is time to look at the file format used to submit pledge transactions to CDSL. Unlike the BO (Beneficiary Owner) Setup files which use a fixed-length positional format, pledge transactions use a tag-based XML-like format. This section is your reference for building the file generation logic.
+Having understood the business flows, it is time to look at the file format used to submit pledge transactions to CDSL. Unlike the <abbr title="Beneficial Owner">BO</abbr> (Beneficiary Owner) Setup files which use a fixed-length positional format, pledge transactions use a tag-based XML-like format. This section is your reference for building the file generation logic.
 
 ## 6. CDSL Pledge File Format (Tag-Based)
 
@@ -228,7 +228,7 @@ Pledge transactions use the **tag-based** Common Upload format (not positional).
 |-----|-------|-------------|
 | `<MrgPldgTp>` | Margin Pledge Type | `MP`=Margin Pledge, `MRP`=Margin Re-pledge, `MFP`=MTF Pledge |
 | `<CMID>` | Clearing Member ID | For re-pledge to CC |
-| `<ExchCd>` | Exchange Code | NSE/BSE/MCX |
+| `<ExchCd>` | Exchange Code | <abbr title="National Stock Exchange of India">NSE</abbr>/<abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr>/<abbr title="Multi Commodity Exchange of India">MCX</abbr> |
 | `<SegCd>` | Segment Code | CM/FO/CD/COM |
 
 In plain English: the `<MrgPldgTp>` tag is how CDSL distinguishes between a regular margin pledge (`MP`), a re-pledge from broker to clearing corporation (`MRP`), and an MTF pledge (`MFP`). Getting this tag wrong will cause your transaction to be rejected or, worse, processed against the wrong account type.
@@ -323,9 +323,9 @@ SEBI circular SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/82 introduced three new automat
 | **Trigger** | Client sells securities that are currently pledged (margin/CUSPA/MTF) |
 | **Old Process** | Manual: Client unpledges, waits, then sells. Short delivery risk. |
 | **New Process** | Automated single instruction: Pledge release + Early pay-in block simultaneously |
-| **Key Feature** | Does NOT require DDPI/POA or any electronic/physical instruction from client |
+| **Key Feature** | Does NOT require DDPI/<abbr title="Power of Attorney">POA</abbr> or any electronic/physical instruction from client |
 | **Validation** | Based on confirmed delivery obligation data from Clearing Corporation |
-| **Effective Date** | October 10, 2025 (extended from September 1, 2025 after CDSL/NSDL representations) |
+| **Effective Date** | October 10, 2025 (extended from September 1, 2025 after CDSL/<abbr title="National Securities Depository Limited">NSDL</abbr> representations) |
 
 :::tip[PR-EP simplifies your settlement flow]
 Before PR-EP, your system had to orchestrate a multi-step dance: check if shares are pledged, trigger unpledge, wait for unpledge confirmation, then proceed with settlement delivery. With PR-EP, a single automated instruction handles both the pledge release and the early pay-in block. This significantly reduces short delivery risk and simplifies your settlement logic. If you are building a new system, design for PR-EP from the start.
@@ -350,7 +350,7 @@ Before PR-EP, your system had to orchestrate a multi-step dance: check if shares
 
 ---
 
-For day-to-day integration work, you will interact with CDSL's pledge operations through a set of APIs. The table below summarizes the key endpoints. All pledge APIs require authentication via API Key and DSC (Digital Signature Certificate).
+For day-to-day integration work, you will interact with CDSL's pledge operations through a set of APIs. The table below summarizes the key endpoints. All pledge APIs require authentication via API Key and <abbr title="Digital Signature Certificate (CCA-licensed; aka Class 2/3 DSC).">DSC</abbr> (Digital Signature Certificate).
 
 ## 9. Pledge APIs Summary
 
@@ -376,16 +376,16 @@ When securities are pledged as margin, the Clearing Corporation applies a haircu
 
 | Security Category | Typical Haircut | Margin Benefit (on Rs. 1 lakh pledged) |
 |-------------------|-----------------|----------------------------------------|
-| Group I (Large Cap, liquid) | VaR (8-15%) + ELM (3.5%) | Rs. 81,500 - Rs. 88,500 |
-| Group II (Mid Cap) | VaR (15-30%) + ELM (5%) | Rs. 65,000 - Rs. 80,000 |
-| Group III (Small Cap) | VaR (30-50%) + ELM (5%) | Rs. 45,000 - Rs. 65,000 |
+| Group I (Large Cap, liquid) | VaR (8-15%) + <abbr title="Extreme Loss Margin">ELM</abbr> (3.5%) | Rs. 81,500 - Rs. 88,500 |
+| Group <abbr title="—">II</abbr> (Mid Cap) | VaR (15-30%) + ELM (5%) | Rs. 65,000 - Rs. 80,000 |
+| Group <abbr title="—">III</abbr> (Small Cap) | VaR (30-50%) + ELM (5%) | Rs. 45,000 - Rs. 65,000 |
 | ETFs / Liquid Bees | 5-10% | Rs. 90,000 - Rs. 95,000 |
 | Sovereign Gold Bonds | 10-15% | Rs. 85,000 - Rs. 90,000 |
 
 In plain English: VaR (Value at Risk) measures how much a security's price might drop in a worst-case scenario, and ELM (Extreme Loss Margin) is an additional buffer. A Group I large-cap stock with a combined haircut of 15% means that pledging Rs. 1 lakh of that stock gives you only Rs. 85,000 of margin credit.
 
 :::note
-Actual haircuts are published daily by Clearing Corporations (NSCCL/ICCL). These are indicative ranges.
+Actual haircuts are published daily by Clearing Corporations (<abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NSCCL</abbr>/<abbr title="Indian Clearing Corporation Limited">ICCL</abbr>). These are indicative ranges.
 :::
 
 ---
@@ -400,7 +400,7 @@ The broker needs a special demat account to receive pledge liens from clients. T
 | **Who Opens** | Broker (TM/CM) opens with CDSL |
 | **Tag** | "TMCM - Client Securities Margin Pledge Account" |
 | **Purpose** | Holds pledge liens from clients who have given DDPI/POA (Power of Attorney) |
-| **AMC** | Rs. 500/year (charged by CDSL to DP (Depository Participant)) |
+| **<abbr title="Asset Management Company (mutual funds context) / Annual Maintenance Charges (depository context).">AMC</abbr>** | Rs. 500/year (charged by CDSL to DP (Depository Participant)) |
 | **Separate from** | Broker's proprietary account (sub-status 30/31/32) |
 | **Visibility** | Client can see pledge status via easi/EASIEST/myEasi |
 | **SEBI Mandate** | Every TM/CM must open CUSPA for collecting client securities as margin |

@@ -5,7 +5,7 @@ description: Every state an application can be in — from the first mobile OTP 
 
 import Diagram from '../../../components/Diagram.astro';
 
-Every application in the KYC (Know Your Customer) system has a status -- a single value that tells you exactly where it stands in the pipeline. If a customer calls asking "when can I trade?", the status is the first thing you look up. If a batch pipeline fails, the status tells you which applications are stuck and where. If a compliance audit asks "how many applications are pending review?", the status gives you the answer. This page documents all 12 possible states, the transitions between them, and the triggers that cause each transition. Think of it as the state machine that governs the entire application lifecycle.
+Every application in the <abbr title="Know Your Customer (process).">KYC</abbr> (Know Your Customer) system has a status -- a single value that tells you exactly where it stands in the pipeline. If a customer calls asking "when can I trade?", the status is the first thing you look up. If a batch pipeline fails, the status tells you which applications are stuck and where. If a compliance audit asks "how many applications are pending review?", the status gives you the answer. This page documents all 12 possible states, the transitions between them, and the triggers that cause each transition. Think of it as the state machine that governs the entire application lifecycle.
 
 <Diagram src="/diagrams/04-status-lifecycle.svg" label="12-State Application Lifecycle — Registration to Trading" />
 
@@ -29,8 +29,8 @@ The table below is the definitive reference for every status transition. Each ro
 
 | From | To | Trigger |
 |------|----|---------|
-| -- | REGISTERED | Mobile OTP (One-Time Password) verified (Screen 1 complete) |
-| REGISTERED | PAN_ENTERED | PAN (Permanent Account Number) + DOB (Date of Birth) submitted (Screen 2), async checks fire |
+| -- | REGISTERED | Mobile <abbr title="One-Time Password">OTP</abbr> (One-Time Password) verified (Screen 1 complete) |
+| REGISTERED | PAN_ENTERED | <abbr title="Permanent Account Number">PAN</abbr> (Permanent Account Number) + DOB (Date of Birth) submitted (Screen 2), async checks fire |
 | PAN_ENTERED | DIGILOCKER_PENDING | Redirected to DigiLocker (Government of India's digital document platform) (Screen 3) |
 | DIGILOCKER_PENDING | FILLING | DigiLocker consent complete, data harvested |
 | DIGILOCKER_PENDING | PAN_ENTERED | DigiLocker cancelled (retry) |
@@ -42,7 +42,7 @@ The table below is the definitive reference for every status transition. Each ro
 | UNDER_REVIEW | APPROVED | Checker approval (after maker review) |
 | UNDER_REVIEW | REJECTED | Checker rejection |
 | REJECTED | FILLING | User resubmits with corrections |
-| APPROVED | REGISTERING | Batch pipelines fire (KRA, CKYC, UCC, BO) |
+| APPROVED | REGISTERING | Batch pipelines fire (<abbr title="KYC Registration Agency">KRA</abbr>, <abbr title="Central KYC (records registry)">CKYC</abbr>, <abbr title="Unique Client Code">UCC</abbr>, <abbr title="Beneficial Owner">BO</abbr>) |
 | REGISTERING | ACTIVE | KRA Registered + UCC Approved + BO Active |
 
 :::tip[The two retry loops]
@@ -56,7 +56,7 @@ Each status belongs to one of four phases. Knowing the phase helps you quickly u
 | Status | Phase | Description |
 |--------|-------|-------------|
 | REGISTERED | User Journey | Mobile verified, PAN not yet entered |
-| PAN_ENTERED | User Journey | Async checks (PAN, KRA, CKYC, AML) in flight |
+| PAN_ENTERED | User Journey | Async checks (PAN, KRA, CKYC, <abbr title="Anti-Money Laundering">AML</abbr>) in flight |
 | DIGILOCKER_PENDING | User Journey | Waiting for DigiLocker consent redirect |
 | FILLING | User Journey | User completing Screens 4-8 |
 | GATE_CHECK | User Journey | Blocking gate evaluation (Screen 8) |
@@ -69,7 +69,7 @@ Each status belongs to one of four phases. Knowing the phase helps you quickly u
 | ACTIVE | Complete | All gates passed -- can trade |
 
 :::caution[REGISTERING can take days]
-The REGISTERING state is not instantaneous. It can last anywhere from a few hours (if CDSL is the primary depository) to 15+ days (if NSDL processing is involved). The admin dashboard should show a sub-status breakdown for REGISTERING applications -- which pipelines have completed and which are still pending. See the [Batch Pipeline](/broking-kyc/operations/batch-pipeline/) documentation for individual pipeline timelines.
+The REGISTERING state is not instantaneous. It can last anywhere from a few hours (if <abbr title="Central Depository Services (India) Limited">CDSL</abbr> is the primary depository) to 15+ days (if <abbr title="National Securities Depository Limited">NSDL</abbr> processing is involved). The admin dashboard should show a sub-status breakdown for REGISTERING applications -- which pipelines have completed and which are still pending. See the [Batch Pipeline](/broking-kyc/operations/batch-pipeline/) documentation for individual pipeline timelines.
 :::
 
 The blocking gate at Screen 8 is the most common point where applications get stuck. The table below shows each check and what the system requires before allowing the application to proceed to eSign.
@@ -82,7 +82,7 @@ The gate evaluates these checks before allowing e-Sign:
 |-------|----------------|--------|
 | PAN verification | Status = E (valid) | PAN verification API |
 | PAN-Aadhaar linkage | Linked | PAN verification API |
-| AML (Anti-Money Laundering) / PEP (Politically Exposed Person) screening | Completed (any result) | AML screening service |
+| AML (Anti-Money Laundering) / <abbr title="Politically Exposed Person">PEP</abbr> (Politically Exposed Person) screening | Completed (any result) | AML screening service |
 | Bank verification | Penny drop complete | Bank verification API |
 | DigiLocker consent | Data harvested | DigiLocker |
 

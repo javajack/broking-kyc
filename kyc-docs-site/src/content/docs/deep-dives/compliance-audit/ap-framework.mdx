@@ -5,16 +5,16 @@ description: Walkthrough and reference for the Authorised Person framework — A
 
 import { Aside } from '@astrojs/starlight/components';
 
-> **Why this page is structured this way:** Authorised Persons (APs) replaced sub-brokers in 2018-2019 as the SEBI-permitted distribution channel for brokers. The supervisory framework evolved across multiple NSE/COMP circulars (2009 → 2024). The page first explains the regulatory chain, then maps the registration / onboarding / supervision / termination lifecycle, then practical operational considerations including AMC, penalty matrix, and incident reporting.
+> **Why this page is structured this way:** Authorised Persons (APs) replaced sub-brokers in 2018-2019 as the <abbr title="Securities and Exchange Board of India">SEBI</abbr>-permitted distribution channel for brokers. The supervisory framework evolved across multiple <abbr title="National Stock Exchange of India">NSE</abbr>/COMP circulars (2009 → 2024). The page first explains the regulatory chain, then maps the registration / onboarding / supervision / termination lifecycle, then practical operational considerations including <abbr title="Asset Management Company (mutual funds context) / Annual Maintenance Charges (depository context).">AMC</abbr>, penalty matrix, and incident reporting.
 
 ## TL;DR
 
 - **Regulatory chain:**
-  - **2009** — SEBI MIRSD/DR-1/Cir-16/09 (6 November 2009) — Foundational framework for "market access through Authorised Persons" replacing the sub-broker concept
-  - **`NSE/COMP/48536`** (9 June 2021) — Foundational NSE COMP-department circular operationalising the SEBI 2009 framework — AP role, prohibitions, supervisory obligations
+  - **2009** — SEBI <abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/DR-1/Cir-16/09 (6 November 2009) — Foundational framework for "market access through Authorised Persons" replacing the sub-broker concept
+  - **`NSE/COMP/48536`** (9 June 2021) — Foundational NSE COMP-department circular operationalising the SEBI 2009 framework — <abbr title="Authorized Person">AP</abbr> role, prohibitions, supervisory obligations
   - **`NSE/COMP/49509`** — Update
   - **`NSE/COMP/50030`** — Update
-  - **`NSE/COMP/55716`** (22 Feb 2023) — Restriction on use of certain words (Bank, Investment, Wealth) by TM / Authorised Person
+  - **`NSE/COMP/55716`** (22 Feb 2023) — Restriction on use of certain words (Bank, Investment, Wealth) by <abbr title="Trading Member">TM</abbr> / Authorised Person
   - **`NSE/COMP/56947`** (2 Jun 2023) — Strengthens AP supervisory framework — incident reporting, terminal monitoring, AMC framework
   - **`NSE/COMP/58438`** (18 Sep 2023) — Operationalises identification and removal of inactive AP terminals
   - **`NSE/COMP/60859`** (26 Feb 2024) — Annual Maintenance Charge (AMC) of Rs 5,000 per AP per year from FY 2024-25
@@ -50,14 +50,14 @@ The NSE COMP-department circular chain (`NSE/COMP/48536` → `49509` → `50030`
 
 - Individual (typically with required NISM certification)
 - Partnership firm (with at least one NISM-certified partner)
-- Limited Liability Partnership (LLP)
+- Limited Liability Partnership (<abbr title="—">LLP</abbr>)
 - Body corporate (with required NISM-certified person)
 - Cooperative society (with restrictions)
 
 ### 1.2 AP can do
 
 - Refer prospective clients to the broker
-- Distribute broker's products (broking, MTF, DP services, mutual fund distribution if registered separately, etc.)
+- Distribute broker's products (broking, <abbr title="Margin Trading Facility">MTF</abbr>, <abbr title="Depository Participant">DP</abbr> services, mutual fund distribution if registered separately, etc.)
 - Provide investor education (within SEBI / exchange permissible limits)
 - Communicate with clients on broker's behalf within prescribed limits
 - Operate broker-provided terminal at AP's office (with mandatory broker-side controls per `NSE/COMP/56947`)
@@ -67,8 +67,8 @@ The NSE COMP-department circular chain (`NSE/COMP/48536` → `49509` → `50030`
 
 - Accept funds or securities from clients (per `NSE/COMP/48536` foundational restriction)
 - Operate any kind of client account (bank / demat / trading)
-- Provide investment advisory unless separately registered under SEBI IA Regulations
-- Conduct PMS-like activities
+- Provide investment advisory unless separately registered under SEBI <abbr title="Investment Adviser">IA</abbr> Regulations
+- Conduct <abbr title="Portfolio Management Services">PMS</abbr>-like activities
 - Operate off-market schemes
 - Issue assured return / guaranteed profit communications
 - Use restricted words in firm name (per `NSE/COMP/55716` — "Bank", "Investment", "Wealth", "Asset Management")
@@ -90,9 +90,9 @@ The NSE COMP-department circular chain (`NSE/COMP/48536` → `49509` → `50030`
 ### 2.1 Pre-requisites for AP applicant
 
 - Application form per exchange-specified format
-- PAN of AP entity (individual / firm / LLP / body corporate)
+- <abbr title="Permanent Account Number">PAN</abbr> of AP entity (individual / firm / LLP / body corporate)
 - Proof of existence (incorporation certificate, partnership deed, etc.)
-- KYC documents (address proof, identity proof)
+- <abbr title="Know Your Customer (process).">KYC</abbr> documents (address proof, identity proof)
 - Education / experience documents (typically minimum 12th standard for individuals, 5+ years experience preferred)
 - NISM Series-VIII (Equity Derivatives) or relevant NISM certification for the designated person
 - No conflict-of-interest declaration with other brokers
@@ -103,7 +103,7 @@ The NSE COMP-department circular chain (`NSE/COMP/48536` → `49509` → `50030`
 
 - AP applies through the principal broker (the broker is the applicant on AP's behalf)
 - Broker conducts due diligence
-- Application uploaded to NSE / BSE / MCX AP registration portal
+- Application uploaded to NSE / <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> / <abbr title="Multi Commodity Exchange of India">MCX</abbr> AP registration portal
 - Exchange reviews — typically 15-30 working days
 - Approved APs receive registration number
 
@@ -426,7 +426,7 @@ Per `NSE/INSP/53530` (Enforcement Actions) penalty grid as applicable to AP-rela
 - Material AP-led fraud requires:
   - Immediate AP termination
   - Internal investigation report
-  - FIU-IND STR (if money-laundering pattern)
+  - <abbr title="Financial Intelligence Unit — India">FIU-IND</abbr> <abbr title="Suspicious Transaction Report">STR</abbr> (if money-laundering pattern)
   - SEBI intimation
   - Exchange intimation
   - Client compensation (broker primary liability)
@@ -436,7 +436,7 @@ Per `NSE/INSP/53530` (Enforcement Actions) penalty grid as applicable to AP-rela
 
 ### 11.6 AP-tagged trades requiring complaint resolution
 
-- AP-related complaints route to broker (SCORES / IGRC / ODR)
+- AP-related complaints route to broker (<abbr title="SEBI Complaints Redress System">SCORES</abbr> / <abbr title="Investor Grievance Redressal Committee">IGRC</abbr> / <abbr title="Online Dispute Resolution">ODR</abbr>)
 - Broker is respondent
 - AP-internal disciplinary action separate from regulator-facing response
 
@@ -456,7 +456,7 @@ Per `NSE/INSP/53530` (Enforcement Actions) penalty grid as applicable to AP-rela
 
 - **[gotcha]** Don't engage AP without completing exchange registration — operating an unregistered AP is a serious violation under NSE / BSE / MCX bye-laws. Penalty is significant and may trigger broker-side enforcement.
 
-- **[industry practice]** Most large brokers (>50k UCC) operate AP networks of 100-1000 APs across India. AP supervision team is a dedicated compliance function at QSBs.
+- **[industry practice]** Most large brokers (>50k <abbr title="Unique Client Code">UCC</abbr>) operate AP networks of 100-1000 APs across India. AP supervision team is a dedicated compliance function at QSBs.
 
 - **[risk trade-off]** Aggressive AP recruitment for distribution speed increases supervisory burden. Mature brokers calibrate AP count to supervisory capacity.
 
@@ -464,11 +464,11 @@ Per `NSE/INSP/53530` (Enforcement Actions) penalty grid as applicable to AP-rela
 
 - **[gotcha]** Annual AP audit is not optional. Failure to inspect APs is an exchange inspection finding under `NSE/INSP/57394` / `NSE/INSP/67804` framework.
 
-- **[industry practice]** AP onboarding due diligence typically includes credit check + criminal record check + SEBI / RBI defaulter list check. Mid-size brokers use third-party background-check services for scale.
+- **[industry practice]** AP onboarding due diligence typically includes credit check + criminal record check + SEBI / <abbr title="Reserve Bank of India">RBI</abbr> defaulter list check. Mid-size brokers use third-party background-check services for scale.
 
 - **[gotcha]** AP cannot accept funds. Any complaint indicating an AP collected money from client should trigger immediate investigation — this is a serious regulatory breach with potential criminal implications.
 
-- **[gotcha]** AP-tagged trading volume should be tracked at the order level. The order-tagging architecture (in OMS) should preserve AP-source even when modifications happen.
+- **[gotcha]** AP-tagged trading volume should be tracked at the order level. The order-tagging architecture (in <abbr title="Order Management System">OMS</abbr>) should preserve AP-source even when modifications happen.
 
 - **[industry practice]** AP training is annual; refresher modules cover regulatory changes, new products, compliance updates. NISM certification renewal cycles align with this.
 
@@ -503,7 +503,7 @@ Industry-typical KPIs for AP supervision teams:
 ## 14. Adjacent regimes
 
 - **SCORES / IGRC / ODR** — AP-related complaints route to broker; broker handles
-- **AML / PMLA** — AP-onboarded clients have same AML scrutiny; AP transactions reviewed for unusual patterns
+- **<abbr title="Anti-Money Laundering">AML</abbr> / <abbr title="Prevention of Money Laundering Act 2002">PMLA</abbr>** — AP-onboarded clients have same AML scrutiny; AP transactions reviewed for unusual patterns
 - **Surveillance / Chapter IVA** — AP-tagged trades within surveillance scope
 - **Inspection** — AP supervision is a standard inspection area
 - **System audit** — AP terminal controls reviewed by system auditor
@@ -518,7 +518,7 @@ Industry-typical KPIs for AP supervision teams:
 - [Deep Dive — Concurrent Audit](/broking-kyc/deep-dives/compliance-audit/concurrent-audit/)
 - [Deep Dive — System Audit](/broking-kyc/deep-dives/compliance-audit/system-audit/)
 - [Deep Dive — Inspection Types](/broking-kyc/deep-dives/compliance-audit/inspection-types/)
-- [Deep Dive — Surveillance NORMS / GSM / ASM](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/)
+- [Deep Dive — Surveillance NORMS / <abbr title="Graded Surveillance Measure">GSM</abbr> / <abbr title="Additional Surveillance Measure">ASM</abbr>](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/)
 - [Deep Dive — Fit-and-Proper](/broking-kyc/deep-dives/member-compliance/fit-and-proper/)
 - [Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/)
 - [Circulars — NSE](/broking-kyc/reference/circulars/nse/)

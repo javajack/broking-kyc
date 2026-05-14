@@ -3,9 +3,9 @@ title: Operations Deep Dives
 description: Focused per-topic deep dives across the Indian broking operational landscape — trading-day mechanics (OMS, RMS/SPAN, surveillance, auction, block deals, retail algo), settlement (T+0/T+1, direct-payout-to-demat, upstreaming, SLBM, MTF), compliance & audit (SCORES, IGRC, ODR, CSCRF, inspection, AP framework), specialty operations (IPO/OFS, MF platforms, DLT, BCP/DR), member compliance (BMC/ABC, fit-and-proper, KMP, renewal, ECN), and foundational topics (SGF/IPF, market manipulation, pre-open/closing auction, segment rules, member default).
 ---
 
-> **Who reads this section?** Engineers and operators going deep on a specific topic — OMS internals, SPAN methodology, CSCRF cyber framework, AP supervision, market manipulation typologies, segment rules, member default recovery. Compliance officers and auditors writing observations needing verifiable citations. New here generally? Try [Choose Your Role](/broking-kyc/personas/) first.
+> **Who reads this section?** Engineers and operators going deep on a specific topic — <abbr title="Order Management System">OMS</abbr> internals, <abbr title="Standard Portfolio Analysis of Risk">SPAN</abbr> methodology, <abbr title="Cybersecurity and Cyber Resilience Framework">CSCRF</abbr> cyber framework, <abbr title="Authorized Person">AP</abbr> supervision, market manipulation typologies, segment rules, member default recovery. Compliance officers and auditors writing observations needing verifiable citations. New here generally? Try [Choose Your Role](/broking-kyc/personas/) first.
 
-This is the depth layer. Where the [Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/) inventories *what must be done*, the [Integration DAG](/broking-kyc/operations/integration-dag/) maps *what runs before what*, the [Broker Process Narrative](/broking-kyc/broker-process/narrative/) tells the chronological story, and the [Field Atlas](/broking-kyc/reference/field-atlas/) maps *where each field flows* — deep dives go narrowly into one topic at the level of detail an operator or engineer needs to actually implement or audit it.
+This is the depth layer. Where the [Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/) inventories *what must be done*, the [Integration <abbr title="Directed Acyclic Graph.">DAG</abbr>](/broking-kyc/operations/integration-dag/) maps *what runs before what*, the [Broker Process Narrative](/broking-kyc/broker-process/narrative/) tells the chronological story, and the [Field Atlas](/broking-kyc/reference/field-atlas/) maps *where each field flows* — deep dives go narrowly into one topic at the level of detail an operator or engineer needs to actually implement or audit it.
 
 ## TL;DR
 
@@ -19,33 +19,33 @@ This is the depth layer. Where the [Compliance Blueprint](/broking-kyc/operation
 
 ### Trading-day operations
 
-How a trading day actually runs at the integration layer — order capture, pre-trade RMS pipeline, margin computation, real-time surveillance, exceptional events like short-delivery auctions and block-deal windows, the retail algo framework (post Aug 2025 SEBI).
+How a trading day actually runs at the integration layer — order capture, pre-trade <abbr title="Risk Management System">RMS</abbr> pipeline, margin computation, real-time surveillance, exceptional events like short-delivery auctions and block-deal windows, the retail algo framework (post Aug 2025 <abbr title="Securities and Exchange Board of India">SEBI</abbr>).
 
 | Topic | Page |
 |---|---|
-| OMS internals — order capture paths, pre-trade RMS hot path, FIX gateway | [oms-internals](./trading-day/oms-internals/) |
+| OMS internals — order capture paths, pre-trade RMS hot path, <abbr title="Financial Information eXchange protocol">FIX</abbr> gateway | [oms-internals](./trading-day/oms-internals/) |
 | RMS / SPAN methodology — margin computation walkthrough | [rms-span-methodology](./trading-day/rms-span-methodology/) |
-| Surveillance — NORMS / GSM / ASM / OTR / social-media | [surveillance-norms-gsm-asm](./trading-day/surveillance-norms-gsm-asm/) |
-| Short-delivery auction — T+2 mechanics + penalty cascade | [short-delivery-auction](./trading-day/short-delivery-auction/) |
+| Surveillance — NORMS / <abbr title="Graded Surveillance Measure">GSM</abbr> / <abbr title="Additional Surveillance Measure">ASM</abbr> / OTR / social-media | [surveillance-norms-gsm-asm](./trading-day/surveillance-norms-gsm-asm/) |
+| Short-delivery auction — <abbr title="Trade-date Plus N settlement">T+2</abbr> mechanics + penalty cascade | [short-delivery-auction](./trading-day/short-delivery-auction/) |
 | Block & bulk deals — windows, threshold, reporting | [block-bulk-deals](./trading-day/block-bulk-deals/) |
 | Retail algo framework — SEBI Aug 2025 mandate | [retail-algo-framework](./trading-day/retail-algo-framework/) |
 
 ### Settlement operations
 
-The settlement layer — how T+1 default and T+0 beta actually run, the direct-payout-to-demat phased rollout, daily client funds upstreaming, payin default mechanics, securities lending and borrowing, and the MTF operational walkthrough.
+The settlement layer — how <abbr title="Trade-date Plus N settlement">T+1</abbr> default and <abbr title="Trade-date Plus N settlement">T+0</abbr> beta actually run, the direct-payout-to-demat phased rollout, daily client funds upstreaming, payin default mechanics, securities lending and borrowing, and the <abbr title="Margin Trading Facility">MTF</abbr> operational walkthrough.
 
 | Topic | Page |
 |---|---|
 | T+0 / T+1 settlement nuances | [t0-t1-settlement](./settlement/t0-t1-settlement/) |
-| Direct payout to demat (TM CUSPA / CM CUSPA / TM CSMFA) | [direct-payout-to-demat](./settlement/direct-payout-to-demat/) |
+| Direct payout to demat (<abbr title="Trading Member">TM</abbr> <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr> / <abbr title="Clearing Member">CM</abbr> CUSPA / TM CSMFA) | [direct-payout-to-demat](./settlement/direct-payout-to-demat/) |
 | Client funds upstreaming (MFOS / FDR / cash) | [client-funds-upstreaming](./settlement/client-funds-upstreaming/) |
-| Payin default + Core SGF draw | [payin-default-core-sgf](./settlement/payin-default-core-sgf/) |
-| SLBM (Securities Lending & Borrowing Mechanism) | [slbm](./settlement/slbm/) |
+| Payin default + Core <abbr title="Settlement Guarantee Fund">SGF</abbr> draw | [payin-default-core-sgf](./settlement/payin-default-core-sgf/) |
+| <abbr title="Securities Lending and Borrowing Mechanism">SLBM</abbr> (Securities Lending & Borrowing Mechanism) | [slbm](./settlement/slbm/) |
 | MTF operational walkthrough | [mtf-operational](./settlement/mtf-operational/) |
 
 ### Compliance & audit
 
-The compliance machinery — investor grievance redressal (SCORES, IGRC, ODR), audit cycles (concurrent, system, cyber), inspections, CSCRF deep-dive, and the Authorized Person framework.
+The compliance machinery — investor grievance redressal (<abbr title="SEBI Complaints Redress System">SCORES</abbr>, <abbr title="Investor Grievance Redressal Committee">IGRC</abbr>, <abbr title="Online Dispute Resolution">ODR</abbr>), audit cycles (concurrent, system, cyber), inspections, CSCRF deep-dive, and the Authorized Person framework.
 
 | Topic | Page |
 |---|---|
@@ -60,22 +60,22 @@ The compliance machinery — investor grievance redressal (SCORES, IGRC, ODR), a
 
 ### Specialty operations
 
-Specialized broker activities — IPO/OFS broker-side, mutual fund platform integrations, DLT comms framework, and BCP/DR drill procedure.
+Specialized broker activities — <abbr title="Initial Public Offering">IPO</abbr>/<abbr title="Offer for Sale (through stock exchange)">OFS</abbr> broker-side, mutual fund platform integrations, DLT comms framework, and BCP/DR drill procedure.
 
 | Topic | Page |
 |---|---|
 | IPO / OFS broker-side flow | [ipo-ofs-broker-side](./specialty/ipo-ofs-broker-side/) |
-| Mutual Fund platforms (BSE StAR MF, NSE NMF II) | [mutual-fund-platforms](./specialty/mutual-fund-platforms/) |
+| Mutual Fund platforms (<abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> StAR MF, <abbr title="National Stock Exchange of India">NSE</abbr> NMF <abbr title="—">II</abbr>) | [mutual-fund-platforms](./specialty/mutual-fund-platforms/) |
 | DLT framework (TRAI) | [dlt-framework](./specialty/dlt-framework/) |
 | BCP / DR drill procedure | [bcp-dr-drill](./specialty/bcp-dr-drill/) |
 
 ### Member compliance
 
-Broker-as-member obligations — capital adequacy, fit-and-proper, KMP intimations, membership renewal, ECN and investor servicing format details.
+Broker-as-member obligations — capital adequacy, fit-and-proper, <abbr title="Key Managerial Personnel">KMP</abbr> intimations, membership renewal, <abbr title="Electronic Contract Note.">ECN</abbr> and investor servicing format details.
 
 | Topic | Page |
 |---|---|
-| BMC / ABC (Base Minimum + Additional Base Capital) | [bmc-abc](./member-compliance/bmc-abc/) |
+| <abbr title="Base Minimum Capital">BMC</abbr> / <abbr title="Additional Base Capital">ABC</abbr> (Base Minimum + Additional Base Capital) | [bmc-abc](./member-compliance/bmc-abc/) |
 | Fit-and-proper criteria | [fit-and-proper](./member-compliance/fit-and-proper/) |
 | KMP changes intimation | [kmp-changes](./member-compliance/kmp-changes/) |
 | Annual membership renewal | [membership-renewal](./member-compliance/membership-renewal/) |
@@ -88,7 +88,7 @@ Topics central to broking operations that the site had only mentioned in passing
 | Topic | Page |
 |---|---|
 | SGF / Core SGF framework | [sgf-core-sgf](./foundational/sgf-core-sgf/) |
-| Investor Protection Fund (IPF) | [ipf](./foundational/ipf/) |
+| Investor Protection Fund (<abbr title="Investor Protection Fund">IPF</abbr>) | [ipf](./foundational/ipf/) |
 | Market manipulation typologies | [market-manipulation-typologies](./foundational/market-manipulation-typologies/) |
 | Pre-open / closing auction mechanics | [pre-open-closing-auction](./foundational/pre-open-closing-auction/) |
 | Segment rules comparison (CD / equity / index / single-stock / commodity) | [segment-rules-comparison](./foundational/segment-rules-comparison/) |

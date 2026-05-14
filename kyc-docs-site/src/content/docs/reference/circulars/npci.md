@@ -15,7 +15,7 @@ description: "Verified index of NPCI circulars affecting Indian stock broking, 2
 
 ## Conceptual overview
 
-This page is the complete listing of NPCI circulars in the project's 2020–2026 sweep window. Each entry contains the verbatim circular ID, issue date, in-force date, status (in-force / superseded / withdrawn), applicable entity types, impact-area tags, a 2–4 sentence summary traceable to clauses, and the primary URL. Where the primary URL could not be re-fetched, an archive URL is provided in its place.
+This page is the complete listing of <abbr title="National Payments Corporation of India">NPCI</abbr> circulars in the project's 2020–2026 sweep window. Each entry contains the verbatim circular ID, issue date, in-force date, status (in-force / superseded / withdrawn), applicable entity types, impact-area tags, a 2–4 sentence summary traceable to clauses, and the primary URL. Where the primary URL could not be re-fetched, an archive URL is provided in its place.
 
 ## Entries (descending date)
 
@@ -23,14 +23,14 @@ This page is the complete listing of NPCI circulars in the project's 2020–2026
 
 - **date_issued:** 2025-10-08
 - **issuer:** NPCI
-- **title:** "Enhancements in UPI Single Block Multiple Debits (UPI Reserve Pay)"
+- **title:** "Enhancements in <abbr title="Unified Payments Interface">UPI</abbr> Single Block Multiple Debits (UPI Reserve Pay)"
 - **applies_to:** broker, all-intermediaries
 - **in_force_date:** [unknown — verify]
 - **status:** in-force
 - **impact_areas:** upi-block, mandate, settlement, client-funds, upstreaming, rms
 - **primary_url:** https://www.npci.org.in/uploads/UPI_OC_No_228_FY_2025_26_Enhancement_in_UPI_Single_Block_Multiple_Debits_UPI_Reserve_Pay_a9095c181d.pdf
 
-Renames Single Block Multiple Debits to "UPI Reserve Pay" and enhances the mechanism. Supports all UPI fund sources (savings, current, OD, RuPay credit card, pre-sanctioned credit lines). Maximum block Rs.10,000 per merchant for 90 days; failed debits can be retried up to 3 times in 24 hours; only one active block per merchant per customer; mandatory issuer-bank notifications on create/modify/debit/revoke/expire; customers retain set/update/revoke control. While the Rs.10,000 cap is targeted at low-ticket high-frequency online merchants, the broader UPI Reserve Pay specification is the same engine used by brokers under the SEBI ASBA-secondary-market block facility.
+Renames Single Block Multiple Debits to "UPI Reserve Pay" and enhances the mechanism. Supports all UPI fund sources (savings, current, OD, RuPay credit card, pre-sanctioned credit lines). Maximum block Rs.10,000 per merchant for 90 days; failed debits can be retried up to 3 times in 24 hours; only one active block per merchant per customer; mandatory issuer-bank notifications on create/modify/debit/revoke/expire; customers retain set/update/revoke control. While the Rs.10,000 cap is targeted at low-ticket high-frequency online merchants, the broader UPI Reserve Pay specification is the same engine used by brokers under the <abbr title="Securities and Exchange Board of India">SEBI</abbr> <abbr title="Applications Supported by Blocked Amount">ASBA</abbr>-secondary-market block facility.
 
 ### NPCI/UPI/OC No. 222/2025-26
 
@@ -44,7 +44,7 @@ Renames Single Block Multiple Debits to "UPI Reserve Pay" and enhances the mecha
 - **impact_areas:** settlement, bod-eod, reporting, file-format
 - **primary_url:** https://www.npci.org.in/uploads/UPI_OC_No_222_FY_2025_26_Segregation_of_UPI_settlement_cycles_for_Auth_and_disputes_transactions_25534237a3.pdf
 
-Splits UPI settlement cycles into AUTH (cycles 1–10) and Dispute (DC1=cycle 11, DC2=cycle 12). Originally effective 03 November 2025 but rescheduled by addendum 222A to 15 December 2025. Adjustment reports shared three times a day; reports for cycles 1–10 discontinued. Brokers' fund-reconciliation files (BOD/EOD) need updating to absorb segregated cycle output.
+Splits UPI settlement cycles into AUTH (cycles 1–10) and Dispute (DC1=cycle 11, DC2=cycle 12). Originally effective 03 November 2025 but rescheduled by addendum 222A to 15 December 2025. Adjustment reports shared three times a day; reports for cycles 1–10 discontinued. Brokers' fund-reconciliation files (<abbr title="Beginning Of Day">BOD</abbr>/<abbr title="End Of Day">EOD</abbr>) need updating to absorb segregated cycle output.
 
 ### NPCI/UPI/OC No. 185B/2025-26
 
@@ -70,7 +70,7 @@ Raised UPI per-transaction limit to Rs.5 lakh and daily aggregate to Rs.10 lakh 
 - **impact_areas:** onboarding, surveillance, cyber-security, file-format, reporting
 - **primary_url:** https://www.npci.org.in/PDF/npci/circular/UPI-OC-No-217-FY-2025-26%C2%A0Adoption-of-Standardized,-Validated-and-Exclusive-UPI-IDs-for-Payment-Collection-by-SEBI.pdf
 
-Implements SEBI directive (SEBI/HO/DEPA-II/DEPA-II_SRG/P/CIR/2025/86 dated 11 June 2025) by mandating that SEBI-registered investor-facing intermediaries (MCC 6211: brokers, RAs, IAs, mutual funds, depositories, REs) collect investor payments only via standardized validated UPI handles using the @validbankpsp nomenclature. Acquiring SCSB-class banks request handles; max handle length 10 characters; AutoPay mandate format for SEBI REs becomes <Merchant identifier>.<Aggregator identifier>.<Intermediary username suffix>@validbankpsp. UPI apps must display a thumbs-up icon enclosed in a green triangle when paying to @validbankpsp handles. Mandatory adoption from 01 October 2025; covers ~9,000 registered intermediaries.
+Implements SEBI directive (SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/DEPA-<abbr title="—">II</abbr>/DEPA-II_SRG/P/CIR/2025/86 dated 11 June 2025) by mandating that SEBI-registered investor-facing intermediaries (MCC 6211: brokers, RAs, IAs, mutual funds, depositories, REs) collect investor payments only via standardized validated UPI handles using the @validbankpsp nomenclature. Acquiring SCSB-class banks request handles; max handle length 10 characters; AutoPay mandate format for SEBI REs becomes <Merchant identifier>.<Aggregator identifier>.<Intermediary username suffix>@validbankpsp. UPI apps must display a thumbs-up icon enclosed in a green triangle when paying to @validbankpsp handles. Mandatory adoption from 01 October 2025; covers ~9,000 registered intermediaries.
 
 ### NPCI/UPI/OC No. 215A/2025-26
 
@@ -83,7 +83,7 @@ Implements SEBI directive (SEBI/HO/DEPA-II/DEPA-II_SRG/P/CIR/2025/86 dated 11 Ju
 - **impact_areas:** cyber-security, system-audit, bod-eod, file-format, rms
 - **primary_url:** https://www.npci.org.in/PDF/npci/upi/circular/2025/UPI-OC-No-215-A-FY-2025-26-Guidelines-on-usage-of-UPI-APIs.pdf
 
-API security and rate-limit framework for UPI ecosystem. Daily caps: balance enquiry 50/user/app/day; linked-account view 25/app/day; transaction status check max 3 per transaction at 90s spacing. AutoPay execution allowed windows: before 10:00, 13:00–17:00, after 21:30; prohibited 10:00–13:00 and 17:00–21:30. Mandates HTTPS/TLS, explicit consent for Penny Drop API, DPDP Act 2023 compliance. Implementation deadline 31 July 2025, formal undertaking by 31 August 2025. Brokers' integration with bank/PSP partners for AutoPay billing must respect the new windows.
+API security and rate-limit framework for UPI ecosystem. Daily caps: balance enquiry 50/user/app/day; linked-account view 25/app/day; transaction status check max 3 per transaction at 90s spacing. AutoPay execution allowed windows: before 10:00, 13:00–17:00, after 21:30; prohibited 10:00–13:00 and 17:00–21:30. Mandates HTTPS/TLS, explicit consent for Penny Drop API, <abbr title="Digital Personal Data Protection Act 2023 (and Rules 2025)">DPDP</abbr> Act 2023 compliance. Implementation deadline 31 July 2025, formal undertaking by 31 August 2025. Brokers' integration with bank/PSP partners for AutoPay billing must respect the new windows.
 
 ### NPCI/UPI/OC No. 101A/2025-26
 
@@ -102,20 +102,20 @@ Mandates that UPI apps display only the ultimate beneficiary's banking name (fro
 
 - **date_issued:** 2025-03-10
 - **issuer:** NPCI
-- **title:** "e-KYC Setu System"
+- **title:** "e-<abbr title="Know Your Customer (process).">KYC</abbr> Setu System"
 - **applies_to:** broker, all-intermediaries
 - **in_force_date:** 2025-03-10
 - **status:** in-force
 - **impact_areas:** onboarding, re-KYC, kyc-modification, dpdp, aa, esign, digi-locker
 - **primary_url:** https://www.npci.org.in/PDF/npci/e-kyc-services/circulars/2025/e-KYC-003-FY-24-25-e-KYC-Setu-System.pdf
 
-Formally introduced the e-KYC Setu facility for regulated financial-sector entities under RBI, SEBI, IRDAI and PFRDA. The verification-seeking entity does not receive the Aadhaar number — only masked Aadhaar (last 4) and demographic data — eliminating direct Aadhaar handling and the need for the entity to be a KUA/AUA. Implementation options: NPCI Web Interface (URL redirect) and Android SDK. Onboarding via ekycservices@npci.org.in. Compliance advantage: entities using Setu do not need a separate notification under Section 11A PMLA. Operationalised for SEBI registered intermediaries (brokers, AMCs, PMs) by SEBI Press Release 35/2025 dated 30 June 2025, which permits use of e-KYC Setu for Aadhaar-based e-KYC authentication.
+Formally introduced the e-KYC Setu facility for regulated financial-sector entities under <abbr title="Reserve Bank of India">RBI</abbr>, SEBI, IRDAI and <abbr title="Pension Fund Regulatory and Development Authority">PFRDA</abbr>. The verification-seeking entity does not receive the Aadhaar number — only masked Aadhaar (last 4) and demographic data — eliminating direct Aadhaar handling and the need for the entity to be a KUA/AUA. Implementation options: NPCI Web Interface (URL redirect) and Android SDK. Onboarding via ekycservices@npci.org.in. Compliance advantage: entities using Setu do not need a separate notification under Section 11A <abbr title="Prevention of Money Laundering Act 2002">PMLA</abbr>. Operationalised for SEBI registered intermediaries (brokers, AMCs, PMs) by SEBI Press Release 35/2025 dated 30 June 2025, which permits use of e-KYC Setu for Aadhaar-based e-KYC authentication.
 
 ### NPCI/NACH/OC No. 006/2024-25
 
 - **date_issued:** 2024-11-27
 - **issuer:** NPCI
-- **title:** "Changes in Rejection Code description in NACH"
+- **title:** "Changes in Rejection Code description in <abbr title="National Automated Clearing House">NACH</abbr>"
 - **applies_to:** broker, all-intermediaries
 - **in_force_date:** [unknown — verify]
 - **status:** in-force
@@ -135,7 +135,7 @@ Revises NACH return/rejection code descriptions used in ACH Debit and APB Credit
 - **impact_areas:** mandate, other
 - **primary_url:** https://www.npci.org.in/PDF/npci/upi/circular/2024/NPCI-UPI-OC-207-Auto-replenishment-of-NETC-FASTag-and-RuPay-NCMC-with-UPI-AutoPay.pdf
 
-Removes the 24-hour Pre-Debit Notification (PDN) requirement for UPI AutoPay debits used to auto-replenish NETC FASTag (MCC 4784) and RuPay NCMC (MCC 7412). Not directly broker-facing but reflects NPCI's PDN-exemption framework, which is referenced in broker-relevant AutoPay debate around recurring brokerage/MTF interest collections.
+Removes the 24-hour Pre-Debit Notification (PDN) requirement for UPI AutoPay debits used to auto-replenish NETC FASTag (MCC 4784) and RuPay NCMC (MCC 7412). Not directly broker-facing but reflects NPCI's PDN-exemption framework, which is referenced in broker-relevant AutoPay debate around recurring brokerage/<abbr title="Margin Trading Facility">MTF</abbr> interest collections.
 
 ### NPCI/UPI/OC No. 205/2024-25
 
@@ -162,7 +162,7 @@ Introduces auto-top-up for UPI Lite where balance auto-replenishes from the link
 - **impact_areas:** settlement, upi-block, mandate, onboarding
 - **primary_url:** https://www.npci.org.in/PDF/npci/upi/circular/2024/UPI-OC-No-185A-FY-24-25-Implementation-of-Rs-5-Lakh-limit-per-transaction-for-specific-categories-in-UPI.pdf
 
-Added Tax Payments (MCC 9311) to Rs.5 lakh per-transaction limit list, restricted to Verified Merchants. Existing categories retained: Hospitals & Educational Services (multiple MCCs); IPO & G-Sec (MCC 6211, purpose code 01 IPO and 25 RDS). Acquirers must classify merchants correctly and conduct due diligence before adding to Verified Merchant list. Compliance by 15 September 2024. Confirms MCC 6211 securities-broker IPO/G-Sec eligibility for Rs.5 lakh limit.
+Added Tax Payments (MCC 9311) to Rs.5 lakh per-transaction limit list, restricted to Verified Merchants. Existing categories retained: Hospitals & Educational Services (multiple MCCs); <abbr title="Initial Public Offering">IPO</abbr> & G-Sec (MCC 6211, purpose code 01 IPO and 25 RDS). Acquirers must classify merchants correctly and conduct due diligence before adding to Verified Merchant list. Compliance by 15 September 2024. Confirms MCC 6211 securities-broker IPO/G-Sec eligibility for Rs.5 lakh limit.
 
 ### NPCI/UPI/OC No. 200/2024-25
 
@@ -188,7 +188,7 @@ Required all UPI members (issuers, acquirers, PSPs/Apps) to enable the Single Bl
 - **impact_areas:** mandate, grievance, scores-odr, dpdp
 - **primary_url:** https://www.npci.org.in/PDF/nach/circular/2024-25/NACH-OC001-FY24-25-Master-Circular-Facility-for-cancellation-of-mandates-to-be-provided-to-customers.pdf
 
-Mandates that all mandate-registering entities (banks, corporates, aggregators) provide customers an online/electronic channel to Amend, Cancel, or Suspend/Revoke their mandates. Each entity's website must host user guides, FAQs, instructional videos. Non-compliance by 30 September 2024 attracts punitive action including bar from registering new mandates. Material for brokers issuing eNACH for MTF, demat AMC, advisory recurring fees.
+Mandates that all mandate-registering entities (banks, corporates, aggregators) provide customers an online/electronic channel to Amend, Cancel, or Suspend/Revoke their mandates. Each entity's website must host user guides, FAQs, instructional videos. Non-compliance by 30 September 2024 attracts punitive action including bar from registering new mandates. Material for brokers issuing eNACH for MTF, demat <abbr title="Asset Management Company (mutual funds context) / Annual Maintenance Charges (depository context).">AMC</abbr>, advisory recurring fees.
 
 ### NPCI/NACH/OC No. 014/2023-24
 
@@ -253,7 +253,7 @@ Reiterates compliance to earlier UPI AutoPay mandate circulars (OC-163, OC-163A)
 - **impact_areas:** upi-block, mandate, settlement, t0-t1, client-funds, upstreaming
 - **primary_url:** https://www.npci.org.in/PDF/npci/press-releases/2023/NPCI-Press-Release-UPI-for-Secondary-Market.pdf
 
-Announced beta launch of UPI for Secondary Market (ASBA-like facility) effective 01 January 2024 for the equity cash segment. During pilot, investors block funds in bank accounts that Clearing Corporations debit only upon trade confirmation; payouts directly to investor bank on T+1. Initial pilot brokerage: Groww. UPI Apps: BHIM, Groww, YES PAY NEXT. Sponsor banks: HDFC Bank, HSBC, ICICI Bank, Yes Bank. Operating instructions for member banks/brokers were released as the underlying NPCI mandate plumbing (eventually formalised in OC 200/2024-25 for SBMD) and SEBI Master Circular on Stock Exchanges and Clearing Corporations (16 October 2023). Note: This is a press release, not an operating circular; OC numbering for the underlying member-bank instructions could not be verified.
+Announced beta launch of UPI for Secondary Market (ASBA-like facility) effective 01 January 2024 for the equity cash segment. During pilot, investors block funds in bank accounts that Clearing Corporations debit only upon trade confirmation; payouts directly to investor bank on <abbr title="Trade-date Plus N settlement">T+1</abbr>. Initial pilot brokerage: Groww. UPI Apps: BHIM, Groww, YES PAY NEXT. Sponsor banks: HDFC Bank, HSBC, ICICI Bank, Yes Bank. Operating instructions for member banks/brokers were released as the underlying NPCI mandate plumbing (eventually formalised in OC 200/2024-25 for SBMD) and SEBI Master Circular on Stock Exchanges and Clearing Corporations (16 October 2023). Note: This is a press release, not an operating circular; OC numbering for the underlying member-bank instructions could not be verified.
 
 ### NPCI/NACH/OC No. 012/2023-24
 
@@ -266,7 +266,7 @@ Announced beta launch of UPI for Secondary Market (ASBA-like facility) effective
 - **impact_areas:** mandate, onboarding, file-format, surveillance
 - **primary_url:** https://www.npci.org.in/PDF/nach/circular/2023-24/Circular-No-012-Master-Circular.pdf
 
-Master circular consolidating mandate rules. Maximum mandate duration capped at 40 years from issuance (effective 01 April 2024); "until cancelled" option removed; explicit final collection date mandatory across all mandate categories. Sets phased penalty for high-return corporates: Phase I (01 Feb 2024) Rs.1/return for corporates >50% returns; Phase II (01 Apr 2024) Rs.5/transaction; Phase III (01 Jul 2024) corporates with >50% returns barred from registering new mandates. Brokers/sponsor-bank partners must align mandate-issuance, file-format generation and corporate-code monitoring with these thresholds.
+Master circular consolidating mandate rules. Maximum mandate duration capped at 40 years from issuance (effective 01 April 2024); "until cancelled" option removed; explicit final collection date mandatory across all mandate categories. Sets phased penalty for high-return corporates: Phase I (01 Feb 2024) Rs.1/return for corporates >50% returns; Phase II (01 Apr 2024) Rs.5/transaction; Phase <abbr title="—">III</abbr> (01 Jul 2024) corporates with >50% returns barred from registering new mandates. Brokers/sponsor-bank partners must align mandate-issuance, file-format generation and corporate-code monitoring with these thresholds.
 
 ### NPCI/UPI/OC No. 151A/2023-24
 
@@ -319,7 +319,7 @@ Capped NACH mandate duration at 30 years from issuance; eliminated "until cancel
 - **impact_areas:** mandate, onboarding, kyc-modification
 - **primary_url:** [unknown — verify]
 
-Streamlined e-mandate registration with authentication via last 4 digits of Aadhaar, last 5 of PAN, and Customer ID. Harmonised all electronic mandate variants to Rs.1 crore — at parity with physical mandates — superseding the 2020 NPCI/2020-21/NACH/010 limit. Material for brokers using eNACH for client mandates (e.g., MTF recurring authorisations, mutual-fund SIPs, demat charges).
+Streamlined e-mandate registration with authentication via last 4 digits of Aadhaar, last 5 of <abbr title="Permanent Account Number">PAN</abbr>, and Customer ID. Harmonised all electronic mandate variants to Rs.1 crore — at parity with physical mandates — superseding the 2020 NPCI/2020-21/NACH/010 limit. Material for brokers using eNACH for client mandates (e.g., MTF recurring authorisations, mutual-fund SIPs, demat charges).
 
 ### NPCI/UPI/OC No. 168/2023-24
 
@@ -332,7 +332,7 @@ Streamlined e-mandate registration with authentication via last 4 digits of Aadh
 - **impact_areas:** onboarding, surveillance, cyber-security, reporting, other
 - **primary_url:** [unknown — verify]
 
-Mandated that all UPI transactions initiated using UPI ID, UPI Number, or Account Number + IFSC must prompt the customer to verify the beneficiary name before initiating the transaction; required UPI apps on different operating systems to use distinct App IDs; required members to support payee/beneficiary name verification (ReqValAdd API). Affects broker payment-collection flows — investor-facing apps must show verified beneficiary name from the broker's settlement account. Compliance by 31 December 2023.
+Mandated that all UPI transactions initiated using UPI ID, UPI Number, or Account Number + <abbr title="Indian Financial System Code.">IFSC</abbr> must prompt the customer to verify the beneficiary name before initiating the transaction; required UPI apps on different operating systems to use distinct App IDs; required members to support payee/beneficiary name verification (ReqValAdd API). Affects broker payment-collection flows — investor-facing apps must show verified beneficiary name from the broker's settlement account. Compliance by 31 December 2023.
 
 ### NPCI/AePS/OC No. 081/2023-24
 
@@ -371,7 +371,7 @@ Original NPCI/UPI/OC No. 163 referenced (alongside OC-163A and OC-100) in NPCI/U
 - **impact_areas:** onboarding, nri, kyc-modification, aml, fatca-crs
 - **primary_url:** https://www.npci.org.in/PDF/npci/upi/circular/2023/UPI-OC-161-Extension-to-UPI-Circular-No-60-Crediting-Debiting-Non-Resident-accounts-in-UPI.pdf
 
-Permitted NRE/NRO accounts with international mobile numbers from ten specified countries (US, UK, Singapore, Canada, Australia, Oman, Qatar, UAE, Saudi Arabia, Hong Kong) to be onboarded for UPI. Remitter/beneficiary banks must conduct AML/CFT and FEMA compliance checks. Compliance deadline for UPI members was 30 April 2023. Material for brokers serving NRI clients who can now fund the trading account via UPI without an Indian SIM.
+Permitted <abbr title="Non-Resident External (Rupee) account">NRE</abbr>/<abbr title="Non-Resident Ordinary (Rupee) account">NRO</abbr> accounts with international mobile numbers from ten specified countries (US, UK, Singapore, Canada, Australia, Oman, Qatar, UAE, Saudi Arabia, Hong Kong) to be onboarded for UPI. Remitter/beneficiary banks must conduct <abbr title="Anti-Money Laundering">AML</abbr>/<abbr title="Combating the Financing of Terrorism">CFT</abbr> and <abbr title="Foreign Exchange Management Act 1999">FEMA</abbr> compliance checks. Compliance deadline for UPI members was 30 April 2023. Material for brokers serving <abbr title="Non-Resident Indian">NRI</abbr> clients who can now fund the trading account via UPI without an Indian SIM.
 
 ### NPCI/UPI/OC No. 138/2021-22
 

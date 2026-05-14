@@ -426,6 +426,7 @@ export default defineConfig({
         {
           label: "Reference",
           items: [
+            { label: "Glossary", slug: "reference/glossary" },
             { label: "Master Dataset", slug: "reference/master-dataset" },
             { label: "Field Summary", slug: "reference/field-summary" },
             { label: "Code Tables", slug: "reference/code-tables" },

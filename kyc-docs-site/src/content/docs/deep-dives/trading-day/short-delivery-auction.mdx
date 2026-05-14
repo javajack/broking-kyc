@@ -5,17 +5,17 @@ description: Walkthrough of the short-delivery auction mechanism — when trigge
 
 import { Aside } from '@astrojs/starlight/components';
 
-> **Why this page is structured this way:** Short delivery is one of the visible failure modes in cash-market settlement — when a selling broker can't deliver shares on pay-in, the buyer's settlement obligation must be honoured anyway, so the clearing corp acquires the shortfall through an auction. The page is structured chronologically across the failure: detection at pay-in (T+1), auction call on T+2, price discovery and settlement, broker remediation, client communication, and back-office accounting. Two reference sections cover the penalty grids and the edge cases (CC vs internal shortage, G-Secs, corporate actions).
+> **Why this page is structured this way:** Short delivery is one of the visible failure modes in cash-market settlement — when a selling broker can't deliver shares on pay-in, the buyer's settlement obligation must be honoured anyway, so the clearing corp acquires the shortfall through an auction. The page is structured chronologically across the failure: detection at pay-in (<abbr title="Trade-date Plus N settlement">T+1</abbr>), auction call on <abbr title="Trade-date Plus N settlement">T+2</abbr>, price discovery and settlement, broker remediation, client communication, and back-office accounting. Two reference sections cover the penalty grids and the edge cases (<abbr title="Clearing Corporation (NCL, ICCL, MCXCCL — context-dependent).">CC</abbr> vs internal shortage, G-Secs, corporate actions).
 
 ## TL;DR
 
 - When a seller's broker fails to deliver securities at pay-in on **T+1**, the clearing corp conducts a **T+2 morning auction** to acquire the shortfall and complete the buyer's settlement.
-- Auction is conducted by the clearing corp for **both CC shortages and internal shortages** (per [NCL/CMPT/71045](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt71045) / [NCL/CMPT/71441](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt71441), referring back to CMPT66688 dated Feb 14, 2025).
-- **Close-out price** for unsuccessful auctions = **higher of (a) the highest scrip price in the settlement-to-auction-date window OR (b) 20% above the latest closing on the auction-call day** per SEBI's master circular [SEBI/HO/MRD-PoD2/CIR/P/2024/00181](/broking-kyc/reference/circulars/sebi-other/#sebihomrd-pod2cirp202400181) (Dec 30, 2024).
+- Auction is conducted by the clearing corp for **both CC shortages and internal shortages** (per [<abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr>/CMPT/71045](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt71045) / [NCL/CMPT/71441](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt71441), referring back to CMPT66688 dated Feb 14, 2025).
+- **Close-out price** for unsuccessful auctions = **higher of (a) the highest scrip price in the settlement-to-auction-date window OR (b) 20% above the latest closing on the auction-call day** per <abbr title="Securities and Exchange Board of India">SEBI</abbr>'s master circular [SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>-PoD2/CIR/P/2024/00181](/broking-kyc/reference/circulars/sebi-other/#sebihomrd-pod2cirp202400181) (Dec 30, 2024).
 - The failing broker pays the **auction difference** (auction price − settlement price), plus the **20% close-out markup** if auction fails, plus per-CC penalty / interest charges.
 - **Direct-payout-to-demat** (effective Nov 2024 phased Jan–Feb 2025 per [NCL/CMPT/63669](/broking-kyc/reference/circulars/clearing-corps/) and [NCL/CMPT/66779](/broking-kyc/reference/circulars/clearing-corps/)) means internal-shortage valuation is at settlement price + 20% mark by noon on settlement day for the member to clear.
 - Broker remediation options: **cover in open market** before auction call to avoid penalty; **accept auction outcome** if no open-market liquidity. Most brokers prefer cover-in-open-market for known shorts.
-- **Repeated short-delivery patterns are a surveillance flag** and possible cause for suspension under [NSE/INSP/53530](/broking-kyc/reference/circulars/nse/) penalty grid.
+- **Repeated short-delivery patterns are a surveillance flag** and possible cause for suspension under [<abbr title="National Stock Exchange of India">NSE</abbr>/INSP/53530](/broking-kyc/reference/circulars/nse/) penalty grid.
 - Back-office entries: debit short-delivering client (auction cost + close-out + penalty), credit the auction-buying party, account for the broker's own pay-in to the CC.
 
 ## Conceptual overview
@@ -34,11 +34,11 @@ The simplest case: a member is net-short across all its clients in a particular 
 
 ### 1.2 Internal shortage
 
-A more common case at retail brokers: at the member level, the member is net-flat in a security (some clients are net-buy, others are net-sell, the netted quantity is zero), but **internally**, the clients' positions don't line up. Specifically, a selling client's securities aren't in the broker's pool to deliver — perhaps the client sold a security they never had (a regulatory issue) or the security is locked in a pledge / MTF pool, or the broker's internal settlement misreconciled.
+A more common case at retail brokers: at the member level, the member is net-flat in a security (some clients are net-buy, others are net-sell, the netted quantity is zero), but **internally**, the clients' positions don't line up. Specifically, a selling client's securities aren't in the broker's pool to deliver — perhaps the client sold a security they never had (a regulatory issue) or the security is locked in a pledge / <abbr title="Margin Trading Facility">MTF</abbr> pool, or the broker's internal settlement misreconciled.
 
-In the pre-direct-payout regime, internal shortage didn't always trigger CC-level auction because the broker could net internally. Post the SEBI Jun 5, 2024 direct-payout-to-demat circular ([SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2024/75](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-pod1pcir202475)) and the implementing [NCL/CMPT/63669](/broking-kyc/reference/circulars/clearing-corps/), **internal shortage is now also auction-eligible** — the CC conducts the auction even when the member is net-flat (per [NCL/CMPT/71045](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt71045) and FAQ [NCL/CMPT/71441](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt71441) referring back to CMPT66688 of Feb 14, 2025).
+In the pre-direct-payout regime, internal shortage didn't always trigger CC-level auction because the broker could net internally. Post the SEBI Jun 5, 2024 direct-payout-to-demat circular ([SEBI/HO/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD1/P/CIR/2024/75](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-pod1pcir202475)) and the implementing [NCL/CMPT/63669](/broking-kyc/reference/circulars/clearing-corps/), **internal shortage is now also auction-eligible** — the CC conducts the auction even when the member is net-flat (per [NCL/CMPT/71045](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt71045) and FAQ [NCL/CMPT/71441](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt71441) referring back to CMPT66688 of Feb 14, 2025).
 
-This is a structural change: direct-payout-to-demat eliminated the broker's internal netting, exposing internal shortages to the same auction mechanism that previously only applied to CC shortages. The broker's responsibility increases — every selling client must have the securities physically available in the broker's pool / CUSPA at pay-in.
+This is a structural change: direct-payout-to-demat eliminated the broker's internal netting, exposing internal shortages to the same auction mechanism that previously only applied to CC shortages. The broker's responsibility increases — every selling client must have the securities physically available in the broker's pool / <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr> at pay-in.
 
 ### 1.3 G-Sec and corporate-action scenarios
 
@@ -93,7 +93,7 @@ Close-out price = higher of:
 
 The 20% mark-up on close-out is the structural penalty for the failing broker — it ensures the buying party is compensated at a meaningful premium for the settlement delay and the price uncertainty.
 
-Note: For T+0 settlements (top 500 scrips per [SEBI/HO/MRD/POD-3/P/CIR/2024/172](/broking-kyc/reference/circulars/sebi-other/#sebihomrdpod-3pcir2024172) and [SEBI/HO/MRD/MRD-PoD-3/P/CIR/2024/20](/broking-kyc/reference/circulars/sebi-other/#sebihomrdmrd-pod-3pcir202420)), the close-out flow has a separate timeline because settlement must complete same day.
+Note: For <abbr title="Trade-date Plus N settlement">T+0</abbr> settlements (top 500 scrips per [SEBI/HO/MRD/POD-3/P/CIR/2024/172](/broking-kyc/reference/circulars/sebi-other/#sebihomrdpod-3pcir2024172) and [SEBI/HO/MRD/MRD-PoD-3/P/CIR/2024/20](/broking-kyc/reference/circulars/sebi-other/#sebihomrdmrd-pod-3pcir202420)), the close-out flow has a separate timeline because settlement must complete same day.
 
 ### 3.1 Worked example
 
@@ -113,7 +113,7 @@ Plus any per-CC penalty charges (typically a percentage of the close-out value o
 
 ### 3.2 Auction-settled (not close-out) example
 
-**Setup:** Same broker short 1,000 shares of ABC at settlement price ₹100. Pay-in fails. Auction called on T+2.
+**Setup:** Same broker short 1,000 shares of <abbr title="Additional Base Capital">ABC</abbr> at settlement price ₹100. Pay-in fails. Auction called on T+2.
 
 - Two members offer to deliver at ₹103 and ₹104 respectively.
 - CC matches the ₹103 offer for the full 1,000 quantity.
@@ -127,7 +127,7 @@ The buying side completes settlement at ₹100; the difference between ₹103 an
 
 ### 4.1 NCL / NSCCL
 
-[NCL/CMPT/61800](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt61800) (CM master) and successor [NCL/CMPT/67751](/broking-kyc/reference/circulars/clearing-corps/) define the cash-segment penalty flows. Key items:
+[NCL/CMPT/61800](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt61800) (<abbr title="Clearing Member">CM</abbr> master) and successor [NCL/CMPT/67751](/broking-kyc/reference/circulars/clearing-corps/) define the cash-segment penalty flows. Key items:
 
 | Item | Description |
 |---|---|
@@ -140,11 +140,11 @@ The penalty cascade is enforced by direct debit to the failing broker's settleme
 
 ### 4.2 ICCL
 
-ICCL operates equivalent mechanics. The Feb 2025 pilot of direct-payout-to-demat at ICCL (per ICCL 20250214-69) extended auction-eligibility to internal shortages on ICCL similarly to NCL.
+<abbr title="Indian Clearing Corporation Limited">ICCL</abbr> operates equivalent mechanics. The Feb 2025 pilot of direct-payout-to-demat at ICCL (per ICCL 20250214-69) extended auction-eligibility to internal shortages on ICCL similarly to NCL.
 
 ### 4.3 MCXCCL
 
-MCX cash-equivalent flows are smaller-volume but operationally similar; MCX/MCXCCL/805/2020 covers the framework with subsequent updates.
+<abbr title="Multi Commodity Exchange of India">MCX</abbr> cash-equivalent flows are smaller-volume but operationally similar; MCX/<abbr title="Multi Commodity Exchange Clearing Corporation Limited">MCXCCL</abbr>/805/2020 covers the framework with subsequent updates.
 
 ### 4.4 NSE Inspection grid
 
@@ -194,9 +194,9 @@ A reconciliation gap = an anticipated short. The compliance / settlement team ha
 When a client is the cause of a short-delivery (the client sold securities they don't actually hold, or a pledge release didn't process in time), the broker debits the client for the auction-related costs and reports the event:
 
 - **Contract note adjustment** — the original trade contract note shows the original price; an auction adjustment is reflected as a separate ledger entry / contract note addendum.
-- **SMS / email notification** — DLT-template-aligned notification informing the client of the short-delivery, the auction outcome, and the client's debit.
+- **<abbr title="Short Message Service.">SMS</abbr> / email notification** — DLT-template-aligned notification informing the client of the short-delivery, the auction outcome, and the client's debit.
 - **Statement of account** — quarterly statement reflects the adjusted ledger.
-- **Investor charter** — repeated auction-debits trigger client-grievance escalation; client may complain via SCORES.
+- **Investor charter** — repeated auction-debits trigger client-grievance escalation; client may complain via <abbr title="SEBI Complaints Redress System">SCORES</abbr>.
 
 For ambiguous cases (broker-side operational error vs client-side responsibility), the broker may absorb the cost rather than debit the client — a customer-experience cost the broker accepts to avoid grievance escalation.
 
@@ -248,7 +248,7 @@ Penalty cannot be passed on to clients per [NSE/INSP/64315](/broking-kyc/referen
 
 ### 8.1 Illiquid security auctions
 
-For very illiquid securities — penny stocks, GSM-stage-IV stocks, ESM-stage-II stocks — the auction may receive no offers at any price. Close-out then applies the formula (max of highest-in-window or 20% above close), and the failing broker pays this directly. The buying party receives funds equivalent to the close-out price rather than the securities themselves; the trade is effectively reversed at the close-out value.
+For very illiquid securities — penny stocks, <abbr title="Graded Surveillance Measure">GSM</abbr>-stage-IV stocks, <abbr title="Enhanced Surveillance Measure">ESM</abbr>-stage-<abbr title="—">II</abbr> stocks — the auction may receive no offers at any price. Close-out then applies the formula (max of highest-in-window or 20% above close), and the failing broker pays this directly. The buying party receives funds equivalent to the close-out price rather than the securities themselves; the trade is effectively reversed at the close-out value.
 
 ### 8.2 Large-position short-delivery
 
@@ -272,11 +272,11 @@ A client borrowing securities via SLB (Securities Lending and Borrowing) to shor
 
 ### 8.7 Cross-CC scenarios
 
-When a broker is a member of multiple clearing corps (NSCCL for NSE, ICCL for BSE, MCXCCL for MCX), shortage at one CC doesn't automatically draw on collateral at another CC. The broker must explicitly transfer cash / collateral between CCs to remediate cross-CC scenarios.
+When a broker is a member of multiple clearing corps (<abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NSCCL</abbr> for NSE, ICCL for <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr>, MCXCCL for MCX), shortage at one CC doesn't automatically draw on collateral at another CC. The broker must explicitly transfer cash / collateral between CCs to remediate cross-CC scenarios.
 
 ### 8.8 NRI shorts
 
-NRI client short-deliveries are rarer but follow the standard auction path. Post the Sep 2025 CP-code mechanism removal for NRI ([SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/109](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir2025109)), the broker handles the NRI short directly without CP-code intermediation.
+<abbr title="Non-Resident Indian">NRI</abbr> client short-deliveries are rarer but follow the standard auction path. Post the Sep 2025 CP-code mechanism removal for NRI ([SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/109](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir2025109)), the broker handles the NRI short directly without CP-code intermediation.
 
 ### 8.9 MTF auction
 
@@ -297,16 +297,16 @@ A taxonomy of the typical root causes:
 | Short selling without inventory | Client sold securities they don't own (uncovered short on cash segment, generally not permitted but can happen via fat-finger or system bypass) | Stricter pre-trade holding-check; SLB-route the short if intentional |
 | Inventory in CSMFA / MTF pool | MTF-funded positions are pledged in CSMFA; can't be delivered without unpledge | Pre-pay-in CSMFA reconciliation; staff awareness |
 | Corporate-action timing | Ex-date adjustment changes the deliverable quantity (bonus, split) | CA-aware reconciliation; book the adjustment before pay-in |
-| Cross-DP transfer in flight | Securities being transmitted from one BO to another, transit window catches pay-in | Pre-pay-in DP-status check; manual remediation if needed |
-| Demat freeze | Securities in a frozen BO can't be delivered | KYC remediation; secondary path through unpledge-and-redeem |
+| Cross-<abbr title="Depository Participant">DP</abbr> transfer in flight | Securities being transmitted from one <abbr title="Beneficial Owner">BO</abbr> to another, transit window catches pay-in | Pre-pay-in DP-status check; manual remediation if needed |
+| Demat freeze | Securities in a frozen BO can't be delivered | <abbr title="Know Your Customer (process).">KYC</abbr> remediation; secondary path through unpledge-and-redeem |
 | Operational error | Settlement file mis-mapped, manual processing error | Process review; root-cause analysis post-event |
-| System failure | OMS / RMS / back-office did not flag the anticipated short | Reliability engineering; redundant reconciliation paths |
+| System failure | <abbr title="Order Management System">OMS</abbr> / <abbr title="Risk Management System">RMS</abbr> / back-office did not flag the anticipated short | Reliability engineering; redundant reconciliation paths |
 
 The taxonomy informs root-cause analysis: each event must be tagged with a root cause so the broker can track trends and invest in the highest-frequency remediation.
 
 ## Sub-cases / edge cases (additional)
 
-- **Pay-in default cascade.** If a broker's overall pay-in fails (not just a single security short but a broad failure), the [Core Settlement Guarantee Fund (Core SGF)](/broking-kyc/reference/circulars/clearing-corps/) covers the obligation to the market; the broker faces immediate consequences — position closure, member suspension or cancellation, and recovery action by the CC against the broker's deposits and own funds. This is the worst-case scenario.
+- **Pay-in default cascade.** If a broker's overall pay-in fails (not just a single security short but a broad failure), the [Core Settlement Guarantee Fund (Core <abbr title="Settlement Guarantee Fund">SGF</abbr>)](/broking-kyc/reference/circulars/clearing-corps/) covers the obligation to the market; the broker faces immediate consequences — position closure, member suspension or cancellation, and recovery action by the CC against the broker's deposits and own funds. This is the worst-case scenario.
 - **G-Sec close-out via NDS-RST.** G-Sec settlements run on the NDS-RST platform with its own settlement procedure (ICCL 20200201-13). Close-out for G-Sec follows a different file naming.
 - **MCX commodity short-delivery (physical contracts).** Tender-period and delivery-period margins (per MCXCCL/C&S/058/2025) are higher precisely to discourage short-delivery; the auction-equivalent mechanism for compulsory-delivery contracts has its own timeline.
 - **SGB (Sovereign Gold Bond) shortage.** SGB tranche settlement (ICCL 20200706-1) has segment-specific cut-offs; short-delivery is rare because SGBs are typically institutional with confirmed inventories.
@@ -326,13 +326,13 @@ The taxonomy informs root-cause analysis: each event must be tagged with a root 
 
 ## Cross-references
 
-- [Integration DAG: Trading hours](/broking-kyc/operations/integration-dag/trading-hours/) — pre-trade pipeline that should catch uncovered short-sells.
+- [Integration <abbr title="Directed Acyclic Graph.">DAG</abbr>: Trading hours](/broking-kyc/operations/integration-dag/trading-hours/) — pre-trade pipeline that should catch uncovered short-sells.
 - [Broker Process Narrative](/broking-kyc/broker-process/narrative/) — Section 3 covers settlement and the auction mechanism at narrative level.
 - [Compliance Blueprint — Settlement domain](/broking-kyc/operations/compliance-blueprint/) — 22 entries covering settlement including auction, close-out, MTF settlement, direct-payout.
 - [Compliance Blueprint — Margin compliance domain](/broking-kyc/operations/compliance-blueprint/) — margin shortfall, peak-margin, DMF.
 - [Deep Dive: OMS internals](/broking-kyc/deep-dives/trading-day/oms-internals/) — pre-trade gates that should prevent short-delivery.
-- [Deep Dive: SPAN methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/) — margin computation; uncovered shorts attract higher margin.
-- [Deep Dive: Surveillance, GSM, ASM](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/) — repeated short-delivery is a surveillance flag.
+- [Deep Dive: <abbr title="Standard Portfolio Analysis of Risk">SPAN</abbr> methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/) — margin computation; uncovered shorts attract higher margin.
+- [Deep Dive: Surveillance, GSM, <abbr title="Additional Surveillance Measure">ASM</abbr>](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/) — repeated short-delivery is a surveillance flag.
 - [Deep Dive: Block / bulk deals](/broking-kyc/deep-dives/trading-day/block-bulk-deals/) — block-deal settlement also flows through this auction mechanism.
 - [Clearing-corp circulars](/broking-kyc/reference/circulars/clearing-corps/) — full text of NCL / ICCL / MCXCCL circulars cited: [NCL/CMPT/71045](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt71045), [NCL/CMPT/71441](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt71441), [NCL/CMPT/61800](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt61800), [NCL/CMPT/63669](/broking-kyc/reference/circulars/clearing-corps/), [NCL/CMPT/66779](/broking-kyc/reference/circulars/clearing-corps/), [NCL/CMPT/72224](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt72224).
 - [SEBI other circulars](/broking-kyc/reference/circulars/sebi-other/) — including [SEBI/HO/MRD-PoD2/CIR/P/2024/00181](/broking-kyc/reference/circulars/sebi-other/#sebihomrd-pod2cirp202400181) master circular.

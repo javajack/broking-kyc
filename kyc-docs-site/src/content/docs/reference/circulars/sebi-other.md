@@ -15,14 +15,14 @@ description: "Verified index of SEBI (MRD / IMD / OIAE / LAD-NRO / CFD) circular
 
 ## Conceptual overview
 
-This page is the complete listing of SEBI (MRD / IMD / OIAE / LAD-NRO / CFD) circulars in the project's 2020–2026 sweep window. Each entry contains the verbatim circular ID, issue date, in-force date, status (in-force / superseded / withdrawn), applicable entity types, impact-area tags, a 2–4 sentence summary traceable to clauses, and the primary URL. Where the primary URL could not be re-fetched, an archive URL is provided in its place.
+This page is the complete listing of <abbr title="Securities and Exchange Board of India">SEBI</abbr> (<abbr title="Market Regulation Department (SEBI)">MRD</abbr> / <abbr title="Investment Management Department (within SEBI)">IMD</abbr> / <abbr title="Office of Investor Assistance and Education (SEBI)">OIAE</abbr> / <abbr title="Legal Affairs Department — Northern Regional Office (SEBI)">LAD-NRO</abbr> / <abbr title="Corporate Finance Department (within SEBI)">CFD</abbr>) circulars in the project's 2020–2026 sweep window. Each entry contains the verbatim circular ID, issue date, in-force date, status (in-force / superseded / withdrawn), applicable entity types, impact-area tags, a 2–4 sentence summary traceable to clauses, and the primary URL. Where the primary URL could not be re-fetched, an archive URL is provided in its place.
 
 ## Entries (descending date)
 
 ### SEBI/LAD-NRO/GN/2026/291
 
 - **date_issued:** 2026-01-07
-- **issuer:** SEBI-LAD-NRO
+- **issuer:** SEBI-LAD-<abbr title="Non-Resident Ordinary (Rupee) account">NRO</abbr>
 - **title:** "Securities and Exchange Board of India (Stock Brokers) Regulations, 2026"
 - **applies_to:** broker, clearing-corp
 - **in_force_date:** 2026-01-07
@@ -43,7 +43,7 @@ Replaces the SEBI (Stock Brokers and Sub-Brokers) Regulations, 1992 with a compl
 - **impact_areas:** digi-locker, transmission, nominee, dormant
 - **primary_url:** https://www.sebi.gov.in/legal/circulars/mar-2025/harnessing-digilocker-as-a-digital-public-infrastructure-for-reducing-unclaimed-assets-in-the-indian-securities-market_92769.html
 
-Directs all AMCs (and their RTAs) and recognized Depositories to register with DigiLocker as 'Issuer' so investors can fetch and store their statement of holdings for shares and mutual fund units along with the Consolidated Account Statement (CAS) inside DigiLocker. Introduces a Data Access Nominee concept under which KRA-notified demise triggers DigiLocker auto-notification to nominees to surface unclaimed financial assets. Effective April 1, 2025.
+Directs all AMCs (and their RTAs) and recognized Depositories to register with DigiLocker as 'Issuer' so investors can fetch and store their statement of holdings for shares and mutual fund units along with the Consolidated Account Statement (CAS) inside DigiLocker. Introduces a Data Access Nominee concept under which <abbr title="KYC Registration Agency">KRA</abbr>-notified demise triggers DigiLocker auto-notification to nominees to surface unclaimed financial assets. Effective April 1, 2025.
 
 ### SEBI/HO/CFD/CFD-PoD-1/P/CIR/2025/31
 
@@ -108,7 +108,7 @@ Establishes the MF Lite framework operationalizing the SEBI (Mutual Funds) (Thir
 - **impact_areas:** settlement, margin, rms, surveillance, reporting, derivatives, cyber-security, bcp-dr, system-audit, t0-t1, file-format
 - **primary_url:** https://www.sebi.gov.in/legal/master-circulars/dec-2024/master-circular-for-stock-exchanges-and-clearing-corporations_89941.html
 
-Updates and consolidates the SE/CC master circular with all circulars issued after the October 2023 master through November 30, 2024. Incorporates T+0 expansion, Index Derivatives Framework, MII Shareholding Monitoring, and other major MRD circulars. Supersedes SEBI/HO/MRD2/PoD-2/CIR/P/2023/171.
+Updates and consolidates the SE/<abbr title="Clearing Corporation (NCL, ICCL, MCXCCL — context-dependent).">CC</abbr> master circular with all circulars issued after the October 2023 master through November 30, 2024. Incorporates <abbr title="Trade-date Plus N settlement">T+0</abbr> expansion, Index Derivatives Framework, <abbr title="Market Infrastructure Institution">MII</abbr> Shareholding Monitoring, and other major MRD circulars. Supersedes SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/MRD2/PoD-2/CIR/P/2023/171.
 
 ### SEBI/LAD-NRO/GN/2024/218
 
@@ -127,7 +127,7 @@ Third amendment to LODR Regulations introducing Integrated Filing (Governance an
 
 - **date_issued:** 2024-12-10
 - **issuer:** SEBI-MRD
-- **title:** "Enhancement in the scope of optional T+0 rolling settlement cycle in addition to the existing T+1 settlement cycle in Equity Cash Markets"
+- **title:** "Enhancement in the scope of optional T+0 rolling settlement cycle in addition to the existing <abbr title="Trade-date Plus N settlement">T+1</abbr> settlement cycle in Equity Cash Markets"
 - **applies_to:** broker, exchange, clearing-corp, depository
 - **in_force_date:** 2025-01-31
 - **status:** in-force
@@ -199,7 +199,7 @@ Consolidates all relevant LODR circulars issued on/before September 30, 2024 int
 - **impact_areas:** upi-block, client-funds, onboarding, rms
 - **primary_url:** https://www.sebi.gov.in/legal/circulars/nov-2024/trading-supported-by-blocked-amount-in-secondary-market_88339.html
 
-Mandates that every Qualified Stock Broker (QSB) must offer its clients either (a) the facility of trading supported by blocked amount in the cash segment using UPI block mechanism, or (b) the 3-in-1 trading account facility, in addition to the conventional mode. Brings ASBA-like protection of investor cash collateral to the secondary market; effective February 1, 2025.
+Mandates that every Qualified Stock Broker (<abbr title="Qualified Stock Broker">QSB</abbr>) must offer its clients either (a) the facility of trading supported by blocked amount in the cash segment using <abbr title="Unified Payments Interface">UPI</abbr> block mechanism, or (b) the 3-in-1 trading account facility, in addition to the conventional mode. Brings <abbr title="Applications Supported by Blocked Amount">ASBA</abbr>-like protection of investor cash collateral to the secondary market; effective February 1, 2025.
 
 ### SEBI/HO/MRD/MRD-PoD-3/P/CIR/2024/139
 
@@ -303,7 +303,7 @@ Directs Market Infrastructure Institutions (stock exchanges, clearing corporatio
 - **impact_areas:** mutual-funds, reporting, file-format
 - **primary_url:** https://www.sebi.gov.in/legal/master-circulars/jun-2024/master-circular-for-mutual-funds_84441.html
 
-Consolidates all extant circulars issued by SEBI on mutual funds up to March 31, 2024 into a single master circular. Covers offer documents, NFO timelines, investment by AMC into its own schemes, risk-management framework, valuation, transaction costs, and stress testing. Supersedes prior MF master circulars including the May 2023 edition.
+Consolidates all extant circulars issued by SEBI on mutual funds up to March 31, 2024 into a single master circular. Covers offer documents, NFO timelines, investment by <abbr title="Asset Management Company (mutual funds context) / Annual Maintenance Charges (depository context).">AMC</abbr> into its own schemes, risk-management framework, valuation, transaction costs, and stress testing. Supersedes prior MF master circulars including the May 2023 edition.
 
 ### SEBI/HO/MRD/MRD-PoD-3/2024/088
 
@@ -409,7 +409,7 @@ Strengthens safeguards for transfer of securities in dematerialized mode. Requir
 - **impact_areas:** grievance, scores-odr
 - **primary_url:** https://www.sebi.gov.in/legal/master-circulars/dec-2023/master-circular-for-online-resolution-of-disputes-in-the-indian-securities-market_80236.html
 
-Consolidates the ODR circular dated July 31, 2023 and amendment dated December 20, 2023 into a single master circular. Sets out the structure of the SMART ODR Portal, eligibility of ODR Institutions, conciliation and arbitration procedures, fees, and timelines for resolution of investor disputes against SEBI-regulated entities.
+Consolidates the <abbr title="Online Dispute Resolution">ODR</abbr> circular dated July 31, 2023 and amendment dated December 20, 2023 into a single master circular. Sets out the structure of the SMART ODR Portal, eligibility of ODR Institutions, conciliation and arbitration procedures, fees, and timelines for resolution of investor disputes against SEBI-regulated entities.
 
 ### SEBI/HO/OIAE/OIAE_IAD-3/P/CIR/2023/191
 
@@ -429,7 +429,7 @@ Amends the July 31, 2023 ODR circular to clarify panel composition, fee structur
 
 - **date_issued:** 2023-12-01
 - **issuer:** SEBI-OIAE
-- **title:** "Timelines for handling investor complaints by SCORES and action against non-compliance"
+- **title:** "Timelines for handling investor complaints by <abbr title="SEBI Complaints Redress System">SCORES</abbr> and action against non-compliance"
 - **applies_to:** broker, depository, exchange, clearing-corp, all-intermediaries
 - **in_force_date:** immediate
 - **status:** in-force
@@ -489,7 +489,7 @@ Consolidates all circulars/directions/operating instructions for the commodity d
 - **impact_areas:** mutual-funds, reporting, file-format
 - **primary_url:** https://www.sebi.gov.in/legal/circulars/jul-2023/new-category-of-mutual-fund-schemes-for-environmental-social-and-governance-esg-investing-and-related-disclosures-by-mutual-funds_74186.html
 
-Creates a separate ESG category under Equity schemes permitting multiple ESG sub-strategies (Exclusion, Integration, Best-in-class, Positive screening, Impact investing, Sustainable objectives, Transition or transition-related investments). Requires 65% of AUM in companies with comprehensive BRSR Core disclosures, annual independent reasonable assurance, and monthly ESG portfolio disclosure with rationale.
+Creates a separate ESG category under Equity schemes permitting multiple ESG sub-strategies (Exclusion, Integration, Best-in-class, Positive screening, Impact investing, Sustainable objectives, Transition or transition-related investments). Requires 65% of AUM in companies with comprehensive <abbr title="Business Responsibility and Sustainability Report">BRSR</abbr> Core disclosures, annual independent reasonable assurance, and monthly ESG portfolio disclosure with rationale.
 
 ### SEBI/HO/CFD/CFD-SEC-2/P/CIR/2023/122
 
@@ -530,7 +530,7 @@ Master circular consolidating LODR-related operational provisions for listed ent
 - **impact_areas:** reporting, file-format, other
 - **primary_url:** https://www.sebi.gov.in/legal/master-circulars/jun-2023/master-circular-for-issue-of-capital-and-disclosure-requirements_72617.html
 
-Consolidates all circulars/directions issued under the SEBI (ICDR) Regulations, 2018 up to that date into a single master circular covering IPOs, FPOs, rights issues, OFS, preferential issues, and Issue Summary Document (ISD) procedures.
+Consolidates all circulars/directions issued under the SEBI (ICDR) Regulations, 2018 up to that date into a single master circular covering IPOs, FPOs, rights issues, <abbr title="Offer for Sale (through stock exchange)">OFS</abbr>, preferential issues, and Issue Summary Document (ISD) procedures.
 
 ### SEBI/HO/CFD/POD-2/P/CIR/2023/93
 
@@ -605,11 +605,11 @@ Issues a comprehensive framework for development of passive funds covering index
 - **applies_to:** exchange, clearing-corp, depository
 - **in_force_date:** immediate
 - **status:** superseded
-- **superseded_by:** SEBI/HO/ITD-1/ITD_CSC_EXT/P/CIR/2024/113
+- **superseded_by:** SEBI/HO/<abbr title="Information Technology Department (within SEBI)">ITD</abbr>-1/ITD_CSC_EXT/P/CIR/2024/113
 - **impact_areas:** cyber-security, system-audit, bcp-dr
 - **primary_url:** https://www.sebi.gov.in/legal/circulars/may-2022/modification-in-cyber-security-and-cyber-resilience-framework-of-stock-exchanges-clearing-corporations-and-depositories_58825.html
 
-Modifies the cyber-security and cyber-resilience framework for MIIs - requiring half-yearly comprehensive cyber audits with declaration from MD/CEO certifying SEBI compliance, classification/designation of critical assets, and additional safeguards for sensitive personal/financial data and PII. Superseded by the consolidated CSCRF in August 2024.
+Modifies the cyber-security and cyber-resilience framework for MIIs - requiring half-yearly comprehensive cyber audits with declaration from MD/CEO certifying SEBI compliance, classification/designation of critical assets, and additional safeguards for sensitive personal/financial data and PII. Superseded by the consolidated <abbr title="Cybersecurity and Cyber Resilience Framework">CSCRF</abbr> in August 2024.
 
 ### SEBI/HO/CFD/DIL2/CIR/P/2022/45
 
@@ -622,7 +622,7 @@ Modifies the cyber-security and cyber-resilience framework for MIIs - requiring 
 - **impact_areas:** upi-block, mandate, file-format
 - **primary_url:** https://www.sebi.gov.in/legal/circulars/apr-2022/streamlining-the-process-of-public-issues_57860.html
 
-Enhances the UPI mandate limit for IPO retail investor applications. Mandates that all individual bidders in IPOs opening on/after May 1, 2022 with application size up to INR 5 lakh shall use the UPI mechanism (raised from INR 2 lakh). Brings 95%+ of retail IPO applications onto a single UPI rail.
+Enhances the UPI mandate limit for <abbr title="Initial Public Offering">IPO</abbr> retail investor applications. Mandates that all individual bidders in IPOs opening on/after May 1, 2022 with application size up to INR 5 lakh shall use the UPI mechanism (raised from INR 2 lakh). Brings 95%+ of retail IPO applications onto a single UPI rail.
 
 ### SEBI/HO/MRD2/DCAP/P/CIR/2021/628
 
@@ -636,7 +636,7 @@ Enhances the UPI mandate limit for IPO retail investor applications. Mandates th
 - **impact_areas:** settlement, t0-t1
 - **primary_url:** https://www.sebi.gov.in/legal/circulars/sep-2021/introduction-of-t-1-rolling-settlement-on-an-optional-basis_52462.html
 
-Permits stock exchanges, at their discretion, to migrate any scrip to a T+1 rolling settlement cycle from the existing T+2, subject to giving one month advance notice and continuing T+1 for that scrip for a minimum of six months. Operationalized in phases beginning February 25, 2022 and completed across all listed scrips by January 27, 2023.
+Permits stock exchanges, at their discretion, to migrate any scrip to a T+1 rolling settlement cycle from the existing <abbr title="Trade-date Plus N settlement">T+2</abbr>, subject to giving one month advance notice and continuing T+1 for that scrip for a minimum of six months. Operationalized in phases beginning February 25, 2022 and completed across all listed scrips by January 27, 2023.
 
 ### SEBI/HO/MRD2_DCAP/CIR/2021/0598
 

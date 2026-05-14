@@ -3,7 +3,7 @@ title: Code Tables
 description: Lookup values for every dropdown and coded field — occupation codes, KRA status codes, PAN status codes, and other reference data.
 ---
 
-This page collects all the coded lookup values used across the KYC system -- the values behind every dropdown, every status field, and every coded response from external systems. You will not read this cover-to-cover, but you will come back to it frequently when building form dropdowns, parsing API responses, or investigating why a record was rejected by the KRA (KYC Registration Agency) or an exchange.
+This page collects all the coded lookup values used across the <abbr title="Know Your Customer (process).">KYC</abbr> system -- the values behind every dropdown, every status field, and every coded response from external systems. You will not read this cover-to-cover, but you will come back to it frequently when building form dropdowns, parsing API responses, or investigating why a record was rejected by the <abbr title="KYC Registration Agency">KRA</abbr> (KYC Registration Agency) or an exchange.
 
 :::tip[Quick navigation]
 Use Ctrl+F to search for a specific code. If you see a two-digit code in a database record or API response and do not know what it means, this is the page to check.
@@ -11,7 +11,7 @@ Use Ctrl+F to search for a specific code. If you see a two-digit code in a datab
 
 ## Occupation Codes (KRA/CKYC)
 
-These codes are used in the KRA submission file and the CKYC (Central KYC) upload. The occupation dropdown on the onboarding form maps directly to these values.
+These codes are used in the KRA submission file and the <abbr title="Central KYC (records registry)">CKYC</abbr> (Central KYC) upload. The occupation dropdown on the onboarding form maps directly to these values.
 
 | Code | Description |
 |------|-------------|
@@ -29,7 +29,7 @@ These codes are used in the KRA submission file and the CKYC (Central KYC) uploa
 
 ## KRA Status Codes
 
-You will encounter these statuses when the system performs a KRA lookup by PAN (Permanent Account Number). The status determines whether the customer can trade and how the onboarding flow should proceed.
+You will encounter these statuses when the system performs a KRA lookup by <abbr title="Permanent Account Number">PAN</abbr> (Permanent Account Number). The status determines whether the customer can trade and how the onboarding flow should proceed.
 
 | Status | Trading | Action |
 |--------|---------|--------|
@@ -41,12 +41,12 @@ You will encounter these statuses when the system performs a KRA lookup by PAN (
 | Not Available | N/A | Fresh KYC required |
 
 :::caution
-"On Hold" is the status that generates the most support tickets. It typically means there is a mismatch between the name or address in the KRA record and what SEBI (Securities and Exchange Board of India) validation checks expect. The ops team must review the discrepancy and either correct the data or escalate to the KRA for resolution.
+"On Hold" is the status that generates the most support tickets. It typically means there is a mismatch between the name or address in the KRA record and what <abbr title="Securities and Exchange Board of India">SEBI</abbr> (Securities and Exchange Board of India) validation checks expect. The ops team must review the discrepancy and either correct the data or escalate to the KRA for resolution.
 :::
 
 ## PAN Status Codes
 
-These come back from the PAN verification API (NSDL/Protean). Any status other than "E" or "valid" is a hard stop -- the onboarding cannot proceed.
+These come back from the PAN verification API (<abbr title="National Securities Depository Limited">NSDL</abbr>/Protean). Any status other than "E" or "valid" is a hard stop -- the onboarding cannot proceed.
 
 | Code | Description | Onboarding |
 |------|-------------|-----------|
@@ -58,7 +58,7 @@ These come back from the PAN verification API (NSDL/Protean). Any status other t
 
 ## Income Range Codes
 
-These codes are submitted to the KRA and the exchanges as part of UCC (Unique Client Code) registration. The customer selects an income range on the onboarding form; the system stores the corresponding code.
+These codes are submitted to the KRA and the exchanges as part of <abbr title="Unique Client Code">UCC</abbr> (Unique Client Code) registration. The customer selects an income range on the onboarding form; the system stores the corresponding code.
 
 | Code | Range | Used By |
 |------|-------|---------|
@@ -71,7 +71,7 @@ These codes are submitted to the KRA and the exchanges as part of UCC (Unique Cl
 
 ## Client Category Codes (MCX)
 
-MCX (Multi Commodity Exchange) requires a client category code during UCC registration. All three categories require income proof documentation.
+<abbr title="Multi Commodity Exchange of India">MCX</abbr> (Multi Commodity Exchange) requires a client category code during UCC registration. All three categories require income proof documentation.
 
 | Code | Description | Income Proof |
 |------|-------------|-------------|
@@ -91,7 +91,7 @@ These are internal application statuses that track where a customer is in the on
 | FILLING | User Journey | Completing Screens 4-8 |
 | GATE_CHECK | User Journey | Blocking gate evaluation |
 | GATE_FAILED | User Journey | A blocking check failed |
-| e_SIGNED | Submitted | Aadhaar OTP e-Sign complete |
+| e_SIGNED | Submitted | Aadhaar <abbr title="One-Time Password">OTP</abbr> e-Sign complete |
 | UNDER_REVIEW | Admin | In maker-checker queue |
 | APPROVED | Admin | Checker signed off |
 | REJECTED | Admin | Checker rejected |

@@ -19,32 +19,32 @@ description: "Delta against the prior 37-entry hand-curated list, after the 2026
 
 | Issuer | New entries |
 | --- | --- |
-| NSE | 156 |
-| NSDL | 112 |
-| CDSL | 108 |
-| Clearing Corporations (NSCCL / ICCL / MCXCCL) | 107 |
-| MCX | 84 |
-| NPCI | 50 |
-| SEBI-MIRSD | 50 |
-| RBI | 47 |
-| SEBI (MRD / IMD / OIAE / LAD-NRO / CFD) | 47 |
-| BSE | 45 |
-| MeitY / CCA | 29 |
-| CERSAI / CKYC | 20 |
-| FIU-IND | 20 |
+| <abbr title="National Stock Exchange of India">NSE</abbr> | 156 |
+| <abbr title="National Securities Depository Limited">NSDL</abbr> | 112 |
+| <abbr title="Central Depository Services (India) Limited">CDSL</abbr> | 108 |
+| Clearing Corporations (<abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NSCCL</abbr> / <abbr title="Indian Clearing Corporation Limited">ICCL</abbr> / <abbr title="Multi Commodity Exchange Clearing Corporation Limited">MCXCCL</abbr>) | 107 |
+| <abbr title="Multi Commodity Exchange of India">MCX</abbr> | 84 |
+| <abbr title="National Payments Corporation of India">NPCI</abbr> | 50 |
+| <abbr title="Securities and Exchange Board of India">SEBI</abbr>-<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr> | 50 |
+| <abbr title="Reserve Bank of India">RBI</abbr> | 47 |
+| SEBI (<abbr title="Market Regulation Department (SEBI)">MRD</abbr> / <abbr title="Investment Management Department (within SEBI)">IMD</abbr> / <abbr title="Office of Investor Assistance and Education (SEBI)">OIAE</abbr> / <abbr title="Legal Affairs Department — Northern Regional Office (SEBI)">LAD-NRO</abbr> / <abbr title="Corporate Finance Department (within SEBI)">CFD</abbr>) | 47 |
+| <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> | 45 |
+| MeitY / <abbr title="Controller of Certifying Authorities">CCA</abbr> | 29 |
+| <abbr title="Central Registry of Securitisation Asset Reconstruction and Security Interest of India">CERSAI</abbr> / <abbr title="Central KYC (records registry)">CKYC</abbr> | 20 |
+| <abbr title="Financial Intelligence Unit — India">FIU-IND</abbr> | 20 |
 
 ## Carried forward from prior list
 
 | ID | Date | Issuer | Title |
 | --- | --- | --- | --- |
-| [SEBI/LAD-NRO/GN/2026/291](./circulars/sebi-other/#sebi-lad-nro-gn-2026-291) | 2026-01-07 | SEBI-LAD-NRO | Securities and Exchange Board of India (Stock Brokers) Regulations, 2026 |
-| [SEBI/HO/OIAE/OIAE_IAD-3/P/CIR/2025/32](./circulars/sebi-other/#sebi-ho-oiae-oiae-iad-3-p-cir-2025-32) | 2025-03-19 | SEBI-OIAE | Harnessing DigiLocker as a Digital Public Infrastructure for reducing Unclaimed  |
-| [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](./circulars/sebi-mirsd/#sebi-ho-mirsd-secfatf-p-cir-2024-78) | 2024-06-06 | SEBI-MIRSD | Master Circular - Guidelines on Anti-Money Laundering (AML) Standards and Combat |
-| [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/79](./circulars/sebi-mirsd/#sebi-ho-mirsd-secfatf-p-cir-2024-79) | 2024-06-06 | SEBI-MIRSD | Uploading of KYC information by KYC Registration Agencies (KRAs) to Central KYC  |
+| [SEBI/LAD-<abbr title="Non-Resident Ordinary (Rupee) account">NRO</abbr>/GN/2026/291](./circulars/sebi-other/#sebi-lad-nro-gn-2026-291) | 2026-01-07 | SEBI-LAD-NRO | Securities and Exchange Board of India (Stock Brokers) Regulations, 2026 |
+| [SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/OIAE/OIAE_IAD-3/P/CIR/2025/32](./circulars/sebi-other/#sebi-ho-oiae-oiae-iad-3-p-cir-2025-32) | 2025-03-19 | SEBI-OIAE | Harnessing DigiLocker as a Digital Public Infrastructure for reducing Unclaimed  |
+| [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](./circulars/sebi-mirsd/#sebi-ho-mirsd-secfatf-p-cir-2024-78) | 2024-06-06 | SEBI-MIRSD | Master Circular - Guidelines on Anti-Money Laundering (<abbr title="Anti-Money Laundering">AML</abbr>) Standards and Combat |
+| [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/79](./circulars/sebi-mirsd/#sebi-ho-mirsd-secfatf-p-cir-2024-79) | 2024-06-06 | SEBI-MIRSD | Uploading of <abbr title="Know Your Customer (process).">KYC</abbr> information by KYC Registration Agencies (KRAs) to Central KYC  |
 | [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/41](./circulars/sebi-mirsd/#sebi-ho-mirsd-secfatf-p-cir-2024-41) | 2024-05-14 | SEBI-MIRSD | Review of validation of KYC records by KRAs under Risk Management Framework |
-| [SEBI/HO/MRD/MRD-PoD-3/P/CIR/2024/20](./circulars/sebi-other/#sebi-ho-mrd-mrd-pod-3-p-cir-2024-20) | 2024-03-21 | SEBI-MRD | Introduction of Beta version of T+0 rolling settlement cycle on optional basis i |
-| [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12](./circulars/sebi-mirsd/#sebi-ho-mirsd-secfatf-p-cir-2024-12) | 2024-02-20 | SEBI-MIRSD | Centralization of certifications under Foreign Account Tax Compliance Act (FATCA |
-| [SEBI/HO/MIRSD/FATF/P/CIR/2023/0144](./circulars/sebi-mirsd/#sebi-ho-mirsd-fatf-p-cir-2023-0144) | 2023-08-11 | SEBI-MIRSD | Simplification of KYC process and rationalisation of Risk Management Framework a |
+| [SEBI/HO/MRD/MRD-PoD-3/P/CIR/2024/20](./circulars/sebi-other/#sebi-ho-mrd-mrd-pod-3-p-cir-2024-20) | 2024-03-21 | SEBI-MRD | Introduction of Beta version of <abbr title="Trade-date Plus N settlement">T+0</abbr> rolling settlement cycle on optional basis i |
+| [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12](./circulars/sebi-mirsd/#sebi-ho-mirsd-secfatf-p-cir-2024-12) | 2024-02-20 | SEBI-MIRSD | Centralization of certifications under Foreign Account Tax Compliance Act (<abbr title="Foreign Account Tax Compliance Act (US)">FATCA</abbr> |
+| [SEBI/HO/MIRSD/<abbr title="Financial Action Task Force">FATF</abbr>/P/CIR/2023/0144](./circulars/sebi-mirsd/#sebi-ho-mirsd-fatf-p-cir-2023-0144) | 2023-08-11 | SEBI-MIRSD | Simplification of KYC process and rationalisation of Risk Management Framework a |
 | [SEBI/HO/MIRSD/DOP/CIR/P/2020/73](./circulars/sebi-mirsd/#sebi-ho-mirsd-dop-cir-p-2020-73) | 2020-04-24 | SEBI-MIRSD | Clarification on Know Your Client (KYC) Process and Use of Technology for KYC |
 
 ## Prior IDs not located in the new index

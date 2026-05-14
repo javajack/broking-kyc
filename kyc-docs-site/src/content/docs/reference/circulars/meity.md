@@ -15,7 +15,7 @@ description: "Verified index of MeitY / CCA circulars affecting Indian stock bro
 
 ## Conceptual overview
 
-This page is the complete listing of MeitY / CCA circulars in the project's 2020–2026 sweep window. Each entry contains the verbatim circular ID, issue date, in-force date, status (in-force / superseded / withdrawn), applicable entity types, impact-area tags, a 2–4 sentence summary traceable to clauses, and the primary URL. Where the primary URL could not be re-fetched, an archive URL is provided in its place.
+This page is the complete listing of MeitY / <abbr title="Controller of Certifying Authorities">CCA</abbr> circulars in the project's 2020–2026 sweep window. Each entry contains the verbatim circular ID, issue date, in-force date, status (in-force / superseded / withdrawn), applicable entity types, impact-area tags, a 2–4 sentence summary traceable to clauses, and the primary URL. Where the primary URL could not be re-fetched, an archive URL is provided in its place.
 
 ## Entries (descending date)
 
@@ -30,7 +30,7 @@ This page is the complete listing of MeitY / CCA circulars in the project's 2020
 - **impact_areas:** esign, file-format
 - **primary_url:** https://cca.gov.in/sites/files/pdf/guidelines/CCA-IOG.pdf
 
-Updated DSC interoperability specification (v4.0) prescribing certificate profile, OIDs, key usage and revocation-information requirements for DSCs issued by all licensed CAs. Brokers' KYC-acceptance, e-contract and order-confirmation systems must validate signatures against this profile.
+Updated <abbr title="Digital Signature Certificate (CCA-licensed; aka Class 2/3 DSC).">DSC</abbr> interoperability specification (v4.0) prescribing certificate profile, OIDs, key usage and revocation-information requirements for DSCs issued by all licensed CAs. Brokers' <abbr title="Know Your Customer (process).">KYC</abbr>-acceptance, e-contract and order-confirmation systems must validate signatures against this profile.
 
 ### CCA-IVG-2-5-2026
 
@@ -56,7 +56,7 @@ Current CCA identity-verification guideline (v2.5) for DSC issuance and Aadhaar-
 - **impact_areas:** onboarding, re-KYC, esign, dpdp
 - **primary_url:** https://uidai.gov.in/en/about-uidai/legal-framework/regulations/19549-aadhaar-authentication-and-offline-verification-amendment-regulations-2025.html
 
-Gazette of India Extraordinary Part III Section 4 dated 9 December 2025 substantially amends the Aadhaar (Authentication and Offline Verification) Regulations, 2021. Introduces "Aadhaar Application", "Aadhaar Verifiable Credential" and "Offline Face Verification" definitions; restructures permissible offline-verification modes (QR, paperless e-KYC, verifiable credential, e-Aadhaar, paper-based) with optional facial verification; mandates registration of Offline Verification Seeking Entities (OVSEs) and surrender procedures. Brokers using DigiLocker-fetched offline-Aadhaar XML or e-Aadhaar for KYC are OVSEs under this framework.
+Gazette of India Extraordinary Part <abbr title="—">III</abbr> Section 4 dated 9 December 2025 substantially amends the Aadhaar (Authentication and Offline Verification) Regulations, 2021. Introduces "Aadhaar Application", "Aadhaar Verifiable Credential" and "Offline Face Verification" definitions; restructures permissible offline-verification modes (QR, paperless e-KYC, verifiable credential, e-Aadhaar, paper-based) with optional facial verification; mandates registration of Offline Verification Seeking Entities (OVSEs) and surrender procedures. Brokers using DigiLocker-fetched offline-Aadhaar XML or e-Aadhaar for KYC are OVSEs under this framework.
 
 ### DPDP-GSR-843-E-2025
 
@@ -69,7 +69,7 @@ Gazette of India Extraordinary Part III Section 4 dated 9 December 2025 substant
 - **impact_areas:** dpdp, reporting, grievance
 - **primary_url:** https://static.pib.gov.in/WriteReadData/specificdocs/documents/2025/nov/doc20251117695301.pdf
 
-MeitY notification under section 1(2) of the DPDP Act, 2023 appointing 13 November 2025 as the commencement date for sections 1(2), 2, 18-26, 35, 38-43 and sub-sections (1) and (3) of section 44 of the Act. These provisions establish the Data Protection Board of India and its powers — the regulator that brokers will report breaches to and be subject to enforcement by under the DPDP regime.
+MeitY notification under section 1(2) of the <abbr title="Digital Personal Data Protection Act 2023 (and Rules 2025)">DPDP</abbr> Act, 2023 appointing 13 November 2025 as the commencement date for sections 1(2), 2, 18-26, 35, 38-43 and sub-sections (1) and (3) of section 44 of the Act. These provisions establish the Data Protection Board of India and its powers — the regulator that brokers will report breaches to and be subject to enforcement by under the DPDP regime.
 
 ### DPDP-Rules-2025-Notification
 
@@ -148,7 +148,7 @@ MeitY released the draft DPDP Rules for public consultation on 3 January 2025 wi
 - **impact_areas:** esign, cyber-security
 - **primary_url:** https://cca.gov.in/sites/files/pdf/guidelines/CCA-CRYPTO.pdf
 
-Updated CCA security-requirements specification (v2.2) for cryptographic devices used by Certifying Authorities and eSign Service Providers. Tightens cryptographic algorithm, key-length and HSM-assurance baselines applicable to PKI infrastructure that underpins broker DSC issuance and Aadhaar OTP eSign on KYC forms.
+Updated CCA security-requirements specification (v2.2) for cryptographic devices used by Certifying Authorities and eSign Service Providers. Tightens cryptographic algorithm, key-length and HSM-assurance baselines applicable to PKI infrastructure that underpins broker DSC issuance and Aadhaar <abbr title="One-Time Password">OTP</abbr> eSign on KYC forms.
 
 ### DigiLocker-Partner-SOP-2024
 
@@ -161,7 +161,7 @@ Updated CCA security-requirements specification (v2.2) for cryptographic devices
 - **impact_areas:** digi-locker, onboarding, dpdp
 - **primary_url:** https://cf-media.api-setu.in/resources/Partners-SOP.pdf
 
-MeitY-issued Standard Operating Procedure for onboarding Partner Organisations (Issuers and Requesters) onto DigiLocker via API Setu. Covers identification, evaluation, verification, agreement, technical integration, testing, launch and ongoing support. Brokers seeking DigiLocker-fetched OVD-based KYC (Aadhaar XML, PAN, driving licence) and post-2025 unclaimed-asset notifications follow this onboarding pathway.
+MeitY-issued Standard Operating Procedure for onboarding Partner Organisations (Issuers and Requesters) onto DigiLocker via API Setu. Covers identification, evaluation, verification, agreement, technical integration, testing, launch and ongoing support. Brokers seeking DigiLocker-fetched <abbr title="Officially Valid Document">OVD</abbr>-based KYC (Aadhaar XML, <abbr title="Permanent Account Number">PAN</abbr>, driving licence) and post-2025 unclaimed-asset notifications follow this onboarding pathway.
 
 ### CCA-FT-1-0-2024
 
@@ -187,7 +187,7 @@ CCA-issued guideline prescribing the functional-testing and verification protoco
 - **impact_areas:** digi-locker, onboarding, file-format
 - **primary_url:** https://cf-media.api-setu.in/resources/DigiLocker-Issuer-APISpecification-v1-13.pdf
 
-Technical specification (v1.13) for the Issuer-side APIs that allow government bodies, regulators and SEBI-registered intermediaries (KRAs, AMCs, Depositories) to publish documents into DigiLocker. Underpins SEBI's March 2025 mandate (separately tracked in SEBI circulars) that AMCs, Depositories and KRAs register with DigiLocker as Issuers by 1 April 2025 to facilitate transmission of unclaimed assets.
+Technical specification (v1.13) for the Issuer-side APIs that allow government bodies, regulators and <abbr title="Securities and Exchange Board of India">SEBI</abbr>-registered intermediaries (KRAs, AMCs, Depositories) to publish documents into DigiLocker. Underpins SEBI's March 2025 mandate (separately tracked in SEBI circulars) that AMCs, Depositories and KRAs register with DigiLocker as Issuers by 1 April 2025 to facilitate transmission of unclaimed assets.
 
 ### CCA-CALIC-2-1-2024
 
@@ -201,7 +201,7 @@ Technical specification (v1.13) for the Issuer-side APIs that allow government b
 - **impact_areas:** esign, system-audit
 - **primary_url:** https://prodigisign.com/wp-content/uploads/2025/08/CCA-CALIC.pdf
 
-CCA licensing framework for Certifying Authorities under the IT Act, 2000 (Rule 8 of IT(CA) Rules, 2000). Specifies eligibility, capital, security-audit, Common Criteria EAL4+ expectation and annual audit obligations. Brokers are indirectly affected because all CA/ESP entities (e.g. eMudhra, Protean, CDSL Ventures) servicing broker KYC must hold a valid CCA licence under this framework.
+CCA licensing framework for Certifying Authorities under the IT Act, 2000 (Rule 8 of IT(CA) Rules, 2000). Specifies eligibility, capital, security-audit, Common Criteria EAL4+ expectation and annual audit obligations. Brokers are indirectly affected because all CA/ESP entities (e.g. eMudhra, Protean, <abbr title="Central Depository Services (India) Limited">CDSL</abbr> Ventures) servicing broker KYC must hold a valid CCA licence under this framework.
 
 ### DPDP-Act-22-2023
 

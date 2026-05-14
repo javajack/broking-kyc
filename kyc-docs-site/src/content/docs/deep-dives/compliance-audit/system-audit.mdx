@@ -5,15 +5,15 @@ description: Walkthrough of the SEBI-mandated system audit for stock brokers —
 
 import { Aside } from '@astrojs/starlight/components';
 
-> **Why this page is structured this way:** System audit is the IT-systems audit of a broker — distinct from the operational concurrent audit, cyber audit, statutory audit, and internal audit. The page walks the regulatory chain from the foundational 2013 SEBI circular through the 2025 technology-monitored framework, then maps scope domain-by-domain (OMS / RMS / back-office / surveillance / cyber / DR), then covers auditor empanelment and the post-audit remediation review.
+> **Why this page is structured this way:** System audit is the IT-systems audit of a broker — distinct from the operational concurrent audit, cyber audit, statutory audit, and internal audit. The page walks the regulatory chain from the foundational 2013 <abbr title="Securities and Exchange Board of India">SEBI</abbr> circular through the 2025 technology-monitored framework, then maps scope domain-by-domain (<abbr title="Order Management System">OMS</abbr> / <abbr title="Risk Management System">RMS</abbr> / back-office / surveillance / cyber / DR), then covers auditor empanelment and the post-audit remediation review.
 
 ## TL;DR
 
-- **Foundational circular:** `SEBI CIR/MRD/DMS/34/2013` (6 November 2013) — System Audit framework for stock brokers using approved trading software. Three audit types — **Type-I** (CTCL trading software), **Type-II** (IBT / STWT — Internet-Based Trading / Smart-Order-Routing / Wireless Technology), **Type-III** (Algorithmic trading software).
-- Cadence: **Type-III** half-yearly (April–September, October–March); **Type-I and Type-II** typically biennial / on event-trigger (industry-typical interpretation; verify with the most recent NSE/BSE/MCX system audit circulars per fiscal year, e.g. `NSE/INSP/70900` for FY26 Type-III).
-- Major 2025 reform: `SEBI/HO/MIRSD/TPD/CIR/2025/10` (31 January 2025) — **Technology-based monitoring framework** for system audits. Web-portal-driven workflow, OTP-based auditor access, geolocation-tagged audit visits, standardised audit plan and Action Taken Report (ATR).
+- **Foundational circular:** `SEBI CIR/MRD/DMS/34/2013` (6 November 2013) — System Audit framework for stock brokers using approved trading software. Three audit types — **Type-I** (<abbr title="Computer-to-Computer Link.">CTCL</abbr> trading software), **Type-<abbr title="—">II</abbr>** (IBT / STWT — Internet-Based Trading / Smart-Order-Routing / Wireless Technology), **Type-<abbr title="—">III</abbr>** (Algorithmic trading software).
+- Cadence: **Type-III** half-yearly (April–September, October–March); **Type-I and Type-II** typically biennial / on event-trigger (industry-typical interpretation; verify with the most recent <abbr title="National Stock Exchange of India">NSE</abbr>/<abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr>/<abbr title="Multi Commodity Exchange of India">MCX</abbr> system audit circulars per fiscal year, e.g. `NSE/INSP/70900` for FY26 Type-III).
+- Major 2025 reform: `SEBI/HO/MIRSD/TPD/CIR/2025/10` (31 January 2025) — **Technology-based monitoring framework** for system audits. Web-portal-driven workflow, <abbr title="One-Time Password">OTP</abbr>-based auditor access, geolocation-tagged audit visits, standardised audit plan and Action Taken Report (<abbr title="Action Taken Report.">ATR</abbr>).
 - Auditor empanelment: per `NSE/INSP/69631` (12 August 2025) — joint-exchange framework. Eligibility — audit firm size, ISO 27001 / CISA team strength, conflict-of-interest screening, mandatory rotation.
-- Scope: **OMS / RMS / Surveillance / Back-office / Cyber / DR / BCP** — overlaps with cyber audit under CSCRF (`SEBI/HO/ITD-1/ITD_CSC_EXT/P/CIR/2024/113`), but system audit is older and more codified.
+- Scope: **OMS / RMS / Surveillance / Back-office / Cyber / DR / BCP** — overlaps with cyber audit under <abbr title="Cybersecurity and Cyber Resilience Framework">CSCRF</abbr> (`SEBI/HO/ITD-1/ITD_CSC_EXT/P/CIR/2024/113`), but system audit is older and more codified.
 - Submission timelines: Preliminary Audit Report typically within 30–60 days of audit completion; Action Taken Report within 60–90 days; Follow-on Audit (verification) typically 6 months later.
 - Common observation categories: change-management gaps, access-control weaknesses, log-retention issues, BCP/DR drill insufficiency, surveillance-system tuning gaps.
 
@@ -95,9 +95,9 @@ These should be checked at the time of each audit cycle on the respective exchan
 
 `NSE/INSP/69631` (12 August 2025) prescribes (forwarded from SEBI circular `SEBI/HO/MIRSD/TPD/CIR/2025/10`):
 
-- **Firm size** — minimum audit team size per engagement (industry-typical: 5–10 team members; QSB engagements may need 15+)
+- **Firm size** — minimum audit team size per engagement (industry-typical: 5–10 team members; <abbr title="Qualified Stock Broker">QSB</abbr> engagements may need 15+)
 - **Certifications** — CISA (ISACA) / DISA (ICAI) / CISM (ISACA) / CISSP (ISC2) / GSNA (GIAC) — at least one engagement team member must hold one of these
-- **Industry experience** — minimum 5 years in IT audit for SEBI / RBI / regulated entities
+- **Industry experience** — minimum 5 years in IT audit for SEBI / <abbr title="Reserve Bank of India">RBI</abbr> / regulated entities
 - **ISO 27001** — auditor's own organisation typically ISO 27001 certified (industry-typical at empanelled firms)
 - **Conflict of interest screening** — no statutory audit / consulting relationship with broker in past 2 years; no family / financial relationship
 - **Independence declaration** — annual declaration on file
@@ -140,7 +140,7 @@ CSCRF clause 4.4 requires cyber audit by **CERT-In empanelled** auditing organis
 - Post-trade RMS: end-of-day reconciliation, M2M, square-off
 - Capacity testing for peak-load (typically 10x daily average capacity per industry practice)
 - Audit trail of RMS rule changes
-- See [RMS / SPAN deep dive](/broking-kyc/deep-dives/trading-day/rms-span-methodology/) for the algorithm detail
+- See [RMS / <abbr title="Standard Portfolio Analysis of Risk">SPAN</abbr> deep dive](/broking-kyc/deep-dives/trading-day/rms-span-methodology/) for the algorithm detail
 
 ### 4.3 Back-office
 
@@ -148,7 +148,7 @@ CSCRF clause 4.4 requires cyber audit by **CERT-In empanelled** auditing organis
 - Pay-in / pay-out workflow
 - Client-fund segregation (per `SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/187` upstreaming)
 - Margin allocation across client / segment / exchange
-- Reconciliation — internal (broker ↔ depository ↔ CC ↔ UCC)
+- Reconciliation — internal (broker ↔ depository ↔ <abbr title="Clearing Corporation (NCL, ICCL, MCXCCL — context-dependent).">CC</abbr> ↔ <abbr title="Unique Client Code">UCC</abbr>)
 - Statement / report generation (daily / weekly / monthly / quarterly)
 
 ### 4.4 Surveillance
@@ -156,9 +156,9 @@ CSCRF clause 4.4 requires cyber audit by **CERT-In empanelled** auditing organis
 - Surveillance system rule library
 - Alert generation (per `NSE/INVG/65921` updated framework and SEBI's brokers' institutional mechanism `SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/96`)
 - Alert disposition workflow
-- STR-triggered investigation pathway
+- <abbr title="Suspicious Transaction Report">STR</abbr>-triggered investigation pathway
 - Whistleblower mechanism (per Chapter IVA)
-- Surveillance Obligation Report (SOR) submission
+- Surveillance Obligation Report (<abbr title="Smart Order Routing">SOR</abbr>) submission
 
 ### 4.5 Cybersecurity (overlap with CSCRF cyber audit)
 
@@ -255,7 +255,7 @@ Per `NSE/INSP/54386` (Penalty matrix for system audit / cyber audit ATR delays) 
 
 ### 7.3 Back-office
 
-- Reconciliation lag between broker BO and depository (occasional)
+- Reconciliation lag between broker <abbr title="Beneficial Owner">BO</abbr> and depository (occasional)
 - Client-fund segregation gaps during intraday windows
 - Contract-note generation delays at peak volume
 
@@ -403,7 +403,7 @@ Per `NSE/INSP/54386` (Penalty matrix for system audit / cyber audit ATR delays) 
 - [Deep Dive — BCP / DR Drill Procedure](/broking-kyc/deep-dives/specialty/bcp-dr-drill/)
 - [Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/)
 - [Circulars — NSE](/broking-kyc/reference/circulars/nse/)
-- [Circulars — SEBI MIRSD](/broking-kyc/reference/circulars/sebi-mirsd/)
+- [Circulars — SEBI <abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>](/broking-kyc/reference/circulars/sebi-mirsd/)
 - [Circulars — SEBI Other](/broking-kyc/reference/circulars/sebi-other/)
 
 ## Verified through

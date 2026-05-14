@@ -13,13 +13,13 @@ import ScreenCard from '../../../components/ScreenCard.astro';
 import AsyncBar from '../../../components/AsyncBar.astro';
 import { Aside } from '@astrojs/starlight/components';
 
-Up to this point, the system has been focused on establishing who the customer is. Now the conversation shifts to what they want to do. This screen asks which market segments the customer wishes to trade in. The customer sees a set of toggles -- Equity, F&O (Futures and Options), Currency Derivatives, and Commodity. For a customer who only wants to buy and hold stocks, this screen is straightforward. But if they toggle on F&O or Commodity, the system needs income proof, and that introduces a conditional branch. This is where KYC (Know Your Customer) meets suitability -- not just "are you who you say you are" but "are you financially qualified to trade derivatives?"
+Up to this point, the system has been focused on establishing who the customer is. Now the conversation shifts to what they want to do. This screen asks which market segments the customer wishes to trade in. The customer sees a set of toggles -- Equity, F&O (Futures and Options), Currency Derivatives, and Commodity. For a customer who only wants to buy and hold stocks, this screen is straightforward. But if they toggle on F&O or Commodity, the system needs income proof, and that introduces a conditional branch. This is where <abbr title="Know Your Customer (process).">KYC</abbr> (Know Your Customer) meets suitability -- not just "are you who you say you are" but "are you financially qualified to trade derivatives?"
 
 <ScreenCard number={6} title="Trading Preferences">
 
 **Purpose:** Select trading segments and provide income proof if required for derivatives.
 
-The segment selection here directly determines which exchanges the system will register this customer with during the post-approval batch pipeline. Equity maps to NSE and BSE. F&O maps to NSE F&O segment. Commodity maps to MCX. Each segment activation is a separate registration with the respective exchange.
+The segment selection here directly determines which exchanges the system will register this customer with during the post-approval batch pipeline. Equity maps to <abbr title="National Stock Exchange of India">NSE</abbr> and <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr>. F&O maps to NSE F&O segment. Commodity maps to <abbr title="Multi Commodity Exchange of India">MCX</abbr>. Each segment activation is a separate registration with the respective exchange.
 
 ## Segment Toggles
 
@@ -34,7 +34,7 @@ The segment selection here directly determines which exchanges the system will r
 Every trading account needs at least one active segment. Equity (cash market) is the baseline -- it allows the customer to buy and sell shares on NSE and BSE. It requires no income proof and has no additional eligibility criteria beyond standard KYC. The other segments are opt-in because they carry additional regulatory requirements.
 :::
 
-When a customer toggles on F&O or Commodity, the screen conditionally reveals an income verification step. This is not optional -- SEBI (Securities and Exchange Board of India) mandates income qualification for derivatives trading.
+When a customer toggles on F&O or Commodity, the screen conditionally reveals an income verification step. This is not optional -- <abbr title="Securities and Exchange Board of India">SEBI</abbr> (Securities and Exchange Board of India) mandates income qualification for derivatives trading.
 
 ## Conditional Fields
 
@@ -50,22 +50,22 @@ If F&O/Commodity selected, income verification fires asynchronously via ITR anal
 
 ## Income Verification Methods
 
-Income verification can be performed via the Account Aggregator framework (RBI Master Direction on Account Aggregator, September 2016) or manual document upload. The Account Aggregator flow lets the customer consent to share their bank data digitally, eliminating the need for manual PDF upload.
+Income verification can be performed via the Account Aggregator framework (<abbr title="Reserve Bank of India">RBI</abbr> Master Direction on Account Aggregator, September 2016) or manual document upload. The Account Aggregator flow lets the customer consent to share their bank data digitally, eliminating the need for manual PDF upload.
 
 Available verification approaches:
-- **Account Aggregator (AA) consent flow** -- customer consents digitally, bank statement data fetched automatically via RBI-licensed AA operators
+- **Account Aggregator (<abbr title="Account Aggregator (RBI-licensed NBFC-AA)">AA</abbr>) consent flow** -- customer consents digitally, bank statement data fetched automatically via RBI-licensed AA operators
 - **ITR analysis** -- customer uploads ITR or authorises fetch; AI-based analysis extracts income figures
 - **Bank statement upload** -- manual PDF upload with automated parsing
 - **Payroll/HRMS integration** -- real-time salary and employment data (for salaried applicants)
 
 <Aside type="tip">
-SEBI circular Aug 2022 allowed depositories (CDSL/NSDL) as FIPs in the AA ecosystem. Brokers can fetch demat holdings, bank statements, and ITR data via consent-based AA flow instead of manual document upload.
+SEBI circular Aug 2022 allowed depositories (<abbr title="Central Depository Services (India) Limited">CDSL</abbr>/<abbr title="National Securities Depository Limited">NSDL</abbr>) as FIPs in the AA ecosystem. Brokers can fetch demat holdings, bank statements, and ITR data via consent-based AA flow instead of manual document upload.
 </Aside>
 
 For vendor implementation options for income verification and Account Aggregator integration, see [Vendor Integrations](/broking-kyc/vendors/).
 
 :::tip[Designing the F&O toggle experience]
-When a customer toggles F&O on, first check if the KRA record (from Screen 2) already contains an income range that meets the threshold. If it does, the income proof step can be skipped. Only fall back to bank statement upload or AA consent if the existing data is insufficient or absent.
+When a customer toggles F&O on, first check if the <abbr title="KYC Registration Agency">KRA</abbr> record (from Screen 2) already contains an income range that meets the threshold. If it does, the income proof step can be skipped. Only fall back to bank statement upload or AA consent if the existing data is insufficient or absent.
 :::
 
 </ScreenCard>

@@ -6,7 +6,7 @@ next:
   label: 'Screen 1: Mobile Registration →'
 ---
 
-This section documents the KYC (Know Your Customer) onboarding journey mandated by SEBI, the exchanges (NSE, BSE, MCX), and the depositories (CDSL, NSDL). The journey is structured as 9 sequential screens, each mapping to specific regulatory requirements. Every field collected traces to a compliance obligation under SEBI KYC Master Circular (SEBI/HO/MIRSD/MIRSD-SEC-2/P/CIR/2023/168), PMLA requirements, or exchange/depository registration specifications.
+This section documents the <abbr title="Know Your Customer (process).">KYC</abbr> (Know Your Customer) onboarding journey mandated by <abbr title="Securities and Exchange Board of India">SEBI</abbr>, the exchanges (<abbr title="National Stock Exchange of India">NSE</abbr>, <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr>, <abbr title="Multi Commodity Exchange of India">MCX</abbr>), and the depositories (<abbr title="Central Depository Services (India) Limited">CDSL</abbr>, <abbr title="National Securities Depository Limited">NSDL</abbr>). The journey is structured as 9 sequential screens, each mapping to specific regulatory requirements. Every field collected traces to a compliance obligation under SEBI KYC Master Circular (SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-SEC-2/P/CIR/2023/168), <abbr title="Prevention of Money Laundering Act 2002">PMLA</abbr> requirements, or exchange/depository registration specifications.
 
 This section walks you through every screen the customer sees, what the system does behind the scenes at each step, and why the screens are ordered the way they are. Read these pages in sequence. By the end, you will have a complete mental model of the onboarding pipeline.
 
@@ -16,14 +16,14 @@ Each screen has a single clear purpose. Every field maps directly to a regulator
 
 | Screen | Title | What Happens |
 |--------|-------|-------------|
-| [1. Mobile Registration](/broking-kyc/journey/01-mobile-registration/) | Mobile / Email Registration | User enters mobile, OTP verified. Device risk assessment fires async. |
-| [2. PAN + DOB](/broking-kyc/journey/02-pan-dob/) | PAN + Date of Birth | User enters PAN + DOB. 4 async API calls fire: PAN Verify, KRA Lookup, CKYC Search, AML Screen. |
-| [3. DigiLocker Consent](/broking-kyc/journey/03-digilocker-consent/) | DigiLocker Consent (Redirect) | Redirect to DigiLocker. Harvests identity fields. IPV/VIPV exempted per SEBI circular. |
+| [1. Mobile Registration](/broking-kyc/journey/01-mobile-registration/) | Mobile / Email Registration | User enters mobile, <abbr title="One-Time Password">OTP</abbr> verified. Device risk assessment fires async. |
+| [2. <abbr title="Permanent Account Number">PAN</abbr> + DOB](/broking-kyc/journey/02-pan-dob/) | PAN + Date of Birth | User enters PAN + DOB. 4 async API calls fire: PAN Verify, <abbr title="KYC Registration Agency">KRA</abbr> Lookup, <abbr title="Central KYC (records registry)">CKYC</abbr> Search, <abbr title="Anti-Money Laundering">AML</abbr> Screen. |
+| [3. DigiLocker Consent](/broking-kyc/journey/03-digilocker-consent/) | DigiLocker Consent (Redirect) | Redirect to DigiLocker. Harvests identity fields. <abbr title="In-Person Verification">IPV</abbr>/<abbr title="Video In-Person Verification (sometimes &quot;Video CIP&quot; / V-CIP)">VIPV</abbr> exempted per SEBI circular. |
 | [4. Confirm Identity](/broking-kyc/journey/04-confirm-identity/) | Confirm Identity | Pre-filled from DigiLocker + KRA + CKYC. User enters email only. |
-| [5. Bank Account](/broking-kyc/journey/05-bank-account/) | Bank Account | User enters account, IFSC, type. Penny Drop fires async. |
+| [5. Bank Account](/broking-kyc/journey/05-bank-account/) | Bank Account | User enters account, <abbr title="Indian Financial System Code.">IFSC</abbr>, type. Penny Drop fires async. |
 | [6. Trading Preferences](/broking-kyc/journey/06-trading-preferences/) | Trading Preferences | Segment toggles. Income proof if F&O/Commodity selected per SEBI requirements. |
 | [7. Nominations](/broking-kyc/journey/07-nominations/) | Nominations | Up to 10 nominees (SEBI Jan 2025). Opt-out requires video declaration. |
-| [8. Declarations Gate](/broking-kyc/journey/08-declarations-gate/) | Declarations + Blocking Gate | FATCA, PEP, T&C checkboxes. Blocking gate: all async checks must pass. |
+| [8. Declarations Gate](/broking-kyc/journey/08-declarations-gate/) | Declarations + Blocking Gate | <abbr title="Foreign Account Tax Compliance Act (US)">FATCA</abbr>, <abbr title="Politically Exposed Person">PEP</abbr>, T&C checkboxes. Blocking gate: all async checks must pass. |
 | [9. Review + eSign](/broking-kyc/journey/09-review-esign/) | Review + Face Match + e-Sign | Review application, selfie face match, Aadhaar OTP e-Sign. Done. |
 
 ## User Input Summary
@@ -38,7 +38,7 @@ The following regulatory mandates drive the screen sequencing and data collectio
 
 - **Mobile OTP verification** -- required for Aadhaar-based authentication (eKYC and eSign) and as the primary communication channel for KRA and exchange notifications
 - **DigiLocker-based Aadhaar eKYC** -- provides IPV exemption per SEBI circular SEBI/HO/MIRSD/DOP/CIR/P/2020/73, eliminating the need for video In-Person Verification
-- **Parallel verification** -- PAN verification against NSDL/Protean, KRA lookup, CKYC search (CERSAI), and AML/PEP screening per SEBI AML/CFT guidelines must all complete before account activation
+- **Parallel verification** -- PAN verification against NSDL/Protean, KRA lookup, CKYC search (<abbr title="Central Registry of Securitisation Asset Reconstruction and Security Interest of India">CERSAI</abbr>), and AML/PEP screening per SEBI AML/<abbr title="Combating the Financing of Terrorism">CFT</abbr> guidelines must all complete before account activation
 - **Single eSign** -- one Aadhaar OTP signature on the complete application PDF, legally valid under IT Act 2000 Section 3A
 - **Blocking gate** -- all verification results must be evaluated before eSign per SEBI KYC norms; no account shall be activated with unresolved verification failures
 

@@ -8,7 +8,7 @@ description: Aadhaar-based electronic signature (eSign) via Leegality — docume
 
 - [1. Overview](#1-overview)
 - [2. eSign Types](#2-esign-types)
-- [3. SEBI eSign Requirements](#3-sebi-esign-requirements)
+- [3. <abbr title="Securities and Exchange Board of India">SEBI</abbr> eSign Requirements](#3-sebi-esign-requirements)
 - [4. API Integration](#4-api-integration)
 - [5. Document Types for Broking](#5-document-types-for-broking)
 - [6. Signing Ceremony Flow](#6-signing-ceremony-flow)
@@ -17,7 +17,7 @@ description: Aadhaar-based electronic signature (eSign) via Leegality — docume
 - [9. Non-Individual Entities](#9-non-individual-entities)
 - [10. Webhook & Callback](#10-webhook--callback)
 - [11. Document Storage & Retrieval](#11-document-storage--retrieval)
-- [12. Integration with Our KYC Flow](#12-integration-with-our-kyc-flow)
+- [12. Integration with Our <abbr title="Know Your Customer (process).">KYC</abbr> Flow](#12-integration-with-our-kyc-flow)
 - [13. Pricing](#13-pricing)
 - [14. Edge Cases](#14-edge-cases)
 - [15. Alternatives Comparison](#15-alternatives-comparison)
@@ -46,30 +46,30 @@ Leegality is an Indian document infrastructure platform providing e-Sign, e-Stam
 
 | Product | Description |
 |---------|-------------|
-| **Aadhaar eSign** | OTP-based and biometric electronic signatures via CCA-compliant ESPs |
-| **DSC Token Signing** | Digital Signature Certificate-based signing using hardware tokens |
+| **Aadhaar eSign** | <abbr title="One-Time Password">OTP</abbr>-based and biometric electronic signatures via <abbr title="Controller of Certifying Authorities">CCA</abbr>-compliant ESPs |
+| **<abbr title="Digital Signature Certificate (CCA-licensed; aka Class 2/3 DSC).">DSC</abbr> Token Signing** | Digital Signature Certificate-based signing using hardware tokens |
 | **Virtual Sign** | Non-Aadhaar electronic acknowledgement via OTP + signature pad |
 | **QuickSign** | OTP-less digital acknowledgement for non-critical documents |
 | **Fingerprint eSign** | Biometric signing via fingerprint capture devices |
 | **Doc Signer** | Organizational Document Signer Certificate for automated broker-side signing |
 | **BharatStamp** | Digital stamp paper procurement across 25+ Indian states |
 | **Document Assembly** | Template engine with dynamic field injection and conditional sections |
-| **Consentin** | DPDP (Digital Personal Data Protection) Act compliance platform |
+| **Consentin** | <abbr title="Digital Personal Data Protection Act 2023 (and Rules 2025)">DPDP</abbr> (Digital Personal Data Protection) Act compliance platform |
 | **Verifier API** | Post-signing verification for tampering detection and certificate validation |
 
 ### 1.3 Why Leegality for Stock Broker KYC
 
 | Concern | Leegality's Value |
 |---------|-------------------|
-| Stock broker-specific use case | Dedicated use case page; supports KYC, DDPI, demat opening, sub-broker agreements |
+| Stock broker-specific use case | Dedicated use case page; supports KYC, <abbr title="Demat Debit and Pledge Instruction">DDPI</abbr>, demat opening, sub-broker agreements |
 | Single OTP ceremony | Customer signs all documents (KYC + AOF + DDPI + RDD) with one Aadhaar OTP in a 4-touch process |
-| ESP redundancy | Dual Aadhaar eSign connections -- NSDL (primary) and eMudhra (backup); auto-switch on downtime |
+| ESP redundancy | Dual Aadhaar eSign connections -- <abbr title="National Securities Depository Limited">NSDL</abbr> (primary) and eMudhra (backup); auto-switch on downtime |
 | 80% less downtime | Auto-Switch to best ESP, fallbacks for OTP and biometrics, Non-Aadhaar Routing |
 | e-Stamp integration | Built-in BharatStamp for DDPI stamp duty (DDPI requires stamping per SEBI circular) |
 | Pay-per-success | Charges only for successful eSigns; failed eSign = zero cost |
 | Fraud prevention | Face Match, Geofencing, Smart Liveliness, Verifier API built into signing flow |
 | API 3.0 (Smart API) | Workflow-based API; configure once in dashboard, pass Workflow ID in API; no code changes for config updates |
-| WhatsApp Pings | Send signing links, reminders, and signed PDFs via WhatsApp (high open rates vs SMS/email) |
+| WhatsApp Pings | Send signing links, reminders, and signed PDFs via WhatsApp (high open rates vs <abbr title="Short Message Service.">SMS</abbr>/email) |
 | SEBI compliance | Explicit support for SEBI DDPI digitization, Section 65B audit trail |
 | Zero license fee | Basic plan includes Aadhaar eSign, Digital Stamping, and API Access at zero license fee |
 
@@ -100,13 +100,13 @@ Leegality serves stock brokers, banks, NBFCs, insurance companies, and fintechs.
 
 | Feature | Aadhaar eSign (OTP) | Aadhaar eSign (Biometric) | DSC Token | Virtual Sign | QuickSign | Fingerprint eSign |
 |---------|---------------------|---------------------------|-----------|--------------|-----------|-------------------|
-| **Legal basis** | IT Act 2000, Schedule II | IT Act 2000, Schedule II | IT Act 2000, Section 3 | IT Act 2000, Section 10A | IT Act 2000, Section 10A | IT Act 2000, Section 10A |
+| **Legal basis** | IT Act 2000, Schedule <abbr title="—">II</abbr> | IT Act 2000, Schedule II | IT Act 2000, Section 3 | IT Act 2000, Section 10A | IT Act 2000, Section 10A | IT Act 2000, Section 10A |
 | **Legal equivalence** | Equivalent to wet-ink | Equivalent to wet-ink | Equivalent to wet-ink | Contractual validity | Contractual validity | Contractual validity |
 | **Authentication** | Aadhaar number + OTP | Aadhaar number + fingerprint/iris | Hardware token + PIN | Phone/email OTP + signature pad | No OTP; digital acknowledgement | Fingerprint + OTP |
 | **Requires Aadhaar** | Yes (linked to mobile) | Yes (biometric device needed) | No (CA-issued certificate) | No | No | Yes (for authentication) |
 | **SEBI acceptance** | Yes (primary for KYC) | Yes | Yes (for entities) | For non-mandatory docs only | For acknowledgements only | Not yet SEBI-prescribed |
 | **Cost** | ~Rs.25/sign | ~Rs.30/sign | Free (token cost upfront) | ~Rs.5/sign | ~Rs.2/sign | ~Rs.15/sign |
-| **Use in our flow** | Primary for customer signing | Fallback for OTP issues | Broker-side signing (Doc Signer) | NRI/non-Aadhaar fallback | RDD acknowledgement | Field office operations |
+| **Use in our flow** | Primary for customer signing | Fallback for OTP issues | Broker-side signing (Doc Signer) | <abbr title="Non-Resident Indian">NRI</abbr>/non-Aadhaar fallback | RDD acknowledgement | Field office operations |
 | **Device needed** | Mobile phone | Biometric device (Mantra MFS-100) | USB token | Mobile phone | Mobile phone | Mantra MFS-100 |
 
 ### 2.2 Aadhaar OTP eSign (Primary for KYC)
@@ -175,9 +175,9 @@ Leegality's Secure Virtual Signature is a non-Aadhaar electronic authentication 
 
 | Circular | Reference | Relevance |
 |----------|-----------|-----------|
-| SEBI KYC Master Circular | SEBI/HO/MIRSD/MIRSD-SEC-2/P/CIR/2023/168 (Oct 2023) | Aadhaar eSign accepted in lieu of wet signature on KYC documents |
+| SEBI KYC Master Circular | SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-SEC-2/P/CIR/2023/168 (Oct 2023) | Aadhaar eSign accepted in lieu of wet signature on KYC documents |
 | SEBI Stock Brokers Master | SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90 (Jun 2025) | eSign provisions for account opening documents |
-| SEBI DDPI Circular | SEBI/HO/MIRSD/DoP/CIR/P/2022/51 (Apr 2022) | DDPI can be digitally signed; replaces POA; requires stamping |
+| SEBI DDPI Circular | SEBI/HO/MIRSD/DoP/CIR/P/2022/51 (Apr 2022) | DDPI can be digitally signed; replaces <abbr title="Power of Attorney">POA</abbr>; requires stamping |
 | SEBI eKYC Notification | [SEBI/HO/MIRSD/DOP/CIR/P/2020/73](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddopcirp202073) (Apr 2020) | eSign + Video KYC for end-to-end digital onboarding |
 | IT Act 2000, Section 5 | Central legislation | Electronic signatures given legal recognition |
 | e-Authentication Guidelines | CCA, MeitY (May 2019) | Regulatory framework for Aadhaar eSign operations |
@@ -187,7 +187,7 @@ Leegality's Secure Virtual Signature is a non-Aadhaar electronic authentication 
 
 | Document | eSign Required | Stamp Duty | Notes |
 |----------|---------------|------------|-------|
-| KYC Form (Part I - CERSAI) | Yes -- Aadhaar eSign | No | Identity + address attestation |
+| KYC Form (Part I - <abbr title="Central Registry of Securitisation Asset Reconstruction and Security Interest of India">CERSAI</abbr>) | Yes -- Aadhaar eSign | No | Identity + address attestation |
 | KYC Form (Part II - Intermediary) | Yes -- Aadhaar eSign | No | Trading preferences, segments, income |
 | Account Opening Form (AOF) | Yes -- Aadhaar eSign | No | Trading account agreement |
 | DDPI Authorization | Yes -- Aadhaar eSign | **Yes** (varies by state) | Replaced POA since Nov 2022; stamp duty mandatory |
@@ -458,10 +458,10 @@ Timeout: Stop polling after document expiry (7 days default)
 
 | # | Document | Source Template | Dynamic Fields | eSign Type | Stamp Required |
 |---|----------|---------------|----------------|------------|----------------|
-| 1 | KYC Form Part I (CERSAI) | SEBI prescribed format | Name, PAN, DOB, Address, Photo, Aadhaar details | Aadhaar eSign | No |
-| 2 | KYC Form Part II (Broker) | Broker's template | Segments, income, bank details, nominee, DP preferences | Aadhaar eSign | No |
+| 1 | KYC Form Part I (CERSAI) | SEBI prescribed format | Name, <abbr title="Permanent Account Number">PAN</abbr>, DOB, Address, Photo, Aadhaar details | Aadhaar eSign | No |
+| 2 | KYC Form Part II (Broker) | Broker's template | Segments, income, bank details, nominee, <abbr title="Depository Participant">DP</abbr> preferences | Aadhaar eSign | No |
 | 3 | Account Opening Form | Broker's template | All KYC data + trading preferences | Aadhaar eSign | No |
-| 4 | DDPI Authorization | SEBI prescribed format | Client name, BO ID, broker details | Aadhaar eSign | **Yes** |
+| 4 | DDPI Authorization | SEBI prescribed format | Client name, <abbr title="Beneficial Owner">BO</abbr> ID, broker details | Aadhaar eSign | **Yes** |
 | 5 | Risk Disclosure Document | Exchange prescribed | Client name, date | QuickSign | No |
 | 6 | Tariff/Brokerage Schedule | Broker's template | Plan details, charges | QuickSign | No |
 | 7 | Nomination Form | SEBI prescribed | Nominee name, relationship, share %, guardian if minor | Aadhaar eSign | No |
@@ -496,11 +496,11 @@ SEPARATE ACKNOWLEDGEMENTS (QuickSign):
 | PAN Details | PAN number, PAN status | A09, R01 |
 | Address | Full address, city, state, PIN | B01-B08 |
 | Contact | Mobile, email | C01-C04 |
-| Bank Account | Bank name, branch, IFSC, a/c number | F01-F10 |
+| Bank Account | Bank name, branch, <abbr title="Indian Financial System Code.">IFSC</abbr>, a/c number | F01-F10 |
 | Segments | Cash, F&O, commodity, currency | G01-G08 |
 | Income | Annual income bracket | H01-H02 |
 | Nominee | Nominee name, relationship, share | L01-L15 |
-| DDPI | Client name, BO ID, broker TM code | Custom fields |
+| DDPI | Client name, BO ID, broker <abbr title="Trading Member">TM</abbr> code | Custom fields |
 
 > Cross-reference: See [Master Dataset](/broking-kyc/reference/master-dataset) for complete field specifications.
 
@@ -761,10 +761,10 @@ Stamp duty for DDPI / Power of Attorney type instruments varies by state. The ra
 |-------------|-----------|---------------|------------------------|
 | **Individual** | Account holder | Aadhaar eSign (OTP) | Standard flow |
 | **Company** | Authorized signatory(ies) | DSC Token or Aadhaar eSign | Board resolution appointing signatories |
-| **HUF** | Karta | Aadhaar eSign | HUF deed, Karta declaration |
+| **<abbr title="Hindu Undivided Family">HUF</abbr>** | Karta | Aadhaar eSign | HUF deed, Karta declaration |
 | **Partnership** | All partners or authorized partner | Aadhaar eSign per partner | Partnership deed, authority letter |
 | **Trust** | Trustee(s) | DSC or Aadhaar eSign | Trust deed, trustee resolution |
-| **NRI** | Account holder | Aadhaar eSign (if Indian mobile) or DSC | PIS permission letter, NRE/NRO bank a/c proof |
+| **NRI** | Account holder | Aadhaar eSign (if Indian mobile) or DSC | <abbr title="Portfolio Investment Scheme (RBI / NRI)">PIS</abbr> permission letter, <abbr title="Non-Resident External (Rupee) account">NRE</abbr>/<abbr title="Non-Resident Ordinary (Rupee) account">NRO</abbr> bank a/c proof |
 
 ### 9.2 Multi-Signatory Workflows
 
@@ -967,7 +967,7 @@ The audit trail PDF is digitally signed by Leegality, giving it a presumption of
 
 ### 11.5 Our Retention Strategy
 
-Per SEBI and PMLA requirements:
+Per SEBI and <abbr title="Prevention of Money Laundering Act 2002">PMLA</abbr> requirements:
 
 ```
 Document Type         Retention Period
@@ -1062,9 +1062,9 @@ Before reaching Screen 9 (eSign), the Blocking Gate (Screen 8) must verify:
 | # | Check | Vendor | Pass Criteria | Per |
 |---|-------|--------|---------------|-----|
 | 1 | PAN Verified | Decentro | Status = E (valid) | [Decentro.md](/broking-kyc/vendors/verification/decentro) |
-| 2 | KRA Status | Digio | Not Rejected | KYC Flow Section 5 |
-| 3 | CKYC Downloaded | Decentro | Search successful | KYC Flow Section 5 |
-| 4 | AML Clear | TrackWizz | No matches / false positive cleared | KYC Flow Section 5 |
+| 2 | <abbr title="KYC Registration Agency">KRA</abbr> Status | Digio | Not Rejected | KYC Flow Section 5 |
+| 3 | <abbr title="Central KYC (records registry)">CKYC</abbr> Downloaded | Decentro | Search successful | KYC Flow Section 5 |
+| 4 | <abbr title="Anti-Money Laundering">AML</abbr> Clear | TrackWizz | No matches / false positive cleared | KYC Flow Section 5 |
 | 5 | Bank Verified | Decentro | Penny drop success + name match >= 70% | [Decentro.md](/broking-kyc/vendors/verification/decentro) |
 
 If any check fails, the customer cannot proceed to eSign. This follows the principle: "Fail fast, fail gracefully. If blocking check fails, stop user before e-Sign. Don't waste their time."
@@ -1142,7 +1142,7 @@ Actual rates should be negotiated directly with Leegality based on projected vol
 |--------|-------------------|---------|-------------------|----------------|
 | **Leegality** | ~Rs.25/sign | Built-in (BharatStamp) | &lt;2 days (Smart API) | Workflow-based API; dual ESP; stock broker focus |
 | **Digio** | ~Rs.15-25/sign | Not built-in (separate integration) | 2-3 days | Broader KYC suite (also does KRA, DigiLocker) |
-| **Setu eSign** | ~Rs.15-20/sign | Not available | 2-3 days | Setu ecosystem (AA, RPD); acquired by Pine Labs |
+| **Setu eSign** | ~Rs.15-20/sign | Not available | 2-3 days | Setu ecosystem (<abbr title="Account Aggregator (RBI-licensed NBFC-AA)">AA</abbr>, RPD); acquired by Pine Labs |
 | **Protean (NSDL)** | ~Rs.5.90/sign | Not built-in | 5-7 days (older API) | Cheapest per-sign; direct from CA; less features |
 | **eMudhra** | ~Rs.8-15/sign | Separate | 5-7 days | SAP/Oracle connectors; enterprise focus |
 | **SignDesk** | ~Rs.20-30/sign | Available | 3-5 days | Document workflow focus |
@@ -1285,7 +1285,7 @@ Fingerprint eSign requires Mantra MFS-100 device. If unavailable:
 | **IT Act 2000, Section 10A** | Electronic contracts valid (Virtual Sign, QuickSign) |
 | **CCA Framework** | Leegality operates under CCA (Controller of Certifying Authorities, MeitY) regulatory framework |
 | **ESP Empanelment** | Leegality's parent Grey Swift Pvt Ltd is registered ASP (Application Service Provider) with NSDL ESP |
-| **Certifying Authorities** | Partners: NSDL, Verasys, CDSL, CDAC via NeSL |
+| **Certifying Authorities** | Partners: NSDL, Verasys, <abbr title="Central Depository Services (India) Limited">CDSL</abbr>, CDAC via NeSL |
 | **Indian Evidence Act** | Digitally signed audit trail enjoys presumption of non-tampering; Section 65B compliance |
 | **SEBI KYC Circulars** | eSign accepted for all KYC and account opening documents |
 | **SEBI DDPI Circular** | Explicit DDPI digitization support with mandatory stamping |
@@ -1376,8 +1376,8 @@ Any modification to the PDF after signing invalidates the digital signature. Thi
 | Jan 2025 | Nomination changes | Up to 10 nominees allowed; nomination opt-out requires video verification. eSign needed for each nominee form |
 | Jun 2025 | SEBI Stock Brokers Master Circular | SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90 consolidates all stock broker requirements including eSign provisions |
 | Jan 2026 | SEBI Stock Brokers Regulations 2026 | Replaces 1992 regulations entirely. eSign provisions continue; digital onboarding remains valid |
-| Jun 2025 | NPCI e-KYC Setu | Aadhaar eKYC without AUA/KUA license (SEBI allowed). Does not change eSign requirements but changes how Aadhaar data is fetched |
-| Feb 2025 | UPI Block Mechanism (mandatory for QSBs) | No direct impact on eSign, but affects overall onboarding flow |
+| Jun 2025 | <abbr title="National Payments Corporation of India">NPCI</abbr> e-KYC Setu | Aadhaar eKYC without AUA/KUA license (SEBI allowed). Does not change eSign requirements but changes how Aadhaar data is fetched |
+| Feb 2025 | <abbr title="Unified Payments Interface">UPI</abbr> Block Mechanism (mandatory for QSBs) | No direct impact on eSign, but affects overall onboarding flow |
 
 ### 17.2 CCA / MeitY Updates
 

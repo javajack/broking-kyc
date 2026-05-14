@@ -15,7 +15,7 @@ description: "Verified index of RBI circulars affecting Indian stock broking, 20
 
 ## Conceptual overview
 
-This page is the complete listing of RBI circulars in the project's 2020–2026 sweep window. Each entry contains the verbatim circular ID, issue date, in-force date, status (in-force / superseded / withdrawn), applicable entity types, impact-area tags, a 2–4 sentence summary traceable to clauses, and the primary URL. Where the primary URL could not be re-fetched, an archive URL is provided in its place.
+This page is the complete listing of <abbr title="Reserve Bank of India">RBI</abbr> circulars in the project's 2020–2026 sweep window. Each entry contains the verbatim circular ID, issue date, in-force date, status (in-force / superseded / withdrawn), applicable entity types, impact-area tags, a 2–4 sentence summary traceable to clauses, and the primary URL. Where the primary URL could not be re-fetched, an archive URL is provided in its place.
 
 ## Entries (descending date)
 
@@ -30,7 +30,7 @@ This page is the complete listing of RBI circulars in the project's 2020–2026 
 - **impact_areas:** client-funds, settlement, upstreaming, onboarding, aml, cyber-security, grievance, file-format
 - **primary_url:** https://www.rbi.org.in/Scripts/BS_ViewMasDirections.aspx?id=12896
 
-Consolidates and supersedes the 2020 PA-PG guidelines, 2021 PPI directions interplay, and 2023 PA-CB framework into a unified Payment Aggregator regime covering online (PA-O), physical (PA-P), and cross-border (PA-CB) aggregators. Mandates CKYCR as first port-of-call for merchant CDD, simplified onboarding for small merchants (annual turnover <= Rs.40L domestic / Rs.5L export), MCC allotment, continuous monitoring, and refreshed escrow/governance norms. Directly affects brokers as merchants for PA-collected pay-ins, broker-side fund payouts, and CKYC-based merchant onboarding flows.
+Consolidates and supersedes the 2020 PA-PG guidelines, 2021 PPI directions interplay, and 2023 PA-CB framework into a unified Payment Aggregator regime covering online (PA-O), physical (PA-P), and cross-border (PA-CB) aggregators. Mandates CKYCR as first port-of-call for merchant CDD, simplified onboarding for small merchants (annual turnover <= Rs.40L domestic / Rs.5L export), MCC allotment, continuous monitoring, and refreshed escrow/governance norms. Directly affects brokers as merchants for PA-collected pay-ins, broker-side fund payouts, and <abbr title="Central KYC (records registry)">CKYC</abbr>-based merchant onboarding flows.
 
 ### RBI/2025-26/63
 
@@ -49,14 +49,14 @@ Mandates acquiring banks to onboard AePS touchpoint operators with full due dili
 
 - **date_issued:** 2025-06-12
 - **issuer:** RBI
-- **title:** "Reserve Bank of India (Know Your Customer (KYC)) (Amendment) Directions, 2025"
+- **title:** "Reserve Bank of India (Know Your Customer (<abbr title="Know Your Customer (process).">KYC</abbr>)) (Amendment) Directions, 2025"
 - **applies_to:** all-intermediaries
 - **in_force_date:** immediate
 - **status:** in-force
 - **impact_areas:** re-KYC, kyc-modification, dormant, onboarding, reporting
 - **primary_url:** https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=12866&Mode=0
 
-Extends the deadline for low-risk customer periodic KYC updation by one year (or up to 30-Jun-2026, whichever is later), authorises Business Correspondents to collect self-declarations for re-KYC, and prescribes 3 advance + 3 reminder customer intimations including at least one letter, plus full implementation by 01-Jan-2026. Provides RBI-side template for low-risk re-KYC convenience that overlaps with SEBI/KRA simplified re-KYC paths used by brokers.
+Extends the deadline for low-risk customer periodic KYC updation by one year (or up to 30-Jun-2026, whichever is later), authorises Business Correspondents to collect self-declarations for re-KYC, and prescribes 3 advance + 3 reminder customer intimations including at least one letter, plus full implementation by 01-Jan-2026. Provides RBI-side template for low-risk re-KYC convenience that overlaps with <abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="KYC Registration Agency">KRA</abbr> simplified re-KYC paths used by brokers.
 
 ### RBI/2025-26/36
 
@@ -69,7 +69,7 @@ Extends the deadline for low-risk customer periodic KYC updation by one year (or
 - **impact_areas:** mtf, margin, dpdp, aa, grievance, reporting
 - **primary_url:** https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=12848&Mode=0
 
-Consolidates the 2022 Digital Lending Guidelines and 2023 DLG framework into a single set of Directions; introduces stricter rules for multi-lender platforms (effective 01-Nov-2025), KFS, APR disclosure, no third-party pass-through accounts, DLA reporting to RBI (from 15-Jun-2025), and data privacy obligations. Brokers' affiliated NBFCs/banks offering MTF, digital margin loans, or pay-later products via lending apps must restructure RE-LSP arrangements.
+Consolidates the 2022 Digital Lending Guidelines and 2023 DLG framework into a single set of Directions; introduces stricter rules for multi-lender platforms (effective 01-Nov-2025), KFS, APR disclosure, no third-party pass-through accounts, DLA reporting to RBI (from 15-Jun-2025), and data privacy obligations. Brokers' affiliated NBFCs/banks offering <abbr title="Margin Trading Facility">MTF</abbr>, digital margin loans, or pay-later products via lending apps must restructure RE-LSP arrangements.
 
 ### RBI/2024-25/121
 
@@ -153,14 +153,14 @@ Harmonises Internal Ombudsman frameworks across banks, NBFCs, NBSPs and CICs; ma
 
 - **date_issued:** 2023-12-12
 - **issuer:** RBI
-- **title:** "Enhancement of UPI limits for specific categories"
+- **title:** "Enhancement of <abbr title="Unified Payments Interface">UPI</abbr> limits for specific categories"
 - **applies_to:** all-intermediaries
 - **in_force_date:** immediate
 - **status:** in-force
 - **impact_areas:** upi-block, mandate, mutual-funds, client-funds
 - **primary_url:** https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx?prid=56945
 
-Announced in the December 2023 MPC; raises the AFA-free e-mandate / UPI AutoPay limit from Rs.15,000 to Rs.1,00,000 per transaction for subscriptions to mutual funds, payment of insurance premiums and credit card bill payments. NPCI operationalised this via UPI/OC-151A. Relevant for SIP collections, MTF interest auto-debits, and broker-MF subscription flows where MCC 6211 (Securities Brokers/Dealers) was included by NPCI.
+Announced in the December 2023 MPC; raises the AFA-free e-mandate / UPI AutoPay limit from Rs.15,000 to Rs.1,00,000 per transaction for subscriptions to mutual funds, payment of insurance premiums and credit card bill payments. <abbr title="National Payments Corporation of India">NPCI</abbr> operationalised this via UPI/OC-151A. Relevant for SIP collections, MTF interest auto-debits, and broker-MF subscription flows where MCC 6211 (Securities Brokers/Dealers) was included by NPCI.
 
 ### RBI/2023-24/107
 
@@ -173,7 +173,7 @@ Announced in the December 2023 MPC; raises the AFA-free e-mandate / UPI AutoPay 
 - **impact_areas:** system-audit, cyber-security, bcp-dr, reporting
 - **primary_url:** https://www.rbi.org.in/scripts/BS_ViewMasDirections.aspx?id=12562
 
-Issues a unified IT governance, risk, controls and assurance framework for SCBs (excl. RRBs), SFBs, PBs, NBFCs in Top/Upper/Middle Layers, CICs and large AIFIs; mandates Board-level IT Strategy Committee, IT Steering Committee, Head of IT and Head of Information Security. Effective from 01-Apr-2024. Indirectly governs broker-bank and broker-NBFC integrations (e-mandate engines, AA endpoints, V-CIP).
+Issues a unified IT governance, risk, controls and assurance framework for SCBs (excl. RRBs), SFBs, PBs, NBFCs in Top/Upper/Middle Layers, CICs and large AIFIs; mandates Board-level IT Strategy Committee, IT Steering Committee, Head of IT and Head of Information Security. Effective from 01-Apr-2024. Indirectly governs broker-bank and broker-NBFC integrations (e-mandate engines, <abbr title="Account Aggregator (RBI-licensed NBFC-AA)">AA</abbr> endpoints, V-CIP).
 
 ### RBI/2023-24/80
 
@@ -187,7 +187,7 @@ Issues a unified IT governance, risk, controls and assurance framework for SCBs 
 - **impact_areas:** client-funds, settlement, aml, nri, reporting
 - **primary_url:** https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=12561&Mode=0
 
-Brings non-bank entities facilitating cross-border import/export payments under direct RBI authorisation as PA-CBs, mandating minimum net-worth (Rs.15 cr at application, Rs.25 cr by 31-Mar-2026), Import Collection Account (ICA) / Export Collection Account (ECA) with AD-I banks, FIU-India registration, per-transaction cap of Rs.25 lakh, and PMLA/KYC compliance. Relevant to brokers using PAs for inbound NRI fund transfers and outbound payouts.
+Brings non-bank entities facilitating cross-border import/export payments under direct RBI authorisation as PA-CBs, mandating minimum net-worth (Rs.15 cr at application, Rs.25 cr by 31-Mar-2026), Import Collection Account (ICA) / Export Collection Account (ECA) with AD-I banks, <abbr title="Financial Intelligence Unit">FIU</abbr>-India registration, per-transaction cap of Rs.25 lakh, and <abbr title="Prevention of Money Laundering Act 2002">PMLA</abbr>/KYC compliance. Relevant to brokers using PAs for inbound <abbr title="Non-Resident Indian">NRI</abbr> fund transfers and outbound payouts.
 
 ### RBI/2023-24/106
 
@@ -213,7 +213,7 @@ Consolidates SBR framework classifying NBFCs into Base/Middle/Upper/Top layers w
 - **impact_areas:** onboarding, aml, reporting, non-individual
 - **primary_url:** https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=12569&Mode=0
 
-Aligns KYC Master Direction with the 2023 PMLA Rules, UAPA, and WMD Act amendments; mandates group-level AML/CFT policies, raises Principal Officer rank to management level, allows Board committee to set ML/TF risk assessment frequency, and tightens beneficial-ownership disclosures. Group-level policy and enhanced ML/TF requirements percolate into broker AML programs via the RBI-aligned PMLA framework.
+Aligns KYC Master Direction with the 2023 PMLA Rules, UAPA, and WMD Act amendments; mandates group-level <abbr title="Anti-Money Laundering">AML</abbr>/<abbr title="Combating the Financing of Terrorism">CFT</abbr> policies, raises Principal Officer rank to management level, allows Board committee to set ML/TF risk assessment frequency, and tightens beneficial-ownership disclosures. Group-level policy and enhanced ML/TF requirements percolate into broker AML programs via the RBI-aligned PMLA framework.
 
 ### RBI/2023-24/41
 
@@ -240,7 +240,7 @@ Permits Default Loss Guarantee (FLDG) arrangements between REs and LSPs with a c
 - **impact_areas:** onboarding, re-KYC, aml, fatca-crs
 - **primary_url:** https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=12491&Mode=0
 
-Permits Aadhaar OTP-based e-KYC in non-face-to-face mode for periodic updation, subject to the customer's Aadhaar-linked mobile being identical to the one in the RE's records. Aligns with FATF recommendations and the 2023 PMLA amendments. Provides the RBI-side basis that SEBI/KRAs use for accepting Aadhaar XML/Digilocker-based periodic updation for broker clients.
+Permits Aadhaar <abbr title="One-Time Password">OTP</abbr>-based e-KYC in non-face-to-face mode for periodic updation, subject to the customer's Aadhaar-linked mobile being identical to the one in the RE's records. Aligns with <abbr title="Financial Action Task Force">FATF</abbr> recommendations and the 2023 PMLA amendments. Provides the RBI-side basis that SEBI/KRAs use for accepting Aadhaar XML/Digilocker-based periodic updation for broker clients.
 
 ### RBI/2023-24/16
 
@@ -266,7 +266,7 @@ Consolidates RBI requirements for outsourcing of IT services by SCBs, SFBs, PBs,
 - **impact_areas:** nri, upi-block, onboarding, client-funds
 - **primary_url:** https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=12453&Mode=0
 
-Permits foreign nationals/NRIs visiting India to make UPI payments using their international mobile numbers linked to NRE/NRO accounts at participating banks; NPCI operationalised via its 10-Jan-2023 OC. Brokers serving NRI clients can extend UPI-based fund pay-in flows for clients with NRE/NRO accounts in the eligible countries (US, UK, SG, CA, AU, OM, QA, AE, SA, HK).
+Permits foreign nationals/NRIs visiting India to make UPI payments using their international mobile numbers linked to <abbr title="Non-Resident External (Rupee) account">NRE</abbr>/<abbr title="Non-Resident Ordinary (Rupee) account">NRO</abbr> accounts at participating banks; NPCI operationalised via its 10-Jan-2023 OC. Brokers serving NRI clients can extend UPI-based fund pay-in flows for clients with NRE/NRO accounts in the eligible countries (US, UK, SG, CA, AU, OM, QA, AE, SA, HK).
 
 ### RBI/2022-23/111
 
@@ -346,7 +346,7 @@ Extends the deadline for purging stored card-on-file data by merchants/PAs/PGs (
 - **impact_areas:** grievance, scores-odr
 - **primary_url:** https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx?prid=52549
 
-Launches a single-window grievance redress scheme integrating the Banking Ombudsman 2006, NBFC Ombudsman 2018 and Digital Transactions Ombudsman 2019 schemes, with one portal/email/address for customers of all RBI-regulated entities. Brokers' partner banks/PAs/NBFC arms fall under this scheme; complaints about funding rails (failed UPI/NEFT/IMPS pay-in or e-mandate failures) are routed here.
+Launches a single-window grievance redress scheme integrating the Banking Ombudsman 2006, NBFC Ombudsman 2018 and Digital Transactions Ombudsman 2019 schemes, with one portal/email/address for customers of all RBI-regulated entities. Brokers' partner banks/PAs/NBFC arms fall under this scheme; complaints about funding rails (failed UPI/<abbr title="National Electronic Funds Transfer">NEFT</abbr>/<abbr title="Immediate Payment Service">IMPS</abbr> pay-in or e-mandate failures) are routed here.
 
 ### RBI/2021-22/126
 
@@ -464,7 +464,7 @@ Enhances V-CIP with facial recognition, formalises risk-based periodic KYC updat
 - **impact_areas:** settlement, reporting, non-individual
 - **primary_url:** https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=12022&Mode=0
 
-Mandates LEI for all RTGS/NEFT transactions of Rs.50 crore and above by non-individual entities, effective 01-Apr-2021. Applies to brokers, exchanges and clearing corps for high-value fund movements; non-individual broker entities also require LEI for cross-border transactions of Rs.50 crore+ effective 01-Oct-2022.
+Mandates LEI for all <abbr title="Real Time Gross Settlement">RTGS</abbr>/NEFT transactions of Rs.50 crore and above by non-individual entities, effective 01-Apr-2021. Applies to brokers, exchanges and clearing corps for high-value fund movements; non-individual broker entities also require LEI for cross-border transactions of Rs.50 crore+ effective 01-Oct-2022.
 
 ### RBI/2020-21/80
 
@@ -490,7 +490,7 @@ Extends CKYCR coverage to Legal Entities, requiring REs to upload KYC for LE acc
 - **impact_areas:** client-funds, settlement, t0-t1, bod-eod
 - **primary_url:** https://www.rbi.org.in/Scripts/BS_CircularIndexDisplay.aspx?Id=11998
 
-Makes RTGS available 24x7 effective 00:30 hrs on 14-Dec-2020. Enables broker-side large-value fund movement (e.g. UCC settlement bank, custodian payouts, FPI pay-in) across all hours, which removed the gating constraint on weekend/holiday large-value transfers between brokers and settlement banks.
+Makes RTGS available 24x7 effective 00:30 hrs on 14-Dec-2020. Enables broker-side large-value fund movement (e.g. <abbr title="Unique Client Code">UCC</abbr> settlement bank, custodian payouts, FPI pay-in) across all hours, which removed the gating constraint on weekend/holiday large-value transfers between brokers and settlement banks.
 
 ### RBI/2020-21/74
 
@@ -559,7 +559,7 @@ Introduces Video-based Customer Identification Process (V-CIP) as an alternate d
 - **impact_areas:** onboarding, esign, digi-locker, aml
 - **primary_url:** https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=11783&Mode=0
 
-Lays out the operational requirements for V-CIP: live video by trained official, randomised question for liveness, geotagging within India, document images side-by-side with face, encryption, audit trail. SEBI's video-IPV framework for broker onboarding (Apr-2020) shares the bulk of these design requirements; the RBI MD remains the regulatory anchor for V-CIP used in bank-arms of brokers.
+Lays out the operational requirements for V-CIP: live video by trained official, randomised question for liveness, geotagging within India, document images side-by-side with face, encryption, audit trail. SEBI's video-<abbr title="In-Person Verification">IPV</abbr> framework for broker onboarding (Apr-2020) shares the bulk of these design requirements; the RBI MD remains the regulatory anchor for V-CIP used in bank-arms of brokers.
 
 ### RBI/DOS/CSITE/BC.4083/2019-20
 
@@ -585,7 +585,7 @@ Issues a graded cyber-security framework (Levels I-IV) for UCBs based on digital
 - **impact_areas:** client-funds, settlement, t0-t1, bod-eod
 - **primary_url:** https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=11750&Mode=0
 
-Makes NEFT available 24x7x365 from 16-Dec-2019 (issued just before the 2020 review window but operative throughout it). Combined with RTGS 24x7 (effective 14-Dec-2020), brokers' fund pay-in and pay-out flows can now move outside banking hours, enabling intra-day liquidity transfers, weekend funding for next-day settlement, and EOD margin top-ups.
+Makes NEFT available 24x7x365 from 16-Dec-2019 (issued just before the 2020 review window but operative throughout it). Combined with RTGS 24x7 (effective 14-Dec-2020), brokers' fund pay-in and pay-out flows can now move outside banking hours, enabling intra-day liquidity transfers, weekend funding for next-day settlement, and <abbr title="End Of Day">EOD</abbr> margin top-ups.
 
 ### RBI/DNBS/2016-17/53
 
@@ -638,7 +638,7 @@ Mandates banks to put in place a Board-approved cyber-security policy distinct f
 - **impact_areas:** onboarding, re-KYC, kyc-modification, aml, fatca-crs, non-individual, minor-joint, nri, dormant, closure, transmission
 - **primary_url:** https://www.rbi.org.in/scripts/bs_viewmasdirections.aspx?id=11566
 
-The foundational RBI KYC Master Direction codifying CDD, EDD, simplified DD, beneficial ownership, periodic updation, record-keeping, FATF compliance, FATCA/CRS reporting, and PEP handling. Continuously amended (Jan 2020 V-CIP, Dec 2020 CKYC LE, May 2021 facial-recognition V-CIP, Apr 2023 NFTF e-KYC, Oct 2023 PMLA alignment, Nov 2024 UCIC-level CDD, Jun 2025 update). Broker KYC under SEBI/PMLA closely mirrors this MD for bank-broker overlap (joint clients, beneficial ownership, screening lists).
+The foundational RBI KYC Master Direction codifying CDD, EDD, simplified DD, beneficial ownership, periodic updation, record-keeping, FATF compliance, <abbr title="Foreign Account Tax Compliance Act (US)">FATCA</abbr>/<abbr title="Common Reporting Standard">CRS</abbr> reporting, and <abbr title="Politically Exposed Person">PEP</abbr> handling. Continuously amended (Jan 2020 V-CIP, Dec 2020 CKYC LE, May 2021 facial-recognition V-CIP, Apr 2023 NFTF e-KYC, Oct 2023 PMLA alignment, Nov 2024 UCIC-level CDD, Jun 2025 update). Broker KYC under SEBI/PMLA closely mirrors this MD for bank-broker overlap (joint clients, beneficial ownership, screening lists).
 
 ## Practical notes
 

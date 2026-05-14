@@ -12,7 +12,7 @@ next:
 import ScreenCard from '../../../components/ScreenCard.astro';
 import { Aside } from '@astrojs/starlight/components';
 
-The customer has just returned from DigiLocker (Government of India's digital document platform). They land on a screen that already knows their name, date of birth, gender, father's name, address, and photo. All of this was fetched from their Aadhaar XML during the DigiLocker consent. On top of that, the four async API calls from Screen 2 have now completed, so the system also has their KRA (KYC Registration Agency) record (occupation, income range, net worth) and CKYC (Central KYC) data if they exist. The customer sees a pre-filled form and only needs to type one thing: their email address. This is the payoff of the DigiLocker-first architecture.
+The customer has just returned from DigiLocker (Government of India's digital document platform). They land on a screen that already knows their name, date of birth, gender, father's name, address, and photo. All of this was fetched from their Aadhaar XML during the DigiLocker consent. On top of that, the four async API calls from Screen 2 have now completed, so the system also has their <abbr title="KYC Registration Agency">KRA</abbr> (<abbr title="Know Your Customer (process).">KYC</abbr> Registration Agency) record (occupation, income range, net worth) and <abbr title="Central KYC (records registry)">CKYC</abbr> (Central KYC) data if they exist. The customer sees a pre-filled form and only needs to type one thing: their email address. This is the payoff of the DigiLocker-first architecture.
 
 <ScreenCard number={4} title="Confirm Identity">
 
@@ -32,7 +32,7 @@ These fields come directly from DigiLocker and are displayed as read-only. The c
 | Father's Name | DigiLocker (Aadhaar XML) |
 | Full Address | DigiLocker (Aadhaar XML) |
 | Photo | DigiLocker (Aadhaar XML) |
-| PAN (Permanent Account Number) | User input (Screen 2) |
+| <abbr title="Permanent Account Number">PAN</abbr> (Permanent Account Number) | User input (Screen 2) |
 
 If the customer has an existing KYC record with another broker, additional financial fields are also pre-filled. These come from the KRA lookup and CKYC search that fired on Screen 2.
 
@@ -43,7 +43,7 @@ If the customer has an existing KYC record with another broker, additional finan
 | Occupation | KRA record |
 | Income Range | KRA / CKYC record |
 | Net Worth | KRA / CKYC record |
-| CKYC Number (KIN) | CKYC Search result |
+| CKYC Number (<abbr title="KYC Identification Number">KIN</abbr>) | CKYC Search result |
 
 :::tip[First-time vs. existing KYC customers]
 If the customer has never opened a trading or demat account before, the KRA lookup will return empty and the CKYC search will find no record. In that case, the occupation and income fields will be blank and the customer will need to fill them in manually. This is the "new-to-market" path. For customers who already have a KYC record with another intermediary, these fields arrive pre-filled, saving them additional effort.
@@ -65,7 +65,7 @@ Behind the scenes, this screen is also where the system assembles the identity r
 
 ## KRA and CKYC Integration
 
-KRA integration supports all five KRAs (CVL, NDML, DOTEX, CAMS, KFintech) via interoperability. Key operations include PAN status check, fetch details, and upload/update. The CKYC integration serves a dual purpose: it provides pre-fill data now, and later (post-approval) the system will upload the customer's complete KYC record back to the CKYC registry (CERSAI). This dual upload -- to both KRA and CKYC -- has been mandatory since August 2024 per SEBI circular.
+KRA integration supports all five KRAs (CVL, NDML, DOTEX, CAMS, KFintech) via interoperability. Key operations include PAN status check, fetch details, and upload/update. The CKYC integration serves a dual purpose: it provides pre-fill data now, and later (post-approval) the system will upload the customer's complete KYC record back to the CKYC registry (<abbr title="Central Registry of Securitisation Asset Reconstruction and Security Interest of India">CERSAI</abbr>). This dual upload -- to both KRA and CKYC -- has been mandatory since August 2024 per <abbr title="Securities and Exchange Board of India">SEBI</abbr> circular.
 
 <Aside type="caution">
 CKYC Search now returns a masked CKYC number (since Jan 2025). A full Download call is needed to get the complete record for identity matching.
@@ -74,7 +74,7 @@ CKYC Search now returns a masked CKYC number (since Jan 2025). A full Download c
 For vendor implementation options for KRA and CKYC integration, see [Vendor Integrations](/broking-kyc/vendors/).
 
 :::note[What the customer does not see]
-By the time the customer reviews and confirms their identity on this screen, the system has already evaluated PAN validity, checked KRA status, searched CKYC, and screened against AML/PEP (Politically Exposed Person) watchlists. None of these results are shown to the customer -- they feed into the blocking gate at Screen 8. The customer simply sees a clean, pre-filled form.
+By the time the customer reviews and confirms their identity on this screen, the system has already evaluated PAN validity, checked KRA status, searched CKYC, and screened against <abbr title="Anti-Money Laundering">AML</abbr>/<abbr title="Politically Exposed Person">PEP</abbr> (Politically Exposed Person) watchlists. None of these results are shown to the customer -- they feed into the blocking gate at Screen 8. The customer simply sees a clean, pre-filled form.
 :::
 
 </ScreenCard>

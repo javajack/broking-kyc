@@ -3,11 +3,11 @@ title: Communications
 description: SMS, email, and WhatsApp vendor options for OTP delivery, status updates, welcome kits, and regulatory notifications.
 ---
 
-The onboarding flow generates a series of communications to the customer -- OTP messages, status updates, verification confirmations, and a welcome kit at the end. Post-onboarding, the broker must send contract notes, margin alerts, and regulatory notifications. This page covers the vendor options for each communication channel, the specific messages triggered during onboarding, and the DLT (Distributed Ledger Technology) registration requirements that apply to all SMS sent in India.
+The onboarding flow generates a series of communications to the customer -- <abbr title="One-Time Password">OTP</abbr> messages, status updates, verification confirmations, and a welcome kit at the end. Post-onboarding, the broker must send contract notes, margin alerts, and regulatory notifications. This page covers the vendor options for each communication channel, the specific messages triggered during onboarding, and the DLT (Distributed Ledger Technology) registration requirements that apply to all <abbr title="Short Message Service.">SMS</abbr> sent in India.
 
 ## Vendor Comparison
 
-Each channel has a recommended vendor and specific regulatory requirements. SMS and email are mandatory per SEBI (Securities and Exchange Board of India) circular from December 2024; WhatsApp and push notifications are supplementary and cannot replace the mandatory channels.
+Each channel has a recommended vendor and specific regulatory requirements. SMS and email are mandatory per <abbr title="Securities and Exchange Board of India">SEBI</abbr> (Securities and Exchange Board of India) circular from December 2024; WhatsApp and push notifications are supplementary and cannot replace the mandatory channels.
 
 | Channel | Vendor | Key Features | Regulatory |
 |---------|--------|-------------|-----------|
@@ -28,8 +28,8 @@ The table below lists every message the system sends during the onboarding journ
 | Maker review pending | Internal | Dashboard notification to ops team |
 | Checker approval | Email + SMS | "Your account is being set up" |
 | Account activated | Email + SMS + WhatsApp | Welcome kit with login credentials |
-| KRA registered | Email | KRA (KYC Registration Agency) registration confirmation |
-| BO account created | Email | Demat account number notification |
+| <abbr title="KYC Registration Agency">KRA</abbr> registered | Email | KRA (<abbr title="Know Your Customer (process).">KYC</abbr> Registration Agency) registration confirmation |
+| <abbr title="Beneficial Owner">BO</abbr> account created | Email | Demat account number notification |
 | Nominee video reminder | SMS + WhatsApp | "Complete your nomination video within 30 days" |
 
 :::tip[The nominee video reminder]

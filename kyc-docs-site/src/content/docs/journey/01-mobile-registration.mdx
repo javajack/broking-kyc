@@ -13,13 +13,13 @@ import ScreenCard from '../../../components/ScreenCard.astro';
 import AsyncBar from '../../../components/AsyncBar.astro';
 import { Aside } from '@astrojs/starlight/components';
 
-The client has just opened the application for the first time. They do not have a trading account yet, and they may be unfamiliar with the regulatory machinery that stands between them and their first trade. The very first screen asks for one thing: their mobile number. Mobile verification is required for OTP-based Aadhaar authentication and KRA communication throughout the onboarding process.
+The client has just opened the application for the first time. They do not have a trading account yet, and they may be unfamiliar with the regulatory machinery that stands between them and their first trade. The very first screen asks for one thing: their mobile number. Mobile verification is required for <abbr title="One-Time Password">OTP</abbr>-based Aadhaar authentication and <abbr title="KYC Registration Agency">KRA</abbr> communication throughout the onboarding process.
 
 <ScreenCard number={1} title="Mobile / Email Registration">
 
-**Purpose:** Establish the identity anchor and OTP (One-Time Password) communication channel before any KYC data is captured.
+**Purpose:** Establish the identity anchor and OTP (One-Time Password) communication channel before any <abbr title="Know Your Customer (process).">KYC</abbr> data is captured.
 
-Every subsequent step -- PAN (Permanent Account Number) verification, KRA (KYC Registration Agency) lookup, DigiLocker (Government of India's digital document platform) authentication, eSign (electronic signature via Aadhaar OTP) -- relies on the ability to send the customer an OTP. Without a verified mobile number, the entire pipeline has no communication channel.
+Every subsequent step -- <abbr title="Permanent Account Number">PAN</abbr> (Permanent Account Number) verification, KRA (KYC Registration Agency) lookup, DigiLocker (Government of India's digital document platform) authentication, eSign (electronic signature via Aadhaar OTP) -- relies on the ability to send the customer an OTP. Without a verified mobile number, the entire pipeline has no communication channel.
 
 ## User Input
 
@@ -27,7 +27,7 @@ The customer types a single field.
 
 | Field | Validation | Notes |
 |-------|-----------|-------|
-| Mobile Number (10 digits) | 10 digits starting with 6-9 | OTP sent via SMS for verification |
+| Mobile Number (10 digits) | 10 digits starting with 6-9 | OTP sent via <abbr title="Short Message Service.">SMS</abbr> for verification |
 
 **Fallback:** Email registration if mobile OTP fails 3 times.
 
@@ -36,7 +36,7 @@ On registration, device risk assessment fires asynchronously -- risk signals inc
 </AsyncBar>
 
 <Aside type="tip" title="Why start with mobile?">
-Mobile number is the universal communication channel for OTPs, KRA verification, CKYC (Central KYC), and all post-onboarding notifications. Establishing it first ensures every subsequent step has a verified contact channel.
+Mobile number is the universal communication channel for OTPs, KRA verification, <abbr title="Central KYC (records registry)">CKYC</abbr> (Central KYC), and all post-onboarding notifications. Establishing it first ensures every subsequent step has a verified contact channel.
 </Aside>
 
 While the customer is looking at the OTP input field, the system initiates a background device risk assessment to detect potentially fraudulent devices.
@@ -45,7 +45,7 @@ While the customer is looking at the OTP input field, the system initiates a bac
 
 | Service | What It Does |
 |---------|-------------|
-| Device Risk Assessment | Detects emulators, rooted devices, synthetic identities, and coordinated fraud patterns. Results feed into AML/fraud evaluation at the Blocking Gate. |
+| Device Risk Assessment | Detects emulators, rooted devices, synthetic identities, and coordinated fraud patterns. Results feed into <abbr title="Anti-Money Laundering">AML</abbr>/fraud evaluation at the Blocking Gate. |
 
 This device intelligence layer runs silently in the background. No user interaction required. Results feed into the AML/fraud evaluation at the [Blocking Gate (Screen 8)](/broking-kyc/journey/08-declarations-gate/).
 

@@ -15,7 +15,7 @@ description: "Verified index of SEBI-MIRSD circulars affecting Indian stock brok
 
 ## Conceptual overview
 
-This page is the complete listing of SEBI-MIRSD circulars in the project's 2020–2026 sweep window. Each entry contains the verbatim circular ID, issue date, in-force date, status (in-force / superseded / withdrawn), applicable entity types, impact-area tags, a 2–4 sentence summary traceable to clauses, and the primary URL. Where the primary URL could not be re-fetched, an archive URL is provided in its place.
+This page is the complete listing of <abbr title="Securities and Exchange Board of India">SEBI</abbr>-<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr> circulars in the project's 2020–2026 sweep window. Each entry contains the verbatim circular ID, issue date, in-force date, status (in-force / superseded / withdrawn), applicable entity types, impact-area tags, a 2–4 sentence summary traceable to clauses, and the primary URL. Where the primary URL could not be re-fetched, an archive URL is provided in its place.
 
 ## Entries (descending date)
 
@@ -23,7 +23,7 @@ This page is the complete listing of SEBI-MIRSD circulars in the project's 2020�
 
 - **date_issued:** 2025-07-29
 - **issuer:** SEBI-MIRSD
-- **title:** "Extension of timeline for implementation of SEBI Circular SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/0000013 dated February 04, 2025"
+- **title:** "Extension of timeline for implementation of SEBI Circular SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/MIRSD/MIRSD-PoD/P/CIR/2025/0000013 dated February 04, 2025"
 - **applies_to:** broker, exchange
 - **in_force_date:** 2025-10-01
 - **status:** in-force
@@ -36,14 +36,14 @@ Extends implementation timeline of the 4 February 2025 algorithmic-trading circu
 
 - **date_issued:** 2025-07-29
 - **issuer:** SEBI-MIRSD
-- **title:** "Operational efficiency in monitoring of Non-Resident Indians (NRI) position limits in Exchange Traded Derivatives contracts"
+- **title:** "Operational efficiency in monitoring of Non-Resident Indians (<abbr title="Non-Resident Indian">NRI</abbr>) position limits in Exchange Traded Derivatives contracts"
 - **applies_to:** broker, exchange, clearing-corp
 - **in_force_date:** 2025-09-01
 - **status:** in-force
 - **impact_areas:** nri, derivatives, surveillance, reporting
 - **primary_url:** https://www.sebi.gov.in/legal/circulars/jul-2025/operational-efficiency-in-monitoring-of-non-resident-indians-nri-position-limits-in-exchange-traded-derivatives-contracts_95758.html
 
-Streamlines monitoring of NRI position limits in exchange-traded derivatives contracts. Specifies exchange-level aggregation, PAN-based linkage and reporting cadence; reduces operational burden on brokers handling NRI clients while preserving regulatory oversight on aggregate exposures.
+Streamlines monitoring of NRI position limits in exchange-traded derivatives contracts. Specifies exchange-level aggregation, <abbr title="Permanent Account Number">PAN</abbr>-based linkage and reporting cadence; reduces operational burden on brokers handling NRI clients while preserving regulatory oversight on aggregate exposures.
 
 ### SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/105
 
@@ -56,7 +56,7 @@ Streamlines monitoring of NRI position limits in exchange-traded derivatives con
 - **impact_areas:** onboarding, grievance, surveillance
 - **primary_url:** https://www.sebi.gov.in/legal/circulars/jul-2025/frequently-asked-questions-faqs-on-research-analysts-under-sebi-research-analysts-regulations-2014_95527.html
 
-18-page FAQ clarifying provisions of the SEBI (Research Analysts) Regulations 2014 read with the May 2024 Research Analysts circular. Covers registration, qualification/experience, KYC of clients, fee structure, segregation of distribution/advisory, recordkeeping and association with regulated entities.
+18-page FAQ clarifying provisions of the SEBI (Research Analysts) Regulations 2014 read with the May 2024 Research Analysts circular. Covers registration, qualification/experience, <abbr title="Know Your Customer (process).">KYC</abbr> of clients, fee structure, segregation of distribution/advisory, recordkeeping and association with regulated entities.
 
 ### SEBI/HO/MIRSD/POD-1/P/CIR/2025/94
 
@@ -69,7 +69,7 @@ Streamlines monitoring of NRI position limits in exchange-traded derivatives con
 - **impact_areas:** onboarding, client-funds, margin, settlement, rms, mtf, slbm, surveillance, reporting, bcp-dr, cyber-security, grievance, file-format, t0-t1, upstreaming, system-audit, nominee
 - **primary_url:** https://www.sebi.gov.in/legal/master-circulars/jun-2025/master-circular-for-stock-brokers_94623.html
 
-Updated Master Circular for stock brokers consolidating directives issued up to 31 March 2025, incorporating the revised nomination framework (Jan/Feb 2025), running-account 30-day settlement (Jan 2025), retail algo participation, and CSCRF cross-references. Supersedes 9 August 2024 master circular.
+Updated Master Circular for stock brokers consolidating directives issued up to 31 March 2025, incorporating the revised nomination framework (Jan/Feb 2025), running-account 30-day settlement (Jan 2025), retail algo participation, and <abbr title="Cybersecurity and Cyber Resilience Framework">CSCRF</abbr> cross-references. Supersedes 9 August 2024 master circular.
 
 ### SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2025/22
 
@@ -82,7 +82,7 @@ Updated Master Circular for stock brokers consolidating directives issued up to 
 - **impact_areas:** grievance, onboarding, reporting, scores-odr
 - **primary_url:** https://www.sebi.gov.in/legal/circulars/feb-2025/investor-charter-for-stock-brokers_92547.html
 
-Updated Investor Charter for stock brokers reflecting SCORES 2.0 (21-day initial resolution), the ODR portal, the revamped nomination framework, BSDA Rs 10 lakh threshold, direct payout of securities, and disclosure of investor complaint statistics. Replaces the December 2021 Investor Charter; to be published on broker websites and shared in account-opening kits.
+Updated Investor Charter for stock brokers reflecting <abbr title="SEBI Complaints Redress System">SCORES</abbr> 2.0 (21-day initial resolution), the <abbr title="Online Dispute Resolution">ODR</abbr> portal, the revamped nomination framework, BSDA Rs 10 lakh threshold, direct payout of securities, and disclosure of investor complaint statistics. Replaces the December 2021 Investor Charter; to be published on broker websites and shared in account-opening kits.
 
 ### SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/15
 
@@ -134,7 +134,7 @@ Operational clarifications on the bar against regulated entities and their agent
 - **impact_areas:** nominee, transmission, dormant, onboarding
 - **primary_url:** https://www.sebi.gov.in/legal/circulars/jan-2025/circular-on-revise-and-revamp-nomination-facilities-in-the-indian-securities-market_90698.html
 
-Comprehensive overhaul of nomination facilities for demat accounts and mutual fund folios: allows up to 10 nominees with percentage allocation, lays out rule-of-survivorship for joint holdings, simplifies transmission to require only death certificate and nominee KYC, and bars demand for affidavits/indemnities/notarised documents from nominees. Provides online (Aadhaar e-sign / DSC / 2FA) and physical submission modes; phased implementation extended to August/December 2025.
+Comprehensive overhaul of nomination facilities for demat accounts and mutual fund folios: allows up to 10 nominees with percentage allocation, lays out rule-of-survivorship for joint holdings, simplifies transmission to require only death certificate and nominee KYC, and bars demand for affidavits/indemnities/notarised documents from nominees. Provides online (Aadhaar e-sign / <abbr title="Digital Signature Certificate (CCA-licensed; aka Class 2/3 DSC).">DSC</abbr> / 2FA) and physical submission modes; phased implementation extended to August/December 2025.
 
 ### SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2025/1
 
@@ -187,7 +187,7 @@ Replaces earlier sectoral cyber circulars with a unified Cybersecurity and Cyber
 - **impact_areas:** onboarding, client-funds, margin, settlement, rms, mtf, slbm, surveillance, reporting, bcp-dr, cyber-security, grievance, file-format, t0-t1, upstreaming, system-audit
 - **primary_url:** https://www.sebi.gov.in/legal/master-circulars/aug-2024/master-circular-for-stock-brokers_85605.html
 
-Updated Master Circular for stock brokers, consolidating provisions to August 2024 including the BSDA enhancement, brokers' institutional mechanism for fraud detection (Chapter IVA), QSB expansion, and direct payout of securities. Supersedes the 7 May 2024 master circular.
+Updated Master Circular for stock brokers, consolidating provisions to August 2024 including the BSDA enhancement, brokers' institutional mechanism for fraud detection (Chapter IVA), <abbr title="Qualified Stock Broker">QSB</abbr> expansion, and direct payout of securities. Supersedes the 7 May 2024 master circular.
 
 ### SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/96
 
@@ -213,7 +213,7 @@ Operationalises Chapter IVA of the SEBI (Stock Brokers) Regulations 2024 requiri
 - **impact_areas:** onboarding, dormant, kyc-modification
 - **primary_url:** https://www.sebi.gov.in/legal/circulars/jun-2024/facility-for-basic-services-demat-account-bsda-for-financial-inclusion-and-ease-of-investing_84470.html
 
-Enhances BSDA portfolio value eligibility to Rs 10 lakh (from Rs 2 lakh) covering debt and equity securities; AMC nil up to Rs 4 lakh, Rs 100 between Rs 4-10 lakh, automatic conversion to regular demat above Rs 10 lakh. DPs must offer BSDA conversion to eligible existing holders.
+Enhances BSDA portfolio value eligibility to Rs 10 lakh (from Rs 2 lakh) covering debt and equity securities; <abbr title="Asset Management Company (mutual funds context) / Annual Maintenance Charges (depository context).">AMC</abbr> nil up to Rs 4 lakh, Rs 100 between Rs 4-10 lakh, automatic conversion to regular demat above Rs 10 lakh. DPs must offer BSDA conversion to eligible existing holders.
 
 ### SEBI/HO/MIRSD/POD-1/P/CIR/2024/81
 
@@ -232,14 +232,14 @@ Master Circular for RTAs consolidating extant circulars/directions up to 31 May 
 
 - **date_issued:** 2024-06-06
 - **issuer:** SEBI-MIRSD
-- **title:** "Master Circular - Guidelines on Anti-Money Laundering (AML) Standards and Combating the Financing of Terrorism (CFT)/Obligations of Securities Market Intermediaries under the Prevention of Money Laundering Act, 2002 and Rules framed there under"
+- **title:** "Master Circular - Guidelines on Anti-Money Laundering (<abbr title="Anti-Money Laundering">AML</abbr>) Standards and Combating the Financing of Terrorism (<abbr title="Combating the Financing of Terrorism">CFT</abbr>)/Obligations of Securities Market Intermediaries under the Prevention of Money Laundering Act, 2002 and Rules framed there under"
 - **applies_to:** all-intermediaries
 - **in_force_date:** 2024-06-06
 - **status:** in-force
 - **impact_areas:** aml, onboarding, reporting, surveillance
 - **primary_url:** https://www.sebi.gov.in/legal/master-circulars/jun-2024/guidelines-on-anti-money-laundering-aml-standards-and-combating-the-financing-of-terrorism-cft-obligations-of-securities-market-intermediaries-under-the-prevention-of-money-laundering-act-2002-a-_83942.html
 
-Updated AML/CFT Master Circular replacing the February 2023 master circular. Covers customer acceptance policy, customer due diligence (including for beneficial owners and politically exposed persons), reliance on third-party CDD, ongoing monitoring, sanction list screening (UN/MHA), record retention (10 years post relationship termination), and reporting obligations (CTR, NTR, CCR, STR, CBWTR) to FIU-IND.
+Updated AML/CFT Master Circular replacing the February 2023 master circular. Covers customer acceptance policy, customer due diligence (including for beneficial owners and politically exposed persons), reliance on third-party CDD, ongoing monitoring, sanction list screening (UN/MHA), record retention (10 years post relationship termination), and reporting obligations (<abbr title="Cash Transaction Report">CTR</abbr>, <abbr title="Non-Profit Organization Transaction Report">NTR</abbr>, CCR, <abbr title="Suspicious Transaction Report">STR</abbr>, CBWTR) to <abbr title="Financial Intelligence Unit — India">FIU-IND</abbr>.
 
 ### SEBI/HO/MIRSD/SECFATF/P/CIR/2024/79
 
@@ -252,7 +252,7 @@ Updated AML/CFT Master Circular replacing the February 2023 master circular. Cov
 - **impact_areas:** onboarding, re-KYC, file-format, reporting
 - **primary_url:** https://www.sebi.gov.in/legal/circulars/jun-2024/uploading-of-kyc-information-by-kyc-registration-agencies-kras-to-central-kyc-records-registry-ckycrr-_84006.html
 
-Mandates KRAs to upload KYC records of all clients (new and existing) to the Central KYC Records Registry (CKYCRR) operated by CERSAI, effecting dual upload obligations under both KRA and CKYC regimes. Specifies cut-off dates from which KRAs must transmit prescribed KYC fields to CKYCRR and report exceptions.
+Mandates KRAs to upload KYC records of all clients (new and existing) to the Central KYC Records Registry (CKYCRR) operated by <abbr title="Central Registry of Securitisation Asset Reconstruction and Security Interest of India">CERSAI</abbr>, effecting dual upload obligations under both <abbr title="KYC Registration Agency">KRA</abbr> and <abbr title="Central KYC (records registry)">CKYC</abbr> regimes. Specifies cut-off dates from which KRAs must transmit prescribed KYC fields to CKYCRR and report exceptions.
 
 ### SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2024/75
 
@@ -311,7 +311,7 @@ Expands the framework of Qualified Stock Brokers (QSBs) by adding parameters for
 
 - **date_issued:** 2024-02-20
 - **issuer:** SEBI-MIRSD
-- **title:** "Centralization of certifications under Foreign Account Tax Compliance Act (FATCA) and Common Reporting Standard (CRS) at KYC Registration Agencies (KRAs)"
+- **title:** "Centralization of certifications under Foreign Account Tax Compliance Act (<abbr title="Foreign Account Tax Compliance Act (US)">FATCA</abbr>) and Common Reporting Standard (<abbr title="Common Reporting Standard">CRS</abbr>) at KYC Registration Agencies (KRAs)"
 - **applies_to:** all-intermediaries
 - **in_force_date:** 2024-07-01
 - **status:** in-force
@@ -324,7 +324,7 @@ Requires SEBI-registered intermediaries acting as Reporting Financial Institutio
 
 - **date_issued:** 2023-12-28
 - **issuer:** SEBI-MIRSD
-- **title:** "Settlement of Running Account of Client's Funds lying with Trading Member (TM)"
+- **title:** "Settlement of Running Account of Client's Funds lying with Trading Member (<abbr title="Trading Member">TM</abbr>)"
 - **applies_to:** broker
 - **in_force_date:** 2024-01-01
 - **status:** in-force
@@ -370,7 +370,7 @@ Consolidates the 31 July 2023 ODR circular and the 4 August 2023 amendment into 
 - **impact_areas:** upstreaming, client-funds, rms, settlement
 - **primary_url:** https://www.sebi.gov.in/legal/circulars/dec-2023/upstreaming-of-clients-funds-by-stock-brokers-sbs-clearing-members-cms-to-clearing-corporations-ccs-_80247.html
 
-Revised upstreaming framework following Industry Standards Forum representations. Operationalises Upstreaming Client Nodal Bank Account (USCNBA) and Downstreaming Client Nodal Bank Account (DSCNBA), allows MFOS pledge expansion, and lays out cash/FDR/MFOS upstreaming modalities while reaffirming the EOD no-retention principle for client funds.
+Revised upstreaming framework following Industry Standards Forum representations. Operationalises Upstreaming Client Nodal Bank Account (USCNBA) and Downstreaming Client Nodal Bank Account (DSCNBA), allows MFOS pledge expansion, and lays out cash/FDR/MFOS upstreaming modalities while reaffirming the <abbr title="End Of Day">EOD</abbr> no-retention principle for client funds.
 
 ### SEBI/HO/MIRSD/POD-1/P/CIR/2023/181
 
@@ -384,7 +384,7 @@ Revised upstreaming framework following Industry Standards Forum representations
 - **impact_areas:** onboarding, re-KYC, kyc-modification, nominee, transmission
 - **primary_url:** https://www.sebi.gov.in/legal/circulars/nov-2023/common-and-simplified-norms-for-processing-investor-s-service-requests-by-rtas-and-norms-for-furnishing-pan-kyc-details-and-nomination_79430.html
 
-Amends the March 2023 RTA service-request circular to remove the term "freezing/frozen" and the referral of folios by RTAs/listed companies to authorities under Benami and PMLA. Reinforces that holders without PAN/KYC/nomination remain eligible for dividend, interest, redemption and grievance redressal.
+Amends the March 2023 RTA service-request circular to remove the term "freezing/frozen" and the referral of folios by RTAs/listed companies to authorities under Benami and <abbr title="Prevention of Money Laundering Act 2002">PMLA</abbr>. Reinforces that holders without PAN/KYC/nomination remain eligible for dividend, interest, redemption and grievance redressal.
 
 ### SEBI/HO/MIRSD/SEC-FATF/P/CIR/2023/0170
 
@@ -411,7 +411,7 @@ Amends the February 2023 AML/CFT master circular pursuant to the Prevention of M
 - **impact_areas:** onboarding, re-KYC, kyc-modification, fatca-crs, aml, esign, digi-locker, nri, minor-joint, non-individual
 - **primary_url:** https://www.sebi.gov.in/legal/master-circulars/oct-2023/master-circular-on-know-your-client-kyc-norms-for-the-securities-market_77945.html
 
-Compiles all circulars/directions on KYC for securities market issued up to 30 September 2023, aligning with PML (Maintenance of Records) Rules 2005 and KRA Regulations 2011. Covers OVD list, client categories (individual/non-individual/PEP/minor/NRI), use of e-Sign/Aadhaar/DigiLocker/VIPV, KRA and CKYC interoperability, periodic updation and risk-based approach.
+Compiles all circulars/directions on KYC for securities market issued up to 30 September 2023, aligning with PML (Maintenance of Records) Rules 2005 and KRA Regulations 2011. Covers <abbr title="Officially Valid Document">OVD</abbr> list, client categories (individual/non-individual/<abbr title="Politically Exposed Person">PEP</abbr>/minor/NRI), use of e-Sign/Aadhaar/DigiLocker/<abbr title="Video In-Person Verification (sometimes &quot;Video CIP&quot; / V-CIP)">VIPV</abbr>, KRA and CKYC interoperability, periodic updation and risk-based approach.
 
 ### SEBI/HO/OIAE/IGRD/CIR/P/2023/156
 
@@ -448,7 +448,7 @@ Permits clients to open and transact in securities market accounts once the KYC 
 - **applies_to:** broker, depository, exchange, clearing-corp, all-intermediaries
 - **in_force_date:** 2023-08-16
 - **status:** superseded
-- **superseded_by:** SEBI/HO/OIAE/OIAE_IAD-1/P/CIR/2023/0182
+- **superseded_by:** SEBI/HO/<abbr title="Office of Investor Assistance and Education (SEBI)">OIAE</abbr>/OIAE_IAD-1/P/CIR/2023/0182
 - **impact_areas:** grievance, scores-odr
 - **primary_url:** https://www.sebi.gov.in/legal/circulars/jul-2023/online-resolution-of-disputes-in-the-indian-securities-market_74794.html
 
@@ -546,7 +546,7 @@ Identifies Qualified Stock Brokers (QSBs) based on size of operations, active cl
 - **impact_areas:** aml, onboarding, reporting, surveillance
 - **primary_url:** https://www.sebi.gov.in/legal/master-circulars/feb-2023/master-circular-on-guidelines-on-anti-money-laundering-aml-standards-and-combating-the-financing-of-terrorism-cft-obligations-of-securities-market-intermediaries-under-the-prevention-of-money-l-_67676.html
 
-Consolidates AML/CFT obligations of SEBI-registered intermediaries under PMLA 2002 and PML Rules including client due diligence, beneficial-ownership identification, sanction-screening, record-keeping, designation of Principal Officer and Designated Director, and STR/CTR reporting to FIU-IND. Sets the framework that is updated periodically by subsequent amendments and the June 2024 successor master circular.
+Consolidates AML/CFT obligations of SEBI-registered intermediaries under PMLA 2002 and PML Rules including client due diligence, beneficial-ownership identification, sanction-screening, record-keeping, designation of Principal Officer and Designated Director, and STR/CTR reporting to <abbr title="Financial Intelligence Unit">FIU</abbr>-IND. Sets the framework that is updated periodically by subsequent amendments and the June 2024 successor master circular.
 
 ### SEBI/HO/MIRSD/TPD-1/P/CIR/2022/160
 
@@ -559,7 +559,7 @@ Consolidates AML/CFT obligations of SEBI-registered intermediaries under PMLA 20
 - **impact_areas:** bcp-dr, reporting, system-audit, surveillance
 - **primary_url:** https://www.sebi.gov.in/legal/circulars/nov-2022/framework-to-address-the-technical-glitches-in-stock-brokers-electronic-trading-systems_65466.html
 
-Defines "technical glitch" for stock-broker trading systems and mandates that brokers report glitches to exchanges within one hour of occurrence, submit a Preliminary Incident Report within T+1 day, and a Root Cause Analysis within 14 days. Specifies BCP-DR setup, log preservation (30 days normal / 2 years post-glitch) and capacity-planning requirements.
+Defines "technical glitch" for stock-broker trading systems and mandates that brokers report glitches to exchanges within one hour of occurrence, submit a Preliminary Incident Report within <abbr title="Trade-date Plus N settlement">T+1</abbr> day, and a Root Cause Analysis within 14 days. Specifies BCP-DR setup, log preservation (30 days normal / 2 years post-glitch) and capacity-planning requirements.
 
 ### SEBI/HO/EFD1/EFD1_DRA4/P/CIR/2022/104
 
@@ -596,7 +596,7 @@ Mandates settlement of running account of client's funds on the first Friday of 
 - **applies_to:** broker, depository
 - **in_force_date:** 2022-06-30
 - **status:** superseded
-- **superseded_by:** SEBI/HO/ITD-1/ITD_CSC_EXT/P/CIR/2024/113
+- **superseded_by:** SEBI/HO/<abbr title="Information Technology Department (within SEBI)">ITD</abbr>-1/ITD_CSC_EXT/P/CIR/2024/113
 - **impact_areas:** cyber-security, reporting, system-audit
 - **primary_url:** https://www.sebi.gov.in/legal/circulars/jun-2022/modification-in-cyber-security-and-cyber-resilience-framework-for-stock-brokers-depository-participants_59875.html
 
@@ -647,7 +647,7 @@ Enhances monetary threshold for simplified transmission of securities to Rs 5 la
 
 - **date_issued:** 2022-04-04
 - **issuer:** SEBI-MIRSD
-- **title:** "Execution of 'Demat Debit and Pledge Instruction' (DDPI) for transfer of securities towards deliveries / settlement obligations and pledging / re-pledging of securities"
+- **title:** "Execution of 'Demat Debit and Pledge Instruction' (<abbr title="Demat Debit and Pledge Instruction">DDPI</abbr>) for transfer of securities towards deliveries / settlement obligations and pledging / re-pledging of securities"
 - **applies_to:** broker, depository
 - **in_force_date:** 2022-07-01
 - **status:** in-force
@@ -722,7 +722,7 @@ Mandates that investors opening new trading and/or demat accounts on or after 1 
 - **impact_areas:** onboarding, client-funds, margin
 - **primary_url:** https://www.sebi.gov.in/legal/circulars/aug-2020/execution-of-power-of-attorney-poa-by-the-client-in-favour-of-the-stock-broker-stock-broker-and-depository-participant_47423.html
 
-Reiterates that PoA is optional and shall not be insisted upon by stock brokers/DPs for opening client accounts. Defines the limited scope of PoA (pay-in, MTF, mutual fund subscription/redemption, settlement obligations) and bars its use for transfer of securities for margin or off-market transactions; PoA prohibited from authorising transfers to broker's own accounts.
+Reiterates that PoA is optional and shall not be insisted upon by stock brokers/DPs for opening client accounts. Defines the limited scope of PoA (pay-in, <abbr title="Margin Trading Facility">MTF</abbr>, mutual fund subscription/redemption, settlement obligations) and bars its use for transfer of securities for margin or off-market transactions; PoA prohibited from authorising transfers to broker's own accounts.
 
 ### SEBI/HO/OIAE/IGRD/CIR/P/2020/152
 
@@ -749,7 +749,7 @@ Operationalises stock exchanges as nodal agencies for handling SCORES investor c
 - **impact_areas:** onboarding, esign, digi-locker, aml
 - **primary_url:** https://www.sebi.gov.in/legal/circulars/apr-2020/clarification-on-know-your-client-kyc-process-and-use-of-technology-for-kyc_46565.html
 
-Permits SEBI-registered intermediaries to undertake online KYC of clients using app/web-based platforms with Video In-Person Verification (VIPV), digital signature, e-Sign, OTP-based Aadhaar e-KYC, and DigiLocker-fetched officially valid documents. Specifies process safeguards for image/video capture (geo-tag, time-stamp), authorised official verification, and equivalency of online KYC to in-person verification. Applies to all SEBI intermediaries including stock brokers, mutual funds, depository participants.
+Permits SEBI-registered intermediaries to undertake online KYC of clients using app/web-based platforms with Video In-Person Verification (VIPV), digital signature, e-Sign, <abbr title="One-Time Password">OTP</abbr>-based Aadhaar e-KYC, and DigiLocker-fetched officially valid documents. Specifies process safeguards for image/video capture (geo-tag, time-stamp), authorised official verification, and equivalency of online KYC to in-person verification. Applies to all SEBI intermediaries including stock brokers, mutual funds, depository participants.
 
 ### SEBI/HO/MIRSD/DOP/CIR/P/2020/28
 

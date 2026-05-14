@@ -3,10 +3,10 @@ title: Audit & Compliance
 description: What to keep, how long, and who audits it — data retention requirements, audit trail specifications, and compliance reporting obligations.
 ---
 
-Building a KYC (Know Your Customer) system is not just about onboarding customers quickly — it is equally about proving, years later, that every step was done correctly. Regulators, auditors, and law enforcement agencies all have the right to examine your records, and the consequences of not having them can range from penalties to license revocation. Think of audit and compliance as the "memory" of your system: every document collected, every verification performed, every approval given, and every modification made must be recorded, retained, and retrievable for years. This page covers data retention requirements under SEBI (Securities and Exchange Board of India) and PMLA (Prevention of Money Laundering Act, 2002), annual audit obligations, cybersecurity frameworks, and suspicious activity reporting timelines.
+Building a <abbr title="Know Your Customer (process).">KYC</abbr> (Know Your Customer) system is not just about onboarding customers quickly — it is equally about proving, years later, that every step was done correctly. Regulators, auditors, and law enforcement agencies all have the right to examine your records, and the consequences of not having them can range from penalties to license revocation. Think of audit and compliance as the "memory" of your system: every document collected, every verification performed, every approval given, and every modification made must be recorded, retained, and retrievable for years. This page covers data retention requirements under <abbr title="Securities and Exchange Board of India">SEBI</abbr> (Securities and Exchange Board of India) and <abbr title="Prevention of Money Laundering Act 2002">PMLA</abbr> (Prevention of Money Laundering Act, 2002), annual audit obligations, cybersecurity frameworks, and suspicious activity reporting timelines.
 
 :::note[Why This Matters for Engineers]
-Even if you are building the front-end or the API (Application Programming Interface) layer, understanding retention and audit requirements affects your database design, storage architecture, and logging strategy. For example, knowing that VIPV (Video In-Person Verification) recordings must be retained for 7 years in tamper-proof storage directly impacts your media storage choices and costs.
+Even if you are building the front-end or the API (Application Programming Interface) layer, understanding retention and audit requirements affects your database design, storage architecture, and logging strategy. For example, knowing that <abbr title="Video In-Person Verification (sometimes &quot;Video CIP&quot; / V-CIP)">VIPV</abbr> (Video In-Person Verification) recordings must be retained for 7 years in tamper-proof storage directly impacts your media storage choices and costs.
 :::
 
 Let us start with how long different types of records must be kept.
@@ -43,7 +43,7 @@ Every trading member (broker) that uses approved trading software must undergo a
 | Auditor certification | CISA (ISACA) \| DISA (ICAI) \| CISM (ISACA) \| CISSP (ISC2) \| GSNA (GIAC) |
 | Auditor rotation | Max **3 consecutive years** per trading member, then **2-year cooling-off** |
 | Independence | Must be independent of empanelled vendors and trading member partners |
-| 2025 Change | SEBI/HO/MIRSD/TPD/CIR/2025/10 (Jan 2025): New technology-based monitoring framework |
+| 2025 Change | SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/TPD/CIR/2025/10 (Jan 2025): New technology-based monitoring framework |
 
 :::note[Auditor Rotation Matters]
 The 3-year limit followed by a 2-year cooling-off period means you cannot use the same auditor indefinitely. Start identifying your next auditor in year 2 so you are not scrambling when the rotation deadline arrives. Maintain a shortlist of at least two qualified auditing firms.
@@ -55,7 +55,7 @@ Beyond the annual system audit, depository participants (DPs) have their own set
 
 ## Depository Audit Requirements
 
-If your broking firm is also a depository participant — meaning you offer demat accounts through CDSL (Central Depository Services Limited) or NSDL (National Securities Depository Limited) — you face additional audit obligations. These audits specifically examine how you handle demat account operations: opening accounts, processing instructions, maintaining KYC compliance, and reconciling holdings.
+If your broking firm is also a depository participant — meaning you offer demat accounts through <abbr title="Central Depository Services (India) Limited">CDSL</abbr> (Central Depository Services Limited) or <abbr title="National Securities Depository Limited">NSDL</abbr> (National Securities Depository Limited) — you face additional audit obligations. These audits specifically examine how you handle demat account operations: opening accounts, processing instructions, maintaining KYC compliance, and reconciling holdings.
 
 | Audit Type | Scope | Auditor Requirement |
 |-----------|-------|---------------------|
@@ -69,7 +69,7 @@ The cybersecurity audit requirements are now governed by a unified framework tha
 
 ## CSCRF (Cybersecurity & Cyber Resilience Framework)
 
-:::note[SEBI CSCRF Is the New Standard]
+:::note[SEBI <abbr title="Cybersecurity and Cyber Resilience Framework">CSCRF</abbr> Is the New Standard]
 **SEBI CSCRF (Aug 20, 2024):** Single consolidated cybersecurity framework for all SEBI-regulated entities. Mandates: risk management, regular VAPT, ISO 27001 (larger entities), periodic cyber audits by CERT-In empanelled auditors. **Compliance deadline:** Stock Brokers — Jan 1, 2025. KRAs (KYC Registration Agencies) and DPs — extended to Apr 1, 2025.
 :::
 
@@ -83,7 +83,7 @@ Every change to a customer's KYC data — whether initiated by the customer, by 
 
 ## KYC Modification Audit Trail
 
-All changes to KYC data must be logged with: **timestamp**, **previous value**, **new value**, **user/system that made the change**, and **reason for change**. Both CDSL BO Modify and NSDL DPM (Depository Participant Module) maintain audit trails. Modification of Name/DOB at BSE (Bombay Stock Exchange) requires Unfreeze request + Protean re-verification.
+All changes to KYC data must be logged with: **timestamp**, **previous value**, **new value**, **user/system that made the change**, and **reason for change**. Both CDSL <abbr title="Beneficial Owner">BO</abbr> Modify and NSDL <abbr title="Depository Participant Module (CDSL terminology).">DPM</abbr> (Depository Participant Module) maintain audit trails. Modification of Name/DOB at <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> (Bombay Stock Exchange) requires Unfreeze request + Protean re-verification.
 
 :::caution[Never Overwrite — Always Append]
 Your database schema for KYC data should never update fields in place. Instead, use an append-only audit log where every change creates a new record with the previous value, the new value, who made the change, and why. This pattern ensures that even if someone accidentally modifies data, the original value is always recoverable and the full history is preserved for auditors.
@@ -101,9 +101,9 @@ When your system or your operations team identifies suspicious activity — unus
 |-----------|----------|-----------|
 | Suspicious activity report to exchange | Within **48 hours** of detection | SEBI (Stock Brokers) Amendment 2024 |
 | Semi-annual summary report | Every 6 months | Regulation 18G(1) |
-| STR (Suspicious Transaction Report) to FIU-IND (Financial Intelligence Unit - India) | Within 7 working days | PMLA, 2002 |
+| <abbr title="Suspicious Transaction Report">STR</abbr> (Suspicious Transaction Report) to <abbr title="Financial Intelligence Unit — India">FIU-IND</abbr> (Financial Intelligence Unit - India) | Within 7 working days | PMLA, 2002 |
 
-In plain English: if you detect something suspicious, you have 48 hours to report it to the exchange and 7 working days to file a formal STR with the FIU. The semi-annual summary report is a broader, periodic obligation that covers all suspicious activity detected during the six-month window.
+In plain English: if you detect something suspicious, you have 48 hours to report it to the exchange and 7 working days to file a formal STR with the <abbr title="Financial Intelligence Unit">FIU</abbr>. The semi-annual summary report is a broader, periodic obligation that covers all suspicious activity detected during the six-month window.
 
 :::tip[Build Automated Alerts]
 Do not rely on manual detection for suspicious activity. Build automated rules that flag unusual patterns — such as a customer who declares Rs.1-5 lakh income but attempts to trade in high-value F&O (Futures and Options) contracts, or a customer whose KYC data changes significantly shortly after account activation. These automated alerts give your compliance team early warning and ensure you meet the 48-hour reporting deadline.

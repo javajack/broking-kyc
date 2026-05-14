@@ -3,13 +3,13 @@ title: CDSL Integration Guide
 description: UAT/production environments, request tracking, sequence numbers, security architecture, encryption, IP whitelisting, and SEBI circulars reference.
 ---
 
-Before a single real client account can be opened in CDSL (Central Depository Services Limited), your system must pass through a multi-phase certification process that includes UAT (User Acceptance Testing) environment setup, test case execution against CDSL-defined scenarios, and a formal sign-off. After that, production onboarding involves leased line connectivity, IP whitelisting, DSC (Digital Signature Certificate) mapping, and strict security protocols. This page is the practical engineering guide to that journey — from requesting your first test credentials to processing your first live transaction. Whether you are integrating with CDSL for the first time or troubleshooting a production issue with file uploads and sequence numbers, this is where you will find the answers.
+Before a single real client account can be opened in <abbr title="Central Depository Services (India) Limited">CDSL</abbr> (Central Depository Services Limited), your system must pass through a multi-phase certification process that includes UAT (User Acceptance Testing) environment setup, test case execution against CDSL-defined scenarios, and a formal sign-off. After that, production onboarding involves leased line connectivity, IP whitelisting, <abbr title="Digital Signature Certificate (CCA-licensed; aka Class 2/3 DSC).">DSC</abbr> (Digital Signature Certificate) mapping, and strict security protocols. This page is the practical engineering guide to that journey — from requesting your first test credentials to processing your first live transaction. Whether you are integrating with CDSL for the first time or troubleshooting a production issue with file uploads and sequence numbers, this is where you will find the answers.
 
 > Back to [CDSL Overview](/broking-kyc/vendors/depositories/cdsl/)
 
 ---
 
-The first decision you will face is which environment to work in. CDSL provides three tiers — an Innovation Sandbox for prototyping, a DP (Depository Participant) UAT environment for real integration testing, and the production environment for live operations. Understanding the differences between these environments will save you from common mistakes like using test credentials in production or expecting real settlement behavior in UAT.
+The first decision you will face is which environment to work in. CDSL provides three tiers — an Innovation Sandbox for prototyping, a <abbr title="Depository Participant">DP</abbr> (Depository Participant) UAT environment for real integration testing, and the production environment for live operations. Understanding the differences between these environments will save you from common mistakes like using test credentials in production or expecting real settlement behavior in UAT.
 
 ## 1. UAT / Test Environment vs Production
 
@@ -23,7 +23,7 @@ The first decision you will face is which environment to work in. CDSL provides 
 | **eDIS Portal** | Sandbox eDIS (on request) | `edis.cdslindia.com` |
 | **TPIN Generation** | Test TPIN generation | `edis.cdslindia.com/Home/GeneratePin` |
 | **easi/EASIEST** | Test instance | `web.cdslindia.com/myeasitoken/Home/Login` |
-| **CVL KRA Verification** | Test URL | `validate.cvlindia.com/CVLKRAVerification_V1/` |
+| **CVL <abbr title="KYC Registration Agency">KRA</abbr> Verification** | Test URL | `validate.cvlindia.com/CVLKRAVerification_V1/` |
 | **Issuer Portal** | Test instance | `issuercentre.cdslindia.com/Home/Login` |
 
 :::tip[Bookmark these URLs early]
@@ -44,8 +44,8 @@ During integration, you will switch between these endpoints dozens of times a da
 | **IP Whitelisting** | May be relaxed; dynamic IPs may be allowed | Static IPs mandatory; registered with CDSL |
 | **SSL/TLS** | TLS 1.2 (same as production) | TLS 1.2 or higher (mandatory) |
 | **TransDtls Encryption** | Same encryption algorithm as production | Same encryption, production keys |
-| **Settlement** | No real settlement; simulated settlement cycle | T+1 live settlement |
-| **Audit Logging** | Minimal / test-only | Full audit trail per SEBI (Securities and Exchange Board of India) requirements |
+| **Settlement** | No real settlement; simulated settlement cycle | <abbr title="Trade-date Plus N settlement">T+1</abbr> live settlement |
+| **Audit Logging** | Minimal / test-only | Full audit trail per <abbr title="Securities and Exchange Board of India">SEBI</abbr> (Securities and Exchange Board of India) requirements |
 | **Go-Live** | Self-service testing | Requires CDSL UAT sign-off certification |
 
 In plain English: the UAT environment mirrors production in its API structure and file formats, but uses synthetic data and relaxed security. Think of it as a flight simulator — the controls are identical to a real cockpit, but crashing has no consequences. Production is the real flight.
@@ -97,7 +97,7 @@ Phase 5: Production Onboarding (1-2 weeks)
 The entire UAT-to-production journey typically takes 6-10 weeks. Do not underestimate Phase 3 — CDSL provides a specific list of test cases, and every one must pass. The most common delays are in error scenario testing (Phase 3) and DSC mapping (Phase 5). Start the DSC procurement process in Phase 1, because getting hardware USB tokens takes 7-10 working days from the certifying authority.
 :::
 
-:::tip[Pre-Allocated BO IDs]
+:::tip[Pre-Allocated <abbr title="Beneficial Owner">BO</abbr> IDs]
 During Phase 5, request a **Client ID range pre-allocation** from CDSL. This allows you to assign BO (Beneficiary Owner) IDs before eSign, so the account opening form displays the demat account number when the client signs it. See [CDSL Overview — Section 5.4](/broking-kyc/vendors/depositories/cdsl/#54-pre-allocated-client-id-bo-id-range-reservation) for the full mechanism, implementation requirements, and eSign workflow.
 :::
 
@@ -159,7 +159,7 @@ In plain English: the Unique Sequence Number is like a receipt number at a bank 
 | **DRN (Demat Request Number)** | 10-digit numeric | CDSL assigns | Dematerialization/Rematerialization request number |
 | **BO Setup Reference** | DP-generated | DP generates | Internal reference for BO account opening request |
 | **Settlement ID** | Exchange-assigned | Exchange | Settlement number for on-market transactions |
-| **CM ID** | 8-digit | Clearing Corp | Clearing Member identifier for settlement matching |
+| **<abbr title="Clearing Member">CM</abbr> ID** | 8-digit | Clearing Corp | Clearing Member identifier for settlement matching |
 
 :::note[You generate some, CDSL generates others]
 Notice the "Source" column carefully. Some reference numbers (Unique Sequence Number, eDIS ReqId, BO Setup Reference) are generated by your system — you control the format and must ensure uniqueness. Others (File Request ID, Transaction Reference, DRN) are assigned by CDSL after processing — you must capture and store these from CDSL's response for downstream tracking.
@@ -366,7 +366,7 @@ In plain English: Layer 1 controls who can talk to CDSL's network. Layer 2 encry
 | Aspect | Details |
 |--------|---------|
 | **Primary CA** | Sify Safescrypt (CDSL-approved Certifying Authority) |
-| **Other CAs** | eMudhra, nCode, (s)TRUST (Capricorn) — BOs can use DSC from any RA |
+| **Other CAs** | eMudhra, nCode, (s)TRUST (Capricorn) — BOs can use DSC from any <abbr title="Research Analyst">RA</abbr> |
 | **DSC Class** | Class 3 Digital Signature Certificate |
 | **Token Type** | Hardware USB e-Token (software certificates NOT accepted) |
 | **Issuance Time** | 7-10 working days from application |
@@ -398,13 +398,13 @@ DSC expiry is a silent production killer. When your DSC expires, all transaction
 | Aspect | Details |
 |--------|---------|
 | **Encrypted Field** | `TransDtls` parameter in VerifyDIS API call |
-| **Content** | ISIN, quantity, exchange (NSE/BSE/MCX), segment (CM/FO/CD/COM), bulk flag |
+| **Content** | ISIN, quantity, exchange (<abbr title="National Stock Exchange of India">NSE</abbr>/<abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr>/<abbr title="Multi Commodity Exchange of India">MCX</abbr>), segment (CM/FO/CD/COM), bulk flag |
 | **Encryption** | DP encrypts using CDSL-provided encryption key and algorithm |
 | **Key Provisioning** | Encryption parameters provided in API documentation during DP registration |
 | **Key Rotation** | CDSL may rotate encryption keys; DP must implement key update mechanism |
 | **Decryption** | CDSL decrypts server-side on eDIS portal |
 | **TPIN Entry** | ALWAYS on CDSL's eDIS webpage — never on DP portal (prevents DP from capturing TPIN) |
-| **OTP Delivery** | CDSL sends directly to BO's registered mobile (DP has zero access) |
+| **<abbr title="One-Time Password">OTP</abbr> Delivery** | CDSL sends directly to BO's registered mobile (DP has zero access) |
 
 :::note[Why TPIN never touches your system]
 CDSL deliberately designed the eDIS flow so that the client's TPIN (Transaction PIN) is entered only on CDSL's own webpage. Your system redirects the client to CDSL's eDIS portal, but you never see or handle the TPIN. This is a security design principle — it prevents brokers from capturing client TPIN credentials. Similarly, the OTP goes directly from CDSL to the client's mobile. Your system only receives the final authorization callback (success or failure).
@@ -472,7 +472,7 @@ In plain English: if you are a large broker with high transaction volumes, a lea
 
 ---
 
-The final section of this guide is a comprehensive reference of all SEBI circulars and CDSL communiques relevant to DDPI (Demat Debit and Pledge Instruction), margin pledge, nomination, and BO modifications. Bookmark this section — you will refer to it frequently when tracing a regulatory requirement back to its source circular, or when compliance asks "which circular requires this?"
+The final section of this guide is a comprehensive reference of all SEBI circulars and CDSL communiques relevant to <abbr title="Demat Debit and Pledge Instruction">DDPI</abbr> (Demat Debit and Pledge Instruction), margin pledge, nomination, and BO modifications. Bookmark this section — you will refer to it frequently when tracing a regulatory requirement back to its source circular, or when compliance asks "which circular requires this?"
 
 ## 4. SEBI Circulars Reference
 
@@ -480,7 +480,7 @@ The final section of this guide is a comprehensive reference of all SEBI circula
 
 | Circular Number | Date | Subject |
 |-----------------|------|---------|
-| [SEBI/HO/MIRSD/DoP/P/CIR/2022/44](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddoppcir202244) | Apr 4, 2022 | DDPI for settlement + pledge (original) |
+| [SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/DoP/P/CIR/2022/44](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddoppcir202244) | Apr 4, 2022 | DDPI for settlement + pledge (original) |
 | SEBI/HO/MIRSD/DoP/P/CIR/2022/119 | Jun 2022 | Implementation timeline extension |
 | SEBI/HO/MIRSD-PoD-1/P/CIR/2022/137 | Oct 6, 2022 | DDPI scope expanded: MF + open offer |
 | SEBI/HO/MIRSD/DoP/P/CIR/2022/153 | Nov 2022 | Further implementation extension |
@@ -491,7 +491,7 @@ The final section of this guide is a comprehensive reference of all SEBI circula
 |-----------------|------|---------|
 | [SEBI/HO/MIRSD/DOP/CIR/P/2020/28](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddopcirp202028) | Feb 25, 2020 | Margin pledge/re-pledge in depository system |
 | SEBI/HO/MIRSD/DOP/CIR/P/2020/88 | Jun 1, 2020 | Extension to Aug 1, 2020 |
-| SEBI/HO/MIRSD/DOP/CIR/P/2020/144 | Sep 22, 2020 | MTF securities as maintenance margin |
+| SEBI/HO/MIRSD/DOP/CIR/P/2020/144 | Sep 22, 2020 | <abbr title="Margin Trading Facility">MTF</abbr> securities as maintenance margin |
 | SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/82 | Jun 3, 2025 | Automated pledge release + invocation |
 
 ### 4.3 Nomination Circulars
@@ -500,7 +500,7 @@ The final section of this guide is a comprehensive reference of all SEBI circula
 |-----------------|------|---------|
 | SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2025/3 | Jan 10, 2025 | Revise and Revamp Nomination Facilities |
 | SEBI Feb 28, 2025 | Feb 28, 2025 | Clarifications to nomination circular |
-| SEBI Jul 2025 | Jul 2025 | Extended Phase II & III implementation |
+| SEBI Jul 2025 | Jul 2025 | Extended Phase <abbr title="—">II</abbr> & <abbr title="—">III</abbr> implementation |
 
 ### 4.4 CDSL Communiques for DDPI/Pledge/Modifications
 
@@ -508,13 +508,13 @@ The final section of this guide is a comprehensive reference of all SEBI circula
 |------------|------|---------|
 | DP-115 | Ongoing | SEBI Circular on Margin Obligations |
 | DP-234 | May 22, 2020 | Operational modalities for margin pledge/re-pledge |
-| DP-304 | Jul 2021 | Mandatory updation of certain KYC attributes |
+| DP-304 | Jul 2021 | Mandatory updation of certain <abbr title="Know Your Customer (process).">KYC</abbr> attributes |
 | DP-332 | Jun 14, 2022 | DDPI implementation |
 | DP-408 | Aug 3, 2018 | Changes in BO Account Information |
 | DP-412 | Aug 2020 | Margin Pledge/Re-Pledge implementation |
-| DP-5565 | Ongoing | BO Setup/Modify changes for CM/POA (Power of Attorney)/DDPI holder |
+| DP-5565 | Ongoing | BO Setup/Modify changes for CM/<abbr title="Power of Attorney">POA</abbr> (Power of Attorney)/DDPI holder |
 | CDSL/OPS/DP/POLCY/2024/314 | Jun 7, 2024 | Pledge file format: rejection reason code |
-| CDSL/OPS/DP/POLCY/2024/657 | Oct 30, 2024 | PAN modification at DP end |
+| CDSL/OPS/DP/POLCY/2024/657 | Oct 30, 2024 | <abbr title="Permanent Account Number">PAN</abbr> modification at DP end |
 
 :::tip[Keep a circular tracker]
 SEBI and CDSL issue circulars and communiques throughout the year, and they often amend or supersede earlier ones. Maintain an internal tracker (a simple spreadsheet works) that maps each circular to the feature or validation rule it affects in your system. When a new circular arrives, check your tracker to see what needs updating. This practice will save your compliance team significant effort during SEBI inspections.

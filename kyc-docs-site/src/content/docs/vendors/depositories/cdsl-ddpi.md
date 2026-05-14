@@ -3,7 +3,7 @@ title: CDSL DDPI Deep Dive
 description: DDPI (Demat Debit and Pledge Instruction) lifecycle — authorization types, regulatory background, technical implementation, vs POA comparison.
 ---
 
-When a client sells shares from their demat account, someone needs to authorize the transfer of those shares to the clearing corporation for settlement. Before 2022, brokers relied on a broad Power of Attorney (POA) that gave them sweeping authority over a client's demat account — an arrangement that was ripe for misuse. SEBI (Securities and Exchange Board of India) replaced this with DDPI (Demat Debit and Pledge Instruction), a tightly scoped authorization that limits what a broker can do to exactly four operations. As an engineer building a broking platform, you will implement DDPI activation during onboarding and encounter its effects across settlement, pledge, and mutual fund flows. By the end of this page, you will understand what DDPI authorizes, how it differs from POA, and exactly how to activate it in CDSL (Central Depository Services Limited).
+When a client sells shares from their demat account, someone needs to authorize the transfer of those shares to the clearing corporation for settlement. Before 2022, brokers relied on a broad Power of Attorney (<abbr title="Power of Attorney">POA</abbr>) that gave them sweeping authority over a client's demat account — an arrangement that was ripe for misuse. <abbr title="Securities and Exchange Board of India">SEBI</abbr> (Securities and Exchange Board of India) replaced this with <abbr title="Demat Debit and Pledge Instruction">DDPI</abbr> (Demat Debit and Pledge Instruction), a tightly scoped authorization that limits what a broker can do to exactly four operations. As an engineer building a broking platform, you will implement DDPI activation during onboarding and encounter its effects across settlement, pledge, and mutual fund flows. By the end of this page, you will understand what DDPI authorizes, how it differs from POA, and exactly how to activate it in <abbr title="Central Depository Services (India) Limited">CDSL</abbr> (Central Depository Services Limited).
 
 > Back to [CDSL Overview](/broking-kyc/vendors/depositories/cdsl/)
 
@@ -17,12 +17,12 @@ DDPI was introduced through a series of SEBI circulars:
 
 | Circular | Date | Subject |
 |----------|------|---------|
-| [SEBI/HO/MIRSD/DoP/P/CIR/2022/44](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddoppcir202244) | April 4, 2022 | Initial DDPI framework for settlement delivery + pledge/re-pledge |
+| [SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/DoP/P/CIR/2022/44](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddoppcir202244) | April 4, 2022 | Initial DDPI framework for settlement delivery + pledge/re-pledge |
 | SEBI/HO/MIRSD/DoP/P/CIR/2022/119 | June 2022 | Implementation extension |
 | SEBI/HO/MIRSD-PoD-1/P/CIR/2022/137 | October 6, 2022 | Expanded scope: MF on exchange + open offer tendering |
 | SEBI/HO/MIRSD/DoP/P/CIR/2022/153 | November 2022 | Further implementation extension |
-| CDSL Communique DP-332 | June 14, 2022 (implemented Nov 2022) | CDSL system implementation of DDPI |
-| CDSL Communique DP-5565 | Ongoing | BO (Beneficiary Owner) Setup/Modify file format changes for DDPI/POA holder fields |
+| CDSL Communique <abbr title="Depository Participant">DP</abbr>-332 | June 14, 2022 (implemented Nov 2022) | CDSL system implementation of DDPI |
+| CDSL Communique DP-5565 | Ongoing | <abbr title="Beneficial Owner">BO</abbr> (Beneficiary Owner) Setup/Modify file format changes for DDPI/POA holder fields |
 
 :::note[Why so many circulars?]
 SEBI rarely introduces a major change with a single circular. The industry typically gets a framework circular, one or more extensions as intermediaries request more time to build systems, and then scope expansions as edge cases are addressed. When you see a trail of circulars like this, read them in chronological order — each one builds on or amends the previous.
@@ -39,14 +39,14 @@ DDPI is limited to exactly four purposes (no broader authority):
 | # | Authorization Type | Description | SEBI Circular |
 |---|-------------------|-------------|---------------|
 | 1 | **Settlement Delivery** | Transfer of securities held in BO account towards stock exchange-related deliveries / settlement obligations arising out of trades executed by the client | Apr 2022 (original) |
-| 2 | **Pledge / Re-pledge for Margin** | Pledging / re-pledging of securities in favour of TM (Trading Member) / CM (Clearing Member) for the purpose of meeting margin requirements of the client | Apr 2022 (original) |
-| 3 | **Mutual Fund on Exchange** | Mutual fund transactions being executed on stock exchange order entry platforms (e.g., BSE StAR MF, NSE MFSS) | Oct 2022 (amendment) |
+| 2 | **Pledge / Re-pledge for Margin** | Pledging / re-pledging of securities in favour of <abbr title="Trading Member">TM</abbr> (Trading Member) / <abbr title="Clearing Member">CM</abbr> (Clearing Member) for the purpose of meeting margin requirements of the client | Apr 2022 (original) |
+| 3 | **Mutual Fund on Exchange** | Mutual fund transactions being executed on stock exchange order entry platforms (e.g., <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> StAR MF, <abbr title="National Stock Exchange of India">NSE</abbr> MFSS) | Oct 2022 (amendment) |
 | 4 | **Open Offer Tendering** | Tendering shares in open offers through stock exchange platforms (takeover / buyback offers routed via exchange) | Oct 2022 (amendment) |
 
 In plain English: DDPI lets your broker move shares out of your account only for trade settlement, margin pledging, exchange-based mutual fund transactions, and tendering in open offers. Everything else requires the client to explicitly authorize each transaction.
 
 :::caution
-Any other use (e.g., off-market transfers, inter-depository transfers, gift transfers) is NOT covered by DDPI. These require eDIS (Electronic Delivery Instruction Slip) authorization using TPIN (Transaction PIN) + OTP.
+Any other use (e.g., off-market transfers, inter-depository transfers, gift transfers) is NOT covered by DDPI. These require eDIS (Electronic Delivery Instruction Slip) authorization using TPIN (Transaction PIN) + <abbr title="One-Time Password">OTP</abbr>.
 :::
 
 ---
@@ -181,7 +181,7 @@ When activating DDPI, the DP (Depository Participant) submits a BO Modify file w
 | POA_TYPE_FLAG | Alpha | 1 | `D` | Indicates DDPI |
 | POA_MASTER_ID | Alphanumeric | 16 | DDPI Master POA ID | CDAS-assigned ID for the DDPI record |
 | POA_HOLDER_NAME | Alpha | 100 | Broker/DP name | Name of DDPI holder (the broker) |
-| POA_HOLDER_PAN | Alphanumeric | 10 | Broker PAN | PAN of the DDPI holder entity |
+| POA_HOLDER_PAN | Alphanumeric | 10 | Broker <abbr title="Permanent Account Number">PAN</abbr> | PAN of the DDPI holder entity |
 | DDPI_AUTH_SETTLEMENT | Alpha | 1 | `Y`/`N` | Authorization for settlement delivery |
 | DDPI_AUTH_PLEDGE | Alpha | 1 | `Y`/`N` | Authorization for pledge/re-pledge |
 | DDPI_AUTH_MF | Alpha | 1 | `Y`/`N` | Authorization for MF on exchange |
@@ -293,11 +293,11 @@ Finally, here is the end-to-end timeline for DDPI activation. This table is usef
 
 | Stage | Online (eSign) | Offline (Physical) |
 |-------|---------------|-------------------|
-| Client initiates | T+0 | T+0 |
+| Client initiates | <abbr title="Trade-date Plus N settlement">T+0</abbr> | T+0 |
 | Document generation | Instant | N/A |
-| eSign / Physical sign | T+0 (minutes) | T+0 to T+2 (courier) |
+| eSign / Physical sign | T+0 (minutes) | T+0 to <abbr title="Trade-date Plus N settlement">T+2</abbr> (courier) |
 | Stamp duty payment | T+0 (online PG) | T+0 (stamp paper) |
-| Upload to CDSL | T+0 | T+1 to T+3 |
+| Upload to CDSL | T+0 | <abbr title="Trade-date Plus N settlement">T+1</abbr> to T+3 |
 | CDSL processing | ~24 working hours | 2-3 working days |
 | DDPI active | T+1 | T+3 to T+5 |
 
@@ -310,6 +310,6 @@ Between the time a client completes DDPI eSign (T+0) and the time CDSL activates
 ## Related Pages
 
 - [CDSL Overview](/broking-kyc/vendors/depositories/cdsl/) — Core BO integration spec
-- [MTF & Pledge Deep Dive](/broking-kyc/vendors/depositories/cdsl-mtf-pledge/) — Margin pledge operations that use DDPI
+- [<abbr title="Margin Trading Facility">MTF</abbr> & Pledge Deep Dive](/broking-kyc/vendors/depositories/cdsl-mtf-pledge/) — Margin pledge operations that use DDPI
 - [BO Modifications](/broking-kyc/vendors/depositories/cdsl-modifications/) — DDPI activation via BO Modify
 - [Integration Guide](/broking-kyc/vendors/depositories/cdsl-integration-guide/) — UAT environments and SEBI circulars

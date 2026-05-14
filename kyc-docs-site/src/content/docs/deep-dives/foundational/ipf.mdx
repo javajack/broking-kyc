@@ -5,17 +5,17 @@ description: Investor Protection Fund procedure — claim eligibility on broker 
 
 import { Aside } from '@astrojs/starlight/components';
 
-> **Why this page is structured this way:** The IPF is *investor-facing* and procedural. A claimant doesn't care about Core-SGF stress tests; they care about (a) am I eligible, (b) what documents do I need, (c) what is the cap, (d) how long does it take. The page therefore opens with claim eligibility (the gating question), walks through the claim procedure step by step, then covers the operational sub-cases (custodian-cleared, NRI, joint accounts, deceased investor). Exchange-specific IPF differences (NSE / BSE / MCX) are pulled into a dedicated comparison section at the end.
+> **Why this page is structured this way:** The <abbr title="Investor Protection Fund">IPF</abbr> is *investor-facing* and procedural. A claimant doesn't care about Core-<abbr title="Settlement Guarantee Fund">SGF</abbr> stress tests; they care about (a) am I eligible, (b) what documents do I need, (c) what is the cap, (d) how long does it take. The page therefore opens with claim eligibility (the gating question), walks through the claim procedure step by step, then covers the operational sub-cases (custodian-cleared, <abbr title="Non-Resident Indian">NRI</abbr>, joint accounts, deceased investor). Exchange-specific IPF differences (<abbr title="National Stock Exchange of India">NSE</abbr> / <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> / <abbr title="Multi Commodity Exchange of India">MCX</abbr>) are pulled into a dedicated comparison section at the end.
 
 ## TL;DR
 
-- The **Investor Protection Fund (IPF)** is an exchange-administered fund that compensates *investors* (clients) for losses arising from a **broker default** — when a SEBI-registered stock broker (or its associated authorised person) is declared a defaulter / expelled by the exchange and is unable to honour client obligations.
+- The **Investor Protection Fund (IPF)** is an exchange-administered fund that compensates *investors* (clients) for losses arising from a **broker default** — when a <abbr title="Securities and Exchange Board of India">SEBI</abbr>-registered stock broker (or its associated authorised person) is declared a defaulter / expelled by the exchange and is unable to honour client obligations.
 - IPF is distinct from the clearing corporation's Core SGF (see [SGF / Core SGF](./sgf-core-sgf/)). Core SGF guarantees inter-member settlement; IPF compensates *retail / non-institutional investors* directly.
 - **Eligibility gating**: claim must arise from a *qualifying loss* — funds and/or securities deposited with the defaulting broker for trading purposes, not received back. Speculative loss, market-loss, and consequential damages are excluded.
-- **Claim window**: typically **3 years from the date of broker default declaration / expulsion** notified by the exchange (some exchanges allow extension by IGRC). Late claims may be entertained at the exchange's discretion within a further outer window (often 5 years total).
+- **Claim window**: typically **3 years from the date of broker default declaration / expulsion** notified by the exchange (some exchanges allow extension by <abbr title="Investor Grievance Redressal Committee">IGRC</abbr>). Late claims may be entertained at the exchange's discretion within a further outer window (often 5 years total).
 - **Per-investor cap**: each exchange publishes a maximum compensation per investor per broker default. **NSE: up to Rs 35 lakh** per investor; **BSE: up to Rs 35 lakh** per investor; **MCX: up to Rs 10 lakh** per investor (per MCX Master Circular — Investor Protection Fund / Investor Service Fund, including corrigendum MCX/IPF/109/2026). Caps revised periodically by exchange in consultation with SEBI.
 - **Administration**: managed by an IPF Trust at each exchange, governed by an IPF Committee with SEBI-nominee representation. Each exchange publishes a Master Circular on IPF/ISF (e.g., MCX IPF/ISF master, NSE Investor Services Department circulars, BSE Investor Services circulars) consolidating the framework.
-- **Payout mechanism**: claim → IGRC scrutiny → IPF Committee approval → payment via bank credit to the claimant's verified bank account. Standard timeline 4–8 months from claim filing to payout for clean claims; longer for disputed claims that go through arbitration or ODR.
+- **Payout mechanism**: claim → IGRC scrutiny → IPF Committee approval → payment via bank credit to the claimant's verified bank account. Standard timeline 4–8 months from claim filing to payout for clean claims; longer for disputed claims that go through arbitration or <abbr title="Online Dispute Resolution">ODR</abbr>.
 - **What is excluded**: any post-default trading activity by the client through any other broker; market-movement losses; opportunity-cost losses; tax liability arising from the default; losses through unauthorised trading (which has its own dispute resolution path — IGRC, arbitration, Smart ODR).
 
 ## Conceptual overview
@@ -33,7 +33,7 @@ The fund is held in trust under an IPF Trust Deed (each exchange has its own) re
 The framework is built on three principles:
 
 1. **Make the investor whole, not the speculator** — the IPF pays for the specific *unrecovered investment* with the defaulting broker, not for market losses or opportunity costs.
-2. **First, exhaust the broker's own estate** — the exchange / CC apply the defaulter's BMC, ABC, exchange deposits, and any segregated client funds to the claim *before* invoking IPF; the IPF compensates the *residual gap*.
+2. **First, exhaust the broker's own estate** — the exchange / <abbr title="Clearing Corporation (NCL, ICCL, MCXCCL — context-dependent).">CC</abbr> apply the defaulter's <abbr title="Base Minimum Capital">BMC</abbr>, <abbr title="Additional Base Capital">ABC</abbr>, exchange deposits, and any segregated client funds to the claim *before* invoking IPF; the IPF compensates the *residual gap*.
 3. **Cap to protect the corpus** — the per-investor cap ensures the fund can compensate the many small investors who depend on it, rather than a small number of large institutional investors who have other risk-mitigation tools (custodian segregation, insurance, deeper diligence).
 
 <Aside type="caution">
@@ -55,7 +55,7 @@ If the broker is "in financial difficulty" but not yet declared a defaulter, no 
 ### 2. Claimant is a *qualifying* investor
 
 The claimant must be:
-- A retail / individual investor — including joint-account holders, HUFs, NRIs (subject to FEMA-route considerations).
+- A retail / individual investor — including joint-account holders, HUFs, NRIs (subject to <abbr title="Foreign Exchange Management Act 1999">FEMA</abbr>-route considerations).
 - An entity below a certain size threshold (specific thresholds per exchange's IPF rules).
 
 **Excluded**: institutional investors (banks, insurance companies, mutual funds, FPIs, pension funds, and other clearing members) generally have separate recourse and are not within the IPF's protected class. Some exchanges allow small non-individual entities (small partnerships, small companies) within scope subject to net-worth cap.
@@ -64,7 +64,7 @@ The claimant must be:
 
 The claim must relate to:
 - **Cash balance** deposited with the defaulting broker that was not paid back upon demand or upon the broker's default declaration.
-- **Securities** delivered to the defaulting broker or held in the broker's pool / segregated demat that were not returned to the client's BO upon demand or upon the broker's default declaration.
+- **Securities** delivered to the defaulting broker or held in the broker's pool / segregated demat that were not returned to the client's <abbr title="Beneficial Owner">BO</abbr> upon demand or upon the broker's default declaration.
 - **Sale proceeds** from a sale executed on the exchange where the broker failed to credit the proceeds to the client.
 - **Unclaimed dividends / corporate-action benefits** in the broker's account on the client's behalf.
 
@@ -95,12 +95,12 @@ The exchange declares the broker a defaulter under its bye-laws and publishes th
 - On the exchange's website (defaulter / expelled members section).
 - By circular to all members (e.g., NSE Investor Services Department circulars / NSE Inspection circulars; BSE Notices; MCX IPF/ISF master-circular update).
 - By press notification.
-- By intimation to SEBI, other exchanges (NSE / BSE / MCX cross-MII intimation), CCs, depositories.
+- By intimation to SEBI, other exchanges (NSE / BSE / MCX cross-<abbr title="Market Infrastructure Institution">MII</abbr> intimation), CCs, depositories.
 - By direct intimation to known clients of the defaulter through their registered contact channels (where available).
 
 The declaration triggers:
 - The 3-year claim window starts.
-- All UCC / clearing-member positions of the broker are frozen.
+- All <abbr title="Unique Client Code">UCC</abbr> / clearing-member positions of the broker are frozen.
 - The CC begins applying the funded waterfall (see [Member default recovery](./member-default-recovery/)).
 - The exchange takes control of the broker's office, books, and records for forensic review.
 
@@ -123,20 +123,20 @@ The notice specifies:
 The claimant assembles:
 
 **Identity and bank**:
-- KYC documents — PAN copy, address proof, photograph.
+- <abbr title="Know Your Customer (process).">KYC</abbr> documents — <abbr title="Permanent Account Number">PAN</abbr> copy, address proof, photograph.
 - Bank account proof — cancelled cheque, latest statement; bank account in claimant's name.
 
 **Relationship with the defaulting broker**:
 - Client agreement / account-opening forms with the defaulting broker.
 - Account statement / contract notes for the disputed period.
-- Demat account statements (CDSL CAS / NSDL Consolidated Account Statement) showing securities held with the broker.
+- Demat account statements (<abbr title="Central Depository Services (India) Limited">CDSL</abbr> CAS / <abbr title="National Securities Depository Limited">NSDL</abbr> Consolidated Account Statement) showing securities held with the broker.
 - Bank statements showing payments to the broker and any refunds attempted.
 - UCC details — the exchange's records will already reflect this but the claimant's copy strengthens the claim.
 
 **The specific claim**:
 - Computation of the claim amount — written narrative explaining what funds / securities were with the broker, what was promised by the broker, what was returned (if any), and the unrecovered balance.
 - Any correspondence with the broker — emails, letters, complaints — showing the demand and the failure to deliver.
-- IGRC / SCORES complaint reference, if any prior complaint was filed with the exchange before the default declaration.
+- IGRC / <abbr title="SEBI Complaints Redress System">SCORES</abbr> complaint reference, if any prior complaint was filed with the exchange before the default declaration.
 
 **Other**:
 - Affidavit / undertaking that the claim does not include market loss / speculative loss / consequential damages.
@@ -183,19 +183,19 @@ The IPF Committee's approval determines:
 
 In parallel with IPF processing, the exchange / CC apply available recoveries from the defaulter's estate to reduce the IPF liability:
 - **Segregated client funds**: the SEBI client-funds-upstreaming and segregation framework ensures the broker maintains a segregated client-funds bank account; balances there at the time of default are claimable by clients *outside* IPF (these are *the client's money* held in trust, not the broker's money).
-- **Segregated client securities**: per SEBI's pledge / repledge framework, client securities held in the broker's CUSPA / CSMFA / pool accounts are identifiable to specific client BOs; the depository can return these directly to the client.
+- **Segregated client securities**: per SEBI's pledge / repledge framework, client securities held in the broker's <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr> / CSMFA / pool accounts are identifiable to specific client BOs; the depository can return these directly to the client.
 - **BMC / ABC** at the exchange — applied first to settlement-side obligations (CC's waterfall), residual to client claims.
 
 The *gap* between what the claimant is owed and what is recovered from these sources is what the IPF compensates, up to the per-investor cap.
 
 ### Step 8 — Payment
 
-The exchange's IPF Trust effects payment to the claimant's verified bank account (penny-drop verified). Payment is by NEFT / RTGS / IMPS.
+The exchange's IPF Trust effects payment to the claimant's verified bank account (penny-drop verified). Payment is by <abbr title="National Electronic Funds Transfer">NEFT</abbr> / <abbr title="Real Time Gross Settlement">RTGS</abbr> / <abbr title="Immediate Payment Service">IMPS</abbr>.
 
 Concurrent intimation:
 - Payment advice to the claimant.
 - TDS as applicable — IPF compensation is typically not taxable as it is the return of the claimant's own capital, not income, but interest or excess components may attract TDS; the exchange advises on applicable tax handling.
-- KYC / FATCA / CRS as required.
+- KYC / <abbr title="Foreign Account Tax Compliance Act (US)">FATCA</abbr> / <abbr title="Common Reporting Standard">CRS</abbr> as required.
 
 ### Step 9 — Post-payment follow-up
 
@@ -210,16 +210,16 @@ For practical use, a claim file should include:
 
 | Category | Documents |
 |---|---|
-| Identity | PAN, address proof, photograph, KYC acknowledgment / KRA reference |
+| Identity | PAN, address proof, photograph, KYC acknowledgment / <abbr title="KYC Registration Agency">KRA</abbr> reference |
 | Bank | Cancelled cheque or front page of bank passbook; bank account in claimant's name |
-| Demat | CDSL CAS / NSDL CAS for the relevant period; DP-ID and Client-ID details |
+| Demat | CDSL CAS / NSDL CAS for the relevant period; <abbr title="Depository Participant">DP</abbr>-ID and Client-ID details |
 | Trading account | Client master at defaulting broker (if available), client agreement, contract notes for relevant period |
 | Claim computation | Spreadsheet / narrative computing the claimed amount with supporting trade-by-trade or balance-by-balance breakdown |
 | Correspondence | All emails / letters / SCORES references between claimant and defaulting broker |
 | Affidavit | Declaration of qualifying loss; no double claim; no inclusion of speculative / market losses |
 | Indemnity | Indemnity to the exchange against future claims on same facts |
 | Legal heir / minor papers (where applicable) | Succession certificate, legal heir certificate, guardian documents |
-| Power of attorney (where applicable) | Notarised POA if claim is being filed through a representative |
+| Power of attorney (where applicable) | Notarised <abbr title="Power of Attorney">POA</abbr> if claim is being filed through a representative |
 
 ## Payout mechanics and timing
 
@@ -271,7 +271,7 @@ A clearing member's default at the CC level triggers IPF claim invitations from 
 
 - **Pre-2014 framework**: SEBI's regulatory framework for IPF / ISF predated the 2014 Core SGF framework. IPF was operationalised in the early 2000s and refined through periodic SEBI circulars; the framework gained renewed attention after several broker-default events in the post-2018 period (e.g., Karvy Stock Broking Limited, NSEL-linked broker exposures, and others).
 - **Karvy event (November 2019)**: NSE / BSE declared Karvy Stock Broking a defaulter; large volume of IPF claims processed thereafter, sharpening the claim documentation, KYC verification, and segregation-recovery interplay. The event is a frequent reference point in IPF training material and SEBI circulars on segregation post-2019.
-- **Post-segregation framework**: SEBI's strengthened client-funds segregation and direct-payout-to-demat (NCL/CMPT/66779 dated 2025-02-21 onwards; ICCL 20250214-69 pilot; subsequent NCL/CMPT/67947 and NCL/CMPT/69455) reduces the dependence on IPF by ensuring client securities and funds are *protected at the depository and CC level* and recoverable directly upon default, with IPF as the residual backstop.
+- **Post-segregation framework**: SEBI's strengthened client-funds segregation and direct-payout-to-demat (<abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr>/CMPT/66779 dated 2025-02-21 onwards; <abbr title="Indian Clearing Corporation Limited">ICCL</abbr> 20250214-69 pilot; subsequent NCL/CMPT/67947 and NCL/CMPT/69455) reduces the dependence on IPF by ensuring client securities and funds are *protected at the depository and CC level* and recoverable directly upon default, with IPF as the residual backstop.
 - **The Investor Education and Protection Fund (IEPF)**: distinct from the exchange IPF. IEPF is administered by MCA (Ministry of Corporate Affairs) for *unclaimed corporate dividends and unclaimed company funds*, not for broker default. A claimant should not confuse the two — broker-default claims go to the exchange IPF; unclaimed corporate dividends go to IEPF.
 
 ## Sub-cases and edge cases
@@ -282,7 +282,7 @@ A custodian-cleared client (institutional, FPI, or certain HNI clients with a se
 
 ### NRI claimant
 
-NRI claimants are eligible subject to FEMA-route validation. Funds in NRE / NRO account refunded through IPF must respect the underlying account's repatriability rules. Documentation must include PIS letter (where applicable), NRE / NRO bank proof, and FATCA / CRS declarations. See [NRI conversion](/broking-kyc/lifecycle/nri-conversion/) for NRI-specific considerations.
+NRI claimants are eligible subject to FEMA-route validation. Funds in <abbr title="Non-Resident External (Rupee) account">NRE</abbr> / <abbr title="Non-Resident Ordinary (Rupee) account">NRO</abbr> account refunded through IPF must respect the underlying account's repatriability rules. Documentation must include <abbr title="Portfolio Investment Scheme (RBI / NRI)">PIS</abbr> letter (where applicable), NRE / NRO bank proof, and FATCA / CRS declarations. See [NRI conversion](/broking-kyc/lifecycle/nri-conversion/) for NRI-specific considerations.
 
 ### Joint account
 
@@ -298,7 +298,7 @@ Minor's claim filed by guardian; payment to guardian's account or to the minor's
 
 ### Authorised person (AP) / sub-broker default vs broker default
 
-The IPF compensates losses arising from a *defaulting member (broker)*. If the loss arose from an *Authorised Person* (AP) of a non-defaulting broker (e.g., AP misappropriated client funds), the broker remains liable to the client under the AP framework; this is *not* an IPF claim. The dispute pathway is IGRC / arbitration / Smart ODR against the broker. The IPF only engages if the *broker itself* is declared a defaulter. See [Authorized Person framework](/broking-kyc/deep-dives/compliance-audit/ap-framework/) for AP-vs-broker liability allocation.
+The IPF compensates losses arising from a *defaulting member (broker)*. If the loss arose from an *Authorised Person* (<abbr title="Authorized Person">AP</abbr>) of a non-defaulting broker (e.g., AP misappropriated client funds), the broker remains liable to the client under the AP framework; this is *not* an IPF claim. The dispute pathway is IGRC / arbitration / Smart ODR against the broker. The IPF only engages if the *broker itself* is declared a defaulter. See [Authorized Person framework](/broking-kyc/deep-dives/compliance-audit/ap-framework/) for AP-vs-broker liability allocation.
 
 ### Claim through SCORES → IGRC → IPF
 

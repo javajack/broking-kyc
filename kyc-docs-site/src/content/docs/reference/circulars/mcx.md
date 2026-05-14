@@ -15,7 +15,7 @@ description: "Verified index of MCX circulars affecting Indian stock broking, 20
 
 ## Conceptual overview
 
-This page is the complete listing of MCX circulars in the project's 2020–2026 sweep window. Each entry contains the verbatim circular ID, issue date, in-force date, status (in-force / superseded / withdrawn), applicable entity types, impact-area tags, a 2–4 sentence summary traceable to clauses, and the primary URL. Where the primary URL could not be re-fetched, an archive URL is provided in its place.
+This page is the complete listing of <abbr title="Multi Commodity Exchange of India">MCX</abbr> circulars in the project's 2020–2026 sweep window. Each entry contains the verbatim circular ID, issue date, in-force date, status (in-force / superseded / withdrawn), applicable entity types, impact-area tags, a 2–4 sentence summary traceable to clauses, and the primary URL. Where the primary URL could not be re-fetched, an archive URL is provided in its place.
 
 ## Entries (descending date)
 
@@ -30,7 +30,7 @@ This page is the complete listing of MCX circulars in the project's 2020–2026 
 - **impact_areas:** cyber-security, reporting
 - **primary_url:** [unknown — verify direct MCX URL]
 
-Trading members must submit cybersecurity incident reports for the quarter ending March 31, 2026 via the designated portal — "nil reporting" required even when no incident occurred. Members registered with NSE may submit exclusively through NSE, which then relays information to other exchanges, eliminating duplicate submissions. Non-compliance exposes members to disciplinary action at the Exchange's discretion.
+Trading members must submit cybersecurity incident reports for the quarter ending March 31, 2026 via the designated portal — "nil reporting" required even when no incident occurred. Members registered with <abbr title="National Stock Exchange of India">NSE</abbr> may submit exclusively through NSE, which then relays information to other exchanges, eliminating duplicate submissions. Non-compliance exposes members to disciplinary action at the Exchange's discretion.
 
 ### MCX/TECH/118/2026
 
@@ -56,7 +56,7 @@ Relocates specific commodity futures across system partitions for operational ef
 - **impact_areas:** grievance, scores-odr
 - **primary_url:** [unknown — verify direct MCX URL]
 
-Corrigendum to the IPF/ISF Master Circular. Deletes the prior paragraph on compilation-date and inconsistency provisions; specifies that the Master Circular covers relevant Exchange circulars/communications issued up to March 31, 2025. Rescinds MCX/IPF/369/2024 dated May 31, 2024.
+Corrigendum to the <abbr title="Investor Protection Fund">IPF</abbr>/ISF Master Circular. Deletes the prior paragraph on compilation-date and inconsistency provisions; specifies that the Master Circular covers relevant Exchange circulars/communications issued up to March 31, 2025. Rescinds MCX/IPF/369/2024 dated May 31, 2024.
 
 ### MCX/MEM/105/2026
 
@@ -82,7 +82,7 @@ Applies to all newly approved memberships pending activation as of March 2, 2026
 - **impact_areas:** file-format, settlement, client-funds
 - **primary_url:** [unknown — verify direct MCX URL]
 
-Introduces the ComRIS API framework integrating the Commodity Receipts Information System with member environments. ComRIS — MCXCCL's internal web application for electronic Warehouse Receipts (eWHR) — now offers an API for seamless eWHR transaction and tracking. Members opting in register via prescribed form; MCXCCL provides connectivity and technical support. Uses OAuth2, IP whitelisting and SSL encryption.
+Introduces the ComRIS API framework integrating the Commodity Receipts Information System with member environments. ComRIS — <abbr title="Multi Commodity Exchange Clearing Corporation Limited">MCXCCL</abbr>'s internal web application for electronic Warehouse Receipts (eWHR) — now offers an API for seamless eWHR transaction and tracking. Members opting in register via prescribed form; MCXCCL provides connectivity and technical support. Uses OAuth2, IP whitelisting and SSL encryption.
 
 ### MCX/TRD/040/2026
 
@@ -114,7 +114,7 @@ Releases v1.6 of MDI and EMDI APIs, adding two new MDEntryType values for Upper 
 
 - **date_issued:** 2026-01-05
 - **issuer:** MCX
-- **title:** "CTCL — operational instruction"
+- **title:** "<abbr title="Computer-to-Computer Link.">CTCL</abbr> — operational instruction"
 - **applies_to:** broker
 - **in_force_date:** 2026-01-05
 - **status:** in-force
@@ -201,7 +201,7 @@ Activates the online portal for empanelment of auditors performing System Audits
 - **impact_areas:** commodities, derivatives
 - **primary_url:** [unknown — verify direct MCX URL]
 
-Publishes the August 2025 contract-launch calendar across Aluminium, Copper, Cotton, Lead, Silver, Zinc, Crude Oil, Gold and mini variants — most commencing August 1, 2025 with some staggered later. Brokers consume this calendar to maintain scrip masters and RMS rollovers. Subsequently followed by monthly cadence calendars including MCX/TRD/617/2025 for December 2025.
+Publishes the August 2025 contract-launch calendar across Aluminium, Copper, Cotton, Lead, Silver, Zinc, Crude Oil, Gold and mini variants — most commencing August 1, 2025 with some staggered later. Brokers consume this calendar to maintain scrip masters and <abbr title="Risk Management System">RMS</abbr> rollovers. Subsequently followed by monthly cadence calendars including MCX/TRD/617/2025 for December 2025.
 
 ### MCX/TRD/372/2025
 
@@ -214,7 +214,7 @@ Publishes the August 2025 contract-launch calendar across Aluminium, Copper, Cot
 - **impact_areas:** settlement, commodities
 - **primary_url:** [unknown — verify direct MCX URL]
 
-Eliminates additional delivery centres in NCR, Chennai and Kolkata regions for Copper Futures. From December 2025 expiries, warehouses within a 100 km radius of main delivery centres will be accredited per SEBI guidelines. Brokers update client communications regarding delivery logistics.
+Eliminates additional delivery centres in NCR, Chennai and Kolkata regions for Copper Futures. From December 2025 expiries, warehouses within a 100 km radius of main delivery centres will be accredited per <abbr title="Securities and Exchange Board of India">SEBI</abbr> guidelines. Brokers update client communications regarding delivery logistics.
 
 ### MCX/MCXCCL/337/2025
 
@@ -292,7 +292,7 @@ Directs members to harden internet-accessible infrastructure, activate SOC-based
 - **impact_areas:** margin, rms, commodities
 - **primary_url:** [unknown — verify direct MCX URL]
 
-Revises Volatility Scan Range (VSR) parameters following backtesting per SEBI guidelines: Copper 5, Crude Oil 33, Gold 4, Natural Gas 6, Silver 6, Zinc 6. Members update SPAN risk parameters consumed by member back-office. Implements MCXCCL/RISK/066/2025 dated April 3, 2025.
+Revises Volatility Scan Range (VSR) parameters following backtesting per SEBI guidelines: Copper 5, Crude Oil 33, Gold 4, Natural Gas 6, Silver 6, Zinc 6. Members update <abbr title="Standard Portfolio Analysis of Risk">SPAN</abbr> risk parameters consumed by member back-office. Implements MCXCCL/RISK/066/2025 dated April 3, 2025.
 
 ### MCX/ISD/211/2025
 
@@ -305,7 +305,7 @@ Revises Volatility Scan Range (VSR) parameters following backtesting per SEBI gu
 - **impact_areas:** grievance, scores-odr, reporting
 - **primary_url:** [unknown — verify direct MCX URL]
 
-Consolidates SEBI and exchange directives operational through March 31, 2025 around member-default handling — covering share of information on declaration as defaulter across memberships, show-cause notices, website disclosures, investor-claim filing, IPF disbursement, defaulter-asset recovery and client-debit-balance treatment. Replaces Chapter 14 of the Business Rules. Foundational reference for grievance and ODR workflows on MCX.
+Consolidates SEBI and exchange directives operational through March 31, 2025 around member-default handling — covering share of information on declaration as defaulter across memberships, show-cause notices, website disclosures, investor-claim filing, IPF disbursement, defaulter-asset recovery and client-debit-balance treatment. Replaces Chapter 14 of the Business Rules. Foundational reference for grievance and <abbr title="Online Dispute Resolution">ODR</abbr> workflows on MCX.
 
 ### MCX/TECH/195/2025
 
@@ -318,7 +318,7 @@ Consolidates SEBI and exchange directives operational through March 31, 2025 aro
 - **impact_areas:** cyber-security, system-audit, reporting
 - **primary_url:** [unknown — verify direct MCX URL]
 
-Trading members must conduct cyber-security audits through approved system auditors and submit reports by June 30, 2025 for FY 2024–25, covering distinct categories (members using Exchange Trader Workstations, CTCL Facility, ATF facility, QSB). Submissions online via the Member Portal `https://member.mcxindia.com`; action-taken reports due by September 30, 2025. Auditor selection guidelines and ToR templates accompany the circular.
+Trading members must conduct cyber-security audits through approved system auditors and submit reports by June 30, 2025 for FY 2024–25, covering distinct categories (members using Exchange Trader Workstations, CTCL Facility, ATF facility, <abbr title="Qualified Stock Broker">QSB</abbr>). Submissions online via the Member Portal `https://member.mcxindia.com`; action-taken reports due by September 30, 2025. Auditor selection guidelines and ToR templates accompany the circular.
 
 ### MCX/TECH/173/2025
 
@@ -396,7 +396,7 @@ Revises the expiry of futures contracts originally expiring March 31, 2025 to Ma
 - **impact_areas:** margin, rms, commodities
 - **primary_url:** [unknown — verify direct MCX URL]
 
-Withdraws an additional 1% margin previously levied on Gold Futures (all variants), effective February 6, 2025. Net margin = higher of Minimum Initial Margin or SPAN, plus 1.25% ELM and 1% additional margin. Brokers retune RMS to drop the withdrawn component.
+Withdraws an additional 1% margin previously levied on Gold Futures (all variants), effective February 6, 2025. Net margin = higher of Minimum Initial Margin or SPAN, plus 1.25% <abbr title="Extreme Loss Margin">ELM</abbr> and 1% additional margin. Brokers retune RMS to drop the withdrawn component.
 
 ### MCX/MCXCCL/019/2025
 
@@ -422,7 +422,7 @@ Reinstates an alternate risk-management framework triggered by extreme price mov
 - **impact_areas:** settlement, bod-eod
 - **primary_url:** [unknown — verify direct MCX URL]
 
-Notifies banking holidays on which pay-in/pay-out settlement obligations defer to the next banking day. Members must maintain sufficient margins/collateral with MCXCCL; MTM Loss of the previous day(s) along with other obligations gets blocked from the Clearing Member's margin limits. Excludes weekends; subject to MCXCCL discretionary change.
+Notifies banking holidays on which pay-in/pay-out settlement obligations defer to the next banking day. Members must maintain sufficient margins/collateral with MCXCCL; <abbr title="Mark-to-Market">MTM</abbr> Loss of the previous day(s) along with other obligations gets blocked from the Clearing Member's margin limits. Excludes weekends; subject to MCXCCL discretionary change.
 
 ### MCX/INSP/820/2024
 
@@ -493,7 +493,7 @@ Revises concentration-margin threshold limits. For non-agricultural commodities,
 
 - **date_issued:** 2024-11-08
 - **issuer:** MCX
-- **title:** "Increase in the maximum limit to upload UCC records in one file"
+- **title:** "Increase in the maximum limit to upload <abbr title="Unique Client Code">UCC</abbr> records in one file"
 - **applies_to:** broker
 - **in_force_date:** 2024-11-11
 - **status:** in-force
@@ -565,7 +565,7 @@ Issues an updated reporting format and operational clarification under the SEBI 
 - **impact_areas:** onboarding, kyc-modification, file-format, dpdp
 - **primary_url:** [unknown — verify direct MCX URL]
 
-Makes the "Client Email ID" field mandatory in the UCC database across all UCC categories, on or after October 21, 2024. Related dependent fields — "Relationship with Client (for Email ID)" and "Name of the Authorized/Contact Person (for Email ID)" — become mandatory accordingly. Applies to member submissions of all client information including names, addresses, PAN, mobile numbers, dates of birth/incorporation, and financial details (including income range used for income-proof tagging).
+Makes the "Client Email ID" field mandatory in the UCC database across all UCC categories, on or after October 21, 2024. Related dependent fields — "Relationship with Client (for Email ID)" and "Name of the Authorized/Contact Person (for Email ID)" — become mandatory accordingly. Applies to member submissions of all client information including names, addresses, <abbr title="Permanent Account Number">PAN</abbr>, mobile numbers, dates of birth/incorporation, and financial details (including income range used for income-proof tagging).
 
 ### MCX/TRD/665/2024
 
@@ -697,13 +697,13 @@ When clearing members exceed margin limits by Rs. 5 lakhs or more on more than t
 - **impact_areas:** other, reporting
 - **primary_url:** [unknown — verify direct MCX URL]
 
-Amends Business Rule 1.2(e) introducing a six-month grace period for newly admitted members to submit fees/deposits and complete the activation procedure. Beyond the grace period, late fees of Rs. 10,000/month apply (capped at Rs. 1,20,000 over 12 months), with the Exchange reserving the right to cancel membership approvals. Special provision for Trading-cum-Clearing Members defers the timeline until full TCM/CM registration with MCXCCL and SEBI as applicable. Refined by MCX/MEM/105/2026 dated March 2, 2026.
+Amends Business Rule 1.2(e) introducing a six-month grace period for newly admitted members to submit fees/deposits and complete the activation procedure. Beyond the grace period, late fees of Rs. 10,000/month apply (capped at Rs. 1,20,000 over 12 months), with the Exchange reserving the right to cancel membership approvals. Special provision for Trading-cum-Clearing Members defers the timeline until full TCM/<abbr title="Clearing Member">CM</abbr> registration with MCXCCL and SEBI as applicable. Refined by MCX/MEM/105/2026 dated March 2, 2026.
 
 ### MCX/MCXCCL/456/2024
 
 - **date_issued:** 2024-07-11
 - **issuer:** MCX
-- **title:** "Standardization of CC to Member Interface Files in Unified Distilled File Formats (UDiFF)"
+- **title:** "Standardization of <abbr title="Clearing Corporation (NCL, ICCL, MCXCCL — context-dependent).">CC</abbr> to Member Interface Files in Unified Distilled File Formats (UDiFF)"
 - **applies_to:** broker, clearing-corp
 - **in_force_date:** 2024-07-15
 - **status:** in-force
@@ -789,7 +789,7 @@ Operationalises CERT-In / SEBI guidance on SaaS use by financial sector organisa
 - **impact_areas:** aml, reporting, fatca-crs
 - **primary_url:** [unknown — verify direct MCX URL]
 
-Directs members with multiple regulatory capacities (SEBI and other) who are MCX trading members to complete FINNET 2.0 registration and update all lines of business mandatorily as soon as possible. Builds on the December 2022 baseline (MCX/MEM/707/2022). Aligns AML LOB metadata across the FIU pipeline used for STR/CTR/PMLA reporting.
+Directs members with multiple regulatory capacities (SEBI and other) who are MCX trading members to complete FINNET 2.0 registration and update all lines of business mandatorily as soon as possible. Builds on the December 2022 baseline (MCX/MEM/707/2022). Aligns <abbr title="Anti-Money Laundering">AML</abbr> LOB metadata across the <abbr title="Financial Intelligence Unit">FIU</abbr> pipeline used for <abbr title="Suspicious Transaction Report">STR</abbr>/<abbr title="Cash Transaction Report">CTR</abbr>/<abbr title="Prevention of Money Laundering Act 2002">PMLA</abbr> reporting.
 
 ### MCX/TECH/413/2024
 
@@ -880,7 +880,7 @@ Companion launch circular for the Crude Oil Mini (10 barrels) December 2024 cont
 - **impact_areas:** file-format, bod-eod, reporting
 - **primary_url:** [unknown — verify direct MCX URL]
 
-Notifies revised back-office file formats — effective from Monday, October 16, 2023 — which include the canonical MCX BOD (pipe-delimited, two records per client) and EOD specifications consumed by member back-office systems. Members had to roll out vendor patches before the cut-over date. Operates in conjunction with the earlier MCX/TECH/325/2022 file-formats parent and the MCX/TECH/023/2022 UCC State-City Code Master.
+Notifies revised back-office file formats — effective from Monday, October 16, 2023 — which include the canonical MCX <abbr title="Beginning Of Day">BOD</abbr> (pipe-delimited, two records per client) and <abbr title="End Of Day">EOD</abbr> specifications consumed by member back-office systems. Members had to roll out vendor patches before the cut-over date. Operates in conjunction with the earlier MCX/TECH/325/2022 file-formats parent and the MCX/TECH/023/2022 UCC State-City Code Master.
 
 ### MCX/TRD/146/2023
 
@@ -919,7 +919,7 @@ Baseline contract specifications for Gold (1 kg) compulsory-delivery futures fro
 - **impact_areas:** aml, reporting, fatca-crs
 - **primary_url:** [unknown — verify direct MCX URL]
 
-Directs MCX trading members (as Reporting Entities under PMLA) to complete FINnet 2.0 registration and comply with supplementary guidelines issued by FIU-IND in 2022. Establishes the FIU reporting pipeline that MCX/MEM/411/2024 later operationalises for multi-LOB members. AML/STR/CTR reporting flows through this channel.
+Directs MCX trading members (as Reporting Entities under PMLA) to complete FINnet 2.0 registration and comply with supplementary guidelines issued by <abbr title="Financial Intelligence Unit — India">FIU-IND</abbr> in 2022. Establishes the FIU reporting pipeline that MCX/MEM/411/2024 later operationalises for multi-LOB members. AML/STR/CTR reporting flows through this channel.
 
 ### MCX/TRD/518/2022
 
@@ -986,7 +986,7 @@ Establishes contract specifications for Gold Mini futures applicable from Octobe
 - **impact_areas:** client-funds, upstreaming, reporting, file-format
 - **primary_url:** https://www.steelcitynettrade.com/Circulars/Segregation%20and%20Monitoring%20of%20Collateral%20at%20Client%20Level1.pdf
 
-Implements SEBI circular SEBI/HO/MRD2_DCAP/CIR/2021/0598 (July 20, 2021) at MCX. Mandates client-wise reporting of cash and non-cash collateral up to TM, CM and Clearing Corporation level via the PAN-based portal `clientreports.mcxccl.com`. Forms the operating baseline for the API-based regime introduced in 2024 and the clarifications issued in MCXCCL/INSP/248/2024.
+Implements SEBI circular SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/MRD2_DCAP/CIR/2021/0598 (July 20, 2021) at MCX. Mandates client-wise reporting of cash and non-cash collateral up to <abbr title="Trading Member">TM</abbr>, CM and Clearing Corporation level via the PAN-based portal `clientreports.mcxccl.com`. Forms the operating baseline for the API-based regime introduced in 2024 and the clarifications issued in MCXCCL/INSP/248/2024.
 
 ### MCX/CTCL/211/2022
 
@@ -1092,7 +1092,7 @@ Mock trading instructions issued during the COVID-19 lockdown trading-hours regi
 - **impact_areas:** file-format, cyber-security
 - **primary_url:** https://www.mcxindia.com/docs/default-source/circulars/english/2023/august/mcxctcl5022023---new-tick-by-tick-trading-market-data-interface-(api)-mcx-enhanced-order-book-interface-(eobi)---version-1-2.pdf
 
-Introduces version 1.2 of the MCX T7 EOBI tick-by-tick market data API for member systems and empanelled vendors. The interface publishes order-level data (orders, executions, state) as fixed-length binary messages using the FIX standard. Brokers using direct market data feeds had to update their parsers.
+Introduces version 1.2 of the MCX T7 EOBI tick-by-tick market data API for member systems and empanelled vendors. The interface publishes order-level data (orders, executions, state) as fixed-length binary messages using the <abbr title="Financial Information eXchange protocol">FIX</abbr> standard. Brokers using direct market data feeds had to update their parsers.
 
 ### MCX/Indices/580/2025
 

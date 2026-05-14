@@ -5,15 +5,15 @@ description: Risk-tier-based KYC refresh procedure — high (2y) / medium (8y) /
 
 import { Aside } from '@astrojs/starlight/components';
 
-> **Why this page is structured this way:** Re-KYC is the most common lifecycle event a typical client will experience — every 2-10 years depending on their risk classification. The walkthrough below follows the operator-perspective steps from trigger detection through to confirmation. Cross-link to the [Integration DAG re-KYC subset](/broking-kyc/operations/integration-dag/lifecycle-events/) for the dependency view and the [Field-level Data Flow Atlas KYC sections](/broking-kyc/reference/field-atlas/) for what specifically changes.
+> **Why this page is structured this way:** Re-<abbr title="Know Your Customer (process).">KYC</abbr> is the most common lifecycle event a typical client will experience — every 2-10 years depending on their risk classification. The walkthrough below follows the operator-perspective steps from trigger detection through to confirmation. Cross-link to the [Integration <abbr title="Directed Acyclic Graph.">DAG</abbr> re-KYC subset](/broking-kyc/operations/integration-dag/lifecycle-events/) for the dependency view and the [Field-level Data Flow Atlas KYC sections](/broking-kyc/reference/field-atlas/) for what specifically changes.
 
 ## TL;DR
 
 - Periodicity is **risk-tier-based**: high-risk every 2 years, medium-risk every 8 years, low-risk every 10 years.
-- Trigger is the **anniversary of last KYC validation** OR an event that changes the client's risk tier (PEP discovery, sanctions hit, large unusual transaction).
-- Refresh process re-runs much of the original onboarding flow but is **lighter** — most fields prefill from existing KRA / CKYC; the operator captures only what has changed.
-- Failure to complete re-KYC by the anniversary triggers an **account hold** per SEBI's risk-based KYC framework.
-- Re-KYC outputs uploaded to KRA + CKYC; exchange / depository continue using existing UCC and BO unless contact details changed.
+- Trigger is the **anniversary of last KYC validation** OR an event that changes the client's risk tier (<abbr title="Politically Exposed Person">PEP</abbr> discovery, sanctions hit, large unusual transaction).
+- Refresh process re-runs much of the original onboarding flow but is **lighter** — most fields prefill from existing <abbr title="KYC Registration Agency">KRA</abbr> / <abbr title="Central KYC (records registry)">CKYC</abbr>; the operator captures only what has changed.
+- Failure to complete re-KYC by the anniversary triggers an **account hold** per <abbr title="Securities and Exchange Board of India">SEBI</abbr>'s risk-based KYC framework.
+- Re-KYC outputs uploaded to KRA + CKYC; exchange / depository continue using existing <abbr title="Unique Client Code">UCC</abbr> and <abbr title="Beneficial Owner">BO</abbr> unless contact details changed.
 
 ## Conceptual overview
 
@@ -26,8 +26,8 @@ A client's KYC isn't a one-time event but a periodic obligation. The framework i
 The orchestrator runs a daily scan of the client base for re-KYC due dates. Triggers:
 
 - **Anniversary trigger** — anniversary of last KYC validation falls within the next 30 / 14 / 7 days, generating progressive reminder notifications.
-- **Risk-tier change trigger** — fired when AML screening surfaces a new PEP / sanctions / adverse-media hit; immediate re-KYC required regardless of anniversary.
-- **Regulatory trigger** — SEBI / RBI mandate (e.g., FATCA centralization in Feb 2024 forced an industry-wide re-collection of tax-residency declarations).
+- **Risk-tier change trigger** — fired when <abbr title="Anti-Money Laundering">AML</abbr> screening surfaces a new PEP / sanctions / adverse-media hit; immediate re-KYC required regardless of anniversary.
+- **Regulatory trigger** — SEBI / <abbr title="Reserve Bank of India">RBI</abbr> mandate (e.g., <abbr title="Foreign Account Tax Compliance Act (US)">FATCA</abbr> centralization in Feb 2024 forced an industry-wide re-collection of tax-residency declarations).
 - **Voluntary client-initiated** — client updates their profile and triggers full re-KYC rather than partial modification.
 
 The trigger writes a re-KYC task to the ops queue with target completion date.
@@ -36,12 +36,12 @@ The trigger writes a re-KYC task to the ops queue with target completion date.
 
 Reminder notifications go out to the client at T-30 / T-14 / T-7 days from the target completion date:
 
-- T-30: email + SMS with re-KYC link and self-service option.
+- T-30: email + <abbr title="Short Message Service.">SMS</abbr> with re-KYC link and self-service option.
 - T-14: SMS + email + in-app banner.
 - T-7: SMS + email + phone call from broker servicing team for high-value clients.
 
 <Aside type="tip">
-**Self-service vs assisted re-KYC.** Self-service (client logs in, re-confirms their data via DigiLocker / OTP) handles ~70% of low-risk re-KYCs without any operator touch. Assisted re-KYC (call-center walks through the flow) handles high-risk or low-digital-literacy clients.
+**Self-service vs assisted re-KYC.** Self-service (client logs in, re-confirms their data via DigiLocker / <abbr title="One-Time Password">OTP</abbr>) handles ~70% of low-risk re-KYCs without any operator touch. Assisted re-KYC (call-center walks through the flow) handles high-risk or low-digital-literacy clients.
 </Aside>
 
 ### Step 3 — Identity & address re-validation
@@ -49,7 +49,7 @@ Reminder notifications go out to the client at T-30 / T-14 / T-7 days from the t
 Client logs in and follows a flow similar to onboarding Screens 2–4, but lighter:
 
 - Existing identity prefilled from KRA / CKYC.
-- Client confirms PAN, name, DOB — no change typical, but flagged if any.
+- Client confirms <abbr title="Permanent Account Number">PAN</abbr>, name, DOB — no change typical, but flagged if any.
 - Aadhaar re-fetch via DigiLocker (fresh OAuth flow). New Aadhaar XML supersedes old.
 - Address re-validated against current Aadhaar address. If different from KRA record, flagged as a modification within the re-KYC.
 
@@ -59,11 +59,11 @@ Mobile and email OTP re-verify. Mobile change or email change is captured as a m
 
 ### Step 5 — Financial profile refresh
 
-Income range re-confirmed. If client has F&O / COM segments active, income proof refreshed via Account Aggregator (AA), recent ITR upload, or HRMS-based payroll verification.
+Income range re-confirmed. If client has F&O / COM segments active, income proof refreshed via Account Aggregator (<abbr title="Account Aggregator (RBI-licensed NBFC-AA)">AA</abbr>), recent ITR upload, or HRMS-based payroll verification.
 
 ### Step 6 — Declarations refresh
 
-Client re-affirms FATCA / CRS declarations, PEP status, and consent for data processing under DPDP framework.
+Client re-affirms FATCA / <abbr title="Common Reporting Standard">CRS</abbr> declarations, PEP status, and consent for data processing under <abbr title="Digital Personal Data Protection Act 2023 (and Rules 2025)">DPDP</abbr> framework.
 
 ### Step 7 — eSign and submit
 
@@ -91,11 +91,11 @@ See [Compliance Blueprint AML domain](/broking-kyc/operations/compliance-bluepri
 
 ### Sanctions-hit forced re-KYC
 
-If a client matches a UN / OFAC / India MEA UAPA sanctions list, the response is typically not re-KYC but **immediate freeze + FIU-IND STR filing + Compliance Officer escalation**. Re-KYC follows only after the sanctions hit is cleared as a false positive. See [Circulars FIU-IND sub-page](/broking-kyc/reference/circulars/fiu-ind/) for STR filing requirements.
+If a client matches a UN / OFAC / India MEA UAPA sanctions list, the response is typically not re-KYC but **immediate freeze + <abbr title="Financial Intelligence Unit — India">FIU-IND</abbr> <abbr title="Suspicious Transaction Report">STR</abbr> filing + Compliance Officer escalation**. Re-KYC follows only after the sanctions hit is cleared as a false positive. See [Circulars <abbr title="Financial Intelligence Unit">FIU</abbr>-IND sub-page](/broking-kyc/reference/circulars/fiu-ind/) for STR filing requirements.
 
 ### FATCA tax-residency change
 
-When a client's tax residency status changes (e.g., relocation abroad without formal NRI conversion), FATCA / CRS declarations need updating. Triggers a partial re-KYC limited to the FATCA fields. The new self-certification is uploaded to KRA-centralized FATCA framework per [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12](/broking-kyc/reference/circulars/sebi-mirsd/).
+When a client's tax residency status changes (e.g., relocation abroad without formal <abbr title="Non-Resident Indian">NRI</abbr> conversion), FATCA / CRS declarations need updating. Triggers a partial re-KYC limited to the FATCA fields. The new self-certification is uploaded to KRA-centralized FATCA framework per [SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/SECFATF/P/CIR/2024/12](/broking-kyc/reference/circulars/sebi-mirsd/).
 
 ### Re-KYC declined / abandoned
 
@@ -123,7 +123,7 @@ Re-KYC touches fields across master-dataset sections A (Personal Identity), B (A
 - [Field Atlas — Section S (KRA Submission)](/broking-kyc/reference/field-atlas/sections/s-kra-submission/)
 - [Field Atlas — Section T (CKYC Submission)](/broking-kyc/reference/field-atlas/sections/t-ckyc-submission/)
 - [Circulars — SEBI MIRSD KYC master](/broking-kyc/reference/circulars/sebi-mirsd/)
-- [Circulars — CERSAI](/broking-kyc/reference/circulars/cersai/)
+- [Circulars — <abbr title="Central Registry of Securitisation Asset Reconstruction and Security Interest of India">CERSAI</abbr>](/broking-kyc/reference/circulars/cersai/)
 
 ## Verified through
 

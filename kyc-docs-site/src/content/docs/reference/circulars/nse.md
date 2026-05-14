@@ -15,7 +15,7 @@ description: "Verified index of NSE circulars affecting Indian stock broking, 20
 
 ## Conceptual overview
 
-This page is the complete listing of NSE circulars in the project's 2020–2026 sweep window. Each entry contains the verbatim circular ID, issue date, in-force date, status (in-force / superseded / withdrawn), applicable entity types, impact-area tags, a 2–4 sentence summary traceable to clauses, and the primary URL. Where the primary URL could not be re-fetched, an archive URL is provided in its place.
+This page is the complete listing of <abbr title="National Stock Exchange of India">NSE</abbr> circulars in the project's 2020–2026 sweep window. Each entry contains the verbatim circular ID, issue date, in-force date, status (in-force / superseded / withdrawn), applicable entity types, impact-area tags, a 2–4 sentence summary traceable to clauses, and the primary URL. Where the primary URL could not be re-fetched, an archive URL is provided in its place.
 
 ## Entries (descending date)
 
@@ -30,7 +30,7 @@ This page is the complete listing of NSE circulars in the project's 2020–2026 
 - **impact_areas:** surveillance, reporting, file-format
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/SURV74008.pdf
 
-Latest Master consolidated Surveillance and Investigation circular compiling departmental circulars up to April 30, 2026. Supersedes NSE/SURV/61848 (Apr 30, 2024) and NSE/SURV/67801 (Apr 30, 2025). Single reference for all current surveillance and investigation policies including Cautionary Messages, RTCM, ESM, GSM, ASM, OTR, OBSM-PNC, Position Limits.
+Latest Master consolidated Surveillance and Investigation circular compiling departmental circulars up to April 30, 2026. Supersedes NSE/SURV/61848 (Apr 30, 2024) and NSE/SURV/67801 (Apr 30, 2025). Single reference for all current surveillance and investigation policies including Cautionary Messages, RTCM, <abbr title="Enhanced Surveillance Measure">ESM</abbr>, <abbr title="Graded Surveillance Measure">GSM</abbr>, <abbr title="Additional Surveillance Measure">ASM</abbr>, OTR, OBSM-PNC, Position Limits.
 
 ### NSE/INSP/73849
 
@@ -43,7 +43,7 @@ Latest Master consolidated Surveillance and Investigation circular compiling dep
 - **impact_areas:** cyber-security, system-audit, reporting
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/INSP73849.pdf
 
-Operationalises Cyber Audit framework for FY2026-27 under SEBI CSCRF (SEBI Circular dated August 20, 2024). Continues clause-4.4 framework (100% critical systems audit, 25% non-critical on sample basis), web-portal mediated monitoring, geo-tagged auditor visits. Builds on NSE/INSP/71214 dated November 10, 2025.
+Operationalises Cyber Audit framework for FY2026-27 under <abbr title="Securities and Exchange Board of India">SEBI</abbr> <abbr title="Cybersecurity and Cyber Resilience Framework">CSCRF</abbr> (SEBI Circular dated August 20, 2024). Continues clause-4.4 framework (100% critical systems audit, 25% non-critical on sample basis), web-portal mediated monitoring, geo-tagged auditor visits. Builds on NSE/INSP/71214 dated November 10, 2025.
 
 ### NSE/INSP/73436
 
@@ -56,7 +56,7 @@ Operationalises Cyber Audit framework for FY2026-27 under SEBI CSCRF (SEBI Circu
 - **impact_areas:** reporting, file-format, onboarding
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/INSP73436.pdf
 
-Forwards SEBI Circular HO/38/11/(1)2026-MIRSD-POD/I/7656/2026 dated March 23, 2026 introducing ease-of-doing-business relaxations for certain trading members. Removes the requirement of demat-account-tagging reporting and other periodic submissions; aligns with SEBI Master Circular for Stock Brokers (June 17, 2025).
+Forwards SEBI Circular <abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/38/11/(1)2026-<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>-POD/I/7656/2026 dated March 23, 2026 introducing ease-of-doing-business relaxations for certain trading members. Removes the requirement of demat-account-tagging reporting and other periodic submissions; aligns with SEBI Master Circular for Stock Brokers (June 17, 2025).
 
 ### NSE/INSP/72118
 
@@ -82,7 +82,7 @@ Quarterly Cyber Incident report due January 15, 2026 for quarter ending December
 - **impact_areas:** bcp-dr, system-audit, other
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMTR71767.pdf
 
-Schedules a Special CM-Segment mock trading on Saturday, December 13, 2025 from Primary Site. Pre-Open, Block-Deal window, Normal Market and Auction Market sessions exercised end-to-end. Members must participate per regulatory mock-cycle requirements.
+Schedules a Special <abbr title="Clearing Member">CM</abbr>-Segment mock trading on Saturday, December 13, 2025 from Primary Site. Pre-Open, Block-Deal window, Normal Market and Auction Market sessions exercised end-to-end. Members must participate per regulatory mock-cycle requirements.
 
 ### NSE/INSP/71214
 
@@ -101,14 +101,14 @@ Operationalises the cyber audit framework under SEBI's CSCRF (SEBI Circular date
 
 - **date_issued:** 2025-10-17
 - **issuer:** NSE
-- **title:** "System Audit of Trading Members (TYPE-III)"
+- **title:** "System Audit of Trading Members (TYPE-<abbr title="—">III</abbr>)"
 - **applies_to:** broker
 - **in_force_date:** 2025-10-17
 - **status:** in-force
 - **impact_areas:** system-audit, reporting
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/INSP70900.pdf
 
-Operationalises half-yearly Type-III (algorithmic software) system audit for trading members for period April 01 to September 30, 2025, per SEBI CIR/MRD/DMS/34/2013, SEBI/HO/MIRSD/TPD/CIR/2025/10 dated January 31, 2025 and NSE/INSP/66456 dated February 03, 2025. Empanelment per NSE/INSP/69631 dated August 12, 2025; first half-year using technology-monitored audit framework.
+Operationalises half-yearly Type-III (algorithmic software) system audit for trading members for period April 01 to September 30, 2025, per SEBI CIR/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>/DMS/34/2013, SEBI/HO/MIRSD/TPD/CIR/2025/10 dated January 31, 2025 and NSE/INSP/66456 dated February 03, 2025. Empanelment per NSE/INSP/69631 dated August 12, 2025; first half-year using technology-monitored audit framework.
 
 ### NSE/FAOP/70616
 
@@ -121,7 +121,7 @@ Operationalises half-yearly Type-III (algorithmic software) system audit for tra
 - **impact_areas:** derivatives, file-format, rms
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/FAOP70616.pdf
 
-Per SEBI Circular SEBI/HO/MRD-PoD2/CIR/P/2024/00181 dated December 30, 2024 on periodic revision of derivatives lot sizes. Revises market lot: NIFTY 75→65, BANKNIFTY 35→30, FINNIFTY 65→60, MIDCPNIFTY 140→120. Operates alongside the new SEBI Tuesday/Thursday expiry-day split (NSE Tuesday, BSE Thursday) effective September 01, 2025.
+Per SEBI Circular SEBI/HO/MRD-PoD2/CIR/P/2024/00181 dated December 30, 2024 on periodic revision of derivatives lot sizes. Revises market lot: NIFTY 75→65, BANKNIFTY 35→30, FINNIFTY 65→60, MIDCPNIFTY 140→120. Operates alongside the new SEBI Tuesday/Thursday expiry-day split (NSE Tuesday, <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> Thursday) effective September 01, 2025.
 
 ### NSE/INSP/70471
 
@@ -173,7 +173,7 @@ Issues NSE-specific clarifications to CSCRF implementation including how to comp
 - **impact_areas:** cyber-security
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/INSP69906.pdf
 
-Forwards SEBI clarification circular SEBI/HO/ITD-1/ITD_CSC_EXT/P/CIR/2025/119 dated August 28, 2025 with further clarifications on the CSCRF framework introduced via SEBI Circular dated August 20, 2024 (NSE/INSP/63502).
+Forwards SEBI clarification circular SEBI/HO/<abbr title="Information Technology Department (within SEBI)">ITD</abbr>-1/ITD_CSC_EXT/P/CIR/2025/119 dated August 28, 2025 with further clarifications on the CSCRF framework introduced via SEBI Circular dated August 20, 2024 (NSE/INSP/63502).
 
 ### NSE/INSP/69631
 
@@ -238,7 +238,7 @@ Forwards SEBI extension of CSCRF adoption and implementation timeline beyond the
 - **impact_areas:** onboarding, surveillance, mutual-funds, other
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/INSP68566.pdf
 
-Issues joint-exchange Regulatory framework for Distribution of third-party products by Trading Members on their own/partner/group platforms (third-party app or parent app). Addresses observed proliferation of broker-app and group-entity platforms offering non-broking products alongside trading services. Sets disclosure, segregation, risk and AP-registration norms.
+Issues joint-exchange Regulatory framework for Distribution of third-party products by Trading Members on their own/partner/group platforms (third-party app or parent app). Addresses observed proliferation of broker-app and group-entity platforms offering non-broking products alongside trading services. Sets disclosure, segregation, risk and <abbr title="Authorized Person">AP</abbr>-registration norms.
 
 ### NSE/INVG/67858
 
@@ -278,7 +278,7 @@ Master consolidated circular compiling Surveillance and Investigation Department
 - **impact_areas:** system-audit, surveillance, file-format, derivatives, other
 - **primary_url:** https://www.ricago.com/assets/front/base/file/file_management/3598.pdf
 
-53-page master consolidated circular replacing NSE/MSD/61825 (April 30, 2024). Covers Scheme governing NNF, Registration, Testing (System Audit / VAPT), CTCL, IBT/STWT, DMA, Smart Order Routing, Algorithmic Trading, NNF surrender, Vendor & ASP empanelment, Foreign ISV registration, NNF Terminal Id identification, and 16 operational sections. Primary reference for member front-end / algo / API trading setup. [unknown — verify] direct NSE archive URL (404 at nsearchives; ricago mirror used).
+53-page master consolidated circular replacing NSE/MSD/61825 (April 30, 2024). Covers Scheme governing NNF, Registration, Testing (System Audit / VAPT), <abbr title="Computer-to-Computer Link.">CTCL</abbr>, IBT/STWT, DMA, Smart Order Routing, Algorithmic Trading, NNF surrender, Vendor & ASP empanelment, Foreign ISV registration, NNF Terminal Id identification, and 16 operational sections. Primary reference for member front-end / algo / API trading setup. [unknown — verify] direct NSE archive URL (404 at nsearchives; ricago mirror used).
 
 ### NSE/INSP/67637
 
@@ -343,7 +343,7 @@ Partial modification to NSE/FAOP/62175 (May 24, 2024) for revised tick-size grid
 - **impact_areas:** settlement, client-funds, file-format, onboarding
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/ISC66717.pdf
 
-Continues direct-payout demat-mapping operational stream — covers NSE/ISC/64984 (Nov 08, 2024), NSE/ISC/66165 (Jan 16, 2025). Communicates further implementation steps for Trading Members on UCC demat-account validation, error handling and direct-pay-out reconciliation.
+Continues direct-payout demat-mapping operational stream — covers NSE/<abbr title="Investor Service Centre.">ISC</abbr>/64984 (Nov 08, 2024), NSE/ISC/66165 (Jan 16, 2025). Communicates further implementation steps for Trading Members on <abbr title="Unique Client Code">UCC</abbr> demat-account validation, error handling and direct-pay-out reconciliation.
 
 ### NSE/INVG/66524
 
@@ -369,20 +369,20 @@ Forwards SEBI Circular SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/0000013 dated February
 - **impact_areas:** system-audit, cyber-security, reporting
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/INSP66456.pdf
 
-Forwards SEBI Circular SEBI/HO/MIRSD/TPD/CIR/2025/10 dated January 31, 2025 establishing technology-based monitoring of system audits — web-portal-driven workflow, geolocation capture of auditor's on-site visit, OTP-based auditor access, standardised audit plan and ATR. Web-portal link goes live April 27, 2026; foundation for NSE/INSP/69631 (auditor empanelment) and NSE/INSP/70900 (Type-III audit FY26).
+Forwards SEBI Circular SEBI/HO/MIRSD/TPD/CIR/2025/10 dated January 31, 2025 establishing technology-based monitoring of system audits — web-portal-driven workflow, geolocation capture of auditor's on-site visit, <abbr title="One-Time Password">OTP</abbr>-based auditor access, standardised audit plan and <abbr title="Action Taken Report.">ATR</abbr>. Web-portal link goes live April 27, 2026; foundation for NSE/INSP/69631 (auditor empanelment) and NSE/INSP/70900 (Type-III audit FY26).
 
 ### NSE/CMPT/66281
 
 - **date_issued:** 2025-01-24
 - **issuer:** NSE
-- **title:** "Trading Supported by Blocked Amount in Secondary Market - Update on UCC Deregistration Request for ASBA Clients"
+- **title:** "Trading Supported by Blocked Amount in Secondary Market - Update on UCC Deregistration Request for <abbr title="Applications Supported by Blocked Amount">ASBA</abbr> Clients"
 - **applies_to:** broker, clearing-corp
 - **in_force_date:** 2025-01-27
 - **status:** in-force
 - **impact_areas:** upi-block, mandate, settlement, onboarding, file-format
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPT66281.pdf
 
-NSE Clearing operational update on UPI-Block (ASBA-like) Trading Supported by Blocked Amount in Secondary Market mechanism per SEBI Circular dated June 23, 2023 and NCL/CMPT/58895 (Oct 12, 2023), NCL/CMPT/63735 (Sep 04, 2024). UCC deregistration request received on T-day made effective on T-day itself; UCC marked "Not Opted for UPI Block facility" upon successful CC API notification. Effective January 27, 2025.
+NSE Clearing operational update on <abbr title="Unified Payments Interface">UPI</abbr>-Block (ASBA-like) Trading Supported by Blocked Amount in Secondary Market mechanism per SEBI Circular dated June 23, 2023 and <abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr>/CMPT/58895 (Oct 12, 2023), NCL/CMPT/63735 (Sep 04, 2024). UCC deregistration request received on T-day made effective on T-day itself; UCC marked "Not Opted for UPI Block facility" upon successful <abbr title="Clearing Corporation (NCL, ICCL, MCXCCL — context-dependent).">CC</abbr> API notification. Effective January 27, 2025.
 
 ### NSE/INSP/66284
 
@@ -434,7 +434,7 @@ Schedules a CM-Segment mock trading session on Saturday, January 04, 2025 with N
 - **impact_areas:** surveillance, system-audit, reporting, cyber-security
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/INVG65921.pdf
 
-Updates broker institutional mechanism for prevention and detection of fraud and market abuse, in line with SEBI's enhanced surveillance framework. Specifies surveillance system controls, escalation pathways, employee training, whistleblower mechanism and the Surveillance Obligation Report (SOR) format/timeline.
+Updates broker institutional mechanism for prevention and detection of fraud and market abuse, in line with SEBI's enhanced surveillance framework. Specifies surveillance system controls, escalation pathways, employee training, whistleblower mechanism and the Surveillance Obligation Report (<abbr title="Smart Order Routing">SOR</abbr>) format/timeline.
 
 ### NSE/CMTR/65587
 
@@ -447,7 +447,7 @@ Updates broker institutional mechanism for prevention and detection of fraud and
 - **impact_areas:** bod-eod, settlement, other
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMTR65587.pdf
 
-Notifies CY2025 trading holidays for the Capital Market Segment. Includes Mahashivratri, Holi, Id-Ul-Fitr, Shri Mahavir Jayanti, Dr Baba Saheb Ambedkar Jayanti, Good Friday, Maharashtra Day, Independence Day, Ganesh Chaturthi, Gandhi Jayanti/Dussehra, Diwali Laxmi Pujan (Muhurat trading), Balipratipada, Guru Nanak Jayanti, Christmas. Sets BOD/EOD file-publication schedule for the year.
+Notifies CY2025 trading holidays for the Capital Market Segment. Includes Mahashivratri, Holi, Id-Ul-Fitr, Shri Mahavir Jayanti, Dr Baba Saheb Ambedkar Jayanti, Good Friday, Maharashtra Day, Independence Day, Ganesh Chaturthi, Gandhi Jayanti/Dussehra, Diwali Laxmi Pujan (Muhurat trading), Balipratipada, Guru Nanak Jayanti, Christmas. Sets <abbr title="Beginning Of Day">BOD</abbr>/<abbr title="End Of Day">EOD</abbr> file-publication schedule for the year.
 
 ### NSE/FAOP/65336
 
@@ -539,7 +539,7 @@ Operationalises half-yearly cyber security/resilience audit for Type-III (algo s
 - **impact_areas:** settlement, client-funds, file-format, bod-eod
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/INSP64381.pdf
 
-Inspection-side guideline aligned to SEBI Circular SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2024/75 (June 05, 2024) and NCL/CMPT/63669 (Aug 30, 2024) requiring securities pay-out to be credited directly to client demat account (instead of pool account). Effective from Oct 14, 2024. Continues compliance Standard Operating Guidelines from NCL CMPT circulars and ICCL Notice No 20240902-8. Members must square trades, shortage handling and direct-credit ISIN/account-mapping per CC operating procedure.
+Inspection-side guideline aligned to SEBI Circular SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2024/75 (June 05, 2024) and NCL/CMPT/63669 (Aug 30, 2024) requiring securities pay-out to be credited directly to client demat account (instead of pool account). Effective from Oct 14, 2024. Continues compliance Standard Operating Guidelines from NCL CMPT circulars and <abbr title="Indian Clearing Corporation Limited">ICCL</abbr> Notice No 20240902-8. Members must square trades, shortage handling and direct-credit ISIN/account-mapping per CC operating procedure.
 
 ### NSE/SURV/64402
 
@@ -565,7 +565,7 @@ Updates cautionary-message file format and dissemination process introduced via 
 - **impact_areas:** reporting, other
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/COMP64293.pdf
 
-Operational reminder for half-yearly Networth Certificate submission as on September 30, 2024, due October 31, 2024 (MTF members) / November 30, 2024 (others) via ENIT-NEW-COMPLIANCE. Cross-references NSE/COMP/64159 dated September 26, 2024. Disciplinary action per NSE/INSP/53530 dated September 2, 2022 for late/short submission.
+Operational reminder for half-yearly Networth Certificate submission as on September 30, 2024, due October 31, 2024 (<abbr title="Margin Trading Facility">MTF</abbr> members) / November 30, 2024 (others) via ENIT-NEW-COMPLIANCE. Cross-references NSE/COMP/64159 dated September 26, 2024. Disciplinary action per NSE/INSP/53530 dated September 2, 2022 for late/short submission.
 
 ### NSE/INSP/64315
 
@@ -591,7 +591,7 @@ Revises NSE/INSP/53525 — permits members to pass on peak-margin penalty to cli
 - **impact_areas:** client-funds, reporting, file-format
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/INSP64053.pdf
 
-Resolves Broker's ISF representation on lack of UCC for unidentified credits/suspense funds. Members must create a designated UCC "SUSPE1234N" on member PAN in back office for allocating/reporting unidentified credits to clearing corporations, while not creating it in Exchange UCC database (no orders to be permitted). Members must keep unidentified/suspense funds upstreamed; compliance deadline December 19, 2024.
+Resolves Broker's ISF representation on lack of UCC for unidentified credits/suspense funds. Members must create a designated UCC "SUSPE1234N" on member <abbr title="Permanent Account Number">PAN</abbr> in back office for allocating/reporting unidentified credits to clearing corporations, while not creating it in Exchange UCC database (no orders to be permitted). Members must keep unidentified/suspense funds upstreamed; compliance deadline December 19, 2024.
 
 ### NSE/CMTR/63915
 
@@ -623,7 +623,7 @@ Releases FAQs on the revised Contract Note format prescribed in NSE/INSP/61999. 
 
 - **date_issued:** 2024-09-04
 - **issuer:** NSE
-- **title:** "Modification in duration for Call Auction in Pre-Open session for Initial Public Offer (IPO) and Relisted Scrips"
+- **title:** "Modification in duration for Call Auction in Pre-Open session for Initial Public Offer (<abbr title="Initial Public Offering">IPO</abbr>) and Relisted Scrips"
 - **applies_to:** broker
 - **in_force_date:** 2024-09-17
 - **status:** in-force
@@ -696,7 +696,7 @@ First NSE-side forwarding of SEBI Circular SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2024/7
 - **impact_areas:** file-format, other
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMTR62174.pdf
 
-Introduces price-linked tick size in Capital Market Segment for securities priced below Rs 250 (revised from Rs 0.05 to Rs 0.01). Securities reviewed monthly using last-trading-day closing price; same tick applies in T+0 settlement series. Sister circular NSE/FAOP/62175 issued same day for F&O segment.
+Introduces price-linked tick size in Capital Market Segment for securities priced below Rs 250 (revised from Rs 0.05 to Rs 0.01). Securities reviewed monthly using last-trading-day closing price; same tick applies in <abbr title="Trade-date Plus N settlement">T+0</abbr> settlement series. Sister circular NSE/FAOP/62175 issued same day for F&O segment.
 
 ### NSE/FAOP/62175
 
@@ -746,10 +746,10 @@ Schedules special live trading session on Saturday, May 18, 2024 with intra-day 
 - **applies_to:** broker
 - **in_force_date:** 2024-04-30
 - **status:** in-force
-- **impact_areas:** onboarding, re-KYC, file-format, reporting, aml, fatca-crs
+- **impact_areas:** onboarding, re-<abbr title="Know Your Customer (process).">KYC</abbr>, file-format, reporting, aml, fatca-crs
 - **primary_url:** https://www.ricago.com/assets/front/base/file/file_management/1806.pdf
 
-Updated UCC Master Circular consolidating all UCC-related circulars up to March 31, 2024. Annexure file formats: API TDD-UCI External Interface UAT v2.0, bulk category-disclosure (COM segment), Active/Inactive/Closed status update file structure, weekly UCC-upload data report (Annexure H Sheet E). Applicable across CM, F&O, CD, COM, SLBM and Debt segments. Replaces NSE/ISC/57393 (June 30, 2023).
+Updated UCC Master Circular consolidating all UCC-related circulars up to March 31, 2024. Annexure file formats: API TDD-UCI External Interface UAT v2.0, bulk category-disclosure (COM segment), Active/Inactive/Closed status update file structure, weekly UCC-upload data report (Annexure H Sheet E). Applicable across CM, F&O, CD, COM, <abbr title="Securities Lending and Borrowing Mechanism">SLBM</abbr> and Debt segments. Replaces NSE/ISC/57393 (June 30, 2023).
 
 ### NSE/SURV/61848
 
@@ -776,7 +776,7 @@ Master consolidated circular compiling all Surveillance and Investigation Depart
 - **impact_areas:** settlement, bod-eod, other
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMTR61805.pdf
 
-Partial modification to Part C 1.8 of NSE/CMTR/57270 (Jun 26, 2023) revising Auction Market timings in the CM Segment. Adjusts T+2 / T+1 auction window in line with shortened settlement cycle, sets pay-in/pay-out cut-offs and BOD/EOD file publication times.
+Partial modification to Part C 1.8 of NSE/CMTR/57270 (Jun 26, 2023) revising Auction Market timings in the CM Segment. Adjusts <abbr title="Trade-date Plus N settlement">T+2</abbr> / <abbr title="Trade-date Plus N settlement">T+1</abbr> auction window in line with shortened settlement cycle, sets pay-in/pay-out cut-offs and BOD/EOD file publication times.
 
 ### NSE/INSP/61529
 
@@ -841,7 +841,7 @@ Following SEBI advice, allows auditors empanelled with any recognised stock exch
 - **impact_areas:** onboarding, reporting, other
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/COMP60859.pdf
 
-Operationalises Annual Maintenance Charge (AMC) of Rs 5,000 per registered AP per year across segments from April 01, 2024 (FY2024-25), payable in April of each FY based on March-31 AP register. AMC once charged is non-refundable, including in cases of mid-year AP cancellation or disciplinary action.
+Operationalises Annual Maintenance Charge (<abbr title="Asset Management Company (mutual funds context) / Annual Maintenance Charges (depository context).">AMC</abbr>) of Rs 5,000 per registered AP per year across segments from April 01, 2024 (FY2024-25), payable in April of each FY based on March-31 AP register. AMC once charged is non-refundable, including in cases of mid-year AP cancellation or disciplinary action.
 
 ### NSE/CMTR/60813
 
@@ -854,7 +854,7 @@ Operationalises Annual Maintenance Charge (AMC) of Rs 5,000 per registered AP pe
 - **impact_areas:** file-format, other
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMTR60813.pdf
 
-Operationalises ETF availability in the existing CM Block Deal Window (minimum Rs 10 Cr trade, ±1% reference price) per SEBI Circular SEBI/HO/IMD/DOF2/P/CIR/2022/69 dated May 23, 2022. Direct redemption/subscription with AMC continues for amounts >= Rs 25 Cr.
+Operationalises ETF availability in the existing CM Block Deal Window (minimum Rs 10 Cr trade, ±1% reference price) per SEBI Circular SEBI/HO/<abbr title="Investment Management Department (within SEBI)">IMD</abbr>/DOF2/P/CIR/2022/69 dated May 23, 2022. Direct redemption/subscription with AMC continues for amounts >= Rs 25 Cr.
 
 ### NSE/ISC/60418
 
@@ -926,7 +926,7 @@ Partial modification to F&O consolidated circular NSE/FAOP/57264 (Jun 23, 2023) 
 
 - **date_issued:** 2023-12-28
 - **issuer:** NSE
-- **title:** "Settlement of Running Account of Client's Funds lying with Trading Member (TM)"
+- **title:** "Settlement of Running Account of Client's Funds lying with Trading Member (<abbr title="Trading Member">TM</abbr>)"
 - **applies_to:** broker
 - **in_force_date:** 2024-04-01
 - **status:** in-force
@@ -1000,7 +1000,7 @@ First NSE forwarding of SEBI Circular SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/180 d
 - **impact_areas:** onboarding, re-KYC, aml, fatca-crs, digi-locker, esign
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/INSP58955.pdf
 
-Forwards SEBI Master Circular SEBI/HO/MIRSD/SECFATF/P/CIR/2023/169 dated October 12, 2023 consolidating SEBI KYC norms for the securities market — Digital KYC, In-Person Verification, Aadhaar-based eKYC (UIDAI), eSign, OVDs, FATCA-CRS, KYC Registration Agency (KRA) and KYC modification process. Single reference for member KYC compliance.
+Forwards SEBI Master Circular SEBI/HO/MIRSD/SECFATF/P/CIR/2023/169 dated October 12, 2023 consolidating SEBI KYC norms for the securities market — Digital KYC, In-Person Verification, Aadhaar-based eKYC (UIDAI), eSign, OVDs, <abbr title="Foreign Account Tax Compliance Act (US)">FATCA</abbr>-<abbr title="Common Reporting Standard">CRS</abbr>, KYC Registration Agency (<abbr title="KYC Registration Agency">KRA</abbr>) and KYC modification process. Single reference for member KYC compliance.
 
 ### NSE/COMP/58570
 
@@ -1013,7 +1013,7 @@ Forwards SEBI Master Circular SEBI/HO/MIRSD/SECFATF/P/CIR/2023/169 dated October
 - **impact_areas:** reporting, other
 - **primary_url:** https://archives.nseindia.com/content/circulars/COMP58570.pdf
 
-Operational reminder for half-yearly Networth Certificate submission via ENIT as on September 30, 2023, due November 30, 2023 (MTF-availing members: October 31, 2023). Networth threshold per SEBI Gazette No. SEBI/LAD-NRO/GN/2022/73 dated February 23, 2022 (higher of Base or Variable Networth). Refers NSE/COMP/55447 for Networth ascertainment guidance.
+Operational reminder for half-yearly Networth Certificate submission via ENIT as on September 30, 2023, due November 30, 2023 (MTF-availing members: October 31, 2023). Networth threshold per SEBI Gazette No. SEBI/<abbr title="Legal Affairs Department — Northern Regional Office (SEBI)">LAD-NRO</abbr>/GN/2022/73 dated February 23, 2022 (higher of Base or Variable Networth). Refers NSE/COMP/55447 for Networth ascertainment guidance.
 
 ### NSE/COMP/58438
 
@@ -1093,7 +1093,7 @@ Forwards SEBI Implementation Circular SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/110 d
 - **impact_areas:** onboarding, re-KYC, dormant, aml, reporting, client-funds, system-audit, cyber-security, grievance, other
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/INSP57394.pdf
 
-Master consolidated circular compiling inspection-department regulatory requirements up to June 30, 2023, covering KYC, PMLA, client-funds settlement, margin reporting, system/cyber audit, dormant accounts, books and records, branch/AP audit, etc. Single reference document for member compliance; periodically refreshed (next: NSE/INSP/67804 dated April 30, 2025). [unknown — verify] direct URL (PDF returned 404 in our archive lookup; full text 148 pages mirrored at ricago).
+Master consolidated circular compiling inspection-department regulatory requirements up to June 30, 2023, covering KYC, <abbr title="Prevention of Money Laundering Act 2002">PMLA</abbr>, client-funds settlement, margin reporting, system/cyber audit, dormant accounts, books and records, branch/AP audit, etc. Single reference document for member compliance; periodically refreshed (next: NSE/INSP/67804 dated April 30, 2025). [unknown — verify] direct URL (PDF returned 404 in our archive lookup; full text 148 pages mirrored at ricago).
 
 ### NSE/ISC/57393
 
@@ -1185,7 +1185,7 @@ Strengthens framework for supervision of APs by trading members further to SEBI/
 - **impact_areas:** surveillance
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/SURV56948.pdf
 
-Introduces Enhanced Surveillance Measure (ESM) framework for Micro-Small Companies (main-board market cap < ₹500 crore) effective June 05, 2023, jointly with BSE and SEBI. Stage I/II measures (T+1 settlement-only, 100% margin, no upper-price-band relaxation, restricted intra-day) apply on objective criteria. Subsequently expanded via NSE/SURV/57609, /63361, /64400.
+Introduces Enhanced Surveillance Measure (ESM) framework for Micro-Small Companies (main-board market cap < ₹500 crore) effective June 05, 2023, jointly with BSE and SEBI. Stage I/<abbr title="—">II</abbr> measures (T+1 settlement-only, 100% margin, no upper-price-band relaxation, restricted intra-day) apply on objective criteria. Subsequently expanded via NSE/SURV/57609, /63361, /64400.
 
 ### NSE/INSP/56927
 
@@ -1204,7 +1204,7 @@ Establishes comprehensive operating guidelines for QSBs under SEBI's enhanced ob
 
 - **date_issued:** 2023-05-22
 - **issuer:** NSE
-- **title:** "Updation of KMP details"
+- **title:** "Updation of <abbr title="Key Managerial Personnel">KMP</abbr> details"
 - **applies_to:** broker
 - **in_force_date:** 2023-05-22
 - **status:** in-force
@@ -1341,7 +1341,7 @@ Mandates daily (T+1) API submission of Holding Statement and Bank Balances effec
 - **impact_areas:** onboarding, aml, surveillance, reporting
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/INVG55347.pdf
 
-Reiterates client due diligence obligations under SEBI/HO/MIRSD/DOS3/CIR/P/2018/104 (July 04, 2018) and SEBI/HO/MIRSD/DOP/CIR/P/2019/113 (October 15, 2019). Members must conduct periodic due diligence, monitor abnormal transaction patterns and PEP/sensitive-PAN flagging; due diligence files must be made available during inspection. Operational anchor for SCORES / AML investigation regime.
+Reiterates client due diligence obligations under SEBI/HO/MIRSD/DOS3/CIR/P/2018/104 (July 04, 2018) and SEBI/HO/MIRSD/DOP/CIR/P/2019/113 (October 15, 2019). Members must conduct periodic due diligence, monitor abnormal transaction patterns and <abbr title="Politically Exposed Person">PEP</abbr>/sensitive-PAN flagging; due diligence files must be made available during inspection. Operational anchor for <abbr title="SEBI Complaints Redress System">SCORES</abbr> / <abbr title="Anti-Money Laundering">AML</abbr> investigation regime.
 
 ### NSE/INSP/55250
 
@@ -1368,7 +1368,7 @@ Extends implementation of daily Holding Statement/Bank Balance API submission in
 - **impact_areas:** other
 - **primary_url:** https://archives.nseindia.com/content/circulars/COMP55151.pdf
 
-Reiterates SEBI Circular dated December 09, 2020 on e-Voting Facility provided by Listed Entities. Members must inform clients about e-voting facility availability through SMS, email and other notifications, and update KYC records with shareholding-account email IDs to facilitate notice delivery from listed companies.
+Reiterates SEBI Circular dated December 09, 2020 on e-Voting Facility provided by Listed Entities. Members must inform clients about e-voting facility availability through <abbr title="Short Message Service.">SMS</abbr>, email and other notifications, and update KYC records with shareholding-account email IDs to facilitate notice delivery from listed companies.
 
 ### NSE/INSP/55039
 
@@ -1572,7 +1572,7 @@ Clarifies that for Enhanced Supervision monitoring of client funds, only the fun
 
 - **date_issued:** 2022-06-10
 - **issuer:** NSE
-- **title:** "Issuance of Electronic Contract Notes (ECN) through SMS/electronic instant messaging services"
+- **title:** "Issuance of Electronic Contract Notes (<abbr title="Electronic Contract Note.">ECN</abbr>) through SMS/electronic instant messaging services"
 - **applies_to:** broker
 - **in_force_date:** 2022-06-10
 - **status:** in-force
@@ -1673,7 +1673,7 @@ Revises annual and one-time rack charges and rack-allotment procedure for NSE Co
 - **impact_areas:** system-audit, reporting
 - **primary_url:** https://archives.nseindia.com/content/circulars/INSP50574.pdf
 
-Strengthens internal-audit auditor eligibility under SEBI/HO/MIRSD/MIRSD2/CIR/P/2016/95. Prescribes additional eligibility criteria (≥10 yrs audit experience for firm/partner, not debarred by ICAI/ICSI/ICMAI/RBI/SEBI, not removed in last 5 yrs, no Internal-Auditor-and-Statutory-Auditor overlap) effective for IAR submissions from half-year ending March 31, 2022. Subsequently modified via NSE/INSP/51939 and NSE/INSP/56678.
+Strengthens internal-audit auditor eligibility under SEBI/HO/MIRSD/MIRSD2/CIR/P/2016/95. Prescribes additional eligibility criteria (≥10 yrs audit experience for firm/partner, not debarred by ICAI/ICSI/ICMAI/<abbr title="Reserve Bank of India">RBI</abbr>/SEBI, not removed in last 5 yrs, no Internal-Auditor-and-Statutory-Auditor overlap) effective for IAR submissions from half-year ending March 31, 2022. Subsequently modified via NSE/INSP/51939 and NSE/INSP/56678.
 
 ### NSE/CMTR/50560
 
@@ -1740,7 +1740,7 @@ Reiterates that members are not permitted to pass on penalties levied by clearin
 - **impact_areas:** dormant, re-KYC
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/INSP49743.pdf
 
-Further clarifies treatment of inactive trading accounts. Members must seek fresh KYC/IPV only when a client returns for reactivation after one year of being flagged inactive (i.e. two years after last trade). Addresses observation that members were re-KYCing prematurely.
+Further clarifies treatment of inactive trading accounts. Members must seek fresh KYC/<abbr title="In-Person Verification">IPV</abbr> only when a client returns for reactivation after one year of being flagged inactive (i.e. two years after last trade). Addresses observation that members were re-KYCing prematurely.
 
 ### NSE/INSP/49691
 
@@ -1805,7 +1805,7 @@ Implements SEBI Circular SEBI/HO/MRD1/DTCS/CIR/P/2021/33 dated March 22, 2021 on
 - **impact_areas:** onboarding, surveillance, reporting
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/COMP48536.pdf
 
-Foundational NSE COMP-department circular implementing the SEBI MIRSD/DR-1/Cir-16/09 dated November 06, 2009 framework on market access via Authorised Persons (APs). Defines AP's role, prohibitions (no incentive sharing beyond approved rates, no PMS-like activity, no off-market schemes) and members' supervisory obligations. Periodically updated through NSE/COMP/49509, /50030, /56947, /58438, /63628.
+Foundational NSE COMP-department circular implementing the SEBI MIRSD/DR-1/Cir-16/09 dated November 06, 2009 framework on market access via Authorised Persons (APs). Defines AP's role, prohibitions (no incentive sharing beyond approved rates, no <abbr title="Portfolio Management Services">PMS</abbr>-like activity, no off-market schemes) and members' supervisory obligations. Periodically updated through NSE/COMP/49509, /50030, /56947, /58438, /63628.
 
 ### NSE/ISC/48456
 
@@ -1818,7 +1818,7 @@ Foundational NSE COMP-department circular implementing the SEBI MIRSD/DR-1/Cir-1
 - **impact_areas:** onboarding, re-KYC, file-format, reporting
 - **primary_url:** https://www.jrkgroup.in/files/downloads/225_ISC48456.pdf
 
-Extends from May 31, 2021 (per NSE/ISC/47869) to July 1, 2021 the timeline for trading members to update six mandatory KYC attributes (Name, Complete address with PIN, PAN, valid Mobile, valid Email-ID, Income range) for new clients in the UCC system. Issued after joint MII/SEBI discussion. References intermediate NSE/ISC/48383 (May 24, 2021) and NSE/ISC/48419 (May 29, 2021). [unknown — verify] direct NSE archive URL (404; mirrored at JRK).
+Extends from May 31, 2021 (per NSE/ISC/47869) to July 1, 2021 the timeline for trading members to update six mandatory KYC attributes (Name, Complete address with PIN, PAN, valid Mobile, valid Email-ID, Income range) for new clients in the UCC system. Issued after joint <abbr title="Market Infrastructure Institution">MII</abbr>/SEBI discussion. References intermediate NSE/ISC/48383 (May 24, 2021) and NSE/ISC/48419 (May 29, 2021). [unknown — verify] direct NSE archive URL (404; mirrored at JRK).
 
 ### NSE/ISC/47939
 
@@ -1872,7 +1872,7 @@ Confidential investigation-department circular prescribing penalty structure for
 - **impact_areas:** dormant, re-KYC, reporting
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/INSP46506.pdf
 
-Clarifies NSE/INSP/43488 — flagging requirement and weekly holding/monthly fund-and-securities upload exemption continues only while client has not traded in last 12 months across all exchanges. Reactivation after 1 year of inactive status requires fresh documentation, due diligence and IPV, except where the client has undertaken IPO/MF subscription or DP operations during the period.
+Clarifies NSE/INSP/43488 — flagging requirement and weekly holding/monthly fund-and-securities upload exemption continues only while client has not traded in last 12 months across all exchanges. Reactivation after 1 year of inactive status requires fresh documentation, due diligence and IPV, except where the client has undertaken IPO/MF subscription or <abbr title="Depository Participant">DP</abbr> operations during the period.
 
 ### NSE/INSP/46485
 
@@ -1927,7 +1927,7 @@ Implements revised guidelines on margin collection following SEBI framework on p
 - **impact_areas:** margin, peak-margin, reporting
 - **primary_url:** https://archives.nseindia.com/content/circulars/INSP45534.pdf
 
-Partial modification to Point A of Question 1 in Annexure A of NSE/INSP/45191 (Jul 31, 2020) operationalising SEBI Circular SEBI/HO/MIRSD/DOP/CIR/P/2020/146. Permits TM/CM to collect minimum 20% upfront margin (in lieu of VaR+ELM) from client in Capital Market segment to avoid short-collection penalty, while CC continues to collect on VaR+ELM basis. First step in the broader peak-margin operationalisation completed by NSE/INSP/45565 and NSE/INSP/46485.
+Partial modification to Point A of Question 1 in Annexure A of NSE/INSP/45191 (Jul 31, 2020) operationalising SEBI Circular SEBI/HO/MIRSD/DOP/CIR/P/2020/146. Permits TM/CM to collect minimum 20% upfront margin (in lieu of VaR+<abbr title="Extreme Loss Margin">ELM</abbr>) from client in Capital Market segment to avoid short-collection penalty, while CC continues to collect on VaR+ELM basis. First step in the broader peak-margin operationalisation completed by NSE/INSP/45565 and NSE/INSP/46485.
 
 ### NSE/INSP/45191
 
@@ -1979,7 +1979,7 @@ Implements SEBI Circular dated March 26, 2019 on BCP and DR for MIIs. Permits Ex
 - **impact_areas:** margin, peak-margin, reporting, derivatives
 - **primary_url:** https://archives.nseindia.com/content/circulars/INSP44459.pdf
 
-Clarifies the revised margin framework for F&O and Currency Derivatives segments prescribed via NCL/CMPT/44391 and NCL/CDS/44392 dated May 15, 2020. Specifies collection and reporting requirements for upfront margins and Mark-to-Market (MTM) by trading members, dovetailing with the COVID-era margin reforms.
+Clarifies the revised margin framework for F&O and Currency Derivatives segments prescribed via NCL/CMPT/44391 and NCL/CDS/44392 dated May 15, 2020. Specifies collection and reporting requirements for upfront margins and Mark-to-Market (<abbr title="Mark-to-Market">MTM</abbr>) by trading members, dovetailing with the COVID-era margin reforms.
 
 ### NSE/INSP/44009
 

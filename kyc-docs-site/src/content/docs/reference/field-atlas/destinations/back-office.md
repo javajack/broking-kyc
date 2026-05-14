@@ -8,7 +8,7 @@ description: "Every field consumed by Back-office (vendor-neutral), with source 
 ## TL;DR
 
 - **237 unique fields** consumed by Back-office (vendor-neutral).
-- Source spans sections: A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, U, V, W, X, Y, Z, AA, AB, AC.
+- Source spans sections: A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, U, V, W, X, Y, Z, <abbr title="Account Aggregator (RBI-licensed NBFC-AA)">AA</abbr>, AB, AC.
 - **87 rows cite a public spec source**; **173** are `[industry typical]`.
 
 ## Field-destination rows
@@ -17,20 +17,20 @@ Sorted by `source_section`, then `field_id`.
 
 | source_section | field_id | field_name | destination_field_name | destination_format | frequency | transformation | quirks_notes | spec_source |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| A | A-aadhaar_number | Aadhaar Number (Masked) | aadhaar_masked | VARCHAR(12) | one-time | truncate to N | stored masked XXXX-XXXX-1234; never store full in BO ledger | [industry typical] |
-| A | A-ckyc_number | CKYC Number (KIN) | ckyc_kin | CHAR(14) | one-time | [direct] | 14-digit KIN; cross-reference field for re-KYC | [industry typical] |
-| A | A-ckyc_number | CKYC Number (KIN) | ckyc_xref_status | VARCHAR(2) | on-event | [direct] | CKYC submission status; 7-day window from KYC change | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/79 |
-| A | A-country_of_birth | Country of Birth | country_of_birth | CHAR(2) | one-time | [direct] | needed for FATCA US-person determination | [industry typical] |
+| A | A-aadhaar_number | Aadhaar Number (Masked) | aadhaar_masked | VARCHAR(12) | one-time | truncate to N | stored masked XXXX-XXXX-1234; never store full in <abbr title="Beneficial Owner">BO</abbr> ledger | [industry typical] |
+| A | A-ckyc_number | <abbr title="Central KYC (records registry)">CKYC</abbr> Number (<abbr title="KYC Identification Number">KIN</abbr>) | ckyc_kin | CHAR(14) | one-time | [direct] | 14-digit KIN; cross-reference field for re-<abbr title="Know Your Customer (process).">KYC</abbr> | [industry typical] |
+| A | A-ckyc_number | CKYC Number (KIN) | ckyc_xref_status | VARCHAR(2) | on-event | [direct] | CKYC submission status; 7-day window from KYC change | <abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/SECFATF/P/CIR/2024/79 |
+| A | A-country_of_birth | Country of Birth | country_of_birth | CHAR(2) | one-time | [direct] | needed for <abbr title="Foreign Account Tax Compliance Act (US)">FATCA</abbr> US-person determination | [industry typical] |
 | A | A-date_of_birth | Date of Birth | dob | DATE YYYYMMDD | one-time | formatted | Age>=18 enforced at ledger creation; drives age-group risk profile | [industry typical] |
 | A | A-disability_type | Disability Type | disability_type | VARCHAR(2) | one-time | [direct] | lookup against code table; conditional only | [industry typical] |
 | A | A-father_spouse_flag | Father/Spouse Flag | f_or_s_flag | CHAR(1) | one-time | [direct] | F or S; required on KYC AOF header in back-office | [industry typical] |
 | A | A-father_spouse_name | Father/Spouse Name | father_spouse_nm | VARCHAR(70) | one-time | [direct] | printed on AOF copy retained 8 yrs per SEBI Stock Brokers Regulations | [industry typical] |
-| A | A-first_name | First Name | first_name | VARCHAR(70) | on-modify | [direct] | must match PAN; mismatch blocks ledger creation | [industry typical] |
-| A | A-full_name | Full Name | client_name | VARCHAR(200) | on-modify | concat with X | concatenation of first+middle+last; used on signed ECN | [industry typical] |
+| A | A-first_name | First Name | first_name | VARCHAR(70) | on-modify | [direct] | must match <abbr title="Permanent Account Number">PAN</abbr>; mismatch blocks ledger creation | [industry typical] |
+| A | A-full_name | Full Name | client_name | VARCHAR(200) | on-modify | concat with X | concatenation of first+middle+last; used on signed <abbr title="Electronic Contract Note.">ECN</abbr> | [industry typical] |
 | A | A-gender | Gender | gender | CHAR(1) | one-time | [direct] | M/F/T; needed for ITR Form 16A and FATCA refresh | [industry typical] |
 | A | A-is_differently_abled | Differently Abled Flag | diff_abled_flg | CHAR(1) | one-time | [direct] | drives accessibility-mode contract-note dispatch | [industry typical] |
 | A | A-last_name | Last Name | last_name | VARCHAR(70) | on-modify | [direct] | PAN-match strict; downstream to ITR Form 16A dispatch | [industry typical] |
-| A | A-maiden_first_name | Maiden First Name | maiden_name | VARCHAR(70) | on-modify | [direct] | BSE Unfreeze process references maiden name on name-change | [industry typical] |
+| A | A-maiden_first_name | Maiden First Name | maiden_name | VARCHAR(70) | on-modify | [direct] | <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> Unfreeze process references maiden name on name-change | [industry typical] |
 | A | A-marital_status | Marital Status | marital_status | CHAR(1) | on-modify | [direct] | drives name-change workflow on marriage | [industry typical] |
 | A | A-middle_name | Middle Name | middle_name | VARCHAR(70) | on-modify | [direct] | null-allowed; rendered on contract note Annexure A header | [industry typical] |
 | A | A-mother_name | Mother Name | mother_name | VARCHAR(70) | one-time | [direct] | transmission docs lookup uses mother name | [industry typical] |
@@ -40,11 +40,11 @@ Sorted by `source_section`, then `field_id`.
 | A | A-pan_number | PAN Number | pan_no | CHAR(10) | on-modify | uppercase | primary key in client master; drives ledger, contract notes, statements | SEBI/HO/MIRSD/POD-1/P/CIR/2025/94 |
 | A | A-place_of_birth | Place of Birth | place_of_birth | VARCHAR(50) | one-time | [direct] | FATCA self-cert audit trail | [industry typical] |
 | A | A-prefix | Salutation | salutation | VARCHAR(5) | on-modify | [direct] | appears on contract-note header and welcome kit | [industry typical] |
-| A | A-residential_status | Residential Status | resi_status | VARCHAR(3) | on-modify | [direct] | RI/NRI/FN/PIO; NRI flag activates PIS-route ledger flags | [industry typical] |
+| A | A-residential_status | Residential Status | resi_status | VARCHAR(3) | on-modify | [direct] | RI/<abbr title="Non-Resident Indian">NRI</abbr>/FN/PIO; NRI flag activates <abbr title="Portfolio Investment Scheme (RBI / NRI)">PIS</abbr>-route ledger flags | [industry typical] |
 | A | A-residential_status | Residential Status | tds_on_payout_rate | NUMBER(5,2) | on-event | lookup against R | TDS on NRI fund-payout per IT Act sec 195; resident no TDS at broker level | Income Tax Act sec 195 |
 | A | A-udid_number | UDID Number | udid_no | VARCHAR(18) | one-time | [direct] | Unique Disability ID; conditional | [industry typical] |
 | AA | AA-data_retention_end_date | Data Retention End Date | data_retention_end | DATE YYYYMMDD | on-modify | derived from Y | 8 yrs per SEBI Stock Brokers Regulations; auto-purge after | SEBI Stock Brokers Regulations 2026 |
-| AA | AA-dpdp_analytics_consent | DPDP Analytics Consent | dpdp_analytics_consent | CHAR(1) | on-modify | [direct] | gates analytics-event capture | DPDP Act 2023 |
+| AA | AA-dpdp_analytics_consent | <abbr title="Digital Personal Data Protection Act 2023 (and Rules 2025)">DPDP</abbr> Analytics Consent | dpdp_analytics_consent | CHAR(1) | on-modify | [direct] | gates analytics-event capture | DPDP Act 2023 |
 | AA | AA-dpdp_consent_date | DPDP Consent Date | dpdp_consent_dt | DATE YYYYMMDD | one-time | formatted | consent capture date | DPDP Act 2023 |
 | AA | AA-dpdp_consent_obtained | DPDP Consent Obtained | dpdp_consent_flg | CHAR(1) | one-time | [direct] | DPDP Act 2023 mandatory; appears on AOF eSign metadata | DPDP Act 2023 |
 | AA | AA-dpdp_consent_version | DPDP Consent Version | dpdp_consent_ver | VARCHAR(10) | one-time | [direct] | version of consent text; supports re-prompting on T&C update | DPDP Act 2023 |
@@ -52,7 +52,7 @@ Sorted by `source_section`, then `field_id`.
 | AA | AA-dpdp_cross_border_consent | DPDP Cross-Border Consent | dpdp_xb_consent | CHAR(1) | on-modify | [direct] | data-localisation override; rarely Y for India-only clients | DPDP Act 2023 |
 | AA | AA-dpdp_marketing_consent | DPDP Marketing Consent | dpdp_mktg_consent | CHAR(1) | on-modify | [direct] | separate granular consent; gates marketing comms | DPDP Act 2023 |
 | AA | AA-dpdp_third_party_sharing_consent | DPDP 3P Sharing Consent | dpdp_3p_consent | CHAR(1) | on-modify | [direct] | third-party sharing flag; controls API-export to partners | DPDP Act 2023 |
-| AB | AB-dnd_registered | DND Registered | dnd_flg | CHAR(1) | on-modify | [direct] | TRAI DND; promotional SMS suppressed if Y | [industry typical] |
+| AB | AB-dnd_registered | DND Registered | dnd_flg | CHAR(1) | on-modify | [direct] | TRAI DND; promotional <abbr title="Short Message Service.">SMS</abbr> suppressed if Y | [industry typical] |
 | AB | AB-pref_contract_note_mode | Contract Note Mode | cn_mode_cd | VARCHAR(2) | on-modify | [direct] | EM/PH; PH triggers physical-dispatch workflow | [industry typical] |
 | AB | AB-pref_email_notifications | Email Notifications Pref | email_notif_flg | CHAR(1) | on-modify | [direct] | cannot be N per SEBI Dec 2024 mandate; default Y | SEBI Dec 3, 2024 SMS/Email mandate |
 | AB | AB-pref_language | Language Preference | lang_pref_cd | VARCHAR(2) | on-modify | [direct] | EN/HI/etc; drives DLT-template language selection | [industry typical] |
@@ -63,7 +63,7 @@ Sorted by `source_section`, then `field_id`.
 | AC | AC-ras_authorized | RAS Authorized | ras_auth | CHAR(1) | on-modify | [direct] | client authorization for running-account retention | SEBI/HO/MIRSD/POD-1/P/CIR/2023/193 |
 | AC | AC-ras_auto_settlement_trigger_days | RAS Auto-Settlement Trigger Days | ras_trigger_days | NUMBER(3) | on-modify | [direct] | default 30 days inactive; overrides cycle for non-traded clients | SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/04 |
 | AC | AC-ras_last_settlement_date | RAS Last Settlement Date | ras_last_dt | DATE YYYYMMDD | on-event | formatted | most recent sweep date | SEBI/HO/MIRSD/POD-1/P/CIR/2023/193 |
-| AC | AC-ras_last_transaction_date | RAS Last Transaction Date | ras_last_txn_dt | DATE YYYYMMDD | EOD | derived from Y | last trade/charge date; resets 30-day timer | SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/04 |
+| AC | AC-ras_last_transaction_date | RAS Last Transaction Date | ras_last_txn_dt | DATE YYYYMMDD | <abbr title="End Of Day">EOD</abbr> | derived from Y | last trade/charge date; resets 30-day timer | SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/04 |
 | AC | AC-ras_next_settlement_date | RAS Next Settlement Date | ras_next_dt | DATE YYYYMMDD | EOD | derived from Y | auto-calc next sweep date based on chosen cycle | SEBI/HO/MIRSD/POD-1/P/CIR/2023/193 |
 | AC | AC-ras_optin_date | RAS Opt-In Date | ras_optin_dt | DATE YYYYMMDD | one-time | formatted | audit for client-driven cycle choice | SEBI/HO/MIRSD/POD-1/P/CIR/2023/193 |
 | AC | AC-ras_settlement_bank_account | RAS Settlement Bank Account | ras_bank_acct | VARCHAR(18) | on-modify | [direct] | primary bank account for fund return; matches G-account_number where is_primary=Y | SEBI/HO/MIRSD/POD-1/P/CIR/2023/193 |
@@ -71,9 +71,9 @@ Sorted by `source_section`, then `field_id`.
 | B | B-corr_address_line1 | Correspondence Address Line 1 | corr_addr1 | VARCHAR(100) | on-modify | [direct] | appears on physical contract-note dispatch envelope; statement-of-account header | [industry typical] |
 | B | B-corr_address_line2 | Correspondence Address Line 2 | corr_addr2 | VARCHAR(100) | on-modify | [direct] | null-if-Z when not provided; rendered on AOF retention copy | [industry typical] |
 | B | B-corr_address_line3 | Correspondence Address Line 3 | corr_addr3 | VARCHAR(100) | on-modify | [direct] | optional landmark; appears on ITR Form 16A | [industry typical] |
-| B | B-corr_address_proof_type | Correspondence Address Proof Type | corr_addr_pf_type | VARCHAR(2) | one-time | [direct] | POA code table; needed for retention audit | [industry typical] |
+| B | B-corr_address_proof_type | Correspondence Address Proof Type | corr_addr_pf_type | VARCHAR(2) | one-time | [direct] | <abbr title="Power of Attorney">POA</abbr> code table; needed for retention audit | [industry typical] |
 | B | B-corr_city | Correspondence City | corr_city | VARCHAR(50) | on-modify | [direct] | feeds stamp-duty state lookup if state derived from city | [industry typical] |
-| B | B-corr_country | Correspondence Country | corr_country | VARCHAR(30) | on-modify | [direct] | default India; non-IN triggers FATCA/CRS workflow | [industry typical] |
+| B | B-corr_country | Correspondence Country | corr_country | VARCHAR(30) | on-modify | [direct] | default India; non-IN triggers FATCA/<abbr title="Common Reporting Standard">CRS</abbr> workflow | [industry typical] |
 | B | B-corr_pincode | Correspondence PIN Code | corr_pin | CHAR(6) | on-modify | [direct] | physical dispatch routing | [industry typical] |
 | B | B-corr_state | Correspondence State Code | corr_state_code | VARCHAR(2) | on-modify | lookup against R | drives stamp-duty rate per state for contract-note charges | [industry typical] |
 | B | B-corr_state | Correspondence State Code | stamp_duty_rate_pct | NUMBER(5,4) | on-trade | lookup against R | state code drives stamp-duty rate lookup; computed per trade; Maharashtra 0.005%, Delhi 0.005%, etc | Indian Stamp Act + Maharashtra Stamp Act |
@@ -93,11 +93,11 @@ Sorted by `source_section`, then `field_id`.
 | D | D-poi_document_number | POI Document Number | poi_doc_no | VARCHAR(30) | one-time | [direct] | retained per SEBI 8-yr rule | [industry typical] |
 | D | D-poi_expiry_date | POI Expiry Date | poi_exp_dt | DATE YYYYMMDD | on-modify | formatted | for Passport/DL; triggers ovd-re-fetch reminder | [industry typical] |
 | D | D-poi_type | POI Type | poi_type_cd | VARCHAR(2) | one-time | [direct] | POI code-table; appears on AOF retention | [industry typical] |
-| D | D-poi_verified_from_issuer | POI Verified from Issuer | poi_ver_flg | CHAR(1) | one-time | [direct] | audit trail; required for KRA submission | [industry typical] |
+| D | D-poi_verified_from_issuer | POI Verified from Issuer | poi_ver_flg | CHAR(1) | one-time | [direct] | audit trail; required for <abbr title="KYC Registration Agency">KRA</abbr> submission | [industry typical] |
 | E | E-poa_document_number | POA Document Number | poa_doc_no | VARCHAR(30) | one-time | [direct] | 8-yr retention | [industry typical] |
 | E | E-poa_expiry_date | POA Expiry Date | poa_exp_dt | DATE YYYYMMDD | on-modify | formatted | for Passport/DL | [industry typical] |
 | E | E-poa_type | POA Type | poa_type_cd | VARCHAR(2) | one-time | [direct] | POA code-table | [industry typical] |
-| F | F-declared_annual_income | Declared Annual Income | decl_ann_income | NUMBER(15,2) | on-modify | [direct] | INR; appears on AML risk-score input | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78 |
+| F | F-declared_annual_income | Declared Annual Income | decl_ann_income | NUMBER(15,2) | on-modify | [direct] | INR; appears on <abbr title="Anti-Money Laundering">AML</abbr> risk-score input | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78 |
 | F | F-gross_annual_income_range | Gross Annual Income Range | income_range_cd | VARCHAR(2) | on-modify | lookup against R | income-range code; downstream to charges-differential (some brokers tier brokerage by income) | [industry typical] |
 | F | F-income_proof_financial_year | Income Proof Financial Year | inc_proof_fy | VARCHAR(9) | on-modify | [direct] | YYYY-YYYY format | [industry typical] |
 | F | F-income_proof_type | Income Proof Type | inc_proof_type | VARCHAR(2) | on-modify | [direct] | conditional; required for F&O/COM segment fee charging | [industry typical] |
@@ -106,16 +106,16 @@ Sorted by `source_section`, then `field_id`.
 | F | F-occupation | Occupation Code | occupation_cd | VARCHAR(2) | on-modify | lookup against R | occupation code-table; flag for high-risk occupation buckets in AML risk-tier | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78 |
 | F | F-source_of_wealth | Source of Wealth | source_of_wealth | VARCHAR(100) | on-modify | [direct] | Salary/Business/Inheritance; AML enhanced due-diligence input | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78 |
 | G | G-account_holder_name | Account Holder Name | acct_holder_nm | VARCHAR(100) | on-modify | [direct] | must match PAN above name-match threshold; mis-match blocks first payout | [industry typical] |
-| G | G-account_number | Bank Account Number | bank_acct_no | VARCHAR(18) | on-modify | [direct] | primary payout destination; T+1 funds-payout target | SEBI/HO/MIRSD/POD-1/P/CIR/2025/94 |
-| G | G-account_number | Bank Account Number | form_c_bank_book_entry | VARCHAR(50) | on-event | [direct] | Form C bank book entry per client transaction; SEBI Stock Brokers Regs | NSE/INSP/57394 |
-| G | G-account_number | Bank Account Number | suspe1234n_route_flag | CHAR(1) | on-event | derived from Y | unidentified credit routed to SUSPE1234N UCC on member PAN | NSE/INSP/64053 |
+| G | G-account_number | Bank Account Number | bank_acct_no | VARCHAR(18) | on-modify | [direct] | primary payout destination; <abbr title="Trade-date Plus N settlement">T+1</abbr> funds-payout target | SEBI/HO/MIRSD/POD-1/P/CIR/2025/94 |
+| G | G-account_number | Bank Account Number | form_c_bank_book_entry | VARCHAR(50) | on-event | [direct] | Form C bank book entry per client transaction; SEBI Stock Brokers Regs | <abbr title="National Stock Exchange of India">NSE</abbr>/INSP/57394 |
+| G | G-account_number | Bank Account Number | suspe1234n_route_flag | CHAR(1) | on-event | derived from Y | unidentified credit routed to SUSPE1234N <abbr title="Unique Client Code">UCC</abbr> on member PAN | NSE/INSP/64053 |
 | G | G-account_number | Bank Account Number | bank_reconciliation_status | VARCHAR(2) | daily | [direct] | BA1/BA2/BA3 daily reconciliation status; T+1 holding+balance API | NSE/INSP/55039 |
-| G | G-account_type | Bank Account Type | bank_acct_type | VARCHAR(2) | on-modify | [direct] | SB/CA/NRE/NRO; NRE/NRO triggers NRI-route fund flag | [industry typical] |
+| G | G-account_type | Bank Account Type | bank_acct_type | VARCHAR(2) | on-modify | [direct] | SB/CA/<abbr title="Non-Resident External (Rupee) account">NRE</abbr>/<abbr title="Non-Resident Ordinary (Rupee) account">NRO</abbr>; NRE/NRO triggers NRI-route fund flag | [industry typical] |
 | G | G-bank_account_seq | Bank Account Sequence | bank_seq | NUMBER(1) | on-modify | [direct] | 1-5; sequence number for multi-account clients | [industry typical] |
-| G | G-bank_name | Bank Name | bank_name | VARCHAR(100) | on-modify | [direct] | appears on payout NEFT/RTGS narration | [industry typical] |
-| G | G-bank_proof_type | Bank Proof Type | bank_proof_type | VARCHAR(2) | one-time | [direct] | CC=Cancelled Cheque or BS=Bank Statement | [industry typical] |
+| G | G-bank_name | Bank Name | bank_name | VARCHAR(100) | on-modify | [direct] | appears on payout <abbr title="National Electronic Funds Transfer">NEFT</abbr>/<abbr title="Real Time Gross Settlement">RTGS</abbr> narration | [industry typical] |
+| G | G-bank_proof_type | Bank Proof Type | bank_proof_type | VARCHAR(2) | one-time | [direct] | <abbr title="Clearing Corporation (NCL, ICCL, MCXCCL — context-dependent).">CC</abbr>=Cancelled Cheque or BS=Bank Statement | [industry typical] |
 | G | G-branch_name | Branch Name | branch_name | VARCHAR(100) | on-modify | [direct] | retained for audit; not on payout narration | [industry typical] |
-| G | G-ifsc_code | IFSC Code | ifsc | CHAR(11) | on-modify | uppercase | validated regex; needed for NEFT/RTGS routing | [industry typical] |
+| G | G-ifsc_code | <abbr title="Indian Financial System Code.">IFSC</abbr> Code | ifsc | CHAR(11) | on-modify | uppercase | validated regex; needed for NEFT/RTGS routing | [industry typical] |
 | G | G-is_primary | Is Primary Bank Account | is_primary_flg | CHAR(1) | on-modify | [direct] | exactly one primary; primary drives default payout and 30-day refund | SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/04 |
 | G | G-micr_code | MICR Code | micr | CHAR(9) | on-modify | [direct] | legacy; some BOs still print on cheque-leaflet | [industry typical] |
 | G | G-penny_drop_date | Penny Drop Date | pd_date | DATE YYYYMMDD | on-modify | formatted | audit retention 8 yrs | [industry typical] |
@@ -123,14 +123,14 @@ Sorted by `source_section`, then `field_id`.
 | G | G-penny_drop_name_returned | Penny Drop Name Returned | pd_name_returned | VARCHAR(100) | on-modify | [direct] | preserved for AML re-screen workflow | [industry typical] |
 | G | G-penny_drop_ref | Penny Drop UTR | pd_utr | VARCHAR(30) | on-modify | [direct] | audit-trail UTR for first-payout dispute resolution | [industry typical] |
 | G | G-penny_drop_status | Penny Drop Status | pd_status | VARCHAR(2) | on-modify | [direct] | S/F/P; only S allows payout activation | [industry typical] |
-| H | H-account_status | Demat Account Status | demat_acct_status | VARCHAR(2) | on-modify | [direct] | AC/FR/CL; FR blocks new buys at OMS via RMS rule | [industry typical] |
+| H | H-account_status | Demat Account Status | demat_acct_status | VARCHAR(2) | on-modify | [direct] | AC/FR/CL; FR blocks new buys at <abbr title="Order Management System">OMS</abbr> via <abbr title="Risk Management System">RMS</abbr> rule | [industry typical] |
 | H | H-account_type | Demat Account Type | demat_acct_type | VARCHAR(2) | on-modify | [direct] | IN/JO/MN; JO triggers joint-holder ledger logic | [industry typical] |
-| H | H-bo_id | BO ID | bo_id | VARCHAR(16) | one-time | concat with X | concat of DP ID + Client ID; key for holding-statement dispatch and direct-payout | SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2024/75 |
+| H | H-bo_id | BO ID | bo_id | VARCHAR(16) | one-time | concat with X | concat of <abbr title="Depository Participant">DP</abbr> ID + Client ID; key for holding-statement dispatch and direct-payout | SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2024/75 |
 | H | H-bo_id | BO ID | direct_payout_demat_target | VARCHAR(16) | on-trade | [direct] | BO ID becomes direct-payout destination per SEBI Nov 2024 mandate | SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2024/75 |
-| H | H-bsda_flag | BSDA Flag | bsda_flg | CHAR(1) | on-modify | [direct] | Basic Services Demat flag; reduces AMC charge in BO billing | [industry typical] |
+| H | H-bsda_flag | BSDA Flag | bsda_flg | CHAR(1) | on-modify | [direct] | Basic Services Demat flag; reduces <abbr title="Asset Management Company (mutual funds context) / Annual Maintenance Charges (depository context).">AMC</abbr> charge in BO billing | [industry typical] |
 | H | H-client_id | Client ID | client_id_demat | VARCHAR(8) | one-time | [direct] | 8-digit; concatenated with DP ID for BO ID | [industry typical] |
-| H | H-depository | Depository | depository_cd | VARCHAR(4) | one-time | [direct] | CDSL/NSDL; drives direct-payout routing and CUSPA mapping | SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2024/75 |
-| H | H-depository | Depository | cuspa_account_route_cd | VARCHAR(8) | on-trade | lookup against R | TM CUSPA / CM CUSPA mapping depending on depository and clearing arrangement | NCL/CMPT/63669 |
+| H | H-depository | Depository | depository_cd | VARCHAR(4) | one-time | [direct] | <abbr title="Central Depository Services (India) Limited">CDSL</abbr>/<abbr title="National Securities Depository Limited">NSDL</abbr>; drives direct-payout routing and <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr> mapping | SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2024/75 |
+| H | H-depository | Depository | cuspa_account_route_cd | VARCHAR(8) | on-trade | lookup against R | <abbr title="Trading Member">TM</abbr> CUSPA / <abbr title="Clearing Member">CM</abbr> CUSPA mapping depending on depository and clearing arrangement | <abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr>/CMPT/63669 |
 | H | H-dp_id | DP ID | dp_id | VARCHAR(8) | one-time | [direct] | CDSL 8-digit, NSDL IN+6; key for ledger demat-link | [industry typical] |
 | H | H-dp_name | DP Name | dp_name | VARCHAR(100) | one-time | [direct] | appears on demat holding statement header | [industry typical] |
 | H | H-opening_date | Demat Opening Date | demat_open_dt | DATE YYYYMMDD | one-time | formatted | needed for KYC audit trail | [industry typical] |
@@ -151,12 +151,12 @@ Sorted by `source_section`, then `field_id`.
 | I | I-number_of_nominees | Number of Nominees | num_nominees | NUMBER(2) | on-modify | [direct] | 1-10; expanded from 3 in Jan 2025 | SEBI circular Jan 10, 2025 |
 | I | I-opt_out_declaration | Opt-Out Declaration | opt_out_decl | CHAR(1) | on-modify | [direct] | requires 30-day video declaration window; pending status persists in BO | SEBI circular Jan 10, 2025 |
 | K | K-beneficial_owner_declaration | BO Declaration | bo_decl_flg | CHAR(1) | on-modify | [direct] | N triggers full BO-details capture in AML case file | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78 |
-| K | K-is_pep | Is PEP | pep_flg | CHAR(1) | on-modify | [direct] | Y triggers EDD; AML risk-tier = High immediately | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78 |
+| K | K-is_pep | Is <abbr title="Politically Exposed Person">PEP</abbr> | pep_flg | CHAR(1) | on-modify | [direct] | Y triggers EDD; AML risk-tier = High immediately | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78 |
 | K | K-is_pep_related | Is PEP-Related | pep_related_flg | CHAR(1) | on-modify | [direct] | Y triggers EDD; flagged in BO audit trail | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78 |
 | K | K-pep_details | PEP Details | pep_details | VARCHAR(200) | on-modify | [direct] | free-text; appears in AML case file | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78 |
 | K | K-source_of_funds | Source of Funds | src_of_funds | VARCHAR(100) | on-modify | [direct] | AML risk-score input; UCC re-screen quarterly | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78 |
 | L | L-exchange_bse | Exchange BSE Flag | bse_flag | CHAR(1) | on-modify | [direct] | BSE charges schedule (different transaction-charge per scrip group) | [industry typical] |
-| L | L-exchange_mcx | Exchange MCX Flag | mcx_flag | CHAR(1) | on-modify | [direct] | MCX commodity flag; activates MCX UCC link in BO | [industry typical] |
+| L | L-exchange_mcx | Exchange <abbr title="Multi Commodity Exchange of India">MCX</abbr> Flag | mcx_flag | CHAR(1) | on-modify | [direct] | MCX commodity flag; activates MCX UCC link in BO | [industry typical] |
 | L | L-exchange_nse | Exchange NSE Flag | nse_flag | CHAR(1) | on-modify | [direct] | routing flag for NSE-bound order; NSE charges schedule applied | [industry typical] |
 | L | L-segment_commodity | Segment Commodity | seg_com_flag | CHAR(1) | on-modify | [direct] | Y requires MCX registration and income proof | [industry typical] |
 | L | L-segment_currency | Segment Currency Derivatives | seg_cd_flag | CHAR(1) | on-modify | [direct] | drives CD brokerage and exchange-transaction-charge schedule | [industry typical] |
@@ -168,7 +168,7 @@ Sorted by `source_section`, then `field_id`.
 | L | L-segment_equity_cash | Segment Equity Cash | gst_on_brokerage_amount | NUMBER(15,2) | on-trade | derived from Y | 18% GST on (brokerage + exchange transaction charge + SEBI fee) | CGST/SGST Act |
 | L | L-segment_equity_fno | Segment F&O | seg_fno_flag | CHAR(1) | on-modify | [direct] | Y requires income proof; drives F&O brokerage and STT (sell side STT 0.0125% premium) | [industry typical] |
 | L | L-segment_equity_fno | Segment F&O | stt_rate_fno | NUMBER(7,4) | on-trade | lookup against R | STT for F&O: futures sell 0.02%, options sell 0.1% premium (revised Oct 2024) | Finance Act 2024 |
-| L | L-settlement_type | Settlement Type | settle_type | VARCHAR(2) | on-modify | [direct] | T+1 default; T+0 opt-in tracked in BO for differential brokerage | SEBI/HO/MRD/POD-3/P/CIR/2024/172 |
+| L | L-settlement_type | Settlement Type | settle_type | VARCHAR(2) | on-modify | [direct] | T+1 default; <abbr title="Trade-date Plus N settlement">T+0</abbr> opt-in tracked in BO for differential brokerage | SEBI/HO/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>/POD-3/P/CIR/2024/172 |
 | L | L-trading_experience_commodity_years | Trading Experience COM (Years) | tr_exp_com | NUMBER(2) | on-modify | [direct] | conditional; COM activation log | [industry typical] |
 | L | L-trading_experience_equity_years | Trading Experience Equity (Years) | tr_exp_eq | NUMBER(2) | on-modify | [direct] | client suitability disclosure; retained for audit | [industry typical] |
 | L | L-trading_experience_fno_years | Trading Experience F&O (Years) | tr_exp_fno | NUMBER(2) | on-modify | [direct] | conditional; F&O risk-acknowledgement record | [industry typical] |
@@ -179,14 +179,14 @@ Sorted by `source_section`, then `field_id`.
 | M | M-risk_appetite | Risk Appetite | risk_appetite_cd | CHAR(1) | on-modify | [direct] | L/M/H; gate for high-risk-product offerings | [industry typical] |
 | M | M-risk_category | Risk Category | risk_cat | VARCHAR(2) | on-modify | derived from Y | Conservative/Moderate/Aggressive; appears on contract-note Annexure | [industry typical] |
 | M | M-risk_profile_score | Risk Profile Score | risk_score | NUMBER(3) | on-modify | derived from Y | 0-100; derived from M01-M04 + F01+F03 | [industry typical] |
-| N | N-ipv_date | IPV Date | ipv_date | DATE YYYYMMDD | one-time | formatted | audit | [industry typical] |
+| N | N-ipv_date | <abbr title="In-Person Verification">IPV</abbr> Date | ipv_date | DATE YYYYMMDD | one-time | formatted | audit | [industry typical] |
 | N | N-ipv_mode | IPV Mode | ipv_mode_cd | VARCHAR(2) | one-time | [direct] | PH/VI/AE | [industry typical] |
 | N | N-ipv_required | IPV Required | ipv_req_flg | CHAR(1) | one-time | [direct] | N if Aadhaar e-KYC or DigiLocker used; retained for audit | [industry typical] |
 | N | N-ipv_status | IPV Status | ipv_status_cd | VARCHAR(2) | on-event | [direct] | CO/PE/FA; CO required before ACTIVE flip | [industry typical] |
-| N | N-vipv_session_id | VIPV Session ID | vipv_sess_id | VARCHAR(50) | one-time | [direct] | unique session identifier; retained for retrieval | [industry typical] |
+| N | N-vipv_session_id | <abbr title="Video In-Person Verification (sometimes &quot;Video CIP&quot; / V-CIP)">VIPV</abbr> Session ID | vipv_sess_id | VARCHAR(50) | one-time | [direct] | unique session identifier; retained for retrieval | [industry typical] |
 | N | N-vipv_video_hash | VIPV Video Hash | vipv_vid_hash | CHAR(64) | one-time | [direct] | SHA-256 integrity hash | [industry typical] |
 | N | N-vipv_video_url | VIPV Video URL | vipv_vid_url | VARCHAR(500) | one-time | [direct] | tamper-proof storage URL; 8-yr retention | [industry typical] |
-| O | O-ddpi_bo_id | DDPI BO ID | ddpi_bo_id | VARCHAR(16) | on-modify | [direct] | BO ID for which DDPI applies | SEBI/HO/MIRSD/DoP/P/CIR/2022/44 |
+| O | O-ddpi_bo_id | <abbr title="Demat Debit and Pledge Instruction">DDPI</abbr> BO ID | ddpi_bo_id | VARCHAR(16) | on-modify | [direct] | BO ID for which DDPI applies | SEBI/HO/MIRSD/DoP/P/CIR/2022/44 |
 | O | O-ddpi_for_mutual_fund | DDPI for MF | ddpi_mf_flg | CHAR(1) | on-modify | [direct] | MF transactions enabled | SEBI/HO/MIRSD/DoP/P/CIR/2022/44 |
 | O | O-ddpi_for_pledge | DDPI for Pledge | ddpi_pledge_flg | CHAR(1) | on-modify | [direct] | pledge/re-pledge for margins enabled | SEBI/HO/MIRSD/DoP/P/CIR/2022/44 |
 | O | O-ddpi_for_settlement | DDPI for Settlement | ddpi_settle_flg | CHAR(1) | on-modify | [direct] | transfer securities for settlement enabled | SEBI/HO/MIRSD/DoP/P/CIR/2022/44 |
@@ -205,7 +205,7 @@ Sorted by `source_section`, then `field_id`.
 | P | P-running_account_settlement_freq | Running Account Settlement Frequency | ras_freq_cd | VARCHAR(2) | on-modify | [direct] | Q1/Q2/M; drives quarterly or monthly RAS sweep schedule | SEBI/HO/MIRSD/POD-1/P/CIR/2023/193 |
 | P | P-tariff_sheet_acknowledged | Tariff Sheet Acknowledged | tariff_ack_flg | CHAR(1) | one-time | [direct] | brokerage and charges schedule; appears on contract-note disclosure | [industry typical] |
 | P | P-terms_conditions_accepted | T&C Accepted | tc_accepted_flg | CHAR(1) | one-time | [direct] | MITC and broker T&C accepted; eSigned copy retained 8yrs | [industry typical] |
-| U | U-bse_ucc_status | BSE UCC Status | bse_ucc_status | VARCHAR(2) | on-event | [direct] | AP unlocks BSE order routing | [industry typical] |
+| U | U-bse_ucc_status | BSE UCC Status | bse_ucc_status | VARCHAR(2) | on-event | [direct] | <abbr title="Authorized Person">AP</abbr> unlocks BSE order routing | [industry typical] |
 | U | U-mcx_client_category | MCX Client Category | mcx_client_cat | VARCHAR(2) | on-modify | [direct] | HE/SP/AR; impacts commodity position limits | [industry typical] |
 | U | U-mcx_ucc_status | MCX UCC Status | mcx_ucc_status | VARCHAR(2) | on-event | [direct] | AP unlocks MCX order routing | [industry typical] |
 | U | U-nse_ucc_status | NSE UCC Status | nse_ucc_status | VARCHAR(2) | on-event | [direct] | AP/RJ/PE; AP unlocks NSE order routing | [industry typical] |
@@ -214,7 +214,7 @@ Sorted by `source_section`, then `field_id`.
 | U | U-ucc_code | UCC Code | client_ledger_debit | NUMBER(15,2) | on-trade | derived from Y | per-trade ledger debit; aggregated nightly batch updates client ledger | SEBI/HO/MIRSD/POD-1/P/CIR/2025/94 |
 | U | U-ucc_code | UCC Code | client_ledger_credit | NUMBER(15,2) | on-trade | derived from Y | per-trade ledger credit on payout receipt | SEBI/HO/MIRSD/POD-1/P/CIR/2025/94 |
 | U | U-ucc_code | UCC Code | ledger_running_balance | NUMBER(15,2) | EOD | derived from Y | running ledger balance; basis for RAS sweep eligibility | SEBI/HO/MIRSD/POD-1/P/CIR/2023/193 |
-| U | U-ucc_code | UCC Code | contract_note_id | VARCHAR(30) | on-trade | derived from Y | ECN ID per client per day per exchange; SHA-256 hash of trade-set signed with DSC | NSE/INSP/53115 |
+| U | U-ucc_code | UCC Code | contract_note_id | VARCHAR(30) | on-trade | derived from Y | ECN ID per client per day per exchange; SHA-256 hash of trade-set signed with <abbr title="Digital Signature Certificate (CCA-licensed; aka Class 2/3 DSC).">DSC</abbr> | NSE/INSP/53115 |
 | U | U-ucc_code | UCC Code | contract_note_format | VARCHAR(2) | on-trade | [direct] | Annexure A (CN-cum-tax-invoice) or Annexure B (separate); member's choice | NSE/INSP/53115 |
 | U | U-ucc_code | UCC Code | contract_note_dispatch_status | VARCHAR(2) | on-event | [direct] | DI=Dispatched, FA=Failed, PE=Pending; T+24h SLA per SEBI | NSE/INSP/53115 |
 | U | U-ucc_code | UCC Code | quarterly_stmt_dispatch_dt | DATE YYYYMMDD | on-event | derived from Y | quarterly statement dispatch date; mandatory via email per investor-servicing framework | SEBI/HO/MIRSD/POD-1/P/CIR/2025/94 |
@@ -240,12 +240,12 @@ Sorted by `source_section`, then `field_id`.
 | W | W-operation_mode | Operation Mode | op_mode_cd | VARCHAR(2) | on-modify | [direct] | ES/AS/JO; drives signature-verification rule | [industry typical] |
 | X | X-collateral_type_preference | Collateral Type Preference | coll_type_pref | VARCHAR(2) | on-modify | [direct] | CA/SE/FD/ET; drives 50%-cash-equivalent rule check | NCL/CMPT/65498 |
 | X | X-daily_margin_report_status | Daily Margin Report Status | dmr_status_cd | VARCHAR(2) | EOD | [direct] | CO/NC; flagged if peak-margin snapshot showed shortfall | SEBI/HO/MRD2/DCAP/CIR/P/2020/127 |
-| X | X-mtf_agreement_date | MTF Agreement Date | mtf_agree_dt | DATE YYYYMMDD | one-time | formatted | audit field | [industry typical] |
+| X | X-mtf_agreement_date | <abbr title="Margin Trading Facility">MTF</abbr> Agreement Date | mtf_agree_dt | DATE YYYYMMDD | one-time | formatted | audit field | [industry typical] |
 | X | X-mtf_enabled | MTF Enabled | mtf_flg | CHAR(1) | on-modify | [direct] | Y activates CSMFA pledge account routing | NCL/CMPT/63669 |
 | X | X-mtf_interest_rate | MTF Interest Rate | mtf_int_rate | NUMBER(5,2) | on-modify | [direct] | %pa; appears on contract-note charges breakdown | [industry typical] |
 | X | X-mtf_limit_sanctioned | MTF Limit Sanctioned | mtf_limit | NUMBER(15,2) | on-modify | [direct] | INR; sanctioned MTF facility cap | [industry typical] |
 | X | X-online_pledge_activated | Online Pledge Activated | online_pledge_flg | CHAR(1) | on-modify | [direct] | Y enables broker-portal pledge initiation | SEBI/HO/MIRSD/DOP/CIR/P/2020/28 |
-| X | X-pledge_consent_obtained | Pledge Consent Obtained | pledge_consent_flg | CHAR(1) | on-modify | [direct] | Y allows margin-pledge file generation; OTP-confirmed | SEBI/HO/MIRSD/DOP/CIR/P/2020/28 |
+| X | X-pledge_consent_obtained | Pledge Consent Obtained | pledge_consent_flg | CHAR(1) | on-modify | [direct] | Y allows margin-pledge file generation; <abbr title="One-Time Password">OTP</abbr>-confirmed | SEBI/HO/MIRSD/DOP/CIR/P/2020/28 |
 | X | X-total_pledged_value | Total Pledged Value | pledged_value_inr | NUMBER(15,2) | EOD | derived from Y | current total with haircut applied; recomputed nightly | NCL/CMPT/65498 |
 | Y | Y-account_status | Account Status | acct_status_cd | VARCHAR(2) | on-event | [direct] | AC/IN/DO/SU/CL; drives ledger eligibility for new trades | SEBI framework for automated deactivation Jul 2022 |
 | Y | Y-account_status_date | Account Status Date | acct_status_dt | DATE YYYYMMDD | on-event | formatted | last status-change date; audit | [industry typical] |
@@ -262,7 +262,7 @@ Sorted by `source_section`, then `field_id`.
 | Y | Y-kyc_validity_start | KYC Validity Start | kyc_valid_start | DATE YYYYMMDD | on-modify | formatted | start of re-KYC cycle | [industry typical] |
 | Y | Y-last_trade_date | Last Trade Date | last_trade_dt | DATE YYYYMMDD | EOD | derived from Y | rolled forward by nightly batch; drives dormancy timer | SEBI framework for automated deactivation Jul 2022 |
 | Y | Y-next_kyc_review_date | Next KYC Review Date | next_kyc_rev_dt | DATE YYYYMMDD | on-modify | derived from Y | computed from risk-tier (2/8/10 yrs) | [industry typical] |
-| Y | Y-ovd_expiry_date | OVD Expiry Date | ovd_expiry_dt | DATE YYYYMMDD | on-modify | formatted | if Passport/DL; triggers ovd-re-fetch reminder | [industry typical] |
+| Y | Y-ovd_expiry_date | <abbr title="Officially Valid Document">OVD</abbr> Expiry Date | ovd_expiry_dt | DATE YYYYMMDD | on-modify | formatted | if Passport/DL; triggers ovd-re-fetch reminder | [industry typical] |
 | Y | Y-reactivation_fresh_kyc | Reactivation Fresh KYC | react_fresh_kyc_flg | CHAR(1) | on-event | [direct] | Y if dormant>12mo; mandates re-KYC before order entry | SEBI framework for automated deactivation Jul 2022 |
 | Y | Y-reactivation_request_date | Reactivation Request Date | react_req_dt | DATE YYYYMMDD | on-event | formatted | client-initiated reactivation trigger | SEBI framework for automated deactivation Jul 2022 |
 | Z | Z-approval_status | Approval Status | appr_status_cd | VARCHAR(2) | on-event | [direct] | PE/AP/RJ; pending blocks downstream propagation | [industry typical] |
@@ -275,7 +275,7 @@ Sorted by `source_section`, then `field_id`.
 | Z | Z-modified_by_user | Modified By User | mod_user_id | VARCHAR(50) | on-modify | [direct] | maker user-ID; access-trail input | [industry typical] |
 | Z | Z-new_value | New Value | new_value | VARCHAR(500) | on-modify | [direct] | new value; appears on modification report | [industry typical] |
 | Z | Z-old_value | Old Value | old_value | VARCHAR(500) | on-modify | [direct] | previous value; retained for 8 yrs | [industry typical] |
-| Z | Z-sar_filed | SAR Filed | sar_filed_flg | CHAR(1) | on-event | [direct] | STR filed with FIU-IND; cross-reference to aml-fiu destination | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78 |
+| Z | Z-sar_filed | SAR Filed | sar_filed_flg | CHAR(1) | on-event | [direct] | <abbr title="Suspicious Transaction Report">STR</abbr> filed with <abbr title="Financial Intelligence Unit — India">FIU-IND</abbr>; cross-reference to aml-fiu destination | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78 |
 | Z | Z-suspicious_activity_flagged | Suspicious Activity Flagged | sus_act_flg | CHAR(1) | on-event | [direct] | Y triggers AML case-file creation | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78 |
 
 ## Verified through

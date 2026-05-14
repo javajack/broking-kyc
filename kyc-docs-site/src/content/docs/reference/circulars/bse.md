@@ -15,7 +15,7 @@ description: "Verified index of BSE circulars affecting Indian stock broking, 20
 
 ## Conceptual overview
 
-This page is the complete listing of BSE circulars in the project's 2020–2026 sweep window. Each entry contains the verbatim circular ID, issue date, in-force date, status (in-force / superseded / withdrawn), applicable entity types, impact-area tags, a 2–4 sentence summary traceable to clauses, and the primary URL. Where the primary URL could not be re-fetched, an archive URL is provided in its place.
+This page is the complete listing of <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> circulars in the project's 2020–2026 sweep window. Each entry contains the verbatim circular ID, issue date, in-force date, status (in-force / superseded / withdrawn), applicable entity types, impact-area tags, a 2–4 sentence summary traceable to clauses, and the primary URL. Where the primary URL could not be re-fetched, an archive URL is provided in its place.
 
 ## Entries (descending date)
 
@@ -49,7 +49,7 @@ Requires trading members to submit Corrective Action Reports (CAR) for non-compl
 
 - **date_issued:** 2025-06-23
 - **issuer:** BSE
-- **title:** "FAQ on Settlement of Running Account of Client's Funds lying with Trading Member (TM)"
+- **title:** "FAQ on Settlement of Running Account of Client's Funds lying with Trading Member (<abbr title="Trading Member">TM</abbr>)"
 - **applies_to:** broker
 - **in_force_date:** immediate
 - **status:** in-force
@@ -69,7 +69,7 @@ Consolidated FAQ on running-account settlement of client funds held by trading m
 - **impact_areas:** grievance, scores-odr, reporting
 - **primary_url:** https://www.bseindia.com/markets/MarketInfo/DispNewNoticesCirculars.aspx?page=20250610-4
 
-Disseminates SEBI circular SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/81 dated June 2, 2025 updating the Investor Charter for Research Analysts to reflect the ODR platform and SCORES 2.0. RAs must display the charter on websites, apps, premises and onboarding material; publish complaint data monthly by the 7th; file FIRs for impersonation-related complaints with SCORES; and display prominent impersonation warnings on website homepage.
+Disseminates <abbr title="Securities and Exchange Board of India">SEBI</abbr> circular SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/81 dated June 2, 2025 updating the Investor Charter for Research Analysts to reflect the <abbr title="Online Dispute Resolution">ODR</abbr> platform and <abbr title="SEBI Complaints Redress System">SCORES</abbr> 2.0. RAs must display the charter on websites, apps, premises and onboarding material; publish complaint data monthly by the 7th; file FIRs for impersonation-related complaints with SCORES; and display prominent impersonation warnings on website homepage.
 
 ### 20250610-5
 
@@ -121,7 +121,7 @@ Reminds trading members of the May 31, 2025 deadline to submit the Internal Audi
 - **impact_areas:** nominee, mutual-funds, file-format, onboarding
 - **primary_url:** https://www.bseindia.com/markets/MarketInfo/DispNewNoticesCirculars.aspx?page=20250411-43
 
-Revises the UCC structure to incorporate nominee-related fields for the Mutual Funds segment per SEBI nomination revamp guidelines. Maintains the 183-field UCC count while reorganising fields. Applies across Manual Interface, Bulk upload, Mobile app and API. Supersedes the March 27, 2025 notice; trading members and third-party / proprietary system users must prepare technical updates.
+Revises the <abbr title="Unique Client Code">UCC</abbr> structure to incorporate nominee-related fields for the Mutual Funds segment per SEBI nomination revamp guidelines. Maintains the 183-field UCC count while reorganising fields. Applies across Manual Interface, Bulk upload, Mobile app and API. Supersedes the March 27, 2025 notice; trading members and third-party / proprietary system users must prepare technical updates.
 
 ### 20250127-22
 
@@ -140,14 +140,14 @@ Compiles recurring compliance irregularities observed during inspections of trad
 
 - **date_issued:** 2025-01-15
 - **issuer:** BSE
-- **title:** "Enablement of Trading in T+0 rolling settlement cycle for Custodial Participant (CP) code (excluding INST)"
+- **title:** "Enablement of Trading in <abbr title="Trade-date Plus N settlement">T+0</abbr> rolling settlement cycle for Custodial Participant (CP) code (excluding INST)"
 - **applies_to:** broker
 - **in_force_date:** 2025-02-10
 - **status:** in-force
 - **impact_areas:** settlement, t0-t1
 - **primary_url:** https://www.bseindia.com/markets/MarketInfo/DispNewNoticesCirculars.aspx?page=20250115-1
 
-Per SEBI December 2024 directive expanding optional T+0 scope, BSE enables T+0 trading for CP codes (excluding INST) effective February 10, 2025, with mock testing from February 8, 2025. Continues to operate alongside T+1.
+Per SEBI December 2024 directive expanding optional T+0 scope, BSE enables T+0 trading for CP codes (excluding INST) effective February 10, 2025, with mock testing from February 8, 2025. Continues to operate alongside <abbr title="Trade-date Plus N settlement">T+1</abbr>.
 
 ### 20250110-47
 
@@ -166,14 +166,14 @@ Splits the previously combined "FDI/DR" UCC category into separate "FDI" and "DR
 
 - **date_issued:** 2025-01-01
 - **issuer:** BSE
-- **title:** "Clarifications to Cybersecurity and Cyber Resilience Framework (CSCRF) for SEBI Regulated Entities (REs)"
+- **title:** "Clarifications to Cybersecurity and Cyber Resilience Framework (<abbr title="Cybersecurity and Cyber Resilience Framework">CSCRF</abbr>) for SEBI Regulated Entities (REs)"
 - **applies_to:** broker
 - **in_force_date:** immediate
 - **status:** in-force
 - **impact_areas:** cyber-security, system-audit
 - **primary_url:** https://www.bseindia.com/markets/MarketInfo/DispNewNoticesCirculars.aspx?page=20250101-35
 
-Disseminates SEBI circular SEBI/HO/ITD-1/ITD_CSC_EXT/P/CIR/2024/184 (Dec 31, 2024) clarifying the August 20, 2024 CSCRF. All stockbrokers are required to acknowledge and implement the clarifications; the full SEBI text is annexed.
+Disseminates SEBI circular SEBI/HO/<abbr title="Information Technology Department (within SEBI)">ITD</abbr>-1/ITD_CSC_EXT/P/CIR/2024/184 (Dec 31, 2024) clarifying the August 20, 2024 CSCRF. All stockbrokers are required to acknowledge and implement the clarifications; the full SEBI text is annexed.
 
 ### 20241209-41
 
@@ -199,20 +199,20 @@ Directs Investment Advisers and Research Analysts to prominently display a Griev
 - **impact_areas:** bcp-dr, settlement
 - **primary_url:** https://www.bseindia.com/markets/MarketInfo/DispNewNoticesCirculars.aspx?page=20241203-37
 
-Disseminates SEBI circular SEBI/HO/MRD/TPD/P/CIR/2024/167 dated November 28, 2024 on continuity protocols for interoperable stock exchange segments. Trading members required to review attached documentation and comply.
+Disseminates SEBI circular SEBI/HO/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>/TPD/P/CIR/2024/167 dated November 28, 2024 on continuity protocols for interoperable stock exchange segments. Trading members required to review attached documentation and comply.
 
 ### 20241202-5
 
 - **date_issued:** 2024-12-02
 - **issuer:** BSE
-- **title:** "Suspension/Freezing of Demat accounts at Depositories whose KYC records are not found to be valid by KRAs"
+- **title:** "Suspension/Freezing of Demat accounts at Depositories whose <abbr title="Know Your Customer (process).">KYC</abbr> records are not found to be valid by KRAs"
 - **applies_to:** broker
 - **in_force_date:** 2024-11-30
 - **status:** in-force
 - **impact_areas:** kyc-modification, mutual-funds, dormant, onboarding
 - **primary_url:** https://www.bseindia.com/markets/MarketInfo/DispNewNoticesCirculars.aspx?page=20241202-5
 
-Notifies that demat accounts with KYC records flagged invalid by KRAs were frozen for debits and credits from November 30, 2024 (based on KRA data dated November 28, 2024). Members must ensure clients maintain valid KYC at their KRA before submitting orders on BSE StAR MF; otherwise depositories, RTAs and AMCs may reject orders. References prior exchange update of November 27, 2024.
+Notifies that demat accounts with KYC records flagged invalid by KRAs were frozen for debits and credits from November 30, 2024 (based on <abbr title="KYC Registration Agency">KRA</abbr> data dated November 28, 2024). Members must ensure clients maintain valid KYC at their KRA before submitting orders on BSE StAR MF; otherwise depositories, RTAs and AMCs may reject orders. References prior exchange update of November 27, 2024.
 
 ### 20241021-13
 
@@ -231,7 +231,7 @@ Per SEBI direction, revises index derivative market lots effective post-November
 
 - **date_issued:** 2024-10-11
 - **issuer:** BSE
-- **title:** "FAQs on Margin Trading Facility (MTF)"
+- **title:** "FAQs on Margin Trading Facility (<abbr title="Margin Trading Facility">MTF</abbr>)"
 - **applies_to:** broker
 - **in_force_date:** immediate
 - **status:** in-force
@@ -257,14 +257,14 @@ Requires all trading members to submit audited annual financials by October 31, 
 
 - **date_issued:** 2024-09-23
 - **issuer:** BSE
-- **title:** "Framework For Centralized Fee Collection Mechanism (CeFCoM) For Investment Advisers (IA) & Research Analysts (RA)"
+- **title:** "Framework For Centralized Fee Collection Mechanism (CeFCoM) For Investment Advisers (<abbr title="Investment Adviser">IA</abbr>) & Research Analysts (<abbr title="Research Analyst">RA</abbr>)"
 - **applies_to:** broker
 - **in_force_date:** 2024-10-01
 - **status:** in-force
 - **impact_areas:** client-funds, mandate, upi-block, onboarding, grievance
 - **primary_url:** https://www.bseindia.com/markets/MarketInfo/DispNewNoticesCirculars.aspx?page=20240923-8
 
-Operationalises a voluntary CeFCoM fee-collection framework for SEBI-registered IAs/RAs. Phase 1 launches Oct 1, 2024 for non-fintech advisers; Phase 2 for digital-first practitioners (date TBD). Supports net banking, cards, UPI, virtual accounts and auto debits. Registration via BSE portal using SEBI and enlistment credentials. Participation optional for advisers and clients.
+Operationalises a voluntary CeFCoM fee-collection framework for SEBI-registered IAs/RAs. Phase 1 launches Oct 1, 2024 for non-fintech advisers; Phase 2 for digital-first practitioners (date TBD). Supports net banking, cards, <abbr title="Unified Payments Interface">UPI</abbr>, virtual accounts and auto debits. Registration via BSE portal using SEBI and enlistment credentials. Participation optional for advisers and clients.
 
 ### 20240507-18
 
@@ -303,7 +303,7 @@ Consolidates all Listing Compliance department circulars in effect as of March 3
 - **impact_areas:** rms, derivatives, commodities
 - **primary_url:** https://www.bseindia.com/markets/MarketInfo/DispNewNoticesCirculars.aspx?page=20240401-9
 
-Disseminates RBI guidance on hedging of foreign exchange risk under the Risk Management and Inter-Bank Dealings framework. Trading members in Currency Derivatives are advised to take note of the annexed RBI directive.
+Disseminates <abbr title="Reserve Bank of India">RBI</abbr> guidance on hedging of foreign exchange risk under the Risk Management and Inter-Bank Dealings framework. Trading members in Currency Derivatives are advised to take note of the annexed RBI directive.
 
 ### 20240322-48
 
@@ -329,7 +329,7 @@ Implements beta version of T+0 rolling settlement in the equity cash segment eff
 - **impact_areas:** onboarding, kyc-modification, file-format
 - **primary_url:** https://www.bseindia.com/markets/MarketInfo/DispNewNoticesCirculars.aspx?page=20240223-42
 
-Revises UCC file formats to align with Protean eGov PAN-verification changes. Client Name limit reduced to 85 characters; separate First/Middle/Last name fields mandatory for individuals; optional 150-character Client Name description field added; DOB (DD/MM/YYYY) mandatory for individuals and DOI for non-individuals. PAN, Name and DOB/DOI must all match Protean records for validation. Name/DOB modifications require Unfreeze requests with re-verification. Old format rejected from March 28, 2024 end-of-day.
+Revises UCC file formats to align with Protean eGov <abbr title="Permanent Account Number">PAN</abbr>-verification changes. Client Name limit reduced to 85 characters; separate First/Middle/Last name fields mandatory for individuals; optional 150-character Client Name description field added; DOB (DD/MM/YYYY) mandatory for individuals and DOI for non-individuals. PAN, Name and DOB/DOI must all match Protean records for validation. Name/DOB modifications require Unfreeze requests with re-verification. Old format rejected from March 28, 2024 end-of-day.
 
 ### 20240117-40
 
@@ -381,7 +381,7 @@ Publishes 14 trading holidays for calendar year 2024 across Equity, Equity Deriv
 - **impact_areas:** onboarding, upi-block, file-format
 - **primary_url:** https://www.bseindia.com/markets/MarketInfo/DispNewNoticesCirculars.aspx?page=20231018-39
 
-Updates the UCC batch upload file format to support SEBI's "Trading supported by Blocked Amount in the Secondary Market" facility for Individuals, PMS, HNI and HUF in the equity segment. Adds an "Opt for UPI" field, allows up to five bank and five demat accounts per client (minimum one each), excludes NRE accounts, requires designation of one primary account, and mandates name/PAN match against bank/demat for validation.
+Updates the UCC batch upload file format to support SEBI's "Trading supported by Blocked Amount in the Secondary Market" facility for Individuals, <abbr title="Portfolio Management Services">PMS</abbr>, HNI and <abbr title="Hindu Undivided Family">HUF</abbr> in the equity segment. Adds an "Opt for UPI" field, allows up to five bank and five demat accounts per client (minimum one each), excludes <abbr title="Non-Resident External (Rupee) account">NRE</abbr> accounts, requires designation of one primary account, and mandates name/PAN match against bank/demat for validation.
 
 ### 20231005-54
 
@@ -400,7 +400,7 @@ Issues a revised penalty framework for delayed/missing submissions of preliminar
 
 - **date_issued:** 2023-08-29
 - **issuer:** BSE
-- **title:** "Enhancements in EOD file formats of Equity Derivatives & Currency Derivatives segments"
+- **title:** "Enhancements in <abbr title="End Of Day">EOD</abbr> file formats of Equity Derivatives & Currency Derivatives segments"
 - **applies_to:** broker
 - **in_force_date:** 2023-09-18
 - **status:** in-force
@@ -433,7 +433,7 @@ Updated FAQ supplementing the August 12, 2023 issue, addressing member queries o
 - **impact_areas:** kyc-modification, onboarding, mutual-funds
 - **primary_url:** https://www.bseindia.com/markets/MarketInfo/DispNewNoticesCirculars.aspx?page=20230819-6
 
-Implements SEBI KYC validation guidelines: Aadhaar via UIDAI, mobile/email via OTP when not linked to Aadhaar, PAN via tax records. Client accounts with unverified contact details marked "ON HOLD" from August 18, 2023; non-demat-mode orders (new purchases, switches, SIPs) face rejection. Depositories will suspend demat accounts of clients failing KYC checks on September 6, 2023 using data dated September 1, 2023.
+Implements SEBI KYC validation guidelines: Aadhaar via UIDAI, mobile/email via <abbr title="One-Time Password">OTP</abbr> when not linked to Aadhaar, PAN via tax records. Client accounts with unverified contact details marked "ON HOLD" from August 18, 2023; non-demat-mode orders (new purchases, switches, SIPs) face rejection. Depositories will suspend demat accounts of clients failing KYC checks on September 6, 2023 using data dated September 1, 2023.
 
 ### 20230812-1
 
@@ -499,7 +499,7 @@ From April 1, 2023, two-factor authentication will be mandatory for all subscrip
 - **impact_areas:** derivatives, rms, margin, reporting
 - **primary_url:** https://www.bseindia.com/markets/MarketInfo/DispNewNoticesCirculars.aspx?page=20230106-56
 
-Issues an ICCL-administered penalty framework for position-limit violations in Equity and Currency Derivatives, effective February 1, 2023. Member/FPI/MF level: first violation no penalty, then Rs.5,000 per instance (2nd-5th), Rs.10,000+ (6th onwards), Disciplinary Committee from 11th. Client level Equity Derivatives: lower of 1% closing-price value or Rs.1,00,000 daily (min Rs.5,000); enhanced violations >5% OI at Rs.5,000. Client Currency: Rs.5,000/day. Clearing members collect from clients. (Issued by clearing affiliate but published as BSE circular on members.)
+Issues an <abbr title="Indian Clearing Corporation Limited">ICCL</abbr>-administered penalty framework for position-limit violations in Equity and Currency Derivatives, effective February 1, 2023. Member/FPI/MF level: first violation no penalty, then Rs.5,000 per instance (2nd-5th), Rs.10,000+ (6th onwards), Disciplinary Committee from 11th. Client level Equity Derivatives: lower of 1% closing-price value or Rs.1,00,000 daily (min Rs.5,000); enhanced violations >5% OI at Rs.5,000. Client Currency: Rs.5,000/day. Clearing members collect from clients. (Issued by clearing affiliate but published as BSE circular on members.)
 
 ### 20230105-59
 
@@ -525,20 +525,20 @@ References notice 20221228-55. Activates online BEFS portal for quarterly report
 - **impact_areas:** client-funds, reporting, upstreaming
 - **primary_url:** https://www.bseindia.com/markets/MarketInfo/DispNewNoticesCirculars.aspx?page=20221228-55
 
-Mandates all trading members to submit summary settlement data (Annexure I, within 2 trading days of settlement) and UCC-wise settlement details (Annexure II, within 10 trading days). Settlement occurs the first Friday of each month/quarter per client preference. Trading members handling only proprietary or institutional trading file one-time declarations. Submission via BEFS.
+Mandates all trading members to submit summary settlement data (Annexure I, within 2 trading days of settlement) and UCC-wise settlement details (Annexure <abbr title="—">II</abbr>, within 10 trading days). Settlement occurs the first Friday of each month/quarter per client preference. Trading members handling only proprietary or institutional trading file one-time declarations. Submission via BEFS.
 
 ### 20220803-40
 
 - **date_issued:** 2022-08-03
 - **issuer:** BSE
-- **title:** "Processing of ASBA applications in Public Issue of Equity Shares and Convertibles"
+- **title:** "Processing of <abbr title="Applications Supported by Blocked Amount">ASBA</abbr> applications in Public Issue of Equity Shares and Convertibles"
 - **applies_to:** broker
 - **in_force_date:** 2022-09-01
 - **status:** in-force
 - **impact_areas:** upi-block, onboarding, file-format, reporting
 - **primary_url:** https://www.bseindia.com/markets/MarketInfo/DispNewNoticesCirculars.aspx?page=20220803-40
 
-Sets procedural changes for UPI-ASBA bids in public issues opening on/after Sep 1, 2022. UPI mandate acceptance expires 5:00 PM on IPO closing day. Stock Exchange will display only successfully blocked applications (UPI Status RC-100). Separate bid modification window on T+1 day eliminated for both UPI and non-UPI bids. Physical application form retention required for 6 months, electronic records for 3 years.
+Sets procedural changes for UPI-ASBA bids in public issues opening on/after Sep 1, 2022. UPI mandate acceptance expires 5:00 PM on <abbr title="Initial Public Offering">IPO</abbr> closing day. Stock Exchange will display only successfully blocked applications (UPI Status RC-100). Separate bid modification window on T+1 day eliminated for both UPI and non-UPI bids. Physical application form retention required for 6 months, electronic records for 3 years.
 
 ### 20220526-6
 
@@ -564,7 +564,7 @@ Introduces API-based submission for weekly Holding Statement plus Cash and Cash 
 - **impact_areas:** other
 - **primary_url:** https://www.bseindia.com/markets/MarketInfo/DispNewNoticesCirculars.aspx?page=20210615-1
 
-Disseminates SEBI notification No. SEBI/LAD-NRO/GN/2021/25 (June 10, 2021) on the Securities and Exchange Board of India (Delisting of Equity Shares) Regulations, 2021. Listed companies advised to review and comply with the new framework. (Broker relevance limited; impacts brokers managing delisted-securities exit flows.)
+Disseminates SEBI notification No. SEBI/<abbr title="Legal Affairs Department — Northern Regional Office (SEBI)">LAD-NRO</abbr>/GN/2021/25 (June 10, 2021) on the Securities and Exchange Board of India (Delisting of Equity Shares) Regulations, 2021. Listed companies advised to review and comply with the new framework. (Broker relevance limited; impacts brokers managing delisted-securities exit flows.)
 
 ### 20200210-47
 

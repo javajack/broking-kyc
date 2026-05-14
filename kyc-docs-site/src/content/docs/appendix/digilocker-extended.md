@@ -3,7 +3,7 @@ title: DigiLocker Extended
 description: Extended DigiLocker specification — advanced OAuth flows, document type catalog, XML schema details, NPCI e-KYC Setu integration, and aggregator comparison.
 ---
 
-DigiLocker is the backbone of the modern KYC onboarding flow. When a customer grants consent through DigiLocker, the system can fetch their Aadhaar details (name, date of birth, gender, address, photograph) directly from UIDAI (Unique Identification Authority of India) -- eliminating manual document uploads and often bypassing the need for a separate IPV (In-Person Verification) step. This page covers the advanced integration details beyond what is needed for basic onboarding: the OAuth 2.0 consent flow mechanics, the full document type catalog, the Aadhaar XML response schema, the newer NPCI (National Payments Corporation of India) e-KYC Setu alternative, and a cost comparison between direct integration and aggregator-based access.
+DigiLocker is the backbone of the modern <abbr title="Know Your Customer (process).">KYC</abbr> onboarding flow. When a customer grants consent through DigiLocker, the system can fetch their Aadhaar details (name, date of birth, gender, address, photograph) directly from UIDAI (Unique Identification Authority of India) -- eliminating manual document uploads and often bypassing the need for a separate <abbr title="In-Person Verification">IPV</abbr> (In-Person Verification) step. This page covers the advanced integration details beyond what is needed for basic onboarding: the OAuth 2.0 consent flow mechanics, the full document type catalog, the Aadhaar XML response schema, the newer <abbr title="National Payments Corporation of India">NPCI</abbr> (National Payments Corporation of India) e-KYC Setu alternative, and a cost comparison between direct integration and aggregator-based access.
 
 :::note
 This page contains extended DigiLocker documentation beyond what's needed for basic individual KYC onboarding. The core DigiLocker integration spec is at [DigiLocker Integration](/broking-kyc/vendors/identity/digilocker).
@@ -43,13 +43,13 @@ These are the documents relevant to stock broking KYC that can be fetched throug
 | Document | Issuer | Key Fields Extracted |
 |----------|--------|---------------------|
 | Aadhaar eKYC | UIDAI | Name, DOB, gender, address, photo |
-| PAN Card | Income Tax Dept | PAN, name, DOB, father's name |
+| <abbr title="Permanent Account Number">PAN</abbr> Card | Income Tax Dept | PAN, name, DOB, father's name |
 | Driving License | State RTO | Name, DOB, address, DL number, expiry |
 | Voter ID | ECI (Election Commission of India) | Name, DOB, address, EPIC number |
 
 ### NPCI e-KYC Setu
 
-This is a newer mechanism, allowed by SEBI since June 2025, for performing Aadhaar eKYC without sharing the actual Aadhaar number. It uses the NPCI infrastructure (the same network that powers UPI).
+This is a newer mechanism, allowed by <abbr title="Securities and Exchange Board of India">SEBI</abbr> since June 2025, for performing Aadhaar eKYC without sharing the actual Aadhaar number. It uses the NPCI infrastructure (the same network that powers <abbr title="Unified Payments Interface">UPI</abbr>).
 
 - Uses NPCI infrastructure (same as UPI)
 - Customer authenticates via UPI app

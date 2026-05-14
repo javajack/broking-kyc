@@ -21,9 +21,9 @@ Sorted by `field_id`, then `destination`.
 | M-investment_horizon | Investment Horizon | back-office | inv_horizon_cd | CHAR(1) | on-modify | [direct] | S/M/L; client suitability matrix input | [industry typical] |
 | M-investment_objective | Investment Objective | back-office | inv_obj_cd | VARCHAR(2) | on-modify | [direct] | CA/IN/WP/SP; suitability disclosure record | [industry typical] |
 | M-risk_appetite | Risk Appetite | back-office | risk_appetite_cd | CHAR(1) | on-modify | [direct] | L/M/H; gate for high-risk-product offerings | [industry typical] |
-| M-risk_appetite | Risk Appetite | rms | rms_risk_tier | CHAR(1) | on-modify | [direct] | L tier may cap MTF and F&O exposure multiplier | [industry typical] |
+| M-risk_appetite | Risk Appetite | rms | rms_risk_tier | CHAR(1) | on-modify | [direct] | L tier may cap <abbr title="Margin Trading Facility">MTF</abbr> and F&O exposure multiplier | [industry typical] |
 | M-risk_category | Risk Category | back-office | risk_cat | VARCHAR(2) | on-modify | derived from Y | Conservative/Moderate/Aggressive; appears on contract-note Annexure | [industry typical] |
-| M-risk_category | Risk Category | regulatory-reports | RiskCategory | CHAR(2) | on-modify | [direct] | Conservative/Moderate/Aggressive feeds AML risk-bucket; drives transaction-monitoring threshold | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78 |
+| M-risk_category | Risk Category | regulatory-reports | RiskCategory | CHAR(2) | on-modify | [direct] | Conservative/Moderate/Aggressive feeds <abbr title="Anti-Money Laundering">AML</abbr> risk-bucket; drives transaction-monitoring threshold | <abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/SECFATF/P/CIR/2024/78 |
 | M-risk_category | Risk Category | rms | rms_client_cat | VARCHAR(2) | on-modify | [direct] | feeds exposure-limit lookup | [industry typical] |
 | M-risk_category | Risk Category | rms | rms_client_risk_cat | VARCHAR(2) | on-modify | [direct] | Conservative/Moderate/Aggressive; caps for MTF and F&O | [industry typical] |
 | M-risk_profile_score | Risk Profile Score | back-office | risk_score | NUMBER(3) | on-modify | derived from Y | 0-100; derived from M01-M04 + F01+F03 | [industry typical] |

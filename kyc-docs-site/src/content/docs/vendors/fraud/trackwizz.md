@@ -3,7 +3,7 @@ title: TrackWizz
 description: AML/PEP/sanctions screening and ongoing monitoring via TrackWizz for regulatory compliance.
 ---
 
-TrackWizz is a specialized AML (Anti-Money Laundering), PEP (Politically Exposed Person), and sanctions screening platform built for Indian capital markets participants. Under SEBI's KYC norms and the PMLA (Prevention of Money Laundering Act, 2002), every stock broker must screen prospective clients against sanctions lists, PEP databases, and adverse media sources before activating a trading account — and must continue doing so on an ongoing basis throughout the client relationship.
+TrackWizz is a specialized <abbr title="Anti-Money Laundering">AML</abbr> (Anti-Money Laundering), <abbr title="Politically Exposed Person">PEP</abbr> (Politically Exposed Person), and sanctions screening platform built for Indian capital markets participants. Under <abbr title="Securities and Exchange Board of India">SEBI</abbr>'s <abbr title="Know Your Customer (process).">KYC</abbr> norms and the <abbr title="Prevention of Money Laundering Act 2002">PMLA</abbr> (Prevention of Money Laundering Act, 2002), every stock broker must screen prospective clients against sanctions lists, PEP databases, and adverse media sources before activating a trading account — and must continue doing so on an ongoing basis throughout the client relationship.
 
 AML screening is not a one-time check. SEBI requires ongoing monitoring with periodic rescreening at intervals determined by the client's risk classification. TrackWizz provides access to over 120 global and Indian watchlists, including sanctions lists from the UN, OFAC (Office of Foreign Assets Control), the EU, and India's UAPA (Unlawful Activities Prevention Act), as well as PEP databases covering both domestic and international politically exposed persons, and adverse media monitoring powered by a Refinitiv World-Check partnership. A positive hit does not automatically block account opening — it triggers Enhanced Due Diligence (EDD) by the compliance team, who must investigate and document their findings before a decision is made.
 
@@ -30,7 +30,7 @@ This page covers TrackWizz's API specifications for screening operations, the br
 
 ## 1. Overview
 
-TrackWizz is an Indian AML/CFT (Anti-Money Laundering / Combating the Financing of Terrorism) compliance platform specialized for capital markets participants. It provides automated screening of customers and entities against 120+ global and India-specific watchlists, with ongoing monitoring capabilities.
+TrackWizz is an Indian AML/<abbr title="Combating the Financing of Terrorism">CFT</abbr> (Anti-Money Laundering / Combating the Financing of Terrorism) compliance platform specialized for capital markets participants. It provides automated screening of customers and entities against 120+ global and India-specific watchlists, with ongoing monitoring capabilities.
 
 | Attribute | Details |
 |-----------|---------|
@@ -42,15 +42,15 @@ TrackWizz is an Indian AML/CFT (Anti-Money Laundering / Combating the Financing 
 | **Deployment** | On-premise or Cloud SaaS |
 | **API Type** | REST / JSON |
 | **Authentication** | Bearer token |
-| **PMLA Compliance** | Full support: CDD, EDD, STR/CTR filing templates |
+| **PMLA Compliance** | Full support: CDD, EDD, <abbr title="Suspicious Transaction Report">STR</abbr>/<abbr title="Cash Transaction Report">CTR</abbr> filing templates |
 | **Ongoing Monitoring** | Real-time alerts via webhook when customers appear on new lists |
-| **Regulatory Focus** | SEBI, RBI, FATF, PMLA, UAPA - designed for Indian regulated entities |
+| **Regulatory Focus** | SEBI, <abbr title="Reserve Bank of India">RBI</abbr>, <abbr title="Financial Action Task Force">FATF</abbr>, PMLA, UAPA - designed for Indian regulated entities |
 
 **Why TrackWizz for Indian Broking**:
 - Deep coverage of India-specific lists (SEBI debarred, RBI defaulters, MHA banned orgs, UAPA, NIA, ED)
 - Fuzzy matching handles Indian name variations and Hindi-English transliterations
 - On-premise deployment option for firms with data residency requirements
-- Pre-built STR/CTR templates for FIU-IND filing
+- Pre-built STR/CTR templates for <abbr title="Financial Intelligence Unit — India">FIU-IND</abbr> filing
 - Used by brokers, AMCs, and banks for PMLA compliance
 
 ---
@@ -80,7 +80,7 @@ TrackWizz is an Indian AML/CFT (Anti-Money Laundering / Combating the Financing 
 | **MHA Banned Organizations** | Ministry of Home Affairs | Banned organizations under UAPA | As notified |
 | **NIA Lists** | National Investigation Agency | Terror-accused, chargesheeted persons | As published |
 | **Enforcement Directorate Orders** | ED, Ministry of Finance | PMLA attachment/prosecution orders | Daily |
-| **IRDA Blacklist** | Insurance Regulatory and Development Authority | Blacklisted insurance agents/entities | Periodic |
+| **<abbr title="Insurance Regulatory and Development Authority of India (IRDAI)">IRDA</abbr> Blacklist** | Insurance Regulatory and Development Authority | Blacklisted insurance agents/entities | Periodic |
 | **NHB Defaulters** | National Housing Bank | Housing finance defaulters | Periodic |
 | **NCLT Orders** | National Company Law Tribunal | Companies under insolvency/liquidation | As published |
 | **CBI Most Wanted** | Central Bureau of Investigation | Fugitives, absconding accused | As updated |
@@ -172,7 +172,7 @@ The watchlist and PEP database coverage described above forms the foundation of 
 | Field | Type | Mandatory | Description |
 |-------|------|-----------|-------------|
 | `reference_id` | String | Yes | Unique reference for this screening request |
-| `name` | String | Yes | Full name (as per PAN/KYC documents) |
+| `name` | String | Yes | Full name (as per <abbr title="Permanent Account Number">PAN</abbr>/KYC documents) |
 | `dob` | String (YYYY-MM-DD) | Yes | Date of birth |
 | `pan` | String (10 chars) | Yes | PAN number |
 | `gender` | String (M/F/T) | No | Gender |
@@ -434,7 +434,7 @@ PEP matches and sanctions hits must be escalated to the designated compliance of
 ### 4.3 STR (Suspicious Transaction Report)
 
 :::note
-Under PMLA Section 12, stock brokers are classified as "reporting entities" and are legally obligated to file Suspicious Transaction Reports (STRs) with FIU-IND. Failure to file an STR when there are grounds for suspicion — or tipping off the customer about the filing — is a criminal offense that can result in prosecution by the Enforcement Directorate. TrackWizz provides pre-formatted STR templates but the decision to file remains with the designated Principal Officer.
+Under PMLA Section 12, stock brokers are classified as "reporting entities" and are legally obligated to file Suspicious Transaction Reports (STRs) with <abbr title="Financial Intelligence Unit">FIU</abbr>-IND. Failure to file an STR when there are grounds for suspicion — or tipping off the customer about the filing — is a criminal offense that can result in prosecution by the Enforcement Directorate. TrackWizz provides pre-formatted STR templates but the decision to file remains with the designated Principal Officer.
 :::
 
 Filed with FIU-IND (Financial Intelligence Unit - India) when suspicious activity is identified.
@@ -539,7 +539,7 @@ TrackWizz can ingest transaction data for pattern-based suspicious activity dete
 - Trading activity inconsistent with declared income
 - Multiple linked accounts with coordinated activity
 
-**Note**: Transaction monitoring requires feeding trade/settlement data from the back-office system (63 Moons ODIN or equivalent) to TrackWizz. This is typically a batch feed (daily EOD file).
+**Note**: Transaction monitoring requires feeding trade/settlement data from the back-office system (63 Moons ODIN or equivalent) to TrackWizz. This is typically a batch feed (daily <abbr title="End Of Day">EOD</abbr> file).
 
 ### 5.4 Alert Management Workflow
 
@@ -677,14 +677,14 @@ For corporate accounts, screening must cover the company AND all key individuals
 
 | Entity Type | Screen Entity Name | Screen Individuals | Who to Screen |
 |-------------|-------------------|-------------------|---------------|
-| **HUF** | Yes (HUF name) | Yes | Karta + coparceners (if known) |
+| **<abbr title="Hindu Undivided Family">HUF</abbr>** | Yes (HUF name) | Yes | Karta + coparceners (if known) |
 | **Partnership Firm** | Yes (firm name) | Yes | All partners individually |
-| **LLP** | Yes (LLP name) | Yes | All designated partners + UBOs (10%+) |
+| **<abbr title="—">LLP</abbr>** | Yes (LLP name) | Yes | All designated partners + UBOs (10%+) |
 | **Company** | Yes (company name) | Yes | All directors + all UBOs (10%+) |
 | **Body Corporate** | Yes (entity name) | Yes | All directors + all UBOs (10%+) |
 | **Trust** | Yes (trust name) | Yes | All trustees + known beneficiaries + settlor |
 | **Society** | Yes (society name) | Yes | Office bearers (President, Secretary, Treasurer) |
-| **NRI Individual** | Yes | Yes | Additional country-risk screening for country of residence |
+| **<abbr title="Non-Resident Indian">NRI</abbr> Individual** | Yes | Yes | Additional country-risk screening for country of residence |
 
 ### 7.3 UBO Identification for Complex Structures
 
@@ -712,7 +712,7 @@ TrackWizz approach:
 
 ### 8.1 Governing Circular
 
-**Master Circular**: SEBI/HO/MIRSD/DOP/P/CIR/2023/37 (March 15, 2023)
+**Master Circular**: SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/DOP/P/CIR/2023/37 (March 15, 2023)
 **Consolidated with**: SEBI/HO/MIRSD/MIRSD-SEC-2/P/CIR/2023/168 (October 2023)
 
 This circular prescribes AML/CFT obligations for all SEBI-registered intermediaries, including stock brokers.
@@ -917,7 +917,7 @@ TrackWizz generates pre-formatted STR templates compatible with FIU-IND's electr
 **STR Template Fields** (auto-populated from screening data):
 - Reporting entity details (broker name, SEBI registration number)
 - Customer identification details (name, PAN, DOB, address)
-- Account details (trading account number, BO ID)
+- Account details (trading account number, <abbr title="Beneficial Owner">BO</abbr> ID)
 - Suspicious transaction details (date, amount, type, description)
 - Reason for suspicion (mapped from screening results and analyst notes)
 - Supporting documentation list

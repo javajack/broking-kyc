@@ -12,11 +12,11 @@ next:
 import ScreenCard from '../../../components/ScreenCard.astro';
 import { Aside } from '@astrojs/starlight/components';
 
-The customer has entered their PAN (Permanent Account Number) and DOB (Date of Birth), and tapped submit. Now the app redirects them to DigiLocker (Government of India's digital document platform) -- a government portal where they will authenticate with their Aadhaar number and a fresh OTP (One-Time Password). From the customer's perspective, they are simply granting consent to share their documents. From the system's perspective, this is the single most productive step in the entire journey: zero fields typed by the customer, yet a comprehensive set of identity fields harvested in one shot. Meanwhile, the four API calls fired on Screen 2 are completing in the background.
+The customer has entered their <abbr title="Permanent Account Number">PAN</abbr> (Permanent Account Number) and DOB (Date of Birth), and tapped submit. Now the app redirects them to DigiLocker (Government of India's digital document platform) -- a government portal where they will authenticate with their Aadhaar number and a fresh <abbr title="One-Time Password">OTP</abbr> (One-Time Password). From the customer's perspective, they are simply granting consent to share their documents. From the system's perspective, this is the single most productive step in the entire journey: zero fields typed by the customer, yet a comprehensive set of identity fields harvested in one shot. Meanwhile, the four API calls fired on Screen 2 are completing in the background.
 
 <ScreenCard number={3} title="DigiLocker Consent (Redirect)">
 
-**Purpose:** Consent-based fetch of Aadhaar XML + PAN document. DigiLocker-based Aadhaar eKYC provides IPV exemption per SEBI circular [SEBI/HO/MIRSD/DOP/CIR/P/2020/73](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddopcirp202073).
+**Purpose:** Consent-based fetch of Aadhaar XML + PAN document. DigiLocker-based Aadhaar eKYC provides <abbr title="In-Person Verification">IPV</abbr> exemption per <abbr title="Securities and Exchange Board of India">SEBI</abbr> circular [SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/DOP/CIR/P/2020/73](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddopcirp202073).
 
 This is the only screen where the customer leaves the application. They are redirected to the DigiLocker portal, where they enter their Aadhaar number and verify with an OTP sent to their Aadhaar-linked mobile. Once they grant consent, DigiLocker returns them to the application with a rich payload of identity data.
 
@@ -41,20 +41,20 @@ The table below shows exactly what comes back from DigiLocker. Every one of thes
 | Father's Name | Aadhaar XML |
 | Full Address (8 fields) | Aadhaar XML |
 | POI auto-set (Aadhaar) | Derived |
-| POA auto-set (Aadhaar) | Derived |
+| <abbr title="Power of Attorney">POA</abbr> auto-set (Aadhaar) | Derived |
 
 <Aside type="tip" title="IPV Exemption">
-Aadhaar eKYC via DigiLocker provides IPV (In-Person Verification) / VIPV (Video In-Person Verification) exemption per SEBI circular SEBI/HO/MIRSD/DOP/CIR/P/2020/73. This eliminates the need for a separate video call step from the onboarding flow.
+Aadhaar eKYC via DigiLocker provides IPV (In-Person Verification) / <abbr title="Video In-Person Verification (sometimes &quot;Video CIP&quot; / V-CIP)">VIPV</abbr> (Video In-Person Verification) exemption per SEBI circular SEBI/HO/MIRSD/DOP/CIR/P/2020/73. This eliminates the need for a separate video call step from the onboarding flow.
 </Aside>
 
 ## Timing and Async Convergence
 
-The DigiLocker redirect (consent + authentication + return) provides a natural window during which all 4 async API calls from [Screen 2](/broking-kyc/journey/02-pan-dob/) complete. By the time the user returns from DigiLocker, PAN verification, KRA (KYC Registration Agency) lookup, CKYC (Central KYC) search, and AML (Anti-Money Laundering) screening results are all available for pre-fill and gate evaluation on subsequent screens.
+The DigiLocker redirect (consent + authentication + return) provides a natural window during which all 4 async API calls from [Screen 2](/broking-kyc/journey/02-pan-dob/) complete. By the time the user returns from DigiLocker, PAN verification, <abbr title="KYC Registration Agency">KRA</abbr> (<abbr title="Know Your Customer (process).">KYC</abbr> Registration Agency) lookup, <abbr title="Central KYC (records registry)">CKYC</abbr> (Central KYC) search, and <abbr title="Anti-Money Laundering">AML</abbr> (Anti-Money Laundering) screening results are all available for pre-fill and gate evaluation on subsequent screens.
 
 For vendor implementation options for DigiLocker integration, see [Vendor Integrations](/broking-kyc/vendors/).
 
 <Aside type="caution">
-If DigiLocker is unavailable, the fallback path requires Aadhaar OCR + manual document upload. This loses the IPV exemption and requires a VIPV (Video In-Person Verification) step per SEBI norms.
+If DigiLocker is unavailable, the fallback path requires Aadhaar <abbr title="Optical Character Recognition.">OCR</abbr> + manual document upload. This loses the IPV exemption and requires a VIPV (Video In-Person Verification) step per SEBI norms.
 </Aside>
 
 :::caution[OTP timeout during DigiLocker]

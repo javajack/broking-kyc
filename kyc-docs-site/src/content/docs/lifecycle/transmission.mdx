@@ -12,8 +12,8 @@ import { Aside } from '@astrojs/starlight/components';
 - **4 sub-cases** depending on holder count + nominee status: single-deceased-nominee, single-deceased-no-nominee (succession), joint-deceased-survivor, joint-deceased-succession.
 - **Nominee path is faster** — weeks. **Succession path is slower** — months, sometimes longer.
 - Document requirements differ per sub-case but death certificate is universal; succession adds probate / succession certificate / letters of administration.
-- CDSL and NSDL each publish detailed transmission procedure guides; broker's ops handles the depository-side workflow.
-- The deceased client's BO ownership transfers to nominee or legal heir; the broker may close the original account and offer a fresh onboarding to the nominee.
+- <abbr title="Central Depository Services (India) Limited">CDSL</abbr> and <abbr title="National Securities Depository Limited">NSDL</abbr> each publish detailed transmission procedure guides; broker's ops handles the depository-side workflow.
+- The deceased client's <abbr title="Beneficial Owner">BO</abbr> ownership transfers to nominee or legal heir; the broker may close the original account and offer a fresh onboarding to the nominee.
 
 ## Conceptual overview
 
@@ -35,7 +35,7 @@ A nominee or family member submits the death certificate to the broker. Submissi
 
 The broker verifies the nominee's identity:
 - Match nominee details on file (registered during onboarding or subsequent modification) against the claimant.
-- Nominee may need to undergo KYC if they're not an existing client — full KYC process applies (PAN, Aadhaar, address, contact, etc.).
+- Nominee may need to undergo <abbr title="Know Your Customer (process).">KYC</abbr> if they're not an existing client — full KYC process applies (<abbr title="Permanent Account Number">PAN</abbr>, Aadhaar, address, contact, etc.).
 
 If the nominee is already an existing client of the same broker, KYC is implicit; the existing client master record links via PAN.
 
@@ -52,7 +52,7 @@ The claim form is the legal-protection artefact for the broker.
 
 The broker initiates BO transfer at the depository:
 - **CDSL** — transmission request via CDAS, following CDSL's documented transmission procedure (CDSL communiques cover this).
-- **NSDL** — transmission request via DPM with UDiFF format support, following NSDL's documented procedure.
+- **NSDL** — transmission request via <abbr title="Depository Participant Module (CDSL terminology).">DPM</abbr> with UDiFF format support, following NSDL's documented procedure.
 
 The depository processes the transmission, typically within 7–15 business days. The deceased's BO is closed; a new BO is opened in the nominee's name (if they don't already have one) and the assets transfer over.
 
@@ -98,7 +98,7 @@ Same depository procedure as Step 4 in Sub-case 1, with legal heir as the recipi
 Same as Sub-case 1 Step 5.
 
 <Aside type="tip">
-**Why nominations matter.** The Sub-case 1 timeline is weeks; Sub-case 2 timeline is months to a year. The SEBI Jan 2025 nominee revamp (up to 10 nominees per account, percentage allocations) substantially improved this — clients can now spread inheritance across multiple nominees without forcing the family into court succession for any of them.
+**Why nominations matter.** The Sub-case 1 timeline is weeks; Sub-case 2 timeline is months to a year. The <abbr title="Securities and Exchange Board of India">SEBI</abbr> Jan 2025 nominee revamp (up to 10 nominees per account, percentage allocations) substantially improved this — clients can now spread inheritance across multiple nominees without forcing the family into court succession for any of them.
 </Aside>
 
 ## Sub-case 3 — Joint account, one holder deceased (survivor mode)
@@ -162,8 +162,8 @@ Throughout the transmission, the broker's communication with claimants is sensit
 
 ## Sub-cases not covered
 
-- **Mutual fund holdings** held outside the demat-mediated broking relationship — handled by the AMC's separate transmission procedure, not the broker.
-- **Loans / margin trading positions** at the time of death — handled separately under MTF / loan agreement terms; typically results in margin call to the estate.
+- **Mutual fund holdings** held outside the demat-mediated broking relationship — handled by the <abbr title="Asset Management Company (mutual funds context) / Annual Maintenance Charges (depository context).">AMC</abbr>'s separate transmission procedure, not the broker.
+- **Loans / margin trading positions** at the time of death — handled separately under <abbr title="Margin Trading Facility">MTF</abbr> / loan agreement terms; typically results in margin call to the estate.
 - **Open derivatives positions** — typically auto-squared-off at the next trading day per broker's policy on deceased-client open positions.
 
 ## Field-level callouts
@@ -174,16 +174,16 @@ Transmission touches sections A (Identity — both deceased and successor), H (D
 
 - **[gotcha]** The "nominee" is the depository-side concept (BO transmission target). It's not the same as a "beneficiary" in a will. A nominee receives the BO via depository transmission; what they then do with the assets is subject to inheritance law. New ops engineers sometimes conflate the two.
 - **[industry practice]** Most brokers maintain a separate "Succession Queue" for Sub-case 2 cases. Update cadence is weekly (not daily) because the legal-process timelines are weeks-to-months. Operationally less intense per case but longer total wall-clock.
-- **[risk trade-off]** Auto-squaring open derivatives positions of a deceased client minimizes broker risk (no further MTM loss) but may not maximize the estate's value. Most brokers err on the side of immediate square-off; clients with significant derivatives exposure should ensure their estate planning addresses this.
+- **[risk trade-off]** Auto-squaring open derivatives positions of a deceased client minimizes broker risk (no further <abbr title="Mark-to-Market">MTM</abbr> loss) but may not maximize the estate's value. Most brokers err on the side of immediate square-off; clients with significant derivatives exposure should ensure their estate planning addresses this.
 - **[cost optimization]** SEBI Jan 2025 nominee revamp (up to 10 nominees, percentage allocations) drastically reduces the proportion of cases that fall into Sub-case 2 (succession). Brokers that nudged clients to update nominations after the revamp saw a measurable shift from succession-heavy to nominee-heavy transmission queues.
 
 ## Cross-references
 
 - [Compliance Blueprint — Edge-case compliances](/broking-kyc/operations/compliance-blueprint/)
-- [Integration DAG — transmission DAGs](/broking-kyc/operations/integration-dag/lifecycle-events/)
+- [Integration <abbr title="Directed Acyclic Graph.">DAG</abbr> — transmission DAGs](/broking-kyc/operations/integration-dag/lifecycle-events/)
 - [Field Atlas — Section I (Nomination)](/broking-kyc/reference/field-atlas/sections/i-nomination/) and [Section H (Demat)](/broking-kyc/reference/field-atlas/sections/h-demat-account/)
 - [Circulars — CDSL](/broking-kyc/reference/circulars/cdsl/) and [NSDL](/broking-kyc/reference/circulars/nsdl/) (transmission procedure guides)
-- [Circulars — SEBI MIRSD](/broking-kyc/reference/circulars/sebi-mirsd/) (Jan 2025 nominee revamp)
+- [Circulars — SEBI <abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>](/broking-kyc/reference/circulars/sebi-mirsd/) (Jan 2025 nominee revamp)
 - [Journey — Nominations](/broking-kyc/journey/07-nominations/)
 
 ## Verified through

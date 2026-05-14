@@ -7,21 +7,21 @@ description: MCX Unique Client Code registration — MCX CONNECT, CTCL API, and 
 ## Table of Contents
 
 1. [Exchange Overview](#1-exchange-overview)
-2. [MCX CONNECT / T7 Trading System](#2-mcx-connect--t7-trading-system)
+2. [<abbr title="Multi Commodity Exchange of India">MCX</abbr> CONNECT / T7 Trading System](#2-mcx-connect--t7-trading-system)
 3. [Connectivity Options](#3-connectivity-options)
-4. [CTCL (Computer-to-Computer Link)](#4-ctcl-computer-to-computer-link)
-5. [UCC Registration](#5-ucc-registration)
-6. [3-Parameter PAN Verification](#6-3-parameter-pan-verification)
+4. [<abbr title="Computer-to-Computer Link.">CTCL</abbr> (Computer-to-Computer Link)](#4-ctcl-computer-to-computer-link)
+5. [<abbr title="Unique Client Code">UCC</abbr> Registration](#5-ucc-registration)
+6. [3-Parameter <abbr title="Permanent Account Number">PAN</abbr> Verification](#6-3-parameter-pan-verification)
 7. [Client Categories (Commodity-Specific)](#7-client-categories-commodity-specific)
 8. [Income Proof Requirements](#8-income-proof-requirements)
 9. [Batch File Format Specification](#9-batch-file-format-specification)
-10. [NRI Restrictions](#10-nri-restrictions)
+10. [<abbr title="Non-Resident Indian">NRI</abbr> Restrictions](#10-nri-restrictions)
 11. [Non-Individual Entity Requirements](#11-non-individual-entity-requirements)
 12. [Commodity Segments & Trading Hours](#12-commodity-segments--trading-hours)
 13. [MCX iCOMDEX Indices](#13-mcx-icomdex-indices)
-14. [MCXCCL (Clearing Corporation)](#14-mcxccl-clearing-corporation)
+14. [<abbr title="Multi Commodity Exchange Clearing Corporation Limited">MCXCCL</abbr> (Clearing Corporation)](#14-mcxccl-clearing-corporation)
 15. [Position Limits](#15-position-limits)
-16. [Differences from NSE/BSE](#16-differences-from-nsebse)
+16. [Differences from <abbr title="National Stock Exchange of India">NSE</abbr>/<abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr>](#16-differences-from-nsebse)
 17. [Penalties & Compliance](#17-penalties--compliance)
 18. [Recent Circulars (2024-2026)](#18-recent-circulars-2024-2026)
 19. [Key Documents to Obtain](#19-key-documents-to-obtain)
@@ -30,7 +30,7 @@ description: MCX Unique Client Code registration — MCX CONNECT, CTCL API, and 
 
 ## 1. Exchange Overview
 
-MCX (Multi Commodity Exchange of India Ltd.) is India's largest commodity derivatives exchange, regulated by SEBI under the Securities Contracts (Regulation) Act, 1956. It offers trading in commodity futures and options across bullion, base metals, energy, and agricultural commodities.
+MCX (Multi Commodity Exchange of India Ltd.) is India's largest commodity derivatives exchange, regulated by <abbr title="Securities and Exchange Board of India">SEBI</abbr> under the Securities Contracts (Regulation) Act, 1956. It offers trading in commodity futures and options across bullion, base metals, energy, and agricultural commodities.
 
 | Attribute | Details |
 |-----------|---------|
@@ -141,7 +141,7 @@ MCX provides three API types for CTCL connectivity:
 
 | API Type | Protocol | Encoding | Status | Notes |
 |----------|----------|----------|--------|-------|
-| **Non-FIX (Legacy)** | TCP/IP | C-struct binary (proprietary) | Legacy, being phased out | Original MCX API format |
+| **Non-<abbr title="Financial Information eXchange protocol">FIX</abbr> (Legacy)** | TCP/IP | C-struct binary (proprietary) | Legacy, being phased out | Original MCX API format |
 | **FIX v4.2** | TCP/IP | FIX tag-value text | Available | Standard FIX protocol |
 | **MCX ETI** (Primary) | TCP/IP | Flat binary encoding | **Primary, recommended** | FIX v5.0 SP2 semantics, proprietary session layer |
 
@@ -272,14 +272,14 @@ MCX mandates that every trading member maintain an **ERROR account**:
 
 ## 6. 3-Parameter PAN Verification
 
-MCX follows the same 3-parameter PAN verification as BSE/NSE, verifying against NSDL/Protean (Income Tax Department) records.
+MCX follows the same 3-parameter PAN verification as BSE/NSE, verifying against <abbr title="National Securities Depository Limited">NSDL</abbr>/Protean (Income Tax Department) records.
 
 ### 6.1 The Three Parameters
 
 | # | Parameter | Field | Mandatory |
 |---|-----------|-------|-----------|
 | 1 | PAN Number | 10-character alphanumeric (AAAAA9999A format) | Yes |
-| 2 | Client Name | Name as per PAN / ITD records | Yes |
+| 2 | Client Name | Name as per PAN / <abbr title="Information Technology Department (within SEBI)">ITD</abbr> records | Yes |
 | 3 | DOB / DOI / DOR | Date of Birth (individuals) / Date of Incorporation (companies) / Date of Registration (other entities) | Yes |
 
 ### 6.2 Verification Result Codes
@@ -304,7 +304,7 @@ MCX follows the same 3-parameter PAN verification as BSE/NSE, verifying against 
 
 ### 7.1 SEBI 6-Category Classification
 
-SEBI mandates a 6-category classification specifically for commodity derivatives, per circular **SEBI/HO/CDMRD/DNPMP/CIR/P/2019/08**:
+SEBI mandates a 6-category classification specifically for commodity derivatives, per circular **SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/CDMRD/DNPMP/CIR/P/2019/08**:
 
 | Category Code | Category Name | Description | Examples |
 |---------------|---------------|-------------|----------|
@@ -396,7 +396,7 @@ In addition to the 6-category classification, MCX retains legacy trading purpose
 | 6 | PAN | Alphanumeric | 10 | M | AAAAA9999A format |
 | 7 | Date of Birth / DOI | Date | 10 | M | DD/MM/YYYY |
 | 8 | Gender | Alpha | 1 | M | M / F / T (Transgender) |
-| 9 | Client Type | Alpha | 2 | M | IN (Individual), CP (Corporate), HU (HUF), PA (Partnership), TR (Trust) |
+| 9 | Client Type | Alpha | 2 | M | IN (Individual), CP (Corporate), HU (<abbr title="Hindu Undivided Family">HUF</abbr>), PA (Partnership), TR (Trust) |
 | 10 | Address Line 1 | Alphanumeric | 100 | M | Correspondence address |
 | 11 | Address Line 2 | Alphanumeric | 100 | O | |
 | 12 | Address Line 3 | Alphanumeric | 100 | O | |
@@ -409,18 +409,18 @@ In addition to the 6-category classification, MCX retains legacy trading purpose
 | 19 | Income Range | Numeric | 1 | M | 1 / 2 / 3 / 4 / 5 (see Section 8.3) |
 | 20 | Trading Category | Alpha | 2 | M | HE / SP / AR |
 | 21 | Commodity Category | Numeric | 1 | M | 1-6 (see Section 7.1) |
-| 22 | Demat Account (DP ID) | Alphanumeric | 8 | O | CDSL DP ID or NSDL DP ID |
-| 23 | Demat Account (Client ID) | Alphanumeric | 8 | O | BO account client ID |
+| 22 | Demat Account (<abbr title="Depository Participant">DP</abbr> ID) | Alphanumeric | 8 | O | <abbr title="Central Depository Services (India) Limited">CDSL</abbr> DP ID or NSDL DP ID |
+| 23 | Demat Account (Client ID) | Alphanumeric | 8 | O | <abbr title="Beneficial Owner">BO</abbr> account client ID |
 | 24 | Bank Account Number | Alphanumeric | 20 | M | Primary bank account |
-| 25 | Bank IFSC Code | Alphanumeric | 11 | M | |
-| 26 | KYC Status | Alpha | 1 | M | Y (Yes) / N (No) |
+| 25 | Bank <abbr title="Indian Financial System Code.">IFSC</abbr> Code | Alphanumeric | 11 | M | |
+| 26 | <abbr title="Know Your Customer (process).">KYC</abbr> Status | Alpha | 1 | M | Y (Yes) / N (No) |
 | 27 | Nominee Name | Alpha | 100 | O | |
 | 28 | Nominee Relationship | Alpha | 20 | O | |
 | 29 | Nominee PAN | Alphanumeric | 10 | O | |
 | 30 | Guardian Name | Alpha | 100 | C | Mandatory for minor clients |
 | 31 | Guardian PAN | Alphanumeric | 10 | C | Mandatory for minor clients |
 
-**Note**: This is a representative subset. The full batch specification may contain additional fields for second/third holders, multiple nominees (up to 10 per SEBI mandate), FATCA/CRS declarations, and segment-specific flags. Refer to the official MCX UCC File Formats document for the complete field list.
+**Note**: This is a representative subset. The full batch specification may contain additional fields for second/third holders, multiple nominees (up to 10 per SEBI mandate), <abbr title="Foreign Account Tax Compliance Act (US)">FATCA</abbr>/<abbr title="Common Reporting Standard">CRS</abbr> declarations, and segment-specific flags. Refer to the official MCX UCC File Formats document for the complete field list.
 
 ### 9.3 Row 2 - Director / Partner Details
 
@@ -455,8 +455,8 @@ Row 2 is required ONLY for non-individual entities (Corporate, Partnership, Body
 | Rule | Details |
 |------|---------|
 | **NRIs CANNOT trade commodity derivatives on MCX** | **Absolute restriction - no exceptions** |
-| Regulatory basis | SEBI commodity derivatives regulations + RBI FEMA guidelines |
-| Applies to | All NRI categories (NRI, NRO, NRE, PIO, OCI) |
+| Regulatory basis | SEBI commodity derivatives regulations + <abbr title="Reserve Bank of India">RBI</abbr> <abbr title="Foreign Exchange Management Act 1999">FEMA</abbr> guidelines |
+| Applies to | All NRI categories (NRI, <abbr title="Non-Resident Ordinary (Rupee) account">NRO</abbr>, <abbr title="Non-Resident External (Rupee) account">NRE</abbr>, PIO, OCI) |
 | Impact on KYC system | Must validate residential status at onboarding; reject NRI applications for MCX |
 
 ### 10.2 FPI Restrictions
@@ -467,7 +467,7 @@ Row 2 is required ONLY for non-individual entities (Corporate, Partnership, Body
 | Commodity type | **Non-agricultural commodities ONLY** |
 | Settlement type | **Cash-settled contracts ONLY** (no physical delivery) |
 | Position limit | **20% of client-level position limit** |
-| Registration | Must be SEBI-registered FPI (Category I or II) |
+| Registration | Must be SEBI-registered FPI (Category I or <abbr title="—">II</abbr>) |
 | Agricultural commodities | **Completely banned** for FPIs |
 
 ### 10.3 KYC System Implementation Notes
@@ -623,25 +623,25 @@ MCX publishes commodity indices under the **iCOMDEX** brand:
 | Full Name | MCX Clearing Corporation Limited |
 | Relationship | Wholly-owned subsidiary of MCX |
 | Recognition | Recognized by SEBI as a clearing corporation |
-| Role | Central counterparty (CCP) for all MCX trades |
+| Role | Central counterparty (<abbr title="Central Counterparty">CCP</abbr>) for all MCX trades |
 | System | TCS BaNCS for Market Infrastructure (post-Project Udaan) |
 
 ### 14.2 Member Types
 
 | Type | Code | Role |
 |------|------|------|
-| **Trading Member (TM)** | TM | Can trade on own account and on behalf of clients; clears through a CM |
+| **Trading Member (<abbr title="Trading Member">TM</abbr>)** | TM | Can trade on own account and on behalf of clients; clears through a <abbr title="Clearing Member">CM</abbr> |
 | **Trading-cum-Clearing Member (TCM)** | TCM | Can trade AND clear/settle on own account and for clients |
 | **Professional Clearing Member (PCM)** | PCM | Only clears and settles trades on behalf of TMs; does not trade |
 
 ### 14.3 Margining Framework (SPAN-Based)
 
-MCXCCL uses a multi-layered SPAN-based margining system:
+MCXCCL uses a multi-layered <abbr title="Standard Portfolio Analysis of Risk">SPAN</abbr>-based margining system:
 
 | Margin Component | Description | Typical Rate |
 |------------------|-------------|--------------|
 | **SPAN Margin** | Standard Portfolio Analysis of Risk; computed using SPAN algorithm | Varies by commodity volatility |
-| **Extreme Loss Margin (ELM)** | Additional margin for tail risk | **1.25% for futures**, **1% for options** |
+| **Extreme Loss Margin (<abbr title="Extreme Loss Margin">ELM</abbr>)** | Additional margin for tail risk | **1.25% for futures**, **1% for options** |
 | **Additional Margin** | Exchange-imposed during high volatility or special situations | Variable, announced via circular |
 | **Concentration Margin** | For large positions exceeding threshold % of open interest | Progressive, based on position size |
 | **Delivery Period Margin** | Enhanced margin during tender/delivery period | Significantly higher (up to 25-50% of contract value) |
@@ -666,7 +666,7 @@ MCXCCL uses a multi-layered SPAN-based margining system:
 |-------|-------------|--------|
 | **Client Level** | Maximum position a single client can hold in a commodity | SEBI / MCX circular |
 | **Member Level** | Maximum position a trading member (including all clients) can hold | SEBI / MCX circular |
-| **Market-Wide Position Limit (MWPL)** | Maximum open interest allowed across the entire market for a contract | SEBI / MCX circular |
+| **Market-Wide Position Limit (<abbr title="Market Wide Position Limit">MWPL</abbr>)** | Maximum open interest allowed across the entire market for a contract | SEBI / MCX circular |
 | **Near Month Limit** | Separate limit for the near-month (expiring) contract | Typically tighter than all-month |
 | **All Month Combined** | Combined position across all contract months | |
 
@@ -705,7 +705,7 @@ MCXCCL uses a multi-layered SPAN-based margining system:
 | **Batch Upload Limit** | Similar to BSE | Max 10,000 records/file | Max 30,000 records/file |
 | **API Protocol** | MCX ETI (binary FIX 5.0 SP2) | FIX / proprietary | ETI (binary FIX 5.0 SP2) / SOAP (UCC) |
 | **Error Account** | Mandatory (`ERROR`), Rs. 10K/month penalty | Mandatory | Mandatory |
-| **Clearing Corp** | MCXCCL (wholly-owned subsidiary) | NSE Clearing Ltd (NCL) | Indian Clearing Corp Ltd (ICCL) |
+| **Clearing Corp** | MCXCCL (wholly-owned subsidiary) | NSE Clearing Ltd (<abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr>) | Indian Clearing Corp Ltd (<abbr title="Indian Clearing Corporation Limited">ICCL</abbr>) |
 | **Delivery Infrastructure** | Exchange-accredited warehouses, vaults, assaying centers | N/A for equity; limited for commodity | N/A for equity; limited for commodity |
 
 ### 16.2 Key Implications for KYC System
@@ -743,7 +743,7 @@ MCXCCL uses a multi-layered SPAN-based margining system:
 | UCC data reconciliation | Monthly | Reconcile UCC records with exchange |
 | KYC periodic review | Annual | Review and update client KYC information |
 | Income proof renewal | Annual / Biennial | Re-verify income declarations |
-| FATCA/CRS reporting | Annual | Report to KRA as per CBDT timelines |
+| FATCA/CRS reporting | Annual | Report to <abbr title="KYC Registration Agency">KRA</abbr> as per CBDT timelines |
 | Audit trail retention | 5 years minimum | All trade, order, and client modification records |
 
 ---
@@ -767,7 +767,7 @@ MCXCCL uses a multi-layered SPAN-based margining system:
 | Jan 7, 2025 | - | MCX ETI v1.4.2 go-live | New CTCL API version with IV Charset encryption |
 | Jan 2025 | - | Nominee enhancement (up to 10) | Per SEBI mandate effective Jan 2025; UCC format updated |
 | 2025 (various) | MCX/TRD/208/2025 | MCX Master Circular - Market Operations | Consolidated trading rules, UCC procedures, settlement norms |
-| Jun 2025 | - | SEBI Stock Brokers Master Circular alignment | Updated procedures per SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90 |
+| Jun 2025 | - | SEBI Stock Brokers Master Circular alignment | Updated procedures per SEBI/HO/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/90 |
 
 ### 2026 Circulars
 

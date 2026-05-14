@@ -3,7 +3,7 @@ title: "KRA (Identity Registry) — Fields consumed"
 description: "Every field consumed by KRA (Identity Registry), with source section, destination format, update frequency, transformation rule, and quirks. Use this when building an integration with this destination."
 ---
 
-> **Why this page is structured this way:** This is the destination-first view for KRA (Identity Registry). Engineers building an integration with this destination get the complete field list on one page. To see where each field originated in onboarding, follow the per-section links via the [atlas overview](/broking-kyc/reference/field-atlas/).
+> **Why this page is structured this way:** This is the destination-first view for <abbr title="KYC Registration Agency">KRA</abbr> (Identity Registry). Engineers building an integration with this destination get the complete field list on one page. To see where each field originated in onboarding, follow the per-section links via the [atlas overview](/broking-kyc/reference/field-atlas/).
 
 ## TL;DR
 
@@ -17,11 +17,11 @@ Sorted by `source_section`, then `field_id`.
 
 | source_section | field_id | field_name | destination_field_name | destination_format | frequency | transformation | quirks_notes | spec_source |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| A | A-aadhaar_number | Aadhaar Number | AADHAAR_REF | VARCHAR(28) | on-modify | derived from Y | KRA does not store full Aadhaar; only masked reference or VID | SEBI/HO/MIRSD/SECFATF/P/CIR/2023/169 |
+| A | A-aadhaar_number | Aadhaar Number | AADHAAR_REF | VARCHAR(28) | on-modify | derived from Y | KRA does not store full Aadhaar; only masked reference or VID | <abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/SECFATF/P/CIR/2023/169 |
 | A | A-aadhaar_reference_number | Aadhaar Reference (VID) | AADHAAR_VID | VARCHAR(28) | on-modify | [direct] | Virtual ID or DigiLocker reference; used in lieu of Aadhaar | [industry typical] |
-| A | A-ckyc_number | CKYC Identification Number | CKYC_NO | CHAR(14) | on-modify | [direct] | KRA stores KIN as reference; masked in API responses post Jan 2025 | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/79 |
-| A | A-country_of_birth | Country of Birth | CTRY_OF_BIRTH | CHAR(2) | on-modify | lookup against R | ISO 3166-1 alpha-2; FATCA-mandatory field centralized at KRA since 01-Jul-2024 | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12 |
-| A | A-date_of_birth | Date of Birth | DOB | DATE DD/MM/YYYY | on-modify | formatted | Must match PAN ITD record; KRA rejects on mismatch via 3-param validation | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/41 |
+| A | A-ckyc_number | <abbr title="Central KYC (records registry)">CKYC</abbr> Identification Number | CKYC_NO | CHAR(14) | on-modify | [direct] | KRA stores <abbr title="KYC Identification Number">KIN</abbr> as reference; masked in API responses post Jan 2025 | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/79 |
+| A | A-country_of_birth | Country of Birth | CTRY_OF_BIRTH | CHAR(2) | on-modify | lookup against R | ISO 3166-1 alpha-2; <abbr title="Foreign Account Tax Compliance Act (US)">FATCA</abbr>-mandatory field centralized at KRA since 01-Jul-2024 | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12 |
+| A | A-date_of_birth | Date of Birth | DOB | DATE DD/MM/YYYY | on-modify | formatted | Must match <abbr title="Permanent Account Number">PAN</abbr> <abbr title="Information Technology Department (within SEBI)">ITD</abbr> record; KRA rejects on mismatch via 3-param validation | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/41 |
 | A | A-din | Director Identification Number | DIN | CHAR(8) | on-modify | [direct] | Optional; applicable only if customer is a director | [industry typical] |
 | A | A-disability_percentage | Disability Percentage | DISABILITY_PCT | NUMBER(3) | on-modify | [direct] | 0-100; conditional | [industry typical] |
 | A | A-disability_type | Disability Type | DISABILITY_TYPE | CHAR(2) | on-modify | lookup against R | Conditional on is_differently_abled=Y | [industry typical] |
@@ -48,10 +48,10 @@ Sorted by `source_section`, then `field_id`.
 | A | A-photograph | Customer Photograph | PHOTO | BLOB | on-modify | [direct] | Passport-size, recent, colour, max 1MB | [industry typical] |
 | A | A-place_of_birth | Place of Birth | PLACE_OF_BIRTH | VARCHAR(50) | on-modify | formatted | Optional in KRA; required for FATCA cross-check | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12 |
 | A | A-prefix | Name Prefix | PREFIX | VARCHAR(5) | on-modify | [direct] | Mr/Mrs/Ms/Dr; KRA template accepts as separate token | [industry typical] |
-| A | A-residential_status | Residential Status | RESI_STATUS | CHAR(2) | on-modify | [direct] | RI/NRI/FN/PIO; KRA accepts via 2024 master KYC circular | SEBI/HO/MIRSD/SECFATF/P/CIR/2023/169 |
+| A | A-residential_status | Residential Status | RESI_STATUS | CHAR(2) | on-modify | [direct] | RI/<abbr title="Non-Resident Indian">NRI</abbr>/FN/PIO; KRA accepts via 2024 master <abbr title="Know Your Customer (process).">KYC</abbr> circular | SEBI/HO/MIRSD/SECFATF/P/CIR/2023/169 |
 | A | A-signature | Customer Signature | SIGNATURE | BLOB | on-modify | [direct] | White background; JPEG/PNG max 500KB | [industry typical] |
 | A | A-udid_number | UDID Number | UDID | VARCHAR(18) | on-modify | uppercase | Format \[A-Z\]{2}\d{16} | [industry typical] |
-| B | B-corr_address_line1 | Correspondence Address Line 1 | CORR_ADDR_L1 | VARCHAR(100) | on-modify | [direct] | Mandatory; KRA validates against POA document | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/41 |
+| B | B-corr_address_line1 | Correspondence Address Line 1 | CORR_ADDR_L1 | VARCHAR(100) | on-modify | [direct] | Mandatory; KRA validates against <abbr title="Power of Attorney">POA</abbr> document | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/41 |
 | B | B-corr_address_line2 | Correspondence Address Line 2 | CORR_ADDR_L2 | VARCHAR(100) | on-modify | [direct] | Optional | [industry typical] |
 | B | B-corr_address_line3 | Correspondence Address Line 3 | CORR_ADDR_L3 | VARCHAR(100) | on-modify | [direct] | Optional | [industry typical] |
 | B | B-corr_address_proof_type | Correspondence Address Proof Type | CORR_POA_TYPE | CHAR(2) | on-modify | lookup against R | POA code table A-Z; KRA validates document validity | SEBI/HO/MIRSD/SECFATF/P/CIR/2023/169 |
@@ -76,7 +76,7 @@ Sorted by `source_section`, then `field_id`.
 | C | C-fax_number | Fax Number | FAX_NO | VARCHAR(15) | on-modify | [direct] | Rarely populated | [industry typical] |
 | C | C-fax_std_code | Fax STD Code | FAX_STD | VARCHAR(5) | on-modify | [direct] | Rarely populated | [industry typical] |
 | C | C-mobile_isd_code | Mobile ISD Code | MOB_ISD | VARCHAR(5) | on-modify | [direct] | Default +91; KRA stores ISD separately for mobile and phone | [industry typical] |
-| C | C-mobile_number | Mobile Number | MOBILE_NO | VARCHAR(15) | on-modify | [direct] | KRA validates mobile via OTP; flag kra_mobile_validated set on success | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/41 |
+| C | C-mobile_number | Mobile Number | MOBILE_NO | VARCHAR(15) | on-modify | [direct] | KRA validates mobile via <abbr title="One-Time Password">OTP</abbr>; flag kra_mobile_validated set on success | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/41 |
 | C | C-phone_number | Phone Number | PHONE_NO | VARCHAR(15) | on-modify | [direct] | Landline; optional | [industry typical] |
 | C | C-phone_std_code | Phone STD Code | PHONE_STD | VARCHAR(5) | on-modify | [direct] | Landline STD; optional | [industry typical] |
 | D | D-poi_document_image | POI Document Image | POI_IMAGE | BLOB | on-modify | [direct] | KRA stores scanned doc; JPEG/PNG/PDF max 2MB | [industry typical] |
@@ -102,10 +102,10 @@ Sorted by `source_section`, then `field_id`.
 | F | F-source_of_wealth | Source of Wealth | SRC_OF_WEALTH | VARCHAR(100) | on-modify | formatted | Optional in KRA; required for high-net-worth EDD | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78 |
 | G | G-account_holder_name | Account Holder Name | BANK_ACCT_HOLDER | VARCHAR(100) | on-modify | formatted | Must match PAN name; verified via penny drop | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/41 |
 | G | G-account_number | Bank Account Number | BANK_ACCT_NO | VARCHAR(18) | on-modify | [direct] | Alphanumeric; KRA stores masked except last 4 | [industry typical] |
-| G | G-account_type | Bank Account Type | BANK_ACCT_TYPE | CHAR(2) | on-modify | [direct] | SB/CA/NRE/NRO | [industry typical] |
+| G | G-account_type | Bank Account Type | BANK_ACCT_TYPE | CHAR(2) | on-modify | [direct] | SB/CA/<abbr title="Non-Resident External (Rupee) account">NRE</abbr>/<abbr title="Non-Resident Ordinary (Rupee) account">NRO</abbr> | [industry typical] |
 | G | G-bank_name | Bank Name | BANK_NAME | VARCHAR(100) | on-modify | formatted | KRA primary bank only; multi-bank stored locally only | [industry typical] |
 | G | G-branch_name | Branch Name | BANK_BRANCH | VARCHAR(100) | on-modify | formatted | Optional | [industry typical] |
-| G | G-ifsc_code | IFSC Code | IFSC | CHAR(11) | on-modify | uppercase | Format \[A-Z\]{4}0\[A-Z0-9\]{6} | [industry typical] |
+| G | G-ifsc_code | <abbr title="Indian Financial System Code.">IFSC</abbr> Code | IFSC | CHAR(11) | on-modify | uppercase | Format \[A-Z\]{4}0\[A-Z0-9\]{6} | [industry typical] |
 | G | G-micr_code | MICR Code | MICR | VARCHAR(9) | on-modify | [direct] | 9 digits; optional | [industry typical] |
 | J | J-citizenship_country | Citizenship Country | CITIZENSHIP | CHAR(2) | on-modify | lookup against R | ISO alpha-2; supports multiple per repeat group | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12 |
 | J | J-country_of_birth | Country of Birth (FATCA) | FATCA_CTRY_BIRTH | CHAR(2) | on-modify | lookup against R | ISO alpha-2; FATCA-mandated | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12 |
@@ -116,14 +116,14 @@ Sorted by `source_section`, then `field_id`.
 | J | J-is_us_person | US Person Flag | US_PERSON_FLAG | CHAR(1) | on-modify | [direct] | Y/N; triggers FATCA reporting if Y | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12 |
 | J | J-place_of_birth_city | Place of Birth City | FATCA_POB_CITY | VARCHAR(50) | on-modify | formatted | FATCA mandatory | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12 |
 | J | J-tax_country | Tax Residency Country | TAX_COUNTRY | CHAR(2) | on-modify | lookup against R | Repeats up to 5 countries; KRA centralization since 01-Jul-2024 | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12 |
-| J | J-tax_id_number | Tax ID Number | TAX_TIN | VARCHAR(30) | on-modify | [direct] | TIN for each tax country | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12 |
+| J | J-tax_id_number | Tax ID Number | TAX_TIN | VARCHAR(30) | on-modify | [direct] | <abbr title="Taxpayer Identification Number (in FATCA / CRS context)">TIN</abbr> for each tax country | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12 |
 | J | J-tax_id_type | Tax ID Type | TIN_TYPE | CHAR(2) | on-modify | [direct] | TIN/SSN/EIN etc | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12 |
 | J | J-tin_not_available_reason | TIN Not Available Reason | TIN_NA_REASON | CHAR(1) | on-modify | [direct] | A=Country doesn't issue, B=Unable, C=Not required | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12 |
 | J | J-us_green_card_holder | US Green Card Holder | US_GREEN_CARD | CHAR(1) | on-modify | [direct] | Conditional; affects FATCA reporting class | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12 |
 | J | J-us_tin_ssn | US TIN/SSN | US_TIN | VARCHAR(11) | on-modify | [direct] | Conditional if is_us_person=Y | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12 |
-| K | K-beneficial_owner_declaration | Beneficial Owner Declaration | BO_DECLARATION | CHAR(1) | on-modify | [direct] | Y if acting for self; PMLA Rule 9 lowered BO threshold per 2023 amendment | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78 |
+| K | K-beneficial_owner_declaration | Beneficial Owner Declaration | BO_DECLARATION | CHAR(1) | on-modify | [direct] | Y if acting for self; <abbr title="Prevention of Money Laundering Act 2002">PMLA</abbr> Rule 9 lowered <abbr title="Beneficial Owner">BO</abbr> threshold per 2023 amendment | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78 |
 | K | K-beneficial_owner_details | Beneficial Owner Details | BO_DETAILS | VARCHAR(500) | on-modify | formatted | Conditional if BO declaration=N; details of actual BO | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78 |
-| K | K-is_pep | PEP Flag | PEP_FLAG | CHAR(1) | on-modify | [direct] | Y/N; triggers EDD; KRA-stored per AML master circular | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78 |
+| K | K-is_pep | <abbr title="Politically Exposed Person">PEP</abbr> Flag | PEP_FLAG | CHAR(1) | on-modify | [direct] | Y/N; triggers EDD; KRA-stored per <abbr title="Anti-Money Laundering">AML</abbr> master circular | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78 |
 | K | K-is_pep_related | PEP-Related Flag | PEP_RELATED | CHAR(1) | on-modify | [direct] | Related to a PEP; same EDD trigger | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78 |
 | K | K-pep_details | PEP Details | PEP_DETAILS | VARCHAR(200) | on-modify | formatted | Conditional; name, designation, relationship | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78 |
 | K | K-source_of_funds | Source of Funds | SRC_OF_FUNDS | VARCHAR(100) | on-modify | formatted | Salary/Business/Investments/Inheritance/Gift/Others | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78 |

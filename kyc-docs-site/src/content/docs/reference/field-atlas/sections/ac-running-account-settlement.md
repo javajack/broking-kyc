@@ -17,17 +17,17 @@ Sorted by `field_id`, then `destination`.
 
 | field_id | field_name | destination | destination_field_name | destination_format | frequency | transformation | quirks_notes | spec_source |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| AC-ras_authorized | RAS Authorized | back-office | ras_auth | CHAR(1) | on-modify | [direct] | client authorization for running-account retention | SEBI/HO/MIRSD/POD-1/P/CIR/2023/193 |
+| AC-ras_authorized | RAS Authorized | back-office | ras_auth | CHAR(1) | on-modify | [direct] | client authorization for running-account retention | <abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/POD-1/P/CIR/2023/193 |
 | AC-ras_auto_settlement_trigger_days | RAS Auto-Settlement Trigger Days | back-office | ras_trigger_days | NUMBER(3) | on-modify | [direct] | default 30 days inactive; overrides cycle for non-traded clients | SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/04 |
 | AC-ras_last_settlement_date | RAS Last Settlement Date | back-office | ras_last_dt | DATE YYYYMMDD | on-event | formatted | most recent sweep date | SEBI/HO/MIRSD/POD-1/P/CIR/2023/193 |
-| AC-ras_last_transaction_date | RAS Last Transaction Date | back-office | ras_last_txn_dt | DATE YYYYMMDD | EOD | derived from Y | last trade/charge date; resets 30-day timer | SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/04 |
+| AC-ras_last_transaction_date | RAS Last Transaction Date | back-office | ras_last_txn_dt | DATE YYYYMMDD | <abbr title="End Of Day">EOD</abbr> | derived from Y | last trade/charge date; resets 30-day timer | SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/04 |
 | AC-ras_last_transaction_date | Last Transaction Date | regulatory-reports | LastTradeDate | DATE YYYYMMDD | daily | [direct] | drives 30-day-inactive auto-settlement trigger per Jan-2025 SEBI circular | SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2025/1 |
 | AC-ras_next_settlement_date | RAS Next Settlement Date | back-office | ras_next_dt | DATE YYYYMMDD | EOD | derived from Y | auto-calc next sweep date based on chosen cycle | SEBI/HO/MIRSD/POD-1/P/CIR/2023/193 |
 | AC-ras_optin_date | RAS Opt-In Date | back-office | ras_optin_dt | DATE YYYYMMDD | one-time | formatted | audit for client-driven cycle choice | SEBI/HO/MIRSD/POD-1/P/CIR/2023/193 |
 | AC-ras_settlement_bank_account | RAS Settlement Bank Account | back-office | ras_bank_acct | VARCHAR(18) | on-modify | [direct] | primary bank account for fund return; matches G-account_number where is_primary=Y | SEBI/HO/MIRSD/POD-1/P/CIR/2023/193 |
 | AC-ras_settlement_bank_account | Running Account Settlement Bank | regulatory-reports | RABankAccount | VARCHAR(18) | on-event | [direct] | fund-return target on running-account settlement run; weekly cadence | SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2025/1 |
 | AC-ras_settlement_frequency | RAS Settlement Frequency | back-office | ras_freq | VARCHAR(2) | on-modify | [direct] | MN/QR; drives sweep-out schedule | SEBI/HO/MIRSD/POD-1/P/CIR/2023/193 |
-| AC-ras_settlement_frequency | Running Account Settlement Frequency | contract-notes | RAFrequency | CHAR(2) | on-trade | [direct] | MN=Monthly / QR=Quarterly; printed in ECN footer block; aligned to exchange-stipulated Friday/Saturday dates | SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2023/197 |
+| AC-ras_settlement_frequency | Running Account Settlement Frequency | contract-notes | RAFrequency | CHAR(2) | on-trade | [direct] | MN=Monthly / QR=Quarterly; printed in <abbr title="Electronic Contract Note.">ECN</abbr> footer block; aligned to exchange-stipulated Friday/Saturday dates | SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2023/197 |
 
 ## Verified through
 

@@ -3,10 +3,10 @@ title: Account Aggregator Framework
 description: RBI's consent-based financial data sharing network — how Account Aggregators let brokers fetch bank statements and ITR data without manual uploads.
 ---
 
-Imagine you are opening a trading account and the broker asks for your last six months of bank statements to verify your income for F&O (Futures and Options) trading. Traditionally, you would log into your net banking portal, download a PDF, and upload it to the broker's website — a process that is slow, error-prone, and requires the broker to parse hundreds of different bank statement formats. The Account Aggregator (AA) framework changes this entirely. AA is like a digital courier service for your financial data — instead of downloading bank statements and uploading them, the data flows directly from your bank to the broker with your one-tap consent. No PDFs, no uploads, no format-parsing headaches. This page covers how the AA framework works, who the key players are, and how a stock broking firm should integrate with it.
+Imagine you are opening a trading account and the broker asks for your last six months of bank statements to verify your income for F&O (Futures and Options) trading. Traditionally, you would log into your net banking portal, download a PDF, and upload it to the broker's website — a process that is slow, error-prone, and requires the broker to parse hundreds of different bank statement formats. The Account Aggregator (<abbr title="Account Aggregator (RBI-licensed NBFC-AA)">AA</abbr>) framework changes this entirely. AA is like a digital courier service for your financial data — instead of downloading bank statements and uploading them, the data flows directly from your bank to the broker with your one-tap consent. No PDFs, no uploads, no format-parsing headaches. This page covers how the AA framework works, who the key players are, and how a stock broking firm should integrate with it.
 
 :::note[What is AA?]
-An AA is an RBI (Reserve Bank of India)-licensed NBFC (Non-Banking Financial Company) that acts as a consent manager for financial data. AA does not store/view/process data — it facilitates encrypted transfer from Financial Information Provider (FIP) to Financial Information User (FIU). Governed by RBI Master Direction (Sep 2, 2016). Industry body: Sahamati.
+An AA is an <abbr title="Reserve Bank of India">RBI</abbr> (Reserve Bank of India)-licensed NBFC (Non-Banking Financial Company) that acts as a consent manager for financial data. AA does not store/view/process data — it facilitates encrypted transfer from Financial Information Provider (FIP) to Financial Information User (<abbr title="Financial Intelligence Unit">FIU</abbr>). Governed by RBI Master Direction (Sep 2, 2016). Industry body: Sahamati.
 :::
 
 The AA framework is built on three roles: the FIP (your bank, which holds your data), the FIU (the broker, which wants your data), and the AA (the consent layer in between, which ensures the data only flows when you explicitly approve it). Understanding these three roles is essential to understanding how the integration works.
@@ -34,8 +34,8 @@ Not all 16 licensed AAs are equally relevant for a stock broking use case. The f
 | **OneMoney** | FinSec AA Solutions | Consumer-focused, wide coverage | Good for retail onboarding |
 | **CAMS Finserv** | CAMSFinServ | MF ecosystem (RTA backing) | Mutual fund holdings fetch |
 | **Anumati** | Perfios AA Services | Analytics + AA combined | Income verification with analytics |
-| **PhonePe** | PhonePe Technology | Massive UPI consumer base | Highest consent conversion rates |
-| **Digio** | Digio Internet | eSign + KYC (Know Your Customer) + AA combined | Full-stack if using Digio for eSign |
+| **PhonePe** | PhonePe Technology | Massive <abbr title="Unified Payments Interface">UPI</abbr> consumer base | Highest consent conversion rates |
+| **Digio** | Digio Internet | eSign + <abbr title="Know Your Customer (process).">KYC</abbr> (Know Your Customer) + AA combined | Full-stack if using Digio for eSign |
 | **Protean SurakshAA** | Protean eGov | Government-backed | Regulatory trust signal |
 | **CRIF Connect** | CRIF Connect | Credit bureau background | Credit + AA data combined |
 
@@ -81,7 +81,7 @@ DATA FETCH FLOW:
       ▸ FIU decrypts using Diffie-Hellman session keys
 ```
 
-In plain English: the customer gets a notification on their AA app asking "Do you want to share your bank statement with [Broker Name] for the purpose of income verification?" They review the details — what data, for how long, how often — and approve with an OTP or PIN. Once approved, the bank encrypts the data and sends it through the AA to the broker. The AA acts as a "blind pipe" and never sees the actual data.
+In plain English: the customer gets a notification on their AA app asking "Do you want to share your bank statement with [Broker Name] for the purpose of income verification?" They review the details — what data, for how long, how often — and approve with an <abbr title="One-Time Password">OTP</abbr> or PIN. Once approved, the bank encrypts the data and sends it through the AA to the broker. The AA acts as a "blind pipe" and never sees the actual data.
 
 The AA framework supports more than just bank statements. Here is the full list of financial data types that can be fetched.
 
@@ -91,16 +91,16 @@ The AA framework supports more than just bank statements. Here is the full list 
 |---------|-----------|--------|----------------|
 | Savings/Current Statements | RBI | Live | F&O income proof (Rs.10K credit in 6 months) |
 | Term/Recurring Deposits | RBI | Live | Net worth verification |
-| Equity Shares (Demat) | SEBI (Securities and Exchange Board of India) | Live | Existing holdings for financial profile |
+| Equity Shares (Demat) | <abbr title="Securities and Exchange Board of India">SEBI</abbr> (Securities and Exchange Board of India) | Live | Existing holdings for financial profile |
 | Mutual Fund Units | SEBI | Live | Net worth + cross-sell |
 | Insurance Policies | IRDAI (Insurance Regulatory and Development Authority of India) | Live | Financial profile |
-| NPS Balances | PFRDA (Pension Fund Regulatory and Development Authority) | Live | Retirement corpus |
+| NPS Balances | <abbr title="Pension Fund Regulatory and Development Authority">PFRDA</abbr> (Pension Fund Regulatory and Development Authority) | Live | Retirement corpus |
 | GST Returns | DoR (Department of Revenue) | Coming Soon | Business income for proprietors |
 
 In plain English: for stock broking, the most relevant data type is savings/current account statements (for F&O income verification). But the framework also lets you fetch demat holdings, mutual fund units, and insurance policies — data that can enrich the customer's financial profile and support suitability assessments.
 
 :::tip[Demat Holdings via AA]
-Since SEBI allowed CDSL (Central Depository Services Limited) and NSDL (National Securities Depository Limited) to act as FIPs (August 2022), you can now fetch a customer's existing demat holdings through the AA framework. This is useful for understanding their trading experience and portfolio composition during onboarding.
+Since SEBI allowed <abbr title="Central Depository Services (India) Limited">CDSL</abbr> (Central Depository Services Limited) and <abbr title="National Securities Depository Limited">NSDL</abbr> (National Securities Depository Limited) to act as FIPs (August 2022), you can now fetch a customer's existing demat holdings through the AA framework. This is useful for understanding their trading experience and portfolio composition during onboarding.
 :::
 
 If you are already using Perfios for ITR-based income verification, you might wonder how AA compares. The answer is: they are complementary, not competing.

@@ -3,23 +3,23 @@ title: Decentro
 description: PAN verification, bank account verification (penny drop), and CKYC proxy via Decentro unified REST API platform.
 ---
 
-Decentro is a unified fintech API platform that consolidates multiple identity verification, banking, and KYC (Know Your Customer) operations into a single REST (Representational State Transfer) integration. For the broking KYC system, Decentro serves as the primary aggregator for PAN (Permanent Account Number) verification, bank account validation via penny drop and reverse penny drop, CKYC (Central Know Your Customer) operations against the CERSAI (Central Registry of Securitisation Asset Reconstruction and Security Interest of India) registry, and Aadhaar-based verification.
+Decentro is a unified fintech API platform that consolidates multiple identity verification, banking, and <abbr title="Know Your Customer (process).">KYC</abbr> (Know Your Customer) operations into a single REST (Representational State Transfer) integration. For the broking KYC system, Decentro serves as the primary aggregator for <abbr title="Permanent Account Number">PAN</abbr> (Permanent Account Number) verification, bank account validation via penny drop and reverse penny drop, <abbr title="Central KYC (records registry)">CKYC</abbr> (Central Know Your Customer) operations against the <abbr title="Central Registry of Securitisation Asset Reconstruction and Security Interest of India">CERSAI</abbr> (Central Registry of Securitisation Asset Reconstruction and Security Interest of India) registry, and Aadhaar-based verification.
 
-By routing through Decentro rather than integrating directly with NSDL/Protean for PAN, NPCI (National Payments Corporation of India) for bank verification, and CERSAI for CKYC, the system reduces vendor count from three to one, simplifies authentication to a single credential set per module, and provides a unified dashboard for monitoring all verification operations. This consolidation is particularly valuable during the early phase of a broking platform where engineering bandwidth is limited and time-to-market matters.
+By routing through Decentro rather than integrating directly with <abbr title="National Securities Depository Limited">NSDL</abbr>/Protean for PAN, <abbr title="National Payments Corporation of India">NPCI</abbr> (National Payments Corporation of India) for bank verification, and CERSAI for CKYC, the system reduces vendor count from three to one, simplifies authentication to a single credential set per module, and provides a unified dashboard for monitoring all verification operations. This consolidation is particularly valuable during the early phase of a broking platform where engineering bandwidth is limited and time-to-market matters.
 
-This page documents the Decentro API specifications for each verification type used in the onboarding flow, including request/response formats, field mappings to the master dataset, and error handling. It also covers edge cases specific to Indian financial infrastructure -- merged bank IFSCs, joint accounts, NRI accounts, and PAN-Aadhaar linking -- that the implementation team will encounter during development and testing.
+This page documents the Decentro API specifications for each verification type used in the onboarding flow, including request/response formats, field mappings to the master dataset, and error handling. It also covers edge cases specific to Indian financial infrastructure -- merged bank IFSCs, joint accounts, <abbr title="Non-Resident Indian">NRI</abbr> accounts, and PAN-Aadhaar linking -- that the implementation team will encounter during development and testing.
 
 ## 1. Overview
 
 ### What is Decentro
 
-Decentro is an API-first financial infrastructure platform based in India. It provides a unified REST API layer over fragmented government and banking infrastructure -- PAN verification (NSDL/Protean), bank account verification (IMPS/NPCI), and CKYC (CERSAI) -- so that regulated entities like stock brokers do not have to integrate with each underlying system individually.
+Decentro is an API-first financial infrastructure platform based in India. It provides a unified REST API layer over fragmented government and banking infrastructure -- PAN verification (NSDL/Protean), bank account verification (<abbr title="Immediate Payment Service">IMPS</abbr>/NPCI), and CKYC (CERSAI) -- so that regulated entities like stock brokers do not have to integrate with each underlying system individually.
 
 ### Why Decentro for This Project
 
 | Concern | Decentro's Value |
 |---------|-----------------|
-| PAN verification | Single API call against NSDL/ITD, returns status + name + category + Aadhaar seeding status |
+| PAN verification | Single API call against NSDL/<abbr title="Information Technology Department (within SEBI)">ITD</abbr>, returns status + name + category + Aadhaar seeding status |
 | Bank account verification | Penny drop (IMPS Rs.1 credit), penniless (zero-cost), and reverse penny drop -- all via one endpoint |
 | CKYC proxy | Abstracts CERSAI authentication (FI code, digital certificate) behind simple REST calls for Search, Download, and Upload |
 | API-first design | REST/JSON, consistent request/response structure, reference IDs for idempotency |
@@ -127,7 +127,7 @@ These map to `pan_verify_status` (field R01) in Master Dataset.
 | EA | `valid` (with flag) | Valid + amalgamation event | Proceed with a note in admin dashboard |
 | ED | `valid` (with flag) | Valid + death event recorded at ITD | **Reject** -- escalate to compliance team |
 
-**Important**: Status `E` does not guarantee the person is alive. A deceased person's PAN may still show status `E` if ITD has not recorded the death event. This cannot be caught by PAN verification alone -- it requires cross-referencing with other sources (CKYC death flag, KRA status, or Video KYC as a physical presence check).
+**Important**: Status `E` does not guarantee the person is alive. A deceased person's PAN may still show status `E` if ITD has not recorded the death event. This cannot be caught by PAN verification alone -- it requires cross-referencing with other sources (CKYC death flag, <abbr title="KYC Registration Agency">KRA</abbr> status, or Video KYC as a physical presence check).
 
 ### 2.6 PAN Category (4th Character of PAN)
 
@@ -137,7 +137,7 @@ The 4th character of a PAN number encodes the entity type. This maps to `pan_ver
 |----------|----------|-------------|
 | P | Individual (Person) | Natural person |
 | C | Company | Incorporated under Companies Act |
-| H | HUF (Hindu Undivided Family) | Joint family entity |
+| H | <abbr title="Hindu Undivided Family">HUF</abbr> (Hindu Undivided Family) | Joint family entity |
 | F | Firm (Partnership) | Registered partnership firm |
 | A | AOP (Association of Persons) | Association of Persons / Body of Individuals |
 | T | Trust | Charitable or private trust |
@@ -243,7 +243,7 @@ Headers:
 | `reference_id` | string | Yes | Unique per request; `BANK_<timestamp>` |
 | `purpose_message` | string | Yes | Narration that appears in bank statement |
 | `beneficiary_details.account_number` | string | Yes | Customer's bank account number |
-| `beneficiary_details.ifsc` | string | Yes | 11-character IFSC code |
+| `beneficiary_details.ifsc` | string | Yes | 11-character <abbr title="Indian Financial System Code.">IFSC</abbr> code |
 | `beneficiary_details.name` | string | Yes | Customer-provided name (for matching) |
 | `transfer_amount` | number | Yes | Always `1` (Rs.1 penny drop) |
 | `validation_type` | string | Yes | `pennydrop`, `penniless`, or `reverse_pennydrop` |
@@ -341,7 +341,7 @@ An alternative where no actual funds are transferred. Decentro validates the acc
 **Recommendation**: Use penny drop for all new customer onboarding. Use penniless only for periodic re-verification of existing clients where cost matters and you already have a verified account on record.
 
 :::note[Penny drop vs reverse penny drop tradeoffs]
-Penny drop (broker-initiated Rs.1 credit) has near-universal coverage because it relies on the IMPS network, which all scheduled commercial banks support. Reverse penny drop (customer-initiated UPI payment) is cheaper and higher-trust since the customer authenticates via their UPI PIN, but it only works for customers who have an active UPI setup. For a broking onboarding flow targeting a broad demographic, penny drop is the safer default with reverse penny drop offered as an optional alternative for digitally savvy users.
+Penny drop (broker-initiated Rs.1 credit) has near-universal coverage because it relies on the IMPS network, which all scheduled commercial banks support. Reverse penny drop (customer-initiated <abbr title="Unified Payments Interface">UPI</abbr> payment) is cheaper and higher-trust since the customer authenticates via their UPI PIN, but it only works for customers who have an active UPI setup. For a broking onboarding flow targeting a broad demographic, penny drop is the safer default with reverse penny drop offered as an optional alternative for digitally savvy users.
 :::
 
 ### 3.5 Reverse Penny Drop (Alternative)
@@ -363,7 +363,7 @@ In reverse penny drop, the customer initiates a UPI payment of Rs.1 TO the broke
 3. Broker receives UPI callback with payer account details (name, account number, IFSC)
 4. Broker verifies name match and marks bank as verified
 
-**Note**: Not all customers have UPI. For customers without UPI (elderly, NRI with NRE accounts, etc.), fall back to standard penny drop.
+**Note**: Not all customers have UPI. For customers without UPI (elderly, NRI with <abbr title="Non-Resident External (Rupee) account">NRE</abbr> accounts, etc.), fall back to standard penny drop.
 
 ### 3.6 Data Mapping to Master Dataset
 
@@ -428,7 +428,7 @@ Searches the CKYC registry by PAN (or other ID) to check if a customer already h
 }
 ```
 
-**Important**: Since January 2025, CKYC Search returns a **masked CKYC number** (format: `$XXXX1234$`). The full 14-digit CKYC Identification Number (KIN) is only available via the Download API. This was a CERSAI policy change to prevent unauthorized bulk lookups.
+**Important**: Since January 2025, CKYC Search returns a **masked CKYC number** (format: `$XXXX1234$`). The full 14-digit CKYC Identification Number (<abbr title="KYC Identification Number">KIN</abbr>) is only available via the Download API. This was a CERSAI policy change to prevent unauthorized bulk lookups.
 
 #### Search Result Interpretation
 
@@ -676,7 +676,7 @@ PAN verification returns the company/association name instead of individual name
 
 ### 5.5 NRI Bank Verification
 
-NRE (Non-Resident External) and NRO (Non-Resident Ordinary) accounts:
+NRE (Non-Resident External) and <abbr title="Non-Resident Ordinary (Rupee) account">NRO</abbr> (Non-Resident Ordinary) accounts:
 
 | Aspect | Detail |
 |--------|--------|
@@ -824,7 +824,7 @@ Retry policy:
 - Staging environment does not require IP whitelisting
 
 :::caution[IP whitelisting is critical for production security]
-While Decentro marks IP whitelisting as optional, it should be treated as mandatory for a SEBI-regulated broking platform. Without it, a leaked API credential can be used from any IP address. Ensure your NAT gateway or load balancer IPs are static and whitelisted before go-live. If your infrastructure uses auto-scaling with dynamic IPs, route all Decentro traffic through a fixed egress proxy or NAT gateway.
+While Decentro marks IP whitelisting as optional, it should be treated as mandatory for a <abbr title="Securities and Exchange Board of India">SEBI</abbr>-regulated broking platform. Without it, a leaked API credential can be used from any IP address. Ensure your NAT gateway or load balancer IPs are static and whitelisted before go-live. If your infrastructure uses auto-scaling with dynamic IPs, route all Decentro traffic through a fixed egress proxy or NAT gateway.
 :::
 
 ---
@@ -865,7 +865,7 @@ Indian financial infrastructure has numerous quirks -- merged bank IFSCs, paymen
 
 - PAN status may still show `E` (valid) if ITD has not recorded the death event
 - Cannot be caught by PAN verification alone
-- Mitigation: Video KYC (VIPV) serves as physical presence verification; CKYC download may show death flag if updated by another FI; KRA status may be updated
+- Mitigation: Video KYC (<abbr title="Video In-Person Verification (sometimes &quot;Video CIP&quot; / V-CIP)">VIPV</abbr>) serves as physical presence verification; CKYC download may show death flag if updated by another FI; KRA status may be updated
 
 ### 8.2 Closed Bank Account
 
@@ -917,7 +917,7 @@ If a customer provides an old IFSC, the penny drop may still work (banks maintai
 - Customer must link Aadhaar with PAN on the Income Tax e-filing portal before proceeding
 - Deadline for linking has been extended multiple times; check current deadline
 - **Exception**: NRI PANs may show "Not applicable" for Aadhaar linking -- this is acceptable
-- **Exchange note**: PAN-Aadhaar seeding is no longer a parameter for PTT (Permitted to Trade) status per NSE circular NSE/ISC/62244 (May 30, 2024), but the PAN itself becomes inoperative if not linked
+- **Exchange note**: PAN-Aadhaar seeding is no longer a parameter for PTT (Permitted to Trade) status per <abbr title="National Stock Exchange of India">NSE</abbr> circular NSE/<abbr title="Investor Service Centre.">ISC</abbr>/62244 (May 30, 2024), but the PAN itself becomes inoperative if not linked
 
 ### 8.8 CKYC Record Stale or Incomplete
 
@@ -928,7 +928,7 @@ If a customer provides an old IFSC, the penny drop may still work (banks maintai
 
 ### 8.9 CERSAI System Downtime
 
-- CERSAI has scheduled maintenance windows (typically late night / early morning IST)
+- CERSAI has scheduled maintenance windows (typically late night / early morning <abbr title="Indian Standard Time (UTC+05:30)">IST</abbr>)
 - During downtime, CKYC Search/Download/Upload will return 503
 - Action: Queue CKYC operations for retry; do not block onboarding on CKYC availability
 - CKYC upload is an async step in the batch pipeline anyway (after maker-checker approval)
@@ -953,9 +953,9 @@ While Decentro is the recommended vendor for PAN, bank, and CKYC verification, i
 | **Documentation Quality** | Good (interactive docs) | Excellent (developer-first) | Good |
 | **Sandbox** | Yes (staging env) | Yes | Yes (with Rs.100 credits) |
 | **Integration Time** | 1-2 weeks | 1-2 weeks | 1-2 weeks |
-| **Best For** | Full KYC bundle (PAN + Bank + CKYC) | UPI/AA focused flows | Payment-focused brokers |
+| **Best For** | Full KYC bundle (PAN + Bank + CKYC) | UPI/<abbr title="Account Aggregator (RBI-licensed NBFC-AA)">AA</abbr> focused flows | Payment-focused brokers |
 | **Key Strength** | Single vendor for 3 integrations | Reverse penny drop, Account Aggregator | Payment gateway + verification combo |
-| **Key Weakness** | No KRA, no eSign, no OCR | No PAN API, no CKYC, no video KYC | No CKYC, limited KYC scope |
+| **Key Weakness** | No KRA, no eSign, no <abbr title="Optical Character Recognition.">OCR</abbr> | No PAN API, no CKYC, no video KYC | No CKYC, limited KYC scope |
 | **Setu Note** | -- | Acquired by Pine Labs ($70-75M); AA market leader | -- |
 | **Bank Coverage** | All IMPS banks | UPI-enabled accounts only (for reverse penny drop) | Most banks; does NOT support Deutsche Bank, Paytm Payments Bank |
 
@@ -970,7 +970,7 @@ While Decentro is the recommended vendor for PAN, bank, and CKYC verification, i
 | Certification | Status |
 |---------------|--------|
 | ISO 27001 | Certified (Information Security Management) |
-| SOC 2 Type II | Certified (Security, Availability, Confidentiality) |
+| SOC 2 Type <abbr title="—">II</abbr> | Certified (Security, Availability, Confidentiality) |
 | PCI DSS | Compliant (for payment data handling) |
 
 ### 10.2 Data Security
@@ -986,8 +986,8 @@ While Decentro is the recommended vendor for PAN, bank, and CKYC verification, i
 ### 10.3 Data Residency
 
 - All data processed and stored within India (Indian data center)
-- Compliant with RBI data localization requirements
-- Compliant with DPDP Act 2023 requirements for financial data
+- Compliant with <abbr title="Reserve Bank of India">RBI</abbr> data localization requirements
+- Compliant with <abbr title="Digital Personal Data Protection Act 2023 (and Rules 2025)">DPDP</abbr> Act 2023 requirements for financial data
 
 ### 10.4 Our Responsibilities
 

@@ -3,7 +3,7 @@ title: 6-Attribute Matching
 description: The 6 fields that must match everywhere — Name, PAN, Address, Mobile, Email, and Income Range across KRA, exchanges, and depositories.
 ---
 
-In the Indian securities market, a customer's identity is not stored in one place — it is spread across their KRA (KYC Registration Agency) record, their exchange UCC (Unique Client Code), and their depository BO (Beneficial Owner) account. SEBI (Securities and Exchange Board of India) mandates that six specific data fields must be identical across all three of these systems. The 6-attribute match is like a three-way handshake — KRA, exchange, and depository must all agree on the same name, PAN (Permanent Account Number), address, mobile number, email address, and income range. If even one of these six fields is inconsistent, settlements can be blocked and accounts can be frozen. This page explains what the six attributes are, why they matter, and what happens when they do not match.
+In the Indian securities market, a customer's identity is not stored in one place — it is spread across their <abbr title="KYC Registration Agency">KRA</abbr> (<abbr title="Know Your Customer (process).">KYC</abbr> Registration Agency) record, their exchange <abbr title="Unique Client Code">UCC</abbr> (Unique Client Code), and their depository <abbr title="Beneficial Owner">BO</abbr> (Beneficial Owner) account. <abbr title="Securities and Exchange Board of India">SEBI</abbr> (Securities and Exchange Board of India) mandates that six specific data fields must be identical across all three of these systems. The 6-attribute match is like a three-way handshake — KRA, exchange, and depository must all agree on the same name, <abbr title="Permanent Account Number">PAN</abbr> (Permanent Account Number), address, mobile number, email address, and income range. If even one of these six fields is inconsistent, settlements can be blocked and accounts can be frozen. This page explains what the six attributes are, why they matter, and what happens when they do not match.
 
 :::danger
 **Critical SEBI Mandate:** Six KYC (Know Your Customer) attributes must be consistent across KRA records, Exchange UCC, and Depository BO accounts. PAN is the primary linkage key. Mismatches block settlement and can freeze accounts.
@@ -15,12 +15,12 @@ Understanding these six attributes is foundational to everything else in the KYC
 
 | # | Attribute | Verification Source | SEBI Requirement |
 |---|-----------|-------------------|------------------|
-| 1 | **Name** | PAN card (NSDL/Protean) | Must match as per PAN records across KRA, exchange UCC, and demat account |
-| 2 | **PAN** | Income Tax Dept (via Protean) | Primary key. PAN-Aadhaar linkage mandatory. BSE (Bombay Stock Exchange) requires 3-param verification. |
+| 1 | **Name** | PAN card (<abbr title="National Securities Depository Limited">NSDL</abbr>/Protean) | Must match as per PAN records across KRA, exchange UCC, and demat account |
+| 2 | **PAN** | Income Tax Dept (via Protean) | Primary key. PAN-Aadhaar linkage mandatory. <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> (Bombay Stock Exchange) requires 3-param verification. |
 | 3 | **Address** | Aadhaar / DigiLocker | Correspondence address must be consistent. Permanent address from Aadhaar. |
-| 4 | **Mobile** | OTP verification | KRA verifies against official databases. Must be unique per client. |
+| 4 | **Mobile** | <abbr title="One-Time Password">OTP</abbr> verification | KRA verifies against official databases. Must be unique per client. |
 | 5 | **Email** | OTP verification | KRA verifies email. Contract notes and statements sent here. |
-| 6 | **Income Range** | Client declaration / AA (Account Aggregator) / bank statement | Required for demat account opening (effective Aug 2021). |
+| 6 | **Income Range** | Client declaration / <abbr title="Account Aggregator (RBI-licensed NBFC-AA)">AA</abbr> (Account Aggregator) / bank statement | Required for demat account opening (effective Aug 2021). |
 
 In plain English: think of these six fields as the "signature" of a customer's identity in the securities ecosystem. The name and PAN come from the Income Tax Department, the address comes from Aadhaar, the mobile and email are verified via OTP (One-Time Password), and the income range is either declared by the customer or verified through bank statements. All six must tell the same story across every system that holds the customer's data.
 
@@ -34,8 +34,8 @@ Now that you know what the six attributes are, let us look at the SEBI circulars
 
 | Circular | Date | Subject |
 |----------|------|---------|
-| SEBI/HO/MIRSD/DOP/CIR/P/2019/136 | Nov 2019 | Mapping of UCC with Demat Account based on PAN |
-| [SEBI/HO/MIRSD/FATF/P/CIR/2023/0144](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdfatfpcir20230144) | 2023 | KRA attribute verification against official databases |
+| SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/DOP/CIR/P/2019/136 | Nov 2019 | Mapping of UCC with Demat Account based on PAN |
+| [SEBI/HO/MIRSD/<abbr title="Financial Action Task Force">FATF</abbr>/P/CIR/2023/0144](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdfatfpcir20230144) | 2023 | KRA attribute verification against official databases |
 | [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/41](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202441) | May 2024 | Review of KYC validation at KRAs |
 | [SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/37](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-pod-1pcir202337) | Mar 2023 | KYC attribute requirements for depository accounts |
 
@@ -72,7 +72,7 @@ Exchange (NSE/BSE/MCX)          Depository (CDSL/NSDL)
 In plain English: every day, the exchange tells the depository "here are today's new trading accounts and their PANs." The depository looks up those PANs in its records and links each trading account to the corresponding demat account. If the PAN or name does not match, the link fails, and that customer cannot settle trades.
 
 :::tip[Why One Customer Might Have Multiple UCCs]
-A customer may trade on multiple exchanges (NSE, BSE, MCX) and through multiple brokers, each of which gives them a separate UCC. All of these UCCs are mapped to the same demat account using PAN as the common key. The daily file ensures that new UCCs are linked immediately.
+A customer may trade on multiple exchanges (<abbr title="National Stock Exchange of India">NSE</abbr>, BSE, <abbr title="Multi Commodity Exchange of India">MCX</abbr>) and through multiple brokers, each of which gives them a separate UCC. All of these UCCs are mapped to the same demat account using PAN as the common key. The daily file ensures that new UCCs are linked immediately.
 :::
 
 Knowing what happens when attributes match is useful, but knowing what happens when they do not match is critical.
@@ -86,7 +86,7 @@ Knowing what happens when attributes match is useful, but knowing what happens w
 | Mobile/Email not verified at KRA | KYC not portable | Client verifies via M-Aadhaar or KRA portal OTP. |
 | PAN-Aadhaar not linked | Account may freeze | Client links at incometax.gov.in. |
 | Income range missing | Demat opening blocked | Client must declare income range. |
-| Address inconsistency | KRA hold possible | Update via KRA modify or CKYC (Central KYC) update. |
+| Address inconsistency | KRA hold possible | Update via KRA modify or <abbr title="Central KYC (records registry)">CKYC</abbr> (Central KYC) update. |
 
 :::caution[Settlement Blocked Is the Worst Outcome]
 When PAN does not match between the trading account and the demat account, the customer literally cannot buy or sell securities — the settlement system cannot debit shares from a demat account that does not match the trading account's PAN. This is the most severe consequence of a 6-attribute mismatch and requires immediate client intervention to resolve.
@@ -100,7 +100,7 @@ The 6-attribute requirements also interact directly with segment activation, bec
 
 | Segment | Income Proof | Min Income | Additional Requirements |
 |---------|-------------|-----------|----------------------|
-| **Equity Cash (CM)** | No | None | Basic KYC sufficient. Default segment. |
+| **Equity Cash (<abbr title="Clearing Member">CM</abbr>)** | No | None | Basic KYC sufficient. Default segment. |
 | **Equity F&O** | **Yes** | Broker-specific (Rs.1-5L) | Trading experience declaration. Bank statement showing Rs.10K credit. |
 | **Currency Derivatives** | No | None | No additional income proof. |
 | **Commodity (MCX)** | **Yes** | Broker-specific | MCX (Multi Commodity Exchange) registration. Client category: Hedger/Speculator/Arbitrageur. |

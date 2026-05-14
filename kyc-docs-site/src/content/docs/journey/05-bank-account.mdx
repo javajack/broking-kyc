@@ -13,13 +13,13 @@ import ScreenCard from '../../../components/ScreenCard.astro';
 import AsyncBar from '../../../components/AsyncBar.astro';
 import { Aside } from '@astrojs/starlight/components';
 
-The customer's identity is now confirmed. The next question the system needs to answer is: where does this person's money live? Every trading account must be linked to a verified bank account -- this is how funds move in and out. The customer enters three fields (account number, IFSC code, and account type), and the system immediately fires a penny drop to verify that the account exists and belongs to the person whose name is on the KYC (Know Your Customer) application. This is one of the few screens where the customer provides genuinely new information that cannot be pre-filled from any external source.
+The customer's identity is now confirmed. The next question the system needs to answer is: where does this person's money live? Every trading account must be linked to a verified bank account -- this is how funds move in and out. The customer enters three fields (account number, <abbr title="Indian Financial System Code.">IFSC</abbr> code, and account type), and the system immediately fires a penny drop to verify that the account exists and belongs to the person whose name is on the <abbr title="Know Your Customer (process).">KYC</abbr> (Know Your Customer) application. This is one of the few screens where the customer provides genuinely new information that cannot be pre-filled from any external source.
 
 <ScreenCard number={5} title="Bank Account">
 
 **Purpose:** Capture bank account details and verify ownership via penny drop.
 
-Bank account verification via IMPS credit (penny drop) validates account holder name. The system sends Re.1 (one rupee) via IMPS to the customer's bank account. The bank responds with the account holder's name, which the system then matches against the name from DigiLocker (Government of India's digital document platform). This proves the account exists, is active, and belongs to the right person.
+Bank account verification via <abbr title="Immediate Payment Service">IMPS</abbr> credit (penny drop) validates account holder name. The system sends Re.1 (one rupee) via IMPS to the customer's bank account. The bank responds with the account holder's name, which the system then matches against the name from DigiLocker (Government of India's digital document platform). This proves the account exists, is active, and belongs to the right person.
 
 ## User Input
 
@@ -33,7 +33,7 @@ The customer types three fields. The IFSC code triggers an automatic lookup that
 
 ## Auto-filled from IFSC (RBI Master)
 
-The moment the customer enters a valid IFSC code, these fields populate automatically from the RBI (Reserve Bank of India) IFSC Master directory. The customer does not type any of these.
+The moment the customer enters a valid IFSC code, these fields populate automatically from the <abbr title="Reserve Bank of India">RBI</abbr> (Reserve Bank of India) IFSC Master directory. The customer does not type any of these.
 
 | Field | Source |
 |-------|--------|
@@ -47,7 +47,7 @@ Penny Drop verification fires on submit -- Rs.1 IMPS credit + name match scoring
 </AsyncBar>
 
 :::tip[Why penny drop and not just account number validation?]
-An account number alone proves nothing -- it is just a sequence of digits. The penny drop proves three things simultaneously: the account exists at the given IFSC, the account is active and can receive funds, and the name on the account matches the KYC applicant. This is why SEBI (Securities and Exchange Board of India) and exchanges require bank verification as a mandatory step.
+An account number alone proves nothing -- it is just a sequence of digits. The penny drop proves three things simultaneously: the account exists at the given IFSC, the account is active and can receive funds, and the name on the account matches the KYC applicant. This is why <abbr title="Securities and Exchange Board of India">SEBI</abbr> (Securities and Exchange Board of India) and exchanges require bank verification as a mandatory step.
 :::
 
 ## Penny Drop Result

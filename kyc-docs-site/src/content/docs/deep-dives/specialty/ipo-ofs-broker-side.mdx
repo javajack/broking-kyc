@@ -5,12 +5,12 @@ description: End-to-end broker-side walkthrough of primary-market issuances — 
 
 import { Aside } from '@astrojs/starlight/components';
 
-> **Why this page is structured this way:** Brokers participate in the primary market as one of two roles — Self-Certified Syndicate Bank (SCSB) is a bank role, but a typical equity broker is a **Syndicate / Sub-Syndicate Member** or a **Stock Exchange platform participant** routing client bids to the exchange's electronic bidding platform (NSE IFM, BSE iBBS). The walkthrough below traces a single retail IPO application from the client's tap on "Apply" through to listing on T+3, with sub-sections for OFS, NCD subscriptions, and the institutional / HNI / retail category mechanics that determine allocation. It mirrors the operator-perspective tone of the [lifecycle/](/broking-kyc/lifecycle/) pages.
+> **Why this page is structured this way:** Brokers participate in the primary market as one of two roles — Self-Certified Syndicate Bank (SCSB) is a bank role, but a typical equity broker is a **Syndicate / Sub-Syndicate Member** or a **Stock Exchange platform participant** routing client bids to the exchange's electronic bidding platform (<abbr title="National Stock Exchange of India">NSE</abbr> IFM, <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> iBBS). The walkthrough below traces a single retail <abbr title="Initial Public Offering">IPO</abbr> application from the client's tap on "Apply" through to listing on T+3, with sub-sections for <abbr title="Offer for Sale (through stock exchange)">OFS</abbr>, NCD subscriptions, and the institutional / HNI / retail category mechanics that determine allocation. It mirrors the operator-perspective tone of the [lifecycle/](/broking-kyc/lifecycle/) pages.
 
 ## TL;DR
 
-- **Broker's role**: capture client bid → push to exchange bidding platform → orchestrate UPI Block mandate via sponsor bank → reconcile allotment file from RTA → release mandate / book security credit. The broker never holds client funds for IPO; funds stay blocked in the client's bank under the UPI / ASBA mechanism.
-- **Window**: standard book-built IPO opens for **3 working days** (T to T+2), revised application / withdrawal possible during the window, allotment finalised by RTA on T+2 evening, listing on T+3 ([SEBI/HO/CFD/TPD1/CIR/P/2023/140](/broking-kyc/reference/circulars/sebi-other/#sebihocfdtpd1cirp2023140), mandatory T+3 from 1 December 2023).
+- **Broker's role**: capture client bid → push to exchange bidding platform → orchestrate <abbr title="Unified Payments Interface">UPI</abbr> Block mandate via sponsor bank → reconcile allotment file from RTA → release mandate / book security credit. The broker never holds client funds for IPO; funds stay blocked in the client's bank under the UPI / <abbr title="Applications Supported by Blocked Amount">ASBA</abbr> mechanism.
+- **Window**: standard book-built IPO opens for **3 working days** (T to <abbr title="Trade-date Plus N settlement">T+2</abbr>), revised application / withdrawal possible during the window, allotment finalised by RTA on T+2 evening, listing on T+3 ([<abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Corporate Finance Department (within SEBI)">CFD</abbr>/TPD1/CIR/P/2023/140](/broking-kyc/reference/circulars/sebi-other/#sebihocfdtpd1cirp2023140), mandatory T+3 from 1 December 2023).
 - **UPI Block** is the default rail for retail bids up to **Rs.5 lakh** ([SEBI/HO/CFD/DIL2/CIR/P/2022/45](/broking-kyc/reference/circulars/sebi-other/#sebihocfddil2cirp202245)). Larger bids route via SCSB ASBA (paper / portal mandate).
 - **Allocation method** depends on category: retail (Rs ≤ 2 lakh per bid) gets a **lottery** if oversubscribed, with each successful retail allottee receiving the minimum lot; HNI / NII (Rs > 2 lakh) gets **proportionate** allocation; QIB gets discretionary / proportionate per merchant-banker book-build.
 - **OFS** (Offer for Sale by promoters) is a one- or two-day exchange-window mechanism distinct from IPO — orders are placed during a 09:15–15:30 trading-day window via a separate OFS UI, and allocation is price-priority at a floor price.
@@ -19,9 +19,9 @@ import { Aside } from '@astrojs/starlight/components';
 
 ## Conceptual overview
 
-The Indian primary market has consolidated around the **ASBA / UPI Block** mechanism. Pre-2016, retail IPO applications used physical cheques or NEFT-pull blocks at SCSBs, which were cumbersome and produced substantial settlement lag. SEBI's progressive 2016–2022 reforms moved the bulk of retail applications to a UPI-mandate plumbing: the client's application instructs the client's bank, via a UPI app or via the broker's syndicate route, to **block** an amount equal to the bid value in the client's own account. The funds never leave the client's account until allocation is confirmed — at which point the issuer's collection bank debits only the allocated amount and **releases** the block on the unallotted portion the same evening.
+The Indian primary market has consolidated around the **ASBA / UPI Block** mechanism. Pre-2016, retail IPO applications used physical cheques or <abbr title="National Electronic Funds Transfer">NEFT</abbr>-pull blocks at SCSBs, which were cumbersome and produced substantial settlement lag. SEBI's progressive 2016–2022 reforms moved the bulk of retail applications to a UPI-mandate plumbing: the client's application instructs the client's bank, via a UPI app or via the broker's syndicate route, to **block** an amount equal to the bid value in the client's own account. The funds never leave the client's account until allocation is confirmed — at which point the issuer's collection bank debits only the allocated amount and **releases** the block on the unallotted portion the same evening.
 
-The broker plays a thinner role here than in secondary-market trading. The broker is a **bid aggregator and reconciliation operator**, not a custodian of client funds. The exchange (NSE / BSE) runs the bidding platform; the RTA (Link Intime, KFintech, MUFG Intime/Bigshare) consolidates allotment; the sponsor bank (one of ~14 banks empanelled by NPCI) issues the UPI mandate; the issuer's collection bank settles the post-allocation funds. The broker's value in this chain is (a) UX — making the bid easy for the retail client, (b) eligibility check — confirming the client has a valid demat / PAN / KYC before pushing the bid, and (c) grievance routing — sitting between the client and the RTA / sponsor bank for refund and credit-related complaints.
+The broker plays a thinner role here than in secondary-market trading. The broker is a **bid aggregator and reconciliation operator**, not a custodian of client funds. The exchange (NSE / BSE) runs the bidding platform; the RTA (Link Intime, KFintech, MUFG Intime/Bigshare) consolidates allotment; the sponsor bank (one of ~14 banks empanelled by <abbr title="National Payments Corporation of India">NPCI</abbr>) issues the UPI mandate; the issuer's collection bank settles the post-allocation funds. The broker's value in this chain is (a) UX — making the bid easy for the retail client, (b) eligibility check — confirming the client has a valid demat / <abbr title="Permanent Account Number">PAN</abbr> / <abbr title="Know Your Customer (process).">KYC</abbr> before pushing the bid, and (c) grievance routing — sitting between the client and the RTA / sponsor bank for refund and credit-related complaints.
 
 The post-2023 trend has been an aggressive compression of the timeline. SEBI's August 2023 circular ([SEBI/HO/CFD/TPD1/CIR/P/2023/140](/broking-kyc/reference/circulars/sebi-other/#sebihocfdtpd1cirp2023140)) reduced public-issue listing from **T+6 to T+3** in two stages — voluntary from 1 September 2023, mandatory from 1 December 2023. The broker's reconciliation cadence has had to compress to match. SEBI's March 2025 rights-issue circular ([SEBI/HO/CFD/CFD-PoD-1/P/CIR/2025/31](/broking-kyc/reference/circulars/sebi-other/#sebihocfdcfd-pod-1pcir202531)) followed with a parallel compression for rights issues to **23 working days** end-to-end.
 
@@ -40,7 +40,7 @@ The issue master is refreshed daily through the bidding window; revisions (price
 
 ### Bidding-window calendar
 
-A typical book-built IPO opens for **3 working days** (T, T+1, T+2). Some issues have a 5-day window for QIB / anchor portions. The anchor allocation runs the day before T (T-1) and is finalised by 5:00 PM the same day — only QIB anchor allottees participate. From the broker's perspective, anchor is a non-event because retail brokers don't typically have anchor clients; large institutional brokers route anchor demand through their institutional desk.
+A typical book-built IPO opens for **3 working days** (T, <abbr title="Trade-date Plus N settlement">T+1</abbr>, T+2). Some issues have a 5-day window for QIB / anchor portions. The anchor allocation runs the day before T (T-1) and is finalised by 5:00 PM the same day — only QIB anchor allottees participate. From the broker's perspective, anchor is a non-event because retail brokers don't typically have anchor clients; large institutional brokers route anchor demand through their institutional desk.
 
 ### Sponsor-bank empanelment & UPI Block configuration
 
@@ -52,10 +52,10 @@ The broker's app shows the client a dropdown of supported PSP handles (@okhdfcba
 
 The broker must confirm before bid submission:
 
-- Client's **PAN is active** and KRA-validated (any client on "KYC on hold" cannot bid).
-- Client has an **active demat account** with the same PAN — the bid is rejected if the PAN-BO ID linkage doesn't validate.
+- Client's **PAN is active** and <abbr title="KYC Registration Agency">KRA</abbr>-validated (any client on "KYC on hold" cannot bid).
+- Client has an **active demat account** with the same PAN — the bid is rejected if the PAN-<abbr title="Beneficial Owner">BO</abbr> ID linkage doesn't validate.
 - Client's bank account in the UPI handle matches the bank account on file (penny-drop name-match is the typical safeguard, though for UPI bids the PSP gateway handles part of this).
-- Client is not on **GSM Stage 4 / ASM-T** restriction (these typically block IPO bidding for the specific category, though this is rare).
+- Client is not on **<abbr title="Graded Surveillance Measure">GSM</abbr> Stage 4 / <abbr title="Additional Surveillance Measure">ASM</abbr>-T** restriction (these typically block IPO bidding for the specific category, though this is rare).
 - Client has not exceeded **5 applications per PAN** in the same issue (SEBI's 2018 multiple-application rule; bids beyond 5 are rejected by the RTA at allocation).
 
 ## 2. The retail UPI Block IPO flow — step by step
@@ -108,13 +108,13 @@ The release shows up in the client's bank as "block released" or "amount availab
 
 ### Step 9 — Security credit & listing
 
-The issuer's RTA submits the corporate-action file to NSDL / CDSL on T+2 evening. The depository credits the allotted shares to each successful allottee's BO ID on T+3 morning. The shares appear in the client's demat by mid-day T+3.
+The issuer's RTA submits the corporate-action file to <abbr title="National Securities Depository Limited">NSDL</abbr> / <abbr title="Central Depository Services (India) Limited">CDSL</abbr> on T+2 evening. The depository credits the allotted shares to each successful allottee's BO ID on T+3 morning. The shares appear in the client's demat by mid-day T+3.
 
 Listing on the exchanges happens on **T+3** itself (mandatory listing day per [SEBI/HO/CFD/TPD1/CIR/P/2023/140](/broking-kyc/reference/circulars/sebi-other/#sebihocfdtpd1cirp2023140)). The stock is available for trading from market open on T+3.
 
 ### Step 10 — Broker reconciliation
 
-The broker reconciles, by EOD T+3:
+The broker reconciles, by <abbr title="End Of Day">EOD</abbr> T+3:
 
 - Bids submitted (from broker's terminal logs).
 - Bids accepted by exchange (RC-100 file from exchange).
@@ -122,7 +122,7 @@ The broker reconciles, by EOD T+3:
 - Refunds released (mandate-release confirmations from sponsor bank).
 - Shares credited (BO credit file from depository).
 
-Any mismatch — a client whose bid was RC-100 but isn't on the allotment file, a client allotted but not credited — triggers a manual reconciliation entry and a grievance ticket. The grievance flow is typically routed to the RTA in the first instance, escalating to the exchange's IGRC if unresolved.
+Any mismatch — a client whose bid was RC-100 but isn't on the allotment file, a client allotted but not credited — triggers a manual reconciliation entry and a grievance ticket. The grievance flow is typically routed to the RTA in the first instance, escalating to the exchange's <abbr title="Investor Grievance Redressal Committee">IGRC</abbr> if unresolved.
 
 <Aside type="note">
 **Why the broker isn't on the funds path.** In the ASBA-UPI mechanism, the broker is a **mandate originator** but not a **fund handler**. The client's funds move directly from the client's bank to the issuer's collection bank (escrow). This is intentional — it removes the broker from the trust path, which historically caused investor losses when brokers used IPO float for proprietary purposes. The broker's compensation in the primary market is therefore not float-based but is a per-application fee (typically Rs 5–20 per UPI-mandate creation) plus exchange-paid syndicate brokerage on allocated value (typically 0.35–0.50% on retail allotment).
@@ -182,11 +182,11 @@ Two categories:
 
 ### Broker-side flow
 
-OFS bids route through the same OMS as cash-segment orders, but tagged with an OFS-eligible flag. The exchange returns acknowledgement and final allocation at end of day. Settlement happens on **T+1** in the same cycle as the cash segment — funds debit / securities credit follow the standard cash-settlement mechanism, not the UPI Block mandate path.
+OFS bids route through the same <abbr title="Order Management System">OMS</abbr> as cash-segment orders, but tagged with an OFS-eligible flag. The exchange returns acknowledgement and final allocation at end of day. Settlement happens on **T+1** in the same cycle as the cash segment — funds debit / securities credit follow the standard cash-settlement mechanism, not the UPI Block mandate path.
 
 OFS is **delivery-based only** — no intraday, no margin trading on the OFS day itself. The buyer must have full funds (cash segment) at the time of bid placement. Brokers verify funds upfront against the available margin and reject bids that would breach margin.
 
-Because OFS settles on T+1 like a regular cash trade, the broker's role is heavier here than in an IPO — the broker is on the funds-and-securities path, not just a mandate originator. Pre-trade margin checks, RMS validation, and post-trade contract notes all apply.
+Because OFS settles on T+1 like a regular cash trade, the broker's role is heavier here than in an IPO — the broker is on the funds-and-securities path, not just a mandate originator. Pre-trade margin checks, <abbr title="Risk Management System">RMS</abbr> validation, and post-trade contract notes all apply.
 
 ### Retail discount
 
@@ -200,7 +200,7 @@ Public NCD issues follow a similar broad rail to IPOs but with substantial mecha
 
 - **First-Come-First-Served (FCFS) allocation** within each category — not lottery, not proportionate. The basis-of-allotment file is sorted by bid timestamp, and allocation runs top-down until the category cap is hit.
 - **Tenor categories** — many NCD issues offer 3-year, 5-year, 7-year, 10-year tenor options. Bidders specify their preferred tenor; allocation runs per-tenor with separate caps. Tenors that fill up first may close intra-day while others remain open.
-- **Investor categories** — Category I (institutional), Category II (HNI), Category III (retail &lt; Rs 10 lakh), Category IV (retail &lt; Rs 2 lakh / individual). Each has its own reservation.
+- **Investor categories** — Category I (institutional), Category <abbr title="—">II</abbr> (HNI), Category <abbr title="—">III</abbr> (retail &lt; Rs 10 lakh), Category IV (retail &lt; Rs 2 lakh / individual). Each has its own reservation.
 - **No demat allocation** for some retail bids — NCDs can be allotted in **physical form** if the bidder explicitly opts; demat is the default.
 
 The funds flow for NCDs is identical to IPO — UPI Block for retail, ASBA for HNI. The post-allocation tranche is the same. The differences are entirely at the **allocation algorithm and category buckets** layer.
@@ -227,7 +227,7 @@ A voluntary delisting via reverse book building has the broker capturing exit-pr
 
 ### Oversubscription handling
 
-For a heavily oversubscribed retail issue (5x, 10x, 100x), the lottery produces many more unsuccessful than successful bidders. The broker's grievance load can spike post-allotment — unsuccessful bidders sometimes file SCORES complaints alleging unfair allocation. The defence is the **audit trail**: RTA's lottery seed, bid book, and the random-draw output should be reproducible. SEBI inspects this periodically; the RTA preserves the artefacts for at least 8 years.
+For a heavily oversubscribed retail issue (5x, 10x, 100x), the lottery produces many more unsuccessful than successful bidders. The broker's grievance load can spike post-allotment — unsuccessful bidders sometimes file <abbr title="SEBI Complaints Redress System">SCORES</abbr> complaints alleging unfair allocation. The defence is the **audit trail**: RTA's lottery seed, bid book, and the random-draw output should be reproducible. SEBI inspects this periodically; the RTA preserves the artefacts for at least 8 years.
 
 ### Withdrawal during the window
 
@@ -277,8 +277,8 @@ If NSE IFM or BSE iBBS itself goes down during bidding hours, the exchange typic
 - [Broker Process Narrative](/broking-kyc/broker-process/narrative/) — Section 4 covers daily reporting touchpoints including primary-market reconciliation.
 - [Compliance Blueprint — Investor servicing domain](/broking-kyc/operations/compliance-blueprint/) — investor-charter, complaint, contract-note obligations that also apply to IPO grievances.
 - [NPCI Circulars](/broking-kyc/reference/circulars/npci/) — UPI Block / AutoPay / SBMD circulars (OC No. 200, OC No. 185A, OC No. 76A).
-- [SEBI MRD / CFD Circulars](/broking-kyc/reference/circulars/sebi-other/) — IPO ASBA-UPI streamlining, T+3 listing, rights issue 23-day timeline.
-- [BSE Circulars](/broking-kyc/reference/circulars/bse/) — UCC structure for primary issues, ASBA UPI 5:00 PM cut-off.
+- [SEBI <abbr title="Market Regulation Department (SEBI)">MRD</abbr> / CFD Circulars](/broking-kyc/reference/circulars/sebi-other/) — IPO ASBA-UPI streamlining, T+3 listing, rights issue 23-day timeline.
+- [BSE Circulars](/broking-kyc/reference/circulars/bse/) — <abbr title="Unique Client Code">UCC</abbr> structure for primary issues, ASBA UPI 5:00 PM cut-off.
 - [NSE Circulars](/broking-kyc/reference/circulars/nse/) — NSE IFM (Integrated Front-end Manager) bidding-window operating procedures.
 - [Vendor Atlas](/broking-kyc/vendors/atlas/) — payment / mandate / UPI vendor category for sponsor-bank integration partners.
 

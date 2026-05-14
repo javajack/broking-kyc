@@ -21,7 +21,7 @@ import Diagram from '../../components/Diagram.astro';
 This documentation was generated using **Claude Code**, an AI-powered LLM (Large Language Model) by Anthropic, as a research and capability estimation exercise. AI models can and do hallucinate — any information presented here may be inaccurate, incomplete, or outdated. Any resemblance to or overlap with the products, documentation, or intellectual property of any specific vendor, organization, or individual is **purely coincidental and unintended**. This project is **not directly inspired by any particular product, vendor, or proprietary system**, and no plagiarism is intended. All content is based on publicly available information, regulatory circulars, and vendor documentation that is freely accessible on the internet. **This is not legal, financial, or compliance advice.** Always verify with official sources before making any business or compliance decisions.
 :::
 
-Indian stock broking operations are an interlocking system: a 9-screen onboarding pipeline that culminates in 8 parallel regulatory batch uploads; a daily trading rhythm that runs from 06:00 BOD scripts through to overnight settlement; quarterly running-account settlements; half-yearly compliance certificates; an audit calendar that pulls together every previous cycle; a regulatory base of 884 circulars; a vendor stack of 233 named products. This site documents all of it, with verifiable citations and persona-curated reading paths for whoever shows up.
+Indian stock broking operations are an interlocking system: a 9-screen onboarding pipeline that culminates in 8 parallel regulatory batch uploads; a daily trading rhythm that runs from 06:00 <abbr title="Beginning Of Day">BOD</abbr> scripts through to overnight settlement; quarterly running-account settlements; half-yearly compliance certificates; an audit calendar that pulls together every previous cycle; a regulatory base of 884 circulars; a vendor stack of 233 named products. This site documents all of it, with verifiable citations and persona-curated reading paths for whoever shows up.
 
 ## Pick your role and we'll point you at the right 5–10 pages
 
@@ -53,10 +53,10 @@ A layered knowledge base that grew across nine focused sub-projects:
 		884 regulatory circulars across 13 issuers, 233 named vendor products across 22 categories, 1,314 field-destination flows across 14 destinations, 400 verifiable compliance touchpoints across 16 domains. Downloadable [master CSV](/broking-kyc/field-atlas-master.csv).
 	</Card>
 	<Card title="Depth: Operator's view" icon="rocket">
-		End-to-end broker process narrative (8.2K words), 163-node integration DAG across 6 phases, 35 focused deep-dive pages (OMS, RMS/SPAN, surveillance, settlement, CSCRF, audits, AP framework, BMC/ABC, SGF/IPF, market manipulation typologies, segment rules, and more).
+		End-to-end broker process narrative (8.2K words), 163-node integration <abbr title="Directed Acyclic Graph.">DAG</abbr> across 6 phases, 35 focused deep-dive pages (<abbr title="Order Management System">OMS</abbr>, <abbr title="Risk Management System">RMS</abbr>/<abbr title="Standard Portfolio Analysis of Risk">SPAN</abbr>, surveillance, settlement, <abbr title="Cybersecurity and Cyber Resilience Framework">CSCRF</abbr>, audits, <abbr title="Authorized Person">AP</abbr> framework, <abbr title="Base Minimum Capital">BMC</abbr>/<abbr title="Additional Base Capital">ABC</abbr>, <abbr title="Settlement Guarantee Fund">SGF</abbr>/<abbr title="Investor Protection Fund">IPF</abbr>, market manipulation typologies, segment rules, and more).
 	</Card>
 	<Card title="Journey: Step-by-step" icon="puzzle">
-		9-screen onboarding journey with field-level coverage. 6 post-onboarding lifecycle walkthroughs (re-KYC, modifications, dormancy, closure, transmission, NRI conversion). All cross-linked back to the breadth and depth layers.
+		9-screen onboarding journey with field-level coverage. 6 post-onboarding lifecycle walkthroughs (re-<abbr title="Know Your Customer (process).">KYC</abbr>, modifications, dormancy, closure, transmission, <abbr title="Non-Resident Indian">NRI</abbr> conversion). All cross-linked back to the breadth and depth layers.
 	</Card>
 	<Card title="Curated by role" icon="list-format">
 		12 persona pages with 5–10 page reading paths. From Product Manager to New Employee to Regulator. Each path skips what you don't need and explains the rationale for what you do.
@@ -69,19 +69,19 @@ The diagram below shows the complete onboarding flow. Spend a minute studying it
 
 <Diagram src="/diagrams/01-onboarding-flow.svg" label="Complete Onboarding Flow — 9 Screens + Maker-Checker + Batch Pipelines" />
 
-Here are the key dimensions of the system, derived from SEBI regulatory requirements and the KRA/CKYC/exchange/depository submission mandates.
+Here are the key dimensions of the system, derived from <abbr title="Securities and Exchange Board of India">SEBI</abbr> regulatory requirements and the <abbr title="KYC Registration Agency">KRA</abbr>/<abbr title="Central KYC (records registry)">CKYC</abbr>/exchange/depository submission mandates.
 
 ## At a Glance
 
 <CardGrid stagger>
 	<Card title="Multi-Step Identity Verification" icon="rocket">
-		Mobile OTP → PAN verification → Government identity source (DigiLocker/Aadhaar) → identity confirmation → bank verification → trading preferences → nominations → declarations → eSign.
+		Mobile <abbr title="One-Time Password">OTP</abbr> → <abbr title="Permanent Account Number">PAN</abbr> verification → Government identity source (DigiLocker/Aadhaar) → identity confirmation → bank verification → trading preferences → nominations → declarations → eSign.
 	</Card>
 	<Card title="Comprehensive KYC Data Capture" icon="document">
 		Government identity sources (DigiLocker, KRA, CKYC) provide pre-verified identity and financial data, minimizing manual data entry errors per SEBI KYC norms.
 	</Card>
 	<Card title="Identity, KRA, Exchange & Depository Integrations" icon="puzzle">
-		PAN verification (NSDL/Protean), KRA agencies, CKYC (CERSAI), DigiLocker, eSign, AML screening, biometric verification, exchanges (NSE/BSE/MCX), and depositories (CDSL/NSDL). See [Vendor Integrations](/broking-kyc/vendors/) for implementation options.
+		PAN verification (<abbr title="National Securities Depository Limited">NSDL</abbr>/Protean), KRA agencies, CKYC (<abbr title="Central Registry of Securitisation Asset Reconstruction and Security Interest of India">CERSAI</abbr>), DigiLocker, eSign, <abbr title="Anti-Money Laundering">AML</abbr> screening, biometric verification, exchanges (<abbr title="National Stock Exchange of India">NSE</abbr>/<abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr>/<abbr title="Multi Commodity Exchange of India">MCX</abbr>), and depositories (<abbr title="Central Depository Services (India) Limited">CDSL</abbr>/NSDL). See [Vendor Integrations](/broking-kyc/vendors/) for implementation options.
 	</Card>
 	<Card title="8 Regulatory Batch Pipelines" icon="list-format">
 		KRA, CKYC, NSE, BSE, MCX, CDSL, NSDL, and Income pipelines run asynchronously after maker-checker approval per SEBI dual-control requirements.
@@ -115,23 +115,23 @@ These are the circulars and regulations that govern everything in this specifica
 
 | Regulation | Reference |
 |-----------|-----------|
-| SEBI KYC Master Circular | SEBI/HO/MIRSD/MIRSD-SEC-2/P/CIR/2023/168 (Oct 2023) |
-| KYC Process & Technology (Online KYC, VIPV) | [SEBI/HO/MIRSD/DOP/CIR/P/2020/73](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddopcirp202073) (Apr 2020) |
-| KYC Simplification at KRAs | [SEBI/HO/MIRSD/FATF/P/CIR/2023/0144](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdfatfpcir20230144) (Aug 2023) |
+| SEBI KYC Master Circular | SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-SEC-2/P/CIR/2023/168 (Oct 2023) |
+| KYC Process & Technology (Online KYC, <abbr title="Video In-Person Verification (sometimes &quot;Video CIP&quot; / V-CIP)">VIPV</abbr>) | [SEBI/HO/MIRSD/DOP/CIR/P/2020/73](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddopcirp202073) (Apr 2020) |
+| KYC Simplification at KRAs | [SEBI/HO/MIRSD/<abbr title="Financial Action Task Force">FATF</abbr>/P/CIR/2023/0144](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdfatfpcir20230144) (Aug 2023) |
 | PAN-Aadhaar Linking Relaxation | [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/41](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202441) (May 2024) |
 | Dual KRA + CKYC Upload | [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/79](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202479) (Jun 2024) — mandatory since Aug 2024 |
-| FATCA/CRS Centralization at KRAs | [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202412) (Feb 2024) — mandatory since Jul 2024 |
-| AML/CFT Guidelines | [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202478) (Jun 2024) |
-| DDPI replacing POA | [SEBI/HO/MIRSD/DoP/P/CIR/2022/44](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddoppcir202244) (Apr 2022) — mandatory since Nov 2022, optional for clients |
+| <abbr title="Foreign Account Tax Compliance Act (US)">FATCA</abbr>/<abbr title="Common Reporting Standard">CRS</abbr> Centralization at KRAs | [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202412) (Feb 2024) — mandatory since Jul 2024 |
+| AML/<abbr title="Combating the Financing of Terrorism">CFT</abbr> Guidelines | [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202478) (Jun 2024) |
+| <abbr title="Demat Debit and Pledge Instruction">DDPI</abbr> replacing <abbr title="Power of Attorney">POA</abbr> | [SEBI/HO/MIRSD/DoP/P/CIR/2022/44](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddoppcir202244) (Apr 2022) — mandatory since Nov 2022, optional for clients |
 | Nomination Revamp (up to 10 nominees) | SEBI circular (Jan 10, 2025) — video verification for opt-out |
-| DigiLocker for Demat Holdings | [SEBI/HO/OIAE/OIAE_IAD-3/P/CIR/2025/32](/broking-kyc/reference/circulars/sebi-other/) (Mar 2025) |
+| DigiLocker for Demat Holdings | [SEBI/HO/<abbr title="Office of Investor Assistance and Education (SEBI)">OIAE</abbr>/OIAE_IAD-3/P/CIR/2025/32](/broking-kyc/reference/circulars/sebi-other/) (Mar 2025) |
 | SEBI Stock Brokers Master Circular | SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90 (Jun 2025) |
-| SEBI Stock Brokers Regulations 2026 | [SEBI/LAD-NRO/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebilad-nrogn2026291) (Jan 7, 2026) — replaces 1992 regulations |
+| SEBI Stock Brokers Regulations 2026 | [SEBI/<abbr title="Legal Affairs Department — Northern Regional Office (SEBI)">LAD-NRO</abbr>/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebilad-nrogn2026291) (Jan 7, 2026) — replaces 1992 regulations |
 | Client Fund Upstreaming | SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/84 (Jun 2023) |
-| UPI Block Mechanism (QSBs) | SEBI consultation paper (Aug 2024) — mandatory from Feb 1, 2025 |
-| T+0 Settlement | [SEBI/HO/MRD/MRD-PoD-3/P/CIR/2024/20](/broking-kyc/reference/circulars/sebi-other/#sebihomrdmrd-pod-3pcir202420) (Mar 2024) — expanded to top 500 stocks Dec 2024 |
-| e-KYC Setu (NPCI) | SEBI press release (Jun 2025) — Aadhaar e-KYC without AUA/KUA license |
-| UPI AutoPay Rs 1 Lakh Limit | RBI/2023-2024/88 + NPCI/UPI/OC-151A (Dec 2023) — MCC 6211 securities brokers |
+| <abbr title="Unified Payments Interface">UPI</abbr> Block Mechanism (QSBs) | SEBI consultation paper (Aug 2024) — mandatory from Feb 1, 2025 |
+| <abbr title="Trade-date Plus N settlement">T+0</abbr> Settlement | [SEBI/HO/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>/MRD-PoD-3/P/CIR/2024/20](/broking-kyc/reference/circulars/sebi-other/#sebihomrdmrd-pod-3pcir202420) (Mar 2024) — expanded to top 500 stocks Dec 2024 |
+| e-KYC Setu (<abbr title="National Payments Corporation of India">NPCI</abbr>) | SEBI press release (Jun 2025) — Aadhaar e-KYC without AUA/KUA license |
+| UPI AutoPay Rs 1 Lakh Limit | <abbr title="Reserve Bank of India">RBI</abbr>/2023-2024/88 + NPCI/UPI/OC-151A (Dec 2023) — MCC 6211 securities brokers |
 | Account Aggregator Master Direction | RBI/DNBR/2016-17/46 (Sep 2016, updated Sep 2024) |
-| DPDP Act 2023 + Rules 2025 | Notified Nov 13, 2025 — full compliance deadline May 2027 |
+| <abbr title="Digital Personal Data Protection Act 2023 (and Rules 2025)">DPDP</abbr> Act 2023 + Rules 2025 | Notified Nov 13, 2025 — full compliance deadline May 2027 |
 | KYC Onboarding Consultation Paper | SEBI (Jan 16, 2026) — proposes centralized KYC, 5-year review cycle |

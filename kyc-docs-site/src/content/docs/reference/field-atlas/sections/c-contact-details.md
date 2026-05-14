@@ -18,33 +18,33 @@ Sorted by `field_id`, then `destination`.
 | field_id | field_name | destination | destination_field_name | destination_format | frequency | transformation | quirks_notes | spec_source |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | C-alternate_email | Alternate Email | back-office | alt_email_id | VARCHAR(100) | on-modify | lowercase | secondary delivery if primary bounces | [industry typical] |
-| C-alternate_email | Alternate Email | bse-ucc | ALT_EMAIL | VARCHAR(100) | on-modify | lowercase | Optional | BSE/20240223-42 |
-| C-alternate_email | Alternate Email | cdsl-bo | ALT_EMAIL | CHAR(100) | on-modify | lowercase | Optional | CDSL/OPS/DP/POLCY/2024/208 |
-| C-alternate_email | Alternate Email | ckyc | ALTERNATE_EMAIL | VARCHAR(100) | one-time | lowercase | CKYC optional | CKYC/2020/04 |
-| C-alternate_email | Alternate Email | dlt-comms | CC_EMAIL | VARCHAR(100) | on-event | lowercase | typically family-member/authorized-user; SEBI does not mandate alert here | [industry typical] |
+| C-alternate_email | Alternate Email | bse-ucc | ALT_EMAIL | VARCHAR(100) | on-modify | lowercase | Optional | <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr>/20240223-42 |
+| C-alternate_email | Alternate Email | cdsl-bo | ALT_EMAIL | CHAR(100) | on-modify | lowercase | Optional | <abbr title="Central Depository Services (India) Limited">CDSL</abbr>/OPS/<abbr title="Depository Participant">DP</abbr>/POLCY/2024/208 |
+| C-alternate_email | Alternate Email | ckyc | ALTERNATE_EMAIL | VARCHAR(100) | one-time | lowercase | <abbr title="Central KYC (records registry)">CKYC</abbr> optional | CKYC/2020/04 |
+| C-alternate_email | Alternate Email | dlt-comms | CC_EMAIL | VARCHAR(100) | on-event | lowercase | typically family-member/authorized-user; <abbr title="Securities and Exchange Board of India">SEBI</abbr> does not mandate alert here | [industry typical] |
 | C-alternate_email | Alternate Email | kra | ALT_EMAIL | VARCHAR(100) | on-modify | lowercase | Optional | [industry typical] |
-| C-alternate_email | Alternate Email | mcx-ucc | ALT_EMAIL | VARCHAR(100) | on-modify | lowercase | Optional; relationship code required if non-self | MCX/S&I/663/2024 |
-| C-alternate_email | Alternate Email | nsdl-bo | AltEmailAdr | VARCHAR(100) UDiFF | on-modify | lowercase | Optional element | NSDL/POLICY/2025/0056 |
-| C-alternate_email | Alternate Email | nse-ucc | ALT_EMAIL | VARCHAR(100) | on-modify | lowercase | Optional; with relationship if non-self | NSE/ISC/61817 |
+| C-alternate_email | Alternate Email | mcx-ucc | ALT_EMAIL | VARCHAR(100) | on-modify | lowercase | Optional; relationship code required if non-self | <abbr title="Multi Commodity Exchange of India">MCX</abbr>/S&I/663/2024 |
+| C-alternate_email | Alternate Email | nsdl-bo | AltEmailAdr | VARCHAR(100) UDiFF | on-modify | lowercase | Optional element | <abbr title="National Securities Depository Limited">NSDL</abbr>/POLICY/2025/0056 |
+| C-alternate_email | Alternate Email | nse-ucc | ALT_EMAIL | VARCHAR(100) | on-modify | lowercase | Optional; with relationship if non-self | <abbr title="National Stock Exchange of India">NSE</abbr>/<abbr title="Investor Service Centre.">ISC</abbr>/61817 |
 | C-alternate_mobile | Alternate Mobile | back-office | alt_mobile_no | VARCHAR(15) | on-modify | [direct] | fallback for transmission/closure intimation | [industry typical] |
 | C-alternate_mobile | Alternate Mobile | bse-ucc | ALT_MOBILE | VARCHAR(15) | on-modify | [direct] | Optional | BSE/20240223-42 |
 | C-alternate_mobile | Alternate Mobile | cdsl-bo | ALT_MOBILE | CHAR(15) | on-modify | [direct] | Line 04 optional position; right-padded | CDSL/OPS/DP/POLCY/2024/208 |
 | C-alternate_mobile | Alternate Mobile | ckyc | ALTERNATE_MOBILE | VARCHAR(15) | one-time | [direct] | CKYC optional | CKYC/2020/04 |
-| C-alternate_mobile | Alternate Mobile | dlt-comms | CC_MSISDN | CHAR(10) | on-event | derived from Y | optional CC for critical alerts (margin call, contract note); not always populated | [industry typical] |
+| C-alternate_mobile | Alternate Mobile | dlt-comms | CC_MSISDN | CHAR(10) | on-event | derived from Y | optional <abbr title="Clearing Corporation (NCL, ICCL, MCXCCL — context-dependent).">CC</abbr> for critical alerts (margin call, contract note); not always populated | [industry typical] |
 | C-alternate_mobile | Alternate Mobile | kra | ALT_MOBILE | VARCHAR(15) | on-modify | [direct] | Optional; not validated | [industry typical] |
 | C-alternate_mobile | Alternate Mobile | mcx-ucc | ALT_MOBILE | VARCHAR(15) | on-modify | [direct] | Optional; relationship code required if non-self | MCX/S&I/663/2024 |
 | C-alternate_mobile | Alternate Mobile | nsdl-bo | AltMblNb | VARCHAR(15) UDiFF | on-modify | [direct] | Optional ISO-tagged element | NSDL/POLICY/2025/0056 |
 | C-alternate_mobile | Alternate Mobile | nse-ucc | ALT_MOBILE | VARCHAR(15) | on-modify | [direct] | Optional; family member with relationship code if used | NSE/ISC/61817 |
-| C-email | Email | aml-fiu | EMAIL | VARCHAR(100) | on-event | lowercase | customer-attribute field; FIU cross-references against other RE filings | FIU-IND-REPORTING-FORMAT-V114 |
-| C-email | Email | back-office | email_id | VARCHAR(100) | on-modify | lowercase | contract-note ECN dispatch; quarterly statement; ITR Form 16A | SEBI/HO/MIRSD/POD-1/P/CIR/2025/94 |
-| C-email | Email Address | bse-ucc | EMAIL_ID | VARCHAR(100) | on-modify | lowercase | Mandatory; OTP-validated; client accounts with unverified email marked ON HOLD | BSE/20230819-6 |
+| C-email | Email | aml-fiu | EMAIL | VARCHAR(100) | on-event | lowercase | customer-attribute field; <abbr title="Financial Intelligence Unit">FIU</abbr> cross-references against other RE filings | <abbr title="Financial Intelligence Unit — India">FIU-IND</abbr>-REPORTING-FORMAT-V114 |
+| C-email | Email | back-office | email_id | VARCHAR(100) | on-modify | lowercase | contract-note <abbr title="Electronic Contract Note.">ECN</abbr> dispatch; quarterly statement; ITR Form 16A | SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/POD-1/P/CIR/2025/94 |
+| C-email | Email Address | bse-ucc | EMAIL_ID | VARCHAR(100) | on-modify | lowercase | Mandatory; <abbr title="One-Time Password">OTP</abbr>-validated; client accounts with unverified email marked ON HOLD | BSE/20230819-6 |
 | C-email | Email | cdsl-bo | EMAIL_ID | CHAR(100) | on-modify | lowercase | Line 04 fixed-length; mandatory per CDSL POLCY/2021/152; right-padded with spaces; RFC 5322 validation; e-CAS sent to this address | CDSL/OPS/DP/POLCY/2021/152 |
 | C-email | Email Address | ckyc | EMAIL_ID | VARCHAR(100) | one-time | lowercase | CKYC stores in lowercase; used in download notifications | CKYC/2025/16 |
 | C-email | Email Address | contract-notes | ClientEmail | VARCHAR(100) | on-trade | lowercase | primary ECN delivery channel; T+24h dispatch SLA; bounce-back retried on alt-email | NSE/INSP/61999 |
 | C-email | Email Address | dlt-comms | TO_EMAIL | VARCHAR(100) | on-event | lowercase | email gateway uses TLS; bounce/complaint rate must be < 0.1% under ESP rules | [industry typical] |
 | C-email | Email | fatca-crs | CONTACT_EMAIL | VARCHAR(100) | on-event | lowercase | contact channel; not itself indicia; used for self-cert refresh reminders | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12 |
-| C-email | Email Address | kra | EMAIL | VARCHAR(100) | on-modify | lowercase | KRA validates via email link; kra_email_validated flag set | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/41 |
-| C-email | Email Address | mcx-ucc | EMAIL_ID | VARCHAR(100) | on-modify | lowercase | Mandatory effective 21 Oct 2024 across all UCC categories; AP/employee personal email triggers Rs.15000 penalty | MCX/S&I/663/2024 |
+| C-email | Email Address | kra | EMAIL | VARCHAR(100) | on-modify | lowercase | <abbr title="KYC Registration Agency">KRA</abbr> validates via email link; kra_email_validated flag set | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/41 |
+| C-email | Email Address | mcx-ucc | EMAIL_ID | VARCHAR(100) | on-modify | lowercase | Mandatory effective 21 Oct 2024 across all <abbr title="Unique Client Code">UCC</abbr> categories; <abbr title="Authorized Person">AP</abbr>/employee personal email triggers Rs.15000 penalty | MCX/S&I/663/2024 |
 | C-email | Email | nsdl-bo | EmailAdr | VARCHAR(100) UDiFF | on-modify | lowercase | ISO-tagged element; mandatory; e-CAS by 12th of month sent here | NSDL/POLICY/2025/0022 |
 | C-email | Email Address | nse-ucc | EMAIL_ID | VARCHAR(100) | on-modify | lowercase | Mandatory; 'notprovided@notprovided.com' disallowed; clients without valid email by deadline flagged Closed | NSE/ISC/47869 |
 | C-email_authorised_person | Authorised/Contact Person Name (for Email) | bse-ucc | EMAIL_AUTH_NAME | VARCHAR(100) | one-time | [direct] | Dependent field | BSE/20240223-42 |
@@ -59,7 +59,7 @@ Sorted by `field_id`, then `destination`.
 | C-fax_number | Fax Number | kra | FAX_NO | VARCHAR(15) | on-modify | [direct] | Rarely populated | [industry typical] |
 | C-fax_std_code | Fax STD Code | ckyc | FAX_STD | VARCHAR(5) | one-time | [direct] | CKYC field retained for legacy | CKYC/2020/04 |
 | C-fax_std_code | Fax STD Code | kra | FAX_STD | VARCHAR(5) | on-modify | [direct] | Rarely populated | [industry typical] |
-| C-mobile_isd_code | Mobile ISD Code | back-office | mob_isd | VARCHAR(5) | on-modify | [direct] | default +91; used as prefix in DLT SMS template variable | [industry typical] |
+| C-mobile_isd_code | Mobile ISD Code | back-office | mob_isd | VARCHAR(5) | on-modify | [direct] | default +91; used as prefix in DLT <abbr title="Short Message Service.">SMS</abbr> template variable | [industry typical] |
 | C-mobile_isd_code | Mobile ISD Code | bse-ucc | ISD_CODE | VARCHAR(5) | on-modify | [direct] | Default +91 | BSE/20240223-42 |
 | C-mobile_isd_code | Mobile ISD Code | cdsl-bo | MOBILE_ISD | CHAR(5) | on-modify | [direct] | Line 04 fixed-length position; default +91 for India; right-padded | CDSL/OPS/DP/SYSTM/2023/119 |
 | C-mobile_isd_code | Mobile ISD Code | ckyc | MOBILE_ISD_CODE | VARCHAR(5) | one-time | [direct] | CKYC stores ISD without leading + sign | CKYC/2025/16 |
@@ -68,17 +68,17 @@ Sorted by `field_id`, then `destination`.
 | C-mobile_isd_code | Mobile ISD Code | mcx-ucc | ISD_CODE | VARCHAR(5) | on-modify | [direct] | Default +91 | MCX/TECH/394/2023 |
 | C-mobile_isd_code | Mobile ISD Code | nsdl-bo | MblISDCd | CHAR(5) UDiFF | on-modify | [direct] | ISD code element in MblPhneNb block | NSDL/POLICY/2025/0056 |
 | C-mobile_isd_code | Mobile ISD Code | nse-ucc | ISD_CODE | VARCHAR(5) | on-modify | [direct] | Default +91 for Indian residents | NSE/ISC/61817 |
-| C-mobile_number | Mobile Number | aml-fiu | MOBILE | VARCHAR(15) | on-event | [direct] | customer-attribute field in STR/CTR; used by FIU to link transactions across REs | FIU-IND-REPORTING-FORMAT-V114 |
+| C-mobile_number | Mobile Number | aml-fiu | MOBILE | VARCHAR(15) | on-event | [direct] | customer-attribute field in <abbr title="Suspicious Transaction Report">STR</abbr>/<abbr title="Cash Transaction Report">CTR</abbr>; used by FIU to link transactions across REs | FIU-IND-REPORTING-FORMAT-V114 |
 | C-mobile_number | Mobile Number | back-office | mobile_no | VARCHAR(15) | on-modify | [direct] | 10-digit India; trade alerts and DLT-approved SMS routed via DLT-comms | SEBI Dec 3, 2024 SMS/Email mandate |
-| C-mobile_number | Mobile Number | bse-ucc | MOBILE_NO | VARCHAR(15) | on-modify | [direct] | Mandatory; OTP-validated via UIDAI/SEBI KYC validation framework | BSE/20230819-6 |
+| C-mobile_number | Mobile Number | bse-ucc | MOBILE_NO | VARCHAR(15) | on-modify | [direct] | Mandatory; OTP-validated via UIDAI/SEBI <abbr title="Know Your Customer (process).">KYC</abbr> validation framework | BSE/20230819-6 |
 | C-mobile_number | Mobile Number | cdsl-bo | MOBILE_NUMBER | CHAR(15) | on-modify | [direct] | Line 04; mandatory per CDSL POLCY/2021/152 (six mandatory KYC attributes); 10 digit India must start 6/7/8/9; rejection on invalid pattern | CDSL/OPS/DP/POLCY/2021/152 |
 | C-mobile_number | Mobile Number | ckyc | MOBILE_NUMBER | VARCHAR(15) | one-time | [direct] | Used to trigger OTP for download consent post May-2025 | CKYC/2025/02 |
 | C-mobile_number | Mobile Number | contract-notes | ClientMobile | VARCHAR(15) | on-trade | [direct] | ECN dispatch via SMS/IM channel permitted in addition to email; DLT-template compliance required | NSE/INSP/52604 |
 | C-mobile_number | Mobile Number | dlt-comms | RECIPIENT_MSISDN | CHAR(10) | on-event | derived from Y | strip +91/0 prefix; DLT requires 10-digit MSISDN; rejected if scrubbed against DND when transactional category not used | [industry typical] |
-| C-mobile_number | Mobile Number | fatca-crs | CONTACT_MOBILE | VARCHAR(15) | on-event | [direct] | contact channel for FATCA discrepancy queries; foreign mobile triggers indicia review | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12 |
+| C-mobile_number | Mobile Number | fatca-crs | CONTACT_MOBILE | VARCHAR(15) | on-event | [direct] | contact channel for <abbr title="Foreign Account Tax Compliance Act (US)">FATCA</abbr> discrepancy queries; foreign mobile triggers indicia review | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12 |
 | C-mobile_number | Mobile Number | kra | MOBILE_NO | VARCHAR(15) | on-modify | [direct] | KRA validates mobile via OTP; flag kra_mobile_validated set on success | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/41 |
 | C-mobile_number | Mobile Number | mcx-ucc | MOBILE_NO | VARCHAR(15) | on-modify | [direct] | Mandatory; Rs.15000/client penalty if member/AP personal mobile used | MCX/INSP/270/2025 |
-| C-mobile_number | Mobile Number | nsdl-bo | MblNb | VARCHAR(15) UDiFF | on-modify | [direct] | ISO 20022 PhneNb pattern; mandatory; OTP-validated via SCORES 2.0 alerts | NSDL/POLICY/2025/0056 |
+| C-mobile_number | Mobile Number | nsdl-bo | MblNb | VARCHAR(15) UDiFF | on-modify | [direct] | ISO 20022 PhneNb pattern; mandatory; OTP-validated via <abbr title="SEBI Complaints Redress System">SCORES</abbr> 2.0 alerts | NSDL/POLICY/2025/0056 |
 | C-mobile_number | Mobile Number | nse-ucc | MOBILE_NO | VARCHAR(15) | on-modify | [direct] | Mandatory; '6666666666' explicitly disallowed; member AP/employee personal mobile disallowed | NSE/ISC/47869 |
 | C-mobile_validated | Mobile Validated | cdsl-bo | MOBILE_OTP_VALIDATED | CHAR(1) | one-time | [direct] | Y/N; OTP validation flag; mandatory under SEBI six attributes | CDSL/OPS/DP/POLCY/2021/152 |
 | C-mobile_validated | Mobile Validated | nsdl-bo | MblValdtdFlg | CHAR(1) UDiFF | one-time | [direct] | OTP validation flag | NSDL/POLICY/2025/0056 |

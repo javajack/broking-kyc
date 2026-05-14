@@ -3,11 +3,11 @@ title: CKYC
 description: Central KYC (CERSAI) integration — search, download, and upload for KYC identity record management.
 ---
 
-Central KYC (CKYC) is India's unified identity registry for all financial institutions, operated by CERSAI (Central Registry of Securitisation Asset Reconstruction and Security Interest of India) through its technology partner Protean (formerly NSDL e-Governance Infrastructure Limited). Unlike the KRA (KYC Registration Agency) system which serves only the securities market, CKYC spans banking, insurance, securities, and NBFCs (Non-Banking Financial Companies) -- making it the single most comprehensive KYC repository in the Indian financial ecosystem.
+Central <abbr title="Know Your Customer (process).">KYC</abbr> (<abbr title="Central KYC (records registry)">CKYC</abbr>) is India's unified identity registry for all financial institutions, operated by <abbr title="Central Registry of Securitisation Asset Reconstruction and Security Interest of India">CERSAI</abbr> (Central Registry of Securitisation Asset Reconstruction and Security Interest of India) through its technology partner Protean (formerly <abbr title="National Securities Depository Limited">NSDL</abbr> e-Governance Infrastructure Limited). Unlike the <abbr title="KYC Registration Agency">KRA</abbr> (KYC Registration Agency) system which serves only the securities market, CKYC spans banking, insurance, securities, and NBFCs (Non-Banking Financial Companies) -- making it the single most comprehensive KYC repository in the Indian financial ecosystem.
 
-Every individual in the registry is assigned a unique 14-digit KIN (KYC Identification Number) that serves as a permanent cross-sector identity reference. When a customer completes KYC at any financial institution, that record becomes available to all other regulated entities through search and download operations. This is the "do KYC once, use everywhere" vision that CKYC was designed to fulfill -- eliminating redundant identity verification across institutions and reducing onboarding friction for customers.
+Every individual in the registry is assigned a unique 14-digit <abbr title="KYC Identification Number">KIN</abbr> (KYC Identification Number) that serves as a permanent cross-sector identity reference. When a customer completes KYC at any financial institution, that record becomes available to all other regulated entities through search and download operations. This is the "do KYC once, use everywhere" vision that CKYC was designed to fulfill -- eliminating redundant identity verification across institutions and reducing onboarding friction for customers.
 
-Since August 2024, SEBI (Securities and Exchange Board of India) mandates dual upload to both KRA and CKYC for every new account. This page covers the complete CKYC integration: search, download, and upload operations via Decentro (our primary aggregator), the SFTP batch pipeline for bulk processing, dual upload orchestration with KRA, and handling of the January 2025 masking change that altered how CKYC numbers are returned in search responses.
+Since August 2024, <abbr title="Securities and Exchange Board of India">SEBI</abbr> (Securities and Exchange Board of India) mandates dual upload to both KRA and CKYC for every new account. This page covers the complete CKYC integration: search, download, and upload operations via Decentro (our primary aggregator), the SFTP batch pipeline for bulk processing, dual upload orchestration with KRA, and handling of the January 2025 masking change that altered how CKYC numbers are returned in search responses.
 
 ## Table of Contents
 
@@ -49,7 +49,7 @@ The **Central KYC Registry (CKYCR)** is a centralized repository of KYC records 
 ### Purpose
 
 CKYC provides a **single KYC record per individual** accessible by all regulated financial institutions across sectors:
-- Banks (RBI-regulated)
+- Banks (<abbr title="Reserve Bank of India">RBI</abbr>-regulated)
 - Stock brokers and intermediaries (SEBI-regulated)
 - Insurance companies (IRDAI-regulated)
 - Mutual fund houses (SEBI-regulated via AMFIs)
@@ -63,7 +63,7 @@ Every individual in the CKYC registry is assigned a **14-digit CKYC Identificati
 
 - Format: 14 numeric digits (e.g., `50000012345678`)
 - Assigned by CERSAI upon successful upload
-- One KIN per person (deduplicated by PAN + DOB + name)
+- One KIN per person (deduplicated by <abbr title="Permanent Account Number">PAN</abbr> + DOB + name)
 - Permanent -- does not change even when records are updated
 
 ### CKYC vs KRA: Key Differences
@@ -81,7 +81,7 @@ Every individual in the CKYC registry is assigned a **14-digit CKYC Identificati
 ### Dual Upload Mandate
 
 Since **August 1, 2024**, SEBI mandates that all intermediaries must upload KYC records to **both** KRA and CKYC:
-- **Circular**: [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/79](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202479) (Jun 6, 2024)
+- **Circular**: [SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/SECFATF/P/CIR/2024/79](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202479) (Jun 6, 2024)
 - Previously, brokers only uploaded to KRA; CKYC upload was optional
 - Now both are mandatory for every new account opening
 
@@ -246,7 +246,7 @@ The Download response returns the complete CKYC record. Fields are grouped below
 | `maritalStatus` | String | Single/Married/Widowed/Divorced |
 | `nationality` | String | Nationality code |
 | `citizenship` | String | IN for Indian citizen |
-| `residentialStatus` | String | Resident/NRI/FPI |
+| `residentialStatus` | String | Resident/<abbr title="Non-Resident Indian">NRI</abbr>/FPI |
 | `occupationType` | String | Occupation code (01-08) |
 | `occupationDetail` | String | Free text occupation |
 | `annualIncome` | String | Income range code |
@@ -291,14 +291,14 @@ The Download response returns the complete CKYC record. Fields are grouped below
 | `drivingLicence` | String | DL number |
 | `dlExpiry` | Date | DL expiry date |
 
-**Tax / FATCA Details**:
+**Tax / <abbr title="Foreign Account Tax Compliance Act (US)">FATCA</abbr> Details**:
 | Field | Type | Description |
 |-------|------|-------------|
 | `taxResidencyCountry` | String | Country of tax residency |
-| `taxIdentificationNumber` | String | TIN for non-India tax residency |
+| `taxIdentificationNumber` | String | <abbr title="Taxpayer Identification Number (in FATCA / CRS context)">TIN</abbr> for non-India tax residency |
 | `birthCountry` | String | Country of birth |
 | `birthCity` | String | City of birth |
-| `isPoliticallyExposed` | Boolean | PEP status as declared |
+| `isPoliticallyExposed` | Boolean | <abbr title="Politically Exposed Person">PEP</abbr> status as declared |
 
 **Images (Base64 encoded)**:
 | Field | Type | Description |
@@ -315,7 +315,7 @@ The Download response returns the complete CKYC record. Fields are grouped below
 | `kycDate` | Date | Original KYC date |
 | `lastUpdated` | Date | Last modification date |
 | `uploadedBy` | String | FI code of institution that uploaded |
-| `verificationMethod` | String | IPV/OVD/eKYC/VKYC |
+| `verificationMethod` | String | <abbr title="In-Person Verification">IPV</abbr>/<abbr title="Officially Valid Document">OVD</abbr>/eKYC/VKYC |
 
 #### Use Case in Onboarding
 
@@ -324,7 +324,7 @@ When CKYC Download returns a full record for a returning customer:
 2. Show the photo and signature from CKYC for visual confirmation
 3. Compare with PAN/Aadhaar data from DigiLocker for consistency
 4. Customer reviews pre-filled data and corrects any outdated information
-5. Only capture delta fields (trading preferences, nominee details, segment selection -- Part II data not in CKYC)
+5. Only capture delta fields (trading preferences, nominee details, segment selection -- Part <abbr title="—">II</abbr> data not in CKYC)
 
 ---
 
@@ -788,11 +788,11 @@ CKYC supports non-individual entities with a different template and additional r
 | 02 | Partnership Firm | Firm PAN, registration number, all partner details |
 | 03 | Company | CIN, date of incorporation, registered office, directors, UBO |
 | 04 | Trust | Trust deed reference, trustee details, settler details |
-| 05 | HUF | HUF PAN, Karta details, coparcener information |
+| 05 | <abbr title="Hindu Undivided Family">HUF</abbr> | HUF PAN, Karta details, coparcener information |
 | 06 | Government Entity | Entity code, department details |
 | 07 | Society | Registration number, governing body members |
 | 08 | AOP/BOI | Formation document, member details |
-| 09 | LLP | LLPIN, LLP agreement reference, designated partner details |
+| 09 | <abbr title="—">LLP</abbr> | LLPIN, LLP agreement reference, designated partner details |
 | 10 | Others | Case-by-case basis |
 
 ### Corporate (Constitution Code: 03)
@@ -806,7 +806,7 @@ CKYC supports non-individual entities with a different template and additional r
 - Board Resolution authorizing account opening (upload as document)
 - UBO (Ultimate Beneficial Owner) declaration -- individuals holding >10% stake or exercising control
 
-**UBO Requirements** (per PMLA/SEBI norms):
+**UBO Requirements** (per <abbr title="Prevention of Money Laundering Act 2002">PMLA</abbr>/SEBI norms):
 - Full KYC of each UBO (name, PAN, address, DOB, photo, signature)
 - Ownership chain tracing to natural person(s)
 - Declaration of all persons with >10% voting rights / capital
@@ -839,11 +839,11 @@ NRI accounts use the individual template (Code: 01) but with additional requirem
 |-------------|---------|
 | Overseas address | Mandatory -- correspondence address outside India |
 | Indian address | Required for communication within India (optional but recommended) |
-| Tax residency | FATCA/CRS self-certification mandatory |
+| Tax residency | FATCA/<abbr title="Common Reporting Standard">CRS</abbr> self-certification mandatory |
 | Tax ID | Foreign TIN (Tax Identification Number) in country of residence |
 | Passport | Copy mandatory (as identity + address proof abroad) |
 | Country of residence | ISO country code |
-| NRE/NRO bank account | Bank verification on NRE/NRO account |
+| <abbr title="Non-Resident External (Rupee) account">NRE</abbr>/<abbr title="Non-Resident Ordinary (Rupee) account">NRO</abbr> bank account | Bank verification on NRE/NRO account |
 | PIO/OCI status | If applicable, OCI/PIO card copy |
 
 ### Trust (Constitution Code: 04) / LLP (Constitution Code: 09)
@@ -889,8 +889,8 @@ The KIN must be stored in the broker's system at multiple levels:
 |--------|-------|---------|
 | Customer master | `ckyc_number` (Field A25) | Primary reference for all CKYC operations |
 | KRA upload record | Optional field in KRA payload | Cross-reference between KRA and CKYC |
-| Depository (CDSL/NSDL) | BO account record | CDSL/NSDL may request KIN for records |
-| Exchange UCC | UCC registration data | NSE/BSE may include in UCC records |
+| Depository (<abbr title="Central Depository Services (India) Limited">CDSL</abbr>/NSDL) | <abbr title="Beneficial Owner">BO</abbr> account record | CDSL/NSDL may request KIN for records |
+| Exchange <abbr title="Unique Client Code">UCC</abbr> | UCC registration data | <abbr title="National Stock Exchange of India">NSE</abbr>/<abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> may include in UCC records |
 | CKYC submission log | `ckyc_kin_generated` (Field T06) | Audit trail for CKYC submission |
 
 ### Masked vs Unmasked
@@ -1145,13 +1145,13 @@ Total                       : Rs. 8-13
 | Aug 1, 2024 | Dual upload effective date | Compliance deadline for all new accounts | Same circular |
 | Jan 2025 | CKYC Search returns masked KIN | Download required for full 14-digit KIN | CERSAI system update |
 | Ongoing (2025-2026) | CERSAI system scalability upgrades | Improved uptime and response times expected | CERSAI internal |
-| Q1 2026 | CKYC integration with e-KYC Setu (NPCI) | Future: Aadhaar eKYC data may flow directly to CKYC | Under discussion |
+| Q1 2026 | CKYC integration with e-KYC Setu (<abbr title="National Payments Corporation of India">NPCI</abbr>) | Future: Aadhaar eKYC data may flow directly to CKYC | Under discussion |
 
 ### Upcoming / Expected
 
 - **CKYC for all existing customers**: SEBI may mandate retrospective CKYC upload for existing clients (currently only new accounts required)
-- **CKYC interop with AA framework**: Potential integration with Account Aggregator for data sharing
-- **Real-time KIN generation**: CERSAI working on reducing processing time from 4-5 days to real-time or T+1
+- **CKYC interop with <abbr title="Account Aggregator (RBI-licensed NBFC-AA)">AA</abbr> framework**: Potential integration with Account Aggregator for data sharing
+- **Real-time KIN generation**: CERSAI working on reducing processing time from 4-5 days to real-time or <abbr title="Trade-date Plus N settlement">T+1</abbr>
 
 ---
 
@@ -1283,7 +1283,7 @@ Mapping between the CKYC upload payload and our internal [Master Dataset](/broki
 | Code | Type | When Used |
 |------|------|-----------|
 | CERTIFIED_COPIES | Physical document copies certified by authorized person | In-branch KYC |
-| EKYC | Aadhaar-based e-KYC (OTP or biometric) | Aadhaar OTP verification |
+| EKYC | Aadhaar-based e-KYC (<abbr title="One-Time Password">OTP</abbr> or biometric) | Aadhaar OTP verification |
 | OFFLINE_VERIFICATION | Offline Aadhaar XML or DigiLocker | DigiLocker-based KYC |
 | DIGITAL_KYC | Geo-tagged photo + OVD verification | Digital KYC (RE visit) |
 | E_DOCUMENT | Electronically fetched documents (DigiLocker, e-PAN) | Document pull via APIs |

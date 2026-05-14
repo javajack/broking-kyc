@@ -12,7 +12,7 @@ next:
 import ScreenCard from '../../../components/ScreenCard.astro';
 import { Aside } from '@astrojs/starlight/components';
 
-The customer has chosen their trading segments. Now the system asks a question that most customers do not expect during account opening: who should receive your holdings if something happens to you? Nomination is a regulatory requirement for all demat and trading accounts in India. SEBI (Securities and Exchange Board of India) updated the rules in January 2025 to allow up to 10 nominees (previously capped at 3), and introduced a mandatory video declaration for customers who choose to opt out of nominating anyone. This screen handles both paths -- adding nominees or opting out.
+The customer has chosen their trading segments. Now the system asks a question that most customers do not expect during account opening: who should receive your holdings if something happens to you? Nomination is a regulatory requirement for all demat and trading accounts in India. <abbr title="Securities and Exchange Board of India">SEBI</abbr> (Securities and Exchange Board of India) updated the rules in January 2025 to allow up to 10 nominees (previously capped at 3), and introduced a mandatory video declaration for customers who choose to opt out of nominating anyone. This screen handles both paths -- adding nominees or opting out.
 
 <ScreenCard number={7} title="Nominations">
 
@@ -34,7 +34,7 @@ If the customer chooses to add nominees, they fill in the following fields for e
 Up to 10 nominees allowed (SEBI Jan 2025 regulation). Total allocation must equal 100%.
 
 <Aside type="note">
-Nominee details can be pre-filled from KRA (KYC Registration Agency) / CKYC (Central KYC) records if the user has existing nominee data on file. This reduces typing for users who are migrating from another broker.
+Nominee details can be pre-filled from <abbr title="KYC Registration Agency">KRA</abbr> (<abbr title="Know Your Customer (process).">KYC</abbr> Registration Agency) / <abbr title="Central KYC (records registry)">CKYC</abbr> (Central KYC) records if the user has existing nominee data on file. This reduces typing for users who are migrating from another broker.
 </Aside>
 
 :::tip[Allocation must total exactly 100%]
@@ -48,7 +48,7 @@ If the customer does not want to nominate anyone, they take the opt-out path ins
 The user selects "I choose to opt out of nomination." This requires an asynchronous video declaration to be completed within 30 days.
 
 <Aside type="caution" title="Video Declaration Required">
-Opting out of nomination requires a video declaration per SEBI rules. This is recorded asynchronously -- the user does not need to complete it during onboarding, but must do so within 30 days. The video verification must comply with SEBI VIPV guidelines.
+Opting out of nomination requires a video declaration per SEBI rules. This is recorded asynchronously -- the user does not need to complete it during onboarding, but must do so within 30 days. The video verification must comply with SEBI <abbr title="Video In-Person Verification (sometimes &quot;Video CIP&quot; / V-CIP)">VIPV</abbr> guidelines.
 </Aside>
 
 The video declaration for nomination opt-out is a SEBI requirement designed to ensure that customers are making an informed, deliberate choice rather than simply skipping a screen they do not understand.
@@ -65,7 +65,7 @@ These are the current rules governing nominations. They have changed significant
 For vendor implementation options for video verification, see [Vendor Integrations](/broking-kyc/vendors/).
 
 :::caution[Do not block account activation on opt-out video]
-The video declaration for nomination opt-out is deferred -- the customer can start trading before completing it. However, if the video is not recorded within 30 days, the account should be flagged for follow-up. Build a reminder workflow (SMS + email at day 7, 14, 21, 28) to ensure compliance.
+The video declaration for nomination opt-out is deferred -- the customer can start trading before completing it. However, if the video is not recorded within 30 days, the account should be flagged for follow-up. Build a reminder workflow (<abbr title="Short Message Service.">SMS</abbr> + email at day 7, 14, 21, 28) to ensure compliance.
 :::
 
 </ScreenCard>

@@ -5,17 +5,17 @@ description: Reference-heavy walkthrough of the TRAI Distributed Ledger Technolo
 
 import { Aside } from '@astrojs/starlight/components';
 
-> **Why this page is structured this way:** Brokers depend on transactional and service-explicit communications for almost every event in the trade lifecycle — order acknowledgement, contract note dispatch, margin shortfall, KYC reminder, SIP debit, IPO mandate. Every such message in India must be routed through the **TRAI DLT (Distributed Ledger Technology) framework** with a registered header (sender ID) and a registered template, scrubbed by a telecom operator. A misregistered or expired template produces silent failures (DLT_TEMPLATE_MISMATCH) that customers see as missing notifications and that auditors flag as compliance breaches. This page is reference-heavy because the framework is technical and field-specific; the broker's compliance officer and the broker's communications-vendor integration engineer both need fluency. Voice mirrors the [lifecycle/](/broking-kyc/lifecycle/) pages, with reference-style tables.
+> **Why this page is structured this way:** Brokers depend on transactional and service-explicit communications for almost every event in the trade lifecycle — order acknowledgement, contract note dispatch, margin shortfall, <abbr title="Know Your Customer (process).">KYC</abbr> reminder, SIP debit, <abbr title="Initial Public Offering">IPO</abbr> mandate. Every such message in India must be routed through the **TRAI DLT (Distributed Ledger Technology) framework** with a registered header (sender ID) and a registered template, scrubbed by a telecom operator. A misregistered or expired template produces silent failures (DLT_TEMPLATE_MISMATCH) that customers see as missing notifications and that auditors flag as compliance breaches. This page is reference-heavy because the framework is technical and field-specific; the broker's compliance officer and the broker's communications-vendor integration engineer both need fluency. Voice mirrors the [lifecycle/](/broking-kyc/lifecycle/) pages, with reference-style tables.
 
 ## TL;DR
 
 - **TRAI DLT** = Distributed Ledger Technology framework operationalised under the **Telecom Commercial Communications Customer Preference Regulations 2018 (TCCCPR 2018)**. The framework moved entity registration, header registration, and template registration onto a blockchain-style registry hosted by the Access Provider (telco operator).
 - **Principal Entity (PE)** = the broker (or any commercial sender). Each PE registers on the DLT portal of one operator (Vodafone Idea, Airtel, BSNL, Jio, MTNL) — once registered, the PE record propagates to other operators' DLT registries via the inter-operator registry.
 - **Header (Sender ID)** = 3–11 character alphanumeric (typically 6 characters) — e.g., `ZRDHCO`, `KOTAKB`, `AXISBN`. Each header is tied to a PE and a message category (transactional / promotional / service-explicit / service-implicit).
-- **Template** = the actual SMS body, with placeholders for variable content (account number, amount, date). Each template is registered against a header and a category. Variable content must respect declared character types (alphanumeric, numeric only, decimal, etc.).
+- **Template** = the actual <abbr title="Short Message Service.">SMS</abbr> body, with placeholders for variable content (account number, amount, date). Each template is registered against a header and a category. Variable content must respect declared character types (alphanumeric, numeric only, decimal, etc.).
 - **Scrubbing** = the telco's gateway at message-receipt time validates: sender PE → header → template → variable content. Failed scrubbing returns a DLT-specific error code; the message is **not delivered**.
 - **Template approval cycle** = 3–7 working days typical (PE-side review, operator DLT-team review, blockchain commit). Urgent templates can be expedited but uniformly take at least 24 hours.
-- **Email DLT** = a parallel but less restrictive framework (TRAI doesn't directly regulate email; AMFI / SEBI rules and DPDP define the obligation). Most broker email is sent without DLT-style scrubbing but must respect the SEBI investor-protection framework, the DPDP Act 2023, and the DLT-aligned content templates used for compliance audit trails.
+- **Email DLT** = a parallel but less restrictive framework (TRAI doesn't directly regulate email; AMFI / <abbr title="Securities and Exchange Board of India">SEBI</abbr> rules and <abbr title="Digital Personal Data Protection Act 2023 (and Rules 2025)">DPDP</abbr> define the obligation). Most broker email is sent without DLT-style scrubbing but must respect the SEBI investor-protection framework, the DPDP Act 2023, and the DLT-aligned content templates used for compliance audit trails.
 - **WhatsApp Business** = subject to Meta's Business Solution Provider (BSP) framework + India's outbound communication policy. The DLT framework doesn't formally apply to WhatsApp, but Indian banks / NBFCs / brokers route WhatsApp communications through BSPs that maintain DLT-equivalent governance (template approval, opt-in management).
 - **Broker obligations**: PE registration with at least one operator; headers registered for each communication category; templates registered for every transactional / service-explicit message body the broker sends; opt-out (NDNC) compliance for promotional messages.
 - AI-generated synthesis. **Verify any specific provision against the TRAI / operator DLT registry documentation before acting.**
@@ -28,10 +28,10 @@ The TCCCPR 2018, notified by TRAI on 19 July 2018, replaced the centralised mode
 
 The mechanism is fundamentally a **pre-registration + scrubbing** approach. Every commercial entity that wants to send SMS / voice / OBD (Outbound Dialler) communication must:
 
-1. Register as a **Principal Entity (PE)** — submit company PAN, GSTIN, address, contact, authorised signatory.
+1. Register as a **Principal Entity (PE)** — submit company <abbr title="Permanent Account Number">PAN</abbr>, GSTIN, address, contact, authorised signatory.
 2. Register one or more **Headers (Sender IDs)** under the PE — e.g., `ZRDHCO`, `KFINIB`, `KOTAKB`.
 3. Register **Templates** for each message it intends to send, under each header.
-4. Tie up with a **Telemarketer (TM)** or **Aggregator** that has telco-API access — the actual message-sending entity. PE + TM are linked.
+4. Tie up with a **Telemarketer (<abbr title="Trading Member">TM</abbr>)** or **Aggregator** that has telco-API access — the actual message-sending entity. PE + TM are linked.
 
 When a message is submitted to the telco's gateway, the gateway **scrubs** the message:
 
@@ -46,7 +46,7 @@ Failed scrubbing returns a DLT-specific error code (DLT_TEMPLATE_MISMATCH, DLT_H
 For a stock broker, the DLT framework affects nearly every customer-facing notification — order acknowledgements, contract note dispatch links, margin shortfall alerts, KYC reminders, SIP debit confirmations, IPO mandate prompts. A misregistered template silently breaks the notification stream for that message class. The broker's CS / Compliance team monitors DLT delivery rates and template-approval status as a routine matter.
 
 <Aside type="note">
-**Why DLT matters more for brokers than for most other industries.** Brokers are heavy SMS senders by volume (a typical retail-broker client receives 50+ SMS / month — order acks, contract notes, MTM intra-day, margin alerts, KYC reminders) AND by criticality (a missed margin-call SMS can cost the client real money). The cost of even a 1% DLT-failure rate is material. Most large brokers run a dedicated DLT-engineering function that monitors template approvals and delivery health continuously.
+**Why DLT matters more for brokers than for most other industries.** Brokers are heavy SMS senders by volume (a typical retail-broker client receives 50+ SMS / month — order acks, contract notes, <abbr title="Mark-to-Market">MTM</abbr> intra-day, margin alerts, KYC reminders) AND by criticality (a missed margin-call SMS can cost the client real money). The cost of even a 1% DLT-failure rate is material. Most large brokers run a dedicated DLT-engineering function that monitors template approvals and delivery health continuously.
 </Aside>
 
 ## 1. The TRAI DLT actor map
@@ -101,14 +101,14 @@ The PE submission requires:
 
 - **Entity PAN** — the broker's PAN.
 - **GSTIN** — broker's GST registration.
-- **Authorised signatory details** — name, DOB, mobile, email, PAN, address (signatory must be a director / KMP).
+- **Authorised signatory details** — name, DOB, mobile, email, PAN, address (signatory must be a director / <abbr title="Key Managerial Personnel">KMP</abbr>).
 - **Entity address** — registered office address with proof.
-- **Business type** — corporate / partnership / LLP / proprietorship / etc.
+- **Business type** — corporate / partnership / <abbr title="—">LLP</abbr> / proprietorship / etc.
 - **Sector / industry** — financial-services / stockbroker / NBFC / etc.
 
 ### Step 3 — Validation
 
-The operator's DLT team validates the documents (typical 2–5 working days). Some operators have an OTP-based authorised-signatory validation step that is automatic; others have manual document review.
+The operator's DLT team validates the documents (typical 2–5 working days). Some operators have an <abbr title="One-Time Password">OTP</abbr>-based authorised-signatory validation step that is automatic; others have manual document review.
 
 ### Step 4 — Inter-operator propagation
 
@@ -236,7 +236,7 @@ When the broker (via its TM / aggregator) submits a message to the telco's gatew
 3. **Template match** — does the message body match a registered template? Variable substitution is computed; the static parts must match exactly.
 4. **Variable character-type check** — runtime values must conform to declared types.
 5. **NDNC check** (promotional only) — is the recipient on NDNC opt-out?
-6. **Time-window check** — promotional messages must be sent within the permitted window (9 AM to 9 PM IST). Some operators restrict to 9 AM to 9 PM IST irrespective of category for safety.
+6. **Time-window check** — promotional messages must be sent within the permitted window (9 AM to 9 PM <abbr title="Indian Standard Time (UTC+05:30)">IST</abbr>). Some operators restrict to 9 AM to 9 PM IST irrespective of category for safety.
 7. **Velocity / throttle check** — operator-side rate-limiting (typically 100–10,000 SMS / sec per PE).
 
 Pass → routes to SMSC → delivered to handset.
@@ -330,7 +330,7 @@ The SEBI investor-charter framework requires dispatching contract notes via SMS 
 Email is governed differently than SMS in India:
 
 - TRAI does **not** directly regulate commercial email (TCCCPR 2018 covers SMS, voice, OBD — not email).
-- Indian commercial email is governed by the **DPDP Act 2023** (data protection / consent obligations), SEBI / AMFI / RBI investor-protection rules, and global anti-spam frameworks (CAN-SPAM, GDPR equivalents).
+- Indian commercial email is governed by the **DPDP Act 2023** (data protection / consent obligations), SEBI / AMFI / <abbr title="Reserve Bank of India">RBI</abbr> investor-protection rules, and global anti-spam frameworks (CAN-SPAM, GDPR equivalents).
 
 That said, many brokers maintain **email templates** parallel to their SMS DLT templates for several reasons:
 
@@ -404,7 +404,7 @@ The distinction between promotional and transactional / service-explicit is one 
 
 ### What is not promotional
 
-- Order acknowledgement — "Your buy order for ABC at Rs Y has been placed."
+- Order acknowledgement — "Your buy order for <abbr title="Additional Base Capital">ABC</abbr> at Rs Y has been placed."
 - Contract note dispatch — "Click here to view your contract note for today."
 - Margin shortfall — "Your account margin shortfall is Rs Z. Please replenish."
 - KYC re-validation reminder — "Your KYC re-validation is due by [date]."
@@ -463,7 +463,7 @@ Operators occasionally suspend templates if customer complaints suggest mis-cate
 
 ### Cross-border numbers
 
-For India-resident numbers, DLT applies. For non-India-resident numbers (e.g., NRI clients with foreign mobile numbers), the message routes via the TM's international SMS rail. DLT registration doesn't apply for foreign destinations; other-country regulations apply (typically lighter than India's DLT).
+For India-resident numbers, DLT applies. For non-India-resident numbers (e.g., <abbr title="Non-Resident Indian">NRI</abbr> clients with foreign mobile numbers), the message routes via the TM's international SMS rail. DLT registration doesn't apply for foreign destinations; other-country regulations apply (typically lighter than India's DLT).
 
 ### Voice / OBD calls
 
@@ -499,11 +499,11 @@ A broker's DLT operations team typically tracks:
 
 - [Broker Process Narrative](/broking-kyc/broker-process/narrative/) — Section 1 covers the welcome cascade and DLT-approved template usage; Section 4 covers daily reporting touchpoints including investor servicing communications.
 - [Compliance Blueprint — Investor servicing domain](/broking-kyc/operations/compliance-blueprint/) — investor charter, contract note dispatch obligations that use DLT templates.
-- [Compliance Blueprint — Cyber security domain](/broking-kyc/operations/compliance-blueprint/) — CSCRF retention rules apply to DLT logs as part of operational logs.
+- [Compliance Blueprint — Cyber security domain](/broking-kyc/operations/compliance-blueprint/) — <abbr title="Cybersecurity and Cyber Resilience Framework">CSCRF</abbr> retention rules apply to DLT logs as part of operational logs.
 - [Vendor Atlas — DLT / SMS / WhatsApp category](/broking-kyc/vendors/atlas/#dlt--sms--whatsapp-12-products) — 12 vendor profiles for TMs / BSPs and their DLT capabilities.
-- [SEBI MIRSD Circulars](/broking-kyc/reference/circulars/sebi-mirsd/) — investor-protection master circular covers contract-note dispatch rules.
+- [SEBI <abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr> Circulars](/broking-kyc/reference/circulars/sebi-mirsd/) — investor-protection master circular covers contract-note dispatch rules.
 - [Lifecycle: Re-KYC](/broking-kyc/lifecycle/re-kyc/) — re-KYC reminder cascade uses DLT-approved templates.
-- [Operations: Integration DAG BOD](/broking-kyc/operations/integration-dag/bod/) — DLT-vendor connectivity is part of broker operational-health checks.
+- [Operations: Integration <abbr title="Directed Acyclic Graph.">DAG</abbr> <abbr title="Beginning Of Day">BOD</abbr>](/broking-kyc/operations/integration-dag/bod/) — DLT-vendor connectivity is part of broker operational-health checks.
 
 ## Verified through
 

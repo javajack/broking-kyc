@@ -17,16 +17,16 @@ Sorted by `field_id`, then `destination`.
 
 | field_id | field_name | destination | destination_field_name | destination_format | frequency | transformation | quirks_notes | spec_source |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| F-declared_annual_income | Declared Annual Income | aml-fiu | DECLARED_INCOME | NUMBER(15,2) | on-event | [direct] | optional exact figure if captured; used in EDD-required STR cases | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78 |
-| F-declared_annual_income | Declared Annual Income | back-office | decl_ann_income | NUMBER(15,2) | on-modify | [direct] | INR; appears on AML risk-score input | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78 |
-| F-declared_annual_income | Declared Annual Income | bse-ucc | DECL_INCOME | NUMBER(15,2) | on-modify | [direct] | Optional; supplements income range | BSE/20240223-42 |
-| F-declared_annual_income | Declared Annual Income | ckyc | ANNUAL_INCOME_AMT | NUMBER(15,2) | one-time | [direct] | CKYC optional | CKYC/2020/04 |
+| F-declared_annual_income | Declared Annual Income | aml-fiu | DECLARED_INCOME | NUMBER(15,2) | on-event | [direct] | optional exact figure if captured; used in EDD-required <abbr title="Suspicious Transaction Report">STR</abbr> cases | <abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/SECFATF/P/CIR/2024/78 |
+| F-declared_annual_income | Declared Annual Income | back-office | decl_ann_income | NUMBER(15,2) | on-modify | [direct] | INR; appears on <abbr title="Anti-Money Laundering">AML</abbr> risk-score input | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78 |
+| F-declared_annual_income | Declared Annual Income | bse-ucc | DECL_INCOME | NUMBER(15,2) | on-modify | [direct] | Optional; supplements income range | <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr>/20240223-42 |
+| F-declared_annual_income | Declared Annual Income | ckyc | ANNUAL_INCOME_AMT | NUMBER(15,2) | one-time | [direct] | <abbr title="Central KYC (records registry)">CKYC</abbr> optional | CKYC/2020/04 |
 | F-declared_annual_income | Declared Annual Income | kra | ANN_INCOME_AMT | NUMBER(15,2) | on-modify | [direct] | Optional; INR exact | [industry typical] |
-| F-declared_annual_income | Declared Annual Income | mcx-ucc | DECL_INCOME | NUMBER(15,2) | on-modify | [direct] | Optional supplement to income range | MCX/TECH/394/2023 |
-| F-declared_annual_income | Declared Annual Income | nse-ucc | DECL_INCOME | NUMBER(15,2) | on-modify | [direct] | INR exact; optional but recommended | NSE/ISC/61817 |
+| F-declared_annual_income | Declared Annual Income | mcx-ucc | DECL_INCOME | NUMBER(15,2) | on-modify | [direct] | Optional supplement to income range | <abbr title="Multi Commodity Exchange of India">MCX</abbr>/TECH/394/2023 |
+| F-declared_annual_income | Declared Annual Income | nse-ucc | DECL_INCOME | NUMBER(15,2) | on-modify | [direct] | INR exact; optional but recommended | <abbr title="National Stock Exchange of India">NSE</abbr>/<abbr title="Investor Service Centre.">ISC</abbr>/61817 |
 | F-gross_annual_income_range | Gross Annual Income Range | aml-fiu | INCOME_RANGE | CHAR(2) | on-event | [direct] | income-range code; STR narrative uses to substantiate "inconsistent with declared income" suspicion | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78 |
 | F-gross_annual_income_range | Gross Annual Income Range | back-office | income_range_cd | VARCHAR(2) | on-modify | lookup against R | income-range code; downstream to charges-differential (some brokers tier brokerage by income) | [industry typical] |
-| F-gross_annual_income_range | Gross Annual Income Range | bse-ucc | INCOME_RANGE | CHAR(2) | on-modify | lookup against R | Mandatory in revised UCC; codes 01-06 | BSE/20240223-42 |
+| F-gross_annual_income_range | Gross Annual Income Range | bse-ucc | INCOME_RANGE | CHAR(2) | on-modify | lookup against R | Mandatory in revised <abbr title="Unique Client Code">UCC</abbr>; codes 01-06 | BSE/20240223-42 |
 | F-gross_annual_income_range | Gross Annual Income Range | ckyc | GROSS_ANNUAL_INCOME | CHAR(2) | one-time | lookup against R | CKYC same code table; mandatory | CKYC/2025/16 |
 | F-gross_annual_income_range | Gross Annual Income Range | kra | INCOME_SLAB | CHAR(2) | on-modify | lookup against R | Income range code 01-06; SEBI proposed revised slabs Jan 2026 | [industry typical] |
 | F-gross_annual_income_range | Gross Annual Income Range | mcx-ucc | INCOME_RANGE | CHAR(2) | on-modify | lookup against R | Mandatory; drives income-proof tagging; required for ALL MCX clients (not just F&O) per MCX/S&I/663/2024 | MCX/S&I/663/2024 |
@@ -48,10 +48,10 @@ Sorted by `field_id`, then `destination`.
 | F-net_worth | Net Worth | back-office | net_worth_inr | NUMBER(15,2) | on-modify | [direct] | INR Lakhs; gate for F&O/COM activation | [industry typical] |
 | F-net_worth | Net Worth | bse-ucc | NET_WORTH | NUMBER(15,2) | on-modify | [direct] | Required for F&O segment activation | BSE/20240223-42 |
 | F-net_worth | Net Worth | ckyc | NETWORTH | NUMBER(15,2) | one-time | [direct] | CKYC optional field | CKYC/2020/04 |
-| F-net_worth | Net Worth | kra | NET_WORTH | NUMBER(15,2) | on-modify | [direct] | INR Lakhs; KRA optional | [industry typical] |
+| F-net_worth | Net Worth | kra | NET_WORTH | NUMBER(15,2) | on-modify | [direct] | INR Lakhs; <abbr title="KYC Registration Agency">KRA</abbr> optional | [industry typical] |
 | F-net_worth | Net Worth | mcx-ucc | NET_WORTH | NUMBER(15,2) | on-modify | [direct] | Required (with date) for all commodity segment clients | MCX/TECH/394/2023 |
 | F-net_worth | Net Worth | nse-ucc | NET_WORTH | NUMBER(15,2) | on-modify | [direct] | Required for F&O segment activation; INR Lakhs | NSE/ISC/61817 |
-| F-net_worth | Net Worth | regulatory-reports | NetWorth | NUMBER(15,2) | on-modify | [direct] | reported in CFR for high-net-worth clients; must be < 1-yr old per master-dataset F06 | [industry typical] |
+| F-net_worth | Net Worth | regulatory-reports | NetWorth | NUMBER(15,2) | on-modify | [direct] | reported in <abbr title="Client Funding Report.">CFR</abbr> for high-net-worth clients; must be < 1-yr old per master-dataset F06 | [industry typical] |
 | F-net_worth | Net Worth | rms | client_net_worth | NUMBER(15,2) | on-modify | [direct] | net-worth threshold gates F&O segment limit | [industry typical] |
 | F-net_worth_date | Net Worth Date | back-office | net_worth_date | DATE YYYYMMDD | on-modify | formatted | must be <1yr old; auto-re-prompt on staleness | [industry typical] |
 | F-net_worth_date | Net Worth Date | bse-ucc | NW_DATE | DATE DD/MM/YYYY | on-modify | formatted | Must be < 1 year old | BSE/20240223-42 |
@@ -62,7 +62,7 @@ Sorted by `field_id`, then `destination`.
 | F-occupation | Occupation | aml-fiu | OCCUPATION | CHAR(2) | on-event | lookup against R | customer-profile field; STR narrative cites occupation when transactions are inconsistent with profile | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78 |
 | F-occupation | Occupation Code | back-office | occupation_cd | VARCHAR(2) | on-modify | lookup against R | occupation code-table; flag for high-risk occupation buckets in AML risk-tier | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78 |
 | F-occupation | Occupation | bse-ucc | OCCUPATION | CHAR(2) | on-modify | lookup against R | Occupation code table; mandatory | BSE/20240223-42 |
-| F-occupation | Occupation | ckyc | OCCUPATION_TYPE | CHAR(2) | one-time | lookup against R | CERSAI occupation codes; same table as KRA per Appendix A1 | CKYC/2025/16 |
+| F-occupation | Occupation | ckyc | OCCUPATION_TYPE | CHAR(2) | one-time | lookup against R | <abbr title="Central Registry of Securitisation Asset Reconstruction and Security Interest of India">CERSAI</abbr> occupation codes; same table as KRA per Appendix A1 | CKYC/2025/16 |
 | F-occupation | Occupation | kra | OCCUPATION | CHAR(2) | on-modify | lookup against R | KRA/CKYC shared occupation code table (01-11, 99) | SEBI/HO/MIRSD/SECFATF/P/CIR/2023/169 |
 | F-occupation | Occupation | mcx-ucc | OCCUPATION | CHAR(2) | on-modify | lookup against R | Required; commodity-segment client risk profiling input | MCX/TECH/394/2023 |
 | F-occupation | Occupation | nse-ucc | OCCUPATION | CHAR(2) | on-modify | lookup against R | Occupation code table (01-11, 99); flows to UCC profile | NSE/ISC/61817 |
@@ -71,7 +71,7 @@ Sorted by `field_id`, then `destination`.
 | F-occupation_others | Occupation Others | kra | OCCUPATION_OTHERS | VARCHAR(50) | on-modify | formatted | Conditional if F01=99 | [industry typical] |
 | F-source_of_wealth | Source of Wealth | aml-fiu | SOURCE_OF_WEALTH | VARCHAR(100) | on-event | [direct] | free-text; STR narrative quotes verbatim when funds source is inconsistent | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78 |
 | F-source_of_wealth | Source of Wealth | back-office | source_of_wealth | VARCHAR(100) | on-modify | [direct] | Salary/Business/Inheritance; AML enhanced due-diligence input | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78 |
-| F-source_of_wealth | Source of Wealth | ckyc | SOURCE_OF_WEALTH | VARCHAR(100) | one-time | formatted | CKYC optional but recommended per PMLA | CKYC/2025/16 |
+| F-source_of_wealth | Source of Wealth | ckyc | SOURCE_OF_WEALTH | VARCHAR(100) | one-time | formatted | CKYC optional but recommended per <abbr title="Prevention of Money Laundering Act 2002">PMLA</abbr> | CKYC/2025/16 |
 | F-source_of_wealth | Source of Wealth | kra | SRC_OF_WEALTH | VARCHAR(100) | on-modify | formatted | Optional in KRA; required for high-net-worth EDD | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78 |
 
 ## Verified through

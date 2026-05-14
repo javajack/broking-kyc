@@ -5,7 +5,7 @@ description: Reading path for the head of order-management and risk-management s
 
 import { Aside } from '@astrojs/starlight/components';
 
-Your team owns the millisecond-budget layer of the broker. Every order — and there are millions a day — passes through your pre-trade RMS pipeline. Your real-time MTM is what determines whether MIS positions auto-square or stay open. The four peak-margin snapshots that fire at 11:30 / 12:30 / 13:30 / 14:30 are your KPIs.
+Your team owns the millisecond-budget layer of the broker. Every order — and there are millions a day — passes through your pre-trade <abbr title="Risk Management System">RMS</abbr> pipeline. Your real-time <abbr title="Mark-to-Market">MTM</abbr> is what determines whether MIS positions auto-square or stay open. The four peak-margin snapshots that fire at 11:30 / 12:30 / 13:30 / 14:30 are your KPIs.
 
 When things break, you're the one whose phone rings first. This page is your shortcut.
 
@@ -13,8 +13,8 @@ When things break, you're the one whose phone rings first. This page is your sho
 
 Three layers matter most:
 
-- **Trading-day deep dives** — OMS internals, RMS / SPAN methodology, surveillance, retail algo framework.
-- **Integration DAG (trading hours)** — pre-trade pipeline, snapshot mechanics, intraday loops.
+- **Trading-day deep dives** — <abbr title="Order Management System">OMS</abbr> internals, RMS / <abbr title="Standard Portfolio Analysis of Risk">SPAN</abbr> methodology, surveillance, retail algo framework.
+- **Integration <abbr title="Directed Acyclic Graph.">DAG</abbr> (trading hours)** — pre-trade pipeline, snapshot mechanics, intraday loops.
 - **Margin / surveillance domains in the Compliance Blueprint** — the obligations driving your KPIs.
 
 Everything else is context for the layer you operate at.
@@ -23,13 +23,13 @@ Everything else is context for the layer you operate at.
 
 1. **[Trading-Hours Integration DAG](/broking-kyc/operations/integration-dag/trading-hours/)** — start here. The per-node table tells you the dependency graph of every call your systems make and respond to.
 
-2. **[OMS Internals deep-dive](/broking-kyc/deep-dives/trading-day/oms-internals/)** — your team's primary product. Order capture paths, pre-trade RMS hot path (segment / margin / MWPL / order-type / surveillance gates), FIX gateway specifics, latency budgets.
+2. **[OMS Internals deep-dive](/broking-kyc/deep-dives/trading-day/oms-internals/)** — your team's primary product. Order capture paths, pre-trade RMS hot path (segment / margin / <abbr title="Market Wide Position Limit">MWPL</abbr> / order-type / surveillance gates), <abbr title="Financial Information eXchange protocol">FIX</abbr> gateway specifics, latency budgets.
 
 3. **[RMS / SPAN Methodology deep-dive](/broking-kyc/deep-dives/trading-day/rms-span-methodology/)** — the margin computation walkthrough. Worked examples; peak margin shortfall penalty grids. This is your team's regulatory reference.
 
-4. **[Surveillance — NORMS / GSM / ASM deep-dive](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/)** — what triggers what flag. Your team's surveillance system mirrors much of this; knowing the exchange-side rules is non-negotiable.
+4. **[Surveillance — NORMS / <abbr title="Graded Surveillance Measure">GSM</abbr> / <abbr title="Additional Surveillance Measure">ASM</abbr> deep-dive](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/)** — what triggers what flag. Your team's surveillance system mirrors much of this; knowing the exchange-side rules is non-negotiable.
 
-5. **[BOD Integration DAG](/broking-kyc/operations/integration-dag/bod/)** — the RMS parameter reload sequence. If BOD fails, your system doesn't have margin parameters and you can't trade.
+5. **[<abbr title="Beginning Of Day">BOD</abbr> Integration DAG](/broking-kyc/operations/integration-dag/bod/)** — the RMS parameter reload sequence. If BOD fails, your system doesn't have margin parameters and you can't trade.
 
 6. **[Compliance Blueprint — Margin domain](/broking-kyc/operations/compliance-blueprint/#margin-compliance-30-entries)** — the regulatory obligations driving your team's deliverables.
 
@@ -37,9 +37,9 @@ Everything else is context for the layer you operate at.
 
 8. **[Short-Delivery Auction deep-dive](/broking-kyc/deep-dives/trading-day/short-delivery-auction/)** — your team owns the prevention (covering shorts before auction); ops owns the auction itself.
 
-9. **[Retail Algo Framework deep-dive](/broking-kyc/deep-dives/trading-day/retail-algo-framework/)** — post Aug 2025 SEBI mandate. Tagged-order flow, pre-trade controls; your team operationalizes the broker-side algo approval.
+9. **[Retail Algo Framework deep-dive](/broking-kyc/deep-dives/trading-day/retail-algo-framework/)** — post Aug 2025 <abbr title="Securities and Exchange Board of India">SEBI</abbr> mandate. Tagged-order flow, pre-trade controls; your team operationalizes the broker-side algo approval.
 
-10. **[Payin Default + Core SGF deep-dive](/broking-kyc/deep-dives/settlement/payin-default-core-sgf/)** — the failure mode your daily margin recompute is preventing.
+10. **[Payin Default + Core <abbr title="Settlement Guarantee Fund">SGF</abbr> deep-dive](/broking-kyc/deep-dives/settlement/payin-default-core-sgf/)** — the failure mode your daily margin recompute is preventing.
 
 That's the foundation.
 
@@ -56,11 +56,11 @@ That's the foundation.
 - **Order-to-Trade Ratio breach for a client — what's our response?** → [Surveillance deep-dive — OTR section](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/).
 - **What's the difference between additional margin and exposure margin?** → [RMS / SPAN deep-dive — margin types section](/broking-kyc/deep-dives/trading-day/rms-span-methodology/).
 - **An algo-tagged order failed pre-trade controls — what's the procedure?** → [Retail Algo Framework deep-dive](/broking-kyc/deep-dives/trading-day/retail-algo-framework/).
-- **CSCRF cyber-audit is up; what does that mean for our systems?** → [CSCRF deep-dive](/broking-kyc/deep-dives/compliance-audit/cscrf-deep-dive/) — your systems are in scope.
+- **<abbr title="Cybersecurity and Cyber Resilience Framework">CSCRF</abbr> cyber-audit is up; what does that mean for our systems?** → [CSCRF deep-dive](/broking-kyc/deep-dives/compliance-audit/cscrf-deep-dive/) — your systems are in scope.
 
 ## What to skip (and why)
 
-- **Compliance Blueprint reporting / grievance / DPDP domains** — Compliance Officer's reading.
+- **Compliance Blueprint reporting / grievance / <abbr title="Digital Personal Data Protection Act 2023 (and Rules 2025)">DPDP</abbr> domains** — Compliance Officer's reading.
 - **Settlement deep-dives other than payin-default** — Operations Lead and Finance / CFO territory.
 - **Lifecycle walkthroughs** — Operations Lead handles these.
 - **Vendor Atlas non-RMS / non-OMS categories** — you only need to know what's in your stack.

@@ -15,7 +15,7 @@ description: "Verified index of NSDL circulars affecting Indian stock broking, 2
 
 ## Conceptual overview
 
-This page is the complete listing of NSDL circulars in the project's 2020–2026 sweep window. Each entry contains the verbatim circular ID, issue date, in-force date, status (in-force / superseded / withdrawn), applicable entity types, impact-area tags, a 2–4 sentence summary traceable to clauses, and the primary URL. Where the primary URL could not be re-fetched, an archive URL is provided in its place.
+This page is the complete listing of <abbr title="National Securities Depository Limited">NSDL</abbr> circulars in the project's 2020–2026 sweep window. Each entry contains the verbatim circular ID, issue date, in-force date, status (in-force / superseded / withdrawn), applicable entity types, impact-area tags, a 2–4 sentence summary traceable to clauses, and the primary URL. Where the primary URL could not be re-fetched, an archive URL is provided in its place.
 
 ## Entries (descending date)
 
@@ -23,7 +23,7 @@ This page is the complete listing of NSDL circulars in the project's 2020–2026
 
 - **date_issued:** 2026-04-10
 - **issuer:** NSDL
-- **title:** "Freezing of KRA KYC Non-compliant Demat Accounts"
+- **title:** "Freezing of <abbr title="KYC Registration Agency">KRA</abbr> <abbr title="Know Your Customer (process).">KYC</abbr> Non-compliant Demat Accounts"
 - **applies_to:** depository
 - **in_force_date:** 2026-04-30
 - **status:** in-force
@@ -36,7 +36,7 @@ All demat accounts whose KYC attributes are not verified by KRAs till April 30, 
 
 - **date_issued:** 2026-03-15
 - **issuer:** NSDL
-- **title:** "SEBI Master Circular for compliance with the provisions of SEBI LODR Regulations 2015 by listed entities"
+- **title:** "<abbr title="Securities and Exchange Board of India">SEBI</abbr> Master Circular for compliance with the provisions of SEBI LODR Regulations 2015 by listed entities"
 - **applies_to:** depository
 - **in_force_date:** [unknown — verify]
 - **status:** in-force
@@ -82,13 +82,13 @@ Operational notice on SPEED-e facility availability on Sunday, February 1, 2026.
 - **impact_areas:** re-KYC, aml
 - **primary_url:** https://nsdl.co.in/downloadables/pdf/2026-0025-Policy-Suspension_of_demat_accounts_of_existing_clients_whose_KYC_records_are_not_found_to_be_valid_by_KRAs_after_the_validation_process.pdf
 
-KRAs provided list of KYC records not valid (including invalid PANs) for PANs updated in KRAs system during December 1-31, 2025. Demat accounts frozen for "Suspended for debit and credit" on January 31, 2026. Participants to send intimation via letter/email/SMS.
+KRAs provided list of KYC records not valid (including invalid PANs) for PANs updated in KRAs system during December 1-31, 2025. Demat accounts frozen for "Suspended for debit and credit" on January 31, 2026. Participants to send intimation via letter/email/<abbr title="Short Message Service.">SMS</abbr>.
 
 ### NSDL/POLICY/2025/0163
 
 - **date_issued:** 2025-12-17
 - **issuer:** NSDL
-- **title:** "Implementation of SEBI CSCRF Circular for Cyber Audit Report Submission"
+- **title:** "Implementation of SEBI <abbr title="Cybersecurity and Cyber Resilience Framework">CSCRF</abbr> Circular for Cyber Audit Report Submission"
 - **applies_to:** depository
 - **in_force_date:** [unknown — verify]
 - **status:** in-force
@@ -127,14 +127,14 @@ DPs must ensure KYCs of all non-closed clients uploaded to KRAs. Only clients wi
 
 - **date_issued:** 2025-10-15
 - **issuer:** NSDL
-- **title:** "Change in Pay-in & Pay-out time for NSE and BSE settlements"
+- **title:** "Change in Pay-in & Pay-out time for <abbr title="National Stock Exchange of India">NSE</abbr> and <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> settlements"
 - **applies_to:** depository
 - **in_force_date:** 2025-10-21
 - **status:** superseded
 - **impact_areas:** settlement, bod-eod
 - **primary_url:** https://nsdl.co.in/downloadables/pdf/2025-0142-Policy-Change_in_Pay-in__Pay-out_time_for_NSE_and_BSE_settlements.pdf
 
-Pay-in deadlines advanced for NSE and BSE settlements due to Muhurat Trading scheduled on October 21, 2025. CC Calendar in eDPM and Local DPM systems revised.
+Pay-in deadlines advanced for NSE and BSE settlements due to Muhurat Trading scheduled on October 21, 2025. <abbr title="Clearing Corporation (NCL, ICCL, MCXCCL — context-dependent).">CC</abbr> Calendar in eDPM and Local <abbr title="Depository Participant Module (CDSL terminology).">DPM</abbr> systems revised.
 
 ### NSDL/POLICY/2025/0137
 
@@ -153,7 +153,7 @@ Implements SEBI review of block deal framework with operational changes for the 
 
 - **date_issued:** 2025-10-01
 - **issuer:** NSDL
-- **title:** "Enhancements in the process of movement of securities for Auto-Pledge instructions (MTF or CUSPA)"
+- **title:** "Enhancements in the process of movement of securities for Auto-Pledge instructions (<abbr title="Margin Trading Facility">MTF</abbr> or <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr>)"
 - **applies_to:** depository
 - **in_force_date:** [unknown — verify]
 - **status:** in-force
@@ -186,7 +186,7 @@ Premature redemption calendar for Sovereign Gold Bonds (SGB) for October 2025 to
 - **impact_areas:** transmission, nominee, reporting
 - **primary_url:** https://nsdl.co.in/downloadables/pdf/2025-0126-Policy_-_SEBI_circular_regarding_Ease_of_Doing_Investment_-_Smooth_transmission_of_securities_from_Nominee_to_Legal_Heir.pdf
 
-Implements SEBI circular SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/130 dated September 19, 2025. New standardized reason code "TLH" (Transmission to Legal Heirs) for SFT/CBDT reporting to prevent nominee being taxed on capital gains.
+Implements SEBI circular SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/130 dated September 19, 2025. New standardized reason code "TLH" (Transmission to Legal Heirs) for SFT/CBDT reporting to prevent nominee being taxed on capital gains.
 
 ### NSDL/POLICY/2025/0124
 
@@ -213,7 +213,7 @@ Periodic suspension cycle of demat accounts in NSDL system whose KRA-side KYC va
 - **impact_areas:** margin, file-format, mtf
 - **primary_url:** https://nsdl.co.in/downloadables/pdf/2025-0119-Policy-Changes_in_Download_file_formats_in_respect_of_Margin_Obligations_to_be_given_by_way_of_Pledge_Re-pledge_in_the_NSDL_Depository_System.pdf
 
-Changes in Margin Pledge/Re-pledge download (.csv format) for TM and TM/CM users; SPEED-e download changes for CUSPA pledge invocation and closure.
+Changes in Margin Pledge/Re-pledge download (.csv format) for <abbr title="Trading Member">TM</abbr> and TM/<abbr title="Clearing Member">CM</abbr> users; SPEED-e download changes for CUSPA pledge invocation and closure.
 
 ### NSDL/POLICY/2025/0118
 
@@ -266,7 +266,7 @@ Companion to NSDL/POLICY/2025/0090. Guidelines for online transfer-cum-closure o
 - **impact_areas:** closure, kyc-modification
 - **primary_url:** https://nsdl.co.in/downloadables/pdf/2025-0090-Policy-Guidelines_for_online_closure_of_demat_accounts.pdf
 
-Modifies online closure guidelines (points 7 and 13). Accounts with balance must e-sign closure form using digital signature or Aadhaar eSign verified by DP. Requests via DP's secured app with 2-factor authentication; emails/SMS/messaging apps not allowed. OTP confirmation to registered email/mobile. From July 15, 2025, joint holder online transfer-cum-closure requests enabled.
+Modifies online closure guidelines (points 7 and 13). Accounts with balance must e-sign closure form using digital signature or Aadhaar eSign verified by <abbr title="Depository Participant">DP</abbr>. Requests via DP's secured app with 2-factor authentication; emails/SMS/messaging apps not allowed. <abbr title="One-Time Password">OTP</abbr> confirmation to registered email/mobile. From July 15, 2025, joint holder online transfer-cum-closure requests enabled.
 
 ### NSDL/POLICY/2025/0084
 
@@ -279,7 +279,7 @@ Modifies online closure guidelines (points 7 and 13). Accounts with balance must
 - **impact_areas:** margin, mtf, rms, settlement
 - **primary_url:** https://nsdl.co.in/downloadables/pdf/2025-0084-Policy-Operating_guidelines_in_respect_of_Margin_Obligations_to_be_given_by_way_of_Pledge_or_Re-pledge_in_the_Depository_System.pdf
 
-Implements SEBI circular SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/82 dated June 3, 2025 on margin pledge/re-pledge. Changes implemented in NSDL depository at EOD September 5, 2025. Covers pledge invocation with early pay-in, invocation/redemption for MF units, and other operational changes.
+Implements SEBI circular SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/82 dated June 3, 2025 on margin pledge/re-pledge. Changes implemented in NSDL depository at <abbr title="End Of Day">EOD</abbr> September 5, 2025. Covers pledge invocation with early pay-in, invocation/redemption for MF units, and other operational changes.
 
 ### NSDL/POLICY/2025/0071
 
@@ -344,7 +344,7 @@ Revised framework for internal and concurrent audit per Bye Law 10.3. Audit by q
 - **impact_areas:** file-format, onboarding, nominee
 - **primary_url:** https://nsdl.co.in/downloadables/pdf/2025-0042-Policy-Enhancements_in_NSDL_Depository_System_-_UDiFF_Catalogue_V2.0.0.0.pdf
 
-UDiFF Catalogue V2.0.0.0 effective April 4, 2025. Introduces BSDA Opt-out option in NSDL Depository system; certain fields in Client Master Export and BO Upload formats become "conditionally required"; date of email consent for BSDA Opt-out required. Nomination address/state fields made optional. Holder Deletion 'Date of Demise' validation removed for joint accounts.
+UDiFF Catalogue V2.0.0.0 effective April 4, 2025. Introduces BSDA Opt-out option in NSDL Depository system; certain fields in Client Master Export and <abbr title="Beneficial Owner">BO</abbr> Upload formats become "conditionally required"; date of email consent for BSDA Opt-out required. Nomination address/state fields made optional. Holder Deletion 'Date of Demise' validation removed for joint accounts.
 
 ### NSDL/POLICY/2025/0030
 
@@ -357,7 +357,7 @@ UDiFF Catalogue V2.0.0.0 effective April 4, 2025. Introduces BSDA Opt-out option
 - **impact_areas:** nominee, kyc-modification, transmission, file-format
 - **primary_url:** https://nsdl.co.in/downloadables/pdf/2025-0030-Policy-Implementation_of_SEBI_circular_on_Amendments_and_clarifications_to_Circular_dated_January_10,_2025_on_Revise_and_Revamp_Nomination_Facilities.pdf
 
-NSDL implementation of SEBI amendments dated February 28, 2025 to nomination circular. Phase II initially set for June 1, 2025 (later extended to August 8, 2025); Phase III to December 15, 2025. DPM System Version 7.95 with Phase II features released EOD August 8, 2025.
+NSDL implementation of SEBI amendments dated February 28, 2025 to nomination circular. Phase <abbr title="—">II</abbr> initially set for June 1, 2025 (later extended to August 8, 2025); Phase <abbr title="—">III</abbr> to December 15, 2025. DPM System Version 7.95 with Phase II features released EOD August 8, 2025.
 
 ### NSDL/POLICY/2025/0029
 
@@ -383,7 +383,7 @@ Forwards SEBI regulatory framework for Specialized Investment Funds (SIF), a new
 - **impact_areas:** reporting, bod-eod
 - **primary_url:** https://nsdl.co.in/downloadables/pdf/2025-0022-Policy-SEBI_circular_-_Revised_timelines_for_issuance_of_Consolidated_Account_Statement_(CAS).pdf
 
-AMCs/MF-RTAs to send monthly common PAN data to Depositories within 5 days of month end. Depositories dispatch e-CAS by 12th day and physical CAS by 15th day of month end.
+AMCs/MF-RTAs to send monthly common <abbr title="Permanent Account Number">PAN</abbr> data to Depositories within 5 days of month end. Depositories dispatch e-CAS by 12th day and physical CAS by 15th day of month end.
 
 ### NSDL/POLICY/2025/0017
 
@@ -448,7 +448,7 @@ DPs must report NISM Series-VI (DOCE) certification details of associated person
 - **impact_areas:** nominee, kyc-modification, onboarding, transmission
 - **primary_url:** https://nsdl.co.in/downloadables/pdf/2025-0006-Policy-SEBI_CIrcular_on__Revise_and_Revamp_Nomination_Facilities_in_the_Indian_Securities_Market.pdf
 
-Implements SEBI Circular No. SEBI/HO/OIAE/OIAE_IAD-3/P/ON/2025/01650 dated January 10, 2025. Investors may make/change nomination any number of times. Up to three nominees with percentage shares; if not specified, distributed equally. Nominee acts as trustee for transmission to legal heir.
+Implements SEBI Circular No. SEBI/HO/<abbr title="Office of Investor Assistance and Education (SEBI)">OIAE</abbr>/OIAE_IAD-3/P/ON/2025/01650 dated January 10, 2025. Investors may make/change nomination any number of times. Up to three nominees with percentage shares; if not specified, distributed equally. Nominee acts as trustee for transmission to legal heir.
 
 ### NSDL/POLICY/2025/0001
 
@@ -493,7 +493,7 @@ SEBI relaxation from ISIN restriction limit for issuers listing originally unlis
 
 - **date_issued:** 2024-12-12
 - **issuer:** NSDL
-- **title:** "SEBI circular on Enhancement in the scope of optional T+0 rolling settlement cycle in addition to the existing T+1 settlement cycle in Equity Cash Markets"
+- **title:** "SEBI circular on Enhancement in the scope of optional <abbr title="Trade-date Plus N settlement">T+0</abbr> rolling settlement cycle in addition to the existing <abbr title="Trade-date Plus N settlement">T+1</abbr> settlement cycle in Equity Cash Markets"
 - **applies_to:** depository
 - **in_force_date:** [unknown — verify]
 - **status:** in-force
@@ -558,7 +558,7 @@ Implements SEBI's CSCRF (issued August 20, 2024) for SEBI Regulated Entities. RE
 
 - **date_issued:** 2024-08-20
 - **issuer:** NSDL
-- **title:** "Guidelines and enhancement in POA / DDPI"
+- **title:** "Guidelines and enhancement in <abbr title="Power of Attorney">POA</abbr> / <abbr title="Demat Debit and Pledge Instruction">DDPI</abbr>"
 - **applies_to:** depository
 - **in_force_date:** 2024-09-27
 - **status:** in-force
@@ -623,7 +623,7 @@ Forwards SEBI circular on BSDA holding limit raised to Rs 10 lakhs. Lays out eli
 
 - **date_issued:** 2024-06-25
 - **issuer:** NSDL
-- **title:** "SEBI Circular on Modification in Framework for Offer for Sale (OFS) of Shares to Employees through Stock Exchange Mechanism"
+- **title:** "SEBI Circular on Modification in Framework for Offer for Sale (<abbr title="Offer for Sale (through stock exchange)">OFS</abbr>) of Shares to Employees through Stock Exchange Mechanism"
 - **applies_to:** depository
 - **in_force_date:** [unknown — verify]
 - **status:** in-force
@@ -716,7 +716,7 @@ Implements SEBI circular ref. no. SEBI/HO/MIRSD/SECFATF/P/CIR/2024/41 dated May 
 
 - **date_issued:** 2024-04-04
 - **issuer:** NSDL
-- **title:** "SEBI PRESS release on SCORES 2.0 — New Technology to strengthen SEBI Complaint Redressal System for Investors"
+- **title:** "SEBI PRESS release on <abbr title="SEBI Complaints Redress System">SCORES</abbr> 2.0 — New Technology to strengthen SEBI Complaint Redressal System for Investors"
 - **applies_to:** depository
 - **in_force_date:** 2024-04-01
 - **status:** in-force
@@ -895,13 +895,13 @@ Cyclical suspension of demat accounts of existing clients whose KYC records fail
 - **impact_areas:** onboarding, re-KYC, aml, kyc-modification
 - **primary_url:** https://nsdl.co.in/downloadables/pdf/2023-0146-Policy-SEBI_Master_Circular_on_Know_Your_Client_(KYC)_norms_for_the_securities_market.pdf
 
-Forwards SEBI Master Circular on KYC norms (October 12, 2023) compiling all KYC circulars/directions issued up to September 30, 2023. PoI/PoA verification, anti-money laundering, alignment with PMLA Rules 2005 and KRA Regulations 2012.
+Forwards SEBI Master Circular on KYC norms (October 12, 2023) compiling all KYC circulars/directions issued up to September 30, 2023. PoI/PoA verification, anti-money laundering, alignment with <abbr title="Prevention of Money Laundering Act 2002">PMLA</abbr> Rules 2005 and KRA Regulations 2012.
 
 ### NSDL/POLICY/2023/0126
 
 - **date_issued:** 2023-10-05
 - **issuer:** NSDL
-- **title:** "SEBI Circular on Redressal of investor grievances through the SCORES Platform and linking it to ODR Platform"
+- **title:** "SEBI Circular on Redressal of investor grievances through the SCORES Platform and linking it to <abbr title="Online Dispute Resolution">ODR</abbr> Platform"
 - **applies_to:** depository
 - **in_force_date:** [unknown — verify]
 - **status:** superseded
@@ -994,7 +994,7 @@ PAN-Aadhaar linkage requirement for demat accounts. Subsequently revisited in 20
 
 - **date_issued:** 2023-02-09
 - **issuer:** NSDL
-- **title:** "Reclassification of sub-type pursuant to conversion from Company to LLP and vice versa"
+- **title:** "Reclassification of sub-type pursuant to conversion from Company to <abbr title="—">LLP</abbr> and vice versa"
 - **applies_to:** depository
 - **in_force_date:** [unknown — verify]
 - **status:** in-force
@@ -1014,7 +1014,7 @@ Procedural framework for client sub-type reclassification when entity converts f
 - **impact_areas:** system-audit, cyber-security, reporting
 - **primary_url:** https://nsdl.co.in/downloadables/pdf/2023-0017-Policy-Annual_System_Audit_Report.pdf
 
-Annual System Audit Report framework per SEBI's June 7, 2022 Cyber Security/Cyber Resilience modification circular. ATR for non-compliances submitted at dpaudit@nsdl.co.in.
+Annual System Audit Report framework per SEBI's June 7, 2022 Cyber Security/Cyber Resilience modification circular. <abbr title="Action Taken Report.">ATR</abbr> for non-compliances submitted at dpaudit@nsdl.co.in.
 
 ### NSDL/POLICY/2023/0014
 
@@ -1463,7 +1463,7 @@ Updated FAQ on online KYC requirements per SEBI April 24, 2020 circular. Operati
 - **impact_areas:** onboarding, re-KYC, digi-locker, esign
 - **primary_url:** https://nsdl.co.in/downloadables/pdf/2020-0115-Policy-Annexure%201.pdf
 
-Annexure on online KYC operational guidelines covering Aadhaar OVD, DigiLocker, eSign workflows.
+Annexure on online KYC operational guidelines covering Aadhaar <abbr title="Officially Valid Document">OVD</abbr>, DigiLocker, eSign workflows.
 
 ### NSDL/POLICY/2020/0109
 

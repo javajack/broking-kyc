@@ -5,20 +5,20 @@ description: Walkthrough of SEBI's safer-retail-algo framework (Feb 2025) and th
 
 import { Aside } from '@astrojs/starlight/components';
 
-> **Why this page is structured this way:** The retail-algo framework is the most recent and most operationally consequential set of broker-side surveillance / control circulars. The page walks the SEBI Feb 2025 framework first, then the NSE operational chain (INVG/66524 → INVG/67858 → INVG/69255 → FAOP/69296), then the broker's approval flows at each exchange, then the algo classification (white-box vs black-box, OPS thresholds), then the tagged-order flow and audit-trail, then the principal-agent model and responsibilities, and finally the predecessor institutional algo framework for context.
+> **Why this page is structured this way:** The retail-algo framework is the most recent and most operationally consequential set of broker-side surveillance / control circulars. The page walks the <abbr title="Securities and Exchange Board of India">SEBI</abbr> Feb 2025 framework first, then the <abbr title="National Stock Exchange of India">NSE</abbr> operational chain (INVG/66524 → INVG/67858 → INVG/69255 → FAOP/69296), then the broker's approval flows at each exchange, then the algo classification (white-box vs black-box, OPS thresholds), then the tagged-order flow and audit-trail, then the principal-agent model and responsibilities, and finally the predecessor institutional algo framework for context.
 
 ## TL;DR
 
-- SEBI's **Safer Participation of Retail Investors in Algorithmic Trading** framework was issued on **4 Feb 2025** ([SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/0000013](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir20250000013)), originally effective **1 Aug 2025**, subsequently extended via SEBI Jul 2025 timeline extension circular.
+- SEBI's **Safer Participation of Retail Investors in Algorithmic Trading** framework was issued on **4 Feb 2025** ([SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/0000013](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir20250000013)), originally effective **1 Aug 2025**, subsequently extended via SEBI Jul 2025 timeline extension circular.
 - Implementation forwarded by NSE in a chain: **[NSE/INVG/66524](/broking-kyc/reference/circulars/nse/#nseinvg66524)** (Feb 5, 2025) → **[NSE/INVG/67858](/broking-kyc/reference/circulars/nse/#nseinvg67858)** (May 5, 2025) → **[NSE/INVG/69255](/broking-kyc/reference/circulars/nse/#nseinvg69255)** (Jul 22, 2025), with parallel pre-trade-controls hardening via **[NSE/FAOP/69296](/broking-kyc/reference/circulars/nse/#nsefaop69296)** (Aug 2025).
 - **Principal-agent model:** Broker acts as **principal**, algo providers / fintechs act as **agents**. Broker is accountable for any algo-misuse via its APIs (per [NSE/INVG/67858](/broking-kyc/reference/circulars/nse/#nseinvg67858)).
 - **Algo categorisation:** **white-box** (execution algos, deterministic logic) vs **black-box** (predictive / AI-driven, where logic is not fully transparent).
 - **OPS threshold:** retail API access ≤ **10 orders per second**. Above this, the order flow is treated as algorithmic and must be registered with a unique algo-ID tagged to every order.
 - **Pre-trade controls under [NSE/FAOP/69296](/broking-kyc/reference/circulars/nse/#nsefaop69296):** Algo Market Order pre-emptive cancellation introduced to prevent runaway market orders; NNF Terminal ID to Algo ID validation enforced.
 - **Audit trail retention:** **5 years** per [NSE/INVG/67858](/broking-kyc/reference/circulars/nse/#nseinvg67858) — broker traces every algo-tagged order to its registered algo-ID and the API vendor.
-- **Approval chain:** Algo providers register with their broker; brokers register their empanelled algo / vendor with NSE / BSE / MCX (per exchange); each segment / each algo / each broker requires its own approval.
-- **Vendor-empanelled vs in-house algos:** Both paths exist; empanelled-vendor algos must be in the broker's registered list; in-house algos require broker-level Type-III system audit per [NSE/INSP/64438](/broking-kyc/reference/circulars/nse/) / [NSE/INSP/70900](/broking-kyc/reference/circulars/nse/).
-- **Predecessor frameworks:** 2022–2024 institutional-algo framework provided the foundation (CTCL approval, NNF terminal IDs, Type-III audit cadence); 2025 retail framework is the extension to retail-API access.
+- **Approval chain:** Algo providers register with their broker; brokers register their empanelled algo / vendor with NSE / <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> / <abbr title="Multi Commodity Exchange of India">MCX</abbr> (per exchange); each segment / each algo / each broker requires its own approval.
+- **Vendor-empanelled vs in-house algos:** Both paths exist; empanelled-vendor algos must be in the broker's registered list; in-house algos require broker-level Type-<abbr title="—">III</abbr> system audit per [NSE/INSP/64438](/broking-kyc/reference/circulars/nse/) / [NSE/INSP/70900](/broking-kyc/reference/circulars/nse/).
+- **Predecessor frameworks:** 2022–2024 institutional-algo framework provided the foundation (<abbr title="Computer-to-Computer Link.">CTCL</abbr> approval, NNF terminal IDs, Type-III audit cadence); 2025 retail framework is the extension to retail-API access.
 
 ## Conceptual overview
 
@@ -28,7 +28,7 @@ SEBI's Feb 2025 framework changed this. The principle: if a retail client's trad
 
 For brokers, the framework introduces several new operational obligations: a broker-side algo registry, algo-tagged order routing, pre-trade controls that catch runaway algo behaviour, an audit trail spanning broker, vendor, and client, and an accountability model that puts the broker first in line for any algo-related issue.
 
-This page covers all of it. For the broader OMS architecture that hosts the algo flow, see [OMS internals deep-dive](/broking-kyc/deep-dives/trading-day/oms-internals/); for the surveillance overlay, see [Surveillance deep-dive](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/).
+This page covers all of it. For the broader <abbr title="Order Management System">OMS</abbr> architecture that hosts the algo flow, see [OMS internals deep-dive](/broking-kyc/deep-dives/trading-day/oms-internals/); for the surveillance overlay, see [Surveillance deep-dive](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/).
 
 ## 1. The SEBI Feb 2025 framework
 
@@ -96,7 +96,7 @@ Detailed operational modalities for safer retail algorithmic trading following t
 
 Strengthens pre-trade risk controls for algorithmic orders. Two key controls:
 
-1. **Algo Market Order pre-emptive cancellation:** Introduced to prevent runaway market orders. The OMS / RMS must implement pre-trade controls to detect and cancel algorithmic market orders that match runaway patterns (high frequency, large notional, deep order book penetration).
+1. **Algo Market Order pre-emptive cancellation:** Introduced to prevent runaway market orders. The OMS / <abbr title="Risk Management System">RMS</abbr> must implement pre-trade controls to detect and cancel algorithmic market orders that match runaway patterns (high frequency, large notional, deep order book penetration).
 2. **NNF Terminal ID to Algo ID validation:** Every order from an NNF terminal that is algo-flagged must have a valid Algo ID; the validation is enforced at the exchange edge.
 
 Builds on the foundational consolidated NNF circular [NSE/FAOP/21794](/broking-kyc/reference/circulars/nse/) (Sep 28, 2012) on Decision Support Tools and Algorithms. Operates alongside [NSE/INVG/67858](/broking-kyc/reference/circulars/nse/#nseinvg67858).
@@ -113,7 +113,7 @@ The broker must obtain approval for each algo and each segment from each exchang
 | For each algo, register algo-ID with NSE | NSE assigns / approves the unique algo-ID; broker maintains an internal mapping (algo-ID → vendor → strategy description → broker contact owner) |
 | Register the algo server | The broker (or the vendor, depending on the architecture) registers the physical server / hosting location with NSE — must be at an exchange-approved facility |
 | Submit broker-level system audit | If the broker is Type-III (algo-capable), the broker submits the half-yearly system audit (per [NSE/INSP/64438](/broking-kyc/reference/circulars/nse/) and successors) |
-| Submit broker-level cyber audit | Half-yearly cyber audit for Type-III brokers per the CSCRF and earlier framework circulars |
+| Submit broker-level cyber audit | Half-yearly cyber audit for Type-III brokers per the <abbr title="Cybersecurity and Cyber Resilience Framework">CSCRF</abbr> and earlier framework circulars |
 | Maintain audit trail | 5-year retention, accessible to NSE inspection on request |
 
 ### 3.2 At BSE
@@ -139,7 +139,7 @@ White-box algos have **deterministic, transparent logic**. Examples:
 - TWAP (Time-Weighted Average Price) — executes a parent order in time-sliced child orders,
 - VWAP (Volume-Weighted Average Price) — executes proportional to historical volume profile,
 - Iceberg / disclosed-quantity slicing,
-- Smart order routing (SOR) that picks the best price across NSE / BSE,
+- Smart order routing (<abbr title="Smart Order Routing">SOR</abbr>) that picks the best price across NSE / BSE,
 - Mean-reversion strategies with documented entry / exit rules,
 - Basket-trade execution with rebalance logic.
 
@@ -182,7 +182,7 @@ The framework introduces a **tagged-order flow** for algo orders. Every algo-ori
 | Algo-ID | The unique exchange-registered algo-ID |
 | API vendor ID | The empanelled vendor that generated the order (where applicable) |
 | Broker terminal / NNF ID | The terminal / endpoint used |
-| Client UCC | The client on whose behalf the algo is trading |
+| Client <abbr title="Unique Client Code">UCC</abbr> | The client on whose behalf the algo is trading |
 | Strategy ID (internal) | Vendor-side strategy identifier for the algo logic variant |
 | Timestamp with microsecond precision | For audit-trail and reconstruction |
 
@@ -226,7 +226,7 @@ A consolidated list of broker responsibilities under the principal model:
 | Maintain static IP whitelisting | Per-vendor / per-client IP records; reject unwhitelisted access |
 | Conduct broker-level pre-trade controls | Algo Market Order pre-emptive cancellation, NNF-to-Algo ID validation |
 | Maintain audit trail | 5-year retention of all tagged orders |
-| Operate algo-aware surveillance | Detect runaway algos, ASM-for-spoofing patterns from algo-originated activity |
+| Operate algo-aware surveillance | Detect runaway algos, <abbr title="Additional Surveillance Measure">ASM</abbr>-for-spoofing patterns from algo-originated activity |
 | Submit half-yearly Type-III system audit | If the broker is algo-capable |
 | Comply with NSE / BSE / MCX algo circulars | Stay current as the framework evolves |
 | Notify exchanges of any incident | Algo-misuse, security breach, vendor issue — within prescribed window |
@@ -307,7 +307,7 @@ NSE's CTCL framework (Computer-to-Computer Link) — see [OMS internals deep-div
 
 ### 10.2 Type-III system audit
 
-Algo-capable trading members are classified as Type-III for system audit purposes. Type-III members undergo half-yearly audits (rather than annual for Type-I / II). Empanelment per [NSE/INSP/69631](/broking-kyc/reference/circulars/nse/) (Aug 2025); current cycle [NSE/INSP/64438](/broking-kyc/reference/circulars/nse/) / [NSE/INSP/70900](/broking-kyc/reference/circulars/nse/).
+Algo-capable trading members are classified as Type-III for system audit purposes. Type-III members undergo half-yearly audits (rather than annual for Type-I / <abbr title="—">II</abbr>). Empanelment per [NSE/INSP/69631](/broking-kyc/reference/circulars/nse/) (Aug 2025); current cycle [NSE/INSP/64438](/broking-kyc/reference/circulars/nse/) / [NSE/INSP/70900](/broking-kyc/reference/circulars/nse/).
 
 The Type-III audit covers:
 - Algo architecture review,
@@ -327,7 +327,7 @@ NNF (Neat Now Final) is NSE's family of trading software variants. Each terminal
 
 ### 10.5 Surveillance dashboard for algos
 
-[NSE/SURV/44477](/broking-kyc/reference/circulars/nse/) introduced the member surveillance dashboard for tracking algo behaviour (spoofing patterns, order-book noise, OBSM-PNC). Quarterly TM reporting per [NSE/SURV/48818](/broking-kyc/reference/circulars/nse/) is the cadence.
+[NSE/SURV/44477](/broking-kyc/reference/circulars/nse/) introduced the member surveillance dashboard for tracking algo behaviour (spoofing patterns, order-book noise, OBSM-PNC). Quarterly <abbr title="Trading Member">TM</abbr> reporting per [NSE/SURV/48818](/broking-kyc/reference/circulars/nse/) is the cadence.
 
 The retail algo framework layered onto this foundation; the OPS threshold, algo-ID tagging, principal-agent model, and 5-year audit trail are the retail-specific additions.
 
@@ -381,13 +381,13 @@ The surveillance team typically has a dedicated algo-monitoring desk for high-OP
 - **Algos placing block-deal orders.** Algo flow can place block-deal orders within the dedicated windows (per [block / bulk deals deep dive](/broking-kyc/deep-dives/trading-day/block-bulk-deals/)). The algo-ID and tag still apply; surveillance for block-deal-adjacent front-running applies.
 - **Algos placing AMOs.** Algo orders captured as AMOs (after-market) follow the standard AMO release flow at pre-open. Algo-ID and tag carry through.
 - **Cross-exchange algo flow.** A single algo strategy can place orders simultaneously on NSE and BSE. Each exchange requires its own algo-ID registration; the broker manages the cross-exchange flow.
-- **Algos in T+0 segment.** T+0 expansion (top 500 scrips per [SEBI/HO/MRD/POD-3/P/CIR/2024/172](/broking-kyc/reference/circulars/sebi-other/#sebihomrdpod-3pcir2024172)) is a separate session; algo orders for T+0 must be tagged for T+0 settlement.
-- **Algos and MTF.** MTF positions (broker-funded purchases) can be exited via algo orders if the broker permits; the algo flow respects the MTF settlement rules.
-- **Algos handling NRI flow.** Post Sep 2025 CP-code removal ([SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/109](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir2025109)), NRI algo flow routes direct broker-side without CP-code intermediation. NRI segment / PIS restrictions still apply.
+- **Algos in <abbr title="Trade-date Plus N settlement">T+0</abbr> segment.** T+0 expansion (top 500 scrips per [SEBI/HO/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>/POD-3/P/CIR/2024/172](/broking-kyc/reference/circulars/sebi-other/#sebihomrdpod-3pcir2024172)) is a separate session; algo orders for T+0 must be tagged for T+0 settlement.
+- **Algos and <abbr title="Margin Trading Facility">MTF</abbr>.** MTF positions (broker-funded purchases) can be exited via algo orders if the broker permits; the algo flow respects the MTF settlement rules.
+- **Algos handling <abbr title="Non-Resident Indian">NRI</abbr> flow.** Post Sep 2025 CP-code removal ([SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/109](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir2025109)), NRI algo flow routes direct broker-side without CP-code intermediation. NRI segment / <abbr title="Portfolio Investment Scheme (RBI / NRI)">PIS</abbr> restrictions still apply.
 - **Algos on commodity segment.** MCX commodity algos have their own registration path via MCX Inspection; the SEBI framework applies but MCX operational paths differ from NSE.
-- **Algos on SLB segment.** SLB transactions can be algorithm-driven; SLBS framework (per [NCL/CMPT/61810](/broking-kyc/reference/circulars/clearing-corps/) / [NCL/CMPT/67763](/broking-kyc/reference/circulars/clearing-corps/)) interacts with the algo framework.
+- **Algos on SLB segment.** SLB transactions can be algorithm-driven; SLBS framework (per [<abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr>/CMPT/61810](/broking-kyc/reference/circulars/clearing-corps/) / [NCL/CMPT/67763](/broking-kyc/reference/circulars/clearing-corps/)) interacts with the algo framework.
 - **Algos and pension / mutual-fund clients.** Institutional algo flow (mutual funds executing baskets via VWAP) is governed by the broader institutional algo framework rather than the retail framework; the algo-ID tagging and approval still apply.
-- **Algo-related grievances.** Client grievances about algo strategy performance flow through the broker's grievance mechanism (SCORES, broker-internal). The broker may be required to demonstrate the algo behaved within approved parameters.
+- **Algo-related grievances.** Client grievances about algo strategy performance flow through the broker's grievance mechanism (<abbr title="SEBI Complaints Redress System">SCORES</abbr>, broker-internal). The broker may be required to demonstrate the algo behaved within approved parameters.
 
 ## Practical notes
 
@@ -395,21 +395,21 @@ The surveillance team typically has a dedicated algo-monitoring desk for high-OP
 - **[industry practice]** Most retail brokers offering algo flow distinguish "algo subscription" (vendor-provided strategy, broker hosts integration) from "API trading" (client builds their own algo using broker's API). The former is more vendor-managed; the latter requires the client to register their own algo-ID with the broker. Both flows must follow the same audit-trail and tagging requirements.
 - **[cost optimization]** Building an in-house algo registry, tagging system, and audit trail is non-trivial — 6-12 months of engineering work for a credible production system. Brokers that don't want this overhead can offer non-algo API access (capped at 10 OPS, no algo-ID required) and route algo demand to vendor-managed platforms.
 - **[risk trade-off]** Black-box algos generate more regulatory scrutiny but may offer better client outcomes (if the model is good). White-box algos are easier to approve and monitor but limited by the explicit strategies the broker can articulate. The mix at a broker reflects the broker's risk appetite and technology depth.
-- **[industry practice]** The 5-year audit trail retention is a *floor*; many brokers retain 7–10 years to align with broader regulatory retention norms (SEBI 10-year retention for records under [AML domain](/broking-kyc/operations/compliance-blueprint/#aml--pmla--sanctions-25-entries) row AML-014).
+- **[industry practice]** The 5-year audit trail retention is a *floor*; many brokers retain 7–10 years to align with broader regulatory retention norms (SEBI 10-year retention for records under [<abbr title="Anti-Money Laundering">AML</abbr> domain](/broking-kyc/operations/compliance-blueprint/#aml--pmla--sanctions-25-entries) row AML-014).
 - **[gotcha]** Static-IP whitelisting can be operationally fragile — IP addresses change (vendor migrates to a new cloud region, ISP renumbers, etc.). The broker's onboarding workflow must include an IP-update mechanism that's faster than the original empanelment process.
 - **[industry practice]** Real-time monitoring of algo behaviour — per-algo P&L, drawdown, OPS, order-modification rate — should be visible to both the broker's surveillance team and the algo vendor. This shared visibility helps detect drift or anomaly quickly. Many brokers offer a vendor portal for this.
-- **[cost optimization]** OPS thresholds and rate limits should be implemented at multiple layers — at the API gateway (early reject), at the OMS (margin-and-control), and at the FIX engine (final cap). Multi-layer enforcement is robust against single-point failures.
+- **[cost optimization]** OPS thresholds and rate limits should be implemented at multiple layers — at the API gateway (early reject), at the OMS (margin-and-control), and at the <abbr title="Financial Information eXchange protocol">FIX</abbr> engine (final cap). Multi-layer enforcement is robust against single-point failures.
 - **[risk trade-off]** Allowing black-box algos at lower OPS thresholds reduces the throughput at which a malfunction can cause damage but limits the strategy's effectiveness. Brokers tune the balance per their risk appetite and the specific algo's profile.
 
 ## Cross-references
 
-- [Integration DAG: Trading hours](/broking-kyc/operations/integration-dag/trading-hours/) — algo-tagged order pre-trade pipeline.
+- [Integration <abbr title="Directed Acyclic Graph.">DAG</abbr>: Trading hours](/broking-kyc/operations/integration-dag/trading-hours/) — algo-tagged order pre-trade pipeline.
 - [Broker Process Narrative](/broking-kyc/broker-process/narrative/) — Section 2 mentions algo flow briefly in narrative.
 - [Compliance Blueprint — Surveillance domain](/broking-kyc/operations/compliance-blueprint/) — algo-related rows including SURVEILLANCE-024 (algo static-IP and algo-ID controls).
 - [Compliance Blueprint — Cyber security domain](/broking-kyc/operations/compliance-blueprint/) — CYBER-024 broker APIs with OAuth/JWT, rate limiting and WAF.
 - [Deep Dive: OMS internals](/broking-kyc/deep-dives/trading-day/oms-internals/) — sibling page on the OMS architecture that hosts algo flow.
-- [Deep Dive: SPAN methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/) — sibling page on margin computation for algo positions.
-- [Deep Dive: Surveillance, GSM, ASM](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/) — sibling page on the surveillance overlay including OTR, OBSM-PNC.
+- [Deep Dive: <abbr title="Standard Portfolio Analysis of Risk">SPAN</abbr> methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/) — sibling page on margin computation for algo positions.
+- [Deep Dive: Surveillance, <abbr title="Graded Surveillance Measure">GSM</abbr>, ASM](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/) — sibling page on the surveillance overlay including OTR, OBSM-PNC.
 - [Deep Dive: Block / bulk deals](/broking-kyc/deep-dives/trading-day/block-bulk-deals/) — sibling page on the block-deal window's interaction with algo flow.
 - [Deep Dive: Short-delivery auction](/broking-kyc/deep-dives/trading-day/short-delivery-auction/) — sibling page on settlement consequences.
 - [SEBI MIRSD circulars](/broking-kyc/reference/circulars/sebi-mirsd/) — including [SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/0000013](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir20250000013).

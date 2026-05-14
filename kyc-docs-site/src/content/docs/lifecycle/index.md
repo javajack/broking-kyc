@@ -3,25 +3,25 @@ title: Lifecycle (post-onboarding)
 description: Operator-friendly step-by-step walkthroughs for every post-onboarding KYC lifecycle event — re-KYC, modifications, dormancy & reactivation, voluntary closure, transmission (deceased), NRI ↔ resident conversion.
 ---
 
-> **Why this page is structured this way:** Onboarding has 9 well-known screens, documented under [User Journey](/broking-kyc/journey/). Post-onboarding events are less standardized — each scenario has its own trigger, its own field set, its own propagation path through KRA / CKYC / UCC / BO. This section is the operator walkthrough for each scenario, parallel in shape to the onboarding journey.
+> **Why this page is structured this way:** Onboarding has 9 well-known screens, documented under [User Journey](/broking-kyc/journey/). Post-onboarding events are less standardized — each scenario has its own trigger, its own field set, its own propagation path through <abbr title="KYC Registration Agency">KRA</abbr> / <abbr title="Central KYC (records registry)">CKYC</abbr> / <abbr title="Unique Client Code">UCC</abbr> / <abbr title="Beneficial Owner">BO</abbr>. This section is the operator walkthrough for each scenario, parallel in shape to the onboarding journey.
 
 ## TL;DR
 
 - 6 scenario pages plus this overview.
 - Each scenario page: step-by-step walkthrough, field-level callouts, regulatory citations, sub-cases, practical notes.
-- Complementary to the [Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/) (what must be done), the [Integration DAG](/broking-kyc/operations/integration-dag/) (dependency structure), the [Broker Process Narrative](/broking-kyc/broker-process/narrative/) (chronological story), and the [Field-level Data Flow Atlas](/broking-kyc/reference/field-atlas/) (where each field flows).
+- Complementary to the [Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/) (what must be done), the [Integration <abbr title="Directed Acyclic Graph.">DAG</abbr>](/broking-kyc/operations/integration-dag/) (dependency structure), the [Broker Process Narrative](/broking-kyc/broker-process/narrative/) (chronological story), and the [Field-level Data Flow Atlas](/broking-kyc/reference/field-atlas/) (where each field flows).
 - AI-generated synthesis. **Verify each scenario's procedural details against current circulars and your back-office configuration before relying on them in production.**
 
 ## Scenarios
 
 | Scenario | Typical timeline | Page |
 |---|---|---|
-| Re-KYC (risk-tier-based refresh) | 2y / 8y / 10y per risk tier | [re-kyc](./re-kyc/) |
+| Re-<abbr title="Know Your Customer (process).">KYC</abbr> (risk-tier-based refresh) | 2y / 8y / 10y per risk tier | [re-kyc](./re-kyc/) |
 | Modifications (address / bank / nominee / segment / mobile / email / name) | 1–3 days per modification | [modifications](./modifications/) |
 | Dormancy → Reactivation | 12-month detection; reactivation 1–3 days | [dormancy-reactivation](./dormancy-reactivation/) |
 | Voluntary closure | 5–7 business days end-to-end | [closure](./closure/) |
 | Transmission (deceased client) | weeks (nominee path) to months (succession) | [transmission](./transmission/) |
-| NRI ↔ Resident conversion | 1–4 weeks both directions | [nri-conversion](./nri-conversion/) |
+| <abbr title="Non-Resident Indian">NRI</abbr> ↔ Resident conversion | 1–4 weeks both directions | [nri-conversion](./nri-conversion/) |
 
 ## How the lifecycle pages relate to other site sections
 

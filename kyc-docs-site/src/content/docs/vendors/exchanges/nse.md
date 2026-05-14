@@ -3,7 +3,7 @@ title: NSE UCC
 description: NSE Unique Client Code (UCC) registration — UCI Online portal, REST API, and batch file integration.
 ---
 
-The National Stock Exchange of India (NSE) is where the vast majority of equity and derivatives trading in India happens. If you are building a KYC onboarding system for a stock broking firm, NSE's Unique Client Code (UCC) registration is one of the first integrations you will implement -- because without a UCC, your client simply cannot place an order. Think of registering a UCC as getting a passport for your client: no exchange will let them trade without it. This page walks you through everything you need to know about NSE's UCC system, from the web portal and REST API to batch file formats, PAN (Permanent Account Number) verification, segment activation, and error handling.
+The National Stock Exchange of India (<abbr title="National Stock Exchange of India">NSE</abbr>) is where the vast majority of equity and derivatives trading in India happens. If you are building a <abbr title="Know Your Customer (process).">KYC</abbr> onboarding system for a stock broking firm, NSE's Unique Client Code (<abbr title="Unique Client Code">UCC</abbr>) registration is one of the first integrations you will implement -- because without a UCC, your client simply cannot place an order. Think of registering a UCC as getting a passport for your client: no exchange will let them trade without it. This page walks you through everything you need to know about NSE's UCC system, from the web portal and REST API to batch file formats, <abbr title="Permanent Account Number">PAN</abbr> (Permanent Account Number) verification, segment activation, and error handling.
 
 :::tip[Quick Reference]
 
@@ -14,7 +14,7 @@ The National Stock Exchange of India (NSE) is where the vast majority of equity 
 | Batch Limit | Max 10,000 records per file |
 | PAN Verification | 3-parameter (PAN + Name + DOB) |
 | Activation SLA | Same day (5PM cutoff) |
-| Key Circular | [NSE/ISC/61817](/broking-kyc/reference/circulars/nse/#nseisc61817) (Apr 2024) |
+| Key Circular | [NSE/<abbr title="Investor Service Centre.">ISC</abbr>/61817](/broking-kyc/reference/circulars/nse/#nseisc61817) (Apr 2024) |
 | New Format Since | July 15, 2024 |
 
 :::
@@ -39,7 +39,7 @@ The National Stock Exchange of India (NSE) is where the vast majority of equity 
 16. [Non-Individual Entity Requirements](#16-non-individual-entity-requirements)
 17. [Modification & Closure Process](#17-modification--closure-process)
 18. [UCC-Demat Mapping](#18-ucc-demat-mapping)
-19. [NSE Clearing (NCL) Relationship](#19-nse-clearing-ncl-relationship)
+19. [NSE Clearing (<abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr>) Relationship](#19-nse-clearing-ncl-relationship)
 20. [Error Handling & Common Rejection Reasons](#20-error-handling--common-rejection-reasons)
 21. [Timeline & SLA](#21-timeline--sla)
 22. [Recent Circulars (2024-2025-2026)](#22-recent-circulars-2024-2025-2026)
@@ -54,11 +54,11 @@ Let us begin with the big picture: what NSE is, why it matters, and the regulato
 
 ### 1.1 NSE in the Indian Capital Markets
 
-The National Stock Exchange of India (NSE), established in 1992 and operational since 1994, is India's largest stock exchange by turnover. NSE introduced electronic, screen-based trading to India and operates across multiple market segments. NSE is the mandatory exchange for UCC (Unique Client Code) registration as part of the SEBI (Securities and Exchange Board of India)-mandated KYC (Know Your Customer) framework.
+The National Stock Exchange of India (NSE), established in 1992 and operational since 1994, is India's largest stock exchange by turnover. NSE introduced electronic, screen-based trading to India and operates across multiple market segments. NSE is the mandatory exchange for UCC (Unique Client Code) registration as part of the <abbr title="Securities and Exchange Board of India">SEBI</abbr> (Securities and Exchange Board of India)-mandated KYC (Know Your Customer) framework.
 
 ### 1.2 NSE's Role in KYC/UCC
 
-Every trading member (broker) registered with NSE must register each client with a Unique Client Code (UCC) before the client can place any order. The UCC record captures identity, financial profile, bank, and demat details and must remain synchronized with the client's KRA (KYC Registration Agency) and CKYC (Central KYC) records. NSE enforces 6 mandatory KYC attributes (Name, PAN, Address, Mobile, Email, Income Range) that must be compliant before a client is marked "Permitted to Trade" (PTT).
+Every trading member (broker) registered with NSE must register each client with a Unique Client Code (UCC) before the client can place any order. The UCC record captures identity, financial profile, bank, and demat details and must remain synchronized with the client's <abbr title="KYC Registration Agency">KRA</abbr> (KYC Registration Agency) and <abbr title="Central KYC (records registry)">CKYC</abbr> (Central KYC) records. NSE enforces 6 mandatory KYC attributes (Name, PAN, Address, Mobile, Email, Income Range) that must be compliant before a client is marked "Permitted to Trade" (PTT).
 
 :::note[Why UCC Matters]
 A UCC is not just a registration formality. It is the single identifier that ties your client's identity to every order, trade, settlement, and margin obligation on NSE. If the UCC is non-compliant, the trading system will reject orders in real time.
@@ -68,7 +68,7 @@ A UCC is not just a registration formality. It is the single identifier that tie
 
 | Regulation | Reference |
 |------------|-----------|
-| SEBI KYC Master Circular | SEBI/HO/MIRSD/MIRSD-SEC-2/P/CIR/2023/168 (Oct 2023) |
+| SEBI KYC Master Circular | SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-SEC-2/P/CIR/2023/168 (Oct 2023) |
 | SEBI Stock Brokers Master Circular | SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90 (Jun 2025) |
 | SEBI Stock Brokers Regulations 2026 | Notified Jan 7, 2026 (replaces 1992 regulations) |
 | NSE UCC Master Circular | NSE/ISC/61817 (Apr 30, 2024) |
@@ -109,7 +109,7 @@ For order routing, NSE provides:
 
 | System | Purpose | Protocol |
 |--------|---------|----------|
-| CTCL (Computer-to-Computer Link) | DMA/Algo trading | Proprietary TCP/IP (C-structure messages) |
+| <abbr title="Computer-to-Computer Link.">CTCL</abbr> (Computer-to-Computer Link) | DMA/Algo trading | Proprietary TCP/IP (C-structure messages) |
 | NOTIS (NSE Open Trading Interface System) | Third-party front-end connectivity | API-based |
 | NNF (NSE Now Front-end) | NSE NOW terminal connectivity | Proprietary |
 
@@ -162,7 +162,7 @@ This path provides:
 Access to UCI Online requires:
 1. Valid NSE Member Portal credentials (Trading Member ID + User ID + Password)
 2. IP whitelisting (production)
-3. Two-factor authentication (OTP to registered mobile)
+3. Two-factor authentication (<abbr title="One-Time Password">OTP</abbr> to registered mobile)
 
 Now that you know where UCC operations happen, the next question is: which method should you use to register UCCs? NSE offers three distinct approaches, each suited to different scales of operation.
 
@@ -479,7 +479,7 @@ Batch files are the workhorse of bulk UCC operations. Even if your primary integ
 | Row Terminator | CRLF or LF |
 | Header Row | **None** (no header line; data starts on line 1) |
 | File Extension | `.txt` or `.csv` |
-| Max Records per File | **10,000** (vs BSE's 30,000) |
+| Max Records per File | **10,000** (vs <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr>'s 30,000) |
 | Row Structure | Two rows per client: Row 1 = General Info, Row 2 = Director Details (if applicable) |
 | Circular | NSE/ISC/61817 (Apr 30, 2024), revised field structure effective Jul 15, 2024 |
 
@@ -553,7 +553,7 @@ The following table documents the key fields in the 183-field pipe-delimited str
 |---------|-----------|------|-----------|-----------|---------------------|
 | 1 | Trading Member ID | AN | 6 | M | NSE member code assigned at registration |
 | 2 | Client Code | AN | 10 | M | Unique per member, alphanumeric, no special chars |
-| 3 | Client Name (First) | A | 70 | M | As per PAN/ITD records, uppercase |
+| 3 | Client Name (First) | A | 70 | M | As per PAN/<abbr title="Information Technology Department (within SEBI)">ITD</abbr> records, uppercase |
 | 4 | Client Name (Middle) | A | 35 | O | |
 | 5 | Client Name (Last) | A | 35 | M | As per PAN/ITD records |
 | 6 | PAN | AN | 10 | M | AAAAA9999A format; or `PAN_EXEMPT` for ITD-exempt |
@@ -572,23 +572,23 @@ The following table documents the key fields in the 183-field pipe-delimited str
 | 19 | Email ID | AN | 100 | M | Valid format, must be verified |
 | 20 | Income Range Code | N | 2 | M | 01-06, see Section 14 |
 | 21 | Bank Account Number | AN | 20 | M | |
-| 22 | Bank IFSC Code | AN | 11 | M | 4 alpha + 0 + 6 alphanumeric |
+| 22 | Bank <abbr title="Indian Financial System Code.">IFSC</abbr> Code | AN | 11 | M | 4 alpha + 0 + 6 alphanumeric |
 | 23 | Bank Account Type | A | 2 | M | SB = Savings, CA = Current |
-| 24 | DP ID | AN | 8/16 | M | NSDL: IN+6 chars, CDSL: 8 digits |
+| 24 | <abbr title="Depository Participant">DP</abbr> ID | AN | 8/16 | M | <abbr title="National Securities Depository Limited">NSDL</abbr>: IN+6 chars, <abbr title="Central Depository Services (India) Limited">CDSL</abbr>: 8 digits |
 | 25 | DP Client ID | AN | 8/16 | M | NSDL: 8 chars, CDSL: 8 digits |
 | 26 | Depository | A | 4 | M | CDSL or NSDL |
 | 27 | KYC Status | A | 1 | M | Y = KYC compliant, N = Not compliant |
-| 28 | FATCA Declaration | A | 1 | M | Y = Declared, N = Not declared |
+| 28 | <abbr title="Foreign Account Tax Compliance Act (US)">FATCA</abbr> Declaration | A | 1 | M | Y = Declared, N = Not declared |
 | 29 | Aadhaar (Masked) | AN | 12 | O | Last 4 digits visible: XXXXXXXX5678 |
-| 30 | PEP Status | A | 1 | M | Y = PEP, N = Not PEP, R = PEP Related |
+| 30 | <abbr title="Politically Exposed Person">PEP</abbr> Status | A | 1 | M | Y = PEP, N = Not PEP, R = PEP Related |
 | 31 | Equity Cash Segment | A | 1 | M | Y / N |
 | 32 | Equity Derivatives (F&O) | A | 1 | O | Y / N |
 | 33 | Currency Derivatives | A | 1 | O | Y / N |
 | 34 | Commodity Segment | A | 1 | O | Y / N (NSE COM since 2018) |
 | 35 | Debt Segment | A | 1 | O | Y / N |
-| 36 | SLBM (Securities Lending & Borrowing) | A | 1 | O | Y / N |
+| 36 | <abbr title="Securities Lending and Borrowing Mechanism">SLBM</abbr> (Securities Lending & Borrowing) | A | 1 | O | Y / N |
 | 37 | Client Status | A | 1 | M | A = Active, I = Inactive, C = Closed |
-| 38 | POA/DDPI for Funds | A | 1 | O | Y / N |
+| 38 | <abbr title="Power of Attorney">POA</abbr>/<abbr title="Demat Debit and Pledge Instruction">DDPI</abbr> for Funds | A | 1 | O | Y / N |
 | 39 | POA/DDPI for Securities | A | 1 | O | Y / N |
 | 40 | Running Account Auth | A | 1 | O | M = Monthly, Q = Quarterly |
 | 41 | Nomination Opt-out | A | 1 | M | Y = Opted out (video verification required), N = Nominees provided |
@@ -673,7 +673,7 @@ Each nominee occupies 6 fields. With up to 10 nominees (SEBI mandate effective J
 | Code | State | Code | State |
 |------|-------|------|-------|
 | AN | Andaman & Nicobar | MH | Maharashtra |
-| AP | Andhra Pradesh | MN | Manipur |
+| <abbr title="Authorized Person">AP</abbr> | Andhra Pradesh | MN | Manipur |
 | AR | Arunachal Pradesh | ML | Meghalaya |
 | AS | Assam | MZ | Mizoram |
 | BR | Bihar | NL | Nagaland |
@@ -762,7 +762,7 @@ Since **July 2022**, NSE validates UCC and PAN status at every order entry point
 
 | Segment | Code | Validation Active |
 |---------|------|-------------------|
-| Cash Market (Equity) | CM | Yes |
+| Cash Market (Equity) | <abbr title="Clearing Member">CM</abbr> | Yes |
 | Futures & Options | FO | Yes |
 | Currency Derivatives | CD | Yes |
 | Commodity Derivatives | COM | Yes |
@@ -834,7 +834,7 @@ Not every client should trade every segment. Segment activation controls access 
 ### 10.2 Segment Activation Rules
 
 1. **Equity Cash (CM) is default**: Every new UCC must have at least the CM segment activated
-2. **F&O eligibility criteria**: Per SEBI/HO/MRD/TPD-1/P/CIR/2025/33, enhanced eligibility criteria for F&O trading include income proof, net worth assessment, and risk disclosure acknowledgement
+2. **F&O eligibility criteria**: Per SEBI/HO/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>/TPD-1/P/CIR/2025/33, enhanced eligibility criteria for F&O trading include income proof, net worth assessment, and risk disclosure acknowledgement
 3. **Segment activation is additive**: Members can activate additional segments for existing clients without re-registering the UCC
 4. **Segment deactivation**: Members can deactivate segments; this prevents new orders but does not affect existing open positions (which must be closed separately)
 5. **Commodity segment**: NSE launched commodity derivatives in 2018; commodity segment activation requires separate income documentation
@@ -926,13 +926,13 @@ Client category codes classify the type of entity being onboarded. Getting this 
 
 ## 12. Client Category Codes
 
-Client category codes are standardized by SEBI and are identical across NSE, BSE (BSE Limited, formerly Bombay Stock Exchange), and MCX (Multi Commodity Exchange).
+Client category codes are standardized by SEBI and are identical across NSE, BSE (BSE Limited, formerly Bombay Stock Exchange), and <abbr title="Multi Commodity Exchange of India">MCX</abbr> (Multi Commodity Exchange).
 
 | Code | Category | Entity Type | Notes |
 |------|----------|-------------|-------|
-| 01 | Individual | Person | Most common; UPI applicable |
+| 01 | Individual | Person | Most common; <abbr title="Unified Payments Interface">UPI</abbr> applicable |
 | 02 | On behalf of Minor | Person (Guardian acting) | Guardian PAN/DOB mandatory |
-| 03 | HUF (Hindu Undivided Family) | Non-individual | Karta details required; UPI applicable |
+| 03 | <abbr title="Hindu Undivided Family">HUF</abbr> (Hindu Undivided Family) | Non-individual | Karta details required; UPI applicable |
 | 04 | Company | Non-individual | DOI, CIN, Director details mandatory |
 | 05 | AOP (Association of Persons) | Non-individual | |
 | 06 | Partnership Firm | Non-individual | Partner details, authorized signatory |
@@ -940,13 +940,13 @@ Client category codes are standardized by SEBI and are identical across NSE, BSE
 | 08 | Trust | Non-individual | Trust deed, trustee details |
 | 09 | Society | Non-individual | |
 | 10 | Others | Miscellaneous | |
-| 11 | NRI - Others | NRI | |
+| 11 | <abbr title="Non-Resident Indian">NRI</abbr> - Others | NRI | |
 | 12 | DFI (Dev. Financial Institution) | Institutional | |
 | 13 | Sole Proprietorship | Non-individual | |
-| 21 | NRI - Repatriable (NRE) | NRI | NRE bank account mandatory |
+| 21 | NRI - Repatriable (<abbr title="Non-Resident External (Rupee) account">NRE</abbr>) | NRI | NRE bank account mandatory |
 | 22 | OCB (Overseas Corporate Body) | Foreign | |
 | 23 | FII (Foreign Institutional Investor) | Foreign | |
-| 24 | NRI - Repatriable (NRO) | NRI | NRO bank account mandatory |
+| 24 | NRI - Repatriable (<abbr title="Non-Resident Ordinary (Rupee) account">NRO</abbr>) | NRI | NRO bank account mandatory |
 | 25 | Overseas Corp. Body - Others | Foreign | |
 | 26 | NRI Child | NRI | |
 | 27 | NRI - HUF (NRO) | NRI | |
@@ -1097,11 +1097,11 @@ Most of your clients will be individuals, but you must also handle non-individua
 
 | Requirement | Details |
 |-------------|---------|
-| RBI PIS Permission | Portfolio Investment Scheme permission letter from authorized dealer (AD bank) required for equity trading |
+| <abbr title="Reserve Bank of India">RBI</abbr> <abbr title="Portfolio Investment Scheme (RBI / NRI)">PIS</abbr> Permission | Portfolio Investment Scheme permission letter from authorized dealer (AD bank) required for equity trading |
 | Bank Account Type | NRE for repatriable (category 21), NRO for non-repatriable (category 24) |
 | CP Code | Custodial Participant code requirement **removed** by SEBI (July 2025) |
 | PAN-Aadhaar | NRI PANs must be "PAN-Aadhaar linked" OR marked "Not applicable" per ITD records |
-| Country of Residence | Mandatory; determines FATCA/CRS reporting obligations |
+| Country of Residence | Mandatory; determines FATCA/<abbr title="Common Reporting Standard">CRS</abbr> reporting obligations |
 | Tax Residency Certificate | Required for treaty benefits |
 | Seafarer NRIs | Certain address/document fields relaxed |
 
@@ -1187,7 +1187,7 @@ Via UCI Online (Manual):
 |------|-----|----------|---------|-------|
 | Active (A) | Inactive (I) | Yes | Member updates via API/portal/batch | Client cannot trade; open orders cancelled |
 | Active (A) | Closed (C) | Yes | Member closes; final settlement | **Irreversible**; demat delinked permanently |
-| Inactive (I) | Active (A) | Yes | Re-verification of 6 KYC attributes | May take T+2 working days |
+| Inactive (I) | Active (A) | Yes | Re-verification of 6 KYC attributes | May take <abbr title="Trade-date Plus N settlement">T+2</abbr> working days |
 | Inactive (I) | Closed (C) | Yes | Member closes | **Irreversible** |
 | Closed (C) | Active (A) | **No** | Not possible | New UCC required |
 | Closed (C) | Inactive (I) | **No** | Not possible | New UCC required |
@@ -1211,7 +1211,7 @@ Every UCC must be linked to at least one demat account. The next section covers 
 
 ---
 
-The UCC-Demat mapping connects a client's trading identity (UCC) to their securities holding identity (BO account at CDSL or NSDL). Without this link, the settlement system cannot deliver or receive securities on behalf of the client.
+The UCC-Demat mapping connects a client's trading identity (UCC) to their securities holding identity (<abbr title="Beneficial Owner">BO</abbr> account at CDSL or NSDL). Without this link, the settlement system cannot deliver or receive securities on behalf of the client.
 
 ## 18. UCC-Demat Mapping
 
@@ -1274,17 +1274,17 @@ NSE Clearing Limited handles the settlement of every trade on NSE. Understanding
 
 ### 19.1 NSE Clearing Limited (NCL)
 
-NCL (formerly NSCCL - National Securities Clearing Corporation Limited) is the clearing corporation subsidiary of NSE. It handles clearing and settlement for all trades executed on NSE.
+NCL (formerly <abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NSCCL</abbr> - National Securities Clearing Corporation Limited) is the clearing corporation subsidiary of NSE. It handles clearing and settlement for all trades executed on NSE.
 
 ### 19.2 UCC-NCL Interaction
 
 | Aspect | Details |
 |--------|---------|
 | Trade Obligation | Every trade on NSE generates an obligation in NCL against the UCC |
-| Settlement | NCL settles all segment obligations (equity T+1, derivatives as per contract) |
+| Settlement | NCL settles all segment obligations (equity <abbr title="Trade-date Plus N settlement">T+1</abbr>, derivatives as per contract) |
 | Margin | Client-level margins computed by NCL based on UCC positions |
 | Collateral | Clearing members upload collateral data daily, segregated by UCC |
-| Risk Management | NCL monitors risk at UCC level (SPAN + Exposure margins) |
+| Risk Management | NCL monitors risk at UCC level (<abbr title="Standard Portfolio Analysis of Risk">SPAN</abbr> + Exposure margins) |
 | Default | If clearing member defaults, NCL's risk management framework protects client collateral per UCC |
 
 ### 19.3 Client-Level Segregation (SEBI Mandate)
@@ -1301,7 +1301,7 @@ NCL (formerly NSCCL - National Securities Clearing Corporation Limited) is the c
 | Segment | Settlement Cycle | Notes |
 |---------|-----------------|-------|
 | Equity Cash (CM) | T+1 | Since Jan 27, 2023 |
-| Equity Derivatives (FO) | T+1 (premium), Expiry-based for margins | Daily MTM settlement |
+| Equity Derivatives (FO) | T+1 (premium), Expiry-based for margins | Daily <abbr title="Mark-to-Market">MTM</abbr> settlement |
 | Currency Derivatives (CD) | T+1 | |
 | Commodity (COM) | T+1 for non-delivery; delivery per contract | |
 | Debt (D) | T+1 | |
@@ -1403,7 +1403,7 @@ Understanding SLAs helps you set the right expectations with your product and op
 | New UCC to PTT | **T+1** (next trading day) | UCCs compliant by 22:00 hrs on T are PTT on T+1 |
 | Emergency PTT Processing | **Same day (T)** if submitted by 14:30 hrs | Exigency provision; PTT effective by next session |
 | API-based registration | Near real-time registration; PTT by T+1 | Registration is instant; PTT batch runs overnight |
-| Batch upload processing | Overnight (T+1 morning) | Files uploaded by EOD on T processed overnight |
+| Batch upload processing | Overnight (T+1 morning) | Files uploaded by <abbr title="End Of Day">EOD</abbr> on T processed overnight |
 
 ### 21.2 Modification Timelines
 
@@ -1426,7 +1426,7 @@ Understanding SLAs helps you set the right expectations with your product and op
 
 ### 21.4 Exchange Operating Hours (for SLA context)
 
-| Window | Time (IST) | Relevance |
+| Window | Time (<abbr title="Indian Standard Time (UTC+05:30)">IST</abbr>) | Relevance |
 |--------|-----------|-----------|
 | Pre-open session | 09:00 - 09:15 | |
 | Normal trading | 09:15 - 15:30 | |
@@ -1456,7 +1456,7 @@ Staying current with circulars is essential. Each one can change field formats, 
 | Aug 2024 | NSE Notice | Old UCC format fully discontinued | Only revised format accepted |
 | Oct 2024 | NSE Notice | 150-field structure goes live (interim) | Intermediate structure before 183-field expansion |
 | Jan 2025 | SEBI Mandate | Up to 10 nominees for trading + demat | Nominees expanded from 3 to 10; video verification for opt-out |
-| Feb 1, 2025 | SEBI/NSE | UPI Block Mechanism mandatory for QSBs | ASBA-like mechanism for secondary market (Qualified Stock Brokers) |
+| Feb 1, 2025 | SEBI/NSE | UPI Block Mechanism mandatory for QSBs | <abbr title="Applications Supported by Blocked Amount">ASBA</abbr>-like mechanism for secondary market (Qualified Stock Brokers) |
 | May 2025 | NSE/BSE | 183-field UCC structure (SaveUCC_V2 equivalent) | Harmonized structure across exchanges; nominees 4-10 supported |
 | Jun 2025 | SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90 | Stock Brokers Master Circular | Consolidated regulation for all broker operations |
 | Jul 2025 | SEBI | CP code requirement removed for NRIs | Simplifies NRI onboarding |
@@ -1489,7 +1489,7 @@ Edge cases are where production systems break. The following section catalogues 
 ### 23.2 Non-Individual Expansion
 
 SEBI has been progressively enhancing non-individual client onboarding:
-- LLP (Limited Liability Partnership) may get dedicated category code
+- <abbr title="—">LLP</abbr> (Limited Liability Partnership) may get dedicated category code
 - Foreign Portfolio Investors (FPI) onboarding streamlining ongoing
 - AI/ML-based entity verification being explored by regulators
 
@@ -1498,8 +1498,8 @@ SEBI has been progressively enhancing non-individual client onboarding:
 | Area | Expected Change | Timeline |
 |------|----------------|----------|
 | Digital-first onboarding | Fully paperless KYC with video verification may become default | 2026 |
-| Account Aggregator | Income verification via AA may replace manual income proof | 2026-2027 |
-| e-KYC Setu | NPCI's Aadhaar e-KYC without Aadhaar number may become standard | 2026 |
+| Account Aggregator | Income verification via <abbr title="Account Aggregator (RBI-licensed NBFC-AA)">AA</abbr> may replace manual income proof | 2026-2027 |
+| e-KYC Setu | <abbr title="National Payments Corporation of India">NPCI</abbr>'s Aadhaar e-KYC without Aadhaar number may become standard | 2026 |
 | UPI Block Mechanism | Extension from QSBs to all brokers | 2026 |
 | Consolidated Account Statement | Cross-exchange, cross-depository unified view | 2026-2027 |
 | Real-time KYC updates | KRA/CKYC/Exchange real-time synchronization | Future |
@@ -1585,7 +1585,7 @@ Key differences between NSE and BSE UCC systems for implementation planning:
 | PAN Verification | 3-parameter (identical) | 3-parameter (identical) |
 | PAN Status Codes | A / I / P (identical) | A / I / P (identical) |
 | PTT Terminology | PTT / NPTT | PTT / NPTT |
-| Clearing Corp | NCL (NSE Clearing Limited) | ICCL (Indian Clearing Corporation Limited) |
+| Clearing Corp | NCL (NSE Clearing Limited) | <abbr title="Indian Clearing Corporation Limited">ICCL</abbr> (Indian Clearing Corporation Limited) |
 | Settlement | T+1 (equity cash) | T+1 (equity cash) |
 | Closed Status | Irreversible (same) | Irreversible (same) |
 | Nominees | Up to 10 (SEBI mandate) | Up to 10 (SEBI mandate) |

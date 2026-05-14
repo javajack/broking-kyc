@@ -5,20 +5,20 @@ description: Bidirectional conversion procedure between Resident and NRI status 
 
 import { Aside } from '@astrojs/starlight/components';
 
-> **Why this page is structured this way:** Conversion goes both ways and the two directions differ substantively. Resident → NRI adds restrictions and new external linkages (PIS letter, NRE/NRO bank); NRI → Resident removes restrictions and unlinks PIS infrastructure. Two separate walkthroughs reflect this.
+> **Why this page is structured this way:** Conversion goes both ways and the two directions differ substantively. Resident → <abbr title="Non-Resident Indian">NRI</abbr> adds restrictions and new external linkages (<abbr title="Portfolio Investment Scheme (RBI / NRI)">PIS</abbr> letter, <abbr title="Non-Resident External (Rupee) account">NRE</abbr>/<abbr title="Non-Resident Ordinary (Rupee) account">NRO</abbr> bank); NRI → Resident removes restrictions and unlinks PIS infrastructure. Two separate walkthroughs reflect this.
 
 ## TL;DR
 
 - Triggered by client status change — moving abroad (Resident → NRI) or returning to India (NRI → Resident).
 - **Resident → NRI** adds: passport + visa proof, NRE/NRO bank linkage, **PIS letter** from an AD-Category-I bank, segment restrictions (PIS = delivery-only, commodities prohibited).
-- **NRI → Resident** removes: PIS account linkage, NRI-specific tax treatment; re-KYC as resident; segment restrictions lifted.
+- **NRI → Resident** removes: PIS account linkage, NRI-specific tax treatment; re-<abbr title="Know Your Customer (process).">KYC</abbr> as resident; segment restrictions lifted.
 - **CP code (Custodian Participant) was removed post July 2025** — older reference to that has been retired.
 - Timeline: 1–4 weeks both directions, mostly bottlenecked by external dependencies (passport / visa documentation, PIS letter from AD bank).
 - Tax treatment differs: NRIs face **TDS at source** on capital gains and dividends; residents declare and self-assess.
 
 ## Conceptual overview
 
-A resident Indian client and an NRI client are technically the same person, often the same brokerage relationship, but the regulatory framework treats them differently. NRIs investing in Indian securities operate under FEMA (Foreign Exchange Management Act) with specific routes — PIS (Portfolio Investment Scheme) for stock-market access through an AD bank — and specific restrictions (no intraday under PIS, no commodities). Conversion in either direction realigns the broker relationship with the right framework. Both directions are operationally substantial; pre-existing positions need careful handling.
+A resident Indian client and an NRI client are technically the same person, often the same brokerage relationship, but the regulatory framework treats them differently. NRIs investing in Indian securities operate under <abbr title="Foreign Exchange Management Act 1999">FEMA</abbr> (Foreign Exchange Management Act) with specific routes — PIS (Portfolio Investment Scheme) for stock-market access through an AD bank — and specific restrictions (no intraday under PIS, no commodities). Conversion in either direction realigns the broker relationship with the right framework. Both directions are operationally substantial; pre-existing positions need careful handling.
 
 ## Direction 1 — Resident → NRI
 
@@ -28,14 +28,14 @@ Triggered when a resident client acquires NRI status (typically by acquiring res
 
 Client notifies the broker of NRI status change. Usually voluntary — the client knows their tax / residency status has changed and proactively contacts the broker to ensure compliance.
 
-The broker doesn't typically detect NRI status independently; FATCA / CRS self-certifications would surface foreign tax residency but those don't always coincide with NRI status changes.
+The broker doesn't typically detect NRI status independently; <abbr title="Foreign Account Tax Compliance Act (US)">FATCA</abbr> / <abbr title="Common Reporting Standard">CRS</abbr> self-certifications would surface foreign tax residency but those don't always coincide with NRI status changes.
 
 ### Step 2 — Documentation collection
 
 Client submits:
 - **Passport** — current valid passport.
 - **Visa / residency proof** — work visa, residence permit, or similar proof of overseas residence.
-- **PAN** — same PAN continues (Indians retain PAN even as NRIs).
+- **<abbr title="Permanent Account Number">PAN</abbr>** — same PAN continues (Indians retain PAN even as NRIs).
 - **Aadhaar** — retained but may have limited utility for NRI verification depending on Aadhaar's framework.
 - Proof of overseas address (utility bill, lease, etc.).
 
@@ -52,7 +52,7 @@ The client opens these at any AD bank (Authorized Dealer Category-I bank, typica
 For stock-market access under the PIS route, the client must obtain a **PIS letter** (Portfolio Investment Scheme letter) from their AD bank. This letter:
 - Designates the bank as the PIS authority for the client.
 - Specifies the NRE / NRO accounts linked to the PIS.
-- Confirms the bank will handle reporting to RBI of NRI transactions.
+- Confirms the bank will handle reporting to <abbr title="Reserve Bank of India">RBI</abbr> of NRI transactions.
 
 The PIS letter is broker-agnostic — one PIS letter per client per bank, usable across any broker the client uses.
 
@@ -64,15 +64,15 @@ The PIS letter is broker-agnostic — one PIS letter per client per bank, usable
 
 Open derivatives positions need attention before conversion:
 - **F&O positions** under resident framework — may need to be unwound or transferred to a non-PIS route.
-- **Commodities (MCX) positions** — MCX prohibits NRI clients; positions must be closed before conversion.
-- **CM holdings** continue without issue; they convert to NRI-held holdings.
+- **Commodities (<abbr title="Multi Commodity Exchange of India">MCX</abbr>) positions** — MCX prohibits NRI clients; positions must be closed before conversion.
+- **<abbr title="Clearing Member">CM</abbr> holdings** continue without issue; they convert to NRI-held holdings.
 
 ### Step 6 — Conversion at broker
 
 Broker updates:
 - Client master with NRI flag, new addresses, NRE/NRO bank linkage, PIS letter on file.
-- Exchange UCC updated to NRI client type.
-- Depository BO re-mapped to NRI account type — affects payout routing (NRE for repatriable, NRO for non-repatriable).
+- Exchange <abbr title="Unique Client Code">UCC</abbr> updated to NRI client type.
+- Depository <abbr title="Beneficial Owner">BO</abbr> re-mapped to NRI account type — affects payout routing (NRE for repatriable, NRO for non-repatriable).
 - Segment restrictions applied per PIS rules.
 
 ### Step 7 — Segment restrictions
@@ -82,7 +82,7 @@ Under PIS route, only:
 - **No F&O** — though some brokers offer non-PIS F&O via NRO route.
 - **No commodities (MCX)** — strict prohibition.
 
-The broker's OMS enforces these restrictions at pre-trade RMS (segment check).
+The broker's <abbr title="Order Management System">OMS</abbr> enforces these restrictions at pre-trade <abbr title="Risk Management System">RMS</abbr> (segment check).
 
 ### Step 8 — Tax treatment
 
@@ -191,18 +191,18 @@ NRI conversion touches sections A (Identity), B (Address), C (Contact), G (Bank 
 
 - **[industry practice]** Most brokers maintain a small dedicated NRI ops team because NRI handling has distinct compliance and tax-treatment patterns. Conversion is one of several NRI-specific procedures this team owns.
 - **[gotcha]** PIS letter is broker-agnostic. A client switching brokers (after conversion to NRI) doesn't need a new PIS letter — the existing one carries over. New ops engineers sometimes assume the PIS letter is broker-specific and ask for a fresh one.
-- **[risk trade-off]** Allowing trading immediately on conversion-day (before all backend updates complete) is a customer-experience win but exposes the broker to mis-applied tax treatment. Tighter brokers require all backend updates to complete (typically T+1) before resuming trading; looser brokers allow trading with end-of-day reconciliation of tax.
+- **[risk trade-off]** Allowing trading immediately on conversion-day (before all backend updates complete) is a customer-experience win but exposes the broker to mis-applied tax treatment. Tighter brokers require all backend updates to complete (typically <abbr title="Trade-date Plus N settlement">T+1</abbr>) before resuming trading; looser brokers allow trading with end-of-day reconciliation of tax.
 - **[cost optimization]** The bulk of NRI conversion ops cost is in PIS letter validation and bank-account verification. Automating these checks (validating PIS letter format against the AD bank's published format; automated penny-drop on the new bank account) reduces manual ops touch points.
 
 ## Cross-references
 
 - [Compliance Blueprint — Edge-case compliances (NRI)](/broking-kyc/operations/compliance-blueprint/)
-- [Integration DAG — NRI conversion path](/broking-kyc/operations/integration-dag/lifecycle-events/)
+- [Integration <abbr title="Directed Acyclic Graph.">DAG</abbr> — NRI conversion path](/broking-kyc/operations/integration-dag/lifecycle-events/)
 - [Field Atlas — Section V (NRI-Specific)](/broking-kyc/reference/field-atlas/sections/v-nri-specific/)
 - [Appendix — NRI Deep Dive](/broking-kyc/appendix/nri-deep-dive/) (existing reference for non-conversion NRI specifics)
 - [Lifecycle: Re-KYC](./re-kyc/) (NRI → Resident triggers re-KYC)
 - [Lifecycle: Modifications — bank account](./modifications/#bank-account-change) (PIS / non-PIS bank changes use the same penny-drop procedure)
-- [Circulars — SEBI MIRSD](/broking-kyc/reference/circulars/sebi-mirsd/) and [RBI](/broking-kyc/reference/circulars/rbi/) (FEMA NRI investment framework)
+- [Circulars — <abbr title="Securities and Exchange Board of India">SEBI</abbr> <abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>](/broking-kyc/reference/circulars/sebi-mirsd/) and [RBI](/broking-kyc/reference/circulars/rbi/) (FEMA NRI investment framework)
 
 ## Verified through
 

@@ -15,42 +15,42 @@ description: "Verified index of FIU-IND circulars affecting Indian stock broking
 
 ## Conceptual overview
 
-This page is the complete listing of FIU-IND circulars in the project's 2020–2026 sweep window. Each entry contains the verbatim circular ID, issue date, in-force date, status (in-force / superseded / withdrawn), applicable entity types, impact-area tags, a 2–4 sentence summary traceable to clauses, and the primary URL. Where the primary URL could not be re-fetched, an archive URL is provided in its place.
+This page is the complete listing of <abbr title="Financial Intelligence Unit — India">FIU-IND</abbr> circulars in the project's 2020–2026 sweep window. Each entry contains the verbatim circular ID, issue date, in-force date, status (in-force / superseded / withdrawn), applicable entity types, impact-area tags, a 2–4 sentence summary traceable to clauses, and the primary URL. Where the primary URL could not be re-fetched, an archive URL is provided in its place.
 
 ## Entries (descending date)
 
 ### FIU-IND-SEBI-MOU-2026
 
 - **date_issued:** 2026-04-16
-- **issuer:** FIU-IND
-- **title:** "Memorandum of Understanding between Financial Intelligence Unit-India (FIU-IND) and Securities and Exchange Board of India (SEBI) for cooperation in combating money laundering and financial crimes"
+- **issuer:** <abbr title="Financial Intelligence Unit">FIU</abbr>-IND
+- **title:** "Memorandum of Understanding between Financial Intelligence Unit-India (FIU-IND) and Securities and Exchange Board of India (<abbr title="Securities and Exchange Board of India">SEBI</abbr>) for cooperation in combating money laundering and financial crimes"
 - **applies_to:** broker, depository, exchange, clearing-corp, all-intermediaries
 - **in_force_date:** 2026-04-16
 - **status:** in-force
 - **impact_areas:** aml, surveillance, reporting, other
 - **primary_url:** https://www.pib.gov.in/PressReleasePage.aspx?PRID=2252517&reg=3&lang=1
 
-Bilateral MoU signed 16 April 2026 between FIU-IND Director Shri Amit Mohan Govil and SEBI Whole-Time Member Shri Sandip Pradhan, formalising structured intelligence exchange between FIU-IND and SEBI. Scope: sharing of databases, joint identification and dissemination of red-flag indicators / suspicious-transaction patterns for the securities sector, supervision/monitoring of SEBI-regulated reporting entities' PMLA compliance, ML/TF risk assessment across capital-market sub-sectors, joint outreach/training, and information exchange under Egmont principles. Quarterly review meetings agreed. Will translate into refreshed red-flag-indicator guidance and inspection focus for stock brokers and depository participants.
+Bilateral MoU signed 16 April 2026 between FIU-IND Director Shri Amit Mohan Govil and SEBI Whole-Time Member Shri Sandip Pradhan, formalising structured intelligence exchange between FIU-IND and SEBI. Scope: sharing of databases, joint identification and dissemination of red-flag indicators / suspicious-transaction patterns for the securities sector, supervision/monitoring of SEBI-regulated reporting entities' <abbr title="Prevention of Money Laundering Act 2002">PMLA</abbr> compliance, ML/TF risk assessment across capital-market sub-sectors, joint outreach/training, and information exchange under Egmont principles. Quarterly review meetings agreed. Will translate into refreshed red-flag-indicator guidance and inspection focus for stock brokers and depository participants.
 
 ### FIU-IND-VDA-08012026
 
 - **date_issued:** 2026-01-08
 - **issuer:** FIU-IND
-- **title:** "AML & CFT Guidelines for Reporting Entities Providing Services Related to Virtual Digital Assets" (consolidated 2026 edition)
+- **title:** "<abbr title="Anti-Money Laundering">AML</abbr> & <abbr title="Combating the Financing of Terrorism">CFT</abbr> Guidelines for Reporting Entities Providing Services Related to Virtual Digital Assets" (consolidated 2026 edition)
 - **applies_to:** all-intermediaries
 - **in_force_date:** 2026-01-08
 - **status:** in-force
-- **impact_areas:** aml, onboarding, re-KYC, kyc-modification, reporting, cyber-security, other
+- **impact_areas:** aml, onboarding, re-<abbr title="Know Your Customer (process).">KYC</abbr>, kyc-modification, reporting, cyber-security, other
 - **primary_url:** https://fiuindia.gov.in/pdfs/downloads/VDA08012026.pdf
 - **archive_url:** [unknown - verify]
 
-Consolidated edition of FIU-IND's VDA AML/CFT Guidelines issued 8 January 2026. Supersedes the 10 March 2023 guidelines and consolidates operational requirements previously dispersed across the 15 September 2025 VDASP registration circular and the 25 February 2025 Principal Officer guidance. Reinforces FIU-IND's pivot from compliance-based to operational-verification supervision: registration diligence, governance accountability (DD/PO), tightened CDD, structured client risk classification, and technology-driven monitoring including the FATF "travel rule." Indirect read-across to stock brokers planning crypto-linked products or arm's-length VDA partnerships.
+Consolidated edition of FIU-IND's VDA AML/CFT Guidelines issued 8 January 2026. Supersedes the 10 March 2023 guidelines and consolidates operational requirements previously dispersed across the 15 September 2025 VDASP registration circular and the 25 February 2025 Principal Officer guidance. Reinforces FIU-IND's pivot from compliance-based to operational-verification supervision: registration diligence, governance accountability (DD/PO), tightened CDD, structured client risk classification, and technology-driven monitoring including the <abbr title="Financial Action Task Force">FATF</abbr> "travel rule." Indirect read-across to stock brokers planning crypto-linked products or arm's-length VDA partnerships.
 
 ### FIU-IND-VDASP-15092025
 
 - **date_issued:** 2025-09-15
 - **issuer:** FIU-IND
-- **title:** "3rd Revision of Circular for Registration of Virtual Digital Asset Service Providers (VDA SPs) in FIU India as Reporting Entity (RE)" (F.No. 9-8/2023/COMPL/FIU-IND-Pt-II)
+- **title:** "3rd Revision of Circular for Registration of Virtual Digital Asset Service Providers (VDA SPs) in FIU India as Reporting Entity (RE)" (F.No. 9-8/2023/COMPL/FIU-IND-Pt-<abbr title="—">II</abbr>)
 - **applies_to:** all-intermediaries
 - **in_force_date:** 2025-09-15
 - **status:** in-force
@@ -92,7 +92,7 @@ FIU-IND update dated 21 February 2025 transmitting UNSC Press Release SC/16003 w
 
 - **date_issued:** 2025-01-20
 - **issuer:** FIU-IND
-- **title:** "2nd Revision of Circular for Registration of Virtual Digital Asset Service Providers (VDA SPs) in FIU-India as Reporting Entity (RE)" (Notification No. 9-8/2023/COMPL/FIU-IND-Pt-III)
+- **title:** "2nd Revision of Circular for Registration of Virtual Digital Asset Service Providers (VDA SPs) in FIU-India as Reporting Entity (RE)" (Notification No. 9-8/2023/COMPL/FIU-IND-Pt-<abbr title="—">III</abbr>)
 - **applies_to:** all-intermediaries
 - **in_force_date:** 2025-01-20
 - **status:** superseded
@@ -174,7 +174,7 @@ FIU-IND notification dated 17 July 2023 operationalising the Central Government'
 - **primary_url:** https://fiuindia.gov.in/pdfs/quicklinks/User_Manual_FINGate_Reports.pdf
 - **archive_url:** [unknown - verify]
 
-Operational user manual (Version 1.6 dated 12 June 2023, periodically revised) for the FINGate Portal Reports module of FINnet 2.0. Covers preparation and submission of STR/CTR/CCR/NTR/CBWTR by reporting entities, including bulk JSON templates, batch submission using Digital Signature Certificate (DSC) and e-sign, and reporting for entities with multiple lines of business. References the Brokerage Firms STR Bulk Template (TS7). Updates rolled out following feedback received from REs in UAT and production testing.
+Operational user manual (Version 1.6 dated 12 June 2023, periodically revised) for the FINGate Portal Reports module of FINnet 2.0. Covers preparation and submission of <abbr title="Suspicious Transaction Report">STR</abbr>/<abbr title="Cash Transaction Report">CTR</abbr>/CCR/<abbr title="Non-Profit Organization Transaction Report">NTR</abbr>/CBWTR by reporting entities, including bulk JSON templates, batch submission using Digital Signature Certificate (<abbr title="Digital Signature Certificate (CCA-licensed; aka Class 2/3 DSC).">DSC</abbr>) and e-sign, and reporting for entities with multiple lines of business. References the Brokerage Firms STR Bulk Template (TS7). Updates rolled out following feedback received from REs in UAT and production testing.
 
 ### FIU-IND-FINNET2-REG-2023
 
@@ -187,7 +187,7 @@ Operational user manual (Version 1.6 dated 12 June 2023, periodically revised) f
 - **impact_areas:** aml, reporting, file-format, system-audit
 - **primary_url:** https://www.sebi.gov.in/legal/circulars/may-2023/registration-with-the-finnet-2-0-system-of-financial-intelligence-unit-india-fiu-india-_71040.html
 
-SEBI mirrored circular (Ref: SEBI/HO/DDHS/DDHS-POD1/CIR/P/2023/67 dated 9 May 2023) operationalising FIU-IND's directive to all SEBI-registered intermediaries (stock brokers, depository participants, mutual funds, portfolio managers, etc.) to register/re-register on the new FINNET 2.0 portal of FIU-IND. The migration replaces the legacy FINNet 1.0 system; all CTR/STR/CCR/NTR/CBWTR reporting is to be filed via FINNET 2.0 going forward. The original FIU-IND directive ("Registration of the Reporting Entities (REs) in FINnet 2.0 system of FIU-INDIA") was issued in 2022 and re-stated through SEBI to securities intermediaries.
+SEBI mirrored circular (Ref: SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/DDHS/DDHS-POD1/CIR/P/2023/67 dated 9 May 2023) operationalising FIU-IND's directive to all SEBI-registered intermediaries (stock brokers, depository participants, mutual funds, portfolio managers, etc.) to register/re-register on the new FINNET 2.0 portal of FIU-IND. The migration replaces the legacy FINNet 1.0 system; all CTR/STR/CCR/NTR/CBWTR reporting is to be filed via FINNET 2.0 going forward. The original FIU-IND directive ("Registration of the Reporting Entities (REs) in FINnet 2.0 system of FIU-INDIA") was issued in 2022 and re-stated through SEBI to securities intermediaries.
 
 ### FIU-IND-AMLCFT-VDA-10032023
 
@@ -216,7 +216,7 @@ Sector-specific AML/CFT guidelines for VDA Service Providers, effective 10 March
 - **primary_url:** https://fiuindia.gov.in/files/AML_Legislation/notification.html
 - **archive_url:** [unknown - verify]
 
-Ministry of Finance amendment to the PML (Maintenance of Records) Rules, 2005 effective 7 March 2023. Lowers the beneficial-owner threshold for companies from 25% to 10% and for partnership firms from 15% to 10%; introduces a FATF-aligned definition of "politically exposed persons" (PEPs); requires reporting entities to upload KYC data of customers on the Central KYC Registry (CKYCR) within prescribed timelines; mandates group-wide policies for compliance with Chapter IV; expands and clarifies reporting entity obligations including determination of beneficial ownership at the commencement of an account-based relationship. Directly impacts onboarding, periodic re-KYC, and BO disclosure obligations of stock brokers and depository participants.
+Ministry of Finance amendment to the PML (Maintenance of Records) Rules, 2005 effective 7 March 2023. Lowers the beneficial-owner threshold for companies from 25% to 10% and for partnership firms from 15% to 10%; introduces a FATF-aligned definition of "politically exposed persons" (PEPs); requires reporting entities to upload KYC data of customers on the Central KYC Registry (CKYCR) within prescribed timelines; mandates group-wide policies for compliance with Chapter IV; expands and clarifies reporting entity obligations including determination of beneficial ownership at the commencement of an account-based relationship. Directly impacts onboarding, periodic re-KYC, and <abbr title="Beneficial Owner">BO</abbr> disclosure obligations of stock brokers and depository participants.
 
 ### FIU-IND-SO1072E-2023-03-07
 
@@ -229,7 +229,7 @@ Ministry of Finance amendment to the PML (Maintenance of Records) Rules, 2005 ef
 - **impact_areas:** aml, reporting, onboarding, kyc-modification, other
 - **primary_url:** https://egazette.gov.in/WriteReadData/2023/244184.pdf
 
-Ministry of Finance gazette notification S.O. 1072(E) dated 7 March 2023, issued under Section 2(1)(sa)(vi) of the PMLA, brought five categories of VDA-related activities (exchange between VDAs and fiat; exchange between forms of VDAs; safekeeping/administration of VDAs or instruments controlling VDAs; participation in/provision of financial services related to an issuer's offer and sale of a VDA; transfer of VDAs) within "designated business or profession" - making VDA Service Providers reporting entities under Section 2(1)(wa) PMLA. While the notification targets VDA-SPs, it operates in parallel with the PML (Maintenance of Records) Amendment Rules of the same date that impact all PMLA reporting entities including stock brokers (lower BO threshold, group-wide policies, PEP definition).
+Ministry of Finance gazette notification S.O. 1072(E) dated 7 March 2023, issued under Section 2(1)(sa)(vi) of the PMLA, brought five categories of VDA-related activities (exchange between VDAs and fiat; exchange between forms of VDAs; safekeeping/administration of VDAs or instruments controlling VDAs; participation in/provision of financial services related to an issuer's offer and sale of a VDA; transfer of VDAs) within "designated business or profession" - making VDA Service Providers reporting entities under Section 2(1)(wa) PMLA. While the notification targets VDA-SPs, it operates in parallel with the PML (Maintenance of Records) Amendment Rules of the same date that impact all PMLA reporting entities including stock brokers (lower BO threshold, group-wide policies, <abbr title="Politically Exposed Person">PEP</abbr> definition).
 
 ### FIU-IND-CAPITAL-MARKET-ALERTS-2022-23
 
@@ -257,7 +257,7 @@ As reported in FIU-IND's Annual Report 2022-23 (publicised in April 2024 press c
 - **primary_url:** https://fiuindia.gov.in/pdfs/downloads/All%20FAQs%20for%20CBWT.pdf
 - **archive_url:** [unknown - verify]
 
-FAQ document interpreting CBWTR (Cross-Border Wire Transfer Report) obligations under Rule 3(1)(D) of the PML (Maintenance of Records) Rules. Every cross-border wire transfer where the value exceeds Rs.5 lakh (or foreign currency equivalent) and where the origin or destination of funds is in India must be reported by the 15th of the succeeding month. Sender and receiver legs must be reported separately ("P" for sender / "R" for receiver). Applies to all reporting entities executing or facilitating cross-border wire transfers, including stock brokers conducting NRI/FPI-linked or merchant remittances on behalf of clients.
+FAQ document interpreting CBWTR (Cross-Border Wire Transfer Report) obligations under Rule 3(1)(D) of the PML (Maintenance of Records) Rules. Every cross-border wire transfer where the value exceeds Rs.5 lakh (or foreign currency equivalent) and where the origin or destination of funds is in India must be reported by the 15th of the succeeding month. Sender and receiver legs must be reported separately ("P" for sender / "R" for receiver). Applies to all reporting entities executing or facilitating cross-border wire transfers, including stock brokers conducting <abbr title="Non-Resident Indian">NRI</abbr>/FPI-linked or merchant remittances on behalf of clients.
 
 ### FIU-IND-CTR-BANKING-FORMAT
 

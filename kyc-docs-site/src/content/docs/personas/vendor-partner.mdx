@@ -15,7 +15,7 @@ Three layers matter most:
 
 - **The Vendor Atlas** — your category and your competitors. Know where you stand.
 - **The Field Atlas** — which fields your product produces or consumes (depending on category).
-- **The Integration DAG** — your position in the dependency graph; what blocks what.
+- **The Integration <abbr title="Directed Acyclic Graph.">DAG</abbr>** — your position in the dependency graph; what blocks what.
 
 Then domain-specific deep-dives for your product category.
 
@@ -24,23 +24,23 @@ Then domain-specific deep-dives for your product category.
 1. **[Vendor Atlas Overview](/broking-kyc/vendors/atlas/)** — find your category. 22 categories total. Skim peers; understand positioning conventions used on the site (descriptive, not endorsement).
 
 2. **[Field Atlas Overview](/broking-kyc/reference/field-atlas/)** — if your product produces or consumes data, find the per-destination page that maps to your product. For example:
-   - KYC verification → [KYC verification destination](/broking-kyc/reference/field-atlas/destinations/kra/) and [CKYC](/broking-kyc/reference/field-atlas/destinations/ckyc/).
+   - <abbr title="Know Your Customer (process).">KYC</abbr> verification → [KYC verification destination](/broking-kyc/reference/field-atlas/destinations/kra/) and [<abbr title="Central KYC (records registry)">CKYC</abbr>](/broking-kyc/reference/field-atlas/destinations/ckyc/).
    - eSign → [eSign-related blueprint rows](/broking-kyc/operations/compliance-blueprint/) — eSign isn't a destination in the atlas because it's signed input; relevant context is in journey screen 9.
-   - AA / consent manager → most relevant in [Income Verification](/broking-kyc/operations/compliance-blueprint/#kyc-lifecycle-41-entries) and bank verification rows.
-   - DLT / SMS → [DLT comms destination](/broking-kyc/reference/field-atlas/destinations/dlt-comms/).
-   - OMS / RMS / back-office → [back-office destination](/broking-kyc/reference/field-atlas/destinations/back-office/), [RMS destination](/broking-kyc/reference/field-atlas/destinations/rms/).
-   - Surveillance / AML → [AML/FIU destination](/broking-kyc/reference/field-atlas/destinations/aml-fiu/).
+   - <abbr title="Account Aggregator (RBI-licensed NBFC-AA)">AA</abbr> / consent manager → most relevant in [Income Verification](/broking-kyc/operations/compliance-blueprint/#kyc-lifecycle-41-entries) and bank verification rows.
+   - DLT / <abbr title="Short Message Service.">SMS</abbr> → [DLT comms destination](/broking-kyc/reference/field-atlas/destinations/dlt-comms/).
+   - <abbr title="Order Management System">OMS</abbr> / <abbr title="Risk Management System">RMS</abbr> / back-office → [back-office destination](/broking-kyc/reference/field-atlas/destinations/back-office/), [RMS destination](/broking-kyc/reference/field-atlas/destinations/rms/).
+   - Surveillance / <abbr title="Anti-Money Laundering">AML</abbr> → [AML/<abbr title="Financial Intelligence Unit">FIU</abbr> destination](/broking-kyc/reference/field-atlas/destinations/aml-fiu/).
 
-3. **[Integration DAG Overview](/broking-kyc/operations/integration-dag/)** — find your phase. Your product likely sits in one of: Onboarding (KYC verification, eSign, AA, penny drop) / BOD (file fetch from exchanges) / Trading Hours (OMS, RMS, surveillance) / EOD & Settlement (back-office, DLT comms) / Lifecycle Events (modification routing).
+3. **[Integration DAG Overview](/broking-kyc/operations/integration-dag/)** — find your phase. Your product likely sits in one of: Onboarding (KYC verification, eSign, AA, penny drop) / <abbr title="Beginning Of Day">BOD</abbr> (file fetch from exchanges) / Trading Hours (OMS, RMS, surveillance) / <abbr title="End Of Day">EOD</abbr> & Settlement (back-office, DLT comms) / Lifecycle Events (modification routing).
 
 4. **Deep dive for your domain:**
    - **eSign** → [Journey screen 9](/broking-kyc/journey/09-review-esign/) + [Compliance Blueprint KYC domain](/broking-kyc/operations/compliance-blueprint/#kyc-lifecycle-41-entries).
    - **AA / consent manager** → [Compliance Blueprint AA-related rows](/broking-kyc/operations/compliance-blueprint/#kyc-lifecycle-41-entries) + [Field Atlas Section F](/broking-kyc/reference/field-atlas/sections/f-financial-profile/) (income verification flows).
    - **KYC verification / face-match / penny-drop** → [Journey screens 2, 3, 5](/broking-kyc/journey/02-pan-dob/).
    - **DLT comms** → [DLT Framework deep-dive](/broking-kyc/deep-dives/specialty/dlt-framework/) — TRAI framework, registration, scrubbing, error codes.
-   - **OMS / RMS** → [OMS Internals deep-dive](/broking-kyc/deep-dives/trading-day/oms-internals/) + [RMS / SPAN Methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/).
+   - **OMS / RMS** → [OMS Internals deep-dive](/broking-kyc/deep-dives/trading-day/oms-internals/) + [RMS / <abbr title="Standard Portfolio Analysis of Risk">SPAN</abbr> Methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/).
    - **Back-office** → [Compliance Blueprint Reporting + Investor Servicing domains](/broking-kyc/operations/compliance-blueprint/#reporting-cadences-40-entries).
-   - **Surveillance** → [Surveillance — NORMS / GSM / ASM deep-dive](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/).
+   - **Surveillance** → [Surveillance — NORMS / <abbr title="Graded Surveillance Measure">GSM</abbr> / <abbr title="Additional Surveillance Measure">ASM</abbr> deep-dive](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/).
    - **AML / sanctions** → [Compliance Blueprint AML domain](/broking-kyc/operations/compliance-blueprint/#aml--pmla--sanctions-25-entries) + [AML / FIU destination page](/broking-kyc/reference/field-atlas/destinations/aml-fiu/).
 
 5. **[Broker Process Narrative](/broking-kyc/broker-process/narrative/)** — light read. Useful for understanding how your product fits the broker's operational rhythm.
@@ -58,9 +58,9 @@ That's the foundation.
 - **What's the SLA the broker needs at my touchpoint?** → [Integration DAG](/broking-kyc/operations/integration-dag/) — find your node; sla column.
 - **What happens if my service fails?** → Integration DAG node → failure_surface column + retry_policy column.
 - **Is my product DLT-compliant for the broker's SMS use case?** → [DLT Framework deep-dive](/broking-kyc/deep-dives/specialty/dlt-framework/).
-- **Does my product need to be empanelled with the exchange?** → Depends on category. CTCL / algo vendors have NSE / BSE / MCX empanelment paths. See [OMS Internals deep-dive](/broking-kyc/deep-dives/trading-day/oms-internals/) + [Retail Algo Framework](/broking-kyc/deep-dives/trading-day/retail-algo-framework/).
+- **Does my product need to be empanelled with the exchange?** → Depends on category. <abbr title="Computer-to-Computer Link.">CTCL</abbr> / algo vendors have <abbr title="National Stock Exchange of India">NSE</abbr> / <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> / <abbr title="Multi Commodity Exchange of India">MCX</abbr> empanelment paths. See [OMS Internals deep-dive](/broking-kyc/deep-dives/trading-day/oms-internals/) + [Retail Algo Framework](/broking-kyc/deep-dives/trading-day/retail-algo-framework/).
 - **The broker says 'I need your product to integrate with my back-office'. What does that involve?** → [Back-office destination page](/broking-kyc/reference/field-atlas/destinations/back-office/) — typical fields; [vendor-specific] tags indicate where your product's column names will differ from "industry typical."
-- **What's the broker's CSCRF expectation for me as a vendor?** → [CSCRF deep-dive — vendor due diligence section](/broking-kyc/deep-dives/compliance-audit/cscrf-deep-dive/).
+- **What's the broker's <abbr title="Cybersecurity and Cyber Resilience Framework">CSCRF</abbr> expectation for me as a vendor?** → [CSCRF deep-dive — vendor due diligence section](/broking-kyc/deep-dives/compliance-audit/cscrf-deep-dive/).
 
 ## What to skip (and why)
 

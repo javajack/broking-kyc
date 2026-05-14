@@ -3,11 +3,11 @@ title: KRA Integration
 description: KRA (KYC Registration Agency) integration — lookup, fetch, submit, and modify across all 5 KRAs via Digio.
 ---
 
-The KYC Registration Agency (KRA) is the backbone of investor identity verification in India's securities market. Before a stock broker or any SEBI (Securities and Exchange Board of India)-registered intermediary can open a trading account for a client, they must verify that client's KYC status at a KRA. This is not optional -- it is a regulatory prerequisite that directly determines whether a person can buy or sell securities on Indian exchanges.
+The <abbr title="Know Your Customer (process).">KYC</abbr> Registration Agency (<abbr title="KYC Registration Agency">KRA</abbr>) is the backbone of investor identity verification in India's securities market. Before a stock broker or any <abbr title="Securities and Exchange Board of India">SEBI</abbr> (Securities and Exchange Board of India)-registered intermediary can open a trading account for a client, they must verify that client's KYC status at a KRA. This is not optional -- it is a regulatory prerequisite that directly determines whether a person can buy or sell securities on Indian exchanges.
 
 There are five SEBI-registered KRAs, but thanks to a mandated interoperability framework they function as a single logical system. A query to any one KRA returns the investor's record regardless of which KRA originally holds it. In practice, this means a broker needs only a single integration point -- and vendors like Digio provide a unified REST API that abstracts away the differences between all five KRAs. The KRA status code returned by this lookup (Registered, Validated, On Hold, Rejected, or Not Available) is the gate that controls whether the client's account can be activated for trading.
 
-Since August 2024, SEBI mandates that every securities intermediary must perform a dual upload of client KYC data to both the KRA and CKYC (Central KYC Registry, maintained by CERSAI). This page is the complete reference for KRA integration: the Digio API specifications for lookup, fetch, submit, and modify operations; the status codes that gate trading access; field-level upload specifications for both Part I (identity) and Part II (intermediary-specific) data; modification workflows and their downstream impact; non-individual entity requirements; and the edge cases that arise in production.
+Since August 2024, SEBI mandates that every securities intermediary must perform a dual upload of client KYC data to both the KRA and <abbr title="Central KYC (records registry)">CKYC</abbr> (Central KYC Registry, maintained by <abbr title="Central Registry of Securitisation Asset Reconstruction and Security Interest of India">CERSAI</abbr>). This page is the complete reference for KRA integration: the Digio API specifications for lookup, fetch, submit, and modify operations; the status codes that gate trading access; field-level upload specifications for both Part I (identity) and Part <abbr title="—">II</abbr> (intermediary-specific) data; modification workflows and their downstream impact; non-individual entity requirements; and the edge cases that arise in production.
 
 ## Table of Contents
 
@@ -36,7 +36,7 @@ Since August 2024, SEBI mandates that every securities intermediary must perform
 | Dual Upload Mandate | KRA + CKYC (since Aug 2024) |
 | Interoperability | Any KRA can access records from any other |
 | Trading Allowed At | REGISTERED status (VALIDATED not required) |
-| Primary Key | PAN |
+| Primary Key | <abbr title="Permanent Account Number">PAN</abbr> |
 | Timeline | 2-3 working days to VALIDATED |
 
 :::
@@ -47,7 +47,7 @@ Since August 2024, SEBI mandates that every securities intermediary must perform
 
 ### 1.1 What is a KRA?
 
-A KYC Registration Agency (KRA) is a SEBI-registered entity that holds and maintains the KYC records of all investors in the Indian securities market. Every intermediary (broker, mutual fund, PMS, AIF, depository participant) registered with SEBI must upload client KYC records to a KRA within 3 working days of account opening.
+A KYC Registration Agency (KRA) is a SEBI-registered entity that holds and maintains the KYC records of all investors in the Indian securities market. Every intermediary (broker, mutual fund, <abbr title="Portfolio Management Services">PMS</abbr>, AIF, depository participant) registered with SEBI must upload client KYC records to a KRA within 3 working days of account opening.
 
 The KRA system ensures that once an investor completes KYC with one intermediary, they do not need to repeat the full KYC process when opening accounts with other SEBI-registered intermediaries. The new intermediary simply looks up the investor's PAN at the KRA, retrieves the existing record, and uses it.
 
@@ -55,10 +55,10 @@ The KRA system ensures that once an investor completes KYC with one intermediary
 
 | # | KRA Name | Full Name | Promoted By | Website |
 |---|----------|-----------|-------------|---------|
-| 1 | **CVL KRA** | CDSL Ventures Limited KRA | CDSL (Central Depository Services Ltd) | https://www.cvlkra.com |
-| 2 | **NDML KRA** | NSDL Database Management Limited KRA | NSDL (National Securities Depository Ltd) | https://kra.ndml.in |
+| 1 | **CVL KRA** | <abbr title="Central Depository Services (India) Limited">CDSL</abbr> Ventures Limited KRA | CDSL (Central Depository Services Ltd) | https://www.cvlkra.com |
+| 2 | **NDML KRA** | <abbr title="National Securities Depository Limited">NSDL</abbr> Database Management Limited KRA | NSDL (National Securities Depository Ltd) | https://kra.ndml.in |
 | 3 | **CAMS KRA** | Computer Age Management Services KRA | CAMS (MF RTA) | https://www.camskra.com |
-| 4 | **DOTEX KRA** | DotEx International Limited KRA | NSE subsidiary | https://www.abortkra.com |
+| 4 | **DOTEX KRA** | DotEx International Limited KRA | <abbr title="National Stock Exchange of India">NSE</abbr> subsidiary | https://www.abortkra.com |
 | 5 | **KFintech KRA** | KFin Technologies KRA | KFintech (MF RTA) | https://kra.kfintech.com |
 
 ### 1.3 KRA Interoperability
@@ -76,10 +76,10 @@ All 5 KRAs operate under a SEBI-mandated interoperability framework:
 
 | Attribute | KRA | CKYC |
 |-----------|-----|------|
-| **Regulator** | SEBI (Securities and Exchange Board of India) | RBI / CERSAI (Central Registry of Securitisation) |
+| **Regulator** | SEBI (Securities and Exchange Board of India) | <abbr title="Reserve Bank of India">RBI</abbr> / CERSAI (Central Registry of Securitisation) |
 | **Scope** | Securities market only (brokers, MFs, DPs, PMSs, AIFs) | All financial institutions (banks, NBFCs, insurance, securities) |
 | **Data Standard** | KRA template (Part I + Part II) | CERSAI template (Part I only, standardized across financial sector) |
-| **Identifier** | PAN (primary key) | 14-digit CKYC Identification Number (KIN) |
+| **Identifier** | PAN (primary key) | 14-digit CKYC Identification Number (<abbr title="KYC Identification Number">KIN</abbr>) |
 | **Part I** | Identity data (CERSAI-aligned) | Identity data (CERSAI standard) |
 | **Part II** | Intermediary-specific data (trading prefs, risk, segments) | Not applicable (CKYC only stores Part I) |
 | **Trading Gate** | KRA status determines if client can trade | CKYC status does NOT directly gate trading |
@@ -95,11 +95,11 @@ Failure to upload to both constitutes a compliance violation and can attract reg
 
 ### 1.6 SEBI Mandate: Intermediary KYC Obligation
 
-Per SEBI KYC Master Circular (SEBI/HO/MIRSD/MIRSD-SEC-2/P/CIR/2023/168, October 2023):
+Per SEBI KYC Master Circular (SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-SEC-2/P/CIR/2023/168, October 2023):
 - Every SEBI-registered intermediary must verify the KYC status of a client before opening an account.
 - If the client is KYC Registered/Validated at a KRA, the intermediary fetches the existing record and verifies it.
 - If the client is not KYC-compliant, the intermediary must collect KYC data and upload to a KRA within 3 working days.
-- The intermediary must also verify the 6 KYC attributes (Name, PAN, Address, Mobile, Email, Income Range) and ensure consistency across KRA, exchange UCC, and depository records.
+- The intermediary must also verify the 6 KYC attributes (Name, PAN, Address, Mobile, Email, Income Range) and ensure consistency across KRA, exchange <abbr title="Unique Client Code">UCC</abbr>, and depository records.
 
 ---
 
@@ -326,7 +326,7 @@ Headers:
 }
 ```
 
-**Data Mapping**: The fetched record populates the prefill layer of the onboarding form. Fields map to [Master Dataset](/broking-kyc/reference/master-dataset) sections A (Personal), B (Identity), C (Address), D (Contact), E (Occupation), F (Financial), J (FATCA), K (PEP/AML), and R34 (full KRA record reference).
+**Data Mapping**: The fetched record populates the prefill layer of the onboarding form. Fields map to [Master Dataset](/broking-kyc/reference/master-dataset) sections A (Personal), B (Identity), C (Address), D (Contact), E (Occupation), F (Financial), J (<abbr title="Foreign Account Tax Compliance Act (US)">FATCA</abbr>), K (<abbr title="Politically Exposed Person">PEP</abbr>/<abbr title="Anti-Money Laundering">AML</abbr>), and R34 (full KRA record reference).
 
 ---
 
@@ -651,7 +651,7 @@ Part I follows the CERSAI (Central Registry of Securitisation Asset Reconstructi
 | # | Field Name | Type | Max Length | Mandatory | Notes |
 |---|-----------|------|-----------|-----------|-------|
 | 40 | `mobile_country_code` | string | 5 | Yes | `+91` for India |
-| 41 | `mobile` | string | 10 | Yes | 10-digit Indian mobile number. Must be pre-verified via OTP. |
+| 41 | `mobile` | string | 10 | Yes | 10-digit Indian mobile number. Must be pre-verified via <abbr title="One-Time Password">OTP</abbr>. |
 | 42 | `email` | string | 100 | Yes | Must be pre-verified. Valid email format. |
 | 43 | `std_code` | string | 5 | No | Landline STD code |
 | 44 | `phone` | string | 12 | No | Landline number |
@@ -661,11 +661,11 @@ Part I follows the CERSAI (Central Registry of Securitisation Asset Reconstructi
 
 | # | Field Name | Type | Max Length | Mandatory | Notes |
 |---|-----------|------|-----------|-----------|-------|
-| 46 | `tax_residency_india_only` | boolean | - | Yes | True if tax resident of India only. If false, FATCA/CRS detailed declaration required. |
+| 46 | `tax_residency_india_only` | boolean | - | Yes | True if tax resident of India only. If false, FATCA/<abbr title="Common Reporting Standard">CRS</abbr> detailed declaration required. |
 | 47 | `fatca_country_of_birth` | string | 2 | Conditional | ISO country code. Mandatory if US person or non-India tax resident. |
 | 48 | `fatca_country_of_citizenship` | string | 2 | Conditional | ISO country code |
 | 49 | `fatca_country_of_tax_residency` | string | 2 | Conditional | ISO country code |
-| 50 | `fatca_tax_identification_number` | string | 20 | Conditional | TIN/SSN/EIN in country of tax residency |
+| 50 | `fatca_tax_identification_number` | string | 20 | Conditional | <abbr title="Taxpayer Identification Number (in FATCA / CRS context)">TIN</abbr>/SSN/EIN in country of tax residency |
 | 51 | `fatca_tin_issuing_country` | string | 2 | Conditional | Country that issued the TIN |
 | 52 | `fatca_declaration_date` | date | 10 | Yes | YYYY-MM-DD. Date of self-certification. |
 | 53 | `fatca_us_person` | boolean | - | Yes | Whether the client is a US person under FATCA |
@@ -713,16 +713,16 @@ Part II data is specific to the securities market intermediary and includes trad
 | 71 | `segment_equity` | boolean | - | Yes | Equity cash segment activation |
 | 72 | `segment_equity_derivatives` | boolean | - | No | F&O segment (requires income proof >= 10L or net worth certificate) |
 | 73 | `segment_currency_derivatives` | boolean | - | No | Currency derivatives |
-| 74 | `segment_commodity` | boolean | - | No | Commodity segment (MCX) |
+| 74 | `segment_commodity` | boolean | - | No | Commodity segment (<abbr title="Multi Commodity Exchange of India">MCX</abbr>) |
 | 75 | `segment_debt` | boolean | - | No | Debt/Fixed Income segment |
 | 76 | `risk_appetite` | string | 15 | Yes | `LOW`, `MODERATE`, `HIGH`, `VERY_HIGH` (derived from risk profiling questionnaire) |
 | 77 | `settlement_preference` | string | 10 | Yes | `MONTHLY`, `QUARTERLY` (running account settlement frequency) |
-| 78 | `ddpi_opted` | boolean | - | Yes | Whether client has opted for DDPI (Demat Debit and Pledge Instruction). DDPI replaced POA since Nov 2022. |
+| 78 | `ddpi_opted` | boolean | - | Yes | Whether client has opted for <abbr title="Demat Debit and Pledge Instruction">DDPI</abbr> (Demat Debit and Pledge Instruction). DDPI replaced <abbr title="Power of Attorney">POA</abbr> since Nov 2022. |
 | 79 | `ddpi_scope` | string | 100 | Conditional | Scope of DDPI authorization. Mandatory if `ddpi_opted` is true. |
 | 80 | `nominee_count` | number | 2 | Yes | Number of nominees (0 to 10). 0 means opt-out with mandatory video verification. |
 | 81-90 | Nominee details (per nominee) | object | - | Conditional | `name`, `relationship`, `dob`, `percentage`, `pan`, `aadhaar_ref`, `address` per nominee. Up to 10 nominees since Jan 2025. |
 | 91 | `bank_account_number` | string | 20 | Yes | Primary bank account for trading |
-| 92 | `bank_ifsc` | string | 11 | Yes | IFSC code |
+| 92 | `bank_ifsc` | string | 11 | Yes | <abbr title="Indian Financial System Code.">IFSC</abbr> code |
 | 93 | `bank_name` | string | 50 | Yes | Bank name as per penny drop |
 | 94 | `bank_account_type` | string | 2 | Yes | `SB`=Savings, `CA`=Current |
 | 95 | `bank_micr` | string | 9 | No | 9-digit MICR code |
@@ -741,7 +741,7 @@ When a client has tax residency outside India (`tax_residency_india_only` = fals
 | 97 | `entity_type_fatca` | string | No | For non-individuals: `ACTIVE_NFFE`, `PASSIVE_NFFE`, `FINANCIAL_INSTITUTION` |
 | 98 | `giin` | string | No | Global Intermediary Identification Number (for financial institutions) |
 | 99 | `sponsoring_entity_name` | string | No | For sponsored entities |
-| 100 | `sponsoring_entity_giin` | string | No | Sponsoring entity's GIIN |
+| 100 | `sponsoring_entity_giin` | string | No | Sponsoring entity's <abbr title="Global Intermediary Identification Number">GIIN</abbr> |
 
 ### 4.4 Document Size & Format Requirements
 
@@ -784,7 +784,7 @@ When a client has tax residency outside India (`tax_residency_india_only` = fals
 
 KRA systems typically have scheduled maintenance:
 - **CVL KRA**: Sunday maintenance window (varies, check CVL website)
-- **NDML KRA**: Sunday maintenance (typically 6 AM - 12 PM IST)
+- **NDML KRA**: Sunday maintenance (typically 6 AM - 12 PM <abbr title="Indian Standard Time (UTC+05:30)">IST</abbr>)
 - **All KRAs**: Year-end / quarter-end may have extended processing times
 
 :::tip[Build a Retry Queue]
@@ -820,10 +820,10 @@ A KRA modification is required when a client's data changes after the initial KY
 | **Freely Modifiable** | Address (corr + perm), Mobile, Email, STD/Phone, Occupation, Income range, Net worth, Marital status, FATCA/CRS data, Nominee details | Submit modification via KRA Upload API with `application_type: "MODIFY"`. No additional verification needed beyond standard API validation. |
 | **Modifiable with Re-verification** | Name (first/middle/last), Date of Birth, Gender | Requires supporting documents: gazette notification (name change), marriage certificate, court order. KRA manual review triggered. Takes 3-5 working days. |
 | **Non-Modifiable** | PAN | PAN is the primary key. Cannot be changed. If PAN itself changes (surrender + new allotment), a fresh KYC submission is required. Old record linked via old PAN becomes inactive. |
-| **Restricted** | Citizenship, Nationality, Residential status | Change from Resident to NRI (or vice versa) triggers enhanced due diligence. New PIS permission letter needed for NRI conversion. Residential status change may require fresh account opening. |
+| **Restricted** | Citizenship, Nationality, Residential status | Change from Resident to <abbr title="Non-Resident Indian">NRI</abbr> (or vice versa) triggers enhanced due diligence. New <abbr title="Portfolio Investment Scheme (RBI / NRI)">PIS</abbr> permission letter needed for NRI conversion. Residential status change may require fresh account opening. |
 
 :::danger[PAN Cannot Be Modified]
-PAN is the primary key of the entire KRA system. There is no API call, batch process, or manual override that can change the PAN on an existing KRA record. If a client's PAN changes (due to surrender and re-allotment by the Income Tax Department), the old KRA record becomes permanently inactive and a completely fresh KYC submission under the new PAN is required, along with new UCC registration at exchanges and a new BO account at the depository.
+PAN is the primary key of the entire KRA system. There is no API call, batch process, or manual override that can change the PAN on an existing KRA record. If a client's PAN changes (due to surrender and re-allotment by the Income Tax Department), the old KRA record becomes permanently inactive and a completely fresh KYC submission under the new PAN is required, along with new UCC registration at exchanges and a new <abbr title="Beneficial Owner">BO</abbr> account at the depository.
 :::
 
 ### 6.3 Modification API Call
@@ -864,7 +864,7 @@ The modification uses the same `POST /kra/upload` endpoint with the `application
 ### 6.4 Modification Impact on 6 KYC Attributes
 
 When any of the 6 KYC attributes (Name, PAN, Address, Mobile, Email, Income Range) is modified at the KRA, the same change must be propagated to:
-1. **Exchange UCC** (NSE, BSE, MCX) -- via UCC modification batch or API
+1. **Exchange UCC** (NSE, <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr>, MCX) -- via UCC modification batch or API
 2. **Depository** (CDSL, NSDL) -- via BO modification
 3. **CKYC** (CERSAI) -- via CKYC modification
 
@@ -919,7 +919,7 @@ KRA supports multiple entity types beyond individuals. Each has additional manda
 
 | Field | Type | Mandatory | Notes |
 |-------|------|-----------|-------|
-| `huf_pan` | string | Yes | PAN of the HUF entity (separate from Karta's personal PAN) |
+| `huf_pan` | string | Yes | PAN of the <abbr title="Hindu Undivided Family">HUF</abbr> entity (separate from Karta's personal PAN) |
 | `huf_name` | string | Yes | Name as per HUF PAN (e.g., "SURESH KUMAR HUF") |
 | `karta_name` | string | Yes | Full name of the Karta (head of HUF) |
 | `karta_pan` | string | Yes | Karta's individual PAN |
@@ -988,7 +988,7 @@ KRA supports multiple entity types beyond individuals. Each has additional manda
 - Passport (Indian or foreign, with valid visa for foreign passport)
 - Overseas address proof
 - PIS permission letter from RBI-authorized bank
-- NRE/NRO bank account details
+- <abbr title="Non-Resident External (Rupee) account">NRE</abbr>/<abbr title="Non-Resident Ordinary (Rupee) account">NRO</abbr> bank account details
 - PIO/OCI card (if applicable)
 - Photo and signature
 
@@ -1025,7 +1025,7 @@ KRA supports multiple entity types beyond individuals. Each has additional manda
 
 | Field | Type | Mandatory | Notes |
 |-------|------|-----------|-------|
-| `llpin` | string | Yes | LLP Identification Number (issued by MCA, 7 characters: AAA-nnnn format) |
+| `llpin` | string | Yes | <abbr title="—">LLP</abbr> Identification Number (issued by MCA, 7 characters: AAA-nnnn format) |
 | `llp_name` | string | Yes | Full name as per LLP registration |
 | `llp_pan` | string | Yes | PAN of the LLP |
 | `date_of_incorporation` | date | Yes | Date of LLP incorporation |
@@ -1301,7 +1301,7 @@ In production, KRA integration encounters a range of real-world scenarios that f
 **Action**:
 - Submit KRA modification with `application_type: "MODIFY"` and the new name
 - Supporting documents required: marriage certificate, gazette notification, or court order
-- New PAN card reflecting the updated name (if PAN was updated at ITD)
+- New PAN card reflecting the updated name (if PAN was updated at <abbr title="Information Technology Department (within SEBI)">ITD</abbr>)
 - KRA manual review triggered -- takes 3-5 working days
 - Simultaneously update all systems (exchange UCC, depository BO, CKYC)
 
@@ -1481,7 +1481,7 @@ Headers:
 
 | Circular | Date | Subject |
 |----------|------|---------|
-| SEBI/HO/MIRSD/MIRSD-SEC-2/P/CIR/2023/168 | Oct 2023 | **KYC Master Circular** -- comprehensive KYC requirements for all SEBI-registered intermediaries. Covers KRA obligations, CKYC requirements, IPV/VIPV, document requirements, and timelines. |
+| SEBI/HO/MIRSD/MIRSD-SEC-2/P/CIR/2023/168 | Oct 2023 | **KYC Master Circular** -- comprehensive KYC requirements for all SEBI-registered intermediaries. Covers KRA obligations, CKYC requirements, <abbr title="In-Person Verification">IPV</abbr>/<abbr title="Video In-Person Verification (sometimes &quot;Video CIP&quot; / V-CIP)">VIPV</abbr>, document requirements, and timelines. |
 | SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90 | Jun 2025 | **Stock Brokers Master Circular** -- updated operational and compliance requirements for stock brokers, including KYC, UCC, margin, and risk management. |
 | SEBI Stock Brokers Regulations 2026 | Jan 7, 2026 | **New Regulations** -- replaces SEBI (Stock Brokers and Sub-Brokers) Regulations 1992. New registration requirements, capital adequacy, record retention (8 years), and governance standards. |
 | SEBI/HO/MIRSD/DOP/CIR/P/2019/136 | - | **UCC-Demat Mapping** -- mandatory mapping between exchange UCC and depository BO account for all clients. |

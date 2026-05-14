@@ -5,15 +5,15 @@ description: Walkthrough and reference for the inspection regime affecting India
 
 import { Aside } from '@astrojs/starlight/components';
 
-> **Why this page is structured this way:** Brokers face three concurrent inspection regimes — exchange-level (NSE / BSE / MCX), SEBI-level (event-triggered + risk-based + thematic), depository-level (CDSL / NSDL for DPs). Each has its own cadence, scope, observation tradition, and remediation cycle. The page covers each separately, then synthesises common patterns.
+> **Why this page is structured this way:** Brokers face three concurrent inspection regimes — exchange-level (<abbr title="National Stock Exchange of India">NSE</abbr> / <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> / <abbr title="Multi Commodity Exchange of India">MCX</abbr>), <abbr title="Securities and Exchange Board of India">SEBI</abbr>-level (event-triggered + risk-based + thematic), depository-level (<abbr title="Central Depository Services (India) Limited">CDSL</abbr> / <abbr title="National Securities Depository Limited">NSDL</abbr> for DPs). Each has its own cadence, scope, observation tradition, and remediation cycle. The page covers each separately, then synthesises common patterns.
 
 ## TL;DR
 
 - **Three inspection layers** for a typical broker: (a) exchange inspection at NSE / BSE / MCX (annual rolling for active members), (b) SEBI inspection (event-triggered, risk-based, thematic), (c) depository inspection at CDSL / NSDL (annual for DPs).
-- **Exchange inspection** is the most frequent. NSE consolidated inspection framework is documented in `NSE/INSP/57394` (Jun 2023) and its successor `NSE/INSP/67804` (30 April 2025). NSE inspection covers KYC, PMLA, client funds, margin, settlement, system / cyber audit, surveillance, governance.
-- **SEBI inspection** is risk-based or thematic — focuses on specific themes (e.g. retail algo, client funds, AP supervision). Less frequent than exchange but with deeper scope. Powers under SEBI Act 1992 and Stock Brokers Regulations.
-- **Depository inspection** for DPs — CDSL annual inspection per CDSL bye-laws (DP code `DP-ADM-...`); NSDL annual inspection per NSDL Inspection framework. Scope: BO operations, KYC modifications, instruction handling, reconciliation.
-- **Response procedure** uniform across regimes: notice → broker prepares → inspection (on-site / virtual / hybrid) → preliminary observations → broker response → final inspection report (FIR) → Action Taken Report (ATR) → follow-on review.
+- **Exchange inspection** is the most frequent. NSE consolidated inspection framework is documented in `NSE/INSP/57394` (Jun 2023) and its successor `NSE/INSP/67804` (30 April 2025). NSE inspection covers <abbr title="Know Your Customer (process).">KYC</abbr>, <abbr title="Prevention of Money Laundering Act 2002">PMLA</abbr>, client funds, margin, settlement, system / cyber audit, surveillance, governance.
+- **SEBI inspection** is risk-based or thematic — focuses on specific themes (e.g. retail algo, client funds, <abbr title="Authorized Person">AP</abbr> supervision). Less frequent than exchange but with deeper scope. Powers under SEBI Act 1992 and Stock Brokers Regulations.
+- **Depository inspection** for DPs — CDSL annual inspection per CDSL bye-laws (<abbr title="Depository Participant">DP</abbr> code `DP-ADM-...`); NSDL annual inspection per NSDL Inspection framework. Scope: <abbr title="Beneficial Owner">BO</abbr> operations, KYC modifications, instruction handling, reconciliation.
+- **Response procedure** uniform across regimes: notice → broker prepares → inspection (on-site / virtual / hybrid) → preliminary observations → broker response → final inspection report (FIR) → Action Taken Report (<abbr title="Action Taken Report.">ATR</abbr>) → follow-on review.
 - **Response windows:** Preliminary observations typically 15 working days for broker response; ATR typically 30–60 days from FIR.
 - **Common observations:** Client-funds segregation, KYC defects, margin reporting, AP supervision gaps, surveillance system gaps, governance lapses, technology controls gaps.
 
@@ -40,22 +40,22 @@ Functionally, all three are similar — a team examines books, records, systems,
 - **Annual rolling** — Each exchange conducts annual inspection of its active members in a rolling cycle
 - **Risk-based scheduling** — Higher-risk members (more clients, recent complaints, higher trade volume) inspected earlier in the cycle
 - **Re-inspection** — Members with significant findings may be re-inspected within the year
-- **QSB enhanced inspection** — per QSB expansion circular (`SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/14`), QSBs face annual inspection by exchanges with enhanced scope
+- **<abbr title="Qualified Stock Broker">QSB</abbr> enhanced inspection** — per QSB expansion circular (`SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/14`), QSBs face annual inspection by exchanges with enhanced scope
 
 ### 1.2 Scope (NSE Consolidated Inspection Circular `NSE/INSP/67804`)
 
 The Consolidated Inspection Circular is the comprehensive scope reference. Key chapters (referencing the framework from `NSE/INSP/57394` and successor):
 
-- **KYC compliance** — six-attribute, KRA, CKYC, IPV / VIPV, KYC modifications, FATCA / CRS
-- **PMLA / AML** — STR / CTR / NTR / CBWTR / CCR filings, BO identification, PEP screening, sanctions screening, EDD, ongoing monitoring
-- **Client funds segregation** — daily upstreaming, USCNBA / DSCNBA, running-account settlement, suspense-UCC handling
-- **Margin compliance** — upfront margin collection, peak-margin reporting, pass-through restrictions, MTF margin maintenance
-- **Trade reporting** — UCC, T+1 reporting, peak-margin snapshots
+- **KYC compliance** — six-attribute, <abbr title="KYC Registration Agency">KRA</abbr>, <abbr title="Central KYC (records registry)">CKYC</abbr>, <abbr title="In-Person Verification">IPV</abbr> / <abbr title="Video In-Person Verification (sometimes &quot;Video CIP&quot; / V-CIP)">VIPV</abbr>, KYC modifications, <abbr title="Foreign Account Tax Compliance Act (US)">FATCA</abbr> / <abbr title="Common Reporting Standard">CRS</abbr>
+- **PMLA / <abbr title="Anti-Money Laundering">AML</abbr>** — <abbr title="Suspicious Transaction Report">STR</abbr> / <abbr title="Cash Transaction Report">CTR</abbr> / <abbr title="Non-Profit Organization Transaction Report">NTR</abbr> / CBWTR / CCR filings, BO identification, <abbr title="Politically Exposed Person">PEP</abbr> screening, sanctions screening, EDD, ongoing monitoring
+- **Client funds segregation** — daily upstreaming, USCNBA / DSCNBA, running-account settlement, suspense-<abbr title="Unique Client Code">UCC</abbr> handling
+- **Margin compliance** — upfront margin collection, peak-margin reporting, pass-through restrictions, <abbr title="Margin Trading Facility">MTF</abbr> margin maintenance
+- **Trade reporting** — UCC, <abbr title="Trade-date Plus N settlement">T+1</abbr> reporting, peak-margin snapshots
 - **Books and records** — physical / electronic; retention; audit trail
 - **System / cyber audit ATR** — closure of past audit observations
-- **Surveillance / Chapter IVA** — SOR submission, fraud-detection policy
-- **Investor grievance** — SCORES disposal, IGRC orders compliance, ODR compliance
-- **AP / branch** — AP supervision, branch operations, AP-AMC payment
+- **Surveillance / Chapter IVA** — <abbr title="Smart Order Routing">SOR</abbr> submission, fraud-detection policy
+- **Investor grievance** — <abbr title="SEBI Complaints Redress System">SCORES</abbr> disposal, <abbr title="Investor Grievance Redressal Committee">IGRC</abbr> orders compliance, <abbr title="Online Dispute Resolution">ODR</abbr> compliance
+- **AP / branch** — AP supervision, branch operations, AP-<abbr title="Asset Management Company (mutual funds context) / Annual Maintenance Charges (depository context).">AMC</abbr> payment
 - **Technical glitch** — glitch reports, capacity planning, ATR closure
 - **Reporting matrix** — periodic submissions (monthly / quarterly / annual)
 
@@ -86,7 +86,7 @@ The Consolidated Inspection Circular is the comprehensive scope reference. Key c
 - Internal audit delay
 - System audit delay
 - Cyber audit delay
-- KMP information update delay
+- <abbr title="Key Managerial Personnel">KMP</abbr> information update delay
 - AP information update delay
 - MITC compliance gap
 - MTF reporting delay
@@ -143,7 +143,7 @@ MCX inspection — for commodity derivatives, equivalent under MCX bye-laws.
 - Client-funds upstreaming compliance (post Jul 2023)
 - Direct-payout-to-demat (post Oct 2024)
 - AP supervision (across NSE/COMP chain)
-- CSCRF readiness (post Aug 2024)
+- <abbr title="Cybersecurity and Cyber Resilience Framework">CSCRF</abbr> readiness (post Aug 2024)
 - Surveillance / Chapter IVA institutional mechanism (per `SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/96`)
 - KYC validation (KRA / CKYC dual upload, post Aug 2024)
 
@@ -212,7 +212,7 @@ When notice received:
 
 1. **Project mode** — designate Inspection Liaison (typically Compliance Officer or senior compliance lead)
 2. **Document collation** — gather requested documents per inspection scope
-3. **Cross-team coordination** — KYC, settlement, RMS, IT, surveillance, customer service, AP / branch teams
+3. **Cross-team coordination** — KYC, settlement, <abbr title="Risk Management System">RMS</abbr>, IT, surveillance, customer service, AP / branch teams
 4. **Internal review** — quick gap-assessment; address obvious gaps before on-site
 5. **Workspace** — dedicated room at broker premises for inspectors
 6. **Senior management briefing** — Compliance Officer / CEO / Designated Director briefed
@@ -388,7 +388,7 @@ From `NSE/INSP/57394` consolidated circular, exchange inspection notices, and SE
 ### 7.2 Inspection of suspended broker
 
 - Suspended brokers may still face inspection for wind-up activities
-- IPF claim verification often triggers post-suspension inspection
+- <abbr title="Investor Protection Fund">IPF</abbr> claim verification often triggers post-suspension inspection
 
 ### 7.3 Inspection of QSB
 
@@ -404,7 +404,7 @@ From `NSE/INSP/57394` consolidated circular, exchange inspection notices, and SE
 
 ### 7.5 Group inspection
 
-- Brokers part of larger NBFC / bank group may face coordinated inspection by SEBI + RBI
+- Brokers part of larger NBFC / bank group may face coordinated inspection by SEBI + <abbr title="Reserve Bank of India">RBI</abbr>
 - Group-wide policies reviewed
 - Cross-entity transactions scrutinised
 
@@ -486,7 +486,7 @@ Exchanges share findings with SEBI; SEBI may share findings with RBI for broker-
 - [Deep Dive — ODR](/broking-kyc/deep-dives/compliance-audit/odr/)
 - [Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/)
 - [Circulars — NSE](/broking-kyc/reference/circulars/nse/)
-- [Circulars — SEBI MIRSD](/broking-kyc/reference/circulars/sebi-mirsd/)
+- [Circulars — SEBI <abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>](/broking-kyc/reference/circulars/sebi-mirsd/)
 - [Circulars — SEBI Other](/broking-kyc/reference/circulars/sebi-other/)
 - [Circulars — CDSL](/broking-kyc/reference/circulars/cdsl/)
 - [Circulars — NSDL](/broking-kyc/reference/circulars/nsdl/)

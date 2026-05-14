@@ -3,7 +3,7 @@ title: Master Dataset
 description: Complete field-level specification — all ~454 fields across 30 sections with data types, sizes, validation rules, source systems, and regulatory references.
 ---
 
-This is the single most comprehensive reference in the entire documentation set. It defines every field the KYC system captures, stores, or generates -- roughly 454 fields across 30 sections, covering everything from the customer's PAN (Permanent Account Number) to the audit trail of every modification made to their record. You will not read this cover-to-cover, but you will come back to it regularly when building forms, writing validation logic, debugging field-mapping issues, or answering compliance questions about where a particular piece of data comes from and why it is required.
+This is the single most comprehensive reference in the entire documentation set. It defines every field the <abbr title="Know Your Customer (process).">KYC</abbr> system captures, stores, or generates -- roughly 454 fields across 30 sections, covering everything from the customer's <abbr title="Permanent Account Number">PAN</abbr> (Permanent Account Number) to the audit trail of every modification made to their record. You will not read this cover-to-cover, but you will come back to it regularly when building forms, writing validation logic, debugging field-mapping issues, or answering compliance questions about where a particular piece of data comes from and why it is required.
 
 :::tip[How to use this page]
 Use your browser's search (Ctrl+F) to find a specific field name like `pan_verify_status` or a section letter like "Section G." Each field has a unique identifier (e.g., A01, G12) that is referenced throughout the codebase and in API mapping documents.
@@ -13,11 +13,11 @@ Use your browser's search (Ctrl+F) to find a specific field name like `pan_verif
 
 ### 1.1 Two-Part KYC Structure (SEBI Mandated)
 
-SEBI (Securities and Exchange Board of India) mandates that KYC is split into two parts. This is not an implementation choice -- it is a regulatory requirement. Part I is standardized across all intermediaries (brokers, mutual funds, insurance), while Part II is specific to each intermediary's line of business.
+<abbr title="Securities and Exchange Board of India">SEBI</abbr> (Securities and Exchange Board of India) mandates that KYC is split into two parts. This is not an implementation choice -- it is a regulatory requirement. Part I is standardized across all intermediaries (brokers, mutual funds, insurance), while Part <abbr title="—">II</abbr> is specific to each intermediary's line of business.
 
 | Part | Name | Purpose | Template |
 |------|------|---------|----------|
-| **Part I** | KYC Form / CIP (Customer Identification Procedure) | Basic client identification - standardized across all SEBI intermediaries | CERSAI prescribed template |
+| **Part I** | KYC Form / CIP (Customer Identification Procedure) | Basic client identification - standardized across all SEBI intermediaries | <abbr title="Central Registry of Securitisation Asset Reconstruction and Security Interest of India">CERSAI</abbr> prescribed template |
 | **Part II** | CDD (Customer Due Diligence) | Activity-specific information for the intermediary (trading prefs, segments, risk) | Intermediary-designed |
 
 ### 1.2 Systems Involved
@@ -26,15 +26,15 @@ These are all the external systems our KYC application communicates with. You wi
 
 | System | Entity | Purpose |
 |--------|--------|---------|
-| **KRA** | CVL/NDML/DOTEX/CAMS/KFintech | Securities-market KYC registry (SEBI regulated) |
-| **CKYC (CKYCR)** | CERSAI / Protean | Cross-sector KYC registry (RBI/SEBI/IRDAI) |
-| **PAN Verification** | NSDL/Protean (ITD authorized) | Identity & PAN-Aadhaar linkage check |
+| **<abbr title="KYC Registration Agency">KRA</abbr>** | CVL/NDML/DOTEX/CAMS/KFintech | Securities-market KYC registry (SEBI regulated) |
+| **<abbr title="Central KYC (records registry)">CKYC</abbr> (CKYCR)** | CERSAI / Protean | Cross-sector KYC registry (<abbr title="Reserve Bank of India">RBI</abbr>/SEBI/IRDAI) |
+| **PAN Verification** | <abbr title="National Securities Depository Limited">NSDL</abbr>/Protean (<abbr title="Information Technology Department (within SEBI)">ITD</abbr> authorized) | Identity & PAN-Aadhaar linkage check |
 | **DigiLocker** | MeitY / UIDAI | Consent-based document fetch (Aadhaar, PAN, DL) |
-| **e-KYC Setu** | NPCI | Aadhaar e-KYC without disclosing Aadhaar number |
-| **Bank Verification** | Penny Drop / UPI | Account ownership verification |
-| **e-Sign** | UIDAI / CCA | Aadhaar OTP-based digital signature |
-| **NSE/BSE/MCX** | Exchanges | UCC registration for trading |
-| **CDSL/NSDL** | Depositories | BO/Demat account creation |
+| **e-KYC Setu** | <abbr title="National Payments Corporation of India">NPCI</abbr> | Aadhaar e-KYC without disclosing Aadhaar number |
+| **Bank Verification** | Penny Drop / <abbr title="Unified Payments Interface">UPI</abbr> | Account ownership verification |
+| **e-Sign** | UIDAI / <abbr title="Controller of Certifying Authorities">CCA</abbr> | Aadhaar <abbr title="One-Time Password">OTP</abbr>-based digital signature |
+| **<abbr title="National Stock Exchange of India">NSE</abbr>/<abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr>/<abbr title="Multi Commodity Exchange of India">MCX</abbr>** | Exchanges | <abbr title="Unique Client Code">UCC</abbr> registration for trading |
+| **<abbr title="Central Depository Services (India) Limited">CDSL</abbr>/NSDL** | Depositories | <abbr title="Beneficial Owner">BO</abbr>/Demat account creation |
 
 ### 1.3 Onboarding Flow Summary
 
@@ -93,13 +93,13 @@ This is the foundational identity section. Every downstream system -- exchanges,
 | A19 | `marital_status` | String | 1 | N | S/M/O | Single/Married/Others |
 | A20 | `date_of_birth` | Date | 10 | **Y** | DD/MM/YYYY | Must match PAN. Age >= 18 |
 | A21 | `nationality` | String | 2 | **Y** | ISO country code | IN=Indian |
-| A22 | `residential_status` | String | 2 | **Y** | RI/NRI/FN/PIO | Resident Indian / NRI / Foreign National / PIO |
+| A22 | `residential_status` | String | 2 | **Y** | RI/<abbr title="Non-Resident Indian">NRI</abbr>/FN/PIO | Resident Indian / NRI / Foreign National / PIO |
 | A23 | `aadhaar_number` | String | 12 | N | 12 digits, Verhoeff algo | Masked in storage: XXXX-XXXX-1234 |
 | A24 | `aadhaar_reference_number` | String | 28 | N | | Virtual ID or reference from DigiLocker |
-| A25 | `ckyc_number` | String | 14 | N | 14 digits | Central KYC Identification Number (KIN) |
+| A25 | `ckyc_number` | String | 14 | N | 14 digits | Central KYC Identification Number (<abbr title="KYC Identification Number">KIN</abbr>) |
 | A26 | `din` | String | 8 | N | 8 digits | Director Identification Number (if applicable) |
 | A27 | `place_of_birth` | String | 50 | N | | City/Town of birth |
-| A28 | `country_of_birth` | String | 2 | N | ISO country code | Required for FATCA |
+| A28 | `country_of_birth` | String | 2 | N | ISO country code | Required for <abbr title="Foreign Account Tax Compliance Act (US)">FATCA</abbr> |
 | A29 | `is_differently_abled` | Boolean | 1 | **Y** | Y/N | CKYC mandatory field |
 | A30 | `disability_type` | String | 2 | Cond. | Code table | Required if A29=Y |
 | A31 | `disability_percentage` | Number | 3 | Cond. | 0-100 | Required if A29=Y |
@@ -126,7 +126,7 @@ Address data typically comes from DigiLocker (Aadhaar XML). If the permanent add
 | B06 | `corr_state` | String | 30 | **Y** | State code table |
 | B07 | `corr_pincode` | String | 6 | **Y** | 6 digits |
 | B08 | `corr_country` | String | 30 | **Y** | Default: India |
-| B09 | `corr_address_proof_type` | String | 2 | **Y** | POA code table |
+| B09 | `corr_address_proof_type` | String | 2 | **Y** | <abbr title="Power of Attorney">POA</abbr> code table |
 
 ### B2: Permanent Address
 
@@ -163,7 +163,7 @@ Address data typically comes from DigiLocker (Aadhaar XML). If the permanent add
 
 ## 5. Section D: Identity Documents (POI)
 
-**Officially Valid Documents (OVDs) per PMLA (Prevention of Money Laundering Act) Rules**
+**Officially Valid Documents (OVDs) per <abbr title="Prevention of Money Laundering Act 2002">PMLA</abbr> (Prevention of Money Laundering Act) Rules**
 
 These are the Proof of Identity documents accepted under Indian law. In practice, almost all customers use Aadhaar (via DigiLocker) or PAN as their POI (Proof of Identity).
 
@@ -224,7 +224,7 @@ POA (Proof of Address) documents have validity constraints. A utility bill older
 
 ## 7. Section F: Financial Profile
 
-**Required By**: PMLA/AML compliance, Segment activation, KRA (optional), Exchange registration
+**Required By**: PMLA/<abbr title="Anti-Money Laundering">AML</abbr> compliance, Segment activation, KRA (optional), Exchange registration
 
 The financial profile drives two critical decisions: which trading segments the customer can access (F&O and Commodity require income proof), and what risk category they fall into for AML (Anti-Money Laundering) screening.
 
@@ -276,7 +276,7 @@ SEBI proposed revised income range codes in January 2026. When these are finaliz
 **Validation**: Penny Drop verification mandatory for primary account
 **Multiple Accounts**: Up to 5 bank accounts allowed
 
-The bank section is where many onboarding failures occur. The penny drop verification (a Rs.1 IMPS credit to confirm the account exists and the name matches) is a blocking step. If the name returned by the bank does not match the PAN name above a configurable threshold, the application cannot proceed.
+The bank section is where many onboarding failures occur. The penny drop verification (a Rs.1 <abbr title="Immediate Payment Service">IMPS</abbr> credit to confirm the account exists and the name matches) is a blocking step. If the name returned by the bank does not match the PAN name above a configurable threshold, the application cannot proceed.
 
 ### Per Bank Account (repeat for each, max 5):
 
@@ -289,9 +289,9 @@ The bank section is where many onboarding failures occur. The penny drop verific
 | G05 | `account_number` | String | 18 | **Y** | Alphanumeric |
 | G06 | `ifsc_code` | String | 11 | **Y** | `[A-Z]{4}0[A-Z0-9]{6}` |
 | G07 | `micr_code` | String | 9 | N | 9 digits |
-| G08 | `account_type` | String | 2 | **Y** | SB=Savings, CA=Current, NRE, NRO |
+| G08 | `account_type` | String | 2 | **Y** | SB=Savings, CA=Current, <abbr title="Non-Resident External (Rupee) account">NRE</abbr>, <abbr title="Non-Resident Ordinary (Rupee) account">NRO</abbr> |
 | G09 | `account_holder_name` | String | 100 | **Y** | Must match PAN name |
-| G10 | `bank_proof_type` | String | 2 | **Y** | CC=Cancelled Cheque, BS=Bank Statement |
+| G10 | `bank_proof_type` | String | 2 | **Y** | <abbr title="Clearing Corporation (NCL, ICCL, MCXCCL — context-dependent).">CC</abbr>=Cancelled Cheque, BS=Bank Statement |
 | G11 | `bank_proof_document` | BLOB | - | **Y** | JPEG/PNG/PDF |
 | G12 | `penny_drop_status` | String | 2 | **Y** | S=Success, F=Failed, P=Pending |
 | G13 | `penny_drop_ref` | String | 30 | Cond. | UTR from penny drop |
@@ -367,10 +367,10 @@ Nomination rules changed significantly in 2024-2025. Previously, nomination was 
 
 ## 11. Section J: FATCA/CRS Declaration
 
-**Regulatory Basis**: [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202412) (Feb 20, 2024) - Centralization at KRAs
+**Regulatory Basis**: [SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/SECFATF/P/CIR/2024/12](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202412) (Feb 20, 2024) - Centralization at KRAs
 **Required By**: KRA (upload mandatory since Jul 1, 2024), All SEBI intermediaries
 
-FATCA (Foreign Account Tax Compliance Act) and CRS (Common Reporting Standard) are international tax compliance frameworks. India participates in both. For the vast majority of Indian-resident customers, the declaration is straightforward -- they check "tax resident of India only" and move on. The complexity arises for NRIs (Non-Resident Indians) and dual citizens who have tax residency in other countries.
+FATCA (Foreign Account Tax Compliance Act) and <abbr title="Common Reporting Standard">CRS</abbr> (Common Reporting Standard) are international tax compliance frameworks. India participates in both. For the vast majority of Indian-resident customers, the declaration is straightforward -- they check "tax resident of India only" and move on. The complexity arises for NRIs (Non-Resident Indians) and dual citizens who have tax residency in other countries.
 
 | # | Field Name | Data Type | Size | Mandatory | Validation |
 |---|-----------|-----------|------|-----------|------------|
@@ -388,7 +388,7 @@ FATCA (Foreign Account Tax Compliance Act) and CRS (Common Reporting Standard) a
 |---|-----------|-----------|------|-----------|------------|
 | J08 | `tax_country_seq` | Number | 1 | Cond. | 1-5 |
 | J09 | `tax_country` | String | 2 | Cond. | ISO country code |
-| J10 | `tax_id_number` | String | 30 | Cond. | TIN for that country |
+| J10 | `tax_id_number` | String | 30 | Cond. | <abbr title="Taxpayer Identification Number (in FATCA / CRS context)">TIN</abbr> for that country |
 | J11 | `tax_id_type` | String | 2 | Cond. | TIN/SSN/EIN etc |
 | J12 | `tin_not_available_reason` | String | 2 | Cond. | If TIN not provided: A=Country doesn't issue, B=Unable to obtain, C=Not required |
 
@@ -404,9 +404,9 @@ FATCA (Foreign Account Tax Compliance Act) and CRS (Common Reporting Standard) a
 
 ## 12. Section K: PEP & AML Declaration
 
-**Regulatory Basis**: SEBI AML/CFT Master Circular ([SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202478))
+**Regulatory Basis**: SEBI AML/<abbr title="Combating the Financing of Terrorism">CFT</abbr> Master Circular ([SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202478))
 
-A PEP (Politically Exposed Person) is anyone who holds or has recently held a prominent public function -- a minister, a senior government official, or a high-ranking military officer. Their immediate family members and close associates are also classified as PEP-related. If a customer declares PEP status, the application triggers EDD (Enhanced Due Diligence), which involves additional manual review by the compliance team.
+A <abbr title="Politically Exposed Person">PEP</abbr> (Politically Exposed Person) is anyone who holds or has recently held a prominent public function -- a minister, a senior government official, or a high-ranking military officer. Their immediate family members and close associates are also classified as PEP-related. If a customer declares PEP status, the application triggers EDD (Enhanced Due Diligence), which involves additional manual review by the compliance team.
 
 | # | Field Name | Data Type | Size | Mandatory | Validation |
 |---|-----------|-----------|------|-----------|------------|
@@ -438,7 +438,7 @@ This section determines what the customer can trade. Equity cash is the default 
 | L09 | `trading_experience_fno_years` | Number | 2 | Cond. | 0-50 | Required if L02=Y |
 | L10 | `trading_experience_commodity_years` | Number | 2 | Cond. | 0-50 | Required if L04=Y |
 | L11 | `trading_preference` | String | 5 | N | | Delivery/Intraday/Both |
-| L12 | `settlement_type` | String | 2 | N | | T+1, T+0 |
+| L12 | `settlement_type` | String | 2 | N | | <abbr title="Trade-date Plus N settlement">T+1</abbr>, <abbr title="Trade-date Plus N settlement">T+0</abbr> |
 
 ### Segment Activation Requirements Matrix
 
@@ -468,10 +468,10 @@ This section determines what the customer can trade. Equity cash is the default 
 
 ## 15. Section N: IPV / VIPV
 
-**Regulatory Basis**: SEBI KYC Master Circular - IPV mandatory unless Aadhaar e-KYC used
+**Regulatory Basis**: SEBI KYC Master Circular - <abbr title="In-Person Verification">IPV</abbr> mandatory unless Aadhaar e-KYC used
 **Required By**: KRA (IPV flag), Broker
 
-IPV (In-Person Verification) is a regulatory requirement to confirm that the person applying is who they claim to be. VIPV (Video In-Person Verification) is the digital equivalent -- a recorded video call where a trained agent verifies the customer's identity against their documents.
+IPV (In-Person Verification) is a regulatory requirement to confirm that the person applying is who they claim to be. <abbr title="Video In-Person Verification (sometimes &quot;Video CIP&quot; / V-CIP)">VIPV</abbr> (Video In-Person Verification) is the digital equivalent -- a recorded video call where a trained agent verifies the customer's identity against their documents.
 
 | # | Field Name | Data Type | Size | Mandatory | Validation | Notes |
 |---|-----------|-----------|------|-----------|------------|-------|
@@ -508,7 +508,7 @@ IPV (In-Person Verification) is a regulatory requirement to confirm that the per
 
 **Regulatory Basis**: [SEBI/HO/MIRSD/DoP/P/CIR/2022/44](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddoppcir202244) (replaces POA since Nov 18, 2022)
 **Required By**: CDSL/NSDL, Broker
-**Note**: DDPI is **optional** - broker cannot deny services if client refuses
+**Note**: <abbr title="Demat Debit and Pledge Instruction">DDPI</abbr> is **optional** - broker cannot deny services if client refuses
 
 DDPI (Demat Debit and Pledge Instruction) replaced the older POA (Power of Attorney) mechanism in November 2022. It authorizes the broker to debit securities from the customer's demat account for specific purposes -- settlement, pledging, mutual fund transactions, and tendering in open offers. Without DDPI, the customer must manually authorize each debit through the depository's system (CDSL's CDAS or NSDL's SPEED-e).
 
@@ -516,7 +516,7 @@ DDPI (Demat Debit and Pledge Instruction) replaced the older POA (Power of Attor
 |---|-----------|-----------|------|-----------|------------|
 | O01 | `ddpi_opted` | Boolean | 1 | **Y** | Y/N |
 | O02 | `ddpi_bo_id` | String | 16 | Cond. | BO ID from Section H |
-| O03 | `ddpi_dp_id` | String | 8 | Cond. | DP ID |
+| O03 | `ddpi_dp_id` | String | 8 | Cond. | <abbr title="Depository Participant">DP</abbr> ID |
 | O04 | `ddpi_authorization_date` | Date | 10 | Cond. | DD/MM/YYYY |
 | O05 | `ddpi_scope` | String | 2 | Cond. | AL=All transactions, SP=Specific |
 | O06 | `ddpi_for_settlement` | Boolean | 1 | Cond. | Transfer securities for settlement |
@@ -536,7 +536,7 @@ This section covers the legal consents and declarations that the customer must a
 | P01 | `consent_kyc_data_sharing` | Boolean | 1 | **Y** | Consent to share KYC with KRA/CKYC |
 | P02 | `consent_aadhaar_usage` | Boolean | 1 | Cond. | If Aadhaar used for e-KYC |
 | P03 | `consent_digilocker` | Boolean | 1 | Cond. | If DigiLocker used |
-| P04 | `consent_email_mobile_validation` | Boolean | 1 | **Y** | Consent for KRA validation SMS/email |
+| P04 | `consent_email_mobile_validation` | Boolean | 1 | **Y** | Consent for KRA validation <abbr title="Short Message Service.">SMS</abbr>/email |
 | P05 | `consent_electronic_communication` | Boolean | 1 | **Y** | E-contract notes, statements |
 | P06 | `declaration_information_true` | Boolean | 1 | **Y** | All info provided is true |
 | P07 | `declaration_not_banned` | Boolean | 1 | **Y** | Not debarred by SEBI/Exchange |
@@ -557,7 +557,7 @@ This section covers the legal consents and declarations that the customer must a
 | P17 | `esign_transaction_id` | String | 50 | Cond. | e-Sign transaction ID |
 | P18 | `esign_timestamp` | DateTime | - | Cond. | ISO 8601 |
 | P19 | `esign_document_hash` | String | 64 | Cond. | SHA-256 of signed document |
-| P20 | `esign_certificate_serial` | String | 50 | Cond. | DSC serial number |
+| P20 | `esign_certificate_serial` | String | 50 | Cond. | <abbr title="Digital Signature Certificate (CCA-licensed; aka Class 2/3 DSC).">DSC</abbr> serial number |
 | P21 | `esign_signed_document_url` | String | 500 | Cond. | Stored signed PDF |
 | P22 | `declaration_date` | Date | 10 | **Y** | DD/MM/YYYY |
 | P23 | `declaration_place` | String | 50 | **Y** | City of declaration |
@@ -602,7 +602,7 @@ These fields are system-populated -- they come from vendor API responses, not fr
 | R01 | `pan_verify_status` | String | 2 | E=Valid, F=Fake, X=Deactivated, D=Deleted, N=NotFound |
 | R02 | `pan_verify_name` | String | 100 | Name as per ITD |
 | R03 | `pan_verify_dob` | Date | 10 | DOB as per ITD |
-| R04 | `pan_verify_category` | String | 1 | P=Individual, C=Company, H=HUF, F=Firm |
+| R04 | `pan_verify_category` | String | 1 | P=Individual, C=Company, H=<abbr title="Hindu Undivided Family">HUF</abbr>, F=Firm |
 | R05 | `pan_aadhaar_seeding_status` | String | 1 | Y=Linked, N=Not linked |
 | R06 | `pan_verify_name_match` | Boolean | 1 | Does name match? |
 | R07 | `pan_verify_dob_match` | Boolean | 1 | Does DOB match? |
@@ -619,7 +619,7 @@ These fields are system-populated -- they come from vendor API responses, not fr
 | R13 | `bank_verify_name_match_result` | String | 20 | FULL_MATCH / PARTIAL_MATCH / NO_MATCH |
 | R14 | `bank_verify_account_exists` | Boolean | 1 | |
 | R15 | `bank_verify_utr` | String | 30 | Bank UTR reference |
-| R16 | `bank_verify_payment_mode` | String | 4 | IMPS/NEFT/UPI |
+| R16 | `bank_verify_payment_mode` | String | 4 | IMPS/<abbr title="National Electronic Funds Transfer">NEFT</abbr>/UPI |
 | R17 | `bank_verify_timestamp` | DateTime | - | |
 | R18 | `bank_verify_transaction_id` | String | 50 | |
 
@@ -731,7 +731,7 @@ The UCC (Unique Client Code) is the customer's identity on the exchange. Each ex
 | U05 | `nse_fno_activated` | Boolean | 1 | Cond. | F&O segment |
 | U06 | `nse_cd_activated` | Boolean | 1 | Cond. | Currency Derivatives |
 | U07 | `nse_com_activated` | Boolean | 1 | Cond. | Commodity segment |
-| U08 | `nse_ucc_status` | String | 2 | **Y** | AP=Approved, RJ=Rejected, PE=Pending |
+| U08 | `nse_ucc_status` | String | 2 | **Y** | <abbr title="Authorized Person">AP</abbr>=Approved, RJ=Rejected, PE=Pending |
 
 ### U3: BSE-Specific
 
@@ -754,7 +754,7 @@ The UCC (Unique Client Code) is the customer's identity on the exchange. Each ex
 
 ## 23. Section V: NRI-Specific Requirements
 
-**Regulatory Basis**: RBI PIS (Portfolio Investment Scheme), FEMA regulations
+**Regulatory Basis**: RBI <abbr title="Portfolio Investment Scheme (RBI / NRI)">PIS</abbr> (Portfolio Investment Scheme), <abbr title="Foreign Exchange Management Act 1999">FEMA</abbr> regulations
 **When Applicable**: residential_status (A22) = NRI / FN / PIO
 
 NRI (Non-Resident Indian) onboarding involves additional regulatory requirements that resident Indians do not face. The most significant is the PIS (Portfolio Investment Scheme) permission from an AD (Authorized Dealer) bank, which is mandatory before an NRI can trade in Indian equities.
@@ -939,7 +939,7 @@ Every change to a client record is logged. This is not optional -- SEBI requires
 
 ## 28. Section AA: DPDP Act 2023 Consent Management
 
-**Regulatory Basis**: Digital Personal Data Protection Act 2023, DPDP Rules 2025 (compliance deadline: May 13, 2027)
+**Regulatory Basis**: Digital Personal Data Protection Act 2023, <abbr title="Digital Personal Data Protection Act 2023 (and Rules 2025)">DPDP</abbr> Rules 2025 (compliance deadline: May 13, 2027)
 
 The DPDP (Digital Personal Data Protection) Act requires granular, informed consent before processing personal data. Each consent purpose must be separately captured and independently revocable.
 
@@ -1113,7 +1113,7 @@ In day-to-day operations, you will mostly care about "KYC Registered" and "On Ho
 | 06 | Government Entity |
 | 07 | Society |
 | 08 | AOP/BOI |
-| 09 | LLP |
+| 09 | <abbr title="—">LLP</abbr> |
 | 10 | Others |
 
 ---
@@ -1132,7 +1132,7 @@ In day-to-day operations, you will mostly care about "KYC Registered" and "On Ho
 | 8 | DDPI replacing POA | SEBI/HO/MIRSD/DoP/P/CIR/2022/44 | Apr 4, 2022 | DDPI mandatory from Nov 18, 2022 |
 | 9 | Nomination Revamp | SEBI circular | Jan 10, 2025 | Up to 10 nominees, video opt-out |
 | 10 | Nomination Simplification | SEBI circular | Jun 10, 2024 | Only 3 mandatory fields for nomination |
-| 11 | DigiLocker for Assets | [SEBI/HO/OIAE/OIAE_IAD-3/P/CIR/2025/32](/broking-kyc/reference/circulars/sebi-other/) | Mar 19, 2025 | Demat statements in DigiLocker |
+| 11 | DigiLocker for Assets | [SEBI/HO/<abbr title="Office of Investor Assistance and Education (SEBI)">OIAE</abbr>/OIAE_IAD-3/P/CIR/2025/32](/broking-kyc/reference/circulars/sebi-other/) | Mar 19, 2025 | Demat statements in DigiLocker |
 | 12 | Stock Brokers Master | SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90 | Jun 17, 2025 | Consolidated broker operations circular |
 | 13 | KYC Overhaul Consultation | SEBI consultation paper | Jan 16, 2026 | Proposed: centralized supplementary KYC, 5-yr review cycle |
 
@@ -1336,7 +1336,7 @@ In day-to-day operations, you will mostly care about "KYC Registered" and "On Ho
 | X | Margin Pledge & Collateral | 10 | 2 |
 | Y | Account Lifecycle & Dormancy | 20 | 5 |
 | Z | Audit Trail & Modification | 20 | ~10 (system) |
-| AA | DPDP Consent Management | 15 | 8 |
+| <abbr title="Account Aggregator (RBI-licensed NBFC-AA)">AA</abbr> | DPDP Consent Management | 15 | 8 |
 | AB | Communication Preferences | 9 | 4 |
 | AC | Running Account Settlement | 9 | 5 |
 | **TOTAL** | | **~454** | **~200** |

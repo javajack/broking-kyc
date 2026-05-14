@@ -13,13 +13,13 @@ import ScreenCard from '../../../components/ScreenCard.astro';
 import AsyncBar from '../../../components/AsyncBar.astro';
 import { Aside } from '@astrojs/starlight/components';
 
-The customer has just verified their mobile number. Now they see a screen with two fields: PAN (Permanent Account Number) and Date of Birth (DOB). To the customer, this feels like a simple identity check. Behind the scenes, this is the most consequential screen in the entire journey. The moment the customer taps "Submit," the system fires four parallel API calls that will determine whether this person can trade, what data is already on file for them, and whether they appear on any watchlists. Everything that follows -- pre-filled forms, compliance gates, the final approval -- traces back to what happens here.
+The customer has just verified their mobile number. Now they see a screen with two fields: <abbr title="Permanent Account Number">PAN</abbr> (Permanent Account Number) and Date of Birth (DOB). To the customer, this feels like a simple identity check. Behind the scenes, this is the most consequential screen in the entire journey. The moment the customer taps "Submit," the system fires four parallel API calls that will determine whether this person can trade, what data is already on file for them, and whether they appear on any watchlists. Everything that follows -- pre-filled forms, compliance gates, the final approval -- traces back to what happens here.
 
 <ScreenCard number={2} title="PAN + Date of Birth">
 
 **Purpose:** Capture the two identity keys that unlock all downstream data lookups.
 
-PAN is the universal financial identifier in India. Combined with DOB, it is the composite key that the KRA (KYC Registration Agency), CKYC (Central KYC) registry, and AML (Anti-Money Laundering) screening systems use to locate a person's records.
+PAN is the universal financial identifier in India. Combined with DOB, it is the composite key that the <abbr title="KYC Registration Agency">KRA</abbr> (<abbr title="Know Your Customer (process).">KYC</abbr> Registration Agency), <abbr title="Central KYC (records registry)">CKYC</abbr> (Central KYC) registry, and <abbr title="Anti-Money Laundering">AML</abbr> (Anti-Money Laundering) screening systems use to locate a person's records.
 
 ## User Input
 
@@ -30,7 +30,7 @@ PAN is the universal financial identifier in India. Combined with DOB, it is the
 
 <AsyncBar>
 On submit, 4 parallel API calls fire (results ready by Screen 4):
-**PAN Verify** | **KRA Lookup** | **CKYC Search** | **AML/PEP Screen**
+**PAN Verify** | **KRA Lookup** | **CKYC Search** | **AML/<abbr title="Politically Exposed Person">PEP</abbr> Screen**
 </AsyncBar>
 
 <Aside type="note">
@@ -43,10 +43,10 @@ The system does not wait for any of these calls to return before moving the cust
 
 | # | API Call | What It Returns | Used At |
 |---|---------|----------------|---------|
-| 1 | PAN Verify (NSDL/Protean) | Status (E/F/X/D/N), name, DOB match, PAN-Aadhaar link status | Gate (Screen 8) |
+| 1 | PAN Verify (<abbr title="National Securities Depository Limited">NSDL</abbr>/Protean) | Status (E/F/X/D/N), name, DOB match, PAN-Aadhaar link status | Gate (Screen 8) |
 | 2 | KRA Lookup | KYC status, occupation, income range, net worth, existing KYC data | Pre-fill (Screen 4) |
-| 3 | CKYC Search (CERSAI) | Masked CKYC number (since Jan 2025), identity data, address | Pre-fill (Screen 4) |
-| 4 | AML/PEP Screen | Risk level (LOW/MEDIUM/HIGH), watchlist matches per SEBI AML/CFT guidelines | Gate (Screen 8) |
+| 3 | CKYC Search (<abbr title="Central Registry of Securitisation Asset Reconstruction and Security Interest of India">CERSAI</abbr>) | Masked CKYC number (since Jan 2025), identity data, address | Pre-fill (Screen 4) |
+| 4 | AML/PEP Screen | Risk level (LOW/MEDIUM/HIGH), watchlist matches per <abbr title="Securities and Exchange Board of India">SEBI</abbr> AML/<abbr title="Combating the Financing of Terrorism">CFT</abbr> guidelines | Gate (Screen 8) |
 
 :::tip[Understanding PAN status codes]
 The PAN verification response includes a status code that is critical for the blocking gate. **E** means the PAN exists and is active -- this is what you want. **F** means a fake or invalid PAN. **X** means deactivated. **D** means the PAN holder is deceased. **N** means not found. Any status other than **E** is a hard block at Screen 8.
@@ -54,7 +54,7 @@ The PAN verification response includes a status code that is critical for the bl
 
 ## Verification Details
 
-PAN verification is performed against NSDL/Protean databases. KRA lookup checks existing KYC records across all five KRAs (CVL, NDML, DOTEX, CAMS, KFintech) via interoperability. CKYC search queries CERSAI. AML/PEP screening runs per SEBI AML/CFT guidelines (SEBI/HO/MIRSD/DOP/CIR/P/2023/37).
+PAN verification is performed against NSDL/Protean databases. KRA lookup checks existing KYC records across all five KRAs (CVL, NDML, DOTEX, CAMS, KFintech) via interoperability. CKYC search queries CERSAI. AML/PEP screening runs per SEBI AML/CFT guidelines (SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/DOP/CIR/P/2023/37).
 
 For vendor implementation options, see [Vendor Integrations](/broking-kyc/vendors/).
 

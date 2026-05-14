@@ -3,7 +3,7 @@ title: Non-Individual Entities
 description: KYC requirements for Corporate, HUF, Partnership, Trust, LLP, and other non-individual entity types across all vendor integrations.
 ---
 
-While the current KYC system focuses on individual customer onboarding, the securities market also serves corporates, partnerships, trusts, HUFs (Hindu Undivided Families), and LLPs (Limited Liability Partnerships). Each of these entity types has its own set of KYC documents, verification requirements, and regulatory obligations. This page consolidates the non-individual touchpoints identified across all vendor integration specifications during the individual KYC design process. It serves as a planning reference for when the team begins the non-individual onboarding phase.
+While the current <abbr title="Know Your Customer (process).">KYC</abbr> system focuses on individual customer onboarding, the securities market also serves corporates, partnerships, trusts, HUFs (Hindu Undivided Families), and LLPs (Limited Liability Partnerships). Each of these entity types has its own set of KYC documents, verification requirements, and regulatory obligations. This page consolidates the non-individual touchpoints identified across all vendor integration specifications during the individual KYC design process. It serves as a planning reference for when the team begins the non-individual onboarding phase.
 
 :::note
 The current KYC system focuses on **individual customer onboarding**. Non-individual entity onboarding is planned for a future phase. This page documents the vendor touchpoints and requirements identified during the individual KYC specification process.
@@ -11,16 +11,16 @@ The current KYC system focuses on **individual customer onboarding**. Non-indivi
 
 ## Entity Types
 
-Each entity type maps to different category codes across the KRA (KYC Registration Agency), CKYC (Central KYC) registry, and CDSL (Central Depository Services Limited). The "Key Documents" column gives you a sense of the additional documentation burden compared to individual onboarding.
+Each entity type maps to different category codes across the <abbr title="KYC Registration Agency">KRA</abbr> (KYC Registration Agency), <abbr title="Central KYC (records registry)">CKYC</abbr> (Central KYC) registry, and <abbr title="Central Depository Services (India) Limited">CDSL</abbr> (Central Depository Services Limited). The "Key Documents" column gives you a sense of the additional documentation burden compared to individual onboarding.
 
 | Entity Type | KRA Category | CKYC Constitution | CDSL Category | Key Documents |
 |-------------|-------------|-------------------|---------------|--------------|
 | **Corporate** | Corporate | Company | Body Corporate | MOA, AOA, Board Resolution, Director KYC |
-| **HUF** | HUF | Hindu Undivided Family | HUF | HUF Deed, Karta PAN, Karta KYC |
+| **<abbr title="Hindu Undivided Family">HUF</abbr>** | HUF | Hindu Undivided Family | HUF | HUF Deed, Karta <abbr title="Permanent Account Number">PAN</abbr>, Karta KYC |
 | **Partnership** | Partnership | Partnership Firm | Partnership | Deed, Partner KYC, Registration Certificate |
 | **Trust** | Trust | Trust | Trust | Trust Deed, Trustee KYC, Registration |
-| **LLP** | LLP | LLP | LLP | LLP Agreement, Partner KYC, CIN |
-| **NRI** | Individual (NRI) | Individual | NRI | Passport, Visa, PIS Permission, NRE/NRO Bank |
+| **<abbr title="—">LLP</abbr>** | LLP | LLP | LLP | LLP Agreement, Partner KYC, CIN |
+| **<abbr title="Non-Resident Indian">NRI</abbr>** | Individual (NRI) | Individual | NRI | Passport, Visa, <abbr title="Portfolio Investment Scheme (RBI / NRI)">PIS</abbr> Permission, <abbr title="Non-Resident External (Rupee) account">NRE</abbr>/<abbr title="Non-Resident Ordinary (Rupee) account">NRO</abbr> Bank |
 
 ## Vendor Touchpoints by Entity Type
 
@@ -29,7 +29,7 @@ Each vendor integration has specific handling for non-individual entities. The s
 ### KRA (via Digio)
 - Separate upload templates per entity type
 - Director/Partner/Trustee KYC as sub-records
-- FATCA/CRS (Foreign Account Tax Compliance Act / Common Reporting Standard) declaration per authorized signatory
+- <abbr title="Foreign Account Tax Compliance Act (US)">FATCA</abbr>/<abbr title="Common Reporting Standard">CRS</abbr> (Foreign Account Tax Compliance Act / Common Reporting Standard) declaration per authorized signatory
 - Full spec: [KRA Integration](/broking-kyc/vendors/kra) Section 7
 
 ### CKYC (via CKYC intermediary)
@@ -48,7 +48,7 @@ Each vendor integration has specific handling for non-individual entities. The s
 - Client type codes differ per entity
 - Director/Partner PAN (Permanent Account Number) verification required
 - Additional document requirements per exchange
-- Full specs: [NSE](/broking-kyc/vendors/exchanges/nse), [BSE](/broking-kyc/vendors/exchanges/bse), [MCX](/broking-kyc/vendors/exchanges/mcx)
+- Full specs: [<abbr title="National Stock Exchange of India">NSE</abbr>](/broking-kyc/vendors/exchanges/nse), [<abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr>](/broking-kyc/vendors/exchanges/bse), [<abbr title="Multi Commodity Exchange of India">MCX</abbr>](/broking-kyc/vendors/exchanges/mcx)
 
 ### eSign (eSign provider)
 - Multi-signatory workflows for corporates
@@ -60,7 +60,7 @@ Each vendor integration has specific handling for non-individual entities. The s
 - Screening by entity type (different risk parameters)
 - UBO screening for corporates
 - Director/Partner screening
-- Full spec: See [Vendor Integrations](/broking-kyc/vendors/) for AML screening provider options
+- Full spec: See [Vendor Integrations](/broking-kyc/vendors/) for <abbr title="Anti-Money Laundering">AML</abbr> screening provider options
 
 ### Face Match (Biometric verification)
 - Face match for authorized signatories

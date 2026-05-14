@@ -3,7 +3,7 @@ title: CDSL BO Modifications
 description: Comprehensive guide to BO account modifications — address, bank, nominee, PAN, email/mobile changes, segment activation, account closure, and dormancy.
 ---
 
-Once a Beneficiary Owner (BO) demat account is opened in CDSL (Central Depository Services Limited), the client's life does not stop changing. They move houses, switch banks, get married, have children who become nominees, correct a misspelled name, or eventually decide to close the account altogether. Every one of these changes must be reflected in CDSL's records, and many of them must also be propagated to KRA (KYC Registration Agency), stock exchanges, and CKYC (Central KYC Registry). As an engineer, you will build the modification workflows that handle these changes — and you need to understand which file lines to update, which documents to collect, and which downstream systems must be notified. By the end of this page, you will know how to implement every major type of BO modification through CDSL's CDAS (Central Depository Accounting System).
+Once a Beneficiary Owner (<abbr title="Beneficial Owner">BO</abbr>) demat account is opened in <abbr title="Central Depository Services (India) Limited">CDSL</abbr> (Central Depository Services Limited), the client's life does not stop changing. They move houses, switch banks, get married, have children who become nominees, correct a misspelled name, or eventually decide to close the account altogether. Every one of these changes must be reflected in CDSL's records, and many of them must also be propagated to <abbr title="KYC Registration Agency">KRA</abbr> (<abbr title="Know Your Customer (process).">KYC</abbr> Registration Agency), stock exchanges, and <abbr title="Central KYC (records registry)">CKYC</abbr> (Central KYC Registry). As an engineer, you will build the modification workflows that handle these changes — and you need to understand which file lines to update, which documents to collect, and which downstream systems must be notified. By the end of this page, you will know how to implement every major type of BO modification through CDSL's CDAS (Central Depository Accounting System).
 
 Changing bank details on a BO account is like updating your address with the post office — except here, CDSL automatically tells every company whose shares you hold, so dividends and corporate action payouts reach the right account.
 
@@ -25,7 +25,7 @@ Before diving into specific modification types, it is important to understand th
 | **Nominee Print Rule** | If nominee modified: Line Code 0 + ALL Line Code 07 fields printed (modified + unmodified) |
 | **Joint Holder Print Rule** | Address changes: Line Codes 01, 02, 03 all printed |
 | **Auto-Propagation** | Address changes automatically downloaded to all companies where BO holds securities |
-| **CDSL Communiques** | DP-408, DP-304, DP-5565 |
+| **CDSL Communiques** | <abbr title="Depository Participant">DP</abbr>-408, DP-304, DP-5565 |
 
 In plain English: all modifications use the same BO Modify API and the same file structure as account opening. You only populate the fields that are changing — everything else retains its existing value. The maker-checker workflow means one person enters the change and a different person must approve it before CDSL processes it.
 
@@ -107,33 +107,33 @@ Step 6: CDSL processes update (typically same day)
 | **Maximum Banks** | Up to 5 bank accounts per BO |
 | **Primary Bank** | Exactly 1 must be marked as primary |
 | **Verification** | New bank must be penny-drop verified before submission |
-| **NRI Accounts** | NRE account for NRE demat; NRO account for NRO demat (must match) |
+| **<abbr title="Non-Resident Indian">NRI</abbr> Accounts** | <abbr title="Non-Resident External (Rupee) account">NRE</abbr> account for NRE demat; <abbr title="Non-Resident Ordinary (Rupee) account">NRO</abbr> account for NRO demat (must match) |
 | **Name Match** | Bank account holder name must match BO name (or joint holder) |
 
 :::caution
-The penny drop verification (Rs. 1 credit via IMPS) must succeed before you submit the bank change to CDSL. If you submit a bank account that fails penny drop later, the client may miss dividend payouts. Always verify first, submit second. Also ensure the IFSC (Indian Financial System Code) is validated against the current RBI directory — bank branches merge and close, and stale IFSCs will cause failed payouts.
+The penny drop verification (Rs. 1 credit via <abbr title="Immediate Payment Service">IMPS</abbr>) must succeed before you submit the bank change to CDSL. If you submit a bank account that fails penny drop later, the client may miss dividend payouts. Always verify first, submit second. Also ensure the <abbr title="Indian Financial System Code.">IFSC</abbr> (Indian Financial System Code) is validated against the current <abbr title="Reserve Bank of India">RBI</abbr> directory — bank branches merge and close, and stale IFSCs will cause failed payouts.
 :::
 
 ---
 
-Nomination rules changed significantly in January 2025, with SEBI (Securities and Exchange Board of India) increasing the maximum number of nominees from 3 to 10, making email and mobile mandatory for each nominee, and simplifying the transmission process after a holder's death. If your system was built before this circular, it almost certainly needs updating.
+Nomination rules changed significantly in January 2025, with <abbr title="Securities and Exchange Board of India">SEBI</abbr> (Securities and Exchange Board of India) increasing the maximum number of nominees from 3 to 10, making email and mobile mandatory for each nominee, and simplifying the transmission process after a holder's death. If your system was built before this circular, it almost certainly needs updating.
 
 ## 4. Nominee Update
 
 ### 4.1 SEBI Nomination Rules (January 10, 2025)
 
-Circular: SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2025/3 (Jan 10, 2025)
+Circular: SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD-1/P/CIR/2025/3 (Jan 10, 2025)
 Amendment: SEBI Feb 28, 2025 (clarifications)
-Extension: SEBI Jul 2025 (Phase II & III implementation extension)
+Extension: SEBI Jul 2025 (Phase <abbr title="—">II</abbr> & <abbr title="—">III</abbr> implementation extension)
 
 | Aspect | Details |
 |--------|---------|
 | **Maximum Nominees** | 10 (increased from 3) |
 | **Effective Date** | March 1, 2025 |
-| **Mandatory Fields** | Name, relationship, percentage, address, email, mobile, one ID (PAN or DL or last 4 Aadhaar digits) |
+| **Mandatory Fields** | Name, relationship, percentage, address, email, mobile, one ID (<abbr title="Permanent Account Number">PAN</abbr> or DL or last 4 Aadhaar digits) |
 | **Percentage** | Must total exactly 100.00% across all nominees |
 | **Minor Nominee** | Guardian details mandatory (name, PAN, relationship, address) |
-| **POA/DDPI Restriction** | Person acting under POA (Power of Attorney) / DDPI (Demat Debit and Pledge Instruction) CANNOT add/modify nominees |
+| **<abbr title="Power of Attorney">POA</abbr>/<abbr title="Demat Debit and Pledge Instruction">DDPI</abbr> Restriction** | Person acting under POA (Power of Attorney) / DDPI (Demat Debit and Pledge Instruction) CANNOT add/modify nominees |
 | **Default Distribution** | If percentages not specified, equal distribution |
 | **Non-Compliance** | Account frozen for debits |
 | **Record Retention** | 8 years post-transmission |
@@ -215,14 +215,14 @@ Email and mobile updates may seem routine, but they carry outsized importance in
 | Step | Details |
 |------|---------|
 | 1 | Client submits change request (online or offline) |
-| 2 | New email verified via OTP to new email |
+| 2 | New email verified via <abbr title="One-Time Password">OTP</abbr> to new email |
 | 3 | New mobile verified via OTP to new mobile |
 | 4 | Maker updates in CDAS: Line 02 (mobile, email fields) |
 | 5 | Checker verifies and releases |
 | 6 | Confirmation sent to BOTH old and new contact details |
 
 :::caution
-Mobile and Email are part of the 6 mandatory KYC attributes. Changes must be propagated to KRA + Exchange (UCC) within 10 working days.
+Mobile and Email are part of the 6 mandatory KYC attributes. Changes must be propagated to KRA + Exchange (<abbr title="Unique Client Code">UCC</abbr>) within 10 working days.
 :::
 
 In plain English: when a client changes their mobile number, you must update it in three places — CDSL, KRA, and the exchange UCC (Unique Client Code) records — within 10 working days. Your system should automate this cross-system propagation rather than relying on manual processes.
@@ -241,10 +241,10 @@ Per CDSL Notification CDSL/OPS/DP/POLCY/2024/657 (October 30, 2024):
 | 2 | DP stamps PAN copy: "Verified with original" + "PAN verified with income tax site" |
 | 3 | DP verifies PAN on protean-tinpan.com |
 | 4 | DP matches BO's signature on PAN copy with signature in CDAS |
-| 5 | For partnership/trust/HUF: First and last 3 pages of deeds |
+| 5 | For partnership/trust/<abbr title="Hindu Undivided Family">HUF</abbr>: First and last 3 pages of deeds |
 | 6 | For mergers: Merger docs + new entity PAN |
 | 7 | Maker creates modification in CDAS (Line 01) |
-| 8 | Checker processes by T+2 working days |
+| 8 | Checker processes by <abbr title="Trade-date Plus N settlement">T+2</abbr> working days |
 | 9 | Cross-system sync: KRA + Exchange + CKYC must be updated |
 
 :::caution
@@ -261,10 +261,10 @@ Segment activation is primarily an **exchange-level operation** (UCC), not a CDS
 
 | Segment | Exchange(s) | Income Proof | Process |
 |---------|-------------|-------------|---------|
-| CM (Equity) | NSE, BSE | No (default) | Auto with UCC |
+| <abbr title="Clearing Member">CM</abbr> (Equity) | <abbr title="National Stock Exchange of India">NSE</abbr>, <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> | No (default) | Auto with UCC |
 | FO (Derivatives) | NSE, BSE | Yes (min Rs. 10L) | UCC modify at exchange |
 | CD (Currency) | NSE, BSE, MSE | No | UCC modify at exchange |
-| COM (Commodity) | MCX, NCDEX | Yes (mandatory) | UCC modify at exchange |
+| COM (Commodity) | <abbr title="Multi Commodity Exchange of India">MCX</abbr>, <abbr title="National Commodity & Derivatives Exchange Limited">NCDEX</abbr> | Yes (mandatory) | UCC modify at exchange |
 | SLB | NSE, BSE | Separate agreement | SLB agreement with broker |
 
 In plain English: a client's demat account does not "know" about segments. Whether a client can trade in derivatives or commodities is controlled by their UCC registration at the exchange. The demat account simply holds whatever securities result from trading in any segment.
@@ -280,7 +280,7 @@ Account closure is a client right that SEBI has strengthened in recent years. Cl
 | Aspect | Details |
 |--------|---------|
 | **SEBI Mandate** | DPs with online services MUST provide online closure facility |
-| **Circular** | [SEBI/HO/MRD/MRD-PoD-1/P/CIR/2024/168](/broking-kyc/reference/circulars/sebi-other/#sebihomrdmrd-pod-1pcir2024168) (Dec 2024) |
+| **Circular** | [SEBI/HO/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>/MRD-PoD-1/P/CIR/2024/168](/broking-kyc/reference/circulars/sebi-other/#sebihomrdmrd-pod-1pcir2024168) (Dec 2024) |
 | **Effective Date** | July 14, 2025 (new procedures) |
 | **Client Right** | BO shall NOT be required to give reasons for closure (online mode) |
 
@@ -343,7 +343,7 @@ The table below is a quick reference matrix that ties together everything covere
 |-------------|-----------|----------|--------------|-------------------|
 | Address Change | Line 02 | Same day | Address proof | KRA (10 days) |
 | Bank Add/Change | Line 05 | Same day | Cheque + penny drop | Exchange (10 days) |
-| Nominee Update | Line 07 | T+0 | Nom form + OTP | N/A |
+| Nominee Update | Line 07 | <abbr title="Trade-date Plus N settlement">T+0</abbr> | Nom form + OTP | N/A |
 | Nominee Opt-Out | Line 07 | T+0 | Video + declaration | N/A |
 | Email/Mobile | Line 02 | Same day | OTP (old + new) | KRA + Exchange (10 days) |
 | PAN Correction | Line 01 | T+2 | PAN copy + IT verify | KRA + Exchange + CKYC |
@@ -361,5 +361,5 @@ The "Cross-System Sync" column is deceptively important. A modification is not t
 
 - [CDSL Overview](/broking-kyc/vendors/depositories/cdsl/) — Core BO integration spec
 - [DDPI Deep Dive](/broking-kyc/vendors/depositories/cdsl-ddpi/) — DDPI activation is a BO modification
-- [MTF & Pledge Deep Dive](/broking-kyc/vendors/depositories/cdsl-mtf-pledge/) — Pledge operations on modified accounts
+- [<abbr title="Margin Trading Facility">MTF</abbr> & Pledge Deep Dive](/broking-kyc/vendors/depositories/cdsl-mtf-pledge/) — Pledge operations on modified accounts
 - [Integration Guide](/broking-kyc/vendors/depositories/cdsl-integration-guide/) — UAT environments and SEBI circulars

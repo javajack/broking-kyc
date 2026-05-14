@@ -5,30 +5,30 @@ description: End-to-end walkthrough of the SEBI Complaint Redress System (SCORES
 
 import { Aside } from '@astrojs/starlight/components';
 
-> **Why this page is structured this way:** SCORES is one investor-facing portal but four operational lifecycles for a broker — registration, daily intake & ATR submission, monthly MIS, and escalation handling. Each has different inputs, deadlines, and disciplinary triggers. The walkthrough follows what a broker's grievance team actually does, day-by-day, with the regulatory clock running in the background.
+> **Why this page is structured this way:** <abbr title="SEBI Complaints Redress System">SCORES</abbr> is one investor-facing portal but four operational lifecycles for a broker — registration, daily intake & <abbr title="Action Taken Report.">ATR</abbr> submission, monthly MIS, and escalation handling. Each has different inputs, deadlines, and disciplinary triggers. The walkthrough follows what a broker's grievance team actually does, day-by-day, with the regulatory clock running in the background.
 
 ## TL;DR
 
-- SCORES is SEBI's investor-grievance portal (https://scores.sebi.gov.in). The current operating regime is **SCORES 2.0**, set by `SEBI/HO/OIAE/IGRD/CIR/P/2023/156` dated 20 September 2023 (in force from 4 December 2023), and reinforced by `SEBI/HO/OIAE/IGRD/CIR/P/2023/183` dated 1 December 2023 which adds the non-compliance consequence matrix.
-- A complaint travels from investor → SCORES portal → broker (auto-routed) → Designated Body (exchange / depository / AMFI) → SEBI → SMART ODR (if still unresolved).
+- SCORES is <abbr title="Securities and Exchange Board of India">SEBI</abbr>'s investor-grievance portal (https://scores.sebi.gov.in). The current operating regime is **SCORES 2.0**, set by `SEBI/HO/OIAE/IGRD/CIR/P/2023/156` dated 20 September 2023 (in force from 4 December 2023), and reinforced by `SEBI/HO/OIAE/IGRD/CIR/P/2023/183` dated 1 December 2023 which adds the non-compliance consequence matrix.
+- A complaint travels from investor → SCORES portal → broker (auto-routed) → Designated Body (exchange / depository / AMFI) → SEBI → SMART <abbr title="Online Dispute Resolution">ODR</abbr> (if still unresolved).
 - The first-level resolution clock is **21 calendar days** from complaint receipt — down from 30 days in SCORES 1.0. Two review stages: First Review by Designated Body (within 15 days of investor's first review request), Second Review by SEBI (within 15 days of investor's second review request).
-- Every broker must (i) register on SCORES and FINnet 2.0, (ii) appoint a designated grievance officer with PAN/contact, (iii) submit Action Taken Report (ATR) within the 21-day clock, (iv) file the **Monthly Complaints MIS** to exchanges/SEBI by the 7th of the succeeding month, (v) publish complaint statistics on the broker's own website.
+- Every broker must (i) register on SCORES and FINnet 2.0, (ii) appoint a designated grievance officer with <abbr title="Permanent Account Number">PAN</abbr>/contact, (iii) submit Action Taken Report (ATR) within the 21-day clock, (iv) file the **Monthly Complaints MIS** to exchanges/SEBI by the 7th of the succeeding month, (v) publish complaint statistics on the broker's own website.
 - Non-compliance with SCORES timelines triggers (a) financial disincentive (per-day fine), (b) warning letter, (c) Designated Body adjudication, (d) regulatory action — including freezing of business activities for repeat defaulters.
-- Categories with highest broker complaint volume: unauthorised trades, demat-account modification delays, brokerage / payout disputes, KYC processing, dormancy reactivation, off-market transfer issues. Common rejection grounds: investor not a client of the broker, dispute relates to pre-2018 transactions, sub-judice matters, anonymous complaints, repeat complaints already adjudicated.
+- Categories with highest broker complaint volume: unauthorised trades, demat-account modification delays, brokerage / payout disputes, <abbr title="Know Your Customer (process).">KYC</abbr> processing, dormancy reactivation, off-market transfer issues. Common rejection grounds: investor not a client of the broker, dispute relates to pre-2018 transactions, sub-judice matters, anonymous complaints, repeat complaints already adjudicated.
 
 ## Conceptual overview
 
-SCORES sits at the centre of SEBI's investor protection architecture. Before SCORES, investor complaints traversed loose paper trails between exchanges, broker compliance officers, and the SEBI Office of Investor Assistance and Education (OIAE). SCORES 1.0, launched 2011, gave investors a single web portal but the workflow was paper-emulating — complaints emailed to entities, follow-ups manual. **SCORES 2.0 (December 2023)** rebuilt the workflow around three principles: auto-routing of complaints to the correct entity based on PAN/UCC mapping; auto-escalation when timelines lapse; integration with the SMART ODR portal for unresolved disputes that escalate beyond the regulatory layer to adjudicatory or arbitral resolution.
+SCORES sits at the centre of SEBI's investor protection architecture. Before SCORES, investor complaints traversed loose paper trails between exchanges, broker compliance officers, and the SEBI Office of Investor Assistance and Education (<abbr title="Office of Investor Assistance and Education (SEBI)">OIAE</abbr>). SCORES 1.0, launched 2011, gave investors a single web portal but the workflow was paper-emulating — complaints emailed to entities, follow-ups manual. **SCORES 2.0 (December 2023)** rebuilt the workflow around three principles: auto-routing of complaints to the correct entity based on PAN/<abbr title="Unique Client Code">UCC</abbr> mapping; auto-escalation when timelines lapse; integration with the SMART ODR portal for unresolved disputes that escalate beyond the regulatory layer to adjudicatory or arbitral resolution.
 
-For a broker, SCORES generates three workflow loads simultaneously: (a) reactive — every new complaint received, the 21-day clock starts; (b) periodic — monthly MIS, annual investor-charter compliance, periodic complaint-statistics web disclosure; (c) systemic — every broker is rated by SEBI on a Compliance Score that factors in SCORES-pendency, repeat-complaints, and average resolution time. The compliance score feeds into the QSB (Qualified Stock Broker) classification per `SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/14` (March 2024).
+For a broker, SCORES generates three workflow loads simultaneously: (a) reactive — every new complaint received, the 21-day clock starts; (b) periodic — monthly MIS, annual investor-charter compliance, periodic complaint-statistics web disclosure; (c) systemic — every broker is rated by SEBI on a Compliance Score that factors in SCORES-pendency, repeat-complaints, and average resolution time. The compliance score feeds into the <abbr title="Qualified Stock Broker">QSB</abbr> (Qualified Stock Broker) classification per `SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/14` (March 2024).
 
 <Aside type="caution">
-**SCORES is not the only investor-grievance touchpoint.** It runs parallel to (i) the broker's own grievance redressal mechanism (mandatory under SEBI Master Circular for Stock Brokers), (ii) Investor Grievance Redressal Committees (IGRC) at NSE / BSE / MCX, (iii) the SMART ODR portal for monetary/arbitral disputes, (iv) the exchanges' Investor Service Cell, (v) consumer courts, and (vi) civil litigation. SCORES is the regulator-administered first-tier escalation. Engineers building grievance pipelines must wire all five touchpoints, not just SCORES.
+**SCORES is not the only investor-grievance touchpoint.** It runs parallel to (i) the broker's own grievance redressal mechanism (mandatory under SEBI Master Circular for Stock Brokers), (ii) Investor Grievance Redressal Committees (<abbr title="Investor Grievance Redressal Committee">IGRC</abbr>) at <abbr title="National Stock Exchange of India">NSE</abbr> / <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> / <abbr title="Multi Commodity Exchange of India">MCX</abbr>, (iii) the SMART ODR portal for monetary/arbitral disputes, (iv) the exchanges' Investor Service Cell, (v) consumer courts, and (vi) civil litigation. SCORES is the regulator-administered first-tier escalation. Engineers building grievance pipelines must wire all five touchpoints, not just SCORES.
 </Aside>
 
 ## 1. Broker registration on SCORES
 
-Every SEBI-registered intermediary must register on SCORES as a "Regulated Entity" before commencing business. The path is documented in the SCORES 2.0 Master Circular `SEBI/HO/OIAE/IGRD/CIR/P/2023/156` and the migration guidance bundled with SEBI/HO/DDHS/DDHS-POD1/CIR/P/2023/67 (the FINnet 2.0 migration circular, which carries cross-references to SCORES login mapping).
+Every SEBI-registered intermediary must register on SCORES as a "Regulated Entity" before commencing business. The path is documented in the SCORES 2.0 Master Circular `SEBI/HO/OIAE/IGRD/CIR/P/2023/156` and the migration guidance bundled with SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/DDHS/DDHS-POD1/CIR/P/2023/67 (the FINnet 2.0 migration circular, which carries cross-references to SCORES login mapping).
 
 **Inputs to registration:**
 
@@ -37,7 +37,7 @@ Every SEBI-registered intermediary must register on SCORES as a "Regulated Entit
 - Compliance Officer name, PAN, mobile, email (often the same person at small brokers; must be distinct at QSBs per Chapter IVA Brokers' Institutional Mechanism)
 - Branch addresses (registered office + corporate office + branches where applicable)
 - Exchange memberships and segment codes
-- Depository participant code (CDSL / NSDL) if applicable
+- Depository participant code (<abbr title="Central Depository Services (India) Limited">CDSL</abbr> / <abbr title="National Securities Depository Limited">NSDL</abbr>) if applicable
 
 **Output:** SCORES login credentials (issued to DGO and Compliance Officer); DGO appointment is reflected on the broker's website mandatorily under SEBI Investor Charter `SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/124` (Updated Investor Charter for stock brokers).
 
@@ -58,13 +58,13 @@ Every SEBI-registered intermediary must register on SCORES as a "Regulated Entit
 Investor accesses https://scores.sebi.gov.in and submits a complaint. SCORES requires:
 
 - PAN (mandatory)
-- Mobile / email (mandatory, OTP-verified)
+- Mobile / email (mandatory, <abbr title="One-Time Password">OTP</abbr>-verified)
 - Entity against which the complaint is raised (search by name / SEBI registration number)
 - Complaint category (drop-down — see section 4 below)
 - Free-text complaint description (typically up to 1500 characters)
 - Supporting documents (PDF up to 5 MB)
 
-SCORES generates a unique **Complaint Registration Number (CRN)** — format `SEBIE/AB/2026/000XXXX` — communicated to the investor by SMS and email. The CRN is the universal reference number throughout the lifecycle.
+SCORES generates a unique **Complaint Registration Number (CRN)** — format `SEBIE/AB/2026/000XXXX` — communicated to the investor by <abbr title="Short Message Service.">SMS</abbr> and email. The CRN is the universal reference number throughout the lifecycle.
 
 ### 2.2 Auto-routing to broker
 
@@ -74,7 +74,7 @@ Auto-routing implies the broker's 21-day clock starts on the **SCORES receipt da
 
 ### 2.3 Broker acknowledgement (Day 1)
 
-Within 1 working day the broker must acknowledge the complaint via SCORES (system auto-prompts on login). Acknowledgement is a confirmation of receipt — not a resolution. The DGO assigns the complaint to internal owner (e.g. KYC team, RMS, settlement team, branch).
+Within 1 working day the broker must acknowledge the complaint via SCORES (system auto-prompts on login). Acknowledgement is a confirmation of receipt — not a resolution. The DGO assigns the complaint to internal owner (e.g. KYC team, <abbr title="Risk Management System">RMS</abbr>, settlement team, branch).
 
 ### 2.4 Investigation and resolution (Days 1 — 21)
 
@@ -86,7 +86,7 @@ The broker investigates and prepares an **Action Taken Report (ATR)**. The ATR m
 - Supporting evidence (system screenshots, ledger extracts, email correspondence)
 - Officer signature with name and designation
 
-ATR is uploaded to SCORES with status options — Resolved / Partially Resolved / Not Resolved (with explanation). Pure investor-side issues (e.g. PMS-related complaint forwarded to a broker that only has trading access for the client) are marked Not Pertaining To This Entity with explanation.
+ATR is uploaded to SCORES with status options — Resolved / Partially Resolved / Not Resolved (with explanation). Pure investor-side issues (e.g. <abbr title="Portfolio Management Services">PMS</abbr>-related complaint forwarded to a broker that only has trading access for the client) are marked Not Pertaining To This Entity with explanation.
 
 ### 2.5 Investor review (post Day 21)
 
@@ -107,7 +107,7 @@ Upon broker's ATR submission, the complaint moves to "Resolved" status. The inve
 If the investor files a First Review, the complaint moves to a **Designated Body** — the entity formally tasked with reviewing the broker's ATR. For stock brokers:
 
 - NSE / BSE / MCX (depending on the exchange where the dispute arises)
-- CDSL / NSDL (for demat-related complaints if filed against DP)
+- CDSL / NSDL (for demat-related complaints if filed against <abbr title="Depository Participant">DP</abbr>)
 
 The Designated Body has **15 calendar days** to review and either uphold the broker's ATR (rejecting the investor's review) or remand the matter back to the broker for further action. NSE administers First Review via its Investor Service Cell; BSE via Investors' Services Cell at Mumbai; MCX via Member Compliance Department.
 
@@ -152,11 +152,11 @@ SCORES uses a structured categorisation tree. Broker-relevant top-level categori
 | --- | --- | --- |
 | Trading / Settlement | Unauthorised trades, brokerage dispute, contract-note discrepancy, payout delay, short delivery | 10–15 days |
 | Demat / Depository | Modification delay, off-market transfer issue, charges levied, holding-statement discrepancy | 7–14 days |
-| KYC / Onboarding | Account opening delay, KRA validation rejection, re-KYC dispute, KYC modification refusal | 7–10 days |
+| KYC / Onboarding | Account opening delay, <abbr title="KYC Registration Agency">KRA</abbr> validation rejection, re-KYC dispute, KYC modification refusal | 7–10 days |
 | Margin / Funds | Margin reporting dispute, peak-margin penalty pass-through, fund segregation, upstreaming dispute | 15–20 days |
 | Client funds / Running account | Running-account settlement delay, balance discrepancy, payout-credit dispute, FDR pledge issue | 14–21 days |
 | Algorithmic / Technical | Algo trade dispute, API order tagging, technical glitch loss, exchange outage compensation | 18–21 days (often closer to cap due to evidentiary load) |
-| AP / Branch issues | Unauthorised activity at AP, AP misrepresentation, AP termination disputes | 15–21 days |
+| <abbr title="Authorized Person">AP</abbr> / Branch issues | Unauthorised activity at AP, AP misrepresentation, AP termination disputes | 15–21 days |
 | Misleading communication / Mis-selling | Mis-selling, unsolicited advisory, social-media tip-driven trades | 18–21 days |
 | Account closure / Dormancy | Closure delay, dormant-account reactivation refusal, balance return on closure | 14–18 days |
 
@@ -187,8 +187,8 @@ SCORES auto-rejects complaints in specific scenarios (clauses 4.6 — 4.10 of th
 - **Anonymous / incomplete** — PAN missing, mobile not verified, complaint description below threshold
 - **Pre-2018 transactions** — SCORES limits look-back to transactions on or after 1 April 2018 (industry-typical interpretation; SEBI has not codified a strict cut-off but practical screening uses this)
 - **Repeat complaint** — same investor, same issue, already adjudicated
-- **Mutual fund / NPS specific** — should be routed to AMFI / PFRDA; not a broker matter
-- **Investment advisory / RA** — routed to SEBI IAD or BSE Administration & Supervision of Investment Advisers (BASA)
+- **Mutual fund / NPS specific** — should be routed to AMFI / <abbr title="Pension Fund Regulatory and Development Authority">PFRDA</abbr>; not a broker matter
+- **Investment advisory / <abbr title="Research Analyst">RA</abbr>** — routed to SEBI IAD or BSE Administration & Supervision of Investment Advisers (BASA)
 
 Brokers cannot themselves trigger rejection; rejection is a SCORES system / OIAE action. But brokers can flag in the ATR that the complaint should be re-categorised — the OIAE team may then re-route or reject.
 
@@ -200,7 +200,7 @@ The internal pipeline that produces ATRs has formal structure per Master Circula
 
 - Broker website grievance form (mandatory under Investor Charter)
 - Designated grievance email (e.g. `grievance@broker.com`)
-- Call centre / phone (recorded with 5-year retention per industry practice; SEBI does not mandate a specific retention but 5 years aligns with PMLA / Stock Brokers Regulations)
+- Call centre / phone (recorded with 5-year retention per industry practice; SEBI does not mandate a specific retention but 5 years aligns with <abbr title="Prevention of Money Laundering Act 2002">PMLA</abbr> / Stock Brokers Regulations)
 - Branch walk-in (must have a complaint register)
 - Direct email / letter to compliance officer
 
@@ -221,8 +221,8 @@ Industry-typical SLAs: Tier 1 — 5 days; Tier 2 — 10 days; Tier 3 — 15 days
 - **Trade logs** — order entry timestamps, IP, terminal ID, modification trail, parent-child order linkage
 - **Audio recordings** — call-centre voice (mandatory record-keeping per industry practice; QSB requirement to record all client communications)
 - **Email trails** — through compliance email archive (5–10 year retention)
-- **KYC artefacts** — KRA / CKYC fetch, IPV / VIPV video, e-Sign trail
-- **Contract notes** — generated artefact with broker DSC; digital signature verification on-demand
+- **KYC artefacts** — KRA / <abbr title="Central KYC (records registry)">CKYC</abbr> fetch, <abbr title="In-Person Verification">IPV</abbr> / <abbr title="Video In-Person Verification (sometimes &quot;Video CIP&quot; / V-CIP)">VIPV</abbr> video, e-Sign trail
+- **Contract notes** — generated artefact with broker <abbr title="Digital Signature Certificate (CCA-licensed; aka Class 2/3 DSC).">DSC</abbr>; digital signature verification on-demand
 - **Settlement trail** — pay-in / pay-out files, demat debit / credit, RMS event log
 - **Surveillance alerts** — if the underlying trade was flagged for review by surveillance dashboard
 - **AP records** — if the trade was executed via an AP-terminal, AP-supervision artefacts
@@ -273,7 +273,7 @@ Brokers also face Compliance Score impact — a low SCORES disposal score affect
 
 ### 9.1 Complaint against deregistered / suspended broker
 
-If a broker's SEBI registration is suspended / cancelled, SCORES routes complaints to SEBI directly (no broker login active). Investor compensation in such cases routes through the exchange Investor Protection Fund (IPF) under SEBI Stock Exchanges and Clearing Corporations Regulations 2018 and Master Circular for Stock Exchanges `SEBI/HO/MRD-PoD2/CIR/P/2024/00181`. See [IPF deep dive](/broking-kyc/deep-dives/foundational/ipf/).
+If a broker's SEBI registration is suspended / cancelled, SCORES routes complaints to SEBI directly (no broker login active). Investor compensation in such cases routes through the exchange Investor Protection Fund (<abbr title="Investor Protection Fund">IPF</abbr>) under SEBI Stock Exchanges and Clearing Corporations Regulations 2018 and Master Circular for Stock Exchanges `SEBI/HO/MRD-PoD2/CIR/P/2024/00181`. See [IPF deep dive](/broking-kyc/deep-dives/foundational/ipf/).
 
 ### 9.2 Complaint against deceased broker (proprietor / partnership)
 
@@ -289,7 +289,7 @@ If an investor has accounts at Broker A and Broker B and the complaint involves 
 
 ### 9.5 Investor abroad / NRI
 
-NRI complaints flow through SCORES identically. Some complaint categories (PIS account, NRO/NRE compliance, FEMA position-limit) require RBI MoU coordination — SEBI internally co-ordinates with RBI; broker submits ATR with FEMA-compliance evidence.
+<abbr title="Non-Resident Indian">NRI</abbr> complaints flow through SCORES identically. Some complaint categories (<abbr title="Portfolio Investment Scheme (RBI / NRI)">PIS</abbr> account, <abbr title="Non-Resident Ordinary (Rupee) account">NRO</abbr>/<abbr title="Non-Resident External (Rupee) account">NRE</abbr> compliance, <abbr title="Foreign Exchange Management Act 1999">FEMA</abbr> position-limit) require <abbr title="Reserve Bank of India">RBI</abbr> MoU coordination — SEBI internally co-ordinates with RBI; broker submits ATR with FEMA-compliance evidence.
 
 ### 9.6 Anonymous / whistleblower complaint
 
@@ -315,15 +315,15 @@ SCORES requires PAN — so true anonymity isn't available. Whistleblower complai
 
 ## 11. SCORES interaction with adjacent regimes
 
-- **PMLA / STR linkage** — A SCORES complaint may surface facts that trigger a Suspicious Transaction Report (STR) to FIU-IND. The broker's PMLA team must be looped in early; STR filings have a 7-working-day clock from forming the suspicion, separate from the 21-day SCORES ATR clock.
+- **PMLA / <abbr title="Suspicious Transaction Report">STR</abbr> linkage** — A SCORES complaint may surface facts that trigger a Suspicious Transaction Report (STR) to <abbr title="Financial Intelligence Unit — India">FIU-IND</abbr>. The broker's PMLA team must be looped in early; STR filings have a 7-working-day clock from forming the suspicion, separate from the 21-day SCORES ATR clock.
 
-- **AML CDD trigger** — Sometimes a grievance reveals a CDD gap (e.g. PEP not flagged, suspicious wire pattern). Broker must update the client's risk profile and trigger EDD.
+- **<abbr title="Anti-Money Laundering">AML</abbr> CDD trigger** — Sometimes a grievance reveals a CDD gap (e.g. <abbr title="Politically Exposed Person">PEP</abbr> not flagged, suspicious wire pattern). Broker must update the client's risk profile and trigger EDD.
 
 - **Investor charter monthly disclosure** — Per `SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/124`, the broker's website must show monthly complaint statistics. The SCORES MIS is the natural source.
 
 - **Annual Compliance Report (ACR)** — Brokers submit ACR annually to SEBI/exchanges with SCORES summary. ACR is consolidated under the Stock Brokers Master Circular reporting matrix.
 
-- **System audit & cyber audit** — System auditor (per CSCRF, `SEBI/HO/ITD-1/ITD_CSC_EXT/P/CIR/2024/113`) tests SCORES interface, ATR submission audit trail, and grievance-team access control as part of the audit scope. See [System Audit deep dive](/broking-kyc/deep-dives/compliance-audit/system-audit/).
+- **System audit & cyber audit** — System auditor (per <abbr title="Cybersecurity and Cyber Resilience Framework">CSCRF</abbr>, `SEBI/HO/ITD-1/ITD_CSC_EXT/P/CIR/2024/113`) tests SCORES interface, ATR submission audit trail, and grievance-team access control as part of the audit scope. See [System Audit deep dive](/broking-kyc/deep-dives/compliance-audit/system-audit/).
 
 - **Inspection** — Exchange inspection (`NSE/INSP/67804` for 2025-26 cycle) routinely reviews SCORES disposal stats, ageing analysis, and ATR quality. See [Inspection Types deep dive](/broking-kyc/deep-dives/compliance-audit/inspection-types/).
 
@@ -336,8 +336,8 @@ SCORES requires PAN — so true anonymity isn't available. Whistleblower complai
 - [Deep Dive — System Audit](/broking-kyc/deep-dives/compliance-audit/system-audit/)
 - [Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/)
 - [Operations — Audit & Compliance](/broking-kyc/operations/audit-compliance/)
-- [Circulars — SEBI Other (OIAE / MRD / IMD / CFD)](/broking-kyc/reference/circulars/sebi-other/)
-- [Circulars — SEBI MIRSD](/broking-kyc/reference/circulars/sebi-mirsd/)
+- [Circulars — SEBI Other (OIAE / <abbr title="Market Regulation Department (SEBI)">MRD</abbr> / <abbr title="Investment Management Department (within SEBI)">IMD</abbr> / <abbr title="Corporate Finance Department (within SEBI)">CFD</abbr>)](/broking-kyc/reference/circulars/sebi-other/)
+- [Circulars — SEBI <abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>](/broking-kyc/reference/circulars/sebi-mirsd/)
 - [Circulars — NSE](/broking-kyc/reference/circulars/nse/)
 
 ## Verified through

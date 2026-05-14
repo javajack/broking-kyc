@@ -3,7 +3,7 @@ title: Cost Analysis
 description: What each onboarding costs in vendor API fees — per-transaction costs for every integration point and total cost-per-onboarding estimates.
 ---
 
-Every time a customer opens an account, the system makes calls to a dozen or more external APIs -- PAN (Permanent Account Number) verification, bank penny drop, KRA (KYC Registration Agency) lookup, e-Sign, and so on. Each call has a per-transaction cost. This page breaks down those costs so you can understand the economics of onboarding: what each integration costs, what the total per-customer cost looks like under different scenarios, and where there are opportunities to optimize.
+Every time a customer opens an account, the system makes calls to a dozen or more external APIs -- <abbr title="Permanent Account Number">PAN</abbr> (Permanent Account Number) verification, bank penny drop, <abbr title="KYC Registration Agency">KRA</abbr> (<abbr title="Know Your Customer (process).">KYC</abbr> Registration Agency) lookup, e-Sign, and so on. Each call has a per-transaction cost. This page breaks down those costs so you can understand the economics of onboarding: what each integration costs, what the total per-customer cost looks like under different scenarios, and where there are opportunities to optimize.
 
 You will refer back to this page during vendor selection discussions, budget planning, or when someone asks "why are we paying Rs.X per onboarding?"
 
@@ -16,13 +16,13 @@ The table below shows the recommended vendor for each integration point alongsid
 | PAN Verify | Decentro | Rs.1-3 | Sandbox.co.in | Rs.1-2 |
 | Bank Verify (Penny Drop) | Decentro | Rs.2-5 | Cashfree | Rs.2-4 |
 | KRA Lookup/Submit | Digio | Rs.3-5 | CVL Direct | Rs.2-3 |
-| CKYC (Central KYC) Search/Upload | Decentro | Rs.3-10 | TrackWizz | Rs.5-10 |
+| <abbr title="Central KYC (records registry)">CKYC</abbr> (Central KYC) Search/Upload | Decentro | Rs.3-10 | TrackWizz | Rs.5-10 |
 | e-Sign | Digio | Rs.15-25 | Protean | Rs.5.90 |
-| OCR (per doc) | HyperVerge | Rs.1-3 | IDfy | Rs.1-3 |
+| <abbr title="Optical Character Recognition.">OCR</abbr> (per doc) | HyperVerge | Rs.1-3 | IDfy | Rs.1-3 |
 | Face Match | HyperVerge | Rs.1-2 | IDfy | Rs.1-2 |
-| AML (Anti-Money Laundering) Screening | TrackWizz | Rs.5-15 | IDfy | Rs.8-20 |
+| <abbr title="Anti-Money Laundering">AML</abbr> (Anti-Money Laundering) Screening | TrackWizz | Rs.5-15 | IDfy | Rs.8-20 |
 | Video KYC (if needed) | HyperVerge | Rs.30-50 | Signzy | Contact |
-| Income Verify (AA, if F&O) | Setu AA | Rs.5-25 | Perfios ITR | Rs.15-50 |
+| Income Verify (<abbr title="Account Aggregator (RBI-licensed NBFC-AA)">AA</abbr>, if F&O) | Setu AA | Rs.5-25 | Perfios ITR | Rs.15-50 |
 | Device Intelligence (optional) | Bureau.id | Contact | — | — |
 
 In plain English: the most expensive single integration is Video KYC at Rs.30-50 per session, but it is only used when the DigiLocker path is not available. The largest cost across all onboardings is e-Sign at Rs.15-25 per transaction, since every customer goes through it.
@@ -36,7 +36,7 @@ In plain English: the most expensive single integration is Video KYC at Rs.30-50
 | **Setu consolidation** | **Rs.70-130** (unified PAN+bank+eSign pricing) |
 
 :::tip[Equity-only vs F&O onboarding]
-Customers who only want equity cash trading cost significantly less to onboard because they skip income verification and the additional VIPV (Video In-Person Verification) that some F&O (Futures and Options) workflows require. When projecting costs, segment your customer base by expected segment mix.
+Customers who only want equity cash trading cost significantly less to onboard because they skip income verification and the additional <abbr title="Video In-Person Verification (sometimes &quot;Video CIP&quot; / V-CIP)">VIPV</abbr> (Video In-Person Verification) that some F&O (Futures and Options) workflows require. When projecting costs, segment your customer base by expected segment mix.
 :::
 
 ## Cost Optimization Strategies

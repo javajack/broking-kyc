@@ -17,13 +17,13 @@ Sorted by `field_id`, then `destination`.
 
 | field_id | field_name | destination | destination_field_name | destination_format | frequency | transformation | quirks_notes | spec_source |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| AB-dnd_registered | DND Registered | back-office | dnd_flg | CHAR(1) | on-modify | [direct] | TRAI DND; promotional SMS suppressed if Y | [industry typical] |
+| AB-dnd_registered | DND Registered | back-office | dnd_flg | CHAR(1) | on-modify | [direct] | TRAI DND; promotional <abbr title="Short Message Service.">SMS</abbr> suppressed if Y | [industry typical] |
 | AB-dnd_registered | DND Registered | dlt-comms | DND_FLAG | CHAR(1) | on-event | lookup against R | checked against TRAI DND registry at send-time; transactional category bypasses DND, promotional respects it | [industry typical] |
 | AB-pref_contract_note_mode | Contract Note Mode | back-office | cn_mode_cd | VARCHAR(2) | on-modify | [direct] | EM/PH; PH triggers physical-dispatch workflow | [industry typical] |
-| AB-pref_contract_note_mode | Contract Note Delivery Mode | contract-notes | DeliveryMode | CHAR(2) | on-trade | [direct] | EM=Email mandatory; PH=Physical+Email; SMS/IM channel permitted as supplement | NSE/INSP/52604 |
-| AB-pref_contract_note_mode | Contract Note Mode | dlt-comms | CN_DELIVERY_MODE | CHAR(2) | on-event | [direct] | EM (email mandatory) drives daily contract-note email; PH adds physical dispatch | SEBI/HO/MIRSD/POD-1/P/CIR/2025/94 |
+| AB-pref_contract_note_mode | Contract Note Delivery Mode | contract-notes | DeliveryMode | CHAR(2) | on-trade | [direct] | EM=Email mandatory; PH=Physical+Email; SMS/IM channel permitted as supplement | <abbr title="National Stock Exchange of India">NSE</abbr>/INSP/52604 |
+| AB-pref_contract_note_mode | Contract Note Mode | dlt-comms | CN_DELIVERY_MODE | CHAR(2) | on-event | [direct] | EM (email mandatory) drives daily contract-note email; PH adds physical dispatch | <abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/POD-1/P/CIR/2025/94 |
 | AB-pref_email_notifications | Email Notifications Pref | back-office | email_notif_flg | CHAR(1) | on-modify | [direct] | cannot be N per SEBI Dec 2024 mandate; default Y | SEBI Dec 3, 2024 SMS/Email mandate |
-| AB-pref_email_notifications | Email Notification Preference | contract-notes | none | none | on-trade | [direct] | cannot be N per SEBI mandate; primary ECN channel | NSE/INSP/61999 |
+| AB-pref_email_notifications | Email Notification Preference | contract-notes | none | none | on-trade | [direct] | cannot be N per SEBI mandate; primary <abbr title="Electronic Contract Note.">ECN</abbr> channel | NSE/INSP/61999 |
 | AB-pref_email_notifications | Email Notifications Pref | dlt-comms | EMAIL_OPTIN_FLAG | CHAR(1) | on-event | [direct] | SEBI mandates contract notes via email; cannot be N for transactional | SEBI/HO/MIRSD/POD-1/P/CIR/2025/94 |
 | AB-pref_language | Language Preference | back-office | lang_pref_cd | VARCHAR(2) | on-modify | [direct] | EN/HI/etc; drives DLT-template language selection | [industry typical] |
 | AB-pref_language | Preferred Language | dlt-comms | LANG_CODE_VAR | CHAR(2) | on-event | [direct] | DLT template-ID differs per language; broker must register Hindi/regional templates separately | [industry typical] |

@@ -7,14 +7,14 @@ description: NSDL Beneficiary Owner (BO) account opening — DPM system, UDiFF f
 ## Table of Contents
 
 1. [Overview](#1-overview)
-2. [DPM (Depository Participant Module)](#2-dpm-depository-participant-module)
-3. [BO Account Opening](#3-bo-account-opening)
-4. [DDPI on NSDL](#4-ddpi-on-nsdl)
+2. [<abbr title="Depository Participant Module (CDSL terminology).">DPM</abbr> (Depository Participant Module)](#2-dpm-depository-participant-module)
+3. [<abbr title="Beneficial Owner">BO</abbr> Account Opening](#3-bo-account-opening)
+4. [<abbr title="Demat Debit and Pledge Instruction">DDPI</abbr> on <abbr title="National Securities Depository Limited">NSDL</abbr>](#4-ddpi-on-nsdl)
 5. [SPEED-e / IDeAS](#5-speed-e--ideas)
 6. [NSDL CAS (Consolidated Account Statement)](#6-nsdl-cas-consolidated-account-statement)
 7. [Non-Individual Entities](#7-non-individual-entities)
 8. [Nomination](#8-nomination)
-9. [Key Differences from CDSL (Comparison Table)](#9-key-differences-from-cdsl-comparison-table)
+9. [Key Differences from <abbr title="Central Depository Services (India) Limited">CDSL</abbr> (Comparison Table)](#9-key-differences-from-cdsl-comparison-table)
 10. [Modernization Status](#10-modernization-status)
 11. [Transaction Types](#11-transaction-types)
 12. [Charges](#12-charges)
@@ -33,12 +33,12 @@ description: NSDL Beneficiary Owner (BO) account opening — DPM system, UDiFF f
 | **Full Name** | National Securities Depository Limited |
 | **Established** | November 8, 1996 |
 | **Significance** | India's first depository; pioneered electronic securities holding in India |
-| **Promoters** | IDBI Bank, UTI, NSE (National Stock Exchange) |
-| **Regulator** | SEBI (Securities and Exchange Board of India) |
+| **Promoters** | IDBI Bank, UTI, <abbr title="National Stock Exchange of India">NSE</abbr> (National Stock Exchange) |
+| **Regulator** | <abbr title="Securities and Exchange Board of India">SEBI</abbr> (Securities and Exchange Board of India) |
 | **Governing Law** | Depositories Act, 1996; SEBI (Depositories and Participants) Regulations, 2018 |
 | **Website** | https://nsdl.co.in |
-| **Listed** | NSE/BSE (ticker: NSDL) |
-| **IPO Status** | Awaiting SEBI approval (as of Feb 2026) |
+| **Listed** | NSE/<abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> (ticker: NSDL) |
+| **<abbr title="Initial Public Offering">IPO</abbr> Status** | Awaiting SEBI approval (as of Feb 2026) |
 
 ### 1.2 NSDL vs CDSL: Market Position (As of Oct 2025)
 
@@ -62,7 +62,7 @@ NSDL is our Phase 2 depository integration for the following reasons:
 1. **CDSL dominates retail**: ~80% of new demat accounts open with CDSL. Our target market (retail onboarding) aligns with CDSL.
 2. **CDSL has better API maturity**: REST APIs, 1-2 hour account opening, online DDPI (24h activation).
 3. **NSDL is slower**: Legacy DPM system, historically ~15 working day account opening, offline DDPI at most DPs.
-4. **But NSDL is required for**: Clients with existing NSDL accounts, certain institutional clients, NRI clients with specific custodian preferences, and inter-depository transfers.
+4. **But NSDL is required for**: Clients with existing NSDL accounts, certain institutional clients, <abbr title="Non-Resident Indian">NRI</abbr> clients with specific custodian preferences, and inter-depository transfers.
 
 ---
 
@@ -70,7 +70,7 @@ NSDL is our Phase 2 depository integration for the following reasons:
 
 ### 2.1 System Architecture
 
-The DPM is NSDL's core system for DP operations. Unlike CDSL's centralized CDAS where DPs connect to a single server, NSDL's architecture has a local component at the DP level that syncs with NSDL's central CDS (Core Depository System).
+The DPM is NSDL's core system for <abbr title="Depository Participant">DP</abbr> operations. Unlike CDSL's centralized CDAS where DPs connect to a single server, NSDL's architecture has a local component at the DP level that syncs with NSDL's central CDS (Core Depository System).
 
 ```
                            ┌─────────────────────────┐
@@ -102,7 +102,7 @@ The DPM is NSDL's core system for DP operations. Unlike CDSL's centralized CDAS 
 | **eDPM** | Central electronic DPM - allows DPs to submit instructions online to CDS |
 | **Local DPM** | Installed at DP premises - account creation, modification, report downloads |
 | **Cloud DPM** | NSDL-hosted version of Local DPM - eliminates on-premise infrastructure |
-| **DPM Plus** | Enhanced limited-purpose back-office: single sign-on, billing, KRA integration, CML/SOH printing |
+| **DPM Plus** | Enhanced limited-purpose back-office: single sign-on, billing, <abbr title="KYC Registration Agency">KRA</abbr> integration, CML/SOH printing |
 | **Insta Interface** | Instant account opening system - API/technical integration for real-time BO creation |
 
 ### 2.2 GISMO (Local DPM Software)
@@ -208,7 +208,7 @@ Step 6: PAN flag enablement in DPM after verification
 | **DPM Plus Manual** | One-by-one entry via DPM Plus web interface | 3-7 working days |
 | **Legacy Full Cycle** | End-to-end including physical document verification | Up to 15 working days |
 
-> **NOTE**: The "~15 working days" timeline cited in older documentation reflects the legacy process including physical verification. With Insta Interface and digital KYC, timelines are significantly faster but still lag CDSL's 1-2 hour API-based opening.
+> **NOTE**: The "~15 working days" timeline cited in older documentation reflects the legacy process including physical verification. With Insta Interface and digital <abbr title="Know Your Customer (process).">KYC</abbr>, timelines are significantly faster but still lag CDSL's 1-2 hour API-based opening.
 
 ### 3.4 Client Maintenance API (NSDL Policy 2024-0012)
 
@@ -234,11 +234,11 @@ UDiFF is the SEBI-mandated standardized file format that replaced the older prop
 |--------|---------|
 | **Full Form** | Unified Distilled File Formats |
 | **Mandated By** | SEBI MDAC (Market Data Advisory Committee) |
-| **Effective Date** | EOD March 30, 2024 |
+| **Effective Date** | <abbr title="End Of Day">EOD</abbr> March 30, 2024 |
 | **Old Format Discontinued** | May 15, 2024 |
 | **Standard** | ISO-tagged fields with standardized data types and lengths |
 | **Coverage** | 23 standardized formats (reduced from 200+ disparate formats) |
-| **Applies To** | NSDL, CDSL, NSE, BSE, MCX, and all clearing corporations |
+| **Applies To** | NSDL, CDSL, NSE, BSE, <abbr title="Multi Commodity Exchange of India">MCX</abbr>, and all clearing corporations |
 
 ### 3.6 UDiFF Format Structure
 
@@ -282,7 +282,7 @@ Key characteristics of UDiFF:
 - **Self-describing**: Tags identify the data, unlike positional formats where position determines meaning
 - **Extensible**: New fields can be added without breaking existing parsers
 - **Standardized data types**: Dates, amounts, codes follow ISO standards
-- **Cross-MII**: Same format used across NSDL, CDSL, exchanges, clearing corporations
+- **Cross-<abbr title="Market Infrastructure Institution">MII</abbr>**: Same format used across NSDL, CDSL, exchanges, clearing corporations
 
 ### 3.7 UDiFF vs CDSL Fixed-Length (Developer Comparison)
 
@@ -381,7 +381,7 @@ SPEED-e is NSDL's electronic delivery instruction system, analogous to CDSL's eD
 |--------|---------|
 | **Purpose** | Online submission of delivery instructions (eliminates physical DIS) |
 | **Portal** | https://eservices.nsdl.com |
-| **Authorization** | IPIN (Internet Personal Identification Number) + OTP |
+| **Authorization** | IPIN (Internet Personal Identification Number) + <abbr title="One-Time Password">OTP</abbr> |
 | **IPIN** | Password-based; set by BO during SPEED-e registration |
 | **OTP** | Sent to registered mobile + email |
 | **Registration** | Online via eservices.nsdl.com; authorized by DP |
@@ -414,12 +414,12 @@ Status: SPEED-e Active - BO can submit instructions online
 | Aspect | CDSL eDIS | NSDL SPEED-e |
 |--------|-----------|--------------|
 | **Authorization Method** | TPIN (6-digit, CDSL-generated) + OTP | IPIN (password, BO-set) + OTP |
-| **TPIN/IPIN Source** | CDSL generates, sends to BO via SMS | BO creates own IPIN during registration |
+| **TPIN/IPIN Source** | CDSL generates, sends to BO via <abbr title="Short Message Service.">SMS</abbr> | BO creates own IPIN during registration |
 | **DP Involvement** | DP cannot see TPIN | DP authorizes SPEED-e registration |
 | **Lock Policy** | 3 wrong TPIN entries = invalidated | Password reset available online |
 | **Bulk Authorization** | Supported (bulk flag in TransDtls) | Supported |
 | **API Integration** | eDIS VerifyDIS API (POST to edis.cdslindia.com) | SPEED-e facility via NSDL eservices |
-| **Pre-trade Auth** | Yes (SEBI-mandated before T+1 settlement) | Yes |
+| **Pre-trade Auth** | Yes (SEBI-mandated before <abbr title="Trade-date Plus N settlement">T+1</abbr> settlement) | Yes |
 | **Revocation** | eDIS Revocation API | Via SPEED-e portal |
 
 ### 5.4 IDeAS (Internet-based Demat Account Statement)
@@ -480,7 +480,7 @@ CDSL and NSDL, in collaboration with SEBI, launched the Unified Investor App (UI
 
 | Section | Details |
 |---------|---------|
-| **Account Summary** | BO ID, name, PAN, DP name, account status |
+| **Account Summary** | BO ID, name, <abbr title="Permanent Account Number">PAN</abbr>, DP name, account status |
 | **Equity Holdings** | ISIN, company name, quantity, face value |
 | **Mutual Fund Holdings** | Scheme name, folio, units, NAV (if held in demat) |
 | **Transaction Summary** | Debits, credits, pledges during the period |
@@ -505,10 +505,10 @@ The entity types are the same as CDSL (SEBI mandates uniform categories), but NS
 |-------------|----------------|-------------------------|
 | **Individual (Resident)** | Insta Interface (single holding) or DPM file | CDSL: API for single + joint |
 | **Joint Holding** | DPM file upload only (Insta Interface does NOT support joint as of 2024) | CDSL: API supports joint |
-| **HUF** | DPM file upload | Same entity requirements, different file format |
+| **<abbr title="Hindu Undivided Family">HUF</abbr>** | DPM file upload | Same entity requirements, different file format |
 | **Body Corporate** | DPM file upload; Board resolution + CIN required | Same requirements, UDiFF format |
 | **Trust** | DPM file upload; Trust deed + trustee list | Same requirements |
-| **Partnership / LLP** | DPM file upload; Partnership deed + LLP agreement | Same requirements |
+| **Partnership / <abbr title="—">LLP</abbr>** | DPM file upload; Partnership deed + LLP agreement | Same requirements |
 | **FPI** | Through Designated DP (DDP); NSDL has strong institutional presence | NSDL preferred by many FPIs historically |
 
 ### 7.2 NRI Accounts
@@ -517,14 +517,14 @@ NRI demat account types are identical across both depositories (SEBI-mandated):
 
 | Account Type | NSDL Sub-Status | Repatriation | Bank Account |
 |-------------|-----------------|--------------|--------------|
-| **NRE** (Non-Resident External) | NRI Repatriable | Fully repatriable | NRE savings/current |
-| **NRO** (Non-Resident Ordinary) | NRI Non-Repatriable | Capped at USD 1M/year | NRO savings/current |
+| **<abbr title="Non-Resident External (Rupee) account">NRE</abbr>** (Non-Resident External) | NRI Repatriable | Fully repatriable | NRE savings/current |
+| **<abbr title="Non-Resident Ordinary (Rupee) account">NRO</abbr>** (Non-Resident Ordinary) | NRI Non-Repatriable | Capped at USD 1M/year | NRO savings/current |
 | **SNRE** (Special NRE) | Specific sub-status | Fully repatriable | SNRE account |
 | **SNRO** (Special NRO) | Specific sub-status | Capped | SNRO account |
 
 NRI processing notes for NSDL:
-- PIS (Portfolio Investment Scheme) approval required from AD bank, same as CDSL
-- FEMA compliance identical
+- <abbr title="Portfolio Investment Scheme (RBI / NRI)">PIS</abbr> (Portfolio Investment Scheme) approval required from AD bank, same as CDSL
+- <abbr title="Foreign Exchange Management Act 1999">FEMA</abbr> compliance identical
 - NSDL historically preferred by some NRI custodian banks (HDFC Bank, ICICI Bank)
 - Processing time for NRI accounts may be longer on NSDL due to offline DDPI
 
@@ -534,7 +534,7 @@ NRI processing notes for NSDL:
 |-------------|------|------|
 | **CIN** | 21-character Corporate Identification Number | Same |
 | **Board Resolution** | Required, uploaded via DPM | Required, uploaded via CDAS |
-| **Authorized Signatories** | DSC mapping in DPM | DSC mapping in CDAS |
+| **Authorized Signatories** | <abbr title="Digital Signature Certificate (CCA-licensed; aka Class 2/3 DSC).">DSC</abbr> mapping in DPM | DSC mapping in CDAS |
 | **Document Format** | UDiFF tagged format | Fixed-length positional |
 | **Processing** | Via DPM file upload | Via BO Setup API or file upload |
 
@@ -552,7 +552,7 @@ The nomination rules are identical for NSDL and CDSL, as they are SEBI-mandated:
 | **Mandatory** | Nomination or opt-out required for all accounts |
 | **Non-Compliance** | Demat account frozen for debits |
 | **Eligible Nominees** | Individuals / natural persons only |
-| **Opt-Out** | Requires video verification (VIPV) |
+| **Opt-Out** | Requires video verification (<abbr title="Video In-Person Verification (sometimes &quot;Video CIP&quot; / V-CIP)">VIPV</abbr>) |
 | **Distribution** | If percentages not specified, equal distribution |
 | **Transmission** | Simplified (no affidavit/indemnity needed since Jan 2025) |
 
@@ -609,7 +609,7 @@ The nomination rules are identical for NSDL and CDSL, as they are SEBI-mandated:
 | **Joint Account API** | Supported | Not supported via Insta Interface (DPM file only) |
 | **Transaction Charge** | Rs. 3.50/debit instruction | Rs. 4.00/debit instruction |
 | **Female Discount** | Rs. 0.25 discount | Yuva Plan (youth) has free debits |
-| **DSC Provider** | RA of TCS | RA of TCS (same) |
+| **DSC Provider** | <abbr title="Research Analyst">RA</abbr> of TCS | RA of TCS (same) |
 
 ### 9.2 Developer Impact Summary
 
@@ -728,7 +728,7 @@ NSDL does not charge investors directly. It charges DPs, who set their own clien
 | Service | NSDL Charge to DP | Comparable CDSL Charge |
 |---------|-------------------|----------------------|
 | **Transaction (Debit)** | Rs. 4.00 per debit instruction | Rs. 3.50 per debit instruction |
-| **AMC (DP to NSDL)** | Rs. 500/year per DP | Rs. 500/year (corporate accounts) |
+| **<abbr title="Asset Management Company (mutual funds context) / Annual Maintenance Charges (depository context).">AMC</abbr> (DP to NSDL)** | Rs. 500/year per DP | Rs. 500/year (corporate accounts) |
 | **Account Opening** | No separate charge from NSDL | No separate charge from CDSL |
 | **Custody Fee** | Based on value of securities held | Based on value of securities held |
 
@@ -774,11 +774,11 @@ NSDL does not charge investors directly. It charges DPs, who set their own clien
 
 | Circular | Date | Impact |
 |----------|------|--------|
-| SEBI Master Circular for Depositories | Dec 3, 2024 | [SEBI/HO/MRD/MRD-PoD-1/P/CIR/2024/168](/broking-kyc/reference/circulars/sebi-other/#sebihomrdmrd-pod-1pcir2024168) - consolidated guidelines |
+| SEBI Master Circular for Depositories | Dec 3, 2024 | [SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>/MRD-PoD-1/P/CIR/2024/168](/broking-kyc/reference/circulars/sebi-other/#sebihomrdmrd-pod-1pcir2024168) - consolidated guidelines |
 | SEBI Nomination Rules | Jan 10, 2025 | Up to 10 nominees; simplified transmission |
 | SEBI Online Closure | Jul 14, 2025 | Mandatory online closure for DPs with online services |
-| SEBI BSDA Revised Criteria | Jun 28, 2024 | SEBI/HO/MIRSD/MIRSDPoD1/P/CIR/2024/91 |
-| SEBI DDPI | Oct 6, 2022 | DDPI replaces POA (uniform across both depositories) |
+| SEBI BSDA Revised Criteria | Jun 28, 2024 | SEBI/HO/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSDPoD1/P/CIR/2024/91 |
+| SEBI DDPI | Oct 6, 2022 | DDPI replaces <abbr title="Power of Attorney">POA</abbr> (uniform across both depositories) |
 
 ---
 

@@ -3,7 +3,7 @@ title: Minor & Joint Accounts
 description: KYC requirements for minor accounts (with guardian) and joint demat accounts — additional fields, validation rules, and vendor handling.
 ---
 
-Minor accounts (for customers under 18) and joint demat accounts are special account types that add layers of complexity to the standard individual onboarding flow. A minor account requires a guardian with their own completed KYC. A joint account requires full KYC for up to three holders, each of whom must independently sign the application. This page documents the requirements for both account types and how each vendor integration handles them.
+Minor accounts (for customers under 18) and joint demat accounts are special account types that add layers of complexity to the standard individual onboarding flow. A minor account requires a guardian with their own completed <abbr title="Know Your Customer (process).">KYC</abbr>. A joint account requires full KYC for up to three holders, each of whom must independently sign the application. This page documents the requirements for both account types and how each vendor integration handles them.
 
 :::note
 Minor and joint accounts are planned for a future phase. This page documents the requirements identified across vendor specs.
@@ -12,7 +12,7 @@ Minor and joint accounts are planned for a future phase. This page documents the
 ## Minor Accounts
 
 ### Requirements
-- Guardian PAN (Permanent Account Number) and KYC mandatory
+- Guardian <abbr title="Permanent Account Number">PAN</abbr> (Permanent Account Number) and KYC mandatory
 - Guardian must be natural guardian (parent) or court-appointed
 - Minor's PAN required (4th char = P)
 - Minor's DOB (Date of Birth) must confirm age < 18
@@ -22,13 +22,13 @@ Minor and joint accounts are planned for a future phase. This page documents the
 
 Each external system has its own mechanism for representing the guardian-minor relationship.
 
-- **CDSL**: Guardian details in Line 01, minor flag set. Disability flag if applicable.
-- **NSDL**: Guardian details in UDiFF (Unified Document Interchange Flat File) record. Mandatory guardian KYC.
-- **KRA**: Minor category with guardian sub-record
-- **Exchange UCC (Unique Client Code)**: Minor client type with guardian PAN
+- **<abbr title="Central Depository Services (India) Limited">CDSL</abbr>**: Guardian details in Line 01, minor flag set. Disability flag if applicable.
+- **<abbr title="National Securities Depository Limited">NSDL</abbr>**: Guardian details in UDiFF (Unified Document Interchange Flat File) record. Mandatory guardian KYC.
+- **<abbr title="KYC Registration Agency">KRA</abbr>**: Minor category with guardian sub-record
+- **Exchange <abbr title="Unique Client Code">UCC</abbr> (Unique Client Code)**: Minor client type with guardian PAN
 
 :::caution
-When a minor turns 18, the account must be converted to a regular individual account through a re-KYC process. This is not automatic -- the system should trigger a notification 30 days before the `date_of_majority` field (W12) to give the ops team time to initiate the conversion. If the conversion is not completed, the account must be frozen per SEBI (Securities and Exchange Board of India) guidelines.
+When a minor turns 18, the account must be converted to a regular individual account through a re-KYC process. This is not automatic -- the system should trigger a notification 30 days before the `date_of_majority` field (W12) to give the ops team time to initiate the conversion. If the conversion is not completed, the account must be frozen per <abbr title="Securities and Exchange Board of India">SEBI</abbr> (Securities and Exchange Board of India) guidelines.
 :::
 
 ## Joint Accounts (Demat Only)

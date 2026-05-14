@@ -5,15 +5,15 @@ description: Per-modification-type walkthroughs — address, bank account, nomin
 
 import { Aside } from '@astrojs/starlight/components';
 
-> **Why this page is structured this way:** Modifications all share a core ordering rule (KRA first, then CKYC, then exchange UCC, then depository BO — sequential, not parallel) but differ substantively in proof requirements and propagation specifics per modification type. The page is structured as one shared "ordering rule" section followed by per-modification-type sub-sections.
+> **Why this page is structured this way:** Modifications all share a core ordering rule (<abbr title="KYC Registration Agency">KRA</abbr> first, then <abbr title="Central KYC (records registry)">CKYC</abbr>, then exchange <abbr title="Unique Client Code">UCC</abbr>, then depository <abbr title="Beneficial Owner">BO</abbr> — sequential, not parallel) but differ substantively in proof requirements and propagation specifics per modification type. The page is structured as one shared "ordering rule" section followed by per-modification-type sub-sections.
 
 ## TL;DR
 
 - **Ordering rule** (the headline gotcha): modifications propagate **KRA → CKYC → UCC → BO**, sequentially. Firing them concurrently triggers rejection cascades because downstream systems validate against KRA's *new* state.
 - 7 modification types covered: address, bank, nominee, segment, mobile, email, name/DOB.
 - Typical timeline per modification: **1–3 business days** for the full propagation chain to settle.
-- Some modifications have special-case sub-flows (name/DOB requires BSE Unfreeze + Protean re-check; bank requires penny-drop; nominee uses the SEBI Jan 2025 10-nominee revamp).
-- All modifications are an `on-modify` event in the [Integration DAG](/broking-kyc/operations/integration-dag/lifecycle-events/) — there is no batch-style modification path.
+- Some modifications have special-case sub-flows (name/DOB requires <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> Unfreeze + Protean re-check; bank requires penny-drop; nominee uses the <abbr title="Securities and Exchange Board of India">SEBI</abbr> Jan 2025 10-nominee revamp).
+- All modifications are an `on-modify` event in the [Integration <abbr title="Directed Acyclic Graph.">DAG</abbr>](/broking-kyc/operations/integration-dag/lifecycle-events/) — there is no batch-style modification path.
 
 ## Conceptual overview
 
@@ -34,7 +34,7 @@ Each arrow is **wait-for-completion**, not fire-and-forget. The broker's orchest
 | `kra_pending` | KRA ack received | `ckyc_pending` |
 | `ckyc_pending` | CKYC ack received | `ucc_pending` |
 | `ucc_pending` | All elected exchanges ack | `bo_pending` |
-| `bo_pending` | CDSL / NSDL ack received | `complete` |
+| `bo_pending` | <abbr title="Central Depository Services (India) Limited">CDSL</abbr> / <abbr title="National Securities Depository Limited">NSDL</abbr> ack received | `complete` |
 | `complete` | Client notified | end |
 
 <Aside type="caution">
@@ -47,19 +47,19 @@ Each arrow is **wait-for-completion**, not fire-and-forget. The broker's orchest
 
 **Trigger.** Client request, proof being one of: Aadhaar (preferred via DigiLocker re-fetch), utility bill &lt; 3 months old, passport, recent bank statement.
 
-**Proof validation.** Verify proof document authenticity, name match against client master, address text extraction (OCR or DigiLocker structured).
+**Proof validation.** Verify proof document authenticity, name match against client master, address text extraction (<abbr title="Optical Character Recognition.">OCR</abbr> or DigiLocker structured).
 
 **Propagation.** Standard KRA → CKYC → UCC → BO chain. Depository updates the address used for physical communications (rare but exists).
 
 **Sub-case — partial address.** Only the correspondence address changes (permanent stays). Most brokers maintain both; the modification updates just the correspondence record.
 
-**Sub-case — NRI address.** Foreign address requires additional fields (country, ISO code); affects FATCA tax residency screening — sometimes the address change is actually a hidden NRI conversion. See [NRI Conversion](./nri-conversion/) for that path.
+**Sub-case — <abbr title="Non-Resident Indian">NRI</abbr> address.** Foreign address requires additional fields (country, ISO code); affects <abbr title="Foreign Account Tax Compliance Act (US)">FATCA</abbr> tax residency screening — sometimes the address change is actually a hidden NRI conversion. See [NRI Conversion](./nri-conversion/) for that path.
 
 ### Bank account change
 
-**Trigger.** Client request with new bank account number + IFSC.
+**Trigger.** Client request with new bank account number + <abbr title="Indian Financial System Code.">IFSC</abbr>.
 
-**Proof validation.** **Penny drop verification** — Re.1 IMPS credit to the new account, name-match score against client master. If name match >= 90%, auto-accept; 70–90% manual review; &lt;70% reject.
+**Proof validation.** **Penny drop verification** — Re.1 <abbr title="Immediate Payment Service">IMPS</abbr> credit to the new account, name-match score against client master. If name match >= 90%, auto-accept; 70–90% manual review; &lt;70% reject.
 
 **Propagation.**
 - KRA + CKYC updated with new bank linkage.
@@ -81,7 +81,7 @@ Each arrow is **wait-for-completion**, not fire-and-forget. The broker's orchest
 - Opt-out (no nominee) requires a **video declaration** within 30 days.
 - Minor nominees require guardian details.
 
-**Proof validation.** Client identity re-verification via eSign. Nominee details captured but nominee KYC not required until transmission event.
+**Proof validation.** Client identity re-verification via eSign. Nominee details captured but nominee <abbr title="Know Your Customer (process).">KYC</abbr> not required until transmission event.
 
 **Propagation.** Nominee data is held by the **depository** (CDSL / NSDL) primarily, with copy in broker master. KRA / CKYC don't store nominee data. Exchange UCC has a nominee flag but not the nominee details.
 
@@ -97,13 +97,13 @@ KRA / CKYC / UCC don't receive the change.
 **Trigger.** Client toggles a segment (F&O / CD / COM / debt).
 
 **Proof validation.**
-- **Adding F&O or COM** requires income proof (via AA fetch, ITR upload, or HRMS payroll). Standard onboarding income-verification path.
+- **Adding F&O or COM** requires income proof (via <abbr title="Account Aggregator (RBI-licensed NBFC-AA)">AA</abbr> fetch, ITR upload, or HRMS payroll). Standard onboarding income-verification path.
 - **Adding CD or debt** is generally lighter — declaration only.
 - **Dropping any segment** requires confirmation of no open positions in that segment.
 
 **Propagation.** Exchange UCC update (segment activation flag) is the primary touchpoint. KRA / CKYC also updated with declared income or segment-elections list. BO at depository doesn't need segment data.
 
-**Sub-case — MCX segment add.** MCX requires income proof for ALL commodity-segment clients (not just F&O). The income proof requirement applies regardless of declared income level on MCX.
+**Sub-case — <abbr title="Multi Commodity Exchange of India">MCX</abbr> segment add.** MCX requires income proof for ALL commodity-segment clients (not just F&O). The income proof requirement applies regardless of declared income level on MCX.
 
 **Sub-case — segment auto-disable from dormancy.** When a dormant account reactivates, segments are re-activated as a modification — but the income-proof requirement (for F&O/COM) re-applies per current rules, even if the client had F&O active before dormancy.
 
@@ -111,7 +111,7 @@ KRA / CKYC / UCC don't receive the change.
 
 **Trigger.** Client request.
 
-**Proof validation.** OTP re-verification — OTP sent to the **new** mobile / email, confirmed by the client. Some brokers also send a confirmation notice to the **old** mobile / email as an anti-fraud step.
+**Proof validation.** <abbr title="One-Time Password">OTP</abbr> re-verification — OTP sent to the **new** mobile / email, confirmed by the client. Some brokers also send a confirmation notice to the **old** mobile / email as an anti-fraud step.
 
 **Propagation.** Standard KRA → CKYC → UCC → BO chain. DLT comms templates also need updating with the new contact details for subsequent messaging.
 
@@ -128,8 +128,8 @@ KRA / CKYC / UCC don't receive the change.
 **Propagation.** This is the most complex modification path:
 
 - KRA + CKYC updated with new name / DOB.
-- **BSE specifically uses the "Unfreeze" process** — the existing UCC is frozen, the new identity is validated through Protean (PAN + Aadhaar + new DOB / new name 3-parameter check), and the UCC is re-opened in the new identity.
-- NSE / MCX have parallel modification flows that don't use "Unfreeze" terminology but require similar 3-parameter re-validation.
+- **BSE specifically uses the "Unfreeze" process** — the existing UCC is frozen, the new identity is validated through Protean (<abbr title="Permanent Account Number">PAN</abbr> + Aadhaar + new DOB / new name 3-parameter check), and the UCC is re-opened in the new identity.
+- <abbr title="National Stock Exchange of India">NSE</abbr> / MCX have parallel modification flows that don't use "Unfreeze" terminology but require similar 3-parameter re-validation.
 - Depository BO updated.
 
 **Sub-case — PAN-Aadhaar link state changes.** If a name change reflects a real Aadhaar update (e.g., post-marriage), the PAN-Aadhaar link status at NSDL may need to refresh. Typical lag 5–7 days.
@@ -163,7 +163,7 @@ Modifications touch fields across master-dataset sections A (Identity), B (Addre
 - [Compliance Blueprint — KYC lifecycle domain](/broking-kyc/operations/compliance-blueprint/)
 - [Integration DAG — modification path](/broking-kyc/operations/integration-dag/lifecycle-events/)
 - [Field Atlas](/broking-kyc/reference/field-atlas/)
-- [Circulars — SEBI MIRSD](/broking-kyc/reference/circulars/sebi-mirsd/) (KYC master + Jan 2025 nominee revamp)
+- [Circulars — SEBI <abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>](/broking-kyc/reference/circulars/sebi-mirsd/) (KYC master + Jan 2025 nominee revamp)
 - [Circulars — BSE](/broking-kyc/reference/circulars/bse/) (Unfreeze)
 - [Circulars — CDSL](/broking-kyc/reference/circulars/cdsl/) and [NSDL](/broking-kyc/reference/circulars/nsdl/)
 

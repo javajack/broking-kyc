@@ -19,45 +19,45 @@ These are official government and regulatory portals whose publicly available ci
 
 | Circular / Regulation | Reference Number | Official Link |
 |---|---|---|
-| KYC Master Circular | SEBI/HO/MIRSD/MIRSD-SEC-2/P/CIR/2023/168 (Oct 2023) | [sebi.gov.in](https://www.sebi.gov.in/legal/master-circulars/oct-2023/master-circular-on-know-your-client-kyc-norms-for-the-securities-market_77945.html) |
+| <abbr title="Know Your Customer (process).">KYC</abbr> Master Circular | <abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-SEC-2/P/CIR/2023/168 (Oct 2023) | [sebi.gov.in](https://www.sebi.gov.in/legal/master-circulars/oct-2023/master-circular-on-know-your-client-kyc-norms-for-the-securities-market_77945.html) |
 | KYC Process & Technology | [SEBI/HO/MIRSD/DOP/CIR/P/2020/73](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddopcirp202073) (Apr 2020) | [sebi.gov.in](https://www.sebi.gov.in/media/press-releases/apr-2020/sebi-eases-the-know-your-client-kyc-process-by-enabling-online-kyc-use-of-technology-app-by-the-registered-intermediary_46612.html) |
-| KYC Simplification at KRAs | [SEBI/HO/MIRSD/FATF/P/CIR/2023/0144](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdfatfpcir20230144) (Aug 2023) | [sebi.gov.in](https://www.sebi.gov.in/legal/circulars/aug-2023/simplification-of-kyc-process-and-rationalisation-of-risk-management-framework-at-kras_75250.html) |
-| PAN-Aadhaar Linking Relaxation | [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/41](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202441) (May 2024) | — |
-| KRA Upload to CKYC | [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/79](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202479) (Jun 2024) | [sebi.gov.in](https://www.sebi.gov.in/legal/circulars/jun-2024/uploading-of-kyc-information-by-kyc-registration-agencies-kras-to-central-kyc-records-registry-ckycrr-_84006.html) |
-| FATCA/CRS Centralization at KRAs | [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202412) (Feb 2024) | [sebi.gov.in](https://www.sebi.gov.in/legal/circulars/feb-2024/centralization-of-certifications-under-foreign-account-tax-compliance-act-fatca-and-common-reporting-standard-crs-at-kyc-registration-agencies-kras-_81583.html) |
-| AML/CFT Guidelines | [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202478) (Jun 2024) | — |
+| KYC Simplification at KRAs | [SEBI/HO/MIRSD/<abbr title="Financial Action Task Force">FATF</abbr>/P/CIR/2023/0144](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdfatfpcir20230144) (Aug 2023) | [sebi.gov.in](https://www.sebi.gov.in/legal/circulars/aug-2023/simplification-of-kyc-process-and-rationalisation-of-risk-management-framework-at-kras_75250.html) |
+| <abbr title="Permanent Account Number">PAN</abbr>-Aadhaar Linking Relaxation | [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/41](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202441) (May 2024) | — |
+| <abbr title="KYC Registration Agency">KRA</abbr> Upload to <abbr title="Central KYC (records registry)">CKYC</abbr> | [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/79](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202479) (Jun 2024) | [sebi.gov.in](https://www.sebi.gov.in/legal/circulars/jun-2024/uploading-of-kyc-information-by-kyc-registration-agencies-kras-to-central-kyc-records-registry-ckycrr-_84006.html) |
+| <abbr title="Foreign Account Tax Compliance Act (US)">FATCA</abbr>/<abbr title="Common Reporting Standard">CRS</abbr> Centralization at KRAs | [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202412) (Feb 2024) | [sebi.gov.in](https://www.sebi.gov.in/legal/circulars/feb-2024/centralization-of-certifications-under-foreign-account-tax-compliance-act-fatca-and-common-reporting-standard-crs-at-kyc-registration-agencies-kras-_81583.html) |
+| <abbr title="Anti-Money Laundering">AML</abbr>/<abbr title="Combating the Financing of Terrorism">CFT</abbr> Guidelines | [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202478) (Jun 2024) | — |
 | Stock Brokers Master Circular | SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90 (Jun 2025) | — |
-| Stock Brokers Regulations 2026 | [SEBI/LAD-NRO/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebilad-nrogn2026291) (Jan 7, 2026) | [sebi.gov.in](https://www.sebi.gov.in/legal/regulations/jan-2026/securities-and-exchange-board-of-india-stock-brokers-regulations-2026_98974.html) |
-| DDPI Circular | [SEBI/HO/MIRSD/DoP/P/CIR/2022/44](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddoppcir202244) (Apr 2022) | — |
+| Stock Brokers Regulations 2026 | [SEBI/<abbr title="Legal Affairs Department — Northern Regional Office (SEBI)">LAD-NRO</abbr>/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebilad-nrogn2026291) (Jan 7, 2026) | [sebi.gov.in](https://www.sebi.gov.in/legal/regulations/jan-2026/securities-and-exchange-board-of-india-stock-brokers-regulations-2026_98974.html) |
+| <abbr title="Demat Debit and Pledge Instruction">DDPI</abbr> Circular | [SEBI/HO/MIRSD/DoP/P/CIR/2022/44](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddoppcir202244) (Apr 2022) | — |
 | Nomination Revamp | SEBI circular (Jan 10, 2025) | [sebi.gov.in](https://www.sebi.gov.in/legal/circulars/jan-2025/circular-on-revise-and-revamp-nomination-facilities-in-the-indian-securities-market_90698.html) |
 | Nomination Amendments | SEBI circular (Feb 28, 2025) | [sebi.gov.in](https://www.sebi.gov.in/legal/circulars/feb-2025/amendments-and-clarifications-to-circular-dated-january-10-2025-on-revise-and-revamp-nomination-facilities-in-the-indian-securities-market_92377.html) |
-| DigiLocker for Holdings | [SEBI/HO/OIAE/OIAE_IAD-3/P/CIR/2025/32](/broking-kyc/reference/circulars/sebi-other/) (Mar 2025) | [sebi.gov.in](https://www.sebi.gov.in/legal/circulars/mar-2025/harnessing-digilocker-as-a-digital-public-infrastructure-for-reducing-unclaimed-assets-in-the-indian-securities-market_92769.html) |
-| UPI Block Mechanism (Consultation) | SEBI consultation paper (Aug 2024) | [sebi.gov.in](https://www.sebi.gov.in/reports-and-statistics/reports/aug-2024/consultation-paper-on-the-facility-for-trading-in-the-secondary-market-using-upi-block-mechanism-to-be-mandatorily-offered-by-qualified-stock-brokers-qsbs-to-their-clients-asba-like-facility-for-_86226.html) |
-| T+0 Settlement | [SEBI/HO/MRD/MRD-PoD-3/P/CIR/2024/20](/broking-kyc/reference/circulars/sebi-other/#sebihomrdmrd-pod-3pcir202420) (Mar 2024) | [sebi.gov.in](https://www.sebi.gov.in/legal/circulars/mar-2024/introduction-of-beta-version-of-t-0-rolling-settlement-cycle-on-optional-basis-in-addition-to-the-existing-t-1-settlement-cycle-in-equity-cash-markets_82455.html) |
+| DigiLocker for Holdings | [SEBI/HO/<abbr title="Office of Investor Assistance and Education (SEBI)">OIAE</abbr>/OIAE_IAD-3/P/CIR/2025/32](/broking-kyc/reference/circulars/sebi-other/) (Mar 2025) | [sebi.gov.in](https://www.sebi.gov.in/legal/circulars/mar-2025/harnessing-digilocker-as-a-digital-public-infrastructure-for-reducing-unclaimed-assets-in-the-indian-securities-market_92769.html) |
+| <abbr title="Unified Payments Interface">UPI</abbr> Block Mechanism (Consultation) | SEBI consultation paper (Aug 2024) | [sebi.gov.in](https://www.sebi.gov.in/reports-and-statistics/reports/aug-2024/consultation-paper-on-the-facility-for-trading-in-the-secondary-market-using-upi-block-mechanism-to-be-mandatorily-offered-by-qualified-stock-brokers-qsbs-to-their-clients-asba-like-facility-for-_86226.html) |
+| <abbr title="Trade-date Plus N settlement">T+0</abbr> Settlement | [SEBI/HO/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>/MRD-PoD-3/P/CIR/2024/20](/broking-kyc/reference/circulars/sebi-other/#sebihomrdmrd-pod-3pcir202420) (Mar 2024) | [sebi.gov.in](https://www.sebi.gov.in/legal/circulars/mar-2024/introduction-of-beta-version-of-t-0-rolling-settlement-cycle-on-optional-basis-in-addition-to-the-existing-t-1-settlement-cycle-in-equity-cash-markets_82455.html) |
 | T+0 Expansion | SEBI circular (Dec 2024) | [sebi.gov.in](https://www.sebi.gov.in/legal/circulars/dec-2024/enhancement-in-the-scope-of-optional-t-0-rolling-settlement-cycle-in-addition-to-the-existing-t-1-settlement-cycle-in-equity-cash-markets_89443.html) |
 | Client Fund Upstreaming | SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/84 (Jun 2023) | — |
-| AA for Depositories | SEBI/HO/MRD/DCAP/P/CIR/2022/110 (Aug 2022) | — |
-| ODR Master Circular | SEBI ODR Master Circular (Dec 2023) | [sebi.gov.in](https://www.sebi.gov.in/legal/master-circulars/dec-2023/master-circular-for-online-resolution-of-disputes-in-the-indian-securities-market_80236.html) |
-| UCC-Demat Mapping | SEBI/HO/MIRSD/DOP/CIR/P/2019/136 (Nov 2019) | — |
+| <abbr title="Account Aggregator (RBI-licensed NBFC-AA)">AA</abbr> for Depositories | SEBI/HO/MRD/DCAP/P/CIR/2022/110 (Aug 2022) | — |
+| <abbr title="Online Dispute Resolution">ODR</abbr> Master Circular | SEBI ODR Master Circular (Dec 2023) | [sebi.gov.in](https://www.sebi.gov.in/legal/master-circulars/dec-2023/master-circular-for-online-resolution-of-disputes-in-the-indian-securities-market_80236.html) |
+| <abbr title="Unique Client Code">UCC</abbr>-Demat Mapping | SEBI/HO/MIRSD/DOP/CIR/P/2019/136 (Nov 2019) | — |
 | KYC Onboarding Consultation Paper | SEBI consultation (Jan 16, 2026) | [sebi.gov.in](https://www.sebi.gov.in/reports-and-statistics/reports/jan-2026/consultation-paper-for-simplification-of-client-on-boarding-and-rationalisation-of-risk-management-framework-at-kyc-registration-agencies_99103.html) |
 | KYC FAQs | SEBI FAQ on KYC Norms (May 2024) | [sebi.gov.in](https://www.sebi.gov.in/sebi_data/faqfiles/may-2024/1715694256793.pdf) |
 
 ### RBI (Reserve Bank of India)
 
-- [RBI Master Directions](https://rbi.org.in/scripts/bs_viewmasterdirections.aspx) — All master directions
+- [<abbr title="Reserve Bank of India">RBI</abbr> Master Directions](https://rbi.org.in/scripts/bs_viewmasterdirections.aspx) — All master directions
 - [Account Aggregator Master Direction](https://www.rbi.org.in/Scripts/BS_ViewMasDirections.aspx?id=10598) — RBI/DNBR/2016-17/46 (Sep 2016, updated Sep 2024)
 - RBI/2023-2024/88 (Dec 2023) — UPI AutoPay limit increase to Rs 1 lakh for MCC 6211
 - RBI e-mandate framework — Recurring payment regulations
 
 ### NPCI (National Payments Corporation of India)
 
-- [NPCI UPI Circulars](https://www.npci.org.in/what-we-do/upi/circular) — All UPI operating circulars
+- [<abbr title="National Payments Corporation of India">NPCI</abbr> UPI Circulars](https://www.npci.org.in/what-we-do/upi/circular) — All UPI operating circulars
 - [UPI AutoPay Enhancement (OC-151A)](https://www.npci.org.in/PDF/npci/upi/circular/2023/UPI-OC-151A-Enhancement-of-Limits-for-UPI-AutoPay.pdf) — Rs 1 lakh limit for securities brokers
 - [e-KYC Setu System](https://www.npci.org.in/product/e-kyc-services/e-kyc-setu-system) — Aadhaar e-KYC without AUA/KUA license
 
 ### MeitY & Data Protection
 
-- [DPDP Act 2023 (Full Text)](https://www.meity.gov.in/static/uploads/2024/06/2bf1f0e9f04e6fb4f8fef35e82c42aa5.pdf) — Digital Personal Data Protection Act
+- [<abbr title="Digital Personal Data Protection Act 2023 (and Rules 2025)">DPDP</abbr> Act 2023 (Full Text)](https://www.meity.gov.in/static/uploads/2024/06/2bf1f0e9f04e6fb4f8fef35e82c42aa5.pdf) — Digital Personal Data Protection Act
 - [DPDP Rules 2025 (Gazette)](https://dpdpa.com/DPDP_Rules_2025_English_only.pdf) — Operationalization rules
 - [DPDP Compliance Guide](https://dpdpa.com/dpdparules.html) — Comprehensive reference
 
@@ -71,8 +71,8 @@ These are official government and regulatory portals whose publicly available ci
 
 ### CERSAI / CKYC (Central KYC Registry)
 
-- [CKYC Portal (CERSAI)](https://ckyc.cersai.org.in) — Central KYC Registry
-- [CKYC via Protean](https://ckyc.protean-tech.in) — CKYC services via Protean (formerly NSDL e-Governance)
+- [CKYC Portal (<abbr title="Central Registry of Securitisation Asset Reconstruction and Security Interest of India">CERSAI</abbr>)](https://ckyc.cersai.org.in) — Central KYC Registry
+- [CKYC via Protean](https://ckyc.protean-tech.in) — CKYC services via Protean (formerly <abbr title="National Securities Depository Limited">NSDL</abbr> e-Governance)
 
 ### UIDAI (Unique Identification Authority of India)
 
@@ -91,7 +91,7 @@ These are official government and regulatory portals whose publicly available ci
 - [FIPs & FIUs](https://sahamati.org.in/fip-fiu-in-account-aggregators-ecosystem/) — 90+ FIPs, 600+ entities
 - [Certified Entities](https://sahamati.org.in/certified-entities/) — Certified participants registry
 - [AA Ecosystem Map (Mar 2025)](https://sahamati.org.in/account-aggregator-ecosystem-map-march-2025/) — Latest ecosystem map
-- [FIU India](https://fiuindia.gov.in) — Financial Information Users portal
+- [<abbr title="Financial Intelligence Unit">FIU</abbr> India](https://fiuindia.gov.in) — Financial Information Users portal
 - [DFS AA Framework](https://financialservices.gov.in/beta/en/account-aggregator-framework) — Government overview
 
 ---
@@ -175,7 +175,7 @@ The following vendor documentation portals and API references were consulted. Al
 
 ### TrackWizz
 
-- Referenced for AML/PEP/Sanctions screening capabilities
+- Referenced for AML/<abbr title="Politically Exposed Person">PEP</abbr>/Sanctions screening capabilities
 - Publicly available product information
 
 ### Perfios
@@ -202,15 +202,15 @@ The following vendor documentation portals and API references were consulted. Al
 
 ### NSE (National Stock Exchange of India)
 
-- [NSE India](https://www.nseindia.com) — Official portal
+- [<abbr title="National Stock Exchange of India">NSE</abbr> India](https://www.nseindia.com) — Official portal
 - [NSE Circulars](https://www.nseindia.com/regulations/exchanges-circulars) — Regulatory circulars
 - [ENIT Portal](https://enit.nseindia.com) — Member services
-- [NSE UCC Circular ISC/61817 (Apr 2024)](https://nsearchives.nseindia.com/content/circulars/ISC66053.pdf) — KYC guidelines
+- [NSE UCC Circular <abbr title="Investor Service Centre.">ISC</abbr>/61817 (Apr 2024)](https://nsearchives.nseindia.com/content/circulars/ISC66053.pdf) — KYC guidelines
 - NSE UCC Circular: [NSE/ISC/61817](/broking-kyc/reference/circulars/nse/#nseisc61817) (Apr 2024) — New format Jul 15, 2024
 
 ### BSE (Bombay Stock Exchange)
 
-- [BSE India](https://www.bseindia.com/nta.aspx) — Notice and circulars
+- [<abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> India](https://www.bseindia.com/nta.aspx) — Notice and circulars
 - [BSE UCC Portal](https://ucc.bseindia.com) — Client registration
 - [BSE UCC Web Service](https://ucc.bseindia.com/newucc/ucc_api_webservice/ucc_api_service.asmx)
 - [BSE StarMF](https://www.bsestarmf.in) — Mutual fund platform
@@ -221,7 +221,7 @@ The following vendor documentation portals and API references were consulted. Al
 
 ### MCX (Multi Commodity Exchange)
 
-- [MCX India](https://www.mcxindia.com) — Official portal
+- [<abbr title="Multi Commodity Exchange of India">MCX</abbr> India](https://www.mcxindia.com) — Official portal
 - [MCX Circulars](https://www.mcxindia.com/market-operations/circulars)
 - [MCX Members](https://www.mcxindia.com/members) — Member resources
 
@@ -235,9 +235,9 @@ The following vendor documentation portals and API references were consulted. Al
 - [EASI](https://easi.cdslindia.com) — Electronic access
 - [Easiest](https://easiest.cdslindia.com) — Online services
 - [EDIS](https://edis.cdslindia.com) — Electronic delivery instruction slip
-- [CDSL DDPI Implementation (PDF)](https://www.cdslindia.com/downloads/Publications/Communique/Implementation%20of%20Circular%20on%20Execution%20of%20Demat%20Debit%20and%20Pledge%20Instruction%20(DDPI)%20for%20transfer%20of%20securities%20towards%20deliveries.PDF)
+- [<abbr title="Central Depository Services (India) Limited">CDSL</abbr> DDPI Implementation (PDF)](https://www.cdslindia.com/downloads/Publications/Communique/Implementation%20of%20Circular%20on%20Execution%20of%20Demat%20Debit%20and%20Pledge%20Instruction%20(DDPI)%20for%20transfer%20of%20securities%20towards%20deliveries.PDF)
 - [CDSL T+0 Settlement (PDF)](https://www.cdslindia.com/downloads/Publications/Communique/SEBI-Circular%20-Operational-Modalities-for-T-plus-0-Settlements.pdf)
-- CDSL BO Setup API: Production `https://api.cdslindia.com/v1/` | Sandbox `https://sandbox-api.cdslindia.com/v1/`
+- CDSL <abbr title="Beneficial Owner">BO</abbr> Setup API: Production `https://api.cdslindia.com/v1/` | Sandbox `https://sandbox-api.cdslindia.com/v1/`
 
 ### NSDL (National Securities Depository Limited)
 

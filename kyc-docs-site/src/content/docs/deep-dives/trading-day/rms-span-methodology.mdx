@@ -5,25 +5,25 @@ description: Reference-heavy walkthrough of the SPAN (Standard Portfolio ANalysi
 
 import { Aside } from '@astrojs/starlight/components';
 
-> **Why this page is structured this way:** SPAN is the operational backbone of derivatives risk management in India. To work with it day-to-day, an operator must hold three things in head: the *components* of the margin (SPAN + ELM + exposure + additional + delivery), the *mechanism* (the 16-scenario grid that produces SPAN), and the *evidence trail* (MG-12 / MG-13 / MG-18 files plus the four peak-margin snapshots that build the DMF). The page is structured component-first, then scenario-mechanism, then the daily file flow, then worked examples per segment.
+> **Why this page is structured this way:** <abbr title="Standard Portfolio Analysis of Risk">SPAN</abbr> is the operational backbone of derivatives risk management in India. To work with it day-to-day, an operator must hold three things in head: the *components* of the margin (SPAN + <abbr title="Extreme Loss Margin">ELM</abbr> + exposure + additional + delivery), the *mechanism* (the 16-scenario grid that produces SPAN), and the *evidence trail* (MG-12 / MG-13 / MG-18 files plus the four peak-margin snapshots that build the DMF). The page is structured component-first, then scenario-mechanism, then the daily file flow, then worked examples per segment.
 
 ## TL;DR
 
-- **SPAN** (Standard Portfolio ANalysis of Risk) is a scenario-based VaR margin computed by the **clearing corporation** (NSCCL / ICCL / MCXCCL), not the exchange. The broker consumes the daily SPAN parameter file and uses it to compute per-client and per-portfolio margin in real time.
+- **SPAN** (Standard Portfolio ANalysis of Risk) is a scenario-based VaR margin computed by the **clearing corporation** (<abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NSCCL</abbr> / <abbr title="Indian Clearing Corporation Limited">ICCL</abbr> / <abbr title="Multi Commodity Exchange Clearing Corporation Limited">MCXCCL</abbr>), not the exchange. The broker consumes the daily SPAN parameter file and uses it to compute per-client and per-portfolio margin in real time.
 - The SPAN scenario grid generates **16 scenarios** by combining 8 futures-price moves with 2 volatility moves. The worst-case loss across the 16 scenarios is the **scanrange-driven SPAN margin** before short-option / inter-month / inter-commodity adjustments.
-- Total upfront margin in derivatives = **SPAN + ELM (Extreme Loss Margin)**, with additional margin layers (delivery, tender, special, surveillance, event-driven) added contextually. CM-segment upfront margin = **VaR + ELM** (per [SEBI/HO/MRD2/DCAP/CIR/P/2020/127](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2dcapcirp2020127)).
-- The clearing corp captures **four random intraday peak-margin snapshots** during 11:00–11:30, 12:30–13:00, 13:30–14:00, 14:30–15:00 (per [NCL/CMPT/45516](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt45516), [NCL/CMPL/44977](/broking-kyc/reference/circulars/clearing-corps/#nclcmpl44977)). The **peak-margin requirement** for the day = max of the four snapshots; the DMF rows reflect this.
-- Margin shortfall penalty grid (per [NSE/INSP/64315](/broking-kyc/reference/circulars/nse/#nseinsp64315)): **0.5% for shortfall &lt; ₹1 lakh AND &lt; 10% of applicable margin; 1.0% otherwise**, with a max-of-four reconciliation (CM-level, Client-level, Intra-day, EOD).
+- Total upfront margin in derivatives = **SPAN + ELM (Extreme Loss Margin)**, with additional margin layers (delivery, tender, special, surveillance, event-driven) added contextually. <abbr title="Clearing Member">CM</abbr>-segment upfront margin = **VaR + ELM** (per [<abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/MRD2/DCAP/CIR/P/2020/127](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2dcapcirp2020127)).
+- The clearing corp captures **four random intraday peak-margin snapshots** during 11:00–11:30, 12:30–13:00, 13:30–14:00, 14:30–15:00 (per [<abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr>/CMPT/45516](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt45516), [NCL/CMPL/44977](/broking-kyc/reference/circulars/clearing-corps/#nclcmpl44977)). The **peak-margin requirement** for the day = max of the four snapshots; the DMF rows reflect this.
+- Margin shortfall penalty grid (per [<abbr title="National Stock Exchange of India">NSE</abbr>/INSP/64315](/broking-kyc/reference/circulars/nse/#nseinsp64315)): **0.5% for shortfall &lt; ₹1 lakh AND &lt; 10% of applicable margin; 1.0% otherwise**, with a max-of-four reconciliation (CM-level, Client-level, Intra-day, <abbr title="End Of Day">EOD</abbr>).
 - Cross-margin offsets reduce required margin on correlated positions: **25% same-expiry / 35% different-expiry** for index-constituent pairs; **30% same-expiry / 40% different-expiry** for correlated-index pairs (per [NCL/CMPT/62978](/broking-kyc/reference/circulars/clearing-corps/) effective Jul 29, 2024).
 - Worked examples below cover **equity** (Reliance buy with VaR+ELM), **F&O** (Nifty futures + Nifty option spread with SPAN scenario grid), **CD** (USDINR futures), and **COM** (Crude Oil futures with MCXCCL VSR and ELM 1.25%).
 
 ## Conceptual overview
 
-Margin in Indian derivatives is built in layers. The base layer is **SPAN initial margin** — the clearing corp's computed worst-case one-day loss on the client's portfolio, derived by running each position through a grid of price-and-volatility scenarios and picking the most adverse outcome. On top of SPAN sits **ELM (Extreme Loss Margin)** — a buffer for tail events the scenario grid doesn't capture, typically a flat percentage of the contract value. On top of that, segment-specific and event-driven additional margins: delivery and tender margins on physical-settled contracts approaching expiry; special margins during high-volatility regimes; surveillance margins (ASM-for-spoofing, additional margin on flagged members); and the cash segment's exposure margin where applicable. The sum, computed continuously and snapshotted at four random intraday windows, is the broker's daily margin obligation against the clearing corp.
+Margin in Indian derivatives is built in layers. The base layer is **SPAN initial margin** — the clearing corp's computed worst-case one-day loss on the client's portfolio, derived by running each position through a grid of price-and-volatility scenarios and picking the most adverse outcome. On top of SPAN sits **ELM (Extreme Loss Margin)** — a buffer for tail events the scenario grid doesn't capture, typically a flat percentage of the contract value. On top of that, segment-specific and event-driven additional margins: delivery and tender margins on physical-settled contracts approaching expiry; special margins during high-volatility regimes; surveillance margins (<abbr title="Additional Surveillance Measure">ASM</abbr>-for-spoofing, additional margin on flagged members); and the cash segment's exposure margin where applicable. The sum, computed continuously and snapshotted at four random intraday windows, is the broker's daily margin obligation against the clearing corp.
 
 The framework is SEBI's, the methodology is SPAN (originally developed by the Chicago Mercantile Exchange in 1988 and licensed to clearing corps worldwide), and the operational implementation is the clearing corps'. The broker consumes the parameter file daily, runs SPAN locally to validate orders pre-trade, and reconciles its computation against the clearing corp's authoritative computation through the daily margin files MG-12 (client margin), MG-13 (segment margin), and MG-18 (client collateral).
 
-This page covers the margin computation in detail. For the broader operational flow (when files arrive, when snapshots happen, what penalty applies for shortfall), see also the [trading-hours integration DAG](/broking-kyc/operations/integration-dag/trading-hours/) and the [Margin compliance section of the Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/).
+This page covers the margin computation in detail. For the broader operational flow (when files arrive, when snapshots happen, what penalty applies for shortfall), see also the [trading-hours integration <abbr title="Directed Acyclic Graph.">DAG</abbr>](/broking-kyc/operations/integration-dag/trading-hours/) and the [Margin compliance section of the Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/).
 
 ## 1. SPAN — the 16-scenario grid
 
@@ -63,7 +63,7 @@ The **2×FSR scenarios (15 and 16)** carry 35% weight because they represent ext
 
 | Parameter | Notation | Source | Typical magnitude |
 |---|---|---|---|
-| Futures price scan range | FSR or PSR | Clearing-corp risk-parameter file (daily, BOD; periodically intraday) | 3–6% of underlying for liquid indices; up to 10–15% for individual stock futures with higher VaR |
+| Futures price scan range | FSR or PSR | Clearing-corp risk-parameter file (daily, <abbr title="Beginning Of Day">BOD</abbr>; periodically intraday) | 3–6% of underlying for liquid indices; up to 10–15% for individual stock futures with higher VaR |
 | Volatility scan range | VSR | Clearing-corp risk-parameter file (daily); reviewed periodically | Typically 4–6% for liquid index options; segment / commodity-specific |
 | Short option minimum charge | SOMC | Risk-parameter file | Floor for deep-out-of-the-money short option positions; per-lot value |
 | Inter-month spread charge | IMSC | Risk-parameter file | Charge for offsetting positions in different expiries |
@@ -108,8 +108,8 @@ A simplified statement: **SPAN initial margin = the worst-case scenario loss, fl
 | NSE F&O — index futures and options | 2–3% of contract value | [NCL/CMPT/61801](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt61801) F&O master; ELM file `ael_<DDMMYYYY>.csv` |
 | NSE F&O — stock futures | 3–5% of contract value | Same source |
 | NSE F&O — stock options | 3–5% of contract value | Same source |
-| Currency derivatives (NSE / BSE) | ~1% | NSCCL / ICCL CD-specific |
-| MCX commodity — base metals | 1–1.25% of contract value | MCXCCL master |
+| Currency derivatives (NSE / <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr>) | ~1% | NSCCL / ICCL CD-specific |
+| <abbr title="Multi Commodity Exchange of India">MCX</abbr> commodity — base metals | 1–1.25% of contract value | MCXCCL master |
 | MCX commodity — bullion | 1–1.25% | Same |
 | MCX commodity — Crude Oil short | 1.25% (per [MCXCCL/RISK/184/2025](/broking-kyc/reference/circulars/clearing-corps/#mcxcclrisk1842025)) | MCXCCL risk circulars |
 | Cash segment | Part of VaR + ELM upfront margin per [SEBI/HO/MRD2/DCAP/CIR/P/2020/127](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2dcapcirp2020127) | Daily ELM ratio file |
@@ -120,7 +120,7 @@ For the cash segment specifically, **VaR + ELM** (per the 20 Jul 2020 SEBI margi
 
 ## 3. Exposure margin (CM only, pre-revised framework)
 
-Exposure margin was a separate margin layer on top of VaR in the cash segment, reflecting concentrated-position risk and category-of-stock risk. With the **SEBI Sep-2020 / Mar-2020 revised margin framework** ([SEBI/HO/MRD2/DCAP/CIR/P/2020/127](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2dcapcirp2020127)), exposure margin was largely subsumed into the SPAN+ELM construct for derivatives and the VaR+ELM construct for cash. Some legacy references to "exposure margin" persist in member files and CC obligations, but conceptually it has been folded into the upfront-margin layer for current operations.
+Exposure margin was a separate margin layer on top of VaR in the cash segment, reflecting concentrated-position risk and category-of-stock risk. With the **SEBI Sep-2020 / Mar-2020 revised margin framework** ([SEBI/HO/MRD2/DCAP/CIR/P/2020/127](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2dcapcirp2020127)), exposure margin was largely subsumed into the SPAN+ELM construct for derivatives and the VaR+ELM construct for cash. Some legacy references to "exposure margin" persist in member files and <abbr title="Clearing Corporation (NCL, ICCL, MCXCCL — context-dependent).">CC</abbr> obligations, but conceptually it has been folded into the upfront-margin layer for current operations.
 
 ## 4. Additional / event-driven margins
 
@@ -140,9 +140,9 @@ These margins are layered on top of SPAN+ELM and contribute to the per-client ma
 
 ## 5. MTM — Mark-to-Market
 
-**MTM** is the daily revaluation of open positions against the day's closing price. For each derivative contract held overnight, the MTM is the change in mark-to-market value from the prior settlement price to the current settlement price.
+**<abbr title="Mark-to-Market">MTM</abbr>** is the daily revaluation of open positions against the day's closing price. For each derivative contract held overnight, the MTM is the change in mark-to-market value from the prior settlement price to the current settlement price.
 
-- **F&O MTM** — settled in cash the next morning's pay-in (T+1). The MTM amount is debited from / credited to the client's ledger and the broker's clearing settlement; positions are marked at the new settlement price for the next day's risk computation.
+- **F&O MTM** — settled in cash the next morning's pay-in (<abbr title="Trade-date Plus N settlement">T+1</abbr>). The MTM amount is debited from / credited to the client's ledger and the broker's clearing settlement; positions are marked at the new settlement price for the next day's risk computation.
 - **CD MTM** — same as F&O.
 - **Commodity MTM** — settled per MCXCCL/MCX timelines; daily MTM is computed against the contract's settlement price.
 
@@ -190,7 +190,7 @@ The clearing corp captures **four random intraday peak-margin snapshots** during
 | Snap 3 | 13:30–14:00 | ~13:30 |
 | Snap 4 | 14:30–15:00 | ~14:30 |
 
-Per [NCL/CMPT/45516](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt45516) and [NCL/CMPL/44977](/broking-kyc/reference/circulars/clearing-corps/#nclcmpl44977), the snapshot time within each window is random (the broker doesn't know exactly when within the window it will fire), forcing the broker's RMS to keep client margin position stable across the full window rather than gaming a known clock.
+Per [NCL/CMPT/45516](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt45516) and [NCL/CMPL/44977](/broking-kyc/reference/circulars/clearing-corps/#nclcmpl44977), the snapshot time within each window is random (the broker doesn't know exactly when within the window it will fire), forcing the broker's <abbr title="Risk Management System">RMS</abbr> to keep client margin position stable across the full window rather than gaming a known clock.
 
 At each snapshot, the broker's RMS produces a per-client margin state — required margin, available collateral, shortfall (if any). This becomes a **DMF row** for that snapshot. At EOD, the broker aggregates the snapshot rows plus the EOD state into the **Daily Margin File** (MG-12 client-level, MG-13 segment-level, MG-18 client-collateral) and submits via SFTP to the clearing corp.
 
@@ -206,7 +206,7 @@ The clearing corp issues a **peak-margin response file** the same evening, indic
 | `NSE_FO_MG13_<member>_DDMMYYYY.csv.gz` | NSCCL | Daily EOD | Segment-margin (MG-13) file |
 | `NSE_FO_MG18_<member>_DDMMYYYY.csv.gz` | NSCCL | Daily EOD | Client-collateral (MG-18) file |
 | `NCL_FO_AMGCM_<memcode>_DDMMYYYY.csv.gz` | NSCCL | Daily EOD | Client-wise EOD-parameter margin (CM-level), added Apr 2023 per [NCL/CMPT/56502](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt56502) |
-| `NCL_FO_AMGTM_<memcode>_DDMMYYYY.csv.gz` | NSCCL | Daily EOD | TM-level equivalent of AMGCM |
+| `NCL_FO_AMGTM_<memcode>_DDMMYYYY.csv.gz` | NSCCL | Daily EOD | <abbr title="Trading Member">TM</abbr>-level equivalent of AMGCM |
 | `SA01–SA06` files | NSCCL | Daily, snapshot-tied | Short-allocation reports at peak-margin snapshots and EOD |
 | `INTRASAR` file | NSCCL | Daily | Intraday short-allocation report with reason codes |
 | ICCL/MCXCCL equivalents | ICCL / MCXCCL | Daily | Same structure with file-format naming differences |
@@ -222,16 +222,16 @@ The MG-12 client-margin file is the most operationally important. Key columns (f
 | `DlvryMrgn` | Delivery margin (where applicable) |
 | `CnsltdCrstllsdOblgtnMrg` | Consolidated crystallised obligation margin |
 | `EndOfDayRqrmnt` | Total EOD margin requirement |
-| `ClntCode` | Client code (UCC) |
+| `ClntCode` | Client code (<abbr title="Unique Client Code">UCC</abbr>) |
 | `CCSegCd` | Clearing-corp segment code |
 | `MbrCode` | Member code |
 | Various date / time fields | Snapshot timestamp |
 
-The AMGCM / AMGTM files (added Apr 2023) carry the same field structure but with EOD parameters applied to EOD positions, distinct from the BOD-parameter-applied EOD-position MG-12 (the dual-file structure is the operational trace of the SEBI Feb 2023 EOD margin computation change per [SEBI/HO/MRD/MRD-PoD-2/P/CIR/2023/016](/broking-kyc/reference/circulars/sebi-other/)).
+The AMGCM / AMGTM files (added Apr 2023) carry the same field structure but with EOD parameters applied to EOD positions, distinct from the BOD-parameter-applied EOD-position MG-12 (the dual-file structure is the operational trace of the SEBI Feb 2023 EOD margin computation change per [SEBI/HO/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>/MRD-PoD-2/P/CIR/2023/016](/broking-kyc/reference/circulars/sebi-other/)).
 
 ## 8. Pre-trade margin computation at the broker
 
-The broker's RMS consumes the SPAN parameter file and ELM ratios at BOD and computes margin in real time for each client position. The pre-trade margin lock (see [OMS internals deep dive](/broking-kyc/deep-dives/trading-day/oms-internals/)) consults this real-time computation to validate every order.
+The broker's RMS consumes the SPAN parameter file and ELM ratios at BOD and computes margin in real time for each client position. The pre-trade margin lock (see [<abbr title="Order Management System">OMS</abbr> internals deep dive](/broking-kyc/deep-dives/trading-day/oms-internals/)) consults this real-time computation to validate every order.
 
 The broker's local SPAN implementation:
 
@@ -264,7 +264,7 @@ Per [NCL/CMPT/55381](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt553
 1. Excess collateral at another CC,
 2. Early Pay-in of securities,
 3. Wrong-client trades (subsequently corrected),
-4. NRI trades (subsequently allocated),
+4. <abbr title="Non-Resident Indian">NRI</abbr> trades (subsequently allocated),
 5. Late allocation acceptance.
 
 False reporting under these codes attracts the same penalty as the underlying short-collection plus inspection action.
@@ -425,7 +425,7 @@ The clearing corp's reconciliation team responds within the operational window; 
 
 - **Cross-CC collateral** — a client may have collateral at multiple clearing corps (e.g., one at NSCCL for NSE F&O, another at MCXCCL for commodity). Permitted reason code 1 (excess collateral at another CC) applies when the broker can demonstrate cross-CC collateral availability.
 - **Custodian-cleared institutional clients** — the broker executes but the custodian clears. Margin is the custodian's obligation; the broker still reports the trade in MG-12 with the custodian's flag. Institutional positions in cross-margin offsets are counted only after T+1 custodian confirmation.
-- **MTF (Margin Trading Facility)** — funded purchases on MTF carry their own margin and collateral pattern; the funded position itself is pledged via the **CSMFA** account ([NCL/CMPT/63669](/broking-kyc/reference/circulars/clearing-corps/) on direct-payout / CSMFA). See [client funds compliance row CLIENT-FUNDS-005](/broking-kyc/operations/compliance-blueprint/).
+- **<abbr title="Margin Trading Facility">MTF</abbr> (Margin Trading Facility)** — funded purchases on MTF carry their own margin and collateral pattern; the funded position itself is pledged via the **CSMFA** account ([NCL/CMPT/63669](/broking-kyc/reference/circulars/clearing-corps/) on direct-payout / CSMFA). See [client funds compliance row CLIENT-FUNDS-005](/broking-kyc/operations/compliance-blueprint/).
 - **SLB (Securities Lending and Borrowing)** — SLB positions carry their own margin per [NCL/CMPT/61810](/broking-kyc/reference/circulars/clearing-corps/) / [NCL/CMPT/67763](/broking-kyc/reference/circulars/clearing-corps/) SLBS master.
 - **Early Pay-in (EPI) of securities** — securities pre-delivered to the clearing corp earn margin exemption per [NCL/CMPT/61800](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt61800) item 10.18; the EPI flow reduces the broker's margin requirement.
 - **G-Sec / T-Bill / SGB collateral with approaching maturity** — margin benefit withdrawn 2 business days prior to maturity per [NCL/CMPT/72224](/broking-kyc/reference/circulars/clearing-corps/) (and equivalent at other CCs).
@@ -448,14 +448,14 @@ The clearing corp's reconciliation team responds within the operational window; 
 - [Integration DAG: Trading hours](/broking-kyc/operations/integration-dag/trading-hours/) — the four intraday peak-margin snapshot nodes and the DMF aggregation flow.
 - [Broker Process Narrative](/broking-kyc/broker-process/narrative/) — Section 4 covers DMF generation and peak-margin reporting at narrative level.
 - [Compliance Blueprint — Margin compliance domain](/broking-kyc/operations/compliance-blueprint/) — 30 entries covering every margin obligation including upfront margin, peak-margin snapshots, DMF, cross-margin, MTF margin, MFOS / FDR pledge.
-- [Compliance Blueprint — Client funds domain](/broking-kyc/operations/compliance-blueprint/) — upstreaming, segregation, networth, BMC / ABC.
-- [Compliance Blueprint — Settlement domain](/broking-kyc/operations/compliance-blueprint/) — short-delivery auction, T+1 settlement, T+0 beta, MTF settlement.
+- [Compliance Blueprint — Client funds domain](/broking-kyc/operations/compliance-blueprint/) — upstreaming, segregation, networth, <abbr title="Base Minimum Capital">BMC</abbr> / <abbr title="Additional Base Capital">ABC</abbr>.
+- [Compliance Blueprint — Settlement domain](/broking-kyc/operations/compliance-blueprint/) — short-delivery auction, T+1 settlement, <abbr title="Trade-date Plus N settlement">T+0</abbr> beta, MTF settlement.
 - [Deep Dive: OMS internals](/broking-kyc/deep-dives/trading-day/oms-internals/) — sibling page; the OMS pre-trade margin-lock gate consumes the SPAN computation.
-- [Deep Dive: Surveillance, GSM, ASM](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/) — sibling page on surveillance-margin layers (ASM-for-spoofing).
+- [Deep Dive: Surveillance, <abbr title="Graded Surveillance Measure">GSM</abbr>, ASM](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/) — sibling page on surveillance-margin layers (ASM-for-spoofing).
 - [Deep Dive: Short-delivery auction](/broking-kyc/deep-dives/trading-day/short-delivery-auction/) — sibling page; auction mechanism is the downstream cousin of margin shortfall.
 - [Deep Dive: Retail algo framework](/broking-kyc/deep-dives/trading-day/retail-algo-framework/) — sibling page; algo OPS thresholds interact with margin computation.
 - [Clearing-corp circulars](/broking-kyc/reference/circulars/clearing-corps/) — full text of NSCCL / ICCL / MCXCCL circulars cited.
-- [SEBI MIRSD circulars](/broking-kyc/reference/circulars/sebi-mirsd/) — broker-side margin and reporting circulars.
+- [SEBI <abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr> circulars](/broking-kyc/reference/circulars/sebi-mirsd/) — broker-side margin and reporting circulars.
 - [SEBI other circulars](/broking-kyc/reference/circulars/sebi-other/) — MRD margin-framework circulars including SEBI/HO/MRD2/DCAP/CIR/P/2020/127.
 - [NSE inspection circulars](/broking-kyc/reference/circulars/nse/) — INSP-prefixed circulars defining penalty grids.
 - [Vendor Atlas — Risk Management Systems](/broking-kyc/vendors/atlas/) — vendor SPAN engine products.

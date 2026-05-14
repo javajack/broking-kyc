@@ -15,7 +15,7 @@ description: "Verified index of Clearing Corporations (NSCCL / ICCL / MCXCCL) ci
 
 ## Conceptual overview
 
-This page is the complete listing of Clearing Corporations (NSCCL / ICCL / MCXCCL) circulars in the project's 2020–2026 sweep window. Each entry contains the verbatim circular ID, issue date, in-force date, status (in-force / superseded / withdrawn), applicable entity types, impact-area tags, a 2–4 sentence summary traceable to clauses, and the primary URL. Where the primary URL could not be re-fetched, an archive URL is provided in its place.
+This page is the complete listing of Clearing Corporations (<abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NSCCL</abbr> / <abbr title="Indian Clearing Corporation Limited">ICCL</abbr> / <abbr title="Multi Commodity Exchange Clearing Corporation Limited">MCXCCL</abbr>) circulars in the project's 2020–2026 sweep window. Each entry contains the verbatim circular ID, issue date, in-force date, status (in-force / superseded / withdrawn), applicable entity types, impact-area tags, a 2–4 sentence summary traceable to clauses, and the primary URL. Where the primary URL could not be re-fetched, an archive URL is provided in its place.
 
 ## Entries (descending date)
 
@@ -27,24 +27,24 @@ This page is the complete listing of Clearing Corporations (NSCCL / ICCL / MCXCC
 - **applies_to:** broker, clearing-corp
 - **in_force_date:** 2026-03-02
 - **status:** superseded
-- **superseded_by:** MCX/MCXCCL/240/2026
+- **superseded_by:** <abbr title="Multi Commodity Exchange of India">MCX</abbr>/MCXCCL/240/2026
 - **impact_areas:** rms, file-format, settlement, commodities
 - **primary_url:** https://kunvarjiwealth.com/uploads/resources/ApprovedCashCollateral-Commodity-MCX.pdf
 
-Quarterly revision of approved collaterals list (Annexure 1.1 — equity shares as non-cash collaterals subject to 25% per-security cap of total collateral with VAR-rate haircut; Annexure 1.2 — ETF cash/non-cash; Annexure 1.3 — Cash MF units; Annexure 1.4 — Non-cash MF units; Annexure 2 — G-Sec/T-Bills/SGBs cash collaterals; Annexure 3 — Approved commodities; Annexure 4 — Approved banks). Same operational rules as prior issues: no own-group/associate-entity issued collateral; physical FDR min 7-day tenure; G-Sec/T-Bill/SGB margin-benefit withdrawn two days prior to maturity; LIFO bank-exposure adjustments; RBI-issued SGB/T-Bill all accepted. Effective March 2, 2026.
+Quarterly revision of approved collaterals list (Annexure 1.1 — equity shares as non-cash collaterals subject to 25% per-security cap of total collateral with VAR-rate haircut; Annexure 1.2 — ETF cash/non-cash; Annexure 1.3 — Cash MF units; Annexure 1.4 — Non-cash MF units; Annexure 2 — G-Sec/T-Bills/SGBs cash collaterals; Annexure 3 — Approved commodities; Annexure 4 — Approved banks). Same operational rules as prior issues: no own-group/associate-entity issued collateral; physical FDR min 7-day tenure; G-Sec/T-Bill/SGB margin-benefit withdrawn two days prior to maturity; LIFO bank-exposure adjustments; <abbr title="Reserve Bank of India">RBI</abbr>-issued SGB/T-Bill all accepted. Effective March 2, 2026.
 
 ### NCL/CMPT/72224
 
 - **date_issued:** 2026-01-09
 - **issuer:** NSCCL
-- **title:** "CM - Changes in settlement schedule due to settlement holiday on January 15, 2026 on account of Municipal Corporation Elections in Maharashtra"
+- **title:** "<abbr title="Clearing Member">CM</abbr> - Changes in settlement schedule due to settlement holiday on January 15, 2026 on account of Municipal Corporation Elections in Maharashtra"
 - **applies_to:** broker, clearing-corp
 - **in_force_date:** 2026-01-15
 - **status:** in-force
 - **impact_areas:** settlement, t0-t1, mtf
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPT72224.pdf
 
-Partial modification to NCL/CMPT/71904 (Dec 22, 2025 on FY 2026 holidays) and NCL/CMPT/71926 (Dec 22, 2025 on T+1 & T+0 Jan 2026 calendar). January 15, 2026 declared settlement holiday on account of Maharashtra municipal-corporation elections; no T+0 settlement 2026511 on Jan 15. Revised T+1 schedule Jan 16, 2026: A 2026009 (auction) pay-in 08:00 / pay-out 10:00; M,Z,B 2026010 pay-in 10:30 / pay-out 15:30; M,Z,B 2026011 pay-in 16:30 / pay-out 21:00. UNPAIDMTF upload windows 15:30-22:00 (Jan 14-15) and 06:30-13:00 (Jan 16 for 2026011). EPI of securities cut-off 9 p.m. on Jan 16.
+Partial modification to <abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr>/CMPT/71904 (Dec 22, 2025 on FY 2026 holidays) and NCL/CMPT/71926 (Dec 22, 2025 on <abbr title="Trade-date Plus N settlement">T+1</abbr> & <abbr title="Trade-date Plus N settlement">T+0</abbr> Jan 2026 calendar). January 15, 2026 declared settlement holiday on account of Maharashtra municipal-corporation elections; no T+0 settlement 2026511 on Jan 15. Revised T+1 schedule Jan 16, 2026: A 2026009 (auction) pay-in 08:00 / pay-out 10:00; M,Z,B 2026010 pay-in 10:30 / pay-out 15:30; M,Z,B 2026011 pay-in 16:30 / pay-out 21:00. UNPAIDMTF upload windows 15:30-22:00 (Jan 14-15) and 06:30-13:00 (Jan 16 for 2026011). EPI of securities cut-off 9 p.m. on Jan 16.
 
 ### NCL/CMPT/72025
 
@@ -57,7 +57,7 @@ Partial modification to NCL/CMPT/71904 (Dec 22, 2025 on FY 2026 holidays) and NC
 - **impact_areas:** settlement, upi-block, upstreaming, bod-eod, client-funds
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPT72025.pdf
 
-Revises EPI/release/upstream cut-offs for January 2, 2026 quarterly running-account-settlement date. Funds EPI 07:00 PM; Securities EPI 07:00 PM (UPI-block clients 06:00 PM); Download of margin report 09:00 PM; Upstreaming of cash/FDR 08:00 PM (revised from 07:00 PM); Downstreaming of cash/FDR 08:00 PM; Collateral allocation window 10:00 PM (revised from 08:00 PM). Cash/FDR/BG release within one hour subject to free-collateral availability.
+Revises EPI/release/upstream cut-offs for January 2, 2026 quarterly running-account-settlement date. Funds EPI 07:00 PM; Securities EPI 07:00 PM (<abbr title="Unified Payments Interface">UPI</abbr>-block clients 06:00 PM); Download of margin report 09:00 PM; Upstreaming of cash/FDR 08:00 PM (revised from 07:00 PM); Downstreaming of cash/FDR 08:00 PM; Collateral allocation window 10:00 PM (revised from 08:00 PM). Cash/FDR/BG release within one hour subject to free-collateral availability.
 
 ### MCXCCL/MEM/282/2025
 
@@ -83,7 +83,7 @@ MCX Circular MCX/MCXCCL/640/2025. Reminder of MCXCCL/MEM/219/2025 (Oct 7, 2025) 
 - **impact_areas:** settlement, file-format
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPT71441.pdf
 
-FAQ accompanying NCL/CMPT/71045 (Oct 30, 2025). Clarifies that auction is conducted for both CC and internal shortages (per CMPT66688 dated Feb 14, 2025). Auction rate based on auction-offer price (for auctioned quantity) and close-out price (for unsuccessful auctions); close-out rate per SEBI Master Circular SEBI/HO/MRDPoD2/CIR/P/2024/00181 (Dec 30, 2024) = higher of highest scrip price in settlement-to-auction-date OR 20% above latest closing on auction-call day. Auction difference collected from short-delivering member when auction rate exceeds settlement price. Close-out files: Auction Delivery P_0000 (unsuccessful internal), F_0000 (CC shortage close-out, CA close-out, non-actionable BL/G-Sec close-out, auction pay-in shortage close-out); EquityT1 Delivery F_0000 for trade-for-trade. Per clause 7.13(iv) of NCL/CMPT/67751 (Apr 29, 2025), close-out for internal shortage where valuation debit unpaid by member and for G-Secs/corporate-action scenarios handled by member.
+FAQ accompanying NCL/CMPT/71045 (Oct 30, 2025). Clarifies that auction is conducted for both <abbr title="Clearing Corporation (NCL, ICCL, MCXCCL — context-dependent).">CC</abbr> and internal shortages (per CMPT66688 dated Feb 14, 2025). Auction rate based on auction-offer price (for auctioned quantity) and close-out price (for unsuccessful auctions); close-out rate per <abbr title="Securities and Exchange Board of India">SEBI</abbr> Master Circular SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/MRDPoD2/CIR/P/2024/00181 (Dec 30, 2024) = higher of highest scrip price in settlement-to-auction-date OR 20% above latest closing on auction-call day. Auction difference collected from short-delivering member when auction rate exceeds settlement price. Close-out files: Auction Delivery P_0000 (unsuccessful internal), F_0000 (CC shortage close-out, CA close-out, non-actionable BL/G-Sec close-out, auction pay-in shortage close-out); EquityT1 Delivery F_0000 for trade-for-trade. Per clause 7.13(iv) of NCL/CMPT/67751 (Apr 29, 2025), close-out for internal shortage where valuation debit unpaid by member and for G-Secs/corporate-action scenarios handled by member.
 
 ### MCX/MCXCCL/588/2025
 
@@ -135,7 +135,7 @@ Update on auction mechanism for internal shortage. Subsequently elaborated in FA
 - **impact_areas:** margin, commodities, derivatives, rms
 - **primary_url:** https://www.steelcitynettrade.com/Circulars/Margin%20Framework%20for%20Commodity%20Derivatives%20Segment.pdf
 
-MCX Circular MCX/MCXCCL/441/2025. Pursuant to SEBI Master Circular SEBI/HO/MRD/MRD-PoD-1/P/CIR/2023/136 (Aug 4, 2023) and in modification to MCXCCL/RISK/045/2025 (Mar 5, 2025). MCXCCL categorises commodities by realised volatility into three categories; applicable minimum IM, SOMM, minimum MPOR, and minimum VSR per Annexure 1. Agri-commodities: additional lean-period margin of 2% on contracts expiring during lean period (lead Exchange website lists). Effective BOD Oct 1, 2025.
+MCX Circular MCX/MCXCCL/441/2025. Pursuant to SEBI Master Circular SEBI/HO/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>/MRD-PoD-1/P/CIR/2023/136 (Aug 4, 2023) and in modification to MCXCCL/RISK/045/2025 (Mar 5, 2025). MCXCCL categorises commodities by realised volatility into three categories; applicable minimum IM, SOMM, minimum MPOR, and minimum VSR per Annexure 1. Agri-commodities: additional lean-period margin of 2% on contracts expiring during lean period (lead Exchange website lists). Effective <abbr title="Beginning Of Day">BOD</abbr> Oct 1, 2025.
 
 ### NCL/CMPT/70039
 
@@ -161,7 +161,7 @@ Partial modification to NCL/CMPT/65916 (Dec 31, 2024 on FY 2025 holidays) and NC
 - **impact_areas:** settlement, file-format, bod-eod
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPT69455.pdf
 
-Continuation of NCL/CMPT/66779 (Feb 21, 2025) and NCL/CMPT/67947 (May 9, 2025) on direct payout to client demat. Notes that direct payout at NSDL is keyed on CM BP ID and not DP ID-Client ID linked to NSDL CM pool account; members must open separate demat account as primary for proprietary UCC, distinct from DP-ID-Client-ID account associated to NSDL CM pool account, to avoid mis-mapping during NSDL demat-verification with Exchanges.
+Continuation of NCL/CMPT/66779 (Feb 21, 2025) and NCL/CMPT/67947 (May 9, 2025) on direct payout to client demat. Notes that direct payout at <abbr title="National Securities Depository Limited">NSDL</abbr> is keyed on CM BP ID and not <abbr title="Depository Participant">DP</abbr> ID-Client ID linked to NSDL CM pool account; members must open separate demat account as primary for proprietary <abbr title="Unique Client Code">UCC</abbr>, distinct from DP-ID-Client-ID account associated to NSDL CM pool account, to avoid mis-mapping during NSDL demat-verification with Exchanges.
 
 ### NCL/CMPT/67833
 
@@ -213,7 +213,7 @@ Annual consolidated circular for Capital Market segment compiling circulars Apri
 - **impact_areas:** settlement, commodities, derivatives
 - **primary_url:** https://www.steelcitynettrade.com/Circulars/Delivery%20&%20Settlement%20Procedure%20for%20GOLD%20TEN%20Contract%201.pdf
 
-Sub-circular MCXCCL/C&S/058/2025. Per MCX/TRD/134/2025 (Mar 18, 2025) on Gold Ten (10 grams) launch. Compulsory delivery; staggered tender period = last 5 trading days incl. expiry. Staggered tender-period margin 5% additional on outstanding positions over IM/special/additional. Mode of intention: MCXCCL eClear. Buyer/seller intentions submitted by 3:00 PM on tender day; dissemination by 3:30 PM TWS broadcast. Delivery-period margin = higher of (a) 3% + 5-day 99% VaR of spot price volatility or (b) 25%. EPI of goods exempts seller from all margins except MTM. Delivery allocation rate = settlement/closing on tender days, Due Date Rate on expiry. Pay-in via ComRIS earmarking.
+Sub-circular MCXCCL/C&S/058/2025. Per MCX/TRD/134/2025 (Mar 18, 2025) on Gold Ten (10 grams) launch. Compulsory delivery; staggered tender period = last 5 trading days incl. expiry. Staggered tender-period margin 5% additional on outstanding positions over IM/special/additional. Mode of intention: MCXCCL eClear. Buyer/seller intentions submitted by 3:00 PM on tender day; dissemination by 3:30 PM TWS broadcast. Delivery-period margin = higher of (a) 3% + 5-day 99% VaR of spot price volatility or (b) 25%. EPI of goods exempts seller from all margins except <abbr title="Mark-to-Market">MTM</abbr>. Delivery allocation rate = settlement/closing on tender days, Due Date Rate on expiry. Pay-in via ComRIS earmarking.
 
 ### ICCL 20250324-4
 
@@ -226,7 +226,7 @@ Sub-circular MCXCCL/C&S/058/2025. Per MCX/TRD/134/2025 (Mar 18, 2025) on Gold Te
 - **impact_areas:** mutual-funds, settlement, file-format
 - **primary_url:** https://www.icclindia.com/Dynamicpages/DispNoticesNCirculars.aspx?page=20250324-4
 
-Advisory ahead of high-volume April 2025 transactions on BSE StAR MF due to multiple holidays. Members/Payment Aggregators/Banks must (i) timely submit Fund Confirmation MIS with accurate UTR matching bank statements; (ii) ensure fund-confirmation amounts match actual credits to ICCL accounts; (iii) upload valid credit MIS and transfer funds before cut-off times. References prior notices 20230620-66 and 20240702-34 on procedures and guidelines.
+Advisory ahead of high-volume April 2025 transactions on <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> StAR MF due to multiple holidays. Members/Payment Aggregators/Banks must (i) timely submit Fund Confirmation MIS with accurate UTR matching bank statements; (ii) ensure fund-confirmation amounts match actual credits to ICCL accounts; (iii) upload valid credit MIS and transfer funds before cut-off times. References prior notices 20230620-66 and 20240702-34 on procedures and guidelines.
 
 ### NCL/CMPT/66779
 
@@ -258,7 +258,7 @@ ICCL pilot of direct securities payout to client demat accounts per SEBI guideli
 
 - **date_issued:** 2025-02-10
 - **issuer:** NSCCL
-- **title:** "Revised MWPL, Participant, Institutional & Non-Institutional Client Limits for JYOTISTRUC"
+- **title:** "Revised <abbr title="Market Wide Position Limit">MWPL</abbr>, Participant, Institutional & Non-Institutional Client Limits for JYOTISTRUC"
 - **applies_to:** broker, clearing-corp
 - **in_force_date:** 2025-02-11
 - **status:** in-force
@@ -271,7 +271,7 @@ SLBS MWPL/limit revision per NCL/CMPT/61810. Increases JYOTISTRUC MWPL from 82,4
 
 - **date_issued:** 2025-01-24
 - **issuer:** NSCCL
-- **title:** "Trading Supported by Blocked Amount in Secondary Market - Update on UCC Deregistration Request for ASBA Clients"
+- **title:** "Trading Supported by Blocked Amount in Secondary Market - Update on UCC Deregistration Request for <abbr title="Applications Supported by Blocked Amount">ASBA</abbr> Clients"
 - **applies_to:** broker, clearing-corp
 - **in_force_date:** 2025-01-27
 - **status:** in-force
@@ -304,7 +304,7 @@ Monthly mutual-fund settlement schedule February 2025. (i) Non-Liquid Subscripti
 - **impact_areas:** settlement, t0-t1, file-format, derivatives
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPT66135.pdf
 
-Operational clarifications for T+0 custodial-participant transactions pursuant to SEBI/HO/MRD/MRD-PoD-3/P/CIR/2024/172 (Dec 10, 2024) scope expansion, NCL/CMPT/65509 (T+0 enhancement) and earlier NCL/CMPT/63165 (Jul 31, 2024). Activates Family Account CP code (name suffix FAMILYAC, PAN/SEBI reg FAMIL999999Y, only non-marginable CP codes, custodian-maintained audit trail). Trade confirmations at Family-Account CP level; obligations at individual CP level; custodians settle to end-investor within day. EPI/pay-in via block mechanism by deadline for non-custodian UPI/non-UPI clients. NCL uploads auto-DO for net deliverable obligations of custodians per opt-in; incremental obligations on rejection get separate auto-DO. Timeline Annexure 1: regular market close 1:30 PM, EPI cut-off 1:45 PM, custodian trade-confirmation cut-off 2:45 PM, securities pay-in 3:30 PM, funds pay-in 4:00 PM. Effective Feb 10, 2025.
+Operational clarifications for T+0 custodial-participant transactions pursuant to SEBI/HO/MRD/MRD-PoD-3/P/CIR/2024/172 (Dec 10, 2024) scope expansion, NCL/CMPT/65509 (T+0 enhancement) and earlier NCL/CMPT/63165 (Jul 31, 2024). Activates Family Account CP code (name suffix FAMILYAC, <abbr title="Permanent Account Number">PAN</abbr>/SEBI reg FAMIL999999Y, only non-marginable CP codes, custodian-maintained audit trail). Trade confirmations at Family-Account CP level; obligations at individual CP level; custodians settle to end-investor within day. EPI/pay-in via block mechanism by deadline for non-custodian UPI/non-UPI clients. NCL uploads auto-DO for net deliverable obligations of custodians per opt-in; incremental obligations on rejection get separate auto-DO. Timeline Annexure 1: regular market close 1:30 PM, EPI cut-off 1:45 PM, custodian trade-confirmation cut-off 2:45 PM, securities pay-in 3:30 PM, funds pay-in 4:00 PM. Effective Feb 10, 2025.
 
 ### ICCL 20250102-15
 
@@ -317,7 +317,7 @@ Operational clarifications for T+0 custodial-participant transactions pursuant t
 - **impact_areas:** settlement, depository
 - **primary_url:** https://www.icclindia.com/Dynamicpages/DispNoticesNCirculars.aspx?page=20250102-15
 
-Representative takeover OTB settlement-calendar circular: bidding window 08/01/2025 - 21/01/2025, obligation download Feb 3, 2025, settlement Feb 4, 2025. Demat shares via EPI mechanism in both depositories using market type "(Takeover)" and settlement number 2025001. CDSL = direct client payment; NSDL = security earmarking/blocking. No EPN files; reference MBRSTD_OTB_CM for stamp duty.
+Representative takeover OTB settlement-calendar circular: bidding window 08/01/2025 - 21/01/2025, obligation download Feb 3, 2025, settlement Feb 4, 2025. Demat shares via EPI mechanism in both depositories using market type "(Takeover)" and settlement number 2025001. <abbr title="Central Depository Services (India) Limited">CDSL</abbr> = direct client payment; NSDL = security earmarking/blocking. No EPN files; reference MBRSTD_OTB_CM for stamp duty.
 
 ### NCL/CMPT/65498
 
@@ -356,7 +356,7 @@ Reiterates per NCL/CMPT/61800 and NCL/CMPT/63669 (direct-payout context) that CM
 - **impact_areas:** settlement, derivatives
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPT64982.pdf
 
-Partial modification to NCL/CMPT/64370 (Oct 4, 2024) on F&O settlement schedule. Trade date Nov 19, 2024 revised settlement date Nov 21, 2024 (instead of Nov 20). Pursuant to NSE/FAOP/64959 (Nov 8, 2024) and Maharashtra government holiday declaration.
+Partial modification to NCL/CMPT/64370 (Oct 4, 2024) on F&O settlement schedule. Trade date Nov 19, 2024 revised settlement date Nov 21, 2024 (instead of Nov 20). Pursuant to <abbr title="National Stock Exchange of India">NSE</abbr>/FAOP/64959 (Nov 8, 2024) and Maharashtra government holiday declaration.
 
 ### NCL/CMPT/64937
 
@@ -382,7 +382,7 @@ SaaS mock-session circular pursuant to SEBI/HO/MRD/TPD/P/CIR/2023/192 (Dec 20, 2
 - **impact_areas:** client-funds, file-format, reporting, upstreaming
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPL64088.pdf
 
-Follow-up to SEBI/HO/MRD2_DCAP/CIR/2021/0598 (Jul 20, 2021), NCL/CMPL/49348, 49640, 49764, and 54214. Allows designated UCC "SUSPE1234N" on member PAN for unidentified/suspense account funds; member must not create this UCC in Exchange UCC database; orders not permitted under it. Such funds to be upstreamed to CCs. Reporting clarifications: EPI of funds for settlement obligation (incl. OFS) reported in column 46 "Cash placed with CC" on days prior to settlement, not column 22; not reported on settlement day as funds no longer in clear ledger. Member compliance by December 19, 2024.
+Follow-up to SEBI/HO/MRD2_DCAP/CIR/2021/0598 (Jul 20, 2021), NCL/CMPL/49348, 49640, 49764, and 54214. Allows designated UCC "SUSPE1234N" on member PAN for unidentified/suspense account funds; member must not create this UCC in Exchange UCC database; orders not permitted under it. Such funds to be upstreamed to CCs. Reporting clarifications: EPI of funds for settlement obligation (incl. <abbr title="Offer for Sale (through stock exchange)">OFS</abbr>) reported in column 46 "Cash placed with CC" on days prior to settlement, not column 22; not reported on settlement day as funds no longer in clear ledger. Member compliance by December 19, 2024.
 
 ### ICCL 20240914-5
 
@@ -408,7 +408,7 @@ Following RBI press release, Maharashtra government declared September 18, 2024 
 - **impact_areas:** settlement
 - **primary_url:** https://www.icclindia.com/Dynamicpages/DispNoticesNCirculars.aspx?page=20240914-7
 
-Revised Corporate Debt Segment settlement schedule per Maharashtra GAD (Sep 13, 2024) and RBI press release (Sep 14, 2024) for Eid-E-Milad Sep 16-18, 2024. Three revised schedules (T+0, T+1, T+2) detailing settlement numbers, transaction dates, pay-in/pay-out dates. Template for similar holiday-adjustment circulars across segments.
+Revised Corporate Debt Segment settlement schedule per Maharashtra GAD (Sep 13, 2024) and RBI press release (Sep 14, 2024) for Eid-E-Milad Sep 16-18, 2024. Three revised schedules (T+0, T+1, <abbr title="Trade-date Plus N settlement">T+2</abbr>) detailing settlement numbers, transaction dates, pay-in/pay-out dates. Template for similar holiday-adjustment circulars across segments.
 
 ### NCL/CMPT/63762
 
@@ -435,7 +435,7 @@ Representative SLBS MWPL/limit-revision circular. Increases MWPL for SAPPHIRE fr
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPT63669.pdf
 - **archive_url:** https://www.ricago.com/assets/front/base/file/file_management/2449.pdf
 
-Full operational guidelines for direct payout of securities to client demat accounts pursuant to SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2024/75 (Jun 5, 2024). Mandates: (i) TMs to update primary demat in UCC database for all clearing-clients; (ii) TMs of CM/F&O clearing through other CM open TM pool accounts in both depositories; (iii) TMs maintain TM CUSPA only (or both with CM CUSPA if TM-cum-CM), self-clearing TMs maintain only TM CUSPA, professional CMs maintain only CM CUSPA; (iv) TMs offering MTF maintain CSMFA where client's demat resides; (v) facility for release-payout-with-pledge-in-favour-of-CUSPA(Unpaid) / CSMFA(MTF). Discontinues legacy direct-payout-to-investor-accounts facility (NCL/CMPT/61800 Part C point 6).
+Full operational guidelines for direct payout of securities to client demat accounts pursuant to SEBI/HO/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD1/P/CIR/2024/75 (Jun 5, 2024). Mandates: (i) TMs to update primary demat in UCC database for all clearing-clients; (ii) TMs of CM/F&O clearing through other CM open <abbr title="Trading Member">TM</abbr> pool accounts in both depositories; (iii) TMs maintain TM <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr> only (or both with CM CUSPA if TM-cum-CM), self-clearing TMs maintain only TM CUSPA, professional CMs maintain only CM CUSPA; (iv) TMs offering <abbr title="Margin Trading Facility">MTF</abbr> maintain CSMFA where client's demat resides; (v) facility for release-payout-with-pledge-in-favour-of-CUSPA(Unpaid) / CSMFA(MTF). Discontinues legacy direct-payout-to-investor-accounts facility (NCL/CMPT/61800 Part C point 6).
 
 ### NCL/CMPT/63561
 
@@ -487,7 +487,7 @@ Full operational circular pursuant to SEBI/HO/MRD/TPD-1/P/CIR/2024/24 (April 23,
 - **impact_areas:** rms, settlement, file-format
 - **primary_url:** https://www.icclindia.com/Dynamicpages/DispNoticesNCirculars.aspx?page=20240710-11
 
-ICCL operationalisation of SEBI norms on collateral acceptance effective August 1, 2024. Eligible securities: equity shares with impact cost up to 0.1% for INR 1 Lakh orders and traded ≥ 99% of days over six months across BSE/NSE/MSEI. Phased haircut on un-approved securities: 40% (or VaR, whichever higher) Aug; 60% Sep; 80% Oct; 100% Nov 2024. Mutual fund haircut: Overnight MFOS 5%; other schemes VaR based on 6σ with min 9% effective Aug 1, 2024. Members directed to replace unapproved collaterals promptly.
+ICCL operationalisation of SEBI norms on collateral acceptance effective August 1, 2024. Eligible securities: equity shares with impact cost up to 0.1% for INR 1 Lakh orders and traded ≥ 99% of days over six months across BSE/NSE/<abbr title="Metropolitan Stock Exchange of India">MSEI</abbr>. Phased haircut on un-approved securities: 40% (or VaR, whichever higher) Aug; 60% Sep; 80% Oct; 100% Nov 2024. Mutual fund haircut: Overnight MFOS 5%; other schemes VaR based on 6σ with min 9% effective Aug 1, 2024. Members directed to replace unapproved collaterals promptly.
 
 ### ICCL 20240613-52
 
@@ -500,7 +500,7 @@ ICCL operationalisation of SEBI norms on collateral acceptance effective August 
 - **impact_areas:** mutual-funds, settlement, client-funds
 - **primary_url:** https://www.icclindia.com/Dynamicpages/DispNoticesNCirculars.aspx?page=20240613-52
 
-Implementation update for BSE StAR MF redemption/SWP transactions effective June 14, 2024: demat transactions — AMC/RTA credits ICCL bank account per settlement-day schedule; non-demat redemptions — RTAs/AMCs credit clients' bank accounts directly. Bank account provided at order entry reported to RTA in transaction files; redemption proceeds to registered account if available, else default account on file.
+Implementation update for BSE StAR MF redemption/SWP transactions effective June 14, 2024: demat transactions — <abbr title="Asset Management Company (mutual funds context) / Annual Maintenance Charges (depository context).">AMC</abbr>/RTA credits ICCL bank account per settlement-day schedule; non-demat redemptions — RTAs/AMCs credit clients' bank accounts directly. Bank account provided at order entry reported to RTA in transaction files; redemption proceeds to registered account if available, else default account on file.
 
 ### NCL/CMPT/62339
 
@@ -583,7 +583,7 @@ Annual consolidated circular for Capital Market segment compiling circulars Apri
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPT61801.pdf
 - **archive_url:** https://avantiscdnprodstorage.blob.core.windows.net/legalupdatedocs/31621/NSE_issued_the_Consolidated_Circular_on_the_Capital_Market_Segment_of_NCL_Apr292024.pdf
 
-Annual consolidated circular for F&O segment. Includes Item 10.13 "Cross Margining" Part B (subsequently partially modified by NCL/CMPT/62978 effective July 29, 2024 for offsetting positions with different expiry). Covers SPAN/scanrange parameters, ELM, delivery margin, margin on consolidated crystallised obligations, peak-margin snapshots at four random intraday windows.
+Annual consolidated circular for F&O segment. Includes Item 10.13 "Cross Margining" Part B (subsequently partially modified by NCL/CMPT/62978 effective July 29, 2024 for offsetting positions with different expiry). Covers <abbr title="Standard Portfolio Analysis of Risk">SPAN</abbr>/scanrange parameters, <abbr title="Extreme Loss Margin">ELM</abbr>, delivery margin, margin on consolidated crystallised obligations, peak-margin snapshots at four random intraday windows.
 
 ### NCL/CMPT/61810
 
@@ -797,7 +797,7 @@ Communicates SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/187 (Dec 12, 2023) on upstream
 - **impact_areas:** upstreaming, client-funds, settlement, commodities
 - **primary_url:** https://www.mcxccl.com/circulars/clearing-settlement
 
-Operationalises SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/187 (Dec 12, 2023) upstreaming framework at MCXCCL. SB/CMs upstream all client clear credit balances to CC on EOD basis via cash, lien on FDR (created out of client funds, residual maturity ≤ 1 year + 1 day, lien marked to MCXCCL, pre-terminable, principal protected), or pledge of MFOS units. Referenced by MCX/MCXCCL/350/2024 (May 28, 2024) for ongoing compliance. [unknown — verify] direct URL (canonical PDF on mcxccl.com returns 403; circular ID/reference confirmed via MCX/MCXCCL/350/2024).
+Operationalises SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/187 (Dec 12, 2023) upstreaming framework at MCXCCL. SB/CMs upstream all client clear credit balances to CC on <abbr title="End Of Day">EOD</abbr> basis via cash, lien on FDR (created out of client funds, residual maturity ≤ 1 year + 1 day, lien marked to MCXCCL, pre-terminable, principal protected), or pledge of MFOS units. Referenced by MCX/MCXCCL/350/2024 (May 28, 2024) for ongoing compliance. [unknown — verify] direct URL (canonical PDF on mcxccl.com returns 403; circular ID/reference confirmed via MCX/MCXCCL/350/2024).
 
 ### ICCL 20231116-51
 
@@ -851,7 +851,7 @@ Revises EPI cut-offs for October 6, 2023 running-account-settlement date. Funds 
 - **impact_areas:** settlement, margin, file-format, client-funds, commodities, rms
 - **primary_url:** https://siddharthacommodities.com/test/admin/data/img/Consolidated%20Master%20Circular%20%20MCXCCL.pdf
 
-Annual MCXCCL master circular consolidating all circulars in force as of June 30, 2023. Forms operational baseline for FY 2023-24 covering risk management framework, margining (SPAN methodology with VaR over MPOR), client margin/peak-margin reporting, MSBA (Margin Shortfall Block Amount), Core SGF, collateral segregation, delivery and settlement procedures, member admission, annual returns. [unknown — verify] direct URL (canonical hosting on mcxccl.com returned 403/403; third-party mirror used).
+Annual MCXCCL master circular consolidating all circulars in force as of June 30, 2023. Forms operational baseline for FY 2023-24 covering risk management framework, margining (SPAN methodology with VaR over MPOR), client margin/peak-margin reporting, MSBA (Margin Shortfall Block Amount), Core <abbr title="Settlement Guarantee Fund">SGF</abbr>, collateral segregation, delivery and settlement procedures, member admission, annual returns. [unknown — verify] direct URL (canonical hosting on mcxccl.com returned 403/403; third-party mirror used).
 
 ### NCL/CMPT/57223
 
@@ -916,7 +916,7 @@ Representative monthly ITP-SME segment trading and settlement calendar (22 cycle
 - **impact_areas:** rms, bcp-dr, system-audit
 - **primary_url:** https://www.icclindia.com/Dynamicpages/DispNoticesNCirculars.aspx?page=20230329-18
 
-Joint NCL-ICCL announcement (counterpart to NCL/CMPT/56168). Two-way Software-as-a-Service (SaaS) portability for business continuity covering Equity Cash, Equity Derivatives, Currency Derivatives. No change for members during normal operations; activates only on major RMS software failure. Each CC provides RMS to the other; real-time position, margin, collateral data access via alternate system's interface; EOD processes handled by designated CCs. Mock sessions periodic; contact risk.monitoring@icclindia.com or ops@icclindia.com.
+Joint NCL-ICCL announcement (counterpart to NCL/CMPT/56168). Two-way Software-as-a-Service (SaaS) portability for business continuity covering Equity Cash, Equity Derivatives, Currency Derivatives. No change for members during normal operations; activates only on major <abbr title="Risk Management System">RMS</abbr> software failure. Each CC provides RMS to the other; real-time position, margin, collateral data access via alternate system's interface; EOD processes handled by designated CCs. Mock sessions periodic; contact risk.monitoring@icclindia.com or ops@icclindia.com.
 
 ### NCL/CMPT/56168
 
@@ -968,7 +968,7 @@ Update to NCL/CMPT/55330 clarifying voluntary-auction request format/process. CM
 - **impact_areas:** settlement, file-format
 - **primary_url:** https://www.icclindia.com/Dynamicpages/DispNoticesNCirculars.aspx?page=20230322-2
 
-Additional bank-account details for RFQ deal settlements on NDS-RST platform effective April 3, 2023. Participants may use existing RBI RTGS account or new HDFC Bank account for fund transfers via NEFT/bank transfer/RTGS. Buyer participants ensure deal-wise correct funds pay-in; seller participants transfer securities accordingly. Cancelled-deal refunds by next-business-day end.
+Additional bank-account details for RFQ deal settlements on NDS-RST platform effective April 3, 2023. Participants may use existing RBI <abbr title="Real Time Gross Settlement">RTGS</abbr> account or new HDFC Bank account for fund transfers via <abbr title="National Electronic Funds Transfer">NEFT</abbr>/bank transfer/RTGS. Buyer participants ensure deal-wise correct funds pay-in; seller participants transfer securities accordingly. Cancelled-deal refunds by next-business-day end.
 
 ### NCL/CMPT/56030
 
@@ -995,7 +995,7 @@ SLBS-segment update on file-format standardisation pursuant to NCL/CMPT/55103. S
 - **impact_areas:** settlement, file-format
 - **primary_url:** https://www.icclindia.com/Dynamicpages/DispNoticesNCirculars.aspx?page=20230206-5
 
-Per SEBI/HO/DDHS/DDHSRACPOD1/P/CIR/2023/9 (Jan 9, 2023), updates fund-settlement procedure for RFQ platform trades. Existing RBI RTGS account 8715962 (IFSC ICLL0000001) continues for amounts ≥ Rs.2 lakh. New HDFC Bank account 57500001086245 (IFSC HDFC0000060) added exclusively for RFQ settlements (RTGS/NEFT/transfer accepted). Previous ICICI Bank account discontinued. Existing settlement procedure per Notice 20091206-1 remains; securities settlement and depository arrangements unaffected.
+Per SEBI/HO/DDHS/DDHSRACPOD1/P/CIR/2023/9 (Jan 9, 2023), updates fund-settlement procedure for RFQ platform trades. Existing RBI RTGS account 8715962 (<abbr title="Indian Financial System Code.">IFSC</abbr> ICLL0000001) continues for amounts ≥ Rs.2 lakh. New HDFC Bank account 57500001086245 (IFSC HDFC0000060) added exclusively for RFQ settlements (RTGS/NEFT/transfer accepted). Previous ICICI Bank account discontinued. Existing settlement procedure per Notice 20091206-1 remains; securities settlement and depository arrangements unaffected.
 
 ### ICCL 20230126-1
 
@@ -1008,7 +1008,7 @@ Per SEBI/HO/DDHS/DDHSRACPOD1/P/CIR/2023/9 (Jan 9, 2023), updates fund-settlement
 - **impact_areas:** client-funds, peak-margin, file-format, reporting
 - **primary_url:** https://www.icclindia.com/Dynamicpages/DispNoticesNCirculars.aspx?page=20230126-1
 
-Postpones short-allocation penalty implementation to February 13, 2023 (from February 1, 2023). Revised procedures: four file submissions — initial short-allocation report, member reporting with reason codes on T+5 basis, ICCL response (accept/reject), penalty-calculation file for EOD shortfalls. Standardised reason codes: excess collateral at other CCs, securities sales pending documentation, NRI client trades, custodian acceptance delays.
+Postpones short-allocation penalty implementation to February 13, 2023 (from February 1, 2023). Revised procedures: four file submissions — initial short-allocation report, member reporting with reason codes on T+5 basis, ICCL response (accept/reject), penalty-calculation file for EOD shortfalls. Standardised reason codes: excess collateral at other CCs, securities sales pending documentation, <abbr title="Non-Resident Indian">NRI</abbr> client trades, custodian acceptance delays.
 
 ### NCL/CMPT/55381
 
@@ -1141,7 +1141,7 @@ SLBS-segment equivalent of NCL/CMPT/55056/55057, revising EPI cut-offs (funds 07
 - **impact_areas:** slbm, settlement, upi-block
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPT54401.pdf
 
-Follow-on to NCL/CMPT/54227 (Oct 28, 2022) on SLBS block mechanism in client demat accounts: where EPI of securities is done via block mechanism, participants must NOT upload client-allocation details through CIM interface in CLNTEPI file. Referencing NSE/ISC/42678 (Nov 18, 2019), participants must verify that client UCC is correctly mapped to demat account to ensure seamless EPI benefit.
+Follow-on to NCL/CMPT/54227 (Oct 28, 2022) on SLBS block mechanism in client demat accounts: where EPI of securities is done via block mechanism, participants must NOT upload client-allocation details through CIM interface in CLNTEPI file. Referencing NSE/<abbr title="Investor Service Centre.">ISC</abbr>/42678 (Nov 18, 2019), participants must verify that client UCC is correctly mapped to demat account to ensure seamless EPI benefit.
 
 ### ICCL 20220826-47
 
