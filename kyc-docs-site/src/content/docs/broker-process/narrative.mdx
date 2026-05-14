@@ -54,7 +54,44 @@ Trade booking happens immediately in the back-office: brokerage, STT (Securities
 
 ## 2. A Trading Day — operator's view
 
-_[Section 2 content — drafted in Tasks 3–4.]_
+A trading day looks like a few hours of market activity bracketed by a few hours of file movement, system checks, and reconciliation. From the operator's seat, the day starts at 06:00 IST and ends past 23:00 IST. The customer sees only 09:15 to 15:30; everything else makes that window possible.
+
+### BOD (06:00–08:30)
+
+The Beginning-of-Day phase is mostly file ingestion. Each exchange and clearing corporation publishes a set of files that the broker must download, validate, and apply before the market can open. Most ops teams arrive by 07:30; the market services / IT team initiates BOD scripts as early as 06:00 to leave buffer for failure.
+
+**From the exchanges**, per segment (CM, F&O, CD, and COM if MCX is elected), the BOD downloads include:
+
+- **Holiday calendar** — published annually and refreshed for any mid-year amendment. Drives the trading-day check on every BOD.
+- **Contract files** — the day's tradable symbols, lot sizes (for derivatives), tick sizes, market-lot rules. Without this file, the OMS cannot validate orders.
+- **SPAN scanrange files** from the clearing corporation — margin parameters (SPAN, ELM ratios, exposure margins) for derivatives. Applied for the entire day; never re-issued mid-day. The clearing corp publishes these, not the exchange, because [margin computation](/broking-kyc/operations/compliance-blueprint/#margin-compliance-30-entries) is a clearing-side responsibility (NSCCL for NSE, ICCL for BSE, MCXCCL for MCX).
+- **Circuit-filter file** — per-stock daily price band (typically 2 / 5 / 10 / 20 %, occasionally no-band for index constituents). The OMS rejects any order at a price outside this band.
+- **Member files** — the exchange's list of active members, including any suspensions or trading-disabled flags issued overnight.
+- **MTM T-1 file** — yesterday's close prices and per-position MTM, needed for accurate overnight margin computation on carried-forward derivative positions.
+
+**From the depositories** (CDSL and / or NSDL, depending on the broker's primary), the BOD pulls in prior-day obligation files (any settlement items due to be honoured today), pledge status updates, [DDPI](/broking-kyc/reference/circulars/cdsl/) activations finalized overnight, transmission updates, and any account-modification reflections from yesterday's UCC / KRA / depository uploads.
+
+**RMS parameter reload.** With the SPAN scanrange and ELM ratios in hand, the [RMS](/broking-kyc/vendors/atlas/#risk-management-systems-15-products) recomputes per-client margin envelopes. Available margin, blocked margin, and free balance are recalculated based on each client's outstanding positions, fund balance from last night's payin / payout, and today's parameter set. This snapshot is then published to the OMS for pre-trade margin checks. The reload typically completes by 08:30 — leaving 45 minutes of buffer before the pre-open begins.
+
+**Surveillance start-of-day.** GSM (Graded Surveillance Measure) lists, ASM (Additional Surveillance Measure) lists, LT-ASM lists, T2T (Trade-to-Trade) segment lists, and restricted security lists are pulled from the exchanges and ingested into the surveillance filter. [Market surveillance](/broking-kyc/vendors/atlas/#market-surveillance-7-products) systems re-arm their alert rules — concentrated position thresholds, OTR (Order-to-Trade Ratio) accumulators, illiquid-security monitoring, social-media surveillance feeds — for the day's trading.
+
+**Operational health checks.** The market services team confirms FIX session login to each exchange, CTCL approval status for any modified order-type configurations, trading-software heartbeat to exchange gateways, DR-site replication confirmation (per [BCP / DR](/broking-kyc/operations/compliance-blueprint/#bcp--dr-15-entries) requirements), and CSCRF log-feed verification (per the [cyber security](/broking-kyc/operations/compliance-blueprint/#cyber-security-27-entries) mandate). Any anomaly here — a failed FIX session, a missed scanrange file, a stale heartbeat — is escalated immediately; the broker can't trade if BOD doesn't complete cleanly.
+
+<Aside type="caution">
+**If BOD fails to complete by 09:00, the broker cannot trade.** Operations teams maintain a runbook with an escalation path: failure to ingest scanrange → escalate to clearing corp helpdesk; missed contract file → re-download from a known alternate path (NSE has multiple FTP endpoints); stale RMS parameter → run a manual reload script. Most large brokers have on-call rotation covering 05:30–09:00 specifically for BOD failures. The cost of missing pre-open is real: orders sitting in queue overnight (AMOs) fail to release, clients see error messages, and revenue is lost for the day.
+</Aside>
+
+<Aside type="note">
+**Why SPAN scanrange comes from the clearing corporation, not the exchange.** The exchange (NSE / BSE / MCX) runs the order-matching engine and surveillance. The clearing corporation (NSCCL / ICCL / MCXCCL) is the central counterparty that takes the settlement risk and computes margins. SPAN — Standard Portfolio ANalysis of Risk — is a margin methodology owned by the clearing layer because that's where credit exposure lives. The exchange consumes SPAN parameters from its sibling clearing corp to validate order-level margin during the trading session, but the file's authoritative source is the clearing layer.
+</Aside>
+
+### Pre-open (09:00–09:15)
+
+Pre-open is a 15-minute call-auction window where the day's opening price is discovered. Order entry runs from 09:00 to 09:08; orders entered are accumulated and matched at 09:08–09:12 to produce a single uncrossed opening price; from 09:12 to 09:15 the market is in "buffer" mode (no new orders, just system synchronization) before continuous trading begins at 09:15.
+
+The broker's OMS routes pre-open orders identically to continuous-trading orders, with the same pre-trade RMS pipeline applied. The wrinkle is that AMOs (After-Market Orders placed by clients the previous evening, typically between 15:45 and 08:59) are released into pre-open as a batch at 09:00 — the OMS holds them overnight, then submits them in priority order at market open. Pre-trade RMS still applies; some AMOs may be rejected if the client's margin position has changed overnight (e.g., a held position incurred MTM loss large enough to consume previously-available margin).
+
+For the operator, pre-open is mostly a watch-and-wait phase. If anything in the BOD ingestion was incomplete, the symptoms surface here: orders rejected with cryptic codes, the OMS reporting unrecognised contracts, surveillance flags firing on clean orders. The on-call team has roughly 15 minutes to triage anything visible at 09:00 before continuous trading begins.
 
 ## 3. The Settlement Cycle
 
