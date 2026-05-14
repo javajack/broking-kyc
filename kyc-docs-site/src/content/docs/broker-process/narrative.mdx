@@ -20,7 +20,37 @@ Indian stock broking operations run on a daily clock. A trading day starts hours
 
 ## 1. From ACTIVE to First Trade
 
-_[Section 1 content — drafted in Task 2.]_
+The [final gate](/broking-kyc/architecture/flow-summary/#final-gate) of onboarding flips three independent flags to green — KRA Registered, BO (Beneficiary Owner) Active at the depository, and UCC (Unique Client Code) Approved at every elected exchange — and only then does the application status machine transition to ACTIVE. Most of what happens next is invisible to the client but takes the broker's back-office an evening to complete.
+
+### Day 0 evening — the welcome cascade
+
+Within minutes of ACTIVE, the broker's back-office runs a "welcome cascade" routine. A status notification is pushed to the client's app and SMS / email via DLT-approved templates (every transactional message must be sent against a header and template ID pre-approved with the telecom DLT registry, per SEBI's December 2024 communications mandate). A welcome kit is emailed: account-opening confirmation letter, MITC (Most Important Terms and Conditions) document signed during eSign, DP (Depository Participant) details and BO ID, segment activation status (CM live by default; F&O / CD / COM live if elected during Screen 6), brokerage and charges schedule, and quick-start links.
+
+Behind the scenes, two more things happen. First, the client's record is propagated to the broker's [back-office](/broking-kyc/vendors/atlas/#back-office-15-products) — TechExcel, Mihir, Shilpi, Aastha, or whatever the broker uses — with margin parameters, segment activation flags, and limit allocations. Second, [RMS](/broking-kyc/vendors/atlas/#risk-management-systems-15-products) initializes the per-client margin envelope: available margin starts at zero (no funds transferred yet), exposure margin parameters are loaded from the day's SPAN scanrange, and the client's name appears in the surveillance NORMS roster as an active retail account.
+
+### Day 1 morning — first login
+
+The client logs in. Their dashboard shows account number, BO ID, segment activations (typically CM live; F&O / CD / COM pending margin), fund balance (zero unless they've already transferred), available margin (also zero), and an empty holdings list. To trade, they need to transfer funds — typically via the broker's payment partner ([UPI Block](/broking-kyc/vendors/atlas/#payment--mandate--upi-15-products), AutoPay, NEFT, IMPS, or directly from a linked bank). For Qualified Stock Brokers, ASBA-style UPI Block is mandatory since February 2025: funds aren't actually transferred to the broker's pool, they're *blocked* in the client's bank account and debited only on trade execution, which both earns the client interest and reduces the broker's counterparty risk.
+
+### Placing the first order
+
+Order capture happens via web, mobile, dealer terminal, or API. Whatever the entry point, the order traverses an identical pre-trade [RMS pipeline](/broking-kyc/operations/compliance-blueprint/#margin-compliance-30-entries) before the broker's [OMS](/broking-kyc/vendors/atlas/#oms-ems-trading-platforms-15-products) releases it to the exchange:
+
+1. **Segment activation check.** Is the segment (CM / F&O / CD / COM) live for this client? Hard-block if not.
+2. **Available margin lock.** Does the client have enough margin for the order? For cash-segment buys, margin = SPAN + ELM + exposure + additional + delivery (where applicable); for sells, margin is computed against the client's existing holdings or upfront margin per SEBI rules. The required margin is reserved against the client's available margin balance.
+3. **MWPL check** (derivatives only). If the order would breach the Market-Wide Position Limit, hard-block at the OMS layer.
+4. **Order-type validation.** NRML (carry-forward), MIS (intraday, auto-square-off at 15:20), CO (cover order), BO (bracket order). Each has its own risk profile and time-cut.
+5. **GSM / ASM / restricted-stock check.** Is the security on a [surveillance](/broking-kyc/operations/compliance-blueprint/#surveillance-30-entries) restriction list? Some symbols are tradeable only with 100% upfront margin (T2T), some only in cash segment, some not at all for retail.
+
+If everything clears, the OMS releases the order to the exchange via leased line + FIX gateway (typical for institutional brokers) or ETI / Connect2NSE / BEFS (typical for member-broker integration with NSE / BSE). The exchange returns an order acknowledgement with an exchange-generated order ID, which the OMS persists. If the order matches, the trade confirmation comes back; the client sees their first execution.
+
+<Aside type="note">
+**Why pre-trade margin lock happens *before* exchange acknowledgement.** SEBI mandates that brokers cannot release any order to the exchange without confirming sufficient client margin (the rule has been progressively tightened since 2020, and peak-margin reporting captures snapshots throughout the day to enforce it). If the broker's OMS skips the margin check, the broker's own funds end up funding the order — which is a violation of client funds segregation rules and exposes the broker to credit risk.
+</Aside>
+
+### After the first trade
+
+Trade booking happens immediately in the back-office: brokerage, STT (Securities Transaction Tax), exchange transaction charges, SEBI turnover fee, GST on brokerage + exchange charges, and stamp duty are all computed and attached to the contract. Intraday MTM accrues on the open position throughout the day. By T+24h (typically the evening of the trade day), the [contract note](/broking-kyc/operations/compliance-blueprint/#investor-servicing-15-entries) is generated as a signed ECN (Electronic Contract Note), the broker's Digital Signature Certificate is applied, and the document is dispatched via SMS link and email per the DLT-approved templates. The client's first trade is, from the system's perspective, just one of thousands of trades that will pass through the same pipeline; for the operator on the back end, it's a checkpoint that confirms the onboarding pipeline actually delivers a trading account.
 
 ## 2. A Trading Day — operator's view
 
