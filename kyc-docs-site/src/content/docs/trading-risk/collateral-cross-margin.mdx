@@ -1,0 +1,152 @@
+---
+title: "Trading Risk: Collateral and Cross-Margin"
+description: The 50 percent cash-equivalent rule and who it binds, eligible collateral and haircuts, client-level collateral segregation and allocation, hedge benefit, and cross-margin across correlated instruments and expiries.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Collateral questions collapse three things into one word, so the page separates them in order: is the asset acceptable, how much recognised value does it create after haircuts, and does the position structure reduce the requirement. The 50-percent rule comes early because it is the most frequently misattributed rule in Indian broking; cross-margin comes last because it depends on everything before it. The two field tables distinguish an internal model from the one verified clearing-corporation layout.
+
+## TL;DR
+
+- **"50:50" binds the clearing member, not each client.** Paragraph 18 of [<abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/MRD2_DCAP/CIR/2021/0598](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2_dcapcir20210598) (July 20, 2021) requires at least 50 percent of collateral at clearing-member level to be cash or cash equivalent and expressly states the minimum need not be applied at individual client level.
+- **A client's surplus cash equivalent cannot support anyone else.** Excess client cash equivalent may not support other clients or the trading member's or clearing member's proprietary account. Excess *proprietary* cash equivalent may support clients for the minimum-cash test — which permits a broker funding arrangement, and says nothing about whether the broker provides it free.
+- **Securities collateral moves by pledge and re-pledge, not by transfer.** [SEBI/HO/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/DOP/CIR/P/2020/28](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddopcirp202028) (February 25, 2020) keeps beneficial ownership with the client and leaves the pledge chain visible in the pledgor's demat account.
+- **Cross-margin on offsetting positions with different expiry dates is live since July 29, 2024.** [<abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr>/CMPT/62978](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt62978) (July 18, 2024) sets spread margins of 25 percent for same-expiry and 35 percent for different-expiry index-constituent pairs, and 30 percent and 40 percent respectively for correlated-index pairs, with eligibility requiring correlation above 0.90 over six months and 80 percent constituent overlap weighted by free float.
+- **Expiry withdraws the spread benefit on the expiring leg** — index contracts from February 1, 2025 under [SEBI/HO/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>/TPD/P/CIR/2024/132](/broking-kyc/reference/circulars/sebi-other/#sebihomrdtpdpcir2024132), single stocks under HO/47/15/11(2)2025-MRD-TPD1/ I/4226/2026 (February 5, 2026), effective three months from issue — `[not yet in index]`.
+- **Eligibility and haircut lists are dated operational inputs, not permanent approvals.** A corporate action can remove an instrument from a cross-margin computation without any client action.
+
+## Conceptual overview
+
+Three questions get compressed into the word "collateral", and a broker that does not separate them will mis-state a client's buying power. Admissibility: will the clearing corporation accept this asset at all. Valuation: after the applicable haircut, how much recognised value does it create. Position structure: does the risk model recognise an offset that reduces the margin required in the first place. Pledging answers the first two; holding an offsetting derivative answers the third. They are not substitutes, and a client who posts more collateral has not created a hedge.
+
+Two architectural rules shape everything else. Since February 2020, client securities given as margin move by pledge and re-pledge inside the depository system rather than by transfer into a broker account, so the client remains beneficial owner and the chain — client to trading member to clearing member to clearing corporation — is visible in the pledgor's demat. Since 2021–2022, collateral is segregated and monitored at client level: the clearing corporation receives daily client-level allocation files, and allocated collateral plus securities re-pledged for a client must at all times be at least that client's minimum margin requirement in the segment. Together these prevent the failure mode in which one client's assets silently financed another's positions.
+
+The margin-reduction side is where the money is. Portfolio margining already recognises offsets within an underlying and across correlated underlyings — the mechanics are in the [<abbr title="Standard Portfolio Analysis of Risk">SPAN</abbr> and margin methodology deep dive](/broking-kyc/deep-dives/trading-day/rms-span-methodology/). Cross-margin extends recognition to designated instrument pairs across the cash and derivatives segments, and since July 2024 to offsetting positions with different expiry dates, at published spread-margin percentages. Operationally, these benefits are conditional and revocable: they depend on a current eligibility list, a current basket definition, and both legs continuing to exist.
+
+The plumbing that carries collateral from the client to the clearing corporation is in the [client funds upstreaming deep dive](/broking-kyc/deep-dives/settlement/client-funds-upstreaming/), which also covers the cash-equivalent test from the treasury side. This page covers the client-facing consequence: what creates capacity, what reduces the requirement, and when either disappears.
+
+## 1. Regulatory framework
+
+- **[SEBI/HO/MRD2_DCAP/CIR/2021/0598](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2_dcapcir20210598)** (July 20, 2021), "Segregation and Monitoring of Collateral at Client Level" — collateral reporting, client-level allocation and valuation, paragraphs 2 to 19, with the cash-equivalent minimum at paragraph 18 and the reporting formats at Annexure 3. In force from February 28, 2022.
+- **[SEBI/HO/MIRSD/DOP/CIR/P/2020/28](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddopcirp202028)** (February 25, 2020), "Margin obligations to be given by way of Pledge/ Re-pledge in the Depository System" — in force from August 1, 2020; off-market transfer of client securities as collateral prohibited.
+- **[SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (June 17, 2025), Master Circular for Stock Brokers — consolidated collateral-segregation and broker obligations.
+- **[NCL/CMPT/62978](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt62978)** (July 18, 2024), "Cross Margin benefits for offsetting positions having different expiry dates" — the operational circular, in partial modification of item 10.13 of the [consolidated F&O circular NCL/CMPT/61801](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt61801). It carries the nine-priority eligible-position list, the eligibility conditions and the spread-margin percentages, effective July 29, 2024. Pursuant to SEBI/HO/MRD/TPD-1/P/CIR/2024/24 (April 23, 2024) — [SEBI-MRD circulars index](/broking-kyc/reference/circulars/sebi-other/) `[not yet in index]`. The <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> clearing counterpart is [<abbr title="Indian Clearing Corporation Limited">ICCL</abbr> notice 20240426-38](/broking-kyc/reference/circulars/clearing-corps/#iccl-20240426-38).
+- **[ICCL notice 20240710-11](/broking-kyc/reference/circulars/clearing-corps/#iccl-20240710-11)** (July 10, 2024), "Norms for Acceptable Collateral and Exposure of Clearing Corporation", following [ICCL notice 20240531-3](/broking-kyc/reference/circulars/clearing-corps/#iccl-20240531-3) (May 31, 2024) — the acceptable-collateral norms on the BSE side.
+- **[NCL/CMPL/61744](/broking-kyc/reference/circulars/clearing-corps/#nclcmpl61744)** (April 25, 2024) and **[NCL/CMPL/64088](/broking-kyc/reference/circulars/clearing-corps/#nclcmpl64088)** (September 23, 2024) — client-level collateral reporting format and its clarifications. **[NCL/CMPT/55381](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt55381)** (January 25, 2023) and [ICCL notice 20230126-1](/broking-kyc/reference/circulars/clearing-corps/#iccl-20230126-1) — short-allocation treatment and penalty mechanism.
+- **[NCL/CMPT/72025](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt72025)** (December 26, 2025) — current timings for early pay-in and collateral allocation. Allocation windows change more often than the framework does; take them from the latest such notice.
+- **NCL/CMPT/66371** (January 29, 2025), "Revised list of Cross Margin Eligible Exchange Traded Funds (ETFs)", effective January 31, 2025, and **NCL/CMPT/65890** (December 31, 2024), adjusting cross-margin weightages for the ITC Limited demerger — [clearing-corporation circulars index](/broking-kyc/reference/circulars/clearing-corps/) `[not yet in index]`.
+- **[<abbr title="National Stock Exchange of India">NSE</abbr>/INSP/61121](/broking-kyc/reference/circulars/nse/#nseinsp61121)** (March 13, 2024) — discontinuation of separate reporting of client-level cash and cash-equivalent balances, a reporting change that post-dates several older FAQ summaries.
+
+## 2. The cash-equivalent rule, stated precisely
+
+| Proposition | Status | Source |
+| --- | --- | --- |
+| At least 50 percent of collateral at clearing-member level must be cash or cash equivalent | Required | Paragraph 18 |
+| The 50 percent minimum must be met by every individual client | Not required — the circular expressly says otherwise | Paragraph 18 |
+| One client's excess cash equivalent may support another client | Prohibited | Paragraph 18 |
+| One client's excess cash equivalent may support the trading member's or clearing member's proprietary account | Prohibited | Paragraph 18 |
+| The member's excess proprietary cash equivalent may support clients for the minimum-cash test | Permitted | Paragraph 18 |
+| A broker must provide that proprietary support free of charge | Not established by the circular; any charge needs its own tariff evidence | — |
+
+A broker may impose a stricter client-level cash-component policy, and many do. Present it as the broker's policy rather than a universal regulatory rule, and disclose the charge if the broker's own funds make up a client's cash component.
+
+<Aside type="caution" title="Haircut and margin rate are different denominators">
+A haircut reduces the recognised value of a posted asset. A margin rate determines how much cover a position requires. They are percentages of different quantities and cannot be added, netted or compared. A screen showing "20 percent haircut" next to "18 percent margin" and implying a relationship between them produces a meaningless number.
+</Aside>
+
+## 3. Valuation and allocation — the daily sequence
+
+1. **Inventory.** Ledger credits, depository pledge confirmations, and clearing-corporation eligibility data for the client, segment, instrument and quantity. Validate receipt, ownership attribution and whether the asset is already encumbered for another purpose.
+2. **Value and classify.** Apply the effective haircut to the relevant valuation base; classify into cash, cash equivalent and non-cash under the applicable clearing definition. Display market value and recognised value as separate columns — a price fall or a haircut revision changes availability while the pledged quantity is unchanged.
+3. **Allocate.** Reconcile trading-member to clearing-member and clearing-member to clearing-corporation allocations by client and segment. Never allocate more than the eligible collateral actually received. An allocation update changes attribution; a bank transfer changes funds. Conflating the two is a reconciliation break waiting to happen.
+4. **Test the cash component.** Compute the clearing-member 50 percent requirement using permitted proprietary support, and disallow cross-client use of excess cash equivalent.
+5. **Monitor short allocation.** Short allocation at end of day and intraday carries its own penalty mechanism under the clearing-corporation notices cited above. This is a different penalty from a client margin shortfall.
+6. **Release or substitute.** Before releasing a pledge or moving an allocation, recompute the remaining portfolio requirement and capture both the clearing acknowledgement and the depository status before reporting assets as free.
+
+Pending or rejected pledge instructions belong in an exception queue. Raising buying power on an unconfirmed instruction is the commonest cause of an intraday shortfall nobody can explain afterwards.
+
+## 4. Cross-margin and hedge benefit
+
+Cross-margin recognises that an offsetting position in a designated related instrument reduces portfolio risk, and charges a spread margin instead of two independent margins.
+
+| Pair type | Same expiry | Different expiry | Source |
+| --- | --- | --- | --- |
+| Index and index-constituent positions | 25 percent spread margin | 35 percent spread margin | NCL/CMPT/62978 |
+| Correlated index pairs | 30 percent spread margin | 40 percent spread margin | NCL/CMPT/62978 |
+
+Eligibility conditions from the same circular: a nine-priority list covering index and constituent futures, exchange-traded funds and eligible index pairs; correlation above 0.90 over six months; 80 percent constituent overlap weighted by free float. Computation is at client level in real time. Institutional cash-segment positions count after custodian confirmation on <abbr title="Trade-date Plus N settlement">T+1</abbr>, which is why an institutional client's benefit can appear a day after the trade.
+
+For exchange-traded-fund baskets the clearing corporation publishes a dated eligible list with a minimum quantity per scheme — the January 2025 list carried columns `Symbol`, `Scheme Name` and `Minimum Quantity Required (in multiple thereon)`, with minimums of 7,500 units for NIFTYBEES, 3,000 for BANKBEES and 2,500 for JUNIORBEES. Those are evidence of the list's structure as at January 31, 2025, not a dealing instruction; obtain the September 2026 list before using any of them.
+
+Benefit can disappear without a client trade. Four events do it:
+
+- **A leg expires.** The expiring index leg loses spread treatment on expiry day from February 1, 2025; the expiring single-stock leg from the February 2026 circular's effective date. See [expiry-day operations](./expiry-day-operations/).
+- **A corporate action changes index replication.** The December 2024 notice excluding ITC Limited from the relevant cross-margin computation on the specified event date is the worked example: the client's basket quantity was unchanged, and the eligibility was not.
+- **The eligibility list is revised.** A scheme or pair leaving the list removes the benefit prospectively.
+- **A leg is closed intraday.** A benefit cached until end of day will overstate available margin from the moment the offsetting leg goes.
+
+## 5. Field-level record — collateral valuation and allocation
+
+Internal analytical model, not a verified exchange file layout. Widths are `[unknown — verify]` pending the current clearing-corporation file and API specifications.
+
+| name | type | length | mandatory | source-system | destination-system(s) | notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| Client, trading-member and clearing-member identifiers | strings | `[unknown — verify]` | Yes | Account master | Allocation chain | Preserve the hierarchy; do not flatten |
+| Segment | enum | `[unknown — verify]` | Yes | Clearing master | <abbr title="Risk Management System">RMS</abbr>, allocation | Availability is segment-attributed |
+| ISIN | string | 12 | Securities | Depository, clearing corporation | Valuation | ISIN is 12 characters; transport width not verified |
+| Quantity | integer | `[unknown — verify]` | Securities | Depository | Haircut computation | Never substitute a displayed value for quantity |
+| Valuation price and price date | decimal, date | `[unknown — verify]` | Securities | Price file | Haircut computation | Stale price is a reconciliation exception |
+| Haircut rate and effective date | decimal, date | `[unknown — verify]` | Yes | Clearing corporation, broker policy | RMS | Keep clearing and broker haircuts as separate fields |
+| Cash-equivalent classification | enum | `[unknown — verify]` | Yes | Clearing rules | Cash-component test | Client-level strictness may be broker policy |
+| Pledge or re-pledge status | enum | `[unknown — verify]` | Securities | Depository | RMS, reconciliation | Successful status required before credit |
+| Recognised value | decimal | `[unknown — verify]` | Yes | Valuation engine | Clearing, client statement | Distinct from market value |
+| Allocated value by client and segment | decimal | `[unknown — verify]` | Yes | Clearing member | Clearing corporation | Must not exceed eligible collateral received |
+| Cross-margin pair reference and spread rate | identifiers, decimal | `[unknown — verify]` | Conditional | Clearing corporation | Margin engine | Rate depends on pair type and expiry match |
+| Benefit-loss event code | enum | `[unknown — verify]` | Conditional | Corporate actions, expiry calendar, list revisions | Client notice | Separates an event from a trading loss |
+
+### Verified columns in the dated cross-margin ETF eligibility list
+
+| name | type | length | mandatory | source-system | destination-system(s) | notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| Symbol | text | `[unknown — verify]` | Listed entries | Clearing-corporation list | Cross-margin reference data | Verbatim column heading |
+| Scheme Name | text | `[unknown — verify]` | Listed entries | Clearing-corporation list | Reference data | Verbatim column heading |
+| Minimum Quantity Required (in multiple thereon) | integer | `[unknown — verify]` | Listed entries | Clearing-corporation list | Eligibility calculator | Heading line breaks normalised; list effective January 31, 2025 |
+
+## 6. Alternatives
+
+| Option A | Option B | When to pick which | Who uses what |
+| --- | --- | --- | --- |
+| Cash collateral | Eligible securities collateral | Cash avoids haircut and price risk but gives up investment exposure; securities keep the exposure and introduce valuation and haircut risk. Neither permits using another client's assets | Active traders hold cash; investors pledge holdings |
+| Client supplies the cash component | Member supplies permitted proprietary support | Both satisfy the clearing-member-level test in the permitted structure; the second consumes member resources and may carry disclosed commercial terms. No universal rate is established by the regulatory source | Retail brokers commonly fund the gap; institutional clients supply their own |
+| Calendar spread within one underlying | Cross-margin across designated instruments | A calendar spread offsets maturities inside one product framework; cross-margin uses designated correlated instruments or baskets and the clearing conditions. Losing one on expiry day does not ban the other | Positional derivatives books use spreads; arbitrage books use cross-margin |
+| Cache the benefit until end of day | Recompute on every leg change | Recomputation is the only safe option once a leg can disappear intraday | Any RMS that permits intraday exits |
+
+## Practical notes
+
+- **[gotcha]** "SEBI requires 50 percent of your margin in cash" is wrong as stated to a client. The rule binds the clearing member, and the circular says in terms that it need not be applied client by client. If broker policy requires it, say whose policy it is.
+- **[gotcha]** A pledged security is not double-counted collateral. Securities re-pledged through the depository mechanism carry client provenance; the same asset cannot also be reported as an unrelated cash allocation.
+- **[cost optimization]** Cross-margin and spread margining are the largest available reductions in derivatives margin, and both depend on lists that change. Budget for a monthly eligibility refresh, not an annual one.
+- **[risk trade-off]** A corporate action or expiry can remove a benefit with no trade by the client. Notices need an event code distinguishing "your hedge stopped being recognised" from "you lost money": the two produce identical-looking debits.
+- **[industry practice]** Brokers commonly add their own haircut on top of the clearing haircut for volatile or concentrated collateral, and publish a shorter approved-securities list. Disclose both layers. `[industry practice — unverified]` as a universal pattern.
+- **[gotcha]** The ETF minimum quantities and the collateral lists on this page are dated evidence. The September 2026 lists and current cross-margin pair rates were not obtained and remain `[unknown — verify]`; a July 2026 clearing file-format revision also surfaced in search and needs primary-document reconciliation before any layout is implemented.
+
+## Cross-references
+
+- [Deep Dive: RMS and SPAN methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/) — portfolio margining, inter-month and inter-commodity offsets, hedge benefit on options.
+- [Deep Dive: Client funds upstreaming](/broking-kyc/deep-dives/settlement/client-funds-upstreaming/) — nodal-account architecture, allocation order and the treasury-side cash-equivalent test.
+- [Deep Dive: <abbr title="Margin Trading Facility">MTF</abbr> operational walkthrough](/broking-kyc/deep-dives/settlement/mtf-operational/) — how funded holdings are pledged and why they are not free collateral.
+- [<abbr title="Central Depository Services (India) Limited">CDSL</abbr> MTF and pledge primer](/broking-kyc/vendors/depositories/cdsl-mtf-pledge/) — depository-side pledge, re-pledge and invocation mechanics.
+- [Field atlas: margin pledge](/broking-kyc/reference/field-atlas/sections/x-margin-pledge/) — pledge and collateral field destinations.
+- [Field atlas: computed margin](/broking-kyc/reference/field-atlas/sections/computed-margin/) — where computed margin values land.
+- [Expiry-day operations](./expiry-day-operations/) — where the expiring leg's spread benefit is withdrawn.
+- [Exercise, assignment and physical settlement](./exercise-assignment-physical/) — delivery margins the same collateral pool covers in expiry week.
+- [Margin shortfall and peak margin](./margin-shortfall-peak-margin/) — when recognised collateral falls short of the snapshot requirement.
+
+## Verified through
+
+2026-09-11
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

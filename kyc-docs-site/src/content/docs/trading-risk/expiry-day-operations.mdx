@@ -1,0 +1,152 @@
+---
+title: "Trading Risk: Expiry-Day Operations"
+description: One weekly expiry per exchange, upfront option-premium collection, removal of calendar-spread benefit on the expiring leg, additional expiry-day tail-risk margin, intraday position monitoring, and the broker's expiry-day runbook.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Expiry day is a session, so the page is ordered as one — the product-structure rules that decide *which* contracts expire today, the four margin and collection changes that apply from the open, the intraday monitoring that runs through the day, then the runbook from session preparation to next-session hand-off. The field table is the audit record an inspection asks for afterwards.
+
+## TL;DR
+
+- **One weekly expiry per exchange.** [<abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>/TPD/P/CIR/2024/132](/broking-kyc/reference/circulars/sebi-other/#sebihomrdtpdpcir2024132) (October 1, 2024) rationalised weekly index derivatives to a single benchmark index per exchange, effective November 20, 2024, with all other equity derivative products on a minimum one-month tenor.
+- **Expiry weekday is Tuesday or Thursday, exchange-chosen.** SEBI/HO/MRD/TPD-1/P/CIR/2025/76 (May 26, 2025) permits each exchange to settle on one of those two weekdays and requires prior SEBI approval to change it — [SEBI-MRD circulars index](/broking-kyc/reference/circulars/sebi-other/) `[not yet in index]`. Implementation for <abbr title="National Stock Exchange of India">NSE</abbr> index derivatives was carried by [NSE/FAOP/65336](/broking-kyc/reference/circulars/nse/#nsefaop65336) (November 29, 2024).
+- **Option premium is collected upfront.** Effective February 1, 2025 under the October 2024 measures, net option premium payable must be collected from buyers before the position is taken, not settled at end of day.
+- **Calendar-spread benefit disappears on the expiring leg.** For index contracts from February 1, 2025 under the October 2024 measures; for single-stock contracts under HO/47/15/11(2)2025-MRD-TPD1/ I/4226/2026 (February 5, 2026), effective three months from issue — [SEBI-MRD circulars index](/broking-kyc/reference/circulars/sebi-other/) `[not yet in index]`.
+- **Short index options expiring today carry an additional 2 percent extreme loss margin**, effective November 20, 2024 under the October 2024 measures. It applies to the expiring contracts only.
+- **Intraday position limits are monitored with at least four random snapshots**, one of them between 14:45 and 15:30, under SEBI/HO/MRD/TPD-1/P/CIR/2025/122 (September 1, 2025) — `[not yet in index]`. Expiry-day breaches attract the exchange penalty and additional-deposit framework from December 6, 2025.
+
+## Conceptual overview
+
+For most of the trading month a derivatives book is a price problem. On expiry day it becomes four problems at once. Margin on the expiring series changes shape, because spread offsets against the expiring leg are withdrawn and an extra tail-risk charge lands on short options. The cash requirement changes, because option premium must be collected before the trade rather than netted at the close. Surveillance changes, because intraday position limits are tested with random snapshots timed to include the final hour. And settlement changes, because open single-stock contracts turn into delivery obligations.
+
+The October 2024 reform package is the origin of most of that. It did six things — upfront premium collection, removal of calendar-spread benefit on expiry day, intraday monitoring of position limits, a larger minimum index contract value, one weekly index product per exchange, and additional tail-risk coverage on expiry day — with commencement dates spread from November 2024 to April 2025. The May 2025 pair of circulars fixed the permitted expiry weekdays and rewrote the risk-monitoring measurement basis; the September 2025 framework replaced the interim intraday arrangement; the February 2026 circular extended the expiry-day spread withdrawal from index contracts to single stocks.
+
+Two framing errors are common. The first treats all six measures as effective in November 2024; two began in February 2025 and the intraday-monitoring measure was dated April 2025 and then superseded twice. The second treats the weekday rule as a list of which product expires when. It is not: the circular grants the exchange a choice and requires approval to change it, so the current contract master and the holiday-adjusted schedule remain the only authority for what expires today.
+
+## 1. Regulatory framework
+
+- **[SEBI/HO/MRD/TPD/P/CIR/2024/132](/broking-kyc/reference/circulars/sebi-other/#sebihomrdtpdpcir2024132)** (October 1, 2024), "Measures to Strengthen Equity Index Derivatives Framework for Increased Investor Protection and Market Stability" — six measures in paragraphs 5.1 to 5.6 with the implementation sequence in paragraph 7. The printed PDF carries the department component as MRD/TPD-1; the landing-page identifier, which the site index follows, omits the "-1".
+- **SEBI/HO/MRD/TPD-1/P/CIR/2025/76** (May 26, 2025), "Final Settlement Day (Expiry Day) for Equity Derivatives Contracts" — permitted final-settlement weekdays and minimum tenor for non-benchmark products, paragraph 3. [SEBI-MRD circulars index](/broking-kyc/reference/circulars/sebi-other/) `[not yet in index]`.
+- **SEBI/HO/MRD/TPD-1/P/CIR/2025/79** (May 29, 2025), "Measures for Enhancing Trading Convenience and Strengthening Risk Monitoring in Equity Derivatives" — futures-equivalent measurement and the phased risk-monitoring changes, paragraphs 5 to 6. `[not yet in index]`.
+- **SEBI/HO/MRD/TPD-1/P/CIR/2025/122** (September 1, 2025), "Framework for Intraday Position Limits Monitoring for Equity Index Derivatives" — operative intraday limits and snapshot requirements, paragraphs 4 to 6. `[not yet in index]`. It replaces the interim arrangement in SEBI/HO/MRD/TPD-1/P/CIR/2025/41 (March 28, 2025), which must not be cited for the proposition that intraday penalties remain suspended.
+- **SEBI/HO/MRD/MRD-PoD-2/P/CIR/2024/140** (October 15, 2024), "Monitoring of position limits for equity derivative segment" — identifier, title and date verified from the SEBI circular landing page; clause detail was not retrieved, so `[verify clauses before acting]`. `[not yet in index]`.
+- **HO/47/15/11(2)2025-MRD-TPD1/ I/4226/2026** (February 5, 2026), "Review of Calendar Spread margin benefit in Single stock derivatives on expiry day" — paragraphs 2 to 6, effective three months from issue. `[not yet in index]`.
+- **[NSE/FAOP/65336](/broking-kyc/reference/circulars/nse/#nsefaop65336)** (November 29, 2024) — exchange implementation of the revised index-derivatives expiry day. **[NSE/FAOP/70616](/broking-kyc/reference/circulars/nse/#nsefaop70616)** (October 3, 2025) — revision in market lot of index derivative contracts, the mechanism through which the contract-value review is applied.
+- **[SEBI/HO/MRD2/DCAP/CIR/P/2020/127](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2dcapcirp2020127)** (July 20, 2020) — the minimum four random intraday margin snapshots that the peak-margin regime rests on. The expiry-day session inherits this, and the [peak-margin field mapping](/broking-kyc/reference/field-atlas/sections/computed-peak-margin/) records the resulting fields.
+- **NSE/INSP/68487** (June 11, 2025), "Issuance of Daily Margin Statement" — the statement must reach the client before the beginning of the next trading session. [NSE circulars index](/broking-kyc/reference/circulars/nse/) `[not yet in index]`.
+
+## 2. Which contracts expire today
+
+The operating unit is exchange, segment, underlying and actual contract expiry date. A weekday label cannot identify it.
+
+| Rule | Content | Effective | Source |
+| --- | --- | --- | --- |
+| Weekly expiry products | One benchmark index options contract per exchange may have weekly expiries | November 20, 2024 | October 2024 measures, 5.5 |
+| Other equity derivative products | Minimum one-month tenor, expiring in the last week of the month on the chosen weekday | Per May 2025 circular | May 2025 expiry circular, 3 |
+| Permitted weekday | Tuesday or Thursday, exchange's choice, prior SEBI approval to change | Per May 2025 circular | May 2025 expiry circular, 3 |
+| Minimum index contract value | ₹15 lakh at introduction; ₹15 lakh to ₹20 lakh band at lot-size review | Per October 2024 measures | October 2024 measures, 5.4 |
+
+Monthly and longer-dated series continue alongside the weekly benchmark series — the restriction is on which products may have *weekly* expiries, not on how many series may be listed. A corporate action can also force a contract to expire outside this structure; those contracts enter the expiry workload even though the published calendar placed them later.
+
+<Aside type="caution" title="Minimum contract value is a product-sizing rule">
+The ₹15 lakh minimum describes how large a new index derivative contract must be. It is not a client account balance, a margin requirement, or the premium payable on an option. Explaining a margin call by reference to this figure will mislead the client.
+</Aside>
+
+## 3. The four things that change when the session opens
+
+**Spread benefit on the expiring leg.** Recompute the portfolio with expiring contracts separated from other expiries for worst-scenario loss. Ordinary spread treatment survives between two later expiries; it is withdrawn where one leg expires today — index contracts since February 1, 2025, single stocks after the February 2026 circular's effective date. This is mandatory in scope, not a conservative broker setting. Present the increment caused by the expiring leg, not an account-wide increase that reads as a loss.
+
+**Upfront premium collection.** Compute net option premium payable at client level and include it in the upfront collection check. The money or eligible collateral must be attributable to that client — another client's surplus cannot support it, per the [client-level collateral segregation framework](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2_dcapcir20210598). An unconfirmed payment instruction is not a collected premium. Rejecting the order or cutting the quantity is an implementation choice; the obligation is upfront collection.
+
+**Additional tail-risk margin on expiring short index options.** An additional 2 percent extreme loss margin applies to short index option positions in contracts expiring that day, effective November 20, 2024. It attaches to expiring contracts only. A strategy label on a multi-leg position does not suppress the surcharge on an eligible short leg.
+
+**Delivery margin staging on single stocks.** Stock derivatives carry staged delivery margins on top of the ordinary requirement — 10, 25, 45 and 70 percent of the computed delivery margin at E-4 to E-1 end of day. See [exercise, assignment and physical settlement](./exercise-assignment-physical/).
+
+## 4. Intraday monitoring during the session
+
+| Measure | Value | Source |
+| --- | --- | --- |
+| Index option net position limit, intraday | ₹5,000 crore futures-equivalent per entity | September 2025 framework, 4.1 |
+| Index option gross limits, intraday | ₹10,000 crore on each of the long and short sides | September 2025 framework, 4.2 |
+| Snapshot requirement | At least four random snapshots, at least one between 14:45 and 15:30 | September 2025 framework, 4.3 |
+| End-of-day index option net limit | ₹1,500 crore futures-equivalent | May 2025 measures, 5.5.1 |
+| Normal enforcement | December 6, 2025, after a July 1 to December 5, 2025 glide path | May and September 2025 instruments |
+| Daily margin statement | Before the beginning of the next trading session | NSE/INSP/68487 |
+
+Three measures are tested — net, gross long and gross short — so a book with modest net exposure can still breach a gross-side ceiling. The intraday ceiling does not replace the smaller end-of-day ceiling. One scheduled batch at the close does not satisfy the four-snapshot framework, and the underlying price used at each snapshot must be retained with it, not recomputed later. The limits and breach treatment are in [position limits and open interest](./position-limits-oi/).
+
+## 5. The broker's expiry-day runbook
+
+Step sequence and screen grouping are **[AI inference — verify before acting]**; the measures are sourced, the workflow is a proposal.
+
+1. **Session preparation, before the open.** Load the trade date, exchange, segment and contract-master version. Query the expiry and corporate-action calendars and split the book into expiring and later series. Validate against the instruction in force rather than carrying forward last week's list — a stale weekly-expiry list admits orders in discontinued series.
+2. **Margin restatement before the first order.** Recompute worst-scenario loss with expiring contracts separated. Apply the single-stock separation after the February 2026 effective date. Preserve ordinary treatment between two later expiries. Publish the delta attributable to the expiring leg.
+3. **Premium collection gate.** Compute client-level net premium payable and gate order acceptance on it. Reconcile against the client's own allocated collateral.
+4. **Short-option expiry gate.** Identify expiring short index options open at beginning of day and those created during the session, and apply the additional 2 percent. Exclude non-expiring contracts from the surcharge.
+5. **Position monitoring.** Aggregate exposure at <abbr title="Permanent Account Number">PAN</abbr> or entity level with the applicable futures-equivalent calculation, monitor net and both gross sides, and keep end-of-day and intraday ceilings as separate tests. Import snapshot timestamps and prices as received.
+6. **Breach handling.** On an intraday excess, capture the rationale, trade changes and any relevant constituent-stock trading. Where additional exposure is claimed against eligible holdings, retain and report the supporting assets under the applicable standard operating procedure. A reduction before the close does not erase the breach, and the expiry-day penalty and additional-deposit framework applies from December 6, 2025 — a different penalty from a client margin shortfall, covered in [margin shortfall and peak margin](./margin-shortfall-peak-margin/).
+7. **Exit or carry decision, before the broker cut-off.** For stock derivatives, refresh funds and deliverable stock. For index derivatives, separate expiring exposure from longer-dated residual legs and preview the residual book's stand-alone margin once the front leg goes. Record actual fills and remaining exposure.
+8. **Close and hand-off.** Preserve final positions, margin obligations, premium obligations, exceptions and client notices. Generate and dispatch the daily margin statement before the next session begins. Reconcile any residual later-expiry hedge on its own.
+
+<Aside type="note" title="The residual leg can cost more than the spread did">
+When the expiring front leg closes or settles, the later leg it was hedging reverts to stand-alone margin. That increase arrives without a new trade and, unless the client sees it before confirming an exit, reads as an unexplained debit. A pre-confirmation residual-position preview is the usual mitigation — an implementation suggestion, not a prescribed screen.
+</Aside>
+
+## 6. Field-level record — expiry control and audit trail
+
+Internal analytical labels. Exchange column names and widths are `[unknown — verify]` pending the current member interface specification.
+
+| name | type | length | mandatory | source-system | destination-system(s) | notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| Trade date | date | `[unknown — verify]` | Yes | Exchange master | <abbr title="Order Management System">OMS</abbr>, <abbr title="Risk Management System">RMS</abbr> | Business date, holiday-adjusted |
+| Contract expiry date | date | `[unknown — verify]` | Yes | Contract master | RMS, settlement | Actual date, never a weekday assumption |
+| Exchange, underlying, series | identifiers | `[unknown — verify]` | Yes | Contract master | RMS | Distinguish weekly from monthly series |
+| Contract lot multiplier | integer | `[unknown — verify]` | Yes | Exchange | Quantity and notional computation | Revised contract value is applied through lot size |
+| Net option premium payable | decimal | `[unknown — verify]` | Applicable clients | Trade ledger | Upfront collection gate | Client-level net amount |
+| Expiring short-option notional | decimal | `[unknown — verify]` | Relevant shorts | Positions, market data | Extreme-loss-margin computation | Drives the additional 2 percent |
+| Expiring-leg spread eligibility | boolean | `[unknown — verify]` | Yes | Effective-date rules | Margin engine | False for the affected expiring leg |
+| Snapshot timestamp | timestamp | `[unknown — verify]` | Yes | Exchange, clearing corporation | Surveillance | At least four per day, one in the final window |
+| Underlying price at snapshot | decimal | `[unknown — verify]` | Yes | Market data | Surveillance | Retain the value used, not a later recomputation |
+| Net futures-equivalent exposure | decimal | `[unknown — verify]` | Index options | Position aggregation | Limit monitor | Tested against intraday and end-of-day ceilings |
+| Gross long and gross short futures-equivalent | decimals | `[unknown — verify]` | Index options | Position aggregation | Limit monitor | Two further independent tests |
+| Daily margin statement dispatch status | timestamp, enum | `[unknown — verify]` | Yes | Communications stack | Compliance | Deadline precedes the next session |
+
+## 7. Alternatives
+
+| Option | What it does | When to pick it | Who uses it |
+| --- | --- | --- | --- |
+| Exit the expiring position | Removes the exposure only if the order fills | The client does not want delivery or carry, and liquidity exists | Retail default; broker-driven cut-offs |
+| Roll to a later expiry | Creates a new position; may leave a leg temporarily unhedged | Exposure is still wanted beyond today | Hedgers, positional traders |
+| Hold to final settlement | Leaves settlement obligations to be funded or delivered | Delivery is intended and funded | Delivery-based books |
+| Intraday surveillance only | Insufficient — the end-of-day ceiling is separate and smaller | Never, as a substitute | — |
+| Intraday plus end-of-day compliance | Both tests run independently | Always, under the current framework | Compliance and surveillance desks |
+
+## Practical notes
+
+- **[gotcha]** Do not describe the October 2024 measures as effective in November 2024. Upfront premium collection and the index spread-benefit withdrawal began February 1, 2025; the intraday-monitoring measure was dated April 2025 and then superseded twice.
+- **[gotcha]** The March 2025 interim intraday circular cannot be used to claim that intraday penalties remain suspended. The September 2025 framework supplies the operative regime and the expiry-day penalty commencement.
+- **[gotcha]** A single weekly benchmark index per exchange does not mean a single listed series. Monthly, quarterly and longer-dated series continue in parallel, and each has its own expiry workload.
+- **[industry practice]** Most brokers set an expiry-day cut-off earlier than the exchange close for client-initiated exits in expiring single-stock contracts, and reserve a square-off window after it. Times are broker policy and belong in the disclosed risk-management document. `[industry practice — unverified]` as a universal pattern.
+- **[cost optimization]** Holiday-adjusted expiry schedules and corporate-action acceleration are the cheapest expiry-day incident sources to eliminate: both are calendar-data problems, not risk-model problems.
+- **[risk trade-off]** Separating expiring contracts raises the requirement at the worst moment for a client who cannot exit. The mitigation is earlier communication, not a softer computation.
+
+## Cross-references
+
+- [Deep Dive: RMS and <abbr title="Standard Portfolio Analysis of Risk">SPAN</abbr> methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/) — the scenario grid, extreme loss margin and spread offsets expiry day modifies.
+- [Deep Dive: Segment rules comparison](/broking-kyc/deep-dives/foundational/segment-rules-comparison/) — per-segment expiry conventions and trading hours.
+- [Deep Dive: Pre-open and closing auction](/broking-kyc/deep-dives/foundational/pre-open-closing-auction/) — the session structure around the expiry timeline.
+- [Deep Dive: OMS internals](/broking-kyc/deep-dives/trading-day/oms-internals/) — where premium and margin gates are enforced per order.
+- [Integration <abbr title="Directed Acyclic Graph.">DAG</abbr>: trading hours](/broking-kyc/operations/integration-dag/trading-hours/) — the intraday loop and snapshot dependencies.
+- [Field atlas: computed peak margin](/broking-kyc/reference/field-atlas/sections/computed-peak-margin/) — snapshot-derived fields and destinations.
+- [Exercise, assignment and physical settlement](./exercise-assignment-physical/) — contracts still open after the close.
+- [Position limits and open interest](./position-limits-oi/) — the limits the snapshots test.
+- [Margin shortfall and peak margin](./margin-shortfall-peak-margin/) — the separate short-collection penalty regime.
+
+## Verified through
+
+2026-09-11
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

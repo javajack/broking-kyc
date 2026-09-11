@@ -1,0 +1,172 @@
+---
+title: "Trading Risk: Margin shortfall and peak margin"
+description: The member's side of the peak-margin regime — collection deadlines, the four-snapshot verification framework, penalty slabs and escalations, short-allocation reason codes, reporting files, the daily margin statement, and who bears the penalty.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** The clearing corporation's margin *computation* (<abbr title="Standard Portfolio Analysis of Risk">SPAN</abbr>, <abbr title="Extreme Loss Margin">ELM</abbr>, the snapshot clock, the MG-12/13 layouts) is already documented in the [<abbr title="Risk Management System">RMS</abbr> SPAN methodology deep dive](/broking-kyc/deep-dives/trading-day/rms-span-methodology/). This page covers the other half — what the member is obliged to *collect*, *report*, and *disclose*, what the penalty grid actually says when you read the source circular, and how the penalty is allocated between broker and client. The order is: obligation, then verification, then penalty, then reporting artefacts, then liability.
+
+## TL;DR
+
+- **Upfront margin means before the trade, not by end of day.** Trading and clearing members must mandatorily collect upfront VaR margin plus Extreme Loss Margin from clients in the cash segment, exactly as in derivatives — para 40.1.2 of the [Master Circular for Stock Brokers](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir2024118) (<abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/POD-1/P/CIR/2024/118, 9 August 2024).
+- **Margins other than upfront are now due by settlement day, not <abbr title="Trade-date Plus N settlement">T+2</abbr>.** SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/57 (28 April 2025) rewrote paras 39.1.2, 39.1.3 and 39.1.5 of the Master Circular to align the collection window with the <abbr title="Trade-date Plus N settlement">T+1</abbr> settlement cycle. Forwarded to members as <abbr title="National Stock Exchange of India">NSE</abbr>/INSP/67739 (29 April 2025). [not yet in index]
+- **Verification uses a minimum of four random intraday snapshots.** Clearing corporations send at least four client-wise margin snapshots per segment per day, taken randomly inside pre-defined windows, per the framework at [SEBI/HO/MRD2/DCAP/CIR/P/2020/127](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2dcapcirp2020127) (20 July 2020). The **higher** of the <abbr title="End Of Day">EOD</abbr> shortfall and the peak-snapshot shortfall is penalised, not the sum.
+- **The penalty slabs are still the 2011 grid.** 0.5% of the shortfall where it is below ₹1 lakh *and* below 10% of applicable margin; 1.0% otherwise — per SEBI circular CIR/DNPD/7/2011 (10 August 2011), which para 40.3.1 of the Master Circular continues to adopt by reference. Escalation to 5% per day applies beyond the third consecutive day and beyond the fifth day in a month. [not yet in index]
+- **Collect 20% upfront and the penalty disappears.** Para 40.3.2: if the member collects a minimum 20% upfront margin in lieu of VaR and ELM from the client, penalty for short collection or non-collection does not apply.
+- **Non-reporting is treated as 100% short reporting.** And false or incorrect reporting is a separate disciplinary offence under CIR/HO/MIRSD/DOP/CIR/P/2019/88 (1 August 2019). [not yet in index]
+
+## Conceptual overview
+
+Three different things get called "peak margin" in broker conversation, and conflating them is the source of most operational confusion. The first is a **collection obligation**: SEBI requires the member to have the client's upfront margin in hand before the order reaches the exchange. The second is a **verification mechanism**: because a regulator cannot watch every order, the clearing corporation takes random snapshots of what each client's margin requirement was during the day and compares that against what the member's books show the client actually had. The third is a **penalty**, levied on the member when the comparison shows a gap.
+
+Only the first is a real-time risk control. The second and third are audit constructs, and SEBI says so explicitly — para 41.9 of the Master Circular notes that fixing intraday and EOD margin computation on beginning-of-day parameters is "only for the purpose of verification of upfront collection of margins from clients", while the clearing corporation continues to update its own margin parameters intraday. A member can therefore be penalised for a gap that its risk system, working off live parameters, never saw as a gap; and conversely a member can pass verification while running genuine intraday risk.
+
+The framework was phased in deliberately: 25% of the peak snapshot obligation in the first three months, then 50%, then 75%, then 100% (para 14.3.3 of Chapter 5 of the SEBI Master Circular for Stock Exchanges and Clearing Corporations). During the phase-in the member had to be able to demonstrate that the un-compared balance had been funded from its own funds and not from another client's money — the same principle that later hardened into the [client-funds upstreaming](/broking-kyc/deep-dives/settlement/client-funds-upstreaming/) and client-level collateral segregation regimes. The phasing is complete; 100% comparison is the live state.
+
+## 1. Regulatory framework
+
+- **[SEBI/HO/MIRSD/POD-1/P/CIR/2024/118](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir2024118)** (9 August 2024) — Master Circular for Stock Brokers. Para 40 sets the cash-segment collection and reporting obligation; para 40.3 the penalty structure; para 41 the verification framework and the snapshot mechanics. Consolidated again as SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90 (17 June 2025). [not yet in index]
+- **[SEBI/HO/MRD2/DCAP/CIR/P/2020/127](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2dcapcirp2020127)** (20 July 2020) — the originating "framework to enable verification of upfront collection of margins": minimum four snapshots, MG-12/13 content, higher-of-two comparison, weekly ledger verification, phased adoption.
+- **CIR/DNPD/7/2011** (10 August 2011) — the penalty grid itself, including the consecutive-day and monthly escalations, the Nifty 3% relief and the treatment of non-reporting. Operationalised by clearing-corporation circular NSE/CMPT/18739 (29 August 2011), which also specified the PNL01/PNL02/PNL03 penalty report formats. [not yet in index]
+- **CIR/HO/MIRSD/DOP/CIR/P/2019/88** (1 August 2019) — disciplinary framework for false or incorrect reporting of margin collection, adopted by para 40.3.3. [not yet in index]
+- **SEBI/HO/MRD2/DCAP/P/CIR/2022/60** (10 May 2022) and **SEBI/HO/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>/MRD-PoD-2/P/CIR/2023/016** (1 February 2023) — moved both the EOD and the intraday margin-collection *verification* computation onto fixed beginning-of-day margin parameters. [not yet in index]
+- **[SEBI/HO/MRD/TPD/P/CIR/2024/132](/broking-kyc/reference/circulars/sebi-other/#sebihomrdtpdpcir2024132)** (1 October 2024) — from 1 February 2025 the upfront collection requirement in equity derivatives also includes **net option premium payable at client level**, and that premium is included in the clearing corporation's intraday snapshots for penalty purposes.
+- **[<abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr>/CMPT/55381](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt55381)** (25 January 2023, effective trade date 13 February 2023) — short-allocation monitoring at snapshot and EOD level, the cross-segment excess-collateral offset, the five permitted reason codes, and the SA-series file names.
+- **NSE/INSP/68487** (11 June 2025) — revised the daily margin statement timeline: the statement must now reach the client **before the beginning of the trading session on the next trading day**, replacing the earlier same-day (T-day EOD) requirement of NSE/INSP/36786. [not yet in index]
+
+## 2. What must be collected, and by when
+
+| Margin type | Segment | Collection deadline | Penalty exposure if not collected |
+|---|---|---|---|
+| VaR margin | Cash | Upfront — in advance of trade | Yes, full slab |
+| Extreme Loss Margin (ELM) | Cash and derivatives | Upfront — in advance of trade | Yes, full slab |
+| SPAN / initial margin | Derivatives | Upfront — in advance of trade | Yes, full slab |
+| Net option premium payable | Equity derivatives | Upfront, from 1 February 2025 | Yes, included in snapshots |
+| Mark-to-market margin | Cash | By settlement day | Yes, unless pay-in made by settlement day |
+| Delivery margin | Cash and derivatives | By settlement day | Yes, unless pay-in or early pay-in made |
+
+Two deeming provisions do most of the work in practice. Para 40.1.3: if pay-in of both funds and securities is made by settlement day, the "other" margins are **deemed** collected and no penalty arises. Para 40.1.4: if early pay-in of securities has been made to the clearing corporation, **all** margins are deemed collected. Institutional investors carrying out business transactions are exempt from upfront collection altogether (para 40.1.6, tracing to MRD/DoP/SE/Cir-07/2005).
+
+SEBI is unusually blunt that the settlement-day window is a penalty-administration concession and not a client entitlement. The parenthetical inserted into para 39.1.2 by the April 2025 circular reads: the period till settlement "has been allowed to TMs/CMs to collect margin from clients taking into account the practical difficulties often faced by them only for the purpose of levy of penalty and it should not be construed that clients have been allowed time till settlement day to pay margin due from them."
+
+## 3. The verification mechanism, in one paragraph
+
+The clearing corporation takes at least four randomly-timed client-wise margin snapshots inside pre-defined windows (more for commodity derivatives with extended sessions — two extra for contracts trading to 21:00 and three extra for contracts trading to 23:30/23:55). It publishes the client-wise margin file MG-12/MG-13 carrying both the EOD requirement and the peak requirement across snapshots. The member reports what it actually held per client at EOD and at peak. Exchanges verify the reported availability against the member's own books and ledgers **on a weekly basis** (para 41.6). The snapshot clock, window timings, the MG-12/MG-13/MG-18 and AMGCM/AMGTM file layouts and the broker-side SPAN implementation are documented in the [RMS SPAN methodology deep dive](/broking-kyc/deep-dives/trading-day/rms-span-methodology/) and the [computed peak-margin field atlas section](/broking-kyc/reference/field-atlas/sections/computed-peak-margin/) — this page does not repeat them.
+
+## 4. Penalty slabs and escalation
+
+The base grid, read directly from the 2011 annexure:
+
+| Short collection per client | Penalty |
+|---|---|
+| Below ₹1 lakh **and** below 10% of applicable margin | 0.5% of the shortfall |
+| ₹1 lakh or more **or** 10% or more of applicable margin | 1.0% of the shortfall |
+
+The escalations are where the real money is:
+
+| Trigger | Consequence |
+|---|---|
+| Short or non-collection for the same client continues beyond the **3rd consecutive day** | 5% of the shortfall **for each day** of continued shortfall beyond day 3 |
+| Short or non-collection for a client occurs on more than **5 days in a month** | 5% of the shortfall for each day during that month beyond the 5th day |
+| Short collection caused by a **3% or more close-to-close move in Nifty** on day T | Penalty imposed only if the shortfall persists to T+2 |
+| **Non-reporting** | Treated as 100% short reporting for penalty computation |
+| Minimum **20% upfront** collected in lieu of VaR plus ELM | No penalty for short or non-collection (para 40.3.2) |
+| **False or incorrect reporting** | Disciplinary action under CIR/HO/MIRSD/DOP/CIR/P/2019/88, separate from the slab |
+
+Penalty is debited from the clearing member's settlement account with the designated primary clearing bank on a daily basis, and is payable by the 5th of the following month.
+
+<Aside type="caution" title="The 3%-Nifty relief is narrower than it looks">
+The relief in clause 4 of the 2011 annexure applies to short collection **caused by** a 3% or greater close-to-close Nifty move on day T, and it only defers the penalty test to T+2 — it does not waive it. A member whose client is still short on T+2 pays the full slab, and the day count for the 3-consecutive-day escalation is not reset. Treat the relief as a two-day grace to make a margin call, not as an exemption. Members who book the relief in their penalty provisioning without tracking the T+2 cure rate consistently under-provide.
+</Aside>
+
+## 5. Short allocation and the permitted reason codes
+
+Short allocation is the collateral-side twin of margin shortfall: the minimum client margin collection requirement in the segment less the client collateral value allocated in that segment (allocation by the clearing member plus the value of securities re-pledged at the clearing corporation for that client, after all prudential norms other than the 50:50 cash-equivalent rule). Per NCL/CMPT/55381 it is monitored both intraday at each peak-margin snapshot and at EOD, and the maximum across all snapshots and EOD is the number that matters.
+
+Before penalty is computed, the clearing corporation checks for excess collateral in **other segments** for the same <abbr title="Trading Member">TM</abbr>-<abbr title="Unique Client Code">UCC</abbr> combination — including where those segments sit with a different clearing member — and nets it off. The netting is snapshot-aligned: snapshot 1 shortfall can only be offset against snapshot 1 excess, never against EOD excess or a later snapshot.
+
+| Reason code | Particulars | Availability |
+|---|---|---|
+| 01 | Excess collateral available at another clearing corporation | Intraday and EOD |
+| 02 | Value of securities sold for which early pay-in was done to the <abbr title="Clearing Corporation (NCL, ICCL, MCXCCL — context-dependent).">CC</abbr> by end of day | Intraday and EOD (report only the T-day EPI value, not the ledger credit) |
+| 03 | Trades executed in wrong client codes | Intraday only (snapshot field other than E) |
+| 04 | Trades done on behalf of <abbr title="Non-Resident Indian">NRI</abbr> clients | Intraday and EOD |
+| 05 | Allocation request submitted to the CC but accepted later | Intraday only |
+
+Trading members report these for their clients and clearing members report them for trading-member proprietary and custodial-participant positions, on NMASS. Reporting under a code that does not hold attracts the false-reporting penalty.
+
+## 6. Reporting artefacts and file names
+
+| Artefact | Direction | Cadence | Content |
+|---|---|---|---|
+| MG-12 / MG-13 | CC to member | Daily EOD | Client-wise and segment-wise EOD requirement plus peak requirement across snapshots |
+| `SA01/02_P_<member code>_DDMMYYYY_i01/02` | CC to member | Per snapshot | Intraday client-level short allocation at that snapshot |
+| `SA01/02_<member code>_DDMMYYYY` | CC to member | Daily EOD | EOD client-level short allocation |
+| `SA04/05_<member code>_DDMMYYYY` | CC to member | Daily EOD | Maximum short allocation across snapshots and EOD, after cross-segment offset, with the governing snapshot number in the snapshot field |
+| `F_PNL01_<MEMBER CODE>_DDMMYYYY.CSV` | CC to trading member | Daily | Trade date, client code, shortfall amount, penalty amount |
+| `F_PNL02_<MEMBER CODE>_DDMMYYYY.CSV` | CC to clearing member | Daily | Trade date, TM code / CP code, shortfall amount, penalty amount |
+| Cash-segment short-collection report | Member to exchange | T+5 | Actual short collection or non-collection of all margins from clients (para 40.1.8) |
+| Daily margin statement | Member to client | Before start of next trading session | Collateral deposited, utilised and status, broken into cash, FDRs, bank guarantees and securities |
+
+## 7. Field-level view: the daily margin statement to the client
+
+The minimum content is set by clause 32 of the standard Rights and Obligations document reproduced in the Master Circular, with the indicative format prescribed by NSE/INSP/45191. [not yet in index]
+
+| name | type | length | mandatory | source-system | destination-system(s) | notes |
+|---|---|---|---|---|---|---|
+| `client_code` | CHAR | 10 | Y | back-office | client email/DLT, exchange on inspection | UCC; must match the exchange UCC master |
+| `trade_date` | DATE | 8 | Y | back-office | client | DDMMYYYY; statement is per trade day |
+| `margin_required_eod` | NUMBER(15,2) | 15 | Y | RMS from MG-12 | client | EOD requirement for that client and segment |
+| `margin_required_peak` | NUMBER(15,2) | 15 | Y | RMS from MG-12 | client | Peak across snapshots; the figure the penalty test uses |
+| `collateral_cash` | NUMBER(15,2) | 15 | Y | back-office ledger | client | Free credit balance plus FDRs and bank guarantees, shown separately; the cash leg of the 50:50 test |
+| `collateral_securities` | NUMBER(15,2) | 15 | Y | depository pledge feed | client | Post-haircut value of margin-pledged securities |
+| `collateral_utilised` | NUMBER(15,2) | 15 | Y | RMS | client | Amount blocked against margin obligations |
+| `collateral_available` | NUMBER(15,2) | 15 | Y | RMS | client | Free balance; negative means due from client |
+| `amount_due_from_client` | NUMBER(15,2) | 15 | Y | RMS | client | The operative margin call |
+| `shortfall_flag` | CHAR | 1 | Y | RMS | client, exchange | Drives the square-off clock under the member's risk policy |
+
+## 8. Client versus broker liability
+
+The penalty is levied on the member, always. The client's obligation runs the other way: to pay upfront margin in advance of the trade and other margins as soon as a margin call is made. Three consequences follow.
+
+**The member cannot simply on-charge the penalty.** Per the exchange penalty framework at [NSE/INSP/64315](/broking-kyc/reference/circulars/nse/#nseinsp64315), margin-shortfall penalty may not be passed to clients except in specified client-attributable circumstances, and prior pass-throughs must be refunded. This is among the most commonly-cited inspection findings; see [inspection types](/broking-kyc/deep-dives/compliance-audit/inspection-types/).
+
+**The member's real remedy is pre-trade refusal or square-off.** Since the member bears the penalty, the economically rational control is a hard pre-trade margin block in the order path (see [<abbr title="Order Management System">OMS</abbr> internals](/broking-kyc/deep-dives/trading-day/oms-internals/)) plus a documented square-off policy disclosed in the account-opening kit. The square-off policy has to be disclosed — it is part of the policies-and-procedures document and is summarised in the <abbr title="Most Important Terms and Conditions">MITC</abbr> acknowledged by the client (see [client protection frameworks](./client-protection-frameworks/)).
+
+**Disclosure, not indemnity, is the compliance artefact.** The risk disclosure document, the policies and procedures, the tariff sheet and the MITC together tell the client that positions may be squared off on margin shortfall and that interest or delayed-payment charges may apply on debit balances. What they cannot do is convert an exchange penalty on the member into a client debit.
+
+## 9. Alternatives
+
+| Option A: hard pre-trade block | Option B: post-trade margin call | When to pick which | Who uses what |
+|---|---|---|---|
+| Order rejected unless margin is already available | Order accepted, margin called on T, squared off if unmet | A for retail and self-directed flow; B where a relationship and a credit view exist | Discount and app-first brokers run A almost exclusively; full-service and institutional desks run B with internal credit limits |
+| Option A: collect full VaR plus ELM | Option B: collect minimum 20% upfront | A where the client funds fully in advance anyway; B as a deliberate penalty-avoidance design under para 40.3.2 | B is common on delivery-oriented cash-segment flow |
+| Option A: rely on cash collateral | Option B: rely on margin-pledged securities | A is penalty-safe and simple; B is capital-efficient but exposed to haircut moves, the 50:50 cash-equivalent test and pledge-release timing | Most retail books are mixed; see [collateral and cross-margin](./collateral-cross-margin/) |
+| Option A: early pay-in of securities | Option B: hold margin | A extinguishes the margin requirement entirely under para 40.1.4 and is the cleanest penalty avoidance for sell trades | Standard on retail sell flow where the securities are already in the client's demat |
+
+## Practical notes
+
+- **[gotcha]** The peak-margin figure in MG-12 is computed on fixed beginning-of-day parameters, while the broker's live RMS uses intraday parameters. On a volatile day the two diverge, and the divergence is not an error in either system — it is paras 41.7 to 41.9 working as designed. Reconciliation tooling that flags every divergence as a break generates unusable noise.
+- **[gotcha]** Non-reporting is penalised as 100% short reporting. A failed NMASS upload or a missed file window is therefore far more expensive than an honest report of a real shortfall. Alerting on *submission success* deserves higher priority than alerting on shortfall magnitude.
+- **[industry practice]** Because the snapshot time inside each window is random, members hold margin-releasing operations — collateral release, pledge revocation, payout of free balance — stable across each window rather than at a presumed clock. `[industry practice — unverified]` for the specific freeze durations used, which vary by member.
+- **[risk trade-off]** The 20% upfront route under para 40.3.2 removes penalty exposure but increases client funding friction, which costs conversion on cash-segment delivery flow. Brokers competing on ease of funding generally accept residual penalty exposure instead and provision for it monthly.
+- **[gotcha]** The daily margin statement deadline moved from T-day EOD to before the next session's start (NSE/INSP/68487, 11 June 2025). Batch schedules built around a 21:00 dispatch still comply; those built around "during the next morning's <abbr title="Beginning Of Day">BOD</abbr> run" may not, because the statement has to be *out* before the session opens.
+- **[AI inference — verify before acting]** The field table in section 7 reconstructs the daily margin statement from clause 32 of the Rights and Obligations document plus common back-office output. The authoritative column list is the indicative format at NSE/INSP/45191, which was not retrievable from the exchange archive at the time of writing.
+
+## Cross-references
+
+- [Deep Dive: RMS SPAN Methodology and Peak Margin](/broking-kyc/deep-dives/trading-day/rms-span-methodology/) — the clearing-corp-side computation, snapshot windows, MG-12/13/18 and AMGCM/AMGTM layouts, and the broker's local SPAN implementation.
+- [Computed / Derived — peak-margin field atlas](/broking-kyc/reference/field-atlas/sections/computed-peak-margin/) — field-by-field destinations for the snapshot, collateral-value and short-allocation attributes.
+- [Deep Dive: Client funds upstreaming](/broking-kyc/deep-dives/settlement/client-funds-upstreaming/) — why "funded from the member's own funds and not from another client" is a hard constraint, not a preference.
+- [Deep Dive: OMS Internals](/broking-kyc/deep-dives/trading-day/oms-internals/) — where the pre-trade margin block sits in the order path and what it costs in latency.
+- [Deep Dive: Inspection types](/broking-kyc/deep-dives/compliance-audit/inspection-types/) — how margin-collection and penalty-pass-through findings surface in exchange inspection.
+- [Compliance blueprint](/broking-kyc/operations/compliance-blueprint/) — the obligation rows for margin collection, reporting and statement dispatch.
+
+## Verified through
+
+2026-09-11
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

@@ -1,0 +1,166 @@
+---
+title: "Trading Risk: Position Limits and Open Interest"
+description: Market-wide position limits on the new futures-equivalent basis, ban-period behaviour, client and member limits by entity category, delta-based index open-interest ceilings from the 2025 framework, and breach handling.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** A position-limit question decomposes into three — who is the entity, how is exposure measured, which ceiling applies. The page follows that order: entity categories, futures-equivalent measurement, the three limit families, ban-period behaviour, then breach handling and evidence. All numbers sit in one table so a ceiling can be looked up without reading the narrative.
+
+## TL;DR
+
+- **Exposure is measured in futures-equivalent terms, using signed deltas.** <abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>/TPD-1/P/CIR/2025/79 (May 29, 2025), paragraph 5.1, replaced notional-contract counting — [SEBI-MRD circulars index](/broking-kyc/reference/circulars/sebi-other/) `[not yet in index]`. It is not the sum of contracts, premium turnover or every leg's notional.
+- **Market-wide position limit is the lower of 15 percent of free float and 65 times average daily delivery value, floored at 10 percent of free float**, recalculated quarterly from the rolling preceding three months (paragraph 5.2). The legacy 20-percent-of-free-float formula must not be presented as current.
+- **A stock enters ban when end-of-day market-wide futures-equivalent open interest exceeds 95 percent of the market-wide limit** (paragraph 5.2.6). During the ban, trading must reduce end-of-day exposure without crossing zero into the opposite sign, so a delta-reducing hedge is permitted.
+- **Single-stock ceilings by category:** client and <abbr title="Non-Resident Indian">NRI</abbr> 10 percent of the market-wide limit; trading-member proprietary 20 percent; proprietary plus clients, Category I <abbr title="Foreign Portfolio Investor">FPI</abbr> and mutual fund 30 percent; Category <abbr title="—">II</abbr> FPI 20 percent, with individuals, family offices and corporates at 10 percent (paragraph 5.8).
+- **Index option ceilings are three separate tests.** End of day: net ₹1,500 crore futures-equivalent, gross ₹10,000 crore each side. Intraday: net ₹5,000 crore, gross ₹10,000 crore each side, under SEBI/HO/MRD/TPD-1/P/CIR/2025/122 (September 1, 2025) — `[not yet in index]`.
+- **Margin and position limits are independent tests.** More collateral does not raise a position ceiling, and one client's collateral cannot support another — see the [client-level collateral segregation framework](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2_dcapcir20210598).
+
+## Conceptual overview
+
+A position limit answers a different question from a margin requirement. Margin asks whether a client has posted enough to absorb a plausible loss; a position limit asks whether the position should exist at all, however well collateralised. The two run independently, which is why a well-funded client can be refused an order and why a broker cannot cure a limit breach by asking for more money.
+
+Indian equity derivatives run three families of limit. The market-wide limit caps how much of a single stock's derivative open interest the whole market may hold; when it is nearly exhausted the stock enters a ban period in which participants may only reduce exposure. Entity-category limits cap what one client, NRI, foreign portfolio investor, mutual fund or trading member may hold in a single stock. Index limits cap index futures and index options exposure; since 2025 the index-option ceilings are stated in rupees of futures-equivalent exposure and tested three ways, with a separate, higher intraday net ceiling monitored by random snapshots.
+
+The measurement change is the part most likely to break an existing implementation. Futures-equivalent exposure signs the position: a long future contributes positively, a long call its positive delta, a long put its negative delta, and short positions reverse the corresponding long's sign. For the market-wide computation the May 2025 circular describes a gross addition of the net futures-equivalent exposures computed at <abbr title="Unique Client Code">UCC</abbr> level. A system that previously summed absolute notional values will produce a different — and non-compliant — answer.
+
+The market-wide limit and the graded or additional surveillance measures are related but distinct; the surveillance stack, and the older market-wide-limit summary, are in the [surveillance norms deep dive](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/). This page carries the current framework and the breach workflow.
+
+## 1. Regulatory framework
+
+- **SEBI/HO/MRD/TPD-1/P/CIR/2025/79** (May 29, 2025), "Measures for Enhancing Trading Convenience and Strengthening Risk Monitoring in Equity Derivatives" — paragraphs 5.1 to 5.5 and 5.8 establish futures-equivalent measurement, the recalibrated market-wide limit, ban-period behaviour, index limits and the entity-category tables; paragraph 6 carries the implementation sequence, single-stock category limits effective October 2025. [SEBI-MRD circulars index](/broking-kyc/reference/circulars/sebi-other/) `[not yet in index]`.
+- **SEBI/HO/MRD/TPD-1/P/CIR/2025/122** (September 1, 2025), "Framework for Intraday Position Limits Monitoring for Equity Index Derivatives" — paragraphs 4 to 6 establish intraday index-option ceilings, snapshot requirements, the holdings-backed additional-exposure route and breach reporting. `[not yet in index]`. Expressly limited to index options; do not copy it to futures or single stocks.
+- **SEBI/HO/MRD/TPD-1/P/CIR/2025/41** (March 28, 2025), "Intraday Monitoring of Position Limits for Index Derivatives" — the interim arrangement, read only together with the later May and September instruments. `[not yet in index]`.
+- **SEBI/HO/MRD/MRD-PoD-2/P/CIR/2024/140** (October 15, 2024), "Monitoring of position limits for equity derivative segment" — identifier, title and date verified from the SEBI landing page; clause detail not retrieved, so `[verify clauses before acting]`. `[not yet in index]`.
+- **[SEBI/HO/MRD/TPD/P/CIR/2024/132](/broking-kyc/reference/circulars/sebi-other/#sebihomrdtpdpcir2024132)** (October 1, 2024) — the original intraday position-monitoring measure among the six October 2024 reforms.
+- **Chapter 5, Exchange Traded Derivatives** (December 30, 2024, SEBI master chapter) — retained baseline mechanics, including the ban-exit test at aggregate open interest of 80 percent or below. The market-wide formula and the old client percentages in it were replaced by the May 2025 circular.
+- **[SEBI/HO/MRD2_DCAP/CIR/2021/0598](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2_dcapcir20210598)** (July 20, 2021) — client-level collateral segregation, which prevents one client's surplus from supporting another's exposure.
+- **[<abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr>/CMPT/66597](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt66597)** (February 10, 2025) and **[NCL/CMPT/63762](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt63762)** (September 5, 2024) — representative per-security notices revising market-wide, participant, institutional and non-institutional client limits: the operational source for the number applying to a given stock.
+- **[<abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> notice 20230106-56](/broking-kyc/reference/circulars/bse/#20230106-56)** (January 6, 2023) — penalty structure for position-limit violations in the equity and currency derivatives segments. The <abbr title="National Stock Exchange of India">NSE</abbr> counterpart sits in the [Surveillance and Investigation Consolidated Circular NSE/SURV/74008](/broking-kyc/reference/circulars/nse/#nsesurv74008) (April 30, 2026).
+- **[Securities and Exchange Board of India (Stock Brokers) Regulations, 2026](/broking-kyc/reference/circulars/sebi-other/#sebilad-nrogn2026291)** (notified January 7, 2026) — the framework within which a member's monitoring obligation sits.
+
+## 2. Entity categories — the aggregation question first
+
+Limits apply to a regulatory identity, not a login. Before any exposure number is computed, the account must be classified, and the classification reconciled with the registered status rather than selected.
+
+| Category | Why it is separate | Aggregation note |
+| --- | --- | --- |
+| Client (resident) | Base non-institutional ceiling | All <abbr title="Permanent Account Number">PAN</abbr>-linked accounts aggregate, across brokers |
+| NRI | Client percentage, own custodial arrangements | See the [NRI deep dive](/broking-kyc/appendix/nri-deep-dive/) |
+| Trading member, proprietary | Own book, distinct ceiling | Visible separately on the member dashboard |
+| Trading member, proprietary plus clients | Aggregate member book | Its own test, not the sum of two compliant numbers |
+| Category I FPI | Institutional treatment | Custodian-reported |
+| Category II FPI | Lower ceiling than Category I | Individuals, family offices and corporates take the client percentage |
+| Mutual fund | Institutional treatment | Scheme- and fund-level rules interact |
+
+Ambiguous classification should be rejected, not resolved by applying the most generous limit. Two clients holding opposite positions are two entities: neither their exposures nor their collateral pools net.
+
+<Aside type="caution" title="Ten percent of the market-wide limit is not ten percent of free float">
+The market-wide limit is already computed from its own formula — the lower of 15 percent of free float and 65 times average daily delivery value, floored at 10 percent of free float. A client ceiling of 10 percent applies to *that result*, not to free float. Applying the client percentage to free float overstates the ceiling wherever the delivery-value leg binds.
+</Aside>
+
+## 3. Measuring exposure
+
+1. **Import the inputs.** Contract quantities, lot multipliers, underlying prices and clearing delta values, each stamped with the timestamp they belong to.
+2. **Sign the legs.** Long future positive; long call positive delta; long put negative delta; short call and short put reverse the corresponding long sign.
+3. **Compute the required measures.** Net futures-equivalent exposure and, where the rule demands them, gross long and gross short as separate figures.
+4. **Reconcile against clearing output.** A missing delta or stale underlying price is a reconciliation exception, not rounding to be dismissed when a threshold is near.
+5. **Keep units consistent.** A share count and a rupee ceiling cannot be compared without explicit conversion, and the market-wide denominator should be taken from the clearing corporation's published figure rather than reconstructed.
+
+## 4. The ceilings
+
+| Limit or trigger | Figure | Source |
+| --- | --- | --- |
+| Market-wide position limit | Greater of (10 percent of free float) and the lesser of (15 percent of free float) and (65 times average daily delivery value) | May 2025, 5.2 |
+| Market-wide recalculation | Quarterly, from rolling preceding three months' average daily delivery value | May 2025, 5.2 |
+| Ban entry | End-of-day market-wide futures-equivalent open interest above 95 percent of the limit | May 2025, 5.2.6 |
+| Ban exit (retained baseline) | Aggregate open interest down to 80 percent or below; confirm the current procedure for the futures-equivalent basis | Dec 2024 master chapter |
+| Single stock — client, NRI | 10 percent of market-wide limit | May 2025, 5.8 |
+| Single stock — <abbr title="Trading Member">TM</abbr> proprietary | 20 percent | May 2025, 5.8 |
+| Single stock — proprietary plus clients, Category I FPI, mutual fund | 30 percent | May 2025, 5.8 |
+| Single stock — Category II FPI | 20 percent; individuals, family offices and corporates 10 percent | May 2025, 5.8 |
+| Index futures — Category I FPI, mutual fund, TM proprietary, clients | Higher of 15 percent of futures open interest and ₹500 crore | May 2025, 5.5.2 |
+| Index futures — Category II FPI | Higher of 10 percent and ₹500 crore; individuals, family offices and corporates higher of 5 percent and ₹500 crore | May 2025, 5.5.2 |
+| Index options — end of day | Net ₹1,500 crore; gross long and gross short ₹10,000 crore each | May 2025, 5.5.1 |
+| Index options — intraday | Net ₹5,000 crore; gross ₹10,000 crore each side | Sep 2025, 4.1–4.2 |
+| Intraday snapshots | Four random minimum; one between 14:45 and 15:30 | Sep 2025, 4.3 |
+| Normal enforcement | December 6, 2025, after the July 1 to December 5, 2025 glide path | May and Sep 2025 |
+
+Index futures limits are measured on gross notional; the index-option ceilings and the market-wide formula depend on delta-equivalent exposure. Both can be retained internally to explain a portfolio, but only the prescribed measure decides each test.
+
+## 5. Ban period — what is and is not permitted
+
+When a stock enters ban, permitted trading is trading that reduces end-of-day futures-equivalent exposure without a sign change.
+
+- **Closing an existing contract** reduces exposure and is the ordinary route.
+- **Adding a delta-reducing hedge** is permitted under the May 2025 formulation, which gives an option hedge as an example. A blanket "no new contracts during a ban" statement is therefore an inaccurate description of the rule — though a broker may impose it as policy, and should label it so.
+- **Crossing the sign** is not permitted: reducing a long book to zero is allowed; turning it into an equivalent short book is not.
+- **A passive increase caused by underlying price movement** is distinguished from an active increase caused by trading, and must be attributed before it is treated as a breach.
+- **The one-day position-reduction facilitation** in paragraph 5.5.4 is expressly not permission to take speculative exposure above the limit.
+
+Intraday market-wide monitoring — at least four random observations for surveillance — is not the end-of-day ban-entry test. A stock can show high utilisation at 11:00 and not enter ban.
+
+## 6. Breach handling and evidence
+
+1. **Classify the breach.** Which entity, limit family and measure (net, gross long, gross short); intraday or end of day; active or passive.
+2. **Reduce, and record.** Capture orders, fills, residual exposure and time. A reduction before the close does not erase an intraday expiry-day breach.
+3. **Retain the rationale and related trading.** Paragraphs 4.5 to 4.7 of the September 2025 framework expect trade rationale and constituent-security movements to be kept for surveillance.
+4. **If additional exposure is claimed against holdings**, validate stock holdings for short-direction exposure and eligible cash or cash equivalents for long-direction exposure, and report them under the applicable procedure. A balance screenshot is not evidence.
+5. **Expect two penalty streams.** Exchange position-limit penalties, and the expiry-day additional-deposit framework operative from December 6, 2025, are distinct from client margin-shortfall penalties — see [margin shortfall and peak margin](./margin-shortfall-peak-margin/).
+6. **Close the day.** Reconcile reported and internal exposures, the next-session ban list and the client restrictions that follow. The 2025 glide path is historical after December 5, 2025.
+
+## 7. Field-level record — position-limit computation
+
+Internal analytical labels; feed filenames and widths are `[unknown — verify]` pending the current member interface specification and the joint monitoring standard operating procedure.
+
+| name | type | length | mandatory | source-system | destination-system(s) | notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| PAN | string | 10 | Yes | Client master | Entity aggregator | Regulatory identity, not a platform login |
+| UCC | string | `[unknown — verify]` | Yes | Exchange master | Entity aggregator | Several UCCs can map to one PAN |
+| Entity category | enum | `[unknown — verify]` | Yes | Registration records | Limit engine | Client, NRI, FPI I or II, TM proprietary, aggregate TM, mutual fund |
+| Underlying and instrument class | identifiers | `[unknown — verify]` | Yes | Contract master | Risk computation | Futures and options measured under different rules |
+| Position quantity and signed delta | integer, decimal | `[unknown — verify]` | Yes | Cleared positions, clearing data | Exposure engine | Per contract, per side; retain the option sign convention |
+| Underlying price and valuation timestamp | decimal, timestamp | `[unknown — verify]` | Yes | Market data, exchange | Intraday limit monitor | Snapshot-price rule applies |
+
+| Net, gross long and gross short futures-equivalent | decimals | `[unknown — verify]` | Yes | Exposure engine | Limit monitor | Three independent index-option tests |
+| Market-wide limit and market futures-equivalent open interest | decimals | `[unknown — verify]` | Stock limits | Exchange, clearing corporation | Limit and ban checks | Store units with business date |
+| Prior end-of-day exposure and passive-change attribution | decimals | `[unknown — verify]` | Ban checks | Position history, market data | Breach investigation | Baseline for the reduce-only test; separates price movement from trading |
+| Additional-exposure backing reference | asset references | `[unknown — verify]` | Conditional | Custodian, bank, depository | Regulatory reporting | Reporting layout not obtained |
+
+## 8. Alternatives
+
+| Option A | Option B | When to pick which | Who uses what |
+| --- | --- | --- | --- |
+| Gross notional measurement | Futures-equivalent (delta) measurement | Not a preference: index futures limits use gross notional; index-option ceilings and the market-wide formula use delta-equivalent exposure | Both retained internally; only the prescribed one decides the test |
+| Close the position during a ban | Add a delta-reducing hedge during a ban | Closing is always compliant; a hedge is permitted where it reduces end-of-day delta without a sign change | Positional books hedge; retail is usually restricted to closing |
+| Stay within the ordinary limit | Report holdings-backed additional exposure | The second needs the defined conditions, evidence and reporting; it is not a way to assign arbitrary cash | Institutional and hedging books |
+| Monitor at end of day | Monitor intraday as well | Both are mandatory; intraday compliance does not imply end-of-day compliance | Compliance and surveillance desks |
+
+## Practical notes
+
+- **[gotcha]** The September 2025 intraday net allowance of ₹5,000 crore does not replace the ₹1,500 crore end-of-day figure. Two ceilings, two tests.
+- **[gotcha]** The December 2024 master chapter's 20-percent-of-free-float formula and its older client percentages are historical for the parts the May 2025 circular replaced. Quoting them as current is the likeliest sourcing error on this topic.
+- **[gotcha]** Opposite-sign positions held by two clients are not one portfolio, and neither is their collateral. Aggregation follows the prescribed identity.
+- **[risk trade-off]** A portfolio with near-zero net delta can still breach a gross-side ceiling; publish all three index-option measures in any review example.
+- **[industry practice]** Brokers commonly apply a stricter internal ceiling and block fresh positions in banned stocks outright rather than assessing whether a trade is delta-reducing. Label it broker policy. `[industry practice — unverified]` as a universal pattern.
+- **[gotcha]** Commodity derivatives run a separate framework. SEBI revised it on September 9, 2026 — HO/47/16/13(5)2026-MRD-POD1/ I/20735/2026 on the [SEBI-MRD circulars index](/broking-kyc/reference/circulars/sebi-other/), forwarded as [<abbr title="Multi Commodity Exchange of India">MCX</abbr>/S&I/513/2026](/broking-kyc/reference/circulars/mcx/) — capping penalties at ₹2 lakh for breaches above 2 percent and ₹10,000 for breaches up to 2 percent, with client limits of 2, 1 and 0.5 percent of deliverable supply for broad, narrow and sensitive commodities. Do not extend the equity tables into commodities or the reverse.
+
+## Cross-references
+
+- [Deep Dive: Surveillance norms, <abbr title="Graded Surveillance Measure">GSM</abbr> and <abbr title="Additional Surveillance Measure">ASM</abbr>](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/) — the surveillance stack and the earlier market-wide-limit summary.
+- [Deep Dive: Segment rules comparison](/broking-kyc/deep-dives/foundational/segment-rules-comparison/) — the per-segment position-limit baseline.
+- [Deep Dive: <abbr title="Risk Management System">RMS</abbr> and <abbr title="Standard Portfolio Analysis of Risk">SPAN</abbr> methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/) — why margin capacity and position permission are separate computations.
+- [Deep Dive: <abbr title="Securities Lending and Borrowing Mechanism">SLBM</abbr>](/broking-kyc/deep-dives/settlement/slbm/) — lending position limits, also expressed against the market-wide limit.
+- [Field atlas: computed surveillance](/broking-kyc/reference/field-atlas/sections/computed-surveillance/) — limit-monitoring field destinations.
+- [Appendix: NRI deep dive](/broking-kyc/appendix/nri-deep-dive/) — the NRI category's custodial and limit particulars.
+- [Expiry-day operations](./expiry-day-operations/) — where intraday monitoring and expiry-day penalties bite.
+- [Collateral and cross-margin](./collateral-cross-margin/) — the independent margin-capacity test.
+- [Persona: <abbr title="Order Management System">OMS</abbr> and RMS head](/broking-kyc/personas/oms-rms-head/) — the reading path this page belongs to.
+
+## Verified through
+
+2026-09-11
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

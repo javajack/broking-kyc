@@ -1,0 +1,149 @@
+---
+title: "Trading Risk: Exercise, Assignment and Physical Settlement of Stock F&O"
+description: What happens to stock futures and stock options still open at expiry — exercise and assignment direction, compulsory physical delivery, staged delivery margins in expiry week, and netting with cash-segment obligations.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** The order follows the calendar a client experiences — why delivery exists, the rule set, the direction matrix deciding who receives and who delivers, the margin that builds four sessions before expiry, the netting that can shrink the obligation, then the runbook and exception paths. The field table sits last because it is the inspection record, not the client screen.
+
+## TL;DR
+
+- **Single-stock futures and options settle by delivery of shares, not cash.** Mandated by <abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>/DOPI/CIR/P/2018/161 (December 31, 2018), phased across the April, July and October 2019 expiries — [SEBI-MRD circulars index](/broking-kyc/reference/circulars/sebi-other/) `[not yet in index]`. Index derivatives are unaffected: there is no index basket to deliver.
+- **Delivery margins build over the last four sessions of expiry week, not on expiry day.** <abbr title="National Stock Exchange of India">NSE</abbr> Clearing stages 10 percent of the computed delivery margin at E-4 end of day, 25 percent at E-3, 45 percent at E-2 and 70 percent at E-1, per <abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr>/CMPT/43262 (January 17, 2020) — [clearing-corporation circulars index](/broking-kyc/reference/circulars/clearing-corps/) `[not yet in index]`.
+- **F&O delivery obligations net against cash-segment obligations for the same clearing member, trading member and <abbr title="Unique Client Code">UCC</abbr>**, per [NCL/CMPT/55330](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt55330) (January 20, 2023) as updated by [NCL/CMPT/56167](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt56167) (March 28, 2023). Securities tax and stamp duty remain segment-wise.
+- **Direction depends on the leg, not the profit.** A long future and an exercised long call receive shares; a short future, an assigned short call and an exercised long put deliver. An option that finished out of the money produces no delivery.
+- **A failed square-off is not an exit.** If illiquidity or a price band blocks the closing trade, the residual quantity stays in the delivery queue.
+- **Corporate actions can accelerate an expiry.** NCL/CMPT/73864 (April 23, 2026) adjusted Vedanta Limited contracts and named reports F_PS03 and F_PS04 — `[not yet in index]`. A month-end filter on the published calendar misses these.
+
+## Conceptual overview
+
+A stock derivative still open at expiry stops being a price bet and becomes a securities transaction. The buyer of a stock future has agreed to buy shares; the seller to sell them; an option holder exercising an in-the-money contract triggers the same obligation on the assigned writer. Until 2018 most of this settled in cash against a final settlement price. Since the phased migration completed in October 2019, single-stock derivatives settle by actual delivery through the same system that clears a cash-market trade.
+
+The F&O desk and the settlement desk therefore converge in expiry week. A client short a stock future needs deliverable shares with a valid debit route; a client long a stock future needs cleared funds for the full contract value, not the margin that supported the position. The clearing corporation does not wait for expiry day to ask: it stages a delivery margin across the final four sessions so the funding gap surfaces before the obligation crystallises.
+
+"Physical" describes the obligation, not the medium — delivery happens electronically through the depository. What differs from a cash trade is that the client did not choose the quantity: the lot size and the contract did, and the client may not have intended to own or short the stock at all. That mismatch causes most expiry-week incidents, and it is why brokers impose earlier cut-offs than the exchange calendar requires. The margin machinery behind these numbers is in the [<abbr title="Standard Portfolio Analysis of Risk">SPAN</abbr> and margin methodology deep dive](/broking-kyc/deep-dives/trading-day/rms-span-methodology/); what follows is the delivery path.
+
+## 1. Regulatory framework
+
+- **SEBI/HO/MRD/DOPI/CIR/P/2018/161** (December 31, 2018) — migrates remaining stock derivatives to compulsory physical settlement, phased across the bottom 50 stocks by market capitalisation from the April 2019 expiry, the next 50 from July 2019 and the remainder from October 2019 (paragraphs 2–3). The February 8, 2019 follow-up covers stocks exiting the segment. Both predate the 2020 sweep window: [SEBI-MRD circulars index](/broking-kyc/reference/circulars/sebi-other/) `[not yet in index]`.
+- **SEBI/HO/MRD2_DCAP/P/CIR/2022/165** (November 30, 2022) — permits net settlement of cash-segment and F&O delivery obligations on expiry of stock derivatives. [SEBI-MRD circulars index](/broking-kyc/reference/circulars/sebi-other/) `[not yet in index]`.
+- **[NCL/CMPT/55330](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt55330)** (January 20, 2023) — the clearing implementation: F&O delivery obligations net against cash-segment obligations for an identical clearing member, trading member and UCC; separate F&O physical settlement and auction calendars cease; margin benefit is given on the total of cash-segment margins and F&O delivery margins. Updated by **[NCL/CMPT/56167](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt56167)** (March 28, 2023), specifying the voluntary-auction file `CM_SA_DDMMYYYY_nn.csv` and rejection reason codes 1 to 14.
+- **NCL/CMPT/43262** (January 17, 2020) — revises delivery-margin staging to 10/25/45/70 percent at E-4 to E-1 end of day, replacing 20/40/60/80; levied from the January 24, 2020 computation for the January 30, 2020 expiry, collected by <abbr title="Trade-date Plus N settlement">T+1</abbr> and included in client margin reporting. [Clearing-corporation circulars index](/broking-kyc/reference/circulars/clearing-corps/) `[not yet in index]`.
+- **[SEBI/HO/MRD/MRD-PoD-2/P/CIR/2024/137](/broking-kyc/reference/circulars/sebi-other/#sebihomrdmrd-pod-2pcir2024137)** (October 10, 2024) — direct pay-out of securities to the client demat account, fully effective for all settlements from January 14, 2025, so delivery lands in the client's demat rather than the broker pool. See the [direct payout deep dive](/broking-kyc/deep-dives/settlement/direct-payout-to-demat/).
+- **HO/47/15/11(2)2025-MRD-TPD1/ I/4226/2026** (February 5, 2026), "Review of Calendar Spread margin benefit in Single stock derivatives on expiry day" — removes the benefit where the expiring single-stock leg is one side of the spread, effective three months from issue. `[not yet in index]`.
+- **[SEBI/HO/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (June 17, 2025), Master Circular for Stock Brokers — the consolidated client-collateral and broker-obligation baseline.
+
+## 2. What actually becomes deliverable
+
+Moneyness at expiry is decided against the final settlement price published by the clearing corporation — not the premium paid, and not the last traded price on the client's screen.
+
+| Position at expiry | Direction | What the client needs | Common misreading |
+| --- | --- | --- | --- |
+| Long stock future | Receives shares | Cleared funds for full contract value | That the blocked margin is the funding requirement |
+| Short stock future | Delivers shares | Free quantity plus valid debit authorisation | That a pledged or funded holding is deliverable |
+| Long call, in the money | Receives shares | Cleared funds for strike times quantity | That a small premium implies a small obligation |
+| Short call, assigned | Delivers shares | Free quantity | That a covered call needs no delivery action |
+| Long put, in the money | Delivers shares | Free quantity | That a long option cannot create a delivery obligation |
+| Short put, assigned | Receives shares | Cleared funds for strike times quantity | That it "expired worthless" because it was sold |
+| Any option out of the money | No delivery | Nothing | That it still needs delivery funding |
+
+Two consequences follow. A strategy label is not a settlement instruction: a spread whose maximum loss is small can still produce two gross delivery legs, netted only at the clearing level if at all. And the deliverable quantity is the lot multiplier times the contract count, corporate-action adjusted — never the quantity the client would have chosen.
+
+<Aside type="danger" title="Do-not-exercise is not an assumption you may make">
+Whether a do-not-exercise facility exists for a contract, and in what format an instruction would be submitted, must be confirmed against current exchange and clearing-corporation instructions before it is offered to a client or built into a screen. A client's wish not to take delivery is not evidence that a facility exists: **[AI inference — verify before acting]** if a design assumes either.
+</Aside>
+
+## 3. Delivery margins during expiry week
+
+Delivery margin is a separate component, levied at client level on positions likely to result in delivery, additive to the ordinary SPAN-plus-extreme-loss requirement on the same contract.
+
+| Session | Percentage of computed delivery margin held | Collection | Superseded staging |
+| --- | --- | --- | --- |
+| E-4 end of day | 10 percent | By T+1 | 20 percent |
+| E-3 end of day | 25 percent | By T+1 | 40 percent |
+| E-2 end of day | 45 percent | By T+1 | 60 percent |
+| E-1 end of day | 70 percent | By T+1 | 80 percent |
+| Expiry and after | The delivery obligation itself | Per settlement schedule | Margin releases only on the applicable release event |
+
+Source: NCL/CMPT/43262 (January 17, 2020). Two operational points travel with those percentages. The stages are end-of-day computations, so a client-facing figure quoted without the end-of-day basis will disagree with the clearing figure. And the percentage applies to the *computed delivery margin* — which for an in-the-money long option position is valued at the strike price and margined at the cash-segment rate — not to the whole contract value. Multiplying the staging percentage by notional contract value is wrong in the denominator.
+
+Brokers commonly hold more and start earlier. Zerodha's published policy blocks the lower of 50 percent of contract value and 1.5 times the normal margin for expiry-day futures and short option positions, charges 0.25 percent of physical delivery value as brokerage (0.1 percent where positions are netted), and lists a risk-management square-off charge of ₹50 plus 18 percent GST — `[industry practice]`, that broker's policy, not a universal rule. Its collection is described at beginning of day while the clearing staging is end of day: carry the timestamp and the denominator with any percentage quoted internally.
+
+## 4. Netting with the cash segment
+
+Where the same client, under the same trading member and clearing member, has an opposite-direction cash-segment obligation on the same settlement, the two are netted. A client short one stock future who bought the equivalent quantity in the cash market for that settlement does not move both sets of shares.
+
+Three conditions limit this. Netting operates on identical clearing member, trading member and UCC combinations — a purchase at another broker does not offset. Securities transaction tax and stamp duty remain segment-wise. And netting is a settlement-level outcome: margin benefit is given across the total of cash-segment margins and F&O delivery margins, but delivery margins are still levied during expiry week on positions whose final net delivery turns out to be zero.
+
+Where delivery fails anyway, the shortfall goes to the close-out and auction process in the [short delivery and auction deep dive](/broking-kyc/deep-dives/trading-day/short-delivery-auction/). Cancelling the derivative obligation is not an available outcome.
+
+## 5. The expiry-week runbook
+
+An operator workflow derived from the cited obligations. Step boundaries and screen naming are **[AI inference — verify before acting]**; the exchanges prescribe the calculations and the settlement schedule, not this interface.
+
+1. **Build the expiry inventory (E-5 or earlier).** Pull the contract master and cleared positions for the trade date, exchange and client. Validate option type, strike, expiry and lot multiplier against the master rather than reconstructing them from the display symbol. Route contracts missing from the master, or lots adjusted by a corporate action, to manual reconciliation.
+2. **Include accelerated expiries.** A merger, demerger or scheme of arrangement can force a contract to expire before its calendar date. [NCL/CMPT/66597](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt66597) (February 10, 2025) and [NCL/CMPT/63762](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt63762) (September 5, 2024) are representative per-security adjustment notices; NCL/CMPT/73864 (April 23, 2026) is the Vedanta example.
+3. **Produce a delivery preview.** Split the book by leg type, recompute likely direction at the latest underlying price, label it provisional, and show gross and eligible net obligations separately. Never present a spread's maximum option payoff as the cash physical settlement will need.
+4. **Stage the margin and explain it.** Apply the published end-of-day staging, hold any stricter broker-policy amount alongside it, and split the client request into the margin block and the eventual delivery consideration. A client shown only a total will read all of it as a loss.
+5. **Test delivery readiness.** Take-delivery: reconcile bank credits and available ledger cash. Give-delivery: reconcile free demat quantity, pledge status and debit authorisation — a holding funded under the margin trading facility is not automatically deliverable, as the [<abbr title="Margin Trading Facility">MTF</abbr> operational deep dive](/broking-kyc/deep-dives/settlement/mtf-operational/) explains. Escalate unsettled purchases and missing authorisation separately.
+6. **Take the client election before the broker cut-off.** Present exit, roll and hold-to-delivery with their consequences, and record acknowledgements, orders placed, fills and residual quantity. A square-off that did not fill leaves the position in the delivery queue.
+7. **Reconcile exercise and assignment after the close.** Import the final clearing results, match the final settlement price and in-the-money status against the position snapshot, then reconcile against delivery obligations. Report names F_PS03 and F_PS04 are verified from the Vedanta notice; their current layouts are `[unknown — verify]`.
+8. **Settle, then release.** Reconcile shares and cash actually moved against the clearing obligation and release the margin hold only on the applicable release event. Feed failures into the auction path rather than closing them silently.
+
+## 6. Field-level record — delivery preview and settlement reconciliation
+
+Analytical fields a broker must hold; not claimed verbatim exchange column names. Widths marked `[unknown — verify]` were not established by the fetched documents.
+
+| name | type | length | mandatory | source-system | destination-system(s) | notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| Client identifier (<abbr title="Permanent Account Number">PAN</abbr>, UCC) | string | `[unknown — verify]` | Yes | UCC mapping | <abbr title="Risk Management System">RMS</abbr>, settlement | Keep PAN-linked allocation distinct from member netting |
+| Contract identifier | string | `[unknown — verify]` | Yes | Contract master | <abbr title="Order Management System">OMS</abbr>, RMS | Do not reconstruct from the display symbol |
+| Expiry date | date | `[unknown — verify]` | Yes | Exchange master | Delivery preview | Override only on an effective corporate-action instruction |
+| Instrument type and side | enum | `[unknown — verify]` | Yes | Cleared positions | Delivery preview | Drives give or take direction |
+| Strike price | decimal | `[unknown — verify]` | Options only | Contract master | Exercise calculation | Delivery consideration, distinct from premium paid |
+| Final settlement price | decimal | `[unknown — verify]` | Yes | Clearing report | Exercise, final mark-to-market | Not the client's last screen quote |
+| Lot multiplier | integer | `[unknown — verify]` | Yes | Contract master | Quantity computation | Adjusted by corporate action |
+| Gross and net delivery quantity | integers | `[unknown — verify]` | Yes | Clearing allocation | Depository, settlement | Retain both, plus the netting evidence |
+| Delivery margin base and stage | decimal, enum | `[unknown — verify]` | Yes | NCL risk computation | RMS, client notice | Store the end-of-day stage, not the weekday |
+| Debit authorisation route and status | enum | `[unknown — verify]` | Give-delivery | Depository, <abbr title="Demat Debit and Pledge Instruction">DDPI</abbr> records | Settlement | Ownership is not debit readiness — see [DDPI fields](/broking-kyc/reference/field-atlas/sections/o-ddpi/) |
+| Settlement report reference (F_PS03, F_PS04) | string | layouts `[unknown — verify]` | Event-dependent | Clearing corporation | Clearing member, broker | Names verified from an event notice only |
+
+
+## 7. Alternatives
+
+| Route | What it costs | When it is right | Who chooses it |
+| --- | --- | --- | --- |
+| Close before expiry | Transaction costs and execution risk; may be impossible in an illiquid or banned contract | No delivery intended, no funding or stock | Most retail clients; the broker default |
+| Roll to the next expiry | New contract, fresh costs, and no expiring-leg spread benefit after the February 2026 change | Exposure wanted beyond this expiry | Continuing views; hedgers |
+| Hold to delivery | Full funding or deliverable quantity, staged delivery margins, physical-delivery brokerage | The client wants to own or dispose of the shares | Delivery users; some arbitrage books |
+| Rely on cash-segment netting | Reduces movement only where clearing member, trading member and UCC align; both levies still apply | An offsetting cash trade exists under the same account chain | Arbitrage and treasury desks |
+
+## Practical notes
+
+- **[gotcha]** Physical settlement is electronic. No paper certificate moves, and the credit reaches the client's demat directly under the October 2024 direct-payout framework.
+- **[gotcha]** A delta-neutral book can still owe delivery margin on both legs and still need funding on the take-delivery side before netting is recognised at settlement. Price risk and settlement risk are separate exposures.
+- **[industry practice]** Brokers commonly restrict fresh long out-of-the-money stock-option positions close to expiry and reserve the right to square off in-the-money positions. Zerodha's published policy does both. Present this as broker policy, never as an exchange prohibition.
+- **[cost optimization]** Netting reduces movement but does not eliminate brokerage, securities transaction tax, stamp duty or the temporary margin block. A cost model that assumes netting is free will be wrong in expiry week.
+- **[risk trade-off]** Tightening the square-off cut-off reduces delivery incidents and raises complaints about forced exits. Either way the disclosure belongs in the accepted risk-management policy, and the evidence trail must show the order, not the intention.
+- **[gotcha]** The 2018 migration phases are historical dates, not eligibility routes. A stock is either in the derivatives segment today or it is not; there is no residual cash-settled tier for single stocks.
+
+## Cross-references
+
+- [Deep Dive: RMS and SPAN methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/) — the base initial margin that delivery margin is added to.
+- [Deep Dive: Short delivery and auction](/broking-kyc/deep-dives/trading-day/short-delivery-auction/) — the close-out path when an expiry delivery obligation is not met.
+- [Deep Dive: Direct pay-out to demat](/broking-kyc/deep-dives/settlement/direct-payout-to-demat/) — where delivered shares land.
+- [Deep Dive: MTF operational walkthrough](/broking-kyc/deep-dives/settlement/mtf-operational/) — why a funded holding is not free deliverable stock.
+- [Deep Dive: Segment rules comparison](/broking-kyc/deep-dives/foundational/segment-rules-comparison/) — the per-segment settlement and expiry baseline.
+- [Expiry-day operations](./expiry-day-operations/) — the session holding the last exit opportunity.
+- [Collateral and cross-margin](./collateral-cross-margin/) — how the collateral funding delivery margin is valued.
+- [Field atlas: computed settlement](/broking-kyc/reference/field-atlas/sections/computed-settlement/) — settlement-side field destinations.
+- [Integration <abbr title="Directed Acyclic Graph.">DAG</abbr>: end-of-day and settlement](/broking-kyc/operations/integration-dag/eod-settlement/) — the nightly dependency graph.
+
+## Verified through
+
+2026-09-11
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

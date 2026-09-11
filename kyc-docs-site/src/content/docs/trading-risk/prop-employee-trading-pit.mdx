@@ -1,0 +1,163 @@
+---
+title: "Trading Risk: Proprietary and employee trading, and PIT obligations"
+description: Proprietary trading disclosure and pro-account terminal rules, the employee dealing policy a broker must formulate, and the SEBI PIT Regulations obligations that apply to an intermediary — structured digital database, Schedule C code of conduct, designated persons and trading-window handling.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Three regimes overlap on the same question — who inside a broking house may trade, and on what terms. Proprietary trading is regulated as a **conflict-of-interest disclosure** problem. Employee dealing is regulated as an **internal-controls** problem. Insider trading is regulated under a separate statute, the <abbr title="Prohibition of Insider Trading">PIT</abbr> Regulations, where a broker is an *intermediary* and therefore falls under Schedule C rather than the Schedule B regime that applies to listed companies. The page treats each in turn, then shows where they collide in a single operating policy.
+
+## TL;DR
+
+- **A broker must tell every client whether it also trades on its own account**, upfront at the time of entering into the Know Your Client agreement, and must disclose before starting proprietary trading if it later begins — para 30 of the [Master Circular for Stock Brokers](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir2024118), tracing to <abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>/SE/CIR-42/2003 (19 November 2003). [not yet in index]
+- **Pro-account order entry is confined to one location.** Terminals elsewhere may place only client orders with client codes; using pro-account from more than one location needs an undertaking to the exchange stating the reason and case-by-case exchange approval (para 31, from SEBI/MRD/SE/CIR-32/2003/27/08). [not yet in index]
+- **Proprietary trades may not be converted into client trades or vice versa** — para 38.7 of the Master Circular. The historical abuse it addresses is pro-account orders placed from branch terminals and reallocated to clients in the back office overnight.
+- **A broker is an "intermediary" under the PIT Regulations**, so its code of conduct must adopt the minimum standards in **Schedule C** (regulation 9(1)), and its CEO or managing director must put in place an institutional mechanism under **regulation 9A**, reviewed by the audit committee or analogous body at least once a financial year.
+- **The structured digital database is not optional and cannot be outsourced.** Regulation 3(5) requires an internal database with time stamping and audit trails naming who shared unpublished price sensitive information and with whom, along with <abbr title="Permanent Account Number">PAN</abbr>; regulation 3(6) requires preservation for not less than **eight years** after completion of the relevant transactions, and until proceedings conclude where SEBI has opened an investigation.
+- **Not formulating internal-controls, employee/insider-trading or anti-money-laundering policies is itself a listed violation** in the exchange disciplinary grid (item 39 of the violation annexure to the Master Circular; penalty framework at [<abbr title="National Stock Exchange of India">NSE</abbr>/INSP/53530](/broking-kyc/reference/circulars/nse/#nseinsp53530)).
+
+## Conceptual overview
+
+A broking firm is structurally conflicted. It sees client order flow before the market does; it may hold positions of its own; its employees and authorised persons see the same flow; and its research, investment-banking or advisory arms may hold unpublished price sensitive information about listed issuers. Indian regulation does not resolve this by prohibition. It resolves it by a combination of disclosure to clients, physical and logical separation of the proprietary order path, a mandated internal code of conduct governing employee dealing, and a statutory insider-trading regime that treats the firm as a fiduciary handling other people's information.
+
+The three regimes have different legal homes and different enforcement paths, which is why firms that treat them as one policy document tend to fail inspection on one of the three. Proprietary trading disclosure and pro-account terminal discipline live in the broker Master Circular and are inspected by the exchange as part of routine inspection. Employee dealing policy is also a Master Circular and exchange-inspection matter, surfacing as the internal-controls line item. Insider trading lives in the SEBI (Prohibition of Insider Trading) Regulations, 2015 as amended, is enforced by SEBI directly, and its artefacts — the designated-persons list, the structured digital database, pre-clearance records, contra-trade tracking — are what SEBI asks for when an investigation opens.
+
+The practical overlap sits in one place: the front-running typology. An employee or authorised person who trades ahead of a large client order breaches the conduct code, breaches the employee dealing policy, may breach the PIT Regulations where the information is price sensitive, and separately falls under the fraudulent-and-unfair-trade-practices regime. One act, four exposures. See [market manipulation typologies](/broking-kyc/deep-dives/foundational/market-manipulation-typologies/) for the detection side.
+
+## 1. Regulatory framework
+
+- **[SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/POD-1/P/CIR/2024/118](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir2024118)** (9 August 2024) — Master Circular for Stock Brokers. Para 30 proprietary trading disclosure; para 31 pro-account terminal restriction; para 32 norms on a broker dealing with other brokers; para 38.7 prohibition on converting proprietary trades to client trades; para 85 employee conduct on unauthenticated news; the violation annexure listing non-formation of internal-controls and employee/insider-trading policies.
+- **SEBI/MRD/SE/CIR-42/2003** (19 November 2003) — the originating proprietary-trading disclosure requirement. [not yet in index]
+- **SEBI/MRD/SE/CIR-32/2003/27/08** (27 August 2003) — pro-account trading terminal restriction to one location. [not yet in index]
+- **SEBI (Prohibition of Insider Trading) Regulations, 2015**, as amended up to 12 March 2025 — regulation 3(5) and 3(6) structured digital database; regulation 9(1) and 9(2) codes of conduct; regulation 9(3) compliance officer; regulation 9(4) identification of designated persons; regulation 9A institutional mechanism; Schedule C minimum standards for intermediaries and fiduciaries. Notified under SEBI/<abbr title="Legal Affairs Department — Northern Regional Office (SEBI)">LAD-NRO</abbr>/GN/2014-15/21/85. [not yet in index]
+- **SEBI FAQs on PIT Regulations** (April 2023) — interpretive guidance on designated persons, <abbr title="Structured Digital Database">SDD</abbr> scope and pre-clearance. [not yet in index]
+- **CIR/ISD/1/2011 and CIR/ISD/2/2011** (23 and 24 March 2011) — the unauthenticated-news directions consolidated at para 85, requiring an internal code of conduct, restriction or supervision of blog and messenger access, log retention, and compliance-officer approval before an employee forwards market-related news. [not yet in index]
+- **[NSE/INSP/53530](/broking-kyc/reference/circulars/nse/#nseinsp53530)** — the exchange penalty and disciplinary-action grid that operationalises the violation categories, including non-formation or non-implementation of the employee and insider-trading policies.
+
+## 2. Proprietary trading: disclosure and separation
+
+| Obligation | Content | Timing |
+|---|---|---|
+| Disclose whether the broker does client-based business, proprietary trading, or both | Stated in the account-opening documentation | Upfront, at the time of entering into the <abbr title="Know Your Customer (process).">KYC</abbr> agreement |
+| Disclose a later start of proprietary trading | Notification to all clients | Before carrying out any proprietary trading |
+| Confine pro-account order entry to one location | Facility extended at one specified member location only; other terminals restricted to client-code orders | Standing |
+| Multi-location pro-account | Undertaking to the exchange stating the reason; exchange approval case by case after due diligence | On application |
+| No conversion of proprietary trades to client trades or the reverse | Absolute | Standing |
+| Dealing with another broker of the same exchange, for proprietary trading or on behalf of clients | Prior exchange permission; the exchange may allow dealing with only one broker of the same exchange | Before dealing |
+
+The separation is not only procedural. Proprietary collateral is identified separately from client collateral throughout the client-level segregation framework, the trading member's proprietary margin requirement is treated as a client requirement for the purpose of its clearing member, and a member's own positions feed distinct surveillance alerts — significant mark-to-market loss on the proprietary account is an explicit early-warning indicator in the Master Circular's surveillance chapter, and multiple proprietary demat accounts or large-value share movements into a broker proprietary account are separately alertable. Exchanges may, in exercising their oversight powers, impose limits on a member's proprietary trading outright.
+
+<Aside type="caution" title="Pro-account discipline is a records problem, not a permissions problem">
+The abuse that para 31 was written against is documented in the circular itself: members placing large numbers of orders on pro-account from multiple locations, with those trades "many a time, transferred subsequently to the respective clients in the back office". The exchange inspection test is therefore not only "is pro-account entry restricted to one terminal" but also "does the back-office trade-allocation log show any movement between the proprietary code and client codes". A system that technically restricts the terminal but permits post-trade reallocation fails. Lock the allocation path, not just the login.
+</Aside>
+
+## 3. Employee dealing policy
+
+There is no single circular titled "employee trading policy". The obligation is assembled from three places, and the enforcement hook is the violation grid.
+
+| Source | What it requires |
+|---|---|
+| Violation annexure to the Master Circular, item 39 | Policies related to internal controls, employee and insider trading, and prevention of money laundering must be **formulated and implemented**. Formulating without implementing is expressly a violation |
+| Violation annexure, item 30 | The broker, its dealers and others connected with it must not be involved in front running, circular trading, creating false markets, misuse of exchange mechanism for financing, fictitious or illegal transactions |
+| Master Circular para 85 | Proper internal code of conduct and controls; employees, temporary staff and voluntary workers must not circulate rumours or unverified information; access to blogs, chat forums and messenger sites either restricted under supervision or disallowed; logs of such usage treated as records and retained; market-related news forwarded only after the compliance officer has seen and approved it, with the employee and the compliance officer both liable on breach |
+| PIT Regulations Schedule C | The pre-clearance, restricted-list, contra-trade, disclosure and sanction machinery described in section 5 below |
+
+A workable employee dealing policy therefore has to cover five things that inspection actually looks for: which accounts are in scope (the employee's own, and immediate relatives'), where those accounts may be held, what pre-clearance is needed and from whom, what holding period applies before a reversing trade, and what happens on breach. The PIT Schedule C standards supply hard minimums for three of the five, so the sensible drafting order is to adopt Schedule C first and then extend it to the non-insider cases — front running, dealing in client-order-flow knowledge, and trading in scrips on the firm's own restricted list.
+
+## 4. PIT obligations: the institutional mechanism
+
+Regulation 9A puts the obligation on a named individual. The chief executive officer, managing director or analogous person must put in place an adequate and effective system of internal controls, which must include:
+
+1. Identifying **all** employees with access to unpublished price sensitive information as designated persons.
+2. Identifying the UPSI itself and maintaining its confidentiality.
+3. Placing adequate restrictions on communication or procurement of UPSI.
+4. Maintaining lists of all employees and other persons with whom UPSI is shared, and either signing confidentiality agreements with them or serving notice on them.
+5. Complying with all other requirements of the regulations.
+6. Periodic process review to evaluate the effectiveness of these controls.
+
+The board of directors or heads of the organisation must ensure the CEO or MD actually does this, and the audit committee or analogous body must review compliance with the regulations **at least once in a financial year** and verify that internal controls are adequate and operating effectively. Where a listed company opens a leak inquiry, the intermediary is required to co-operate with it.
+
+Note what regulation 9A does **not** impose on an intermediary: sub-regulations (5) and (6) — written leak-inquiry policies and the whistle-blower policy — are addressed to listed companies. An intermediary that also happens to be listed carries both sets.
+
+## 5. Schedule C: the code of conduct a broker must adopt
+
+Schedule C is the minimum standard for intermediaries and fiduciaries under regulation 9(1) and 9(2). Schedule B, which contains the familiar quarter-end trading-window closure regime, applies to **listed companies**. A broker that is not itself listed does not close a trading window against its own securities; it operates a restricted list instead.
+
+| Schedule C clause | Requirement | Hard minimum |
+|---|---|---|
+| 1 | Compliance officer reports to the board or head of organisation, and to the audit committee chairman or analogous body | Not less than once a year |
+| 2 | Need-to-know handling; UPSI communicated only for legitimate purposes, performance of duties or discharge of legal obligations; code must contain Chinese Wall norms and a documented process for permitting a designated person to cross the wall | — |
+| 3 | Designated persons **and their immediate relatives** governed by an internal code on dealing in securities | — |
+| 4 | Pre-clearance by the compliance officer where the proposed trade value exceeds a threshold the board or head of organisation stipulates | Threshold is firm-set; pre-clearance itself is mandatory above it |
+| 5 | Compliance officer maintains a confidential **restricted list** used to approve or reject pre-clearance applications | — |
+| 6 | Declaration from the applicant that they are not in possession of UPSI, and the compliance officer must consider whether that declaration could be rendered inaccurate | — |
+| 7 | Window within which a pre-cleared trade must be executed, failing which fresh pre-clearance is needed | Not more than **7 trading days** |
+| 8 | Contra-trade restriction for a designated person who is a connected person of a listed company and is permitted to trade in that company's securities | Not less than **6 months**; not less than **2 months** for units of a mutual fund where the person is connected to that mutual fund, <abbr title="Asset Management Company (mutual funds context) / Annual Maintenance Charges (depository context).">AMC</abbr> or trustees. Compliance officer may relax in writing; profits from a breaching contra trade are disgorged to the Investor Protection and Education Fund. Does not apply to trades pursuant to exercise of stock options |
+| 9 | Prescribed formats for pre-clearance applications, reporting of executed trades, reporting of decisions not to trade after pre-clearance, and periodic holdings reporting | — |
+| 10 | Internal sanctions and disciplinary actions including wage freeze, suspension and recovery; amounts collected are remitted to SEBI for credit to the IPEF | — |
+| 11 | On observing a violation of the regulations, the intermediary must promptly inform the stock exchanges where the concerned securities are traded, in the form and manner SEBI specifies | — |
+| 12 | Annual disclosure by every designated person of names and PAN of immediate relatives, persons with whom they share a material financial relationship, and phone and mobile numbers used by them; plus a one-time disclosure of educational institutions and past employers | Annual, and on change |
+| 13 | A documented process for how and when people are brought "inside" on sensitive transactions, and for making them aware of the duties, responsibilities and liability attached to receiving inside information | — |
+
+"Material financial relationship" is defined: a relationship in which one person receives any kind of payment such as a loan or gift from a designated person in the immediately preceding twelve months equivalent to at least **25% of that designated person's annual income**, excluding arm's-length payments.
+
+### 5.1 Who is a designated person
+
+Regulation 9(4) requires the board or analogous authority, in consultation with the compliance officer, to specify designated persons by role, function and access to UPSI, in addition to seniority and professional designation, and it must include at minimum:
+
+- Employees of the intermediary designated on the basis of functional role or UPSI access.
+- All promoters who are individuals, and investment companies that are promoters, of the intermediary.
+- The chief executive officer and **all employees up to two levels below the CEO**, irrespective of functional role or actual UPSI access.
+- Support staff such as IT or secretarial staff who have access to UPSI.
+
+The "two levels below the CEO regardless of access" limb is the one most often missed in broker implementations, because it captures people whose job has nothing to do with issuer information.
+
+## 6. Field-level view: the structured digital database
+
+Regulation 3(5) fixes the mandatory content; the rest of the schema is implementation. The database must be maintained internally, must not be outsourced, and must carry adequate internal controls and checks such as time stamping and audit trails to ensure non-tampering.
+
+| name | type | length | mandatory | source-system | destination-system(s) | notes |
+|---|---|---|---|---|---|---|
+| `sdd_entry_id` | CHAR | 24 | Y | SDD application | audit trail | Immutable identifier; entries are append-only |
+| `upsi_nature` | VARCHAR | 500 | Y | compliance officer input | SDD, SEBI on request | Nature of the unpublished price sensitive information; required expressly by regulation 3(5) |
+| `sharer_name` | VARCHAR | 150 | Y | HR master or counterparty record | SDD, SEBI on request | Name of the person who shared the information |
+| `sharer_pan` | CHAR | 10 | Y | HR master or counterparty KYC | SDD | PAN, or another identifier authorised by law where PAN is unavailable |
+| `recipient_name` | VARCHAR | 150 | Y | HR master or counterparty record | SDD, SEBI on request | Name of the person with whom information is shared |
+| `recipient_pan` | CHAR | 10 | Y | HR master or counterparty KYC | SDD | Same identifier rule as sharer |
+| `legitimate_purpose` | VARCHAR | 300 | Y | compliance officer input | SDD | The legitimate purpose relied on; the permission that makes the sharing lawful |
+| `shared_at` | TIMESTAMP | 14 | Y | SDD application clock | SDD, audit trail | Time stamping is an express regulation 3(5) control |
+| `entered_at` | TIMESTAMP | 14 | Y | SDD application clock | SDD, audit trail | For information **not** emanating from within the organisation, entry may be made not later than **2 calendar days** from receipt |
+
+## 7. Alternatives
+
+| Option A | Option B | When to pick which | Who uses what |
+|---|---|---|---|
+| Adopt Schedule C only | Adopt Schedule B and Schedule C | A for an unlisted broking company; B where the broker or its holding company is itself listed, or where it acts as a fiduciary to listed clients | Listed broking groups run both; standalone unlisted members run Schedule C |
+| Build the SDD in-house | Buy an SDD product | The regulation prohibits **outsourcing** the database. A licensed product deployed and operated inside the firm's own environment is generally read as compliant; a hosted service where the vendor holds the data is the risk. `[AI inference — verify before acting]` | Larger members buy; smaller members build on an internal ticketing system with hash-chained audit |
+| Pre-clearance above a rupee threshold | Pre-clearance for all designated-person trades | A follows Schedule C clause 4 and keeps volume manageable; B removes threshold-gaming arguments but is operationally heavy | Most members set a threshold and lower it for the restricted list |
+| Prohibit employee trading outright | Permit it under pre-clearance | Prohibition is simpler to supervise but hard to enforce against immediate relatives and costs recruitment; the regulations contemplate permission-with-controls | Permission-with-controls is the norm |
+
+## Practical notes
+
+- **[gotcha]** Schedule B's quarter-end trading window closure does not apply to an unlisted broker. Members that copy a listed-company PIT policy end up "closing a window" that has no securities behind it, and then cannot explain their restricted-list process — which is the control Schedule C actually asks for.
+- **[gotcha]** The 2-calendar-day entry proviso in regulation 3(5) applies only to information **not** emanating from within the organisation. Internally generated UPSI has no grace period, so the SDD has to be usable at the moment of sharing, not as an end-of-week reconciliation.
+- **[gotcha]** Regulation 3(6) retention is eight years **after completion of the relevant transactions** — not eight years from entry. That means the retention clock for a long-running mandate starts late, and a records-management policy keyed to entry date under-retains.
+- **[industry practice]** The annual designated-person disclosure under Schedule C clause 12 — immediate relatives, material financial relationships, phone numbers used — is usually collected through the HR system at the same time as the annual compliance declaration, with a mid-year change-reporting obligation. The one-time education and past-employer disclosure is collected at onboarding.
+- **[gotcha]** Schedule C clause 11 requires reporting an observed violation to the **stock exchanges where the concerned securities are traded**, not to SEBI, following the 2020 amendment. Policies still drafted around "inform the Board promptly" reflect the pre-2020 text.
+
+## Cross-references
+
+- [Deep Dive: Market manipulation typologies](/broking-kyc/deep-dives/foundational/market-manipulation-typologies/) — the surveillance and detection side of front running, circular trading and insider patterns, including the designated-person list as a detection input.
+- [Deep Dive: Fit and proper criteria](/broking-kyc/deep-dives/member-compliance/fit-and-proper/) — how conduct findings against the member and its key personnel feed the fit-and-proper test.
+- [Deep Dive: <abbr title="Key Managerial Personnel">KMP</abbr> changes](/broking-kyc/deep-dives/member-compliance/kmp-changes/) — appointment and change procedures for the compliance officer who administers the PIT code.
+- [Deep Dive: Inspection types](/broking-kyc/deep-dives/compliance-audit/inspection-types/) — where proprietary-trading, pro-account and internal-controls findings surface.
+- [Deep Dive: Authorised person framework](/broking-kyc/deep-dives/compliance-audit/ap-framework/) — authorised persons and their employees are inside the conduct perimeter but outside the employee payroll.
+- [Compliance blueprint](/broking-kyc/operations/compliance-blueprint/) — the obligation rows for policy formulation, PIT code, SDD and annual audit-committee review.
+
+## Verified through
+
+2026-09-11
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

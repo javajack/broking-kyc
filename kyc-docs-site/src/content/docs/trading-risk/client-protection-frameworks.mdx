@@ -1,0 +1,165 @@
+---
+title: "Trading Risk: Client protection frameworks"
+description: The client-facing protection stack — two-factor authentication history, the proposed SIM and device binding framework, validated @valid UPI handles and SEBI Check, the MITC document, voluntary freezing of trading accounts, and Investor Charter touchpoints.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Every control here answers the same question from a different angle — how does a client know that the account, the app and the payment address in front of them are genuinely theirs and genuinely the broker's? The page follows the client's own timeline: logging in (2FA, and the proposed device binding), paying money in (validated <abbr title="Unified Payments Interface">UPI</abbr> handles and <abbr title="Securities and Exchange Board of India">SEBI</abbr> Check), understanding the relationship (<abbr title="Most Important Terms and Conditions">MITC</abbr>, Investor Charter), and stopping everything when something looks wrong (voluntary freeze). Each section states what is in force today, because several of these frameworks are at different stages of maturity.
+
+## TL;DR
+
+- **Two-factor authentication for internet-based and wireless trading is mandatory**, and the two factors must not be the same. Para 56.1.6 of the [Master Circular for Stock Brokers](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir2024118) traces to CIR/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>/<abbr title="Depository Participant">DP</abbr>/08/2011 (30 June 2011); the cyber-security annexure states that for internet-based trading and securities trading through wireless technology "a minimum of two-factors in the authentication flow are mandatory", originating in SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/CIR/PB/2018/147 (3 December 2018). [not yet in index]
+- **SIM and device binding is still a proposal.** SEBI's consultation paper of 18 February 2025 proposed One <abbr title="Unique Client Code">UCC</abbr>–One Device–One SIM hard binding with biometric login, QR-based desktop authentication and a temporary account lock, initially for the top 10 Qualified Stock Brokers. No final circular was verified as issued through 11 September 2026.
+- **Validated UPI handles went live for investors on 1 October 2025.** SEBI/HO/DEPA-<abbr title="—">II</abbr>/DEPA-II_SRG/P/CIR/2025/86 (11 June 2025) created the `@valid` handle structure; brokers use the username suffix `brk`. Implemented in the payment rails by [<abbr title="National Payments Corporation of India">NPCI</abbr>/UPI/OC No. 217/2025-26](/broking-kyc/reference/circulars/npci/#npciupioc-no-2172025-26) (3 July 2025). [SEBI circular not yet in index]
+- **Coverage was later extended to every investor-facing collection account.** Depositories and exchanges issued clarifications in August 2026 — [<abbr title="Multi Commodity Exchange of India">MCX</abbr>/MEM/461/2026](/broking-kyc/reference/circulars/mcx/#mcxmem4612026) sets 6 September 2026 for upstream accounts, while [<abbr title="Central Depository Services (India) Limited">CDSL</abbr>/ADM/DP/GENRL/2026/543](/broking-kyc/reference/circulars/cdsl/#cdsladmdpgenrl2026543) and [<abbr title="National Securities Depository Limited">NSDL</abbr>/POLICY/2026/0113](/broking-kyc/reference/circulars/nsdl/#nsdlpolicy20260113) give participants 30 days and expressly include DP-charge accounts.
+- **MITC has been acknowledged by new clients since 1 April 2024** and communicated to existing clients by 1 June 2024, under SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/180 (13 November 2023) as operationalised by [<abbr title="National Stock Exchange of India">NSE</abbr>/INSP/59367](/broking-kyc/reference/circulars/nse/#nseinsp59367) and [NSE/INSP/60147](/broking-kyc/reference/circulars/nse/#nseinsp60147).
+- **Voluntary freeze of online trading access has been live since 1 July 2024**, on the framework at [NSE/INSP/61529](/broking-kyc/reference/circulars/nse/#nseinsp61529) (8 April 2024) implementing SEBI/HO/MIRSD/POD-1/P/CIR/2024/4 (12 January 2024) — 15 minutes to freeze on an online request, acknowledgement by <abbr title="Trade-date Plus N settlement">T+1</abbr> end of day, with a separate penalty structure for members that fail to implement it ([MCX/INSP/820/2024](/broking-kyc/reference/circulars/mcx/#mcxinsp8202024)).
+
+## Conceptual overview
+
+India's client-protection stack was built incrementally, and each layer was added in response to a specific fraud pattern. Password-only login gave way to two-factor authentication after account-takeover losses. Two-factor authentication delivered by <abbr title="Short Message Service.">SMS</abbr> came under pressure once SIM swapping became common, which is why the current proposals move away from one-time passwords towards device binding. Payments to brokers went through a separate evolution: an investor transferring money to a "broker" bank account had no way to verify that the account belonged to a registered intermediary at all, which is precisely the gap that fake-app and fake-advisory frauds exploited — hence a reserved UPI handle and a public lookup tool.
+
+The second half of the stack is about comprehension and control rather than authentication. The account-opening kit is long, so SEBI required a short standard document — the Most Important Terms and Conditions — that the client actually acknowledges. The Investor Charter tells the client what service levels to expect and where to complain. And the voluntary freeze facility gives the client a single lever, modelled explicitly on blocking a debit or credit card, to stop online access when something looks wrong.
+
+## 1. Regulatory framework
+
+- **[SEBI/HO/MIRSD/POD-1/P/CIR/2024/118](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir2024118)** (9 August 2024) — Master Circular for Stock Brokers. Para 56.1 internet-based trading and wireless-technology norms including 2FA; para 78 Investor Charter and monthly complaint disclosure; the Rights and Obligations document with its password and unauthorised-access clauses; the cyber-security annexure.
+- **CIR/MRD/DP/08/2011** (30 June 2011) — the originating internet-based-trading authentication norms. Read with SMDRP/POLICY/CIR-06/2000 (31 January 2000) and CIR/MRD/DP/25/2010 (27 August 2010). [not yet in index]
+- **SEBI/HO/MIRSD/CIR/PB/2018/147** (3 December 2018) — Cyber Security and Cyber Resilience framework for stock brokers and depository participants; the annexure's authentication requirements, including a cryptographically secure biometric two-factor mechanism for mobile applications and the account-lock-after-failed-attempts rule. Now sitting under the wider <abbr title="Cybersecurity and Cyber Resilience Framework">CSCRF</abbr> regime — see [CSCRF deep dive](/broking-kyc/deep-dives/compliance-audit/cscrf-deep-dive/). [not yet in index]
+- **Consultation Paper on Technology based measures to secure trading environment and to prevent unauthorised transactions in trading/demat account of investors** (18 February 2025, comments to 11 March 2025) — the SIM-binding proposal, with a draft circular at Annexure A. [not a circular]
+- **SEBI/HO/DEPA-II/DEPA-II_SRG/P/CIR/2025/86** (11 June 2025) — standardised, validated and exclusive UPI IDs; handle structure, transaction limits, SEBI Check, and the activity-wise timetable ending with investor availability from 1 October 2025. [not yet in index]
+- **[NPCI/UPI/OC No. 217/2025-26](/broking-kyc/reference/circulars/npci/#npciupioc-no-2172025-26)** (3 July 2025) — the payments-side implementation: merchant category code 6211, the `@validbankpsp` nomenclature, handle length limits and the AutoPay mandate format.
+- **SEBI Press Release 64/2025** (1 October 2025) — roll-out of Validated UPI Handles and SEBI Check. **Press Release 69/2025** (6 November 2025) — SEBI's approach to online investment scams, advertiser verification and verified-app labelling on platforms. **Press Release 12/2026** (13 February 2026) — AI-driven calling campaign promoting SEBI Check. [not circulars]
+- **SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/180** (13 November 2023) — Most Important Terms and Conditions. [not yet in index]
+- **SEBI/HO/MIRSD/POD-1/P/CIR/2024/4** (12 January 2024) — facility of voluntary freezing and blocking of trading accounts, forwarded as [NSE/INSP/60277](/broking-kyc/reference/circulars/nse/#nseinsp60277) and operationalised by [NSE/INSP/61529](/broking-kyc/reference/circulars/nse/#nseinsp61529). [SEBI circular not yet in index]
+- **[SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2025/22](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-pod1pcir202522)** (21 February 2025, in force 1 April 2025) — updated Investor Charter for stock brokers, replacing the December 2021 charter.
+
+## 2. Two-factor authentication: what is actually required
+
+| Layer | Requirement | Source |
+|---|---|---|
+| Internet-based trading and wireless trading | Two-factor authentication for the login session, for all orders emanating using Internet Protocol; the two factors must not be the same | Master Circular para 56.1.6 |
+| Session hygiene | Automatic trading-session logout on client inactivity | Master Circular para 56.1.7 |
+| Cyber-security baseline | A minimum of two factors in the authentication flow are **mandatory** for internet-based trading and wireless trading; multi-factor schemes using cryptographic tokens, VPNs, biometric devices or PKI may be used | Cyber-security annexure, clause 3 |
+| Mobile applications | A cryptographically secure biometric two-factor mechanism may be used | Cyber-security annexure, clause 4 |
+| Lockout | After a reasonable number of failed login attempts the account may be locked until reset through an out-of-band channel — an emailed cryptographically secure link, an SMS one-time password, or manual identity verification by the broker | Cyber-security annexure, clause 5 |
+| Client responsibility | The client is responsible for keeping the username and password confidential, is solely responsible for all orders entered under their credentials whether or not the person was authorised, and must not reveal credentials to any third party **including employees and dealers of the stock broker** | Rights and Obligations document, clauses 5 and 7 |
+| Incident notification | The client must immediately notify the broker in writing on discovering or suspecting unauthorised access, with date, manner and the transactions effected | Rights and Obligations document, clause 6 |
+
+In practice the industry converged during 2022 on three second factors: an SMS one-time password, a time-based one-time password from an external authenticator application, and an in-app code on a biometrically-locked mobile session. The dominant retail broker's public explanation of its implementation, published on 21 October 2022, describes the shift as taking effect from 30 September 2022 and argues that SMS one-time passwords are the weakest of the three for trading platforms specifically. `[industry practice — unverified]` for the exact industry-wide effective date, which was set through exchange communications rather than a single SEBI circular.
+
+Note that two-factor authentication also appears in unrelated corners of the same rulebook — the nomination framework allows existing investors to submit or opt out of nomination through 2FA login on the broker's internet trading platform (Master Circular para 22.6), and the depositories added 2FA to beneficial-owner portal logins (for example [CDSL/OPS/DP/EASI/2024/310](/broking-kyc/reference/circulars/cdsl/#cdslopsdpeasi2024310)). The same phrase is doing different work in each place.
+
+## 3. SIM and device binding: the 2025–26 proposal
+
+SEBI's February 2025 consultation paper proposed replacing <abbr title="One-Time Password">OTP</abbr>-centric authentication with hard binding, on the explicit analogy of UPI payment applications. The draft circular at Annexure A is the best available statement of intent, and the following is a summary of that draft rather than of a rule in force.
+
+| Element | Proposal |
+|---|---|
+| Primary SIM-bound device | A mobile device holding the registered mobile number and a specific IMEI is linked to the client's UCC. Exchanges to issue the hard-binding registration procedure |
+| Secondary device and proximity | One additional SIM and device may be registered; binding is one-time. Both stay active only within 100 metres of each other, with trading through one at a time, and the secondary logs out automatically beyond that distance |
+| Login | Biometric authentication on the primary bound device authorises login directly without a password; a PIN-based alternative may be offered |
+| Desktop and browser | QR-code based, proximity-sensitive and time-sensitive authentication through the bound device; access controls to prevent scanning a QR code from the phone gallery or a messaging app; one active instance per channel |
+| Deceased client | With no open position, freeze until nomination or transmission completes; with open positions, square off and then freeze |
+| Call and trade | Only through centralised dedicated phone numbers, email addresses or mobile numbers of the broker, including for authorised persons; uniform unchangeable time stamps on call recordings; OTP authentication of the order unless the call originates from the registered mobile number |
+| Off-market transfer safety | Beneficiary-name verification before execution, or entering the target demat account twice with one entry masked; QR-scan or push-notification authorisation; IVR-keypad OTP for basic phones |
+| Applicability | Authentication binding initially mandatory for the top 10 Qualified Stock Brokers within six months, optional for investors at first and mandatory in phases. All other provisions apply to all brokers and depository participants |
+
+<Aside type="caution" title="Do not cite the SIM-binding framework as if it were in force">
+As at 11 September 2026 the February 2025 consultation remains a consultation. A dedicated regulatory-delta review covering 15 May to 11 September 2026 across all thirteen issuer groups found no final circular on SIM binding, and said so explicitly. That is a search outcome rather than proof that no instrument exists, so verify against the SEBI circulars listing before relying on it either way. What this means for product planning: the *non-authentication* limbs of the draft — call-and-trade centralisation, walk-in recording, session revocation, temporary lock, off-market beneficiary verification — are the ones most likely to arrive first and to apply to every broker, not only the top ten.
+</Aside>
+
+## 4. Validated UPI handles and SEBI Check
+
+### 4.1 Handle structure
+
+A validated handle has two halves. The username is a readable name chosen by the intermediary, followed by a suffix identifying its intermediary category — `brk` for stock brokers across segments, `dp` for depository participants, `ra` for research analysts, `ia` for investment advisers, `mf` for mutual funds, `pms` for portfolio managers. The handle itself is `@valid` combined with the name of the self-certified syndicate bank, allocated by NPCI. The result reads as `abc.brk@validhdfc`. Payments to such a handle display a thumbs-up icon inside a green triangle in the UPI application; its **absence** is the signal that the payee may be unauthorised.
+
+| Element | Rule |
+|---|---|
+| Who issues | Only the self-certified syndicate banks listed in Annexure C are allocated `@valid` handles by NPCI; intermediaries may use existing bank accounts and need not open new ones |
+| Mandatory versus optional | Use by investors is optional; obtaining the handle and making it available to investors is **mandatory** for intermediaries |
+| Transaction limit | Up to ₹5 lakh per day for capital-market transactions, subject to periodic review |
+| Old handles | Usable in parallel for a defined period, then discontinued — the timetable set discontinuation at T plus 180 days from 11 June 2025, with existing mutual-fund SIP mandates grandfathered and new or renewed SIPs required to use the new IDs |
+| Investor availability | From **1 October 2025** |
+
+### 4.2 SEBI Check
+
+SEBI Check is the verification counterpart: the investor scans a QR code or enters a UPI ID and the tool confirms whether it belongs to a registered intermediary, and can also confirm the intermediary's bank account number and <abbr title="Indian Financial System Code.">IFSC</abbr>. It is reachable at the SEBI intermediary portal path `siportal.sebi.gov.in/intermediary/sebi-check` and through the Saarthi app. SEBI's November 2025 press release directs investors to use validated handles and SEBI Check for secure payments, alongside verifying registration on the intermediaries listing and using authentic apps verified through the investor-support page. It also records SEBI's requests to social-media platforms and search engines for mandatory advertiser verification in the securities-market domain and verified labelling of registered intermediary apps.
+
+### 4.3 The August 2026 extension
+
+Many intermediaries read the original circular as covering only the main client-funds collection account. The August 2026 clarifications closed that gap: **every** investor-facing bank account receiving money or fees from individual or non-institutional investors must be linked to an `@valid` UPI ID so it is verifiable through SEBI Check, expressly including DP-charge accounts, on a 30-day clock from each clarification; the commodity-exchange clarification sets 6 September 2026 for upstream accounts, covers newly-opened accounts, and tells members on multiple exchanges to apply through only one. A separate CDSL facility already allows beneficial owners to pay stamp duty through a validated UPI handle ([CDSL/OPS/DP/SETT/2025/633](/broking-kyc/reference/circulars/cdsl/#cdslopsdpsett2025633)).
+
+## 5. MITC and Investor Charter
+
+MITC exists because the standard account-opening set — account opening form, rights and obligations, risk disclosure documents, guidance note, policies and procedures, tariff sheet — is voluminous, and SEBI concluded that investors lose focus on the critical terms. The MITC is a short standard text the client **acknowledges**, and its standards were published by the Brokers' Industry Standards Forum under the aegis of the exchanges. New clients onboarded from 1 April 2024 acknowledge it as part of onboarding; existing clients were to be informed by 1 June 2024 by email or another preservable channel. The exchange circulars carry the standard text in an annexure.
+
+The Investor Charter is the service-level counterpart: services provided, rights of investors, broker activities with timelines, dos and don'ts, and the grievance redressal mechanism. It must be on the broker's website, at prominent places in the office, and in the account-opening kit, and brokers must publish monthly complaint data by the seventh of the following month. The current charter reflects <abbr title="SEBI Complaints Redress System">SCORES</abbr> 2.0 with its 21-day initial resolution, the online dispute resolution portal, the revamped nomination framework, the ₹10 lakh Basic Services Demat Account threshold and direct payout of securities.
+
+## 6. Voluntary freezing and blocking of trading accounts
+
+SEBI's reasoning was blunt: investors could already block ATM and credit cards and could already voluntarily freeze demat accounts, but most trading members had no equivalent facility even though investors regularly reported suspicious activity. The framework was finalised by the Industry Standards Forum and implemented from 1 July 2024.
+
+| Element | Requirement |
+|---|---|
+| Channels | Registered email, the broker's app, web, and IVR are acceptable request channels |
+| Freeze turnaround | 15 minutes for an online request |
+| Acknowledgement | Issued to the client on receipt; by T+1 end of day |
+| Permanent block | After 7 days |
+| Scope | Freezing or blocking of **online access** to the trading account |
+| Open positions | Square-off rules specified in the framework; a freeze does not by itself extinguish exposure |
+| Re-enablement | A defined process for re-enabling the client for trading and transfers |
+| Disclosure | Reflected in the MITC and on the member's website |
+| Reporting and penalty | Exchanges put in place reporting requirements; a separate penalty structure applies to members that fail to implement the framework |
+
+<Aside type="tip" title="Freeze, deactivate, and close are three different things">
+A **voluntary freeze** blocks online access on the client's own request and is reversible through a defined re-enablement process. A **segment deactivation** removes an entitlement — for example turning off derivatives — and is a modification, not a protective measure. A **closure** ends the relationship and triggers settlement of funds and securities. A **regulatory or <abbr title="KYC Registration Agency">KRA</abbr>-driven freeze** is imposed on the member or the depository participant, not requested by the client, and cannot be lifted by the broker unilaterally. Support and product teams that collapse these into one "block account" flow generate both mis-set expectations and audit findings. See [modifications](/broking-kyc/lifecycle/modifications/), [dormancy and reactivation](/broking-kyc/lifecycle/dormancy-reactivation/) and [closure](/broking-kyc/lifecycle/closure/).
+</Aside>
+
+## 7. Field-level view: the freeze request record and the SEBI Check lookup
+
+| name | type | length | mandatory | source-system | destination-system(s) | notes |
+|---|---|---|---|---|---|---|
+| `freeze_request_id` | CHAR | 20 | Y | client-servicing application | audit trail, exchange reporting | Immutable; the acknowledgement quotes it |
+| `client_code` | CHAR | 10 | Y | client identity on the request channel | <abbr title="Risk Management System">RMS</abbr>, back-office | UCC whose online access is frozen |
+| `requested_at` | TIMESTAMP | 14 | Y | channel handler clock | SLA engine | Starts the 15-minute clock for online requests |
+| `frozen_at` | TIMESTAMP | 14 | Y | RMS | SLA engine, audit trail | Evidence of the 15-minute turnaround |
+| `ack_sent_at` | TIMESTAMP | 14 | Y | communications platform | audit trail | Must be by T+1 end of day |
+| `permanent_block_at` | TIMESTAMP | 14 | Conditional | RMS | audit trail | Set on expiry of the 7-day period |
+| `upi_username` | VARCHAR | 30 | Y | SEBI username-generation utility | NPCI, SCSB, client-facing payment screen | Readable name plus the `brk` suffix; generated only through the prescribed utility |
+| `upi_handle` | VARCHAR | 20 | Y | NPCI via the syndicate bank | client-facing payment screen | `@valid` plus the bank identifier; maximum handle length 10 characters |
+| `collection_account_number` | VARCHAR | 20 | Y | bank mandate | SEBI intermediary portal, SEBI Check | Every investor-facing collection account must be linked |
+| `mitc_ack_at` | TIMESTAMP | 14 | Y | onboarding flow | back-office, audit trail | Client acknowledgement of the MITC; mandatory for clients onboarded from 1 April 2024 |
+
+## 8. Alternatives
+
+| Option A | Option B | When to pick which | Who uses what |
+|---|---|---|---|
+| SMS one-time password as second factor | TOTP from an external authenticator, or an in-app code on a biometrically locked session | A is universally available and needs no client setup; B is resistant to SIM swapping and interception, which is the whole reason the binding proposal exists | Discount brokers push B and retain A as fallback; full-service brokers keep A as default |
+| Single collection account with one `@valid` handle | A handle per business account | A is simpler to reconcile; B is required in substance after the August 2026 clarifications wherever separate investor-facing accounts exist, including DP-charge accounts | Members with separate DP, broking and commodity collections need B |
+
+## Practical notes
+
+- **[gotcha]** The 11 June 2025 UPI circular contains an internal inconsistency in its own examples: paragraph 2.1(i) writes the broker suffix as `abc.brk` while 2.1(ii) writes `abc.bkr`. Annexure B, which is the operative abbreviation table, says **`brk`**. Use the annexure.
+- **[gotcha]** The `@valid` obligation is on the intermediary to *obtain and make available* the handle. Investor use is optional. A broker that treats low investor adoption as evidence of non-compliance is measuring the wrong thing; a broker that has not obtained handles for every investor-facing account is non-compliant regardless of adoption.
+- **[risk trade-off]** Freezing online access does not close open positions. A client who freezes and then cannot place a square-off order is exposed to market risk they can no longer manage, which is why the framework specifies square-off rules and why the re-enablement path needs to be genuinely fast, not merely documented.
+- **[AI inference — verify before acting]** The 30-day compliance clock in the depository `@valid` clarifications runs from the date of each clarification, so the effective deadline differs between CDSL and NSDL participants and from the commodity-exchange date. Read the clarification that applies to your registration rather than assuming a single market-wide date.
+
+## Cross-references
+
+- [Deep Dive: CSCRF (Cyber Security and Cyber Resilience Framework)](/broking-kyc/deep-dives/compliance-audit/cscrf-deep-dive/) — the successor regime to the 2018 cyber framework, including categorisation, VAPT and incident reporting.
+- [Screen 8: Declarations and blocking gate](/broking-kyc/journey/08-declarations-gate/) — where onboarding declarations and gating checks, including the documents the MITC summarises, are captured.
+- [Lifecycle: Modifications](/broking-kyc/lifecycle/modifications/) — segment deactivation and detail changes, distinct from a protective freeze.
+- [Lifecycle: Closure](/broking-kyc/lifecycle/closure/) — what a client actually wants when a freeze turns out to be permanent.
+- [Deep Dive: <abbr title="Electronic Contract Note.">ECN</abbr> and investor servicing](/broking-kyc/deep-dives/member-compliance/ecn-investor-servicing/) — the preservable-communication channels used to deliver MITC to existing clients.
+- [Deep Dive: SCORES procedure](/broking-kyc/deep-dives/compliance-audit/scores-procedure/) — the grievance machinery the Investor Charter points clients at.
+
+## Verified through
+
+2026-09-11
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

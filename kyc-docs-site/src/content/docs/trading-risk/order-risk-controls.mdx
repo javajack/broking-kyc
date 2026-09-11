@@ -1,0 +1,180 @@
+---
+title: "Trading Risk: Order risk controls"
+description: Pre-trade risk controls at the exchange and at the broker — circuit breakers, dynamic price bands and sliding flex, Limit Price Protection, self-trade prevention, order-value and quantity freeze limits, the algo kill switch, and the rise and discontinuation of IRRA.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Order risk controls sit in two places that are easy to confuse — inside the exchange matching engine, and inside the broker's own order path. The page separates them deliberately: first the exchange-side validations an order must survive (market-wide halts, price bands, Limit Price Protection, self-trade prevention), then the broker-side controls the member is obliged to operate, then the emergency stops (kill switch, contingency access), and finally what changed in 2026 when <abbr title="Securities and Exchange Board of India">SEBI</abbr> withdrew the Investor Risk Reduction Access platform.
+
+## TL;DR
+
+- **Market-wide circuit breakers halt the whole market at 10%, 15% and 20% index movement**, with halt durations that depend on the time of day — 20% stops trading for the rest of the day regardless. Consolidated in Section 2.1 of the trading annexure to the SEBI Master Circular for Stock Exchanges, tracing to SMDRPD/Policy/Cir-37/2001. [not yet in index]
+- **Derivative-eligible scrips get dynamic price bands, not fixed 20% bands.** Initial band is 10% of the previous close for stocks with derivatives, stocks in derivative-bearing indices, index futures and stock futures, relaxed in 5% increments on a market-wide trend (Circular CIR/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>/<abbr title="Depository Participant">DP</abbr>/34/2012). [not yet in index]
+- **Since November 2024 the band slides rather than expands.** Under [SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/MRD/TPD-1/P/CIR/2024/58](/broking-kyc/reference/circulars/sebi-other/) (24 May 2024) as operationalised by <abbr title="National Stock Exchange of India">NSE</abbr>/FAOP/64995 (8 November 2024, live 18 November 2024), flexing one side also moves the other side by the same amount, and pending limit orders outside the new band are **cancelled by the exchange**. [not yet in index]
+- **Limit Price Protection rejects aberrant option orders before they reach the book.** For index options, the LPP range is plus or minus ₹20 where the reference price is ₹50 or less, and plus or minus 40% of the reference price above ₹50 (NSE/FAOP/54242, 28 October 2022, live 31 October 2022). [not yet in index]
+- **Self-trade prevention is <abbr title="Permanent Account Number">PAN</abbr>-based and mandatory.** PAN must be populated in every order message for PRO and client orders, including custodial-participant orders; the exchange cancels the active or the passive side per the option set in order entry (NSE/CD/40134, 5 February 2019, effective 11 March 2019). [not yet in index]
+- **The <abbr title="Investor Risk Reduction Access">IRRA</abbr> platform is gone.** SEBI discontinued Investor Risk Reduction Access with immediate effect on 7 May 2026, superseding SEBI/HO/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD-1/P/CIR/2022/177. The surviving mechanism is the exchanges' **Contingency Pool Trading facility**. [not yet in index]
+
+## Conceptual overview
+
+An order placed by a retail client passes through at least four gates before it can match. The broker's own risk management system checks client-level permissions, available margin and per-order sanity limits. The exchange's order-entry validation checks the order against the instrument's price band and, for index options, against the Limit Price Protection range. The matching engine checks whether the match would be a self-trade. And the market-wide circuit breaker can remove the whole venue from under the order. Only the first of these is the broker's to design; the rest are given, and the broker's job is to surface their rejection messages intelligibly and to reconcile the consequences.
+
+The architecture is deliberately layered because the failure modes are different. Circuit breakers address systemic disorder. Price bands and dynamic bands address instrument-level disorder. Limit Price Protection addresses the specific pathology of thin option books where a single fat-fingered limit order can print an absurd price and trigger a cascade of stop-losses. Self-trade prevention addresses a conduct problem rather than a risk problem. And the kill switch addresses the case where the broker's own automation has gone wrong.
+
+What changed materially in this decade is the shift from *rejection* to *cancellation*. Older controls rejected incoming orders that fell outside limits but left resting orders alone. The November 2024 sliding-band framework cancels resting limit orders that fall outside a newly-flexed band, and the retail algo framework gave exchanges the power to kill all orders emanating from a particular algo identifier. Both changes push consequences into the broker's order-state reconciliation: an order can now die without the client or the broker having touched it.
+
+## 1. Regulatory framework
+
+- **[SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/0000013](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir20250000013)** (4 February 2025) — safer participation of retail investors in algorithmic trading. Para 59.18(a)(iii) of the consolidated Master Circular text requires exchanges to "continue to have the ability to use the kill switch for orders emanating from a particular algo id", with the footnote defining the kill switch as "an emergency function and the last level of defence against any Algorithm malfunction … expected to automatically trigger a halt on trading activity based on pre-defined conditions."
+- **SEBI/HO/MRD/TPD-1/P/CIR/2024/58** (24 May 2024) — enhancement of dynamic price bands for scrips in the derivatives segment; para (D) sliding price band on flexing, para (E) options trading during cooling-off in the underlying. [not yet in index]
+- **NSE/FAOP/64995** (8 November 2024) — the sliding-band and order-cancellation mechanics, plus a temporary LPP floor/ceiling on stock options during underlying cooling-off; effective 18 November 2024. Builds on NSE/FAOP/64627 (18 October 2024), NSE/FAOP/63405 (14 August 2024) and NSE/FAOP/62241 (30 May 2024). [not yet in index]
+- **NSE/FAOP/54242** (28 October 2022) — Limit Price Protection for index options; reference price construction, LPP ranges, auto-flex criteria, broadcast parameters. [not yet in index]
+- **NSE/FAOP/61814** — the consolidated Pre-Trade Risk Controls chapter (chapter 1.15) for the F&O segment, referenced as the standing baseline by NSE/FAOP/64995. [not yet in index]
+- **NSE/CD/40134** (5 February 2019) — PAN-based Self-Trade Prevention, revising NSE/CD/37520 (12 April 2018) and NSE/CD/38038; effective 11 March 2019. [not yet in index]
+- **SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2022/177** (30 December 2022) — introduced IRRA; operationalised by NSE/<abbr title="Investor Service Centre.">ISC</abbr>/58390 (14 September 2023) with the platform live from October 2023. Superseded. [not yet in index]
+- **HO/38/44/12(3)2025-MIRSD-TPD1/I/10705/2026** (7 May 2026) — discontinuation of IRRA with immediate effect, and direction to exchanges to review the Contingency Pool Trading facility. [not yet in index]
+- **[NSE/SURV/45016](/broking-kyc/reference/circulars/nse/#nsesurv45016)** — Order-to-Trade Ratio framework, covered on the surveillance page rather than here.
+
+## 2. Exchange-side controls: halts and bands
+
+### 2.1 Market-wide circuit breaker
+
+Triggered by whichever of the two benchmark indices breaches first, in either direction:
+
+| Index movement | Before 13:00 | 13:00 to 14:30 | At or after 14:30 |
+|---|---|---|---|
+| 10% | 1 hour halt | 30 minute halt (trigger before 14:30) | No halt; market continues |
+| 15% | 2 hour halt | 1 hour halt (13:00 to 14:00); halt for remainder of day if at or after 14:00 | Halt for remainder of day |
+| 20% | Halt for remainder of day | Halt for remainder of day | Halt for remainder of day |
+
+The percentages are converted into absolute index points quarterly and applied for the following quarter. On resumption the market reopens through a call auction — see [pre-open and closing auction](/broking-kyc/deep-dives/foundational/pre-open-closing-auction/).
+
+### 2.2 Scrip-wise and dynamic price bands
+
+| Instrument class | Band type | Initial width | Flex behaviour |
+|---|---|---|---|
+| Cash-segment scrips in compulsory rolling settlement, without derivatives and not in a derivative-bearing index | Fixed scrip-wise price band | 20% either way | No flex |
+| Stocks with derivatives available, and stocks in derivative-bearing indices | Dynamic price band | 10% of previous close | Relaxed in 5% increments on market-wide trend |
+| Index futures | Dynamic price band | 10% | Relaxed in 5% increments |
+| Stock futures | Dynamic price band | 10% | Relaxed in 5% increments; sliding since November 2024 |
+| Index options | Operating price range plus Limit Price Protection | Per exchange | LPP auto-flex on rejection criteria |
+
+Dynamic price bands were historically called dummy filters or the operating range. Functionally they prevent acceptance of orders placed beyond the limits rather than halting the instrument.
+
+### 2.3 The sliding band, from November 2024
+
+Objective flex criteria in the F&O segment require 50 trades executed with 10 different UCCs and 3 trading members on each side before a band flexes. Under the pre-November-2024 framework an upward flex simply widened the band: a ₹100 base price with a 10% band moved from 90–110 to 90–115. Under the revised framework the band slides to 95–115, and all pending orders priced between ₹90 and ₹95 — inside the old band, outside the new one — are cancelled automatically with intimation. Untriggered stop-loss orders are **not** cancelled, but on trigger only those with a limit price inside the prevailing band are accepted into the main order book.
+
+<Aside type="danger" title="Sliding bands cancel orders your client never touched">
+The cancellation in NSE/FAOP/64995 is exchange-initiated and unsolicited. A resting limit order that was valid when placed can be cancelled mid-session because the band slid away from it. Three things follow for the broker. First, the order-state machine must accept an unsolicited cancellation reason code and not treat it as a gateway error. Second, the client notification path must explain *why* — a silent disappearance from the order book is a grievance in the making. Third, strategies that rely on a resting far-side order as a hedge leg lose that leg exactly when the market is moving fast. Test this path in the exchange mock sessions, not in production.
+</Aside>
+
+### 2.4 Limit Price Protection for index options
+
+LPP is a second validation layered on top of the operating price range, applicable to index options on weekly and monthly expiries.
+
+| Element | Rule |
+|---|---|
+| Reference price during trading hours | Simple average of trade prices in the last 30 seconds, revised every 30 seconds for contracts that traded |
+| LPP range, index options, reference price ₹50 or below | Plus or minus ₹20 absolute |
+| LPP range, index options, reference price above ₹50 | Plus or minus 40% of the reference price |
+| Rejection | Buy order priced above the high LPP limit, or sell order priced below the low LPP limit, is rejected with the message "Order price is beyond LPP limit" |
+| Stop-loss limit orders | Validation applied post-trigger, when the order is released into the main order book |
+| Auto-flex | LPP limit flexes in the direction of the breach when at least 10 orders are rejected on LPP grounds between two LPP revision events **and** those orders involve at least 5 unique UCCs |
+
+## 3. Self-trade prevention
+
+The mechanism is PAN-based and operates at match time, not at order entry.
+
+| Scenario | Behaviour |
+|---|---|
+| Active PRO or non-CP client order about to match a passive order (PRO, non-CP client, or CP-code client) with the same PAN in the same order book | Active or passive order cancelled, in full or in part, per the option set in order entry; reason: the order could have resulted in a self-trade |
+| Active CP-code order about to match a passive CP-code order with the same CP code in the same order book | Same |
+| Active CP-code order about to match a passive PRO or non-CP client order with the same PAN | Same |
+| Orders entered by **different** members that would self-trade on the same PAN or CP code | Same — the check is not member-scoped |
+| Trade modification | The mechanism applies only during matching; PAN can be modified during trade modification, and the member must take precautions to avoid creating a self-trade that way |
+
+Because the check keys on PAN, populating PAN in order messages is mandatory for PRO and client orders alike, CP and non-CP, and the member is solely responsible for its correctness. Self-trade and reversal patterns that do get through are separately addressed by the exchange's Reversal Trade Cancellation Mechanism ([NSE/SURV/67801](/broking-kyc/reference/circulars/nse/#nsesurv67801)) and by the conduct framework described in [market manipulation typologies](/broking-kyc/deep-dives/foundational/market-manipulation-typologies/).
+
+## 4. Order-to-trade ratio, in one paragraph
+
+<abbr title="Order-to-Trade Ratio">OTR</abbr> counts order submissions plus modifications plus cancellations divided by trades, with penalty slabs and per-breach consequences that escalate through the day. The formula, the breach grid, the cautionary-message obligation and the related Order-Based Surveillance Measure for persistent noise creators are documented in full on the [surveillance deep dive](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/) and are not repeated here. For this page the relevant point is architectural: OTR is a *post-hoc* control on order-message behaviour, which means the broker must throttle in its own order path if it wants to avoid the penalty — the exchange will not reject the marginal order that pushes the ratio over.
+
+## 5. Broker-side pre-trade controls
+
+These are the member's own, and the member is accountable for them under the risk-management-policy requirement and the system-audit scope.
+
+| Control | Typical placement | What it prevents |
+|---|---|---|
+| Client segment and product entitlement | Order entry, before margin | Orders in a segment the client never activated — see [trading preferences](/broking-kyc/journey/06-trading-preferences/) |
+| Available-margin block | Pre-trade hot path | Margin shortfall penalty; see [margin shortfall and peak margin](./margin-shortfall-peak-margin/) |
+| Per-order value limit | Order entry | Fat-finger notional errors |
+| Per-order quantity limit and quantity freeze | Order entry | Oversized single orders; quantity freeze routes large orders for exchange confirmation |
+| Restricted, banned and surveillance-list blocks | Order entry, from <abbr title="Beginning Of Day">BOD</abbr> lists | Orders in scrips under ban period, <abbr title="Graded Surveillance Measure">GSM</abbr>/<abbr title="Additional Surveillance Measure">ASM</abbr> restrictions or the member's own restricted list |
+| Algo identifier tagging and per-algo rate limits | API gateway | Runaway algo order rates; the exchange-side kill switch is the backstop, not the primary control |
+| Broker kill switch | <abbr title="Risk Management System">RMS</abbr> console | Bulk cancellation of outstanding orders and blocking of further entry for a client, dealer, algo or the whole book |
+
+<Aside type="note" title="Two different things are called a kill switch">
+The **exchange** kill switch is the emergency halt referenced in the retail algo framework — an exchange-side function that stops orders from a particular algo identifier when pre-defined conditions are met. The **broker** kill switch is a feature of the member's own risk console: cancel-all plus block-further-entry, scoped to a client, a dealer, an API key, an algo, or the entire book. Only the first is a regulatory obligation on the exchange; the second is an internal control the member designs, and its existence and testing are in scope for the [system audit](/broking-kyc/deep-dives/compliance-audit/system-audit/). Do not cite one when you mean the other in a policy document.
+</Aside>
+
+## 6. Emergency access: IRRA, and what replaced it
+
+IRRA was introduced by SEBI's 30 December 2022 circular and operationalised jointly by the exchanges from October 2023. The design: where a trading member's primary *and* disaster-recovery sites were both down, exchanges would jointly invoke a common platform on which that member's retail internet and mobile clients could log in with <abbr title="Unique Client Code">UCC</abbr> or PAN plus <abbr title="One-Time Password">OTP</abbr>, view their order book and net positions, cancel pending orders and square off — fresh positions could not be created, algo and institutional clients were out of scope, and gross-settled instruments could not be squared off. The member and its clearing member remained responsible for clearing, settlement and margin throughout, and an admin terminal let the member act for clients or its own proprietary account. Only one affected member could use the platform at a time, priority going to the one with more active UCCs. Invocation was on member request to `irra@bsetech.in` or on exchange monitoring, with one reverse migration allowed per trading day.
+
+On 7 May 2026 SEBI discontinued it with immediate effect. The stated reasoning is worth reading carefully because it is a rare regulatory admission of redundancy: business-continuity requirements had since been strengthened through BCP-DR operationalisation, the enhanced cyber-security and cyber-resilience framework, a market-wide Security Operations Centre and a tightened technical-glitch framework; brokers had built independent cold sites and smoother primary-to-alternate failover; and the exchanges' **Contingency Pool Trading facility** — dedicated terminals inside exchange premises on the exchange's internal network, through which a broker can square off client open positions during a disruption — had actually been used on several occasions while IRRA had never been accessed by any broker since inception. Exchanges were told to review and strengthen the Contingency Pool Trading framework.
+
+| Aspect | IRRA (2023 to May 2026) | Contingency Pool Trading (current) |
+|---|---|---|
+| Who acts | The investor, directly, plus a member admin terminal | The broker, from exchange premises |
+| Access path | Public web and mobile app, OTP login on UCC or PAN | Dedicated terminals on the exchange's internal network |
+| Scope | Square off and cancel only; no fresh positions | Square off client open positions |
+| Status | Discontinued 7 May 2026 | In force; framework under review per the same circular |
+
+The practical consequence for a broker's BCP documentation is immediate: any runbook, client-facing FAQ or disclosure that names IRRA as the failover path for clients is now wrong and should point at the Contingency Pool Trading facility instead. See [BCP and DR drills](/broking-kyc/deep-dives/specialty/bcp-dr-drill/).
+
+## 7. Alternatives
+
+| Option A | Option B | When to pick which | Who uses what |
+|---|---|---|---|
+| Block the order at the broker for price reasonability | Let the exchange band or LPP reject it | A gives a clearer client message and avoids rejection-rate scrutiny; B is simpler and always authoritative | App-first brokers pre-validate to keep the UX clean; smaller members rely on exchange rejection |
+| Broker-level kill switch scoped per API key | Kill switch scoped per client | A contains a runaway algo without disabling a human client's ability to exit; B is blunter but simpler | Brokers with material API and algo flow run per-key scoping |
+
+## 8. Field-level view: pre-trade validation attributes on an order
+
+| name | type | length | mandatory | source-system | destination-system(s) | notes |
+|---|---|---|---|---|---|---|
+| `client_code` | CHAR | 10 | Y | <abbr title="Order Management System">OMS</abbr> | exchange, RMS, back-office | UCC; mandatory in every order message |
+| `pan` | CHAR | 10 | Y | <abbr title="Know Your Customer (process).">KYC</abbr> master via OMS | exchange matching engine | Drives self-trade prevention; member solely responsible for correctness |
+| `pro_client_flag` | CHAR | 1 | Y | OMS | exchange | PRO versus CLI; PRO entry restricted to the member's designated location |
+| `stp_option` | CHAR | 1 | Y | OMS order-entry default | exchange | Whether the active or the passive order is cancelled on a self-trade match |
+| `algo_id` | CHAR | 16 | Conditional | exchange algo registry via OMS | exchange, surveillance | Mandatory for algo-originated orders; the unit the exchange kill switch acts on |
+| `order_price` | NUMBER(12,2) | 12 | Conditional | client input | exchange | Validated against operating price range and, for index options, LPP |
+| `incremental_margin` | NUMBER(15,2) | 15 | Derived | RMS | RMS | Marginal margin of the proposed order; blocks on insufficiency |
+| `unsolicited_cancel_flag` | CHAR | 1 | Conditional | exchange | order-state machine, client notification | Set on exchange-initiated cancellation such as a sliding-band cancel |
+
+## Practical notes
+
+- **[gotcha]** LPP reference prices refresh every 30 seconds and stop refreshing for untraded contracts. On an illiquid far-strike option the effective LPP range can be anchored to a stale theoretical price, so a perfectly sensible limit order gets rejected. The auto-flex needs 10 rejections from 5 unique UCCs before the range moves — a single client cannot flex the range by retrying.
+- **[gotcha]** Self-trade prevention is not member-scoped. Two different brokers carrying the same PAN on opposite sides will trigger the cancellation, which means a client running accounts at two brokers can have orders cancelled for reasons neither broker can see. Support scripts should cover this explicitly.
+- **[gotcha]** The exchange kill switch acts on an algo identifier. If a member routes multiple client strategies through a single registered algo id, an exchange kill takes them all down together. Granular algo registration is an availability decision, not only a compliance one — see [retail algo framework](/broking-kyc/deep-dives/trading-day/retail-algo-framework/).
+- **[gotcha]** Any client-facing content referencing IRRA is stale after 7 May 2026. That includes website footers, the disclosure that members were required to display linking to the IRRA app, and BCP annexures in the account-opening kit.
+- **[AI inference — verify before acting]** The broker-side control table in section 5 is a composite of the risk-management-policy and system-audit expectations rather than a single prescribed list; the exact control set and its parameters are member-specific and set by the member's board-approved risk policy.
+
+## Cross-references
+
+- [Deep Dive: Surveillance — NORMS, GSM, ASM, OTR, T2T](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/) — the OTR formula and breach grid, GSM and ASM stages, and the surveillance consequences of order-pattern anomalies.
+- [Deep Dive: OMS Internals](/broking-kyc/deep-dives/trading-day/oms-internals/) — where each pre-trade check sits in the order path, the latency budget and the order-state machine that must absorb unsolicited cancellations.
+- [Deep Dive: Retail Algo Framework](/broking-kyc/deep-dives/trading-day/retail-algo-framework/) — algo registration, tagged-order flow and the exchange's supervisory powers including the kill switch.
+- [Deep Dive: Market manipulation typologies](/broking-kyc/deep-dives/foundational/market-manipulation-typologies/) — spoofing, layering, wash trades and the conduct framework behind self-trade prevention.
+- [Deep Dive: BCP and DR drills](/broking-kyc/deep-dives/specialty/bcp-dr-drill/) — the business-continuity obligations SEBI cited as the reason IRRA became redundant.
+- [Deep Dive: System audit](/broking-kyc/deep-dives/compliance-audit/system-audit/) — the audit scope that covers the member's own risk controls and kill-switch testing.
+
+## Verified through
+
+2026-09-11
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*
