@@ -77,7 +77,7 @@ CDSL supports three distinct types of pledges, each serving a different business
 
 | Pledge Type | Purpose | Pledgor --> Pledgee | <abbr title="One-Time Password">OTP</abbr> Required |
 |-------------|---------|---------------------|--------------|
-| **Normal Pledge** | Loan Against Shares (eLAS) | Client --> NBFC/Bank | Yes (TPIN+OTP) |
+| **Normal Pledge** | Loan Against Shares (eLAS) | Client --> NBFC/Bank | Yes (<abbr title="Transaction PIN">TPIN</abbr>+OTP) |
 | **Margin Pledge** | Margin collateral for trading | Client --> <abbr title="Trading Member">TM</abbr>/<abbr title="Clearing Member">CM</abbr> CUSPA | Yes (TPIN+OTP) or <abbr title="Demat Debit and Pledge Instruction">DDPI</abbr> (Demat Debit and Pledge Instruction) |
 | **MTF Pledge** | Margin Trading Facility funding | Client --> TM/CM Funding Account | Yes (TPIN+OTP) or DDPI |
 

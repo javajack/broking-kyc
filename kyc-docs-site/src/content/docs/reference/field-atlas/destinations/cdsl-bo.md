@@ -57,7 +57,7 @@ Sorted by `source_section`, then `field_id`.
 | B | B-poa_address_same_as_corr | POA Same as Correspondence | POA_SAME_FLAG | CHAR(1) | one-time | [direct] | Y/N flag; POA document address same as corr address | CDSL/OPS/DP/SYSTM/2023/119 |
 | C | C-alternate_email | Alternate Email | ALT_EMAIL | CHAR(100) | on-modify | lowercase | Optional | CDSL/OPS/DP/POLCY/2024/208 |
 | C | C-alternate_mobile | Alternate Mobile | ALT_MOBILE | CHAR(15) | on-modify | [direct] | Line 04 optional position; right-padded | CDSL/OPS/DP/POLCY/2024/208 |
-| C | C-email | Email | EMAIL_ID | CHAR(100) | on-modify | lowercase | Line 04 fixed-length; mandatory per CDSL POLCY/2021/152; right-padded with spaces; RFC 5322 validation; e-CAS sent to this address | CDSL/OPS/DP/POLCY/2021/152 |
+| C | C-email | Email | EMAIL_ID | CHAR(100) | on-modify | lowercase | Line 04 fixed-length; mandatory per CDSL POLCY/2021/152; right-padded with spaces; RFC 5322 validation; e-<abbr title="Consolidated Account Statement">CAS</abbr> sent to this address | CDSL/OPS/DP/POLCY/2021/152 |
 | C | C-email_validated | Email Validated | EMAIL_OTP_VALIDATED | CHAR(1) | one-time | [direct] | Y/N; email <abbr title="One-Time Password">OTP</abbr>/link validation | CDSL/OPS/DP/POLCY/2021/152 |
 | C | C-mobile_isd_code | Mobile ISD Code | MOBILE_ISD | CHAR(5) | on-modify | [direct] | Line 04 fixed-length position; default +91 for India; right-padded | CDSL/OPS/DP/SYSTM/2023/119 |
 | C | C-mobile_number | Mobile Number | MOBILE_NUMBER | CHAR(15) | on-modify | [direct] | Line 04; mandatory per CDSL POLCY/2021/152 (six mandatory <abbr title="Know Your Customer (process).">KYC</abbr> attributes); 10 digit India must start 6/7/8/9; rejection on invalid pattern | CDSL/OPS/DP/POLCY/2021/152 |
@@ -78,7 +78,7 @@ Sorted by `source_section`, then `field_id`.
 | H | H-account_type | BO Account Type | ACCT_TYPE | CHAR(2) | one-time | lookup against R | Code IN=Individual, JO=Joint, MN=Minor, HU=<abbr title="Hindu Undivided Family">HUF</abbr>; line 06 | CDSL/OPS/DP/POLCY/2022/115 |
 | H | H-bo_id | BO ID | BO_ID | CHAR(16) | one-time | concat with X | Concatenation DP_ID (8 digit) + CLIENT_ID (8 digit) = 16-digit numeric; line 06; primary key | CDSL/OPS/DP/SYSTM/2023/119 |
 | H | H-bo_status_code | BO Status Code | BO_STATUS_CODE | CHAR(2) | one-time | lookup against R | 2-char primary status code (Resident, NRI, FN, etc.) different from sub-status; line 02 | CDSL/OPS/DP/SYSTM/2023/119 |
-| H | H-bsda_flag | BSDA Flag | BSDA_FLAG | CHAR(1) | one-time | [direct] | Y/N; line 06; default Y at opening per CDSL practice; opt-out by email consent | CDSL/OPS/DP/POLCY/2024/208 |
+| H | H-bsda_flag | <abbr title="Basic Services Demat Account">BSDA</abbr> Flag | BSDA_FLAG | CHAR(1) | one-time | [direct] | Y/N; line 06; default Y at opening per CDSL practice; opt-out by email consent | CDSL/OPS/DP/POLCY/2024/208 |
 | H | H-bsda_optout_consent_date | BSDA Opt-Out Consent Date | BSDA_OPTOUT_DATE | CHAR(8) | one-time | formatted | YYYYMMDD if BSDA opt-out; required by V2.0.0.0; CDSL aligns to <abbr title="National Securities Depository Limited">NSDL</abbr> convention | CDSL/OPS/DP/POLCY/2024/208 |
 | H | H-client_id | Client ID | CLIENT_ID | CHAR(8) | one-time | [direct] | 8-digit numeric assigned by DP within their range; line 06 positional | CDSL/OPS/DP/SYSTM/2023/119 |
 | H | H-cusps_account_flag | <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr> Indicator | CUSPA_FLAG | CHAR(1) | one-time | [direct] | Y/N for Client Unpaid Securities Pledgee Account | CDSL/OPS/DP/SYSTM/2023/119 |
@@ -87,7 +87,7 @@ Sorted by `source_section`, then `field_id`.
 | H | H-holding_type | Holding Pattern | HOLDING_PATTERN | CHAR(2) | one-time | lookup against R | SI=Single, J2=Joint(2), J3=Joint(3); line 06; second/third holder triggers replication of line 01-02 | CDSL/OPS/DP/SYSTM/2023/119 |
 | H | H-ifsc_branch | First Holder IFSC | FIRST_HOLDER_IFSC | CHAR(11) | on-modify | uppercase | Bank IFSC linked at BO level for payouts; same as G-ifsc_code | CDSL/OPS/DP/SYSTM/2023/119 |
 | H | H-income_range | Income Range | INCOME_RANGE | CHAR(2) | one-time | lookup against R | Income range code 01-06; mandatory per CDSL POLCY/2021/152 | CDSL/OPS/DP/POLCY/2021/152 |
-| H | H-lei_number | Legal Entity Identifier | LEI_NUMBER | CHAR(20) | on-modify | uppercase | 20-char LEI for non-individual; freeze reason 30 on expiry per CDSL/OPS/DP/POLCY/2024/51 | CDSL/OPS/DP/POLCY/2024/51 |
+| H | H-lei_number | Legal Entity Identifier | LEI_NUMBER | CHAR(20) | on-modify | uppercase | 20-char <abbr title="Legal Entity Identifier">LEI</abbr> for non-individual; freeze reason 30 on expiry per CDSL/OPS/DP/POLCY/2024/51 | CDSL/OPS/DP/POLCY/2024/51 |
 | H | H-occupation | Occupation | OCCUPATION_CODE | CHAR(2) | one-time | lookup against R | Occupation code 01-11/99; mandatory line 06; harmonized with KRA | CDSL/OPS/DP/POLCY/2021/152 |
 | H | H-opening_date | BO Account Opening Date | OPENING_DATE | CHAR(8) | one-time | formatted | YYYYMMDD format in line 06; right-aligned | CDSL/OPS/DP/SYSTM/2023/119 |
 | H | H-operation_mode | Operation Mode | OPERATION_MODE | CHAR(2) | one-time | lookup against R | Code ES=Either or Survivor, AS=Anyone or Survivor, JO=Jointly; mandatory for joint | CDSL/OPS/DP/SYSTM/2023/119 |

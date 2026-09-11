@@ -13,7 +13,7 @@ import { Aside } from '@astrojs/starlight/components';
 - The pre-trade RMS pipeline is a strictly sequential six-stage chain — **segment / margin / <abbr title="Market Wide Position Limit">MWPL</abbr> / order-type / surveillance / release** — with a combined budget of single-digit milliseconds per order at P99 (see [Integration <abbr title="Directed Acyclic Graph.">DAG</abbr>: Trading hours](/broking-kyc/operations/integration-dag/trading-hours/)).
 - Three systems share responsibility for a trading day: the **OMS** routes and persists orders, the **RMS** validates margin and risk gates, the **back-office** books trades and produces contract notes plus regulatory files. Misallocating any one responsibility is a recurring source of operational defects.
 - The exchange edge runs on **FIX 4.4 (with <abbr title="National Stock Exchange of India">NSE</abbr> / <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> / <abbr title="Multi Commodity Exchange of India">MCX</abbr> dialect extensions)** for institutional flow or **CTCL** (NEAT-IXS / IML / BOLT-IML / MCX-TWS) for retail trading-software paths. Each requires segment-level **CTCL approval** before any production order can be routed.
-- Order-type matrix is segment-specific: cash supports NRML / MIS / CO / <abbr title="Beneficial Owner">BO</abbr> / AMO / GTT; derivatives add carry-forward and bracket limits; commodities have their own intraday vs delivery distinctions. Each order type has a distinct risk profile and time-cut.
+- Order-type matrix is segment-specific: cash supports NRML / MIS / CO / <abbr title="Beneficial Owner">BO</abbr> / <abbr title="After Market Order">AMO</abbr> / <abbr title="Good Till Triggered">GTT</abbr>; derivatives add carry-forward and bracket limits; commodities have their own intraday vs delivery distinctions. Each order type has a distinct risk profile and time-cut.
 - Latency budgets are tighter than they look: the entire chain from order-receive to FIX-out must fit in roughly 5 ms at P95 for a credible retail OMS, and well below 1 ms at the exchange edge for an institutional one.
 - The failure surfaces are well-known and worth memorising: scanrange-not-loaded, FIX-session-disconnect, RMS-stale-parameter, CTCL-approval-revoked, AMO-overnight-margin-shift, and the dealer-terminal-trust-boundary class of bugs.
 
@@ -23,7 +23,7 @@ The OMS — Order Management System — is the broker's traffic controller. What
 
 Around the OMS sit two siblings with sharply separated responsibilities. The **RMS** (Risk Management System) is consulted by the OMS at every gate — segment activation, margin availability, MWPL headroom, order-type rules, surveillance filters. The RMS owns the per-client risk picture: <abbr title="Standard Portfolio Analysis of Risk">SPAN</abbr> scanrange, <abbr title="Extreme Loss Margin">ELM</abbr> ratios, exposure margins, position limits, surveillance flags. The OMS holds the order; the RMS holds the risk. Together they make the release decision in single-digit milliseconds.
 
-The **back-office** comes in once trades happen. Where the OMS-RMS pair runs in milliseconds, the back-office runs in seconds-to-minutes — booking trades against the contract files received from each exchange, computing brokerage / STT / GST / stamp duty / <abbr title="Securities and Exchange Board of India">SEBI</abbr> turnover fee, producing the day's contract notes, generating the [DMF](/broking-kyc/operations/compliance-blueprint/), feeding the [surveillance](/broking-kyc/operations/compliance-blueprint/) and settlement pipelines. The clean split — OMS for orders, RMS for risk, back-office for books — is one of the most important architectural lines in a broking stack, and the one most often blurred by accident in smaller deployments.
+The **back-office** comes in once trades happen. Where the OMS-RMS pair runs in milliseconds, the back-office runs in seconds-to-minutes — booking trades against the contract files received from each exchange, computing brokerage / <abbr title="Securities Transaction Tax">STT</abbr> / GST / stamp duty / <abbr title="Securities and Exchange Board of India">SEBI</abbr> turnover fee, producing the day's contract notes, generating the [DMF](/broking-kyc/operations/compliance-blueprint/), feeding the [surveillance](/broking-kyc/operations/compliance-blueprint/) and settlement pipelines. The clean split — OMS for orders, RMS for risk, back-office for books — is one of the most important architectural lines in a broking stack, and the one most often blurred by accident in smaller deployments.
 
 ## 1. Order capture paths
 
@@ -72,7 +72,7 @@ The OMS holds, per client per segment, an activation flag: <abbr title="Clearing
 The OMS computes the **required margin** for the proposed order and **reserves it against the client's available margin** before any further validation. The computation differs by segment:
 
 - **CM buy:** required margin = VaR + ELM (per [SEBI/HO/MRD2/DCAP/CIR/P/2020/127](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2dcapcirp2020127)). The 20% alternative — a flat 20% upfront margin in place of VaR+ELM — is acceptable per [NSE/INSP/45534](/broking-kyc/reference/circulars/nse/#nseinsp45565) and is a common simplification at retail brokers.
-- **CM sell of holding:** margin requirement is partly waived against the holding; the RMS validates that the holding is unencumbered (not under a pledge, not in a CSMFA / <abbr title="Margin Trading Facility">MTF</abbr> lock).
+- **CM sell of holding:** margin requirement is partly waived against the holding; the RMS validates that the holding is unencumbered (not under a pledge, not in a <abbr title="Client Securities Margin Funded Account">CSMFA</abbr> / <abbr title="Margin Trading Facility">MTF</abbr> lock).
 - **F&O / CD:** SPAN + ELM, with the client's margin recomputed from the SPAN scanrange and ELM ratios loaded at <abbr title="Beginning Of Day">BOD</abbr> (see [SPAN methodology deep-dive](/broking-kyc/deep-dives/trading-day/rms-span-methodology/)).
 - **Commodity:** SPAN + ELM via <abbr title="Multi Commodity Exchange Clearing Corporation Limited">MCXCCL</abbr>'s commodity SPAN, plus any additional / event-driven margins.
 
@@ -100,7 +100,7 @@ The order is screened against the day's surveillance lists:
 - **<abbr title="Additional Surveillance Measure">ASM</abbr>** (Additional Surveillance Measure) Short-term and Long-term lists. ASM positions typically require 100% upfront margin in higher stages.
 - **T2T** (Trade-to-Trade) — securities in T2T must settle gross (no intraday netting). The OMS must restrict order-type to NRML and reject any MIS / intraday variant.
 - **<abbr title="Enhanced Surveillance Measure">ESM</abbr>** (Enhanced Surveillance Measure) for SME / micro-cap segments per [NSE/SURV/61848](/broking-kyc/reference/circulars/nse/#nsesurv61848).
-- **Broker-internal restricted lists** — securities the broker has flagged for its own reasons (employee designated person list per PIT, MOU-based restrictions, client-segregation rules).
+- **Broker-internal restricted lists** — securities the broker has flagged for its own reasons (employee designated person list per <abbr title="Prohibition of Insider Trading">PIT</abbr>, MOU-based restrictions, client-segregation rules).
 
 Any surveillance flag on the order returns a typed reject ("surveillance: GSM stage III, 100% margin required") that the client UI translates to a customer-friendly explanation.
 
@@ -132,7 +132,7 @@ A consistent source of confusion in broking architecture is the boundary between
 | Intraday peak-margin snapshot capture | no | yes | reads (for DMF aggregation) |
 | Daily Margin File (DMF) generation | no | partial | yes (aggregation) |
 | Position file generation per segment | no | partial | yes (aggregation) |
-| Surveillance OTR / pattern computation (intraday) | feeds | partial | reads (EOD) |
+| Surveillance <abbr title="Order-to-Trade Ratio">OTR</abbr> / pattern computation (intraday) | feeds | partial | reads (EOD) |
 | Client ledger update (trade entries, <abbr title="Mark-to-Market">MTM</abbr> realized) | feeds | no | yes |
 | <abbr title="KYC Registration Agency">KRA</abbr> / <abbr title="Central KYC (records registry)">CKYC</abbr> / <abbr title="Unique Client Code">UCC</abbr> / DLT integrations | no | no | yes |
 | Auction obligation, short-delivery remediation | no | no | yes |

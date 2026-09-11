@@ -519,7 +519,7 @@ Example: `BO_SETUP_12345678_20260213_001.txt`
 | 13-13 | 1 | Politically Exposed | Alpha | **Y** | Y/N |
 | 14-14 | 1 | Related to PEP | Alpha | **Y** | Y/N |
 | 15-16 | 2 | Tax Status | Numeric | **Y** | CDSL tax status code |
-| 17-17 | 1 | BSDA Flag | Alpha | N | Y/N |
+| 17-17 | 1 | <abbr title="Basic Services Demat Account">BSDA</abbr> Flag | Alpha | N | Y/N |
 | 18-19 | 2 | FATCA Country | Alpha | Cond. | ISO country if foreign tax |
 | 20-39 | 20 | FATCA Tax ID | Alphanumeric | Cond. | Foreign TIN |
 | 40-41 | 2 | Country of Birth | Alpha | **Y** | ISO country code |
@@ -749,7 +749,7 @@ Per Master Dataset Section H:
 
 ### 6.2 DDPI Scope
 
-DDPI authorizes the DP (broker) to perform the following without per-trade TPIN+<abbr title="One-Time Password">OTP</abbr>:
+DDPI authorizes the DP (broker) to perform the following without per-trade <abbr title="Transaction PIN">TPIN</abbr>+<abbr title="One-Time Password">OTP</abbr>:
 
 | Authorization | Code | Description |
 |---------------|------|-------------|
@@ -994,7 +994,7 @@ CDSL sends a POST callback to `callback_url` after client completes or rejects:
 - View current holdings (ISIN-wise)
 - View transaction history
 - View corporate action entitlements
-- Download Consolidated Account Statement (CAS)
+- Download Consolidated Account Statement (<abbr title="Consolidated Account Statement">CAS</abbr>)
 - Set/reset TPIN for eDIS
 - View pledge/unpledge status
 - View nomination details
@@ -1062,7 +1062,7 @@ Response:
 |-------------|---------|
 | Account Type | `CO` |
 | CIN | 21-character Corporate Identification Number (mandatory) |
-| PAN | Corporate PAN (starts with `A` in 4th character) |
+| PAN | Corporate PAN (4th character `C` for company; `A` is AOP, `F` firm, `H` HUF, `T` trust) |
 | Board Resolution | Upload required: authorizing demat account opening and naming authorized signatories |
 | Authorized Signatories | List of individuals authorized to operate the account; each needs PAN, DIN (if director), address |
 | MOA/AOA | Memorandum and Articles of Association (copy to be maintained) |
@@ -1985,7 +1985,7 @@ Corporate account opening is more complex than individual:
 ### 22.2 FPI (Foreign Portfolio Investor) Accounts
 
 - Custodian model: FPIs operate through SEBI-registered custodians
-- Our DP may not directly open FPI accounts unless we have custodian capabilities
+- Our DP may not directly open <abbr title="Foreign Portfolio Investor">FPI</abbr> accounts unless we have custodian capabilities
 - DDPs (Designated Depository Participants) handle FPI registrations
 - CDSL has a separate FPI module in CDAS
 

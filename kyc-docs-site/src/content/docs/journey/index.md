@@ -6,7 +6,7 @@ next:
   label: 'Screen 1: Mobile Registration →'
 ---
 
-> **Where this fits.** This is the **Onboarding journey** section — the customer-facing flow from mobile OTP to first trade. For what happens to an active account *after* onboarding (margin, settlement, audits, cycles), see [Broker process narrative](/broking-kyc/broker-process/narrative/). For events that hit an account *later in life* (re-KYC, modifications, dormancy, closure, transmission, NRI conversion), see [Lifecycle events](/broking-kyc/lifecycle/). For the regulatory base, see [Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/). New here? Try [Choose Your Role](/broking-kyc/personas/) first.
+> **Where this fits.** This is the **Onboarding journey** section — the customer-facing flow from mobile OTP to first trade. For what happens to an active account *after* onboarding (margin, settlement, audits, cycles), see [Broker process narrative](/broking-kyc/broker-process/narrative/). For events that hit an account *later in life* (re-KYC, modifications, dormancy, closure, transmission, <abbr title="Non-Resident Indian">NRI</abbr> conversion), see [Lifecycle events](/broking-kyc/lifecycle/). For the regulatory base, see [Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/). New here? Try [Choose Your Role](/broking-kyc/personas/) first.
 
 This section documents the <abbr title="Know Your Customer (process).">KYC</abbr> (Know Your Customer) onboarding journey mandated by <abbr title="Securities and Exchange Board of India">SEBI</abbr>, the exchanges (<abbr title="National Stock Exchange of India">NSE</abbr>, <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr>, <abbr title="Multi Commodity Exchange of India">MCX</abbr>), and the depositories (<abbr title="Central Depository Services (India) Limited">CDSL</abbr>, <abbr title="National Securities Depository Limited">NSDL</abbr>). The journey is structured as 9 sequential screens, each mapping to specific regulatory requirements. Every field collected traces to a compliance obligation under SEBI KYC Master Circular (SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-SEC-2/P/CIR/2023/168), <abbr title="Prevention of Money Laundering Act 2002">PMLA</abbr> requirements, or exchange/depository registration specifications.
 
@@ -48,4 +48,8 @@ For vendor implementation options, see [Vendor Integrations](/broking-kyc/vendor
 
 :::caution[The blocking gate is non-negotiable]
 Screen 8 is not just a checkbox screen. It is where the system evaluates every async check that has been running since Screen 1. If PAN verification failed, KRA returned "Rejected," or AML flagged the customer as high-risk, the journey stops here. Never let a customer reach e-Sign if any blocking condition is unresolved.
+:::
+
+:::note[Other client types and products]
+This journey covers a resident individual. For minors, NRIs, HUFs, partnerships, companies, trusts, FPIs, joint holders, and <abbr title="Basic Services Demat Account">BSDA</abbr>, see [Account Variants](/broking-kyc/account-variants/). For what happens when a client switches on F&O, <abbr title="Margin Trading Facility">MTF</abbr>, <abbr title="Initial Public Offering">IPO</abbr> bidding, pledge, or API access after onboarding, see [Product Activation](/broking-kyc/product-activation/).
 :::

@@ -25,7 +25,7 @@ How a trading day actually runs at the integration layer — order capture, pre-
 |---|---|
 | OMS internals — order capture paths, pre-trade RMS hot path, <abbr title="Financial Information eXchange protocol">FIX</abbr> gateway | [oms-internals](./trading-day/oms-internals/) |
 | RMS / SPAN methodology — margin computation walkthrough | [rms-span-methodology](./trading-day/rms-span-methodology/) |
-| Surveillance — NORMS / <abbr title="Graded Surveillance Measure">GSM</abbr> / <abbr title="Additional Surveillance Measure">ASM</abbr> / OTR / social-media | [surveillance-norms-gsm-asm](./trading-day/surveillance-norms-gsm-asm/) |
+| Surveillance — NORMS / <abbr title="Graded Surveillance Measure">GSM</abbr> / <abbr title="Additional Surveillance Measure">ASM</abbr> / <abbr title="Order-to-Trade Ratio">OTR</abbr> / social-media | [surveillance-norms-gsm-asm](./trading-day/surveillance-norms-gsm-asm/) |
 | Short-delivery auction — <abbr title="Trade-date Plus N settlement">T+2</abbr> mechanics + penalty cascade | [short-delivery-auction](./trading-day/short-delivery-auction/) |
 | Block & bulk deals — windows, threshold, reporting | [block-bulk-deals](./trading-day/block-bulk-deals/) |
 | Retail algo framework — SEBI Aug 2025 mandate | [retail-algo-framework](./trading-day/retail-algo-framework/) |
@@ -37,7 +37,7 @@ The settlement layer — how <abbr title="Trade-date Plus N settlement">T+1</abb
 | Topic | Page |
 |---|---|
 | T+0 / T+1 settlement nuances | [t0-t1-settlement](./settlement/t0-t1-settlement/) |
-| Direct payout to demat (<abbr title="Trading Member">TM</abbr> <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr> / <abbr title="Clearing Member">CM</abbr> CUSPA / TM CSMFA) | [direct-payout-to-demat](./settlement/direct-payout-to-demat/) |
+| Direct payout to demat (<abbr title="Trading Member">TM</abbr> <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr> / <abbr title="Clearing Member">CM</abbr> CUSPA / TM <abbr title="Client Securities Margin Funded Account">CSMFA</abbr>) | [direct-payout-to-demat](./settlement/direct-payout-to-demat/) |
 | Client funds upstreaming (MFOS / FDR / cash) | [client-funds-upstreaming](./settlement/client-funds-upstreaming/) |
 | Payin default + Core <abbr title="Settlement Guarantee Fund">SGF</abbr> draw | [payin-default-core-sgf](./settlement/payin-default-core-sgf/) |
 | <abbr title="Securities Lending and Borrowing Mechanism">SLBM</abbr> (Securities Lending & Borrowing Mechanism) | [slbm](./settlement/slbm/) |
@@ -100,6 +100,15 @@ Topics central to broking operations that the site had only mentioned in passing
 - **Engineer building an integration** — start at the relevant topic, then cross-link out to the [Integration DAG](/broking-kyc/operations/integration-dag/) for the dependency structure and the [Field Atlas](/broking-kyc/reference/field-atlas/) for the data flow.
 - **Compliance officer building a runbook** — start at the relevant topic, cross-link to the [Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/) for obligation context and to [Circulars](/broking-kyc/reference/regulatory-circulars/) for the regulatory citation.
 - **Auditor / inspector** — pages are written with verifiability in mind. Every claim cites a circular or vendor doc; gaps where public source isn't available are tagged `[industry typical — verify]`.
+
+## Related sections
+
+The deep dives take the broker-side view. Four sections added in September 2026 take the client-facing and servicing view of neighbouring topics:
+
+- [Account Variants](/broking-kyc/account-variants/): onboarding journeys by client type.
+- [Product Activation](/broking-kyc/product-activation/): client activation for F&O, MTF, IPO, SLBM, pledge, <abbr title="Demat Debit and Pledge Instruction">DDPI</abbr>, API, GIFT City, and bonds. It pairs with the MTF, SLBM, IPO, and retail algo deep dives.
+- [Funds & Tax](/broking-kyc/funds-tax/): pay-in, payout, charges, statements, tax, corporate actions, and demat servicing. It pairs with the upstreaming and ECN deep dives.
+- [Trading Risk & Derivatives](/broking-kyc/trading-risk/): exercise and assignment, expiry day, position limits, collateral, margin shortfall, order controls, and client protection. It pairs with the RMS / SPAN and surveillance deep dives.
 
 ## Practical notes
 

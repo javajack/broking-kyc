@@ -156,7 +156,7 @@ When the broker realises (typically during T+1 pre-pay-in reconciliation) that a
 
 ### 5.1 Cover in open market
 
-The broker buys the shortfall quantity in the open market on T+1 (or in the pre-open of T+2 if discovered late) and uses the bought shares for the pay-in. Cost: market price plus brokerage + STT + statutory charges. Compared to auction outcome:
+The broker buys the shortfall quantity in the open market on T+1 (or in the pre-open of T+2 if discovered late) and uses the bought shares for the pay-in. Cost: market price plus brokerage + <abbr title="Securities Transaction Tax">STT</abbr> + statutory charges. Compared to auction outcome:
 
 - If the open-market price is below the projected auction price → cover-in-market saves cost.
 - If the open-market price is above the projected auction price → auction is cheaper (rare).
@@ -280,7 +280,7 @@ When a broker is a member of multiple clearing corps (<abbr title="NSE Clearing 
 
 ### 8.9 MTF auction
 
-For MTF-funded positions where the broker has funded the buy and the client hasn't paid, the broker can't deliver securities (they're in the broker's MTF pool / CSMFA). If the broker has further pledged these securities or there's an inventory mismatch, an MTF-related short-delivery is possible. Per [NCL/CMPT/72224](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt72224), the UNPAIDMTF file upload windows are 15:30–22:00 on T-1/T and 06:30–13:00 on T pay-in day — the broker must reconcile MTF inventory through these windows.
+For MTF-funded positions where the broker has funded the buy and the client hasn't paid, the broker can't deliver securities (they're in the broker's MTF pool / <abbr title="Client Securities Margin Funded Account">CSMFA</abbr>). If the broker has further pledged these securities or there's an inventory mismatch, an MTF-related short-delivery is possible. Per [NCL/CMPT/72224](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt72224), the UNPAIDMTF file upload windows are 15:30–22:00 on T-1/T and 06:30–13:00 on T pay-in day — the broker must reconcile MTF inventory through these windows.
 
 <Aside type="caution">
 **The Feb 2025 direct-payout-to-demat phase 2 (ICCL pilot) materially expanded auction scope.** Pre-Feb 2025, internal shortages at retail brokers were often resolved through internal netting and didn't reach CC auction. Post Feb 25, 2025 (ICCL phase 2) and broader rollout, internal shortages also auction-eligible — the broker can no longer hide an internal misallocation. Brokers must run client-securities reconciliation continuously and ensure each selling client has the securities physically in the broker's pool at pay-in. Auction-frequency metrics jumped at many retail brokers during this transition, requiring tighter pre-pay-in reconciliation.
@@ -309,7 +309,7 @@ The taxonomy informs root-cause analysis: each event must be tagged with a root 
 - **Pay-in default cascade.** If a broker's overall pay-in fails (not just a single security short but a broad failure), the [Core Settlement Guarantee Fund (Core <abbr title="Settlement Guarantee Fund">SGF</abbr>)](/broking-kyc/reference/circulars/clearing-corps/) covers the obligation to the market; the broker faces immediate consequences — position closure, member suspension or cancellation, and recovery action by the CC against the broker's deposits and own funds. This is the worst-case scenario.
 - **G-Sec close-out via NDS-RST.** G-Sec settlements run on the NDS-RST platform with its own settlement procedure (ICCL 20200201-13). Close-out for G-Sec follows a different file naming.
 - **MCX commodity short-delivery (physical contracts).** Tender-period and delivery-period margins (per MCXCCL/C&S/058/2025) are higher precisely to discourage short-delivery; the auction-equivalent mechanism for compulsory-delivery contracts has its own timeline.
-- **SGB (Sovereign Gold Bond) shortage.** SGB tranche settlement (ICCL 20200706-1) has segment-specific cut-offs; short-delivery is rare because SGBs are typically institutional with confirmed inventories.
+- **<abbr title="Sovereign Gold Bond">SGB</abbr> (Sovereign Gold Bond) shortage.** SGB tranche settlement (ICCL 20200706-1) has segment-specific cut-offs; short-delivery is rare because SGBs are typically institutional with confirmed inventories.
 - **Holiday-shifted auction.** Per [NCL/CMPT/72224](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt72224), holiday-shifted T+1 schedules shift auction windows correspondingly. The Jan 15, 2026 example: auction settlement 2026009 falls on Jan 16, 2026 with pay-in 08:00 / pay-out 10:00.
 - **Internal-shortage reporting field updates.** Per [NCL/CMPT/49502](/broking-kyc/reference/circulars/clearing-corps/) (referenced in narrative around 2022), members must report Field 8 — quantities delivered via auctions (incl. self-auctions); Field 9 — quantities cleared via close-out; Field 11 — purchases in member or client accounts. Submission cut-off is S+5 working days.
 

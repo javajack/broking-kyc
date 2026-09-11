@@ -35,7 +35,7 @@ Each vendor integration has specific handling for non-individual entities. The s
 ### CKYC (via CKYC intermediary)
 - 7 constitution types supported
 - Authorized signatory photo and signature required
-- UBO (Ultimate Beneficial Owner) identification for companies
+- <abbr title="Ultimate Beneficial Owner">UBO</abbr> (Ultimate Beneficial Owner) identification for companies
 - Full spec: [CKYC Integration](/broking-kyc/vendors/identity/ckyc) Section 6
 
 ### CDSL BO Account
@@ -79,4 +79,8 @@ Non-individual entity onboarding will be implemented after the individual KYC sy
 
 :::tip[Why HUF first?]
 An HUF (Hindu Undivided Family) is structurally similar to an individual account -- it has a single Karta (head of family) whose PAN and KYC are the primary identifiers. This makes it the smallest incremental step from individual onboarding and a good starting point for validating the non-individual architecture.
+:::
+
+:::note[Full walkthroughs now available]
+This appendix is the short form. Per-entity journeys live under [Account Variants](/broking-kyc/account-variants/): [HUF](/broking-kyc/account-variants/huf/), [Partnership / LLP](/broking-kyc/account-variants/partnership-llp/), [Company](/broking-kyc/account-variants/company/), [Trust / Society / AOP](/broking-kyc/account-variants/trust-society-aop/), [<abbr title="Foreign Portfolio Investor">FPI</abbr> / <abbr title="Foreign Venture Capital Investor">FVCI</abbr>](/broking-kyc/account-variants/fpi-fvci/), and [Institutional / Custodial clients](/broking-kyc/account-variants/institutional-custodial/).
 :::

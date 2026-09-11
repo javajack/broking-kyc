@@ -17,9 +17,9 @@ Sorted by `field_id`, then `destination`.
 | field_id | field_name | destination | destination_field_name | destination_format | frequency | transformation | quirks_notes | spec_source |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | rep-gst_monthly_return | GST Monthly Return | regulatory-reports | GSTR3B | NUMBER(18,2) | on-event | derived from Y | monthly cadence; GSTR-1 + GSTR-3B; brokers register GSTIN per state of supply | <abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/POD-1/P/CIR/2025/94 |
-| rep-sebi_turnover_fee_halfyear | SEBI Turnover Fee Half-Yearly | regulatory-reports | SEBIHYFee | NUMBER(18,2) | on-event | derived from Y | half-yearly cadence; half-year ending 30 Sep / 31 Mar; Schedule <abbr title="—">III</abbr> SEBI Stock Brokers Regs | SEBI/HO/MIRSD/POD-1/P/CIR/2025/94 |
+| rep-sebi_turnover_fee_halfyear | SEBI Turnover Fee Half-Yearly | regulatory-reports | SEBIHYFee | NUMBER(18,2) | on-event | derived from Y | half-yearly cadence; half-year ending 30 Sep / 31 Mar; Schedule <abbr title="—">III</abbr> SEBI Stock Brokers Regs | SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90 |
 | rep-stamp_duty_monthly | Stamp Duty Monthly Remittance | regulatory-reports | StampDutyRemittance | NUMBER(18,2) | on-event | derived from Y | monthly cadence per state; <abbr title="Clearing Corporation (NCL, ICCL, MCXCCL — context-dependent).">CC</abbr> centralised collection since Jul-2020 under amended Indian Stamp Rules | <abbr title="National Stock Exchange of India">NSE</abbr>/INSP/61999 |
-| rep-stt_monthly_remittance | STT Monthly Remittance | regulatory-reports | STTRemittance | NUMBER(18,2) | on-event | derived from Y | monthly cadence; collected daily, deposited monthly per IT Act Section 104 | NSE/INSP/61999 |
+| rep-stt_monthly_remittance | <abbr title="Securities Transaction Tax">STT</abbr> Monthly Remittance | regulatory-reports | STTRemittance | NUMBER(18,2) | on-event | derived from Y | monthly cadence; collected daily, deposited monthly per IT Act Section 104 | NSE/INSP/61999 |
 
 ## Verified through
 

@@ -11,7 +11,7 @@ description: NSDL Beneficiary Owner (BO) account opening — DPM system, UDiFF f
 3. [<abbr title="Beneficial Owner">BO</abbr> Account Opening](#3-bo-account-opening)
 4. [<abbr title="Demat Debit and Pledge Instruction">DDPI</abbr> on <abbr title="National Securities Depository Limited">NSDL</abbr>](#4-ddpi-on-nsdl)
 5. [SPEED-e / IDeAS](#5-speed-e--ideas)
-6. [NSDL CAS (Consolidated Account Statement)](#6-nsdl-cas-consolidated-account-statement)
+6. [NSDL <abbr title="Consolidated Account Statement">CAS</abbr> (Consolidated Account Statement)](#6-nsdl-cas-consolidated-account-statement)
 7. [Non-Individual Entities](#7-non-individual-entities)
 8. [Nomination](#8-nomination)
 9. [Key Differences from <abbr title="Central Depository Services (India) Limited">CDSL</abbr> (Comparison Table)](#9-key-differences-from-cdsl-comparison-table)
@@ -413,7 +413,7 @@ Status: SPEED-e Active - BO can submit instructions online
 
 | Aspect | CDSL eDIS | NSDL SPEED-e |
 |--------|-----------|--------------|
-| **Authorization Method** | TPIN (6-digit, CDSL-generated) + OTP | IPIN (password, BO-set) + OTP |
+| **Authorization Method** | <abbr title="Transaction PIN">TPIN</abbr> (6-digit, CDSL-generated) + OTP | IPIN (password, BO-set) + OTP |
 | **TPIN/IPIN Source** | CDSL generates, sends to BO via <abbr title="Short Message Service.">SMS</abbr> | BO creates own IPIN during registration |
 | **DP Involvement** | DP cannot see TPIN | DP authorizes SPEED-e registration |
 | **Lock Policy** | 3 wrong TPIN entries = invalidated | Password reset available online |
@@ -509,7 +509,7 @@ The entity types are the same as CDSL (SEBI mandates uniform categories), but NS
 | **Body Corporate** | DPM file upload; Board resolution + CIN required | Same requirements, UDiFF format |
 | **Trust** | DPM file upload; Trust deed + trustee list | Same requirements |
 | **Partnership / <abbr title="—">LLP</abbr>** | DPM file upload; Partnership deed + LLP agreement | Same requirements |
-| **FPI** | Through Designated DP (DDP); NSDL has strong institutional presence | NSDL preferred by many FPIs historically |
+| **<abbr title="Foreign Portfolio Investor">FPI</abbr>** | Through Designated DP (<abbr title="Designated Depository Participant">DDP</abbr>); NSDL has strong institutional presence | NSDL preferred by many FPIs historically |
 
 ### 7.2 NRI Accounts
 
@@ -738,7 +738,7 @@ NSDL does not charge investors directly. It charges DPs, who set their own clien
 |-------------|-------------------------|-------------------------|
 | **Account Opening** | Rs. 0 - Rs. 500 | Rs. 0 - Rs. 500 |
 | **AMC (Standard)** | Rs. 200 - Rs. 1,000/year | Rs. 200 - Rs. 750/year |
-| **AMC (BSDA)** | Rs. 0 - Rs. 100/year | Rs. 0 - Rs. 100/year |
+| **AMC (<abbr title="Basic Services Demat Account">BSDA</abbr>)** | Rs. 0 - Rs. 100/year | Rs. 0 - Rs. 100/year |
 | **Transaction (Debit)** | Rs. 15 - Rs. 30 per transaction | Rs. 13.50 - Rs. 25 per transaction |
 | **Dematerialization** | Rs. 50 - Rs. 150 per request | Rs. 50 - Rs. 150 per request |
 | **Pledge** | Rs. 25 per ISIN | Rs. 25 per ISIN |

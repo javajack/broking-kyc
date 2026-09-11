@@ -5,12 +5,12 @@ description: Reference and walkthrough of the fit-and-proper framework that gove
 
 import { Aside } from '@astrojs/starlight/components';
 
-> **Why this page is structured this way:** Fit-and-proper sits at the intersection of three regulatory layers — <abbr title="Securities and Exchange Board of India">SEBI</abbr> (Intermediaries) Regulations 2008 (Schedule <abbr title="—">II</abbr> is the canonical fit-and-proper test), SEBI (Stock Brokers) Regulations 2026 ([SEBI/<abbr title="Legal Affairs Department — Northern Regional Office (SEBI)">LAD-NRO</abbr>/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebilad-nrogn2026291), the broker-specific overlay), and the SEBI Stock Broker Master Circular ([SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir202594)). This page knits them together so a compliance officer can answer: "what does fit-and-proper actually require, who does it apply to, how often is it tested, and what happens when an individual fails the test?".
+> **Why this page is structured this way:** Fit-and-proper sits at the intersection of three regulatory layers — <abbr title="Securities and Exchange Board of India">SEBI</abbr> (Intermediaries) Regulations 2008 (Schedule <abbr title="—">II</abbr> is the canonical fit-and-proper test), SEBI (Stock Brokers) Regulations 2026 ([SEBI/<abbr title="Legal Affairs Department — Northern Regional Office (SEBI)">LAD-NRO</abbr>/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebilad-nrogn2026291), the broker-specific overlay), and the SEBI Stock Broker Master Circular ([SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)). This page knits them together so a compliance officer can answer: "what does fit-and-proper actually require, who does it apply to, how often is it tested, and what happens when an individual fails the test?".
 
 ## TL;DR
 
 - **Fit-and-proper is a continuing eligibility test**, not a one-time admission gate. Brokers must demonstrate ongoing fit-and-proper status of (a) the broker entity, (b) every director on the board, (c) every Key Managerial Person (<abbr title="Key Managerial Personnel">KMP</abbr>) under Section 2(51) of the Companies Act 2013, and (d) senior management with material control over operations.
-- The legal source is **Schedule II of SEBI (Intermediaries) Regulations 2008**, applied to brokers through **Regulation 9 of SEBI (Stock Brokers) Regulations 2026 ([SEBI/LAD-<abbr title="Non-Resident Ordinary (Rupee) account">NRO</abbr>/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebilad-nrogn2026291))** and reiterated in the **SEBI Stock Broker Master Circular ([SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir202594))**.
+- The legal source is **Schedule II of SEBI (Intermediaries) Regulations 2008**, applied to brokers through **Regulation 9 of SEBI (Stock Brokers) Regulations 2026 ([SEBI/LAD-<abbr title="Non-Resident Ordinary (Rupee) account">NRO</abbr>/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebilad-nrogn2026291))** and reiterated in the **SEBI Stock Broker Master Circular ([SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590))**.
 - **Disqualifying conditions** include: criminal conviction involving moral turpitude or economic offence; SEBI / <abbr title="Reserve Bank of India">RBI</abbr> / other-regulator debarment or specific enforcement action; insolvency; declared NPA on a financial-services account; orders restraining the person from accessing the securities market; ongoing inquiry where adverse findings are likely; and inadequate integrity, reputation, or character.
 - **Cadence: annual self-certification** at minimum, plus event-triggered re-verification when an adverse regulatory action, criminal proceeding, or other disqualifying condition arises. The annual self-certification is one of the named recurring cycles ([CYC-AN-FIT_PROPER](/broking-kyc/operations/integration-dag/recurring-cycles/)).
 - The **2026 Regulations introduce a resident-director requirement**: at least one designated director must be resident in India for 182+ days per financial year (MEMBER-COMP-018 in the [Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/)).
@@ -76,7 +76,7 @@ The person must not have a **pending inquiry** before SEBI / RBI / IRDAI / other
 
 The person must not have been:
 
-- found guilty of **insider trading** under SEBI (PIT) Regulations 2015;
+- found guilty of **insider trading** under SEBI (<abbr title="Prohibition of Insider Trading">PIT</abbr>) Regulations 2015;
 - found guilty of **market manipulation** under SEBI (PFUTP) Regulations 2003;
 - removed from membership of any **stock exchange or clearing corporation** for default, fraud, or misconduct.
 
@@ -116,7 +116,7 @@ The Companies Act 2013 Section 2(51) defines KMP as the Chief Executive Officer 
 - **Principal Officer (PMLA)** — the PMLA-designated <abbr title="Anti-Money Laundering">AML</abbr> officer. Holds NISM Series I or VII as applicable ([MEMBER-COMP-007](/broking-kyc/operations/compliance-blueprint/)).
 - **Designated Director (PMLA)** — the senior manager designated under PMLA for AML responsibility. Often co-located with the resident-director requirement under the 2026 Regulations.
 - **MD / CEO** — managing director or chief executive who heads the broker entity.
-- **Designated Persons (<abbr title="Depository Participant">DP</abbr>)** under SEBI (PIT) Regulations 2015 — persons in possession of UPSI or having reasonable expectation of access to UPSI ([MEMBER-COMP-013](/broking-kyc/operations/compliance-blueprint/)). Designated Persons must also be on the structured digital database (SDD).
+- **Designated Persons (<abbr title="Depository Participant">DP</abbr>)** under SEBI (PIT) Regulations 2015 — persons in possession of UPSI or having reasonable expectation of access to UPSI ([MEMBER-COMP-013](/broking-kyc/operations/compliance-blueprint/)). Designated Persons must also be on the structured digital database (<abbr title="Structured Digital Database">SDD</abbr>).
 - **Senior management** — broadly defined as the layer one level below the board with material operational control. Compliance officers should adopt a generous reading of this layer rather than the narrow.
 
 ### Promoters and persons in control
@@ -263,7 +263,7 @@ A broker entity whose registration was cancelled may re-apply after the SEBI-pre
 
 - [Compliance Blueprint — Member compliance (23 entries)](/broking-kyc/operations/compliance-blueprint/) — MEMBER-COMP-005 (continuing fit-and-proper), MEMBER-COMP-017 (KMP change intimation), MEMBER-COMP-018 (resident designated director), MEMBER-COMP-019 (two-year experience).
 - [SEBI (Stock Brokers) Regulations 2026 — SEBI/LAD-NRO/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebilad-nrogn2026291) — primary Regulation effective 7 January 2026.
-- [SEBI Stock Broker Master Circular — SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir202594) — operational layer for continuing compliance.
+- [SEBI Stock Broker Master Circular — SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590) — operational layer for continuing compliance.
 - [SEBI Master AML Circular — SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202478) — Principal Officer and Designated Director under PMLA.
 - [KMP changes deep dive](/broking-kyc/deep-dives/member-compliance/kmp-changes/) — operational procedure for changes triggered by fit-and-proper events.
 - [Membership renewal deep dive](/broking-kyc/deep-dives/member-compliance/membership-renewal/) — fit-and-proper attestations bundled into annual renewal.

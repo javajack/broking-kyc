@@ -39,7 +39,7 @@ Sorted by `source_section`, then `field_id`.
 | A | A-place_of_birth | Place of Birth | BirthPlc | VARCHAR(50) UDiFF | one-time | [direct] | Optional ISO-tagged element | NSDL/POLICY/2025/0056 |
 | A | A-prefix | Name Prefix | Prfx | VARCHAR(5) UDiFF | one-time | [direct] | Optional prefix element | NSDL/POLICY/2025/0056 |
 | A | A-residential_status | Residential Status | ResdtlSts | CHAR(2) UDiFF | one-time | lookup against R | Maps to BO client-type code in BO Upload; <abbr title="Non-Resident Indian">NRI</abbr> triggers <abbr title="Portfolio Investment Scheme (RBI / NRI)">PIS</abbr> account validation | NSDL/POLICY/2025/0056 |
-| A | A-residential_status | NRI Sub-Status Code | BOSubSts | CHAR(2) UDiFF | one-time | lookup against R | Sub-status code element; NRI/PIO/OCI codes differ | NSDL/POLICY/2025/0056 |
+| A | A-residential_status | NRI Sub-Status Code | BOSubSts | CHAR(2) UDiFF | one-time | lookup against R | Sub-status code element; NRI/PIO/<abbr title="Overseas Citizen of India">OCI</abbr> codes differ | NSDL/POLICY/2025/0056 |
 | B | B-corr_address_line1 | Correspondence Address Line 1 | AdrLine1 | VARCHAR(100) UDiFF | on-modify | [direct] | ISO 20022-style address element; UDiFF AdrLine1 within PstlAdr block | NSDL/POLICY/2025/0042 |
 | B | B-corr_address_line2 | Correspondence Address Line 2 | AdrLine2 | VARCHAR(100) UDiFF | on-modify | [direct] | Optional ISO-tagged element | NSDL/POLICY/2024/0041 |
 | B | B-corr_address_line3 | Correspondence Address Line 3 | AdrLine3 | VARCHAR(100) UDiFF | on-modify | [direct] | Optional | NSDL/POLICY/2024/0041 |
@@ -57,7 +57,7 @@ Sorted by `source_section`, then `field_id`.
 | B | B-poa_address_same_as_corr | POA Same as Correspondence | POASameFlg | CHAR(1) UDiFF | one-time | [direct] | Y/N element | NSDL/POLICY/2025/0056 |
 | C | C-alternate_email | Alternate Email | AltEmailAdr | VARCHAR(100) UDiFF | on-modify | lowercase | Optional element | NSDL/POLICY/2025/0056 |
 | C | C-alternate_mobile | Alternate Mobile | AltMblNb | VARCHAR(15) UDiFF | on-modify | [direct] | Optional ISO-tagged element | NSDL/POLICY/2025/0056 |
-| C | C-email | Email | EmailAdr | VARCHAR(100) UDiFF | on-modify | lowercase | ISO-tagged element; mandatory; e-CAS by 12th of month sent here | NSDL/POLICY/2025/0022 |
+| C | C-email | Email | EmailAdr | VARCHAR(100) UDiFF | on-modify | lowercase | ISO-tagged element; mandatory; e-<abbr title="Consolidated Account Statement">CAS</abbr> by 12th of month sent here | NSDL/POLICY/2025/0022 |
 | C | C-email_validated | Email Validated | EmailValdtdFlg | CHAR(1) UDiFF | one-time | [direct] | Email validation flag | NSDL/POLICY/2025/0056 |
 | C | C-mobile_isd_code | Mobile ISD Code | MblISDCd | CHAR(5) UDiFF | on-modify | [direct] | ISD code element in MblPhneNb block | NSDL/POLICY/2025/0056 |
 | C | C-mobile_number | Mobile Number | MblNb | VARCHAR(15) UDiFF | on-modify | [direct] | ISO 20022 PhneNb pattern; mandatory; <abbr title="One-Time Password">OTP</abbr>-validated via <abbr title="SEBI Complaints Redress System">SCORES</abbr> 2.0 alerts | NSDL/POLICY/2025/0056 |
@@ -78,7 +78,7 @@ Sorted by `source_section`, then `field_id`.
 | H | H-account_type | BO Account Type | BOAcctTp | CHAR(2) UDiFF | one-time | lookup against R | ISO-tagged element; sub-type classifications added in 2022 (NSDL/POLICY/2022/126) | NSDL/POLICY/2025/0056 |
 | H | H-bo_id | BO ID | BOID | CHAR(16) UDiFF | one-time | concat with X | Format IN + 14 alphanumeric (DP ID 8 chars + Client ID 8 chars including 'IN' prefix); primary key | NSDL/POLICY/2025/0056 |
 | H | H-bo_status_code | BO Status Code | BOStsCd | CHAR(2) UDiFF | one-time | lookup against R | Primary BO status code element | NSDL/POLICY/2025/0056 |
-| H | H-bsda_flag | BSDA Flag | BSDAFlg | CHAR(1) UDiFF | one-time | [direct] | Default Y; opt-out requires email-consent date capture per V2.0.0.0 | NSDL/POLICY/2024/0122 |
+| H | H-bsda_flag | <abbr title="Basic Services Demat Account">BSDA</abbr> Flag | BSDAFlg | CHAR(1) UDiFF | one-time | [direct] | Default Y; opt-out requires email-consent date capture per V2.0.0.0 | NSDL/POLICY/2024/0122 |
 | H | H-bsda_optout_consent_date | BSDA Opt-Out Consent Date | BSDAOptOutCnsntDt | ISODate (YYYY-MM-DD) | one-time | formatted | Date of email consent for BSDA Opt-out; required per V2.0.0.0 (Apr 4, 2025) | NSDL/POLICY/2025/0042 |
 | H | H-client_id | Client ID | ClntId | CHAR(8) UDiFF | one-time | [direct] | 8-digit alphanumeric within NSDL DP range | NSDL/POLICY/2025/0056 |
 | H | H-cusps_account_flag | <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr> Indicator | CUSPAFlg | CHAR(1) UDiFF | one-time | [direct] | CUSPA flag element | NSDL/POLICY/2023/0113 |
@@ -87,7 +87,7 @@ Sorted by `source_section`, then `field_id`.
 | H | H-holding_type | Holding Pattern | HldgPttrn | CHAR(2) UDiFF | one-time | lookup against R | Holding pattern code; joint accounts use HldrInf repeating block | NSDL/POLICY/2025/0056 |
 | H | H-ifsc_branch | First Holder IFSC | FrstHldrIFSC | CHAR(11) UDiFF | on-modify | uppercase | Linked IFSC element | NSDL/POLICY/2024/0041 |
 | H | H-income_range | Income Range | GrssIncmRng | CHAR(2) UDiFF | one-time | lookup against R | Income range code element; mandatory | NSDL/POLICY/2025/0056 |
-| H | H-lei_number | Legal Entity Identifier | LEI | CHAR(20) UDiFF | on-modify | uppercase | LEI element for non-individual entities; ISO 17442 format | NSDL/POLICY/2025/0056 |
+| H | H-lei_number | Legal Entity Identifier | <abbr title="Legal Entity Identifier">LEI</abbr> | CHAR(20) UDiFF | on-modify | uppercase | LEI element for non-individual entities; ISO 17442 format | NSDL/POLICY/2025/0056 |
 | H | H-occupation | Occupation | OccptnCd | CHAR(2) UDiFF | one-time | lookup against R | Occupation code element | NSDL/POLICY/2025/0056 |
 | H | H-opening_date | BO Account Opening Date | OpngDt | ISODate (YYYY-MM-DD) | one-time | formatted | ISO 8601 date element | NSDL/POLICY/2024/0041 |
 | H | H-operation_mode | Operation Mode | OprtnMd | CHAR(2) UDiFF | one-time | lookup against R | Operation mode element | NSDL/POLICY/2025/0056 |

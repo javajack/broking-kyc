@@ -456,14 +456,14 @@ Row 2 is required ONLY for non-individual entities (Corporate, Partnership, Body
 |------|---------|
 | **NRIs CANNOT trade commodity derivatives on MCX** | **Absolute restriction - no exceptions** |
 | Regulatory basis | SEBI commodity derivatives regulations + <abbr title="Reserve Bank of India">RBI</abbr> <abbr title="Foreign Exchange Management Act 1999">FEMA</abbr> guidelines |
-| Applies to | All NRI categories (NRI, <abbr title="Non-Resident Ordinary (Rupee) account">NRO</abbr>, <abbr title="Non-Resident External (Rupee) account">NRE</abbr>, PIO, OCI) |
+| Applies to | All NRI categories (NRI, <abbr title="Non-Resident Ordinary (Rupee) account">NRO</abbr>, <abbr title="Non-Resident External (Rupee) account">NRE</abbr>, PIO, <abbr title="Overseas Citizen of India">OCI</abbr>) |
 | Impact on KYC system | Must validate residential status at onboarding; reject NRI applications for MCX |
 
 ### 10.2 FPI Restrictions
 
 | Rule | Details |
 |------|---------|
-| FPI participation | Allowed, but severely restricted |
+| <abbr title="Foreign Portfolio Investor">FPI</abbr> participation | Allowed, but severely restricted |
 | Commodity type | **Non-agricultural commodities ONLY** |
 | Settlement type | **Cash-settled contracts ONLY** (no physical delivery) |
 | Position limit | **20% of client-level position limit** |

@@ -5,7 +5,7 @@ description: Walkthrough plus reference for India's market surveillance architec
 
 import { Aside } from '@astrojs/starlight/components';
 
-> **Why this page is structured this way:** Surveillance has three distinct layers — exchange-side (NORMS / <abbr title="National Stock Exchange of India">NSE</abbr>-SURV), clearing-corp-side (margin-linked surveillance), and broker-side (Chapter IVA institutional mechanism). All three interlock during the trading day. The page first frames the layered architecture, then walks each surveillance product (<abbr title="Graded Surveillance Measure">GSM</abbr>, <abbr title="Additional Surveillance Measure">ASM</abbr>, T2T, OTR, <abbr title="Market Wide Position Limit">MWPL</abbr>, social media) in its own section, and ends with the broker-side surveillance system's role and the failure / penalty modes.
+> **Why this page is structured this way:** Surveillance has three distinct layers — exchange-side (NORMS / <abbr title="National Stock Exchange of India">NSE</abbr>-SURV), clearing-corp-side (margin-linked surveillance), and broker-side (Chapter IVA institutional mechanism). All three interlock during the trading day. The page first frames the layered architecture, then walks each surveillance product (<abbr title="Graded Surveillance Measure">GSM</abbr>, <abbr title="Additional Surveillance Measure">ASM</abbr>, T2T, <abbr title="Order-to-Trade Ratio">OTR</abbr>, <abbr title="Market Wide Position Limit">MWPL</abbr>, social media) in its own section, and ends with the broker-side surveillance system's role and the failure / penalty modes.
 
 ## TL;DR
 
@@ -42,7 +42,7 @@ BSE and MCX operate equivalent platforms. The architectural pattern is similar: 
 | Concentration | Single-account exposure > threshold | Position-limit advisory; eventually hard limit |
 | Cross-exchange manipulation | Coordinated activity across NSE / BSE | SEBI escalation |
 | Social-media-coordinated activity | Pump-and-dump tied to finfluencer post | NSE Investigation; SEBI / <abbr title="Financial Intelligence Unit — India">FIU-IND</abbr> referral |
-| Insider trading patterns | Trades near corporate-action dates | PIT-driven investigation |
+| Insider trading patterns | Trades near corporate-action dates | <abbr title="Prohibition of Insider Trading">PIT</abbr>-driven investigation |
 
 NORMS-driven actions flow back to members via:
 - **GSM / ASM list updates** — daily at <abbr title="Beginning Of Day">BOD</abbr>, intraday for emergent cases,
@@ -367,7 +367,7 @@ Surveillance load is not uniform across the trading day. Peak periods:
 
 | Window | Surveillance load driver |
 |---|---|
-| 09:00–09:15 (pre-open) | AMO releases generate burst of orders; surveillance feeds need to be live |
+| 09:00–09:15 (pre-open) | <abbr title="After Market Order">AMO</abbr> releases generate burst of orders; surveillance feeds need to be live |
 | 09:15–09:30 (open) | Open-window volatility; surveillance flags spike |
 | 11:00–11:30 (peak-margin Snap 1) | Margin-driven order behavior may trigger surveillance |
 | 12:30–13:00, 13:30–14:00, 14:30–15:00 (Snap 2/3/4) | Same |

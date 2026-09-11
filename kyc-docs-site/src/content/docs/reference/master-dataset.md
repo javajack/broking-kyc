@@ -444,7 +444,7 @@ This section determines what the customer can trade. Equity cash is the default 
 
 | Segment | Income Proof | Min Income | Risk Disclosure | Additional |
 |---------|-------------|------------|-----------------|------------|
-| Equity Cash | No | None | General RDD | - |
+| Equity Cash | No | None | General <abbr title="Risk Disclosure Document">RDD</abbr> | - |
 | Equity F&O | **Yes** | Broker-specific (typically 1-5L) | F&O specific RDD | Trading experience declaration |
 | Currency Derivatives | No | None | Currency RDD | - |
 | Commodity | **Yes** | Broker-specific | Commodity RDD | MCX registration |

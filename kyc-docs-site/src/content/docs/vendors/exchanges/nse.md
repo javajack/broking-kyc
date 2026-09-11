@@ -957,7 +957,7 @@ Client category codes are standardized by SEBI and are identical across NSE, BSE
 | 33 | Gratuity Fund | Institutional | |
 | 34 | Pension Fund | Institutional | |
 | 36 | Mutual Funds FOF Schemes | Institutional | |
-| 37 | NPS Trust | Institutional | |
+| 37 | <abbr title="National Pension System">NPS</abbr> Trust | Institutional | |
 | 38 | Global Development Network | Institutional | |
 | 39 | FCRA | Institutional | |
 | 41 | QFI - Individual | Foreign (QFI) | |
@@ -1490,7 +1490,7 @@ Edge cases are where production systems break. The following section catalogues 
 
 SEBI has been progressively enhancing non-individual client onboarding:
 - <abbr title="—">LLP</abbr> (Limited Liability Partnership) may get dedicated category code
-- Foreign Portfolio Investors (FPI) onboarding streamlining ongoing
+- Foreign Portfolio Investors (<abbr title="Foreign Portfolio Investor">FPI</abbr>) onboarding streamlining ongoing
 - AI/ML-based entity verification being explored by regulators
 
 ### 23.3 Upcoming Regulatory Changes

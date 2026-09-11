@@ -24,7 +24,7 @@ Sorted by `field_id`, then `destination`.
 | X-daily_margin_report_status | Daily Margin Report Status | back-office | dmr_status_cd | VARCHAR(2) | <abbr title="End Of Day">EOD</abbr> | [direct] | CO/NC; flagged if peak-margin snapshot showed shortfall | <abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/MRD2/DCAP/CIR/P/2020/127 |
 | X-daily_margin_report_status | DMR Status | rms | dmr_status | VARCHAR(2) | EOD | [direct] | NC triggers next-day pre-trade margin freeze for that client | SEBI/HO/MRD2/DCAP/CIR/P/2020/127 |
 | X-mtf_agreement_date | <abbr title="Margin Trading Facility">MTF</abbr> Agreement Date | back-office | mtf_agree_dt | DATE YYYYMMDD | one-time | formatted | audit field | [industry typical] |
-| X-mtf_enabled | MTF Enabled | back-office | mtf_flg | CHAR(1) | on-modify | [direct] | Y activates CSMFA pledge account routing | NCL/CMPT/63669 |
+| X-mtf_enabled | MTF Enabled | back-office | mtf_flg | CHAR(1) | on-modify | [direct] | Y activates <abbr title="Client Securities Margin Funded Account">CSMFA</abbr> pledge account routing | NCL/CMPT/63669 |
 | X-mtf_enabled | MTF Enabled Flag | contract-notes | MTFFlag | CHAR(1) | on-trade | [direct] | MTF line-item handling per revised Annexure A/B; CSMFA pledge reference printed | <abbr title="National Stock Exchange of India">NSE</abbr>/INSP/61999 |
 | X-mtf_enabled | MTF Enabled | rms | mtf_active | CHAR(1) | on-modify | [direct] | MTF-active client routes to CSMFA pledge envelope | NCL/CMPT/63669 |
 | X-mtf_interest_rate | MTF Interest Rate | back-office | mtf_int_rate | NUMBER(5,2) | on-modify | [direct] | %pa; appears on contract-note charges breakdown | [industry typical] |

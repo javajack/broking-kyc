@@ -46,7 +46,7 @@ DDPI is limited to exactly four purposes (no broader authority):
 In plain English: DDPI lets your broker move shares out of your account only for trade settlement, margin pledging, exchange-based mutual fund transactions, and tendering in open offers. Everything else requires the client to explicitly authorize each transaction.
 
 :::caution
-Any other use (e.g., off-market transfers, inter-depository transfers, gift transfers) is NOT covered by DDPI. These require eDIS (Electronic Delivery Instruction Slip) authorization using TPIN (Transaction PIN) + <abbr title="One-Time Password">OTP</abbr>.
+Any other use (e.g., off-market transfers, inter-depository transfers, gift transfers) is NOT covered by DDPI. These require eDIS (Electronic Delivery Instruction Slip) authorization using <abbr title="Transaction PIN">TPIN</abbr> (Transaction PIN) + <abbr title="One-Time Password">OTP</abbr>.
 :::
 
 ---

@@ -9,7 +9,7 @@ import { Aside } from '@astrojs/starlight/components';
 
 ## TL;DR
 
-- **Six primary segments** for Indian retail / institutional trading: **Cash Market (<abbr title="Clearing Member">CM</abbr> / equity delivery, intraday, BTST)**, **Equity F&O** (futures and options on indices and single-stocks), **Currency Derivatives (CD)** (USD/INR, EUR/INR, GBP/INR, JPY/INR, cross-currency pairs), **Interest Rate Derivatives (IRD)** (G-Sec futures), **Commodity Derivatives (<abbr title="Multi Commodity Exchange of India">MCX</abbr> / <abbr title="National Stock Exchange of India">NSE</abbr> / <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> Commodity)** (agri, base metals, bullion, energy), **Debt** (corporate bonds, G-Sec retail, T-Bills, SGB secondary).
+- **Six primary segments** for Indian retail / institutional trading: **Cash Market (<abbr title="Clearing Member">CM</abbr> / equity delivery, intraday, BTST)**, **Equity F&O** (futures and options on indices and single-stocks), **Currency Derivatives (CD)** (USD/INR, EUR/INR, GBP/INR, JPY/INR, cross-currency pairs), **Interest Rate Derivatives (IRD)** (G-Sec futures), **Commodity Derivatives (<abbr title="Multi Commodity Exchange of India">MCX</abbr> / <abbr title="National Stock Exchange of India">NSE</abbr> / <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> Commodity)** (agri, base metals, bullion, energy), **Debt** (corporate bonds, G-Sec retail, T-Bills, <abbr title="Sovereign Gold Bond">SGB</abbr> secondary).
 - **Trading hours vary widely**: equity cash and F&O 09:15-15:30 <abbr title="Indian Standard Time (UTC+05:30)">IST</abbr> (with pre-open / closing extensions); currency derivatives 09:00-17:00 IST; commodities MCX 09:00-23:30 / 23:55 IST (with evening session to align with international markets); debt 10:00-17:00 IST (NDS-OM); GIFT <abbr title="Indian Financial System Code.">IFSC</abbr> venues 24x6.
 - **Settlement cycle**: equity cash <abbr title="Trade-date Plus N settlement">T+1</abbr> default with <abbr title="Trade-date Plus N settlement">T+0</abbr> beta optional (extended to top 500 scrips per <abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>/MRD-PoD-2/P/CIR/2024/02 dated Dec 10, 2024); F&O T+1 cash settlement and physical delivery on expiry for stock derivatives; commodities physical delivery (compulsory or option) per contract specification; currency / IRD cash settlement.
 - **Margin framework**: <abbr title="Standard Portfolio Analysis of Risk">SPAN</abbr> + <abbr title="Extreme Loss Margin">ELM</abbr> in derivatives (computed at <abbr title="Clearing Corporation (NCL, ICCL, MCXCCL — context-dependent).">CC</abbr>: <abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NSCCL</abbr>, <abbr title="Indian Clearing Corporation Limited">ICCL</abbr>, <abbr title="Multi Commodity Exchange Clearing Corporation Limited">MCXCCL</abbr>); VaR-based margin in cash (with peak margin reporting); upfront option premium collection (per SEBI Oct 2024 reforms). Each segment has segment-specific add-ons.
@@ -47,7 +47,7 @@ The equity cash market is the primary segment for retail and institutional equit
 - **Continuous trading**: 09:15-15:30 IST.
 - **Closing session**: 15:30-15:40 IST (continuous trading with closing-auction call for eligible scrips 15:40-15:50 on NSE).
 - **T+0 session** (for eligible scrips): 09:15-13:30 IST only; no pre-open / closing for T+0.
-- **AMO acceptance**: post-close (16:00) to next-day 08:59 IST.
+- **<abbr title="After Market Order">AMO</abbr> acceptance**: post-close (16:00) to next-day 08:59 IST.
 
 ### Settlement cycle
 
@@ -60,7 +60,7 @@ The equity cash market is the primary segment for retail and institutional equit
 
 - **VaR-based margin** at the clearing corporation; member-level margin reporting daily.
 - **Peak margin** — intraday peak-margin reporting introduced via SEBI to capture intraday margin compliance.
-- **UPI block / 3-in-1 facility for QSB**: per SEBI circular SEBI/HO/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD-1/P/CIR/2024/175 (Dec 17, 2024) — every Qualified Stock Broker must offer either the UPI-block facility (<abbr title="Applications Supported by Blocked Amount">ASBA</abbr>-like protection in cash segment) or 3-in-1 trading account, effective February 1, 2025.
+- **UPI block / 3-in-1 facility for QSB**: per SEBI circular SEBI/HO/MRD/MRD-PoD-2/P/CIR/2024/153 (Dec 17, 2024) — every Qualified Stock Broker must offer either the UPI-block facility (<abbr title="Applications Supported by Blocked Amount">ASBA</abbr>-like protection in cash segment) or 3-in-1 trading account, effective February 1, 2025.
 - **Margin pledge / repledge framework** at depositories — see <abbr title="Central Depository Services (India) Limited">CDSL</abbr> and <abbr title="National Securities Depository Limited">NSDL</abbr> circulars.
 
 ### Position limits
@@ -150,7 +150,7 @@ Equity Futures & Options covers **index futures** (Nifty 50, Bank Nifty, Fin Nif
 ### Retail eligibility
 
 - Open with **income proof** (ITR, salary slips, bank statement) per broker's KYC / suitability framework.
-- Trading-preference election at onboarding per **SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/127** (the trading-preferences circular replacing 2011 framework) — new clients are registered on all active exchanges by default after obtaining trading preferences.
+- Trading-preference election at onboarding per **SEBI/HO/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD-1/P/CIR/2024/127** (the trading-preferences circular replacing 2011 framework) — new clients are registered on all active exchanges by default after obtaining trading preferences.
 
 ### NRI eligibility
 
@@ -237,7 +237,7 @@ Interest Rate Derivatives include **G-Sec futures** (futures contracts on Govern
 ### Position limits
 
 - Per-instrument limits per RBI / SEBI guidelines.
-- Aggregate limits per category (FPI / domestic).
+- Aggregate limits per category (<abbr title="Foreign Portfolio Investor">FPI</abbr> / domestic).
 
 ### Lot size
 
@@ -342,7 +342,7 @@ Commodity Derivatives covers four broad categories on **MCX** (the primary commo
 
 Debt segment includes:
 - **NDS-OM** (Negotiated Dealing System — Order Matching) for G-Sec / T-Bills / SDLs — primarily institutional.
-- **Corporate bond trading** on NSE / BSE platforms — primarily institutional via RFQ.
+- **Corporate bond trading** on NSE / BSE platforms — primarily institutional via <abbr title="Request for Quote">RFQ</abbr>.
 - **Retail debt platforms**: NSE goBID, BSE Direct — retail-friendly G-Sec auctions.
 - **Sovereign Gold Bonds (SGB)** secondary market trading on NSE / BSE cash segment alongside equity trading.
 
@@ -409,7 +409,7 @@ Debt segment includes:
 
 ### Tax treatment differences
 
-- **Equity delivery** (CM): held >12 months → LTCG @ 12.5% on gains above Rs 1.25 lakh; held &lt;12 months → STCG @ 20%. STT applicable on each side.
+- **Equity delivery** (CM): held >12 months → <abbr title="Long-term capital gains">LTCG</abbr> @ 12.5% on gains above Rs 1.25 lakh; held &lt;12 months → <abbr title="Short-term capital gains">STCG</abbr> @ 20%. <abbr title="Securities Transaction Tax">STT</abbr> applicable on each side.
 - **Equity intraday** (CM): treated as speculative business income; taxed at slab rate.
 - **F&O** (Equity, CD, IRD): treated as business income (non-speculative); taxed at slab rate.
 - **Commodities**: treated as business income (non-speculative); slab rate. CTT (Commodity Transaction Tax) applicable.
@@ -510,7 +510,7 @@ Debt segment includes:
 
 ### GIFT IFSC venues
 
-- NSE IFSC, India INX (BSE IFSC) operate in GIFT City IFSC with a separate regulatory framework under IFSCA.
+- NSE IFSC, India INX (BSE IFSC) operate in GIFT City IFSC with a separate regulatory framework under <abbr title="International Financial Services Centres Authority">IFSCA</abbr>.
 - 24x6 trading.
 - Out of scope for this page; covered briefly in [Compliance Blueprint — Member compliance section](/broking-kyc/operations/compliance-blueprint/).
 

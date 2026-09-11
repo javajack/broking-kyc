@@ -1,6 +1,6 @@
 ---
 title: Glossary
-description: Reference glossary of every acronym, regulatory body, and broking concept used across the site. ~120 entries.
+description: Reference glossary of every acronym, regulatory body, and broking concept used across the site. 211 entries.
 ---
 
 This is the universal glossary. Every acronym referenced anywhere on this site links here. Entries are alphabetical, with a category-grouped table of contents immediately below for browsing by topic.
@@ -40,6 +40,8 @@ The same entries appear once below in alphabetical order. This grouping is a nav
 **Member compliance & corporate** — [BMC](#bmc), [ABC](#abc), [Net worth requirement](#net-worth-requirement), [Fit and proper](#fit-and-proper), [KYP](#kyp), [HUF](#huf), [Family company](#family-company), [Partnership, LLP, Corporate broker](#partnership-llp-corporate-broker), [BRSR](#brsr)
 
 **Misc broking concepts** — [DDPI](#ddpi), [POA](#poa), [Nomination](#nomination), [Transmission](#transmission), [Dormancy](#dormancy), [Re-KYC](#re-kyc), [Modification request](#modification-request), [NRI conversion](#nri-conversion), [Closure](#closure), [2FA](#2fa), [Maker-checker](#maker-checker)
+
+**Account types, products & client protection** — [AIS](#ais), [AMO](#amo), [BSDA](#bsda), [CAS](#cas), [CP code](#cp-code), [CSMFA](#csmfa), [DDP](#ddp), [DPC](#dpc), [DRF](#drf), [eDIS](#edis), [FPI](#fpi), [FVCI](#fvci), [GTT](#gtt), [IEPF](#iepf), [IFSCA](#ifsca), [IRRA](#irra), [LEI](#lei), [LRS](#lrs), [LTCG](#ltcg), [MITC](#mitc), [NPS](#nps), [OCI](#oci), [OTR](#otr), [PIT](#pit), [RDD](#rdd), [RFQ](#rfq), [SDD](#sdd), [SFT](#sft), [SGB](#sgb), [STCG](#stcg), [STT](#stt), [TPIN](#tpin), [UBO](#ubo)
 
 **SEBI internal department codes** — [MIRSD](#mirsd), [MRD](#mrd), [IMD](#imd), [OIAE](#oiae), [LAD-NRO](#lad-nro), [CFD](#cfd), [SEC-FATF](#sec-fatf), [HO](#ho), [ITD](#itd)
 
@@ -83,6 +85,12 @@ The same entries appear once below in alphabetical order. This grouping is a nav
 **Meaning:** NPCI-operated payment system that uses Aadhaar number + biometric (fingerprint / iris) for authentication of cash withdrawal, balance inquiry, mini-statement, and fund transfer at micro-ATMs and business correspondents. AePS is rarely a primary rail for broker collections (which prefer UPI, NEFT, RTGS), but it surfaces in inclusive-finance segments and in some hybrid onboarding flows in semi-urban / rural geographies.
 **See also:** [UPI](#upi), [Payment mandates](/broking-kyc/vendors/payment-mandates/)
 
+### AIS
+
+**Full form:** Annual Information Statement
+**Meaning:** Income-tax Department statement that aggregates transactions reported against a PAN by banks, depositories, brokers, AMCs and others, including securities sales and dividends. Clients reconcile their tax P&L against it.
+**See also:** [Tax reporting](/broking-kyc/funds-tax/tax-reporting/), [SFT](#sft)
+
 ### AMC
 **Full form:** Asset Management Company (mutual funds context) / Annual Maintenance Charges (depository context).
 **Meaning:** Two unrelated broking-context meanings. (1) An **AMC** in mutual funds = SEBI-registered Asset Management Company that manages mutual fund schemes (e.g., HDFC AMC, ICICI Prudential AMC); the broker integrates with these via direct AMC API or via platforms like MFU / BSE StAR MF. (2) An **AMC** in depository context = the annual fee a Depository Participant charges Beneficial Owners for maintaining the demat account (BSDA accounts have AMC waivers/concessions per CDSL/NSDL circulars). Pick the meaning from context.
@@ -91,6 +99,12 @@ The same entries appear once below in alphabetical order. This grouping is a nav
 **Full form:** Anti-Money Laundering
 **Meaning:** The body of rules and operational controls a regulated entity must run to detect, deter, and report attempts to launder proceeds of crime through its platform. In Indian broking, AML obligations flow from the Prevention of Money Laundering Act 2002 (PMLA), Rules 2005, and SEBI's master circular on AML/CFT (latest `SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78`, 6 Jun 2024). Operational pillars: client risk categorization at onboarding (low / medium / high), enhanced due diligence (EDD) for high-risk and PEP clients, ongoing transaction monitoring, and reporting of STRs / CTRs / NTRs to FIU-IND.
 **See also:** [AML / FIU field-atlas destination](/broking-kyc/reference/field-atlas/destinations/aml-fiu/), [PEP / AML section](/broking-kyc/reference/field-atlas/sections/k-pep-aml/)
+
+### AMO
+
+**Full form:** After Market Order
+**Meaning:** An order a broker accepts outside exchange trading hours and holds until the next session opens, when it is released to the exchange. It is a broker-side queue, not a separate exchange order type.
+**See also:** [Advanced order types](/broking-kyc/product-activation/advanced-order-types/)
 
 ### AP
 
@@ -170,6 +184,12 @@ Both create market-disclosure obligations; brokers run automated trade-pattern d
 **Meaning:** SEBI-mandated annual disclosure on environmental, social, and governance (ESG) parameters required from the top 1,000 listed entities since FY22 (and stepwise extended). For broking firms in this set (publicly listed Trading Members), BRSR captures GHG emissions, water consumption, gender diversity, training spend, grievance redressal, value-chain partners' ESG posture. The "BRSR Core" sub-set is audit-assured by an independent assessor.
 **See also:** [Member compliance overview](/broking-kyc/deep-dives/member-compliance/membership-renewal/)
 
+### BSDA
+
+**Full form:** Basic Services Demat Account
+**Meaning:** A lower-cost demat account for individuals with a single demat account as sole or first holder whose holdings stay within SEBI-set value slabs. SEBI revised the slabs and charges in June 2024; DPs must review eligibility and convert accounts that cross the limits.
+**See also:** [Account variants: BSDA](/broking-kyc/account-variants/bsda/), [DP](#dp)
+
 ### BSE
 
 **Full form:** BSE Limited (formerly Bombay Stock Exchange)
@@ -181,6 +201,12 @@ Both create market-disclosure obligations; brokers run automated trade-pattern d
 **Full form:** —
 **Meaning:** A trading mechanism where orders are collected over a window and matched at a single equilibrium price computed to maximize tradeable volume (or minimize imbalance) at the close of the window — as opposed to continuous order-book matching. Used in the pre-open session (09:00–09:15 IST), the closing call (15:30–15:40 IST on participating exchanges and segments), and the **periodic call auction** sessions imposed on illiquid scrips.
 **See also:** [Pre-open / closing auction deep dive](/broking-kyc/deep-dives/foundational/pre-open-closing-auction/)
+
+### CAS
+
+**Full form:** Consolidated Account Statement
+**Meaning:** Statement issued by the depositories that consolidates a PAN's demat holdings and mutual-fund units across DPs and AMCs, sent monthly when there are transactions and half-yearly otherwise.
+**See also:** [Ledger and statements](/broking-kyc/funds-tax/ledger-and-statements/)
 
 ### CC
 **Full form:** Clearing Corporation (NCL, ICCL, MCXCCL — context-dependent).
@@ -267,6 +293,12 @@ Both create market-disclosure obligations; brokers run automated trade-pattern d
 **Meaning:** The first-priority, segregated layer of the clearing corporation's default waterfall, separate from the regular SGF. Funded by contributions from CCP itself (skin-in-the-game), clearing members, and stock exchanges in fixed proportion per SEBI's Recovery & Resolution norms. Core SGF is tapped before the CCP's other resources after the defaulting member's own margins / collateral are exhausted. Size is recalibrated periodically using stress-test scenarios under SEBI's framework for CCP risk.
 **See also:** [Core SGF deep dive](/broking-kyc/deep-dives/foundational/sgf-core-sgf/), [Member default recovery](/broking-kyc/deep-dives/foundational/member-default-recovery/), [Pay-in default and Core SGF](/broking-kyc/deep-dives/settlement/payin-default-core-sgf/)
 
+### CP code
+
+**Full form:** Custodial Participant code
+**Meaning:** A clearing-corporation code that lets trades executed through one broker be confirmed and settled by the client's custodian clearing member. Used by FPIs, mutual funds, insurers and other institutional clients.
+**See also:** [Institutional and custodial clients](/broking-kyc/account-variants/institutional-custodial/), [FPI](#fpi)
+
 ### CRS
 
 **Full form:** Common Reporting Standard
@@ -278,6 +310,12 @@ Both create market-disclosure obligations; brokers run automated trade-pattern d
 **Full form:** Cybersecurity and Cyber Resilience Framework
 **Meaning:** SEBI's foundational cyber framework circular `SEBI/HO/ITD-1/ITD_CSC_EXT/P/CIR/2024/113` (20 Aug 2024) and its clarification chain through 2024–2025. Replaces earlier sectoral cyber circulars and applies to all SEBI-regulated entities. Built on five goals — **Anticipate, Withstand, Contain, Recover, Evolve** — and categorizes entities into tiers (MII / Qualified RE / Mid-size / Small / Self-Certification) based on registered clients and trade value. Operational mandates include quarterly VAPT for critical systems, six-hour CERT-In incident reporting, Type-I / II / III audit cycle, 180-day minimum log retention, supply-chain vendor due diligence, and an annual cyber-audit report submitted to the exchange. Repeated clarifications between Dec 2024 and Aug 2025 adjust audit timelines, cloud-specific guidance, and SOC requirements.
 **See also:** [CSCRF deep dive](/broking-kyc/deep-dives/compliance-audit/cscrf-deep-dive/)
+
+### CSMFA
+
+**Full form:** Client Securities Margin Funded Account
+**Meaning:** The broker's depository account type in which securities bought under the Margin Trading Facility are held under pledge in favour of the broker.
+**See also:** [MTF activation](/broking-kyc/product-activation/mtf-activation/), [MTF](#mtf)
 
 ### CTCL
 **Full form:** Computer-to-Computer Link.
@@ -294,6 +332,12 @@ Both create market-disclosure obligations; brokers run automated trade-pattern d
 ### DAG
 **Full form:** Directed Acyclic Graph.
 **Meaning:** A graph with directed edges and no cycles. Used on this site (see [Integration Choreography DAG](/broking-kyc/operations/integration-dag/)) to model broker integration dependencies: each node is an integration (e.g., "BOD margin file → RMS → pre-open file → exchange"), edges encode "must complete before". Useful because it forces explicit dependency declaration (idempotency, retry policy, rollback, SLA, failure surface) and makes parallelisation safe.
+### DDP
+
+**Full form:** Designated Depository Participant
+**Meaning:** A SEBI-approved custodian and DP that registers Foreign Portfolio Investors on SEBI's behalf, performs their KYC, and issues the FPI registration certificate.
+**See also:** [Account variants: FPI / FVCI](/broking-kyc/account-variants/fpi-fvci/), [FPI](#fpi)
+
 ### DDPI
 
 **Full form:** Demat Debit and Pledge Instruction
@@ -328,6 +372,12 @@ See [TRAI DLT](#trai-dlt) for SMS-pre-registration framework. Note: SEBI uses "D
 **Meaning:** A SEBI-registered entity (typically a broker, bank, or NBFC) that maintains demat accounts for clients on behalf of CDSL or NSDL. The DP is the customer-facing layer; the depository is the back-end registry. Each DP has a unique 8-digit DP-ID; a client's full demat BO-ID is DP-ID + 8-digit client code. A broker may be its own DP (combined TM+DP) or use a separate DP. Notable: the term "DP" is sometimes used informally for "Display Price" in vendor / OMS context — in this glossary and on this site, DP always means Depository Participant unless explicitly stated otherwise.
 **See also:** [CDSL vendor page](/broking-kyc/vendors/depositories/cdsl/), [NSDL vendor page](/broking-kyc/vendors/depositories/nsdl/)
 
+### DPC
+
+**Full form:** Delayed Payment Charges
+**Meaning:** Interest-style charge a broker levies on a client's debit balance when pay-in obligations are not met on time. The rate and computation method must be disclosed in the tariff sheet and client agreement.
+**See also:** [Delayed payment charges](/broking-kyc/funds-tax/delayed-payment-charges/)
+
 ### DPDP
 
 **Full form:** Digital Personal Data Protection Act 2023 (and Rules 2025)
@@ -337,6 +387,12 @@ See [TRAI DLT](#trai-dlt) for SMS-pre-registration framework. Note: SEBI uses "D
 ### DPM
 **Full form:** Depository Participant Module (CDSL terminology).
 **Meaning:** The DP-side application/system used by Depository Participants to interface with CDSL — account opening, transfer instructions, pledge, demat/remat, corporate actions. CDSL provides DPM as managed software; NSDL has an equivalent (DPM-SHR). Daily-end DPM reconciliation is mandatory; mismatch between DPM-CDSL and broker back-office is an audit-grade exception.
+### DRF
+
+**Full form:** Demat Request Form
+**Meaning:** The form a holder submits through their DP, together with physical share certificates, to convert physical securities into electronic form.
+**See also:** [Demat servicing](/broking-kyc/funds-tax/demat-servicing/)
+
 ### DSC
 **Full form:** Digital Signature Certificate (CCA-licensed; aka Class 2/3 DSC).
 **Meaning:** An X.509 certificate issued by a Controller of Certifying Authorities (CCA)-licensed CA, used to sign documents in compliance with the IT Act 2000. Used in broking for: company-level signing on regulatory filings (e.g., compliance certificates, annual returns), executive eSigns (Class 3), and per-employee KYC dossier signing. Distinct from [eSign](#esign) (Aadhaar-OTP-based, individual-only, ephemeral) and [DigiLocker eSign](#digilocker) (DigiLocker-issued).
@@ -366,6 +422,12 @@ See [TRAI DLT](#trai-dlt) for SMS-pre-registration framework. Note: SEBI uses "D
 **Full form:** Electronic Clearing Service
 **Meaning:** A legacy RBI-operated bulk-debit / bulk-credit mechanism for repetitive payments — used historically for dividends, salaries, SIPs. ECS is largely superseded by NACH (which is more efficient and has clearer rules) since 2016 but still exists for legacy mandates. The acronym surfaces in broker collections occasionally for older systematic-investment instructions that were never migrated to NACH or UPI AutoPay.
 **See also:** [NACH](#nach), [Payment mandates](/broking-kyc/vendors/payment-mandates/)
+
+### eDIS
+
+**Full form:** Electronic Delivery Instruction Slip
+**Meaning:** Per-transaction depository authorisation, confirmed with the client's TPIN and OTP, that lets a broker debit securities from the demat account when the client has not executed a DDPI.
+**See also:** [DDPI vs eDIS / TPIN](/broking-kyc/product-activation/ddpi-edis-tpin/), [DDPI](#ddpi), [TPIN](#tpin)
 
 ### eKYC
 
@@ -462,6 +524,18 @@ See [TRAI DLT](#trai-dlt) for SMS-pre-registration framework. Note: SEBI uses "D
 **Meaning:** The erstwhile regulator of commodity derivatives in India, established under the Forward Contracts (Regulation) Act 1952. **Merged into SEBI on 28 Sep 2015** under the Finance Act 2015. Since merger, all commodity derivatives — agriculture and non-agri — fall under SEBI's MRD-jurisdiction, and MCX / NCDEX / ICEX function as SEBI-registered exchanges. The acronym still surfaces in historical contexts and in pre-2015 commodity circulars.
 **See also:** [SEBI](#sebi), [MCX](#mcx)
 
+### FPI
+
+**Full form:** Foreign Portfolio Investor
+**Meaning:** A non-resident investor registered under the SEBI (Foreign Portfolio Investors) Regulations, 2019, in Category I or Category II, through a Designated Depository Participant.
+**See also:** [Account variants: FPI / FVCI](/broking-kyc/account-variants/fpi-fvci/), [DDP](#ddp), [CP code](#cp-code)
+
+### FVCI
+
+**Full form:** Foreign Venture Capital Investor
+**Meaning:** A foreign investor registered under the SEBI (Foreign Venture Capital Investors) Regulations, 2000, to invest in venture capital undertakings and specified sectors.
+**See also:** [Account variants: FPI / FVCI](/broking-kyc/account-variants/fpi-fvci/)
+
 ### GIIN
 
 **Full form:** Global Intermediary Identification Number
@@ -473,6 +547,12 @@ See [TRAI DLT](#trai-dlt) for SMS-pre-registration framework. Note: SEBI uses "D
 **Full form:** Graded Surveillance Measure
 **Meaning:** SEBI / exchange surveillance regime targeting securities with extreme price moves disconnected from fundamentals. Six stages from Stage 0 (trade-to-trade with 5% price band) up to Stage 5 (no trading, only periodic call auction once a week with 5% upper cap). Brokers' RMS pulls GSM list at BOD; price-band, margin, and trading-window restrictions are applied for the next day. GSM, ASM, ESM together form the three-tier surveillance toolbox; GSM is the slowest-moving (stage progression is monthly / quarterly), ASM is the most reactive (daily list refresh), ESM is small-cap-targeted.
 **See also:** [Surveillance / GSM / ASM deep dive](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/)
+
+### GTT
+
+**Full form:** Good Till Triggered
+**Meaning:** A broker-side order construct that stores a trigger condition and places a regular exchange order only when the price condition is met. The exchange never sees the GTT itself, so validity, triggering, and failure handling are broker responsibilities.
+**See also:** [Advanced order types](/broking-kyc/product-activation/advanced-order-types/)
 
 ### HO
 
@@ -504,9 +584,21 @@ See [TRAI DLT](#trai-dlt) for SMS-pre-registration framework. Note: SEBI uses "D
 **Meaning:** A SEBI-registered commodity exchange focused on diamond derivatives — gained limited traction and **voluntarily surrendered its recognition in 2022**. Mentioned in the regulatory catalog for completeness; current trading volumes are zero. The Indian commodity-exchange space is effectively MCX (dominant), NCDEX (agri), with BSE Commodity as a smaller participant.
 **See also:** [MCX](#mcx), [NCDEX](#ncdex)
 
+### IEPF
+
+**Full form:** Investor Education and Protection Fund
+**Meaning:** Fund under the Ministry of Corporate Affairs to which companies transfer dividends unclaimed for seven consecutive years along with the underlying shares. Holders reclaim them through the IEPF Authority's claim process.
+**See also:** [Corporate actions](/broking-kyc/funds-tax/corporate-actions/)
+
 ### IFSC
 **Full form:** Indian Financial System Code.
 **Meaning:** RBI-issued 11-character alphanumeric code identifying a specific bank branch in the Indian payment infrastructure (NEFT / RTGS / IMPS routing). Format: 4-letter bank code + "0" + 6-character branch code (e.g., HDFC0000123). Used in client bank-account capture during KYC, on contract notes for client bank settlement, and on TPIN / fund-transfer instructions. Distinct from MICR code (cheque routing) and SWIFT/BIC (international).
+### IFSCA
+
+**Full form:** International Financial Services Centres Authority
+**Meaning:** The unified regulator for financial services in International Financial Services Centres, including GIFT IFSC, covering exchanges, broker-dealers, banks and funds there.
+**See also:** [GIFT City / IFSC](/broking-kyc/product-activation/gift-ifsc/), [IFSC](#ifsc)
+
 ### IGRC
 
 **Full form:** Investor Grievance Redressal Committee
@@ -565,6 +657,12 @@ The CSCRF circular explicitly references Type-I/II/III in the audit-cycle obliga
 **Meaning:** The Indian insurance regulator. Mostly orthogonal to broking, but appears in two contexts: (a) the CKYC framework — IRDAI is one of the four sectoral regulators feeding into CKYCRR, (b) broking-group companies that hold an IRDAI insurance-broker / corporate-agent license and run insurance products alongside broking. Not to be confused with the older "IRDA" (without I); the regulator has rebranded to "IRDAI" though both forms appear in older circulars.
 **See also:** [CKYC](#ckyc)
 
+### IRRA
+
+**Full form:** Investor Risk Reduction Access
+**Meaning:** SEBI-mandated exchange platform, live from October 2023, that let clients square off or cancel orders during a broker's trading outage. SEBI discontinued it by circular dated May 7, 2026, citing BCP-DR, CSCRF and the exchanges' contingency pool trading facility.
+**See also:** [Order risk controls](/broking-kyc/trading-risk/order-risk-controls/), [SEBI-MIRSD circulars](/broking-kyc/reference/circulars/sebi-mirsd/)
+
 ### ISC
 **Full form:** Investor Service Centre.
 **Meaning:** A physical (and now mostly virtual) point where investors raise queries, file complaints, or seek remediation. Exchanges run regional ISCs (e.g., NSE ISC), CDSL/NSDL run depository ISCs, and SEBI runs SCORES as the digital ISC. Brokers are required to display their ISC contact details prominently and to route SCORES complaints back to ISC for resolution within prescribed timelines. See [SCORES procedure deep-dive](/broking-kyc/deep-dives/compliance-audit/scores-procedure/).
@@ -613,6 +711,24 @@ The CSCRF circular explicitly references Type-I/II/III in the audit-cycle obliga
 **Meaning:** SEBI's New Delhi-based legal affairs office, which issues gazette notifications of new and amended SEBI Regulations. The prefix `SEBI/LAD-NRO/GN/...` identifies a gazette notification rather than an operational circular. The 2026 SEBI (Stock Brokers) Regulations were issued under this prefix (`SEBI/LAD-NRO/GN/2026/291`, 7 Jan 2026). Distinct from operational circulars (typically `SEBI/HO/MIRSD/...` etc.), gazette notifications are the underlying delegated legislation; operational circulars implement them.
 **See also:** [SEBI-other circulars](/broking-kyc/reference/circulars/sebi-other/)
 
+### LEI
+
+**Full form:** Legal Entity Identifier
+**Meaning:** A 20-character ISO 17442 code identifying a legal entity in financial transactions. Collected for non-individual clients where RBI or market rules require it.
+**See also:** [Account variants: Company](/broking-kyc/account-variants/company/)
+
+### LRS
+
+**Full form:** Liberalised Remittance Scheme
+**Meaning:** RBI scheme under FEMA that lets resident individuals remit up to USD 250,000 per financial year for permitted current and capital account transactions, including overseas and IFSC investments.
+**See also:** [GIFT City / IFSC](/broking-kyc/product-activation/gift-ifsc/), [FEMA](#fema)
+
+### LTCG
+
+**Full form:** Long-term capital gains
+**Meaning:** Gains on assets held beyond the statutory holding period. For listed equity shares and equity-oriented funds the holding period is more than 12 months, taxed at a concessional rate above an annual exemption threshold.
+**See also:** [Tax reporting](/broking-kyc/funds-tax/tax-reporting/), [STCG](#stcg)
+
 ### Maker-checker
 
 **Full form:** —
@@ -648,6 +764,12 @@ The CSCRF circular explicitly references Type-I/II/III in the audit-cycle obliga
 **Full form:** Markets Intermediaries Regulation and Supervision Department (SEBI)
 **Meaning:** SEBI's department for intermediary regulation — stock brokers, sub-brokers, authorized persons, custodians, KRA, registrar/transfer agents, debenture trustees, merchant bankers (the supervisory side). Most broker-specific operational circulars carry the `SEBI/HO/MIRSD/...` prefix. The KYC, AML, FATCA, DDPI, fund-upstreaming, half-yearly compliance certificate — all flow from MIRSD. This is the department a Trading Member's compliance team interacts with most.
 **See also:** [SEBI-MIRSD circulars](/broking-kyc/reference/circulars/sebi-mirsd/)
+
+### MITC
+
+**Full form:** Most Important Terms and Conditions
+**Meaning:** A short-form disclosure of the key terms of the broker-client relationship that stock brokers must give clients at onboarding, alongside the rights and obligations and risk disclosure documents.
+**See also:** [Client protection frameworks](/broking-kyc/trading-risk/client-protection-frameworks/)
 
 ### Modification request
 
@@ -727,6 +849,12 @@ The CSCRF circular explicitly references Type-I/II/III in the audit-cycle obliga
 **Meaning:** RBI-incentivized umbrella organization for retail payment systems in India. Operates UPI, IMPS, NACH, AePS, RuPay (card scheme), Bharat BillPay, FASTag, e-KYC e-Aadhaar Authentication API rails (in some). Not a regulator itself but a payment-system operator; supervised by RBI. For brokers, NPCI is the upstream of every payment rail used for client collections / pay-outs except RTGS / NEFT (which are RBI-direct).
 **See also:** [NPCI circulars](/broking-kyc/reference/circulars/npci/), [UPI](#upi), [NACH](#nach)
 
+### NPS
+
+**Full form:** National Pension System
+**Meaning:** PFRDA-regulated defined-contribution pension scheme. Brokers registered as Points of Presence can open accounts and accept contributions.
+**See also:** [Bonds, G-Sec and NPS](/broking-kyc/product-activation/bonds-gsec-nps/), [PFRDA](#pfrda)
+
 ### NRE
 
 **Full form:** Non-Resident External (Rupee) account
@@ -769,6 +897,12 @@ The CSCRF circular explicitly references Type-I/II/III in the audit-cycle obliga
 **Meaning:** A specific FIU-IND report for receipt of any funds by or on behalf of a non-profit organization (registered Sec 8 company, registered trust, registered society) in single or aggregated transactions of INR 10 lakh+ per month. Threshold matches CTR; obligation arises because of FATF concerns around NPO misuse for terrorism financing. Less common in broker context (broker collections from NPO clients are typically small / atypical), but appears in the reporting checklist.
 **See also:** [STR](#str), [CTR](#ctr), [FIU-IND](#fiu-ind)
 
+### OCI
+
+**Full form:** Overseas Citizen of India
+**Meaning:** A foreign citizen of Indian origin holding an OCI card. Treated alongside NRIs for most FEMA investment routes, with account-opening documentation that differs from Indian-passport holders.
+**See also:** [Account variants: NRI](/broking-kyc/account-variants/nri/), [NRI](#nri)
+
 ### OCR
 **Full form:** Optical Character Recognition.
 **Meaning:** Image-to-text extraction used in KYC document processing — PAN card, Aadhaar XML (when not paperless), bank statement, ITR, utility bill. Vendor stack in this category includes HyperVerge OCR, Idfy, Karza/Perfios, Veri5. OCR is usually paired with confidence scoring; below a threshold (typically 90%), the document routes to maker-checker review.
@@ -801,6 +935,12 @@ The CSCRF circular explicitly references Type-I/II/III in the audit-cycle obliga
 **Full form:** One-Time Password
 **Meaning:** A short-lived (typically 30-second to 10-minute validity) numeric or alphanumeric password delivered via SMS, email, voice call, or authenticator app, used as the second factor of authentication. In broking, OTPs gate sensitive operations: login (2FA), order placement (on internet-based trading), withdrawal, fund-in mandate setup, modification request, eSign authentication for documents, DigiLocker consent, UPI mandate authorization.
 **See also:** [2FA](#2fa), [eSign](#esign)
+
+### OTR
+
+**Full form:** Order-to-Trade Ratio
+**Meaning:** The ratio of orders placed, modified or cancelled to orders executed. Exchanges levy charges when a member's OTR exceeds prescribed thresholds, mainly aimed at algorithmic flow.
+**See also:** [Order risk controls](/broking-kyc/trading-risk/order-risk-controls/), [Surveillance deep dive](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/)
 
 ### OVD
 
@@ -862,6 +1002,12 @@ The CSCRF circular explicitly references Type-I/II/III in the audit-cycle obliga
 **Meaning:** RBI's scheme under FEMA permitting NRIs to invest in Indian listed equities (and select listed securities) through a designated PIS bank account at an Authorized Dealer (AD-Category I) bank. PIS accounts come in two flavors: NRE-PIS (repatriable) and NRO-PIS (non-repatriable). All NRI broking trades — buy / sell of listed shares — flow through this PIS account; the AD bank reports to RBI quarterly. NRI clients must designate exactly one PIS bank for their broking activity (single-bank-route rule).
 **See also:** [NRI deep dive](/broking-kyc/appendix/nri-deep-dive/), [NRE](#nre), [NRO](#nro)
 
+### PIT
+
+**Full form:** Prohibition of Insider Trading
+**Meaning:** Shorthand for the SEBI (Prohibition of Insider Trading) Regulations, 2015. Intermediaries that handle unpublished price-sensitive information must maintain a code of conduct, designated-person controls and a structured digital database.
+**See also:** [Prop, employee trading and PIT](/broking-kyc/trading-risk/prop-employee-trading-pit/), [SDD](#sdd)
+
 ### PMLA
 
 **Full form:** Prevention of Money Laundering Act 2002
@@ -904,11 +1050,23 @@ The CSCRF circular explicitly references Type-I/II/III in the audit-cycle obliga
 **Meaning:** India's central bank and the regulator of banks, NBFCs, payment systems, and foreign exchange. For broking, RBI's relevance is indirect-but-pervasive: it regulates the banks that hold the broker's segregated client-funds account, it operates the RTGS / NEFT rails, it issues FEMA master directions governing NRI / FPI / FII broker activity, it co-regulates Account Aggregators, and it overseas NPCI. RBI circulars relevant to broking sit in the master-directions catalog rather than as one-off circulars.
 **See also:** [RBI circulars](/broking-kyc/reference/circulars/rbi/), [FEMA](#fema)
 
+### RDD
+
+**Full form:** Risk Disclosure Document
+**Meaning:** SEBI-prescribed document explaining the risks of trading in securities and derivatives, which clients must acknowledge before trading. A separate derivatives risk disclosure applies at F&O activation.
+**See also:** [F&O activation](/broking-kyc/product-activation/fno-activation/)
+
 ### Re-KYC
 
 **Full form:** —
 **Meaning:** Periodic re-verification of an existing client's KYC, typically at risk-category-driven cadence — every 10 years for low-risk clients, every 8 years for medium-risk, every 2 years for high-risk (the cadence varies across regulators; SEBI's master circular set the broking norms). Re-KYC may involve only confirmation of unchanged details (negative-affirmation), or full refresh with new OVDs depending on the trigger. KRA and CKYC both maintain "last verified" timestamps; the broker monitors expiry and proactively initiates re-KYC ahead of the deadline.
 **See also:** [Lifecycle: Re-KYC](/broking-kyc/lifecycle/re-kyc/)
+
+### RFQ
+
+**Full form:** Request for Quote
+**Meaning:** Exchange platform for negotiated trading in corporate bonds and commercial paper, where participants seek and respond to quotes and trades settle through the clearing corporation.
+**See also:** [Bonds, G-Sec and NPS](/broking-kyc/product-activation/bonds-gsec-nps/)
 
 ### RMS
 
@@ -940,6 +1098,12 @@ The CSCRF circular explicitly references Type-I/II/III in the audit-cycle obliga
 **Meaning:** SEBI's online portal where investors lodge complaints against any SEBI-registered intermediary — broker, mutual fund, RTA, depository, listed company. SCORES 2.0 (rolled out 2023) tightened SLAs: intermediary has 21 days to respond after a complaint is registered; unresolved escalates to IGRC and onwards to ODR. Brokers maintain a dedicated SCORES desk, must mark each complaint resolved with a documented response, and report monthly counts to SEBI. SCORES non-responsiveness is itself a regulatory violation captured in inspection.
 **See also:** [SCORES procedure deep dive](/broking-kyc/deep-dives/compliance-audit/scores-procedure/), [IGRC](#igrc), [ODR](#odr)
 
+### SDD
+
+**Full form:** Structured Digital Database
+**Meaning:** The time-stamped, non-tamperable database of unpublished price-sensitive information sharing that PIT Regulations require listed companies and intermediaries or fiduciaries to maintain.
+**See also:** [Prop, employee trading and PIT](/broking-kyc/trading-risk/prop-employee-trading-pit/), [PIT](#pit)
+
 ### SEBI
 
 **Full form:** Securities and Exchange Board of India
@@ -951,6 +1115,18 @@ The CSCRF circular explicitly references Type-I/II/III in the audit-cycle obliga
 **Full form:** Securities — Financial Action Task Force (SEBI internal cell)
 **Meaning:** SEBI-internal cell within MIRSD focused on FATF-aligned obligations — AML / CFT, FATCA, CRS implementation in the SEBI-regulated universe. Circulars on AML, FATCA, CRS carry the prefix `SEBI/HO/MIRSD/SECFATF/...` — the 2024 dual-upload (`SEBI/HO/MIRSD/SECFATF/P/CIR/2024/79`), the FATCA centralization (`SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12`), and the AML master circular (`SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78`) all originate from this cell.
 **See also:** [SEBI-MIRSD circulars](/broking-kyc/reference/circulars/sebi-mirsd/), [FATF](#fatf)
+
+### SFT
+
+**Full form:** Statement of Financial Transactions
+**Meaning:** Annual report that specified entities file with the Income-tax Department on prescribed high-value or specified transactions. Securities-related data flows into the client's AIS.
+**See also:** [Tax reporting](/broking-kyc/funds-tax/tax-reporting/), [AIS](#ais)
+
+### SGB
+
+**Full form:** Sovereign Gold Bond
+**Meaning:** Government of India securities denominated in grams of gold, issued by RBI, which trade in the exchanges' cash segment once listed.
+**See also:** [Bonds, G-Sec and NPS](/broking-kyc/product-activation/bonds-gsec-nps/)
 
 ### SGF
 
@@ -997,11 +1173,23 @@ The CSCRF circular explicitly references Type-I/II/III in the audit-cycle obliga
 **Meaning:** Annual external audit conducted by an independent chartered accountant firm under the Companies Act 2013 (Section 139) for the broking firm's financial statements. For SEBI-registered brokers, the statutory auditor must also confirm regulatory-specific items: client funds segregation, KRA / CKYC compliance, peak margin compliance, half-yearly net-worth certificate, AML alert disposition. The audit report carries weight in the broker's exchange filings and is the basis of the next year's fit-and-proper certification.
 **See also:** [Inspection types deep dive](/broking-kyc/deep-dives/compliance-audit/inspection-types/)
 
+### STCG
+
+**Full form:** Short-term capital gains
+**Meaning:** Gains on assets sold within the statutory holding period. For listed equity shares on which STT is paid, taxed at the special rate applicable to such gains.
+**See also:** [Tax reporting](/broking-kyc/funds-tax/tax-reporting/), [LTCG](#ltcg), [STT](#stt)
+
 ### STR
 
 **Full form:** Suspicious Transaction Report
 **Meaning:** Mandatory FIU-IND report for any transaction that, in the reporting officer's reasonable belief, may relate to proceeds of crime or terrorism financing, irrespective of value. No threshold — even an INR 5,000 transaction can be STR-worthy if pattern is suspicious. Filing deadline: 7 working days from the date of detection. Brokers maintain an internal STR-evaluation workflow (compliance / principal officer review), file via FINGate, and retain supporting documents for the prescribed period.
 **See also:** [CTR](#ctr), [NTR](#ntr), [FIU-IND](#fiu-ind), [AML / FIU destination](/broking-kyc/reference/field-atlas/destinations/aml-fiu/)
+
+### STT
+
+**Full form:** Securities Transaction Tax
+**Meaning:** Tax on the value of securities transactions executed on recognised exchanges, levied under Chapter VII of the Finance (No. 2) Act, 2004. Exchanges collect it through brokers; rates differ by segment and by buy or sell side.
+**See also:** [Brokerage and charges](/broking-kyc/funds-tax/brokerage-and-charges/)
 
 ### System audit
 
@@ -1027,6 +1215,12 @@ The CSCRF circular explicitly references Type-I/II/III in the audit-cycle obliga
 **Meaning:** An entity (typically a broker) registered with an exchange to trade on behalf of clients or for its own account. TM membership is segment-specific (cash, F&O, currency, commodity). A TM may also be its own CM (combined TM+CM) or rely on a separate Professional Clearing Member. Trading Members carry BMC, ABC, net-worth, and a battery of operational compliance obligations (KYC, margin, settlement, contract note, AML).
 **See also:** [Exchange registration](/broking-kyc/operations/exchange-registration/), [Member compliance: BMC and ABC](/broking-kyc/deep-dives/member-compliance/bmc-abc/)
 
+### TPIN
+
+**Full form:** Transaction PIN
+**Meaning:** A depository-issued PIN that a client uses, with an OTP, to authorise eDIS debits from their demat account.
+**See also:** [DDPI vs eDIS / TPIN](/broking-kyc/product-activation/ddpi-edis-tpin/), [eDIS](#edis)
+
 ### TRAI DLT
 
 **Full form:** Telecom Regulatory Authority of India — Distributed Ledger Technology framework
@@ -1038,6 +1232,12 @@ The CSCRF circular explicitly references Type-I/II/III in the audit-cycle obliga
 **Full form:** —
 **Meaning:** Lifecycle event where assets in a deceased account-holder's demat / broking account are transferred to the nominee or legal heir. Distinct from "transfer" (which requires the account-holder's own instructions). Triggered by death certificate; standard documents: death certificate, nominee KYC, succession / probate / legal-heir certificate (if no nominee), and the executed transmission request form. Each depository has its own transmission process; the broker coordinates between bank, depository, and (for non-listed assets) the company / RTA.
 **See also:** [Lifecycle: Transmission](/broking-kyc/lifecycle/transmission/), [Nomination](#nomination)
+
+### UBO
+
+**Full form:** Ultimate Beneficial Owner
+**Meaning:** The natural person or persons who ultimately own or control a non-individual client, identified under the PMLA Rules and SEBI's beneficial-ownership thresholds.
+**See also:** [Account variants: Company](/broking-kyc/account-variants/company/), [PMLA](#pmla)
 
 ### UCC
 

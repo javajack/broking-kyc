@@ -725,7 +725,7 @@ Client category codes classify each entity type. The category you assign determi
 | 33 | Gratuity Fund | |
 | 34 | Pension Fund | |
 | 36 | Mutual Funds FOF Schemes | Fund of Funds |
-| 37 | NPS Trust | National Pension System |
+| 37 | <abbr title="National Pension System">NPS</abbr> Trust | National Pension System |
 | 38 | GDN (Global Development Network) | |
 | 39 | FCRA | Foreign Contribution Regulation Act entities |
 

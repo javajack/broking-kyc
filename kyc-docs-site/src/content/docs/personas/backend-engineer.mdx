@@ -46,6 +46,17 @@ That's the foundation. The rest of the site is searchable.
 **The Integration DAG node-detail tables are the most useful single artefact for an engineer here.** Per-node: `depends_on`, `blocks`, `parallel_eligible`, `idempotent`, `retry_policy`, `rollback`, `sla`, `failure_surface`. Lift node IDs and dependencies directly into your orchestrator config (Airflow / Temporal / custom).
 </Aside>
 
+## Added in September 2026
+
+Four new sections cover account variants, product activation, funds and tax, and trading risk. For your role, start with these:
+
+- **[NRI accounts](/broking-kyc/account-variants/nri/)** — <abbr title="Portfolio Investment Scheme (RBI / NRI)">PIS</abbr> routing, designated bank and repatriability flags in the data model.
+- **[Institutional and custodial clients](/broking-kyc/account-variants/institutional-custodial/)** — CP code and custodian confirmation flows.
+- **[API and algo access](/broking-kyc/product-activation/api-algo-access/)** — static IP, order tagging and rate limits.
+- **[<abbr title="Demat Debit and Pledge Instruction">DDPI</abbr> vs eDIS / <abbr title="Transaction PIN">TPIN</abbr>](/broking-kyc/product-activation/ddpi-edis-tpin/)** — depository authorisation paths your sell flow must support.
+- **[Pay-in rails](/broking-kyc/funds-tax/payin-rails/)** — <abbr title="Unified Payments Interface">UPI</abbr>, gateway, bank-transfer and UPI-block integration.
+- **[Order risk controls](/broking-kyc/trading-risk/order-risk-controls/)** — kill switch, price bands and pre-trade checks.
+
 ## Common questions in your role
 
 - **Can I parallelize the 8 post-eSign batch pipelines?** → Yes. [Onboarding DAG](/broking-kyc/operations/integration-dag/onboarding/) confirms they fan out from `ONB-CHECKER_APPROVE` and converge on `ONB-FINAL_GATE`. No inter-dependencies.

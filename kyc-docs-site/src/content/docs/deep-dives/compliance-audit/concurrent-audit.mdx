@@ -10,7 +10,7 @@ import { Aside } from '@astrojs/starlight/components';
 ## TL;DR
 
 - Concurrent audit is the **continuous-mirror audit** of broker client-funds, securities-handling, margin-compliance, and account-opening operations conducted by an independent auditor. The auditor reviews near-real-time samples and reports observations on a weekly / fortnightly cycle.
-- Master framework: **<abbr title="Securities and Exchange Board of India">SEBI</abbr> Master Circular for Stock Brokers** `SEBI/HO/MIRSD/POD-1/P/CIR/2025/94` (current; supersedes `2024/118`, `2024/37`, and `2023/71`); chapter on "Books, accounts, audit, and inspection" and "Client funds and securities handling".
+- Master framework: **<abbr title="Securities and Exchange Board of India">SEBI</abbr> Master Circular for Stock Brokers** `SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90` (current; supersedes `2024/118`, `2024/37`, and `2023/71`); chapter on "Books, accounts, audit, and inspection" and "Client funds and securities handling".
 - DP-side concurrent audit is mandated under **<abbr title="Central Depository Services (India) Limited">CDSL</abbr>** and **<abbr title="National Securities Depository Limited">NSDL</abbr>** bye-laws; cycle is monthly, audit scope covers account opening, <abbr title="Beneficial Owner">BO</abbr> modifications, delivery instructions, transmissions, and reconciliation. Linked to the Master Circular for RTAs / DPs (`SEBI/HO/MIRSD/POD-1/P/CIR/2024/81` June 2024).
 - Concurrent auditor must be a **practising Chartered Accountant** (or CA firm), with prescribed independence — typically not the same auditor as the statutory audit; rotation rules apply.
 - Observation cycle: typically **monthly closing-cycle for DPs**, **fortnightly for client-funds review at brokers**. Each observation is logged, classified by severity (high / medium / low), and tracked to remediation closure.
@@ -21,7 +21,7 @@ import { Aside } from '@astrojs/starlight/components';
 
 Stock brokers and DPs hold investor funds and securities continuously. Errors and irregularities here have direct, large monetary consequences for clients. Annual statutory audit catches problems retrospectively; system audit catches infrastructure issues; **concurrent audit catches operational defects close to occurrence**.
 
-The framework dates back to the SEBI Master Circular for Stock Brokers (which has been progressively updated). The current master `SEBI/HO/MIRSD/POD-1/P/CIR/2025/94` (in force as the regulatory state at the time of writing — verify on SEBI's master-circular page) consolidates client-funds-handling, securities-handling, segregation requirements, daily upstreaming (`SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/187`), direct payout (`SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2024/75`), and brokers' institutional mechanism (`SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/96`). All of these are concurrent-audit-relevant.
+The framework dates back to the SEBI Master Circular for Stock Brokers (which has been progressively updated). The current master `SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90` (in force as the regulatory state at the time of writing — verify on SEBI's master-circular page) consolidates client-funds-handling, securities-handling, segregation requirements, daily upstreaming (`SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/187`), direct payout (`SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2024/75`), and brokers' institutional mechanism (`SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/96`). All of these are concurrent-audit-relevant.
 
 DP-side concurrent audit is older and more codified — CDSL communiques (e.g. `CDSL/OPS/DP/POLCY/...` chain) and NSDL policy circulars (`NSDL/POLICY/...` chain) prescribe DP concurrent audit scope, frequency, and reporting.
 
@@ -274,7 +274,7 @@ From inspection consolidated circulars (`NSE/INSP/57394` / `NSE/INSP/67804`) and
 
 - BO modification without proper authentication
 - Nominee data inconsistencies
-- <abbr title="Asset Management Company (mutual funds context) / Annual Maintenance Charges (depository context).">AMC</abbr> slab calculation error (BSDA threshold breach)
+- <abbr title="Asset Management Company (mutual funds context) / Annual Maintenance Charges (depository context).">AMC</abbr> slab calculation error (<abbr title="Basic Services Demat Account">BSDA</abbr> threshold breach)
 - Aadhaar masking failure (post `CDSL/OPS/DP/POLCY/2024/580`)
 - Dormancy flag not applied
 

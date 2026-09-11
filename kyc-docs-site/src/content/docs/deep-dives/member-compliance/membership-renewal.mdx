@@ -9,7 +9,7 @@ import { Aside } from '@astrojs/starlight/components';
 
 ## TL;DR
 
-- **<abbr title="Securities and Exchange Board of India">SEBI</abbr> registration** for a stockbroker is structured as a **5-year block fee cycle** under the SEBI fee regime since 1 April 2007, consolidated under the SEBI Stock Broker Master Circular ([SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir202594)) and confirmed under SEBI (Stock Brokers) Regulations 2026 ([SEBI/<abbr title="Legal Affairs Department — Northern Regional Office (SEBI)">LAD-NRO</abbr>/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebilad-nrogn2026291)).
+- **<abbr title="Securities and Exchange Board of India">SEBI</abbr> registration** for a stockbroker is structured as a **5-year block fee cycle** under the SEBI fee regime since 1 April 2007, consolidated under the SEBI Stock Broker Master Circular ([SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)) and confirmed under SEBI (Stock Brokers) Regulations 2026 ([SEBI/<abbr title="Legal Affairs Department — Northern Regional Office (SEBI)">LAD-NRO</abbr>/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebilad-nrogn2026291)).
 - **Exchange membership** at <abbr title="National Stock Exchange of India">NSE</abbr> / <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> / <abbr title="Multi Commodity Exchange of India">MCX</abbr> is renewed annually through exchange-specific fee cycles, evidenced via the exchange's online filing modules (ENIT for NSE, BEFS for BSE, MCX Member Portal for MCX).
 - **Clearing-corporation membership** (<abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NSCCL</abbr> / <abbr title="Indian Clearing Corporation Limited">ICCL</abbr> / <abbr title="Multi Commodity Exchange Clearing Corporation Limited">MCXCCL</abbr>) is a separate track from exchange membership; clearing rights must be renewed independently per <abbr title="Clearing Corporation (NCL, ICCL, MCXCCL — context-dependent).">CC</abbr> byelaws.
 - **Renewal attestations** consolidate confirmations from upstream compliance tracks: half-yearly networth certificate, BMC compliance, fit-and-proper declarations, KMP roster, NISM-certificate validity, advertisement-approval register, compliance certificate, internal audit report.
@@ -41,7 +41,7 @@ This page covers all four cycles, the attestations that go with them, the prereq
 
 ### Mechanics
 
-Per the SEBI Stock Broker Master Circular ([SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir202594)) and the SEBI (Stock Brokers) Regulations 2026 ([SEBI/LAD-<abbr title="Non-Resident Ordinary (Rupee) account">NRO</abbr>/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebilad-nrogn2026291)), brokers registered with SEBI hold permanent registration subject to periodic fee payment in 5-year blocks. The broker pays the prescribed fee at the start of each block; receipt issued by SEBI evidences continuing registration.
+Per the SEBI Stock Broker Master Circular ([SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)) and the SEBI (Stock Brokers) Regulations 2026 ([SEBI/LAD-<abbr title="Non-Resident Ordinary (Rupee) account">NRO</abbr>/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebilad-nrogn2026291)), brokers registered with SEBI hold permanent registration subject to periodic fee payment in 5-year blocks. The broker pays the prescribed fee at the start of each block; receipt issued by SEBI evidences continuing registration.
 
 The fee schedule is set by SEBI from time to time, segment-wise (Cash, F&O, CD, COM, IRD, Debt), and varies by membership category. The fee is calibrated to the broker's turnover and exposure pattern, with floor-and-cap bands.
 
@@ -173,7 +173,7 @@ Clearing-corp membership at NSCCL / ICCL / MCXCCL is **separate** from exchange 
 
 Clearing-corp membership has its own:
 
-- **Capital requirements** — TM <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr>, CM CUSPA, TM CSMFA accounts under [<abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr>/CMPT/63669](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt63669) for direct-payout framework.
+- **Capital requirements** — TM <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr>, CM CUSPA, TM <abbr title="Client Securities Margin Funded Account">CSMFA</abbr> accounts under [<abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr>/CMPT/63669](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt63669) for direct-payout framework.
 - **BMC at CC** — clearing-side base minimum capital, parallel to but separate from the trading-side BMC at the exchange.
 - **Core SGF contribution** — quarterly contribution per [NCL/CMPT/61800](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt61800) and [NCL/CMPT/61801](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt61801).
 - **Annual subscription fee** — paid to the CC.
@@ -306,7 +306,7 @@ A broker that is under suspension at the renewal date faces a complex renewal �
 - [Recurring cycles — CYC-AN-MEMBERSHIP](/broking-kyc/operations/integration-dag/recurring-cycles/) — node in the cadence <abbr title="Directed Acyclic Graph.">DAG</abbr>; depends on networth + fit-and-proper, blocks nothing (terminal node).
 - [Broker process narrative — Section 5 Annual cycles](/broking-kyc/broker-process/narrative/) — narrative context.
 - [SEBI (Stock Brokers) Regulations 2026 — SEBI/LAD-NRO/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebilad-nrogn2026291) — primary Regulation effective 7 January 2026.
-- [SEBI Stock Broker Master Circular — SEBI/HO/MIRSD/POD-1/P/CIR/2025/94](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir202594) — operational compliance master.
+- [SEBI Stock Broker Master Circular — SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590) — operational compliance master.
 - [NSE half-yearly networth — NSE/COMP/64293](/broking-kyc/reference/circulars/nse/#nsecomp64293) — networth attestation timing and channel.
 - [NSE KMP intimation — NSE/COMP/56766](/broking-kyc/reference/circulars/nse/#nsecomp56766) — KMP roster maintenance.
 - [NSE AP framework — NSE/COMP/63628](/broking-kyc/reference/circulars/nse/#nsecomp63628) — joint-exchange AP supervisory framework with annual AMC.

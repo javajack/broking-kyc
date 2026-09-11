@@ -12,7 +12,7 @@ import { Aside } from '@astrojs/starlight/components';
 - **Member default** = a clearing member fails to honour a settlement obligation at the clearing corporation (CC). Most common trigger: **payin failure** — the member cannot deposit the required funds or securities on the CC's settlement payin window.
 - **Default declaration** is a formal exchange / CC action under the bye-laws; it freezes the member's <abbr title="Unique Client Code">UCC</abbr>, halts new trading, transfers the recovery process to the default-management procedure, and starts the <abbr title="Investor Protection Fund">IPF</abbr> claim window for clients.
 - **Asset liquidation sequence (the funded waterfall)**: (1) defaulter's collateral at CC (margins, pledged securities, BG, FDR, cash); (2) defaulter's Core <abbr title="Settlement Guarantee Fund">SGF</abbr> contribution; (3) defaulter's <abbr title="Base Minimum Capital">BMC</abbr> / <abbr title="Additional Base Capital">ABC</abbr> at exchange; (4) insurance (if applicable); (5) CC skin-in-the-game Core SGF (25% min); (6) non-defaulter Core SGF contributions (pro-rata, replenishable T+3); (7) unfunded tools — cash call, variation-margin haircut, partial tear-up. See [SGF / Core SGF](./sgf-core-sgf/) for the funded-waterfall detail.
-- **Client-asset protection** during default rests on three pillars: (a) **segregated client-funds bank account** at the broker maintained per <abbr title="Securities and Exchange Board of India">SEBI</abbr> segregation framework — balances there are client property, returned to clients outside the CC's recovery; (b) **segregated client securities** at the depository (<abbr title="Central Depository Services (India) Limited">CDSL</abbr> / <abbr title="National Securities Depository Limited">NSDL</abbr>) in <abbr title="Trading Member">TM</abbr> <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr> / <abbr title="Clearing Member">CM</abbr> CUSPA / TM CSMFA accounts and direct-payout-to-demat regime — these are identifiable to client BOs and returnable; (c) **IPF backstop** for residual unrecovered amounts — see [IPF](./ipf/).
+- **Client-asset protection** during default rests on three pillars: (a) **segregated client-funds bank account** at the broker maintained per <abbr title="Securities and Exchange Board of India">SEBI</abbr> segregation framework — balances there are client property, returned to clients outside the CC's recovery; (b) **segregated client securities** at the depository (<abbr title="Central Depository Services (India) Limited">CDSL</abbr> / <abbr title="National Securities Depository Limited">NSDL</abbr>) in <abbr title="Trading Member">TM</abbr> <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr> / <abbr title="Clearing Member">CM</abbr> CUSPA / TM <abbr title="Client Securities Margin Funded Account">CSMFA</abbr> accounts and direct-payout-to-demat regime — these are identifiable to client BOs and returnable; (c) **IPF backstop** for residual unrecovered amounts — see [IPF](./ipf/).
 - **Client transfer-out** to another broker is permitted post-default — the client opens an account at a new broker and arranges inter-depository transfer of holdings; positions are squared at the defaulting broker per the default's special-settlement rules.
 - **Suspension procedure**: defaulter declared → membership suspended at all exchanges / CCs where registered (cross-<abbr title="Market Infrastructure Institution">MII</abbr> intimation) → trading rights revoked → office records taken into custody → forensic review.
 - **Re-admission**: rare; requires SEBI no-objection, satisfaction of all client claims, capital restoration, fresh fit-and-proper assessment, and formal re-admission application. Most defaulting members are expelled rather than re-admitted.
@@ -128,7 +128,7 @@ The CC applies the funded waterfall to settle the broken obligation:
 
 #### Step 4a: Defaulter's resources at CC
 
-- Liquidate / appropriate all defaulter's collateral: cash, FDR, BG, securities (including approved-collateral securities like equity / ETF / MF units), G-Sec / SGB.
+- Liquidate / appropriate all defaulter's collateral: cash, FDR, BG, securities (including approved-collateral securities like equity / ETF / MF units), G-Sec / <abbr title="Sovereign Gold Bond">SGB</abbr>.
 - Apply all margins held: IM, <abbr title="Mark-to-Market">MTM</abbr>/Variation, <abbr title="Extreme Loss Margin">ELM</abbr>, Special / Additional, Premium, Tender / Delivery-period.
 - Apply defaulter's mandatory Core SGF contribution (member share).
 - Apply defaulter's non-core SGF and any voluntary deposits.
@@ -290,7 +290,7 @@ Standard KYC / onboarding at the new broker (see [Broker process narrative](/bro
 ### Step 3: Initiate inter-depository or intra-depository transfer
 
 - If the client opens at the new broker with a fresh BO at the new broker's DP, holdings can be transferred from the old BO to the new BO via inter-depository (CDSL ↔ NSDL) or intra-depository (CDSL ↔ CDSL, NSDL ↔ NSDL) transfer.
-- **No STT, no capital-gains event** — transfer is not a sale (see [Closure — closure-with-securities-transfer](/broking-kyc/lifecycle/closure/)).
+- **No <abbr title="Securities Transaction Tax">STT</abbr>, no capital-gains event** — transfer is not a sale (see [Closure — closure-with-securities-transfer](/broking-kyc/lifecycle/closure/)).
 - Holdings claimable from the CUSPA / CSMFA / pool flow back to client's BO via the depository's recovery instructions issued by the exchange.
 
 ### Step 4: Open positions at the defaulting broker
@@ -333,7 +333,7 @@ The reforms that followed (and continue):
 - **Direct payout to demat**: phased implementation from 2024 onwards (NCL/CMPT/63669 → NCL/CMPT/66779 dated Feb 21, 2025; ICCL 20250214-69 pilot; NCL/CMPT/67947 dated May 9, 2025; NCL/CMPT/69455 dated Aug 1, 2025).
 - **Client-funds upstreaming**: daily upstreaming of client funds from broker to CC; quarterly running-account settlement.
 - **Quarterly disclosure of segregation compliance** by brokers to exchanges.
-- **<abbr title="Unified Payments Interface">UPI</abbr> block / 3-in-1 facility for <abbr title="Qualified Stock Broker">QSB</abbr>** per SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD-1/P/CIR/2024/175 (Dec 17, 2024) — <abbr title="Applications Supported by Blocked Amount">ASBA</abbr>-like protection in cash market, effective Feb 1, 2025.
+- **<abbr title="Unified Payments Interface">UPI</abbr> block / 3-in-1 facility for <abbr title="Qualified Stock Broker">QSB</abbr>** per SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/MRD/MRD-PoD-2/P/CIR/2024/153 (Dec 17, 2024) — <abbr title="Applications Supported by Blocked Amount">ASBA</abbr>-like protection in cash market, effective Feb 1, 2025.
 
 The cumulative effect is that a Karvy-scale segregation breach would today be substantially more difficult to perpetrate without earlier detection via the audit and reconciliation framework.
 
@@ -366,7 +366,7 @@ A formal member suspension involves:
 ### Regulatory level
 
 - SEBI updates the broker registration status in its database.
-- Other regulators (RBI for currency, IFSCA for GIFT <abbr title="Indian Financial System Code.">IFSC</abbr> operations, <abbr title="Financial Intelligence Unit">FIU</abbr>-IND for <abbr title="Anti-Money Laundering">AML</abbr> reporting entity status) informed.
+- Other regulators (RBI for currency, <abbr title="International Financial Services Centres Authority">IFSCA</abbr> for GIFT <abbr title="Indian Financial System Code.">IFSC</abbr> operations, <abbr title="Financial Intelligence Unit">FIU</abbr>-IND for <abbr title="Anti-Money Laundering">AML</abbr> reporting entity status) informed.
 - Public-database updates: SEBI website's intermediary search, <abbr title="KYC Registration Agency">KRA</abbr> records.
 
 ### Internal at member firm
@@ -444,7 +444,7 @@ If the defaulting broker was the client's DP and the client wants to move DP, ho
 - [Operations: Audit & Compliance](/broking-kyc/operations/audit-compliance/) — concurrent audit and segregation-verification framework.
 - [Circulars — Clearing Corporations](/broking-kyc/reference/circulars/clearing-corps/) — NCL/CMPT/66779 (direct payout to demat Phase 2 go-live), NCL/CMPT/67947 (subsequent NSDL CM-pool clarification), NCL/CMPT/69455 (proprietary-UCC demat account separation), NCL/CMPT/71045 / NCL/CMPT/71441 (internal-shortage auction).
 - [Circulars — MCX](/broking-kyc/reference/circulars/mcx/) — MCX Master Circular Investor Services Department (Default) Version 3 dated 2025-04-29; MCX/IPF/109/2026 corrigendum.
-- [Circulars — SEBI MIRSD](/broking-kyc/reference/circulars/sebi-mirsd/) — segregation, broker AML / surveillance, UPI block for QSB.
+- [Circulars — SEBI <abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>](/broking-kyc/reference/circulars/sebi-mirsd/) — segregation, broker AML / surveillance, UPI block for QSB.
 - [Circulars — SEBI Other](/broking-kyc/reference/circulars/sebi-other/) — outage SOP for commodity derivatives, segregation framework, equity-index-derivatives framework.
 - [Circulars — FIU-IND](/broking-kyc/reference/circulars/fiu-ind/) — alert indicators for misuse of client funds.
 

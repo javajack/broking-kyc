@@ -184,7 +184,7 @@ Sorted by `field_id`, then `destination`.
 | A-pan_exempt_category | PAN Exempt Category | kra | PAN_EXEMPT_CATG | CHAR(2) | on-modify | lookup against R | Required if pan_exempt=Y; code table maintained by intermediary | [industry typical] |
 | A-pan_number | PAN Number | aml-fiu | CUSTOMER_PAN | CHAR(10) | on-event | uppercase | primary client identifier in all FIU reports; STR/CTR rejected by FINnet if PAN missing/invalid format | FIU-IND-REPORTING-FORMAT-V114 |
 | A-pan_number | PAN (UAPA Screening) | aml-fiu | UAPA_SCREEN_KEY | CHAR(10) | on-event | uppercase | PAN re-screened on every UNSC list refresh; positive match -> freeze + MHA report via FIU-IND | FIU-IND-UAPA-UNSC-UPDATE-21022025 |
-| A-pan_number | PAN Number | back-office | pan_no | CHAR(10) | on-modify | uppercase | primary key in client master; drives ledger, contract notes, statements | SEBI/HO/MIRSD/POD-1/P/CIR/2025/94 |
+| A-pan_number | PAN Number | back-office | pan_no | CHAR(10) | on-modify | uppercase | primary key in client master; drives ledger, contract notes, statements | SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90 |
 | A-pan_number | PAN Number | bse-ucc | PAN | CHAR(10) | one-time | uppercase | Validated against Protean eGov; PAN+Name+DOB must all match; mandatory field in revised UCC | BSE/20240223-42 |
 | A-pan_number | PAN Number | cdsl-bo | FIRST_HOLDER_PAN | CHAR(10) | one-time | uppercase | Line 01 of BO opening fixed-length record; 4th char must be 'P' for Individual; right-padded with spaces; PAN-flag finalization 5-7 days post-opening before trading enabled | CDSL/OPS/DP/SYSTM/2023/119 |
 | A-pan_number | PAN Number | ckyc | PAN | CHAR(10) | one-time | uppercase | Format \[A-Z\]{5}\[0-9\]{4}\[A-Z\] validated by CKYCRR; mandatory at upload | CKYC/2025/16 |
@@ -227,7 +227,7 @@ Sorted by `field_id`, then `destination`.
 | A-residential_status | Residential Status | kra | RESI_STATUS | CHAR(2) | on-modify | [direct] | RI/NRI/FN/PIO; KRA accepts via 2024 master KYC circular | SEBI/HO/MIRSD/SECFATF/P/CIR/2023/169 |
 | A-residential_status | Residential Status | mcx-ucc | RES_STATUS | CHAR(2) | one-time | [direct] | Drives client category (Foreign category in HE/SP/AR/Farmer/VCP/DFI/Foreign/Other) | MCX/TECH/394/2023 |
 | A-residential_status | Residential Status | nsdl-bo | ResdtlSts | CHAR(2) UDiFF | one-time | lookup against R | Maps to BO client-type code in BO Upload; NRI triggers PIS account validation | NSDL/POLICY/2025/0056 |
-| A-residential_status | NRI Sub-Status Code | nsdl-bo | BOSubSts | CHAR(2) UDiFF | one-time | lookup against R | Sub-status code element; NRI/PIO/OCI codes differ | NSDL/POLICY/2025/0056 |
+| A-residential_status | NRI Sub-Status Code | nsdl-bo | BOSubSts | CHAR(2) UDiFF | one-time | lookup against R | Sub-status code element; NRI/PIO/<abbr title="Overseas Citizen of India">OCI</abbr> codes differ | NSDL/POLICY/2025/0056 |
 | A-residential_status | Residential Status | nse-ucc | RES_STATUS | CHAR(2) | one-time | [direct] | RI=Resident Indian, NRI, FN=Foreign National, PIO; drives client_type | NSE/ISC/61817 |
 | A-residential_status | Residential Status | regulatory-reports | ClientCategory | CHAR(2) | daily | lookup against R | drives NRI flag in MG-12 client-category column; restricts intraday route | NSE/ISC/61817 |
 | A-residential_status | Residential Status | rms | resi_category | VARCHAR(3) | on-modify | [direct] | NRI flag triggers PIS-route segment block in pre-trade pipeline | [industry typical] |

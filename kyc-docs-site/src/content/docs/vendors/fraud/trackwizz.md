@@ -418,7 +418,7 @@ EDD is triggered when any of the following conditions are met:
 | **Adverse media hit** | `adverse_media_hit` = true | Investigate nature of adverse media, assess materiality |
 | **Suspicious activity patterns** | Post-onboarding transaction monitoring | File STR if suspicion confirmed |
 | **High-value transactions** | As per broker's internal policy thresholds | Additional verification, senior management review |
-| **Complex ownership structure** | Multiple UBO layers identified | Trace full ownership chain, verify all UBOs |
+| **Complex ownership structure** | Multiple <abbr title="Ultimate Beneficial Owner">UBO</abbr> layers identified | Trace full ownership chain, verify all UBOs |
 
 :::danger
 PEP matches and sanctions hits must be escalated to the designated compliance officer or Principal Officer. These cannot be auto-cleared by the system or dismissed at L1 analyst level, regardless of the match score. SEBI's AML framework and PMLA mandate that senior management approval is obtained before onboarding any PEP, and sanctions matches must be treated as potential account-blocking events until fully investigated and documented.

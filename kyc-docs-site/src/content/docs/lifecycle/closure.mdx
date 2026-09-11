@@ -12,7 +12,7 @@ import { Aside } from '@astrojs/starlight/components';
 - **6 steps, sequential**: (1) pending obligations check → (2) fund withdrawal → (3) pledge release → (4) <abbr title="Depository Participant">DP</abbr> BO closure → (5) <abbr title="Unique Client Code">UCC</abbr> deactivation → (6) <abbr title="KYC Registration Agency">KRA</abbr> closure intimation.
 - Typical timeline: **5–7 business days** end-to-end.
 - **<abbr title="Central KYC (records registry)">CKYC</abbr> record is retained** as identity reference post-closure; KRA record marked "closed".
-- Two important sub-cases: **closure-with-securities-transfer** (transfer to another broker without selling, saves STT and capital-gains realization) and **failed closure under freeze orders**.
+- Two important sub-cases: **closure-with-securities-transfer** (transfer to another broker without selling, saves <abbr title="Securities Transaction Tax">STT</abbr> and capital-gains realization) and **failed closure under freeze orders**.
 - Some clients close voluntarily but leave residual balances (forgotten holdings, small unclaimed dividends). These follow a separate "unclaimed funds" path.
 
 ## Conceptual overview
@@ -29,7 +29,7 @@ Verification:
 - **Open trades**: any <abbr title="Trade-date Plus N settlement">T+1</abbr> / <abbr title="Trade-date Plus N settlement">T+0</abbr> settlements pending? Wait for settlement to complete.
 - **<abbr title="Margin Trading Facility">MTF</abbr> positions**: any outstanding funding owed to broker? Settle before closure.
 - **Unsettled payouts**: any payouts in flight? Allow them to complete.
-- **Open orders**: any GTC / AMO / pending orders? Cancel them.
+- **Open orders**: any GTC / <abbr title="After Market Order">AMO</abbr> / pending orders? Cancel them.
 - **Margin pledge / MTF pledge**: any securities pledged that need to be unpledged before transfer-or-sale?
 
 If any of these are open, the closure request is put on **hold** with a note to the client explaining what must complete first.
@@ -112,7 +112,7 @@ The mirror scenario: broker forcing closure of a client account (typically for c
 
 ### Unclaimed funds / forgotten holdings
 
-A surprisingly common edge case: client closes the broker relationship but leaves small holdings or unclaimed dividend balances. These don't necessarily prevent closure — they're moved to an unclaimed-funds register and the broker continues to attempt return periodically. Long-uncollected balances eventually flow to the IEPF (Investor Education and Protection Fund) per SEBI rules.
+A surprisingly common edge case: client closes the broker relationship but leaves small holdings or unclaimed dividend balances. These don't necessarily prevent closure — they're moved to an unclaimed-funds register and the broker continues to attempt return periodically. Long-uncollected balances eventually flow to the <abbr title="Investor Education and Protection Fund">IEPF</abbr> (Investor Education and Protection Fund) per SEBI rules.
 
 ## Field-level callouts
 

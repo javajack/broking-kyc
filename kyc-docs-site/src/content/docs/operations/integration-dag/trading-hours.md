@@ -14,7 +14,7 @@ description: Dependency graph for the continuous trading window (09:15–15:30) 
 
 ## Conceptual overview
 
-Once the market opens at 09:15, the broker's tech stack settles into an <abbr title="Order Management System">OMS</abbr>/RMS loop that repeats per order: validate, release, execute, book, update margin, repeat. Surveillance runs in parallel at the exchange level (NORMS), with the broker's mirror surveillance system catching exchange-side flags and adding broker-specific rules (intraday OTR caps, <abbr title="Graded Surveillance Measure">GSM</abbr>/<abbr title="Additional Surveillance Measure">ASM</abbr> intervention). Four times during the session — at 11:30, 12:30, 13:30, 14:30 — the clearing corp captures a margin snapshot; the broker must have sufficient client-collected margin in each.
+Once the market opens at 09:15, the broker's tech stack settles into an <abbr title="Order Management System">OMS</abbr>/RMS loop that repeats per order: validate, release, execute, book, update margin, repeat. Surveillance runs in parallel at the exchange level (NORMS), with the broker's mirror surveillance system catching exchange-side flags and adding broker-specific rules (intraday <abbr title="Order-to-Trade Ratio">OTR</abbr> caps, <abbr title="Graded Surveillance Measure">GSM</abbr>/<abbr title="Additional Surveillance Measure">ASM</abbr> intervention). Four times during the session — at 11:30, 12:30, 13:30, 14:30 — the clearing corp captures a margin snapshot; the broker must have sufficient client-collected margin in each.
 
 ## DAG 1 — Per-order pre-trade pipeline (millisecond-scale)
 

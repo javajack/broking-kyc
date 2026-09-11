@@ -40,7 +40,7 @@ Sorted by `field_id`, then `destination`.
 | L-segment_currency | Currency Derivatives Segment | mcx-ucc | _NA_ | none | one-time | null-if-Z | Not on MCX | MCX/TECH/394/2023 |
 | L-segment_currency | Currency Derivatives Segment | nse-ucc | NSE_CD_FLAG | CHAR(1) | one-time | [direct] | Y activates Currency Derivatives on NSE | NSE/ISC/61817 |
 | L-segment_currency | Segment Currency | rms | seg_cd_active | CHAR(1) | on-modify | [direct] | pre-trade hard-block on CD orders if N | [industry typical] |
-| L-segment_equity_cash | Segment Equity Cash | back-office | seg_cm_flag | CHAR(1) | on-modify | [direct] | default Y; drives <abbr title="Clearing Member">CM</abbr> brokerage and STT computation columns | [industry typical] |
+| L-segment_equity_cash | Segment Equity Cash | back-office | seg_cm_flag | CHAR(1) | on-modify | [direct] | default Y; drives <abbr title="Clearing Member">CM</abbr> brokerage and <abbr title="Securities Transaction Tax">STT</abbr> computation columns | [industry typical] |
 | L-segment_equity_cash | Segment Equity Cash | back-office | stt_rate_cm | NUMBER(7,4) | on-trade | lookup against R | STT rate lookup by segment+side; CM delivery 0.1% both sides, CM intraday 0.025% sell side | Finance Act / STT Act |
 | L-segment_equity_cash | Segment Equity Cash | back-office | exch_txn_charge_rate | NUMBER(7,5) | on-trade | lookup against R | exchange transaction charge per segment; NSE CM 0.00297%, BSE CM 0.00375% (per scrip group) | [industry typical] |
 | L-segment_equity_cash | Segment Equity Cash | back-office | sebi_turnover_fee_rate | NUMBER(7,5) | on-trade | lookup against R | <abbr title="Securities and Exchange Board of India">SEBI</abbr> turnover fee Rs 10 per crore (0.0001%) | SEBI Turnover Fee Notification |
@@ -60,7 +60,7 @@ Sorted by `field_id`, then `destination`.
 | L-segment_equity_fno | Segment F&O | back-office | seg_fno_flag | CHAR(1) | on-modify | [direct] | Y requires income proof; drives F&O brokerage and STT (sell side STT 0.0125% premium) | [industry typical] |
 | L-segment_equity_fno | Segment F&O | back-office | stt_rate_fno | NUMBER(7,4) | on-trade | lookup against R | STT for F&O: futures sell 0.02%, options sell 0.1% premium (revised Oct 2024) | Finance Act 2024 |
 | L-segment_equity_fno | Equity F&O Segment | bse-ucc | BSE_FNO_FLAG | CHAR(1) | one-time | [direct] | Y activates F&O on BSE; income-proof tagged | BSE/20240223-42 |
-| L-segment_equity_fno | Equity F&O Segment Flag | contract-notes | SegmentCode | CHAR(2) | on-trade | lookup against R | F&O contract note includes RDD-FNO acknowledgement reference + premium/notional disclosure | NSE/INSP/61999 |
+| L-segment_equity_fno | Equity F&O Segment Flag | contract-notes | SegmentCode | CHAR(2) | on-trade | lookup against R | F&O contract note includes <abbr title="Risk Disclosure Document">RDD</abbr>-FNO acknowledgement reference + premium/notional disclosure | NSE/INSP/61999 |
 | L-segment_equity_fno | Equity F&O Segment | mcx-ucc | _NA_ | none | one-time | null-if-Z | Not applicable to MCX (commodity-only exchange) | MCX/TECH/394/2023 |
 | L-segment_equity_fno | Equity F&O Segment | nse-ucc | NSE_FNO_FLAG | CHAR(1) | one-time | [direct] | Y activates F&O on NSE; requires income proof at UCC level | NSE/ISC/61817 |
 | L-segment_equity_fno | Segment F&O | rms | seg_fno_active | CHAR(1) | on-modify | [direct] | pre-trade hard-block on F&O orders if N; pre-margin lock applies | SEBI/HO/MRD2/DCAP/CIR/P/2020/127 |

@@ -21,7 +21,7 @@ The first decision you will face is which environment to work in. CDSL provides 
 | **Mock Environment** | `mock.cdslindia.com` (MOCKCDAS for RTA/DP testing) | N/A |
 | **API Services** | Test API server (credentials from dprtasupport@cdslindia.com) | `api.cdslindia.com/APIServices` |
 | **eDIS Portal** | Sandbox eDIS (on request) | `edis.cdslindia.com` |
-| **TPIN Generation** | Test TPIN generation | `edis.cdslindia.com/Home/GeneratePin` |
+| **<abbr title="Transaction PIN">TPIN</abbr> Generation** | Test TPIN generation | `edis.cdslindia.com/Home/GeneratePin` |
 | **easi/EASIEST** | Test instance | `web.cdslindia.com/myeasitoken/Home/Login` |
 | **CVL <abbr title="KYC Registration Agency">KRA</abbr> Verification** | Test URL | `validate.cvlindia.com/CVLKRAVerification_V1/` |
 | **Issuer Portal** | Test instance | `issuercentre.cdslindia.com/Home/Login` |

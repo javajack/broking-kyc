@@ -75,3 +75,7 @@ This table summarizes the key differences between resident and NRI onboarding. I
 :::tip[The PIS constraint that catches people off guard]
 Under the PIS route, NRIs cannot do intraday trading -- they are restricted to delivery-based trades only, and they cannot access F&O (Futures and Options), currency, or commodity segments. The Non-PIS route allows intraday and F&O but still blocks currency and commodity. Make sure the onboarding UI clearly communicates these restrictions before the customer selects their trading route.
 :::
+
+:::note[Full walkthrough now available]
+This appendix is the short form. The screen-by-screen NRI onboarding journey, with PIS vs non-PIS routing, <abbr title="Foreign Exchange Management Act 1999">FEMA</abbr> limits, and field-level deltas, lives at [Account Variants: NRI](/broking-kyc/account-variants/nri/). Post-onboarding status changes are covered in [Lifecycle: NRI conversion](/broking-kyc/lifecycle/nri-conversion/).
+:::

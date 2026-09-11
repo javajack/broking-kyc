@@ -66,7 +66,7 @@ npm install
 
 ## Key Regulatory References
 
-**884 circulars** tracked across 13 issuer groupings — SEBI (MIRSD + MRD + IMD + OIAE + LAD-NRO + CFD), RBI, NPCI, CERSAI, MeitY/CCA, FIU-IND, CDSL, NSDL, NSE, BSE, MCX, and clearing corps (NSCCL / ICCL / MCXCCL) — over the 2020-01-01 → 2026-05-14 window. Coverage spans regulatory norms AND operational/file-format circulars (BOD/EOD specs, settlement files, margin frameworks). Here are the most critical ones:
+**1,058 circulars** tracked across 13 issuer groupings — SEBI (MIRSD + MRD + IMD + OIAE + LAD-NRO + CFD), RBI, NPCI, CERSAI, MeitY/CCA, FIU-IND, CDSL, NSDL, NSE, BSE, MCX, and clearing corps (NSCCL / ICCL / MCXCCL) — over the 2020-01-01 → 2026-09-11 window. Coverage spans regulatory norms AND operational/file-format circulars (BOD/EOD specs, settlement files, margin frameworks). Here are the most critical ones:
 
 | Regulation | Reference |
 |---|---|
@@ -91,7 +91,7 @@ npm install
 | DPDP Act 2023 + Rules 2025 | Notified Nov 13, 2025 — full compliance deadline May 2027 |
 | KYC Onboarding Consultation Paper | SEBI (Jan 16, 2026) — proposes centralized KYC, 5-year review cycle |
 
-See the [Regulatory Circulars master index](https://javajack.github.io/broking-kyc/reference/regulatory-circulars/) (curated highlights + per-issuer navigation), the [per-issuer sub-pages](https://javajack.github.io/broking-kyc/reference/circulars/sebi-mirsd/) (884 verified entries with primary URLs, in-force dates, supersession chains, and impact-area tags), the [circulars changelog](https://javajack.github.io/broking-kyc/reference/circulars-changelog/) (delta against the prior 37-entry list), and the [References & Sources](https://javajack.github.io/broking-kyc/reference/references-sources/) (130+ URLs) page for complete listings.
+See the [Regulatory Circulars master index](https://javajack.github.io/broking-kyc/reference/regulatory-circulars/) (curated highlights + per-issuer navigation), the [per-issuer sub-pages](https://javajack.github.io/broking-kyc/reference/circulars/sebi-mirsd/) (1,058 verified entries with primary URLs, in-force dates, supersession chains, and impact-area tags), the [circulars changelog](https://javajack.github.io/broking-kyc/reference/circulars-changelog/) (2026-09-11 delta on top of the 2026-05-14 rebuild), and the [References & Sources](https://javajack.github.io/broking-kyc/reference/references-sources/) (130+ URLs) page for complete listings.
 
 ## Compliance & Vendor Coverage
 
@@ -101,6 +101,10 @@ See the [Regulatory Circulars master index](https://javajack.github.io/broking-k
 - **[Integration Choreography DAG](https://javajack.github.io/broking-kyc/operations/integration-dag/)** — dependency graph of 163 integration nodes across six phases (Onboarding, BOD, Trading Hours, EOD & Settlement, Recurring Cycles, Lifecycle Events). ASCII DAGs + per-node detail (idempotency, retry policy, rollback, SLA, failure surface, spec source).
 - **[Lifecycle (post-onboarding)](https://javajack.github.io/broking-kyc/lifecycle/)** — operator-walkthrough deep-dives for six post-onboarding scenarios: re-KYC, modifications, dormancy & reactivation, voluntary closure, transmission, NRI conversion. Step-by-step with field-level callouts, sub-cases, and cross-links to blueprint / DAG / circulars.
 - **[Operations Deep Dives](https://javajack.github.io/broking-kyc/deep-dives/)** — 35 focused per-topic deep-dive pages across 6 themes (~159,000 words, 1,113 cross-links): Trading-day (OMS, RMS/SPAN, surveillance, auction, block deals, retail algo), Settlement (T+0/T+1, direct-payout, upstreaming, payin default, SLBM, MTF), Compliance & Audit (SCORES, IGRC, ODR, audits, CSCRF, inspection, AP framework), Specialty (IPO/OFS, MF platforms, DLT, BCP/DR), Member Compliance (BMC/ABC, fit-and-proper, KMP, renewal, ECN), Foundational (SGF, IPF, market manipulation, auctions, segment rules, member default).
+- **[Account Variants](https://javajack.github.io/broking-kyc/account-variants/)** — 12 onboarding journeys beyond the resident individual: minor, NRI (PIS / non-PIS), HUF, partnership / LLP, company, trust / society / AOP, FPI / FVCI, joint accounts, BSDA, bank-led 3-in-1, institutional and custodial clients. Eligibility, documents, screen deltas, KRA / CKYC / UCC / BO field deltas.
+- **[Product Activation](https://javajack.github.io/broking-kyc/product-activation/)** — 12 client-facing activation flows: F&O, commodity, currency and interest-rate derivatives, MTF, IPO via ASBA / UPI, SLBM, margin pledge, DDPI vs eDIS / TPIN, API and algo access, GIFT City / IFSC, bonds / G-Sec / NPS, advanced order types.
+- **[Funds & Tax](https://javajack.github.io/broking-kyc/funds-tax/)** — pay-in rails, payout and running-account settlement, delayed payment charges, brokerage and statutory charges (STT, stamp duty, exchange and SEBI fees, GST), ledgers and statements, tax reporting, corporate actions, demat servicing.
+- **[Trading Risk & Derivatives](https://javajack.github.io/broking-kyc/trading-risk/)** — exercise, assignment and physical settlement, expiry-day operations, position limits and OI, collateral and cross-margin, margin shortfall and peak margin, order risk controls (kill switch, price bands, OTR, IRRA discontinuation), prop and employee trading under PIT, client protection frameworks.
 - **[Choose Your Role](https://javajack.github.io/broking-kyc/personas/)** — 12 persona pages with curated 5–10 page reading paths. Product Manager, Backend Engineer, Frontend / UX Engineer, Operations Lead, Head of OMS / RMS, Compliance Officer, Finance / CFO, Internal Auditor, Statutory Auditor, Trainee, Regulator / Inspector, Vendor / Integration Partner. Each path skips what you don't need and explains the rationale for what you do.
 
 ## Author

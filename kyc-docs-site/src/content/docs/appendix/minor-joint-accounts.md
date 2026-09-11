@@ -60,3 +60,7 @@ Joint accounts multiply the data capture and verification effort since each hold
 :::tip[Why joint accounts are demat-only]
 Trading accounts in India are always single-holder. Joint holding applies only to the demat (depository) account. This means the 1st holder is the one who places trades and whose income/risk profile governs segment activation, while the 2nd and 3rd holders are co-owners of the securities held in the demat account.
 :::
+
+:::note[Full walkthroughs now available]
+This appendix is the short form. Full journeys live at [Account Variants: Minor](/broking-kyc/account-variants/minor/) (guardian KYC, majority conversion) and [Account Variants: Joint Accounts](/broking-kyc/account-variants/joint-accounts/) (mode of operation, either-or-survivor, nomination interplay).
+:::

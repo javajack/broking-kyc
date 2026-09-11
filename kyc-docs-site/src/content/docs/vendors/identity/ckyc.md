@@ -246,7 +246,7 @@ The Download response returns the complete CKYC record. Fields are grouped below
 | `maritalStatus` | String | Single/Married/Widowed/Divorced |
 | `nationality` | String | Nationality code |
 | `citizenship` | String | IN for Indian citizen |
-| `residentialStatus` | String | Resident/<abbr title="Non-Resident Indian">NRI</abbr>/FPI |
+| `residentialStatus` | String | Resident/<abbr title="Non-Resident Indian">NRI</abbr>/<abbr title="Foreign Portfolio Investor">FPI</abbr> |
 | `occupationType` | String | Occupation code (01-08) |
 | `occupationDetail` | String | Free text occupation |
 | `annualIncome` | String | Income range code |
@@ -786,7 +786,7 @@ CKYC supports non-individual entities with a different template and additional r
 |------|------------|----------------------|
 | 01 | Individual | Standard fields (covered above) |
 | 02 | Partnership Firm | Firm PAN, registration number, all partner details |
-| 03 | Company | CIN, date of incorporation, registered office, directors, UBO |
+| 03 | Company | CIN, date of incorporation, registered office, directors, <abbr title="Ultimate Beneficial Owner">UBO</abbr> |
 | 04 | Trust | Trust deed reference, trustee details, settler details |
 | 05 | <abbr title="Hindu Undivided Family">HUF</abbr> | HUF PAN, Karta details, coparcener information |
 | 06 | Government Entity | Entity code, department details |
@@ -844,7 +844,7 @@ NRI accounts use the individual template (Code: 01) but with additional requirem
 | Passport | Copy mandatory (as identity + address proof abroad) |
 | Country of residence | ISO country code |
 | <abbr title="Non-Resident External (Rupee) account">NRE</abbr>/<abbr title="Non-Resident Ordinary (Rupee) account">NRO</abbr> bank account | Bank verification on NRE/NRO account |
-| PIO/OCI status | If applicable, OCI/PIO card copy |
+| PIO/<abbr title="Overseas Citizen of India">OCI</abbr> status | If applicable, OCI/PIO card copy |
 
 ### Trust (Constitution Code: 04) / LLP (Constitution Code: 09)
 

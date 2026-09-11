@@ -5,7 +5,7 @@ description: Pre-open session (09:00-09:15 IST) order-entry / matching / buffer 
 
 import { Aside } from '@astrojs/starlight/components';
 
-> **Why this page is structured this way:** The auction windows at the start and end of the equity cash trading day are *call-auction* sessions — fundamentally different from the continuous limit-order-book trading that occupies the bulk of the day. The page therefore separates: (1) the pre-open session — opening-price discovery, order-entry / matching / buffer phases, AMO release, surveillance considerations; (2) the closing session — settlement-price discovery, closing call-auction, eligibility. Each section walks through the mechanics chronologically with the broker's routing and <abbr title="Order Management System">OMS</abbr>-level considerations called out.
+> **Why this page is structured this way:** The auction windows at the start and end of the equity cash trading day are *call-auction* sessions — fundamentally different from the continuous limit-order-book trading that occupies the bulk of the day. The page therefore separates: (1) the pre-open session — opening-price discovery, order-entry / matching / buffer phases, <abbr title="After Market Order">AMO</abbr> release, surveillance considerations; (2) the closing session — settlement-price discovery, closing call-auction, eligibility. Each section walks through the mechanics chronologically with the broker's routing and <abbr title="Order Management System">OMS</abbr>-level considerations called out.
 
 ## TL;DR
 
@@ -261,7 +261,7 @@ A broker OMS handling pre-open, continuous, and closing-auction trading must:
 ### Surveillance interface
 
 - Closing-window concentration alerts — flag clients whose closing-window participation exceeds threshold (see [Market manipulation typologies](./market-manipulation-typologies/) — marking-the-close).
-- High OTR alerts in pre-open (per NSE/SURV/61970).
+- High <abbr title="Order-to-Trade Ratio">OTR</abbr> alerts in pre-open (per NSE/SURV/61970).
 - Order-modification / cancellation pattern alerts in pre-open buffer phase.
 
 ### Reconciliation
@@ -295,7 +295,7 @@ The above is for **NSE / BSE equity cash market**. Other segments have variation
 
 ### Debt / G-Sec
 
-- NDS-OM (G-Sec) timing differs from equity; trading is mostly RFQ / direct-deal-based and call-auction frameworks differ.
+- NDS-OM (G-Sec) timing differs from equity; trading is mostly <abbr title="Request for Quote">RFQ</abbr> / direct-deal-based and call-auction frameworks differ.
 - Out of scope for this page; cross-reference to [Segment rules comparison](./segment-rules-comparison/).
 
 ### Mutual Fund (BSE StAR MF, NSE NMF II)

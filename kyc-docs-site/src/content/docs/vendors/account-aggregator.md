@@ -94,7 +94,7 @@ The AA framework supports more than just bank statements. Here is the full list 
 | Equity Shares (Demat) | <abbr title="Securities and Exchange Board of India">SEBI</abbr> (Securities and Exchange Board of India) | Live | Existing holdings for financial profile |
 | Mutual Fund Units | SEBI | Live | Net worth + cross-sell |
 | Insurance Policies | IRDAI (Insurance Regulatory and Development Authority of India) | Live | Financial profile |
-| NPS Balances | <abbr title="Pension Fund Regulatory and Development Authority">PFRDA</abbr> (Pension Fund Regulatory and Development Authority) | Live | Retirement corpus |
+| <abbr title="National Pension System">NPS</abbr> Balances | <abbr title="Pension Fund Regulatory and Development Authority">PFRDA</abbr> (Pension Fund Regulatory and Development Authority) | Live | Retirement corpus |
 | GST Returns | DoR (Department of Revenue) | Coming Soon | Business income for proprietors |
 
 In plain English: for stock broking, the most relevant data type is savings/current account statements (for F&O income verification). But the framework also lets you fetch demat holdings, mutual fund units, and insurance policies — data that can enrich the customer's financial profile and support suitability assessments.

@@ -900,7 +900,7 @@ KRA supports multiple entity types beyond individuals. Each has additional manda
 | `authorized_signatory.designation` | string | Yes | Designation in the company |
 | `authorized_signatory.specimen_signature` | binary | Yes | Signature image (base64) |
 | `ubo_declaration` | array | Yes | Ultimate Beneficial Owner declaration (individuals owning >= 10% for listed, >= 25% for unlisted companies) |
-| `ubo[].name` | string | Yes | Full name of UBO |
+| `ubo[].name` | string | Yes | Full name of <abbr title="Ultimate Beneficial Owner">UBO</abbr> |
 | `ubo[].pan` | string | Yes | PAN |
 | `ubo[].holding_percentage` | number | Yes | Percentage of ownership |
 | `ubo[].address` | object | Yes | UBO's address |
@@ -979,7 +979,7 @@ KRA supports multiple entity types beyond individuals. Each has additional manda
 | `overseas_address.zip_postal_code` | string | Yes | ZIP/Postal code |
 | `overseas_address.country` | string | Yes | ISO country code |
 | `pio_oci_status` | string | Conditional | `PIO` (Person of Indian Origin), `OCI` (Overseas Citizen of India), `NONE`. Mandatory if citizenship is not Indian. |
-| `pio_oci_card_number` | string | Conditional | PIO/OCI card number. Mandatory if `pio_oci_status` is PIO or OCI. |
+| `pio_oci_card_number` | string | Conditional | PIO/<abbr title="Overseas Citizen of India">OCI</abbr> card number. Mandatory if `pio_oci_status` is PIO or OCI. |
 
 **FATCA/CRS for NRIs**: NRIs have more detailed FATCA/CRS requirements since they have tax residency outside India. All tax residency countries must be declared with TINs.
 
