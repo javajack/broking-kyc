@@ -1,14 +1,14 @@
 ---
 title: CERSAI / CKYC Circulars
-description: "Verified index of CERSAI / CKYC circulars affecting Indian stock broking, 2020-01-01 to 2026-05-14. 20 entries."
+description: "Verified index of CERSAI / CKYC circulars affecting Indian stock broking, 2020-01-01 to 2026-09-11. 25 entries."
 ---
 
 > **Why this page is structured this way:** All in-window entries are listed descending by date so the most recent regulatory state is the first thing a reader sees. Use Cmd-F / Ctrl-F for ID-based lookup. Cross-references from the rest of the site point at anchors on this page.
 
 ## TL;DR
 
-- **20 circulars** indexed in this issuer's section.
-- **9** issued in 2025 or later.
+- **25 circulars** indexed in this issuer's section.
+- **14** issued in 2025 or later.
 - **1** entries flagged `[unknown — verify]` in at least one field.
 - All entries trace to a primary issuer URL (or Wayback fallback) where research could verify the source.
 - AI-generated; **read the linked PDF before acting on any provision**.
@@ -19,6 +19,71 @@ This page is the complete listing of <abbr title="Central Registry of Securitisa
 
 ## Entries (descending date)
 
+### CERSAI/CKYCRR 2.0/26-27/11053
+
+- **date_issued:** 2026-09-03
+- **issuer:** CERSAI
+- **title:** "Readiness for Go-Live of Central <abbr title="Know Your Customer (process).">KYC</abbr> Records Registry 2.0 (CKYCRR 2.0) and participation in Pilot Testing"
+- **applies_to:** all-intermediaries
+- **in_force_date:** 2026-09-07
+- **status:** in-force
+- **impact_areas:** onboarding, kyc-modification, file-format
+- **primary_url:** https://www.ricago.com/assets/front/base/file/file_management/7292.pdf
+
+REs must complete onboarding and pilot testing during September 7–20, 2026 using production data, while continuing live transactions on CKYCRR 1.0 until formal go-live (per paragraphs 2–4 and 8). Pilot data will be purged and not carried into live operations (per paragraph 2). REs must secure credentials, DSCs and personal information and monitor user activity (per paragraph 6).
+
+### CERSAI/CKYCRR 2.0/26-27/553
+
+- **date_issued:** 2026-08-18
+- **issuer:** CERSAI
+- **title:** "New Registrations of Reporting Entities (REs) in CKYCRR 1.0 and claiming TDS on hold and Incentive by existing REs in CKYCRR 1.0"
+- **applies_to:** all-intermediaries
+- **in_force_date:** 2026-08-20
+- **status:** in-force
+- **impact_areas:** onboarding, kyc-modification, file-format
+- **primary_url:** https://www.ricago.com/assets/front/base/file/file_management/7093.pdf
+
+New CKYCRR 1.0 registration requests stop from August 20, 2026; pending applicants must complete the applicable August 24 or August 27 testbed deadline (per section A). Existing REs must submit incentive claims through June 30, 2026 and held-TDS claims through March 31, 2026 by August 25, 2026 (per section B).
+
+### CERSAI/CKYCRR 2.0/26-27/10959
+
+- **date_issued:** 2026-08-04
+- **issuer:** CERSAI
+- **title:** "REs onboarding and performing Mock Run before final Go-live of CKYCRR 2.0"
+- **applies_to:** all-intermediaries
+- **in_force_date:** 2026-08-10
+- **status:** in-force
+- **impact_areas:** onboarding, kyc-modification, file-format
+- **primary_url:** https://www.ricago.com/assets/front/base/file/file_management/6909.pdf
+
+Reporting-entity onboarding starts August 10, with production mock transactions scheduled August 10–14, 2026 (per opening schedule and sections 1–2). REs must supply newly introduced registration fields and test KYC transactions through the specified channels; mock transactions are test data to be purged before live operations (per sections 1–2 and Mock Run Validity).
+
+### CERSAI/CKYCRR/2026/10921
+
+- **date_issued:** 2026-07-29
+- **issuer:** CERSAI
+- **title:** "CKYCRR 2.0 Go-live preparedness for REs"
+- **applies_to:** all-intermediaries
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** onboarding, kyc-modification, file-format
+- **primary_url:** https://www.ricago.com/assets/front/base/file/file_management/6794.pdf
+
+Reporting entities must complete testbed activities, receive production credentials and fill newly introduced registration fields before using CKYCRR 2.0 (per Migration Plan for existing REs). The notice describes temporary search/download-only access to CKYCRR 1.0, retention of pending customer uploads/updates and their submission after migration (per Important Points 1–4). August 2026 is a tentative launch month, rather than a fixed commencement date (per opening paragraph).
+
+### CKYC/NOTIF/2026/01
+
+- **date_issued:** 2026-06-05
+- **issuer:** CERSAI
+- **title:** "CKYCRR 2.0 API integration & Reporting entity onboarding guide"
+- **applies_to:** all-intermediaries
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** onboarding, kyc-modification, file-format
+- **primary_url:** https://www.ricago.com/assets/front/base/file/file_management/6150.pdf
+
+CERSAI states that the CKYCRR 2.0 API document has been finalised and covers onboarding, API security, testing, certification and production deployment (per page 1, opening paragraph and bullets). Reporting entities are asked to use the sandbox with that documentation; July 2026 is described only as a tentative launch month (per page 1, opening and sandbox paragraphs).
+
 ### CKYC/2026/08
 
 - **date_issued:** 2026-04-22
@@ -27,7 +92,7 @@ This page is the complete listing of <abbr title="Central Registry of Securitisa
 - **applies_to:** all-intermediaries
 - **in_force_date:** immediate
 - **status:** in-force
-- **impact_areas:** onboarding, re-<abbr title="Know Your Customer (process).">KYC</abbr>, kyc-modification, file-format, reporting, system-audit
+- **impact_areas:** onboarding, re-KYC, kyc-modification, file-format, reporting, system-audit
 - **primary_url:** https://www.ckycindia.in/ckyc/assets/doc/CommuniqueManagementOfLegacyData.pdf
 
 Notes that CKYCRR holds approximately 112 crore digitised CKYC records and that legacy-data compliance among REs remains a substantive concern (records held in silos prior to the framework becoming operative on 01-01-2017; CKYC records generated by one RE not linked by another; identifier mismatches). Prescribes a multi-parameter parallel-search workflow (Mobile, <abbr title="Permanent Account Number">PAN</abbr>, last-4 of Aadhaar+Name+DOB+Gender, Voter ID, DL, Passport, NREGA, NPR, CKYC reference ID) before resorting to fresh CKYC upload. Recommends SFTP bulk-search for REs not yet API-integrated, with migration to real-time API "at the earliest." Re-iterates the sequential search → download → fresh-upload process to achieve CKYC compliance for legacy customers.
@@ -232,7 +297,7 @@ Cyber-security advisory citing pandemic-era remote-work risks: social engineerin
 
 - **date_issued:** 2022-01-19
 - **issuer:** CERSAI
-- **title:** "Exemption from PML Rules for FPI related upload to CKYCRR"
+- **title:** "Exemption from PML Rules for <abbr title="Foreign Portfolio Investor">FPI</abbr> related upload to CKYCRR"
 - **applies_to:** all-intermediaries
 - **in_force_date:** immediate
 - **status:** in-force
@@ -289,7 +354,7 @@ Confirms the go-live date of October 3, 2020 for the revised Individual KYC temp
 
 ## Verified through
 
-2026-05-14
+2026-09-11
 
 ---
 

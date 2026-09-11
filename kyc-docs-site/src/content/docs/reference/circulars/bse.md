@@ -1,6 +1,6 @@
 ---
 title: BSE Circulars
-description: "Verified index of BSE circulars affecting Indian stock broking, 2020-01-01 to 2026-05-14. 45 entries."
+description: "Verified index of BSE circulars affecting Indian stock broking, 2020-01-01 to 2026-09-11. 45 entries."
 ---
 
 > **Why this page is structured this way:** All in-window entries are listed descending by date so the most recent regulatory state is the first thing a reader sees. Use Cmd-F / Ctrl-F for ID-based lookup. Cross-references from the rest of the site point at anchors on this page.
@@ -499,7 +499,7 @@ From April 1, 2023, two-factor authentication will be mandatory for all subscrip
 - **impact_areas:** derivatives, rms, margin, reporting
 - **primary_url:** https://www.bseindia.com/markets/MarketInfo/DispNewNoticesCirculars.aspx?page=20230106-56
 
-Issues an <abbr title="Indian Clearing Corporation Limited">ICCL</abbr>-administered penalty framework for position-limit violations in Equity and Currency Derivatives, effective February 1, 2023. Member/FPI/MF level: first violation no penalty, then Rs.5,000 per instance (2nd-5th), Rs.10,000+ (6th onwards), Disciplinary Committee from 11th. Client level Equity Derivatives: lower of 1% closing-price value or Rs.1,00,000 daily (min Rs.5,000); enhanced violations >5% OI at Rs.5,000. Client Currency: Rs.5,000/day. Clearing members collect from clients. (Issued by clearing affiliate but published as BSE circular on members.)
+Issues an <abbr title="Indian Clearing Corporation Limited">ICCL</abbr>-administered penalty framework for position-limit violations in Equity and Currency Derivatives, effective February 1, 2023. Member/<abbr title="Foreign Portfolio Investor">FPI</abbr>/MF level: first violation no penalty, then Rs.5,000 per instance (2nd-5th), Rs.10,000+ (6th onwards), Disciplinary Committee from 11th. Client level Equity Derivatives: lower of 1% closing-price value or Rs.1,00,000 daily (min Rs.5,000); enhanced violations >5% OI at Rs.5,000. Client Currency: Rs.5,000/day. Clearing members collect from clients. (Issued by clearing affiliate but published as BSE circular on members.)
 
 ### 20230105-59
 
@@ -606,7 +606,7 @@ Updates eligibility for stock-broking companies seeking SME-platform listing. Ne
 
 ## Verified through
 
-2026-05-14
+2026-09-11
 
 ---
 

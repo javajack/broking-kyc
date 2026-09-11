@@ -1,14 +1,14 @@
 ---
 title: SEBI (MRD / IMD / OIAE / LAD-NRO / CFD) Circulars
-description: "Verified index of SEBI (MRD / IMD / OIAE / LAD-NRO / CFD) circulars affecting Indian stock broking, 2020-01-01 to 2026-05-14. 50 entries."
+description: "Verified index of SEBI (MRD / IMD / OIAE / LAD-NRO / CFD) circulars affecting Indian stock broking, 2020-01-01 to 2026-09-11. 79 entries."
 ---
 
 > **Why this page is structured this way:** All in-window entries are listed descending by date so the most recent regulatory state is the first thing a reader sees. Use Cmd-F / Ctrl-F for ID-based lookup. Cross-references from the rest of the site point at anchors on this page.
 
 ## TL;DR
 
-- **50 circulars** indexed in this issuer's section.
-- **4** issued in 2025 or later.
+- **79 circulars** indexed in this issuer's section.
+- **33** issued in 2025 or later.
 - **0** entries flagged `[unknown — verify]` in at least one field.
 - All entries trace to a primary issuer URL (or Wayback fallback) where research could verify the source.
 - AI-generated; **read the linked PDF before acting on any provision**.
@@ -19,10 +19,387 @@ This page is the complete listing of <abbr title="Securities and Exchange Board 
 
 ## Entries (descending date)
 
+### HO/47/16/13(5)2026-MRD-POD1/ I/20735/2026
+
+- **date_issued:** 2026-09-09
+- **issuer:** SEBI-MRD
+- **title:** "Review of Position Limits for Clients and Penalty Provisions for Violation / Breach of Position Limits for Commodity Derivatives Segment"
+- **applies_to:** broker, exchange
+- **in_force_date:** immediate
+- **status:** in-force
+- **impact_areas:** commodities, derivatives, rms, surveillance
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/sep-2026/1788952299552.PDF
+
+Caps the specified position-limit penalties at ₹2 lakh for breaches above 2% and ₹10,000 for breaches up to 2%, retaining next-day position reduction and repeat-violation consequences (clause 2.1). Revises broad-commodity classification and client limits to 2%, 1% and 0.5% of deliverable supply for broad, narrow and sensitive commodities; newly reclassified broad commodities retain 1% initially for one year (clauses 2.2–2.3). The changes apply immediately (clause 3).
+
+### HO/(485)2026-AFD-POD2/I/20296/2026
+
+- **date_issued:** 2026-09-07
+- **issuer:** SEBI-MRD
+- **title:** "Ease of regulatory compliances for FPIs investing only in Government Securities"
+- **applies_to:** depository
+- **in_force_date:** immediate
+- **status:** in-force
+- **impact_areas:** onboarding, nri, reporting
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/sep-2026/1788779580343.PDF
+
+Removes the investor-group-details requirement for all FPIs investing only in government securities, extending the earlier Fully Accessible Route exemption (clauses 2–4). Depositories, custodians and DDPs must modify systems; the amendment applies immediately (clauses 5–6).
+
+### HO/47/11/11(1)2026-MRD-POD3/I/19839/2026
+
+- **date_issued:** 2026-08-28
+- **issuer:** SEBI-MRD
+- **title:** "Extension of timeline for implementation of provisions of SEBI Circular dated June 15, 2026 on norms for base price, price bands, call auction in pre-open session and close-out procedure for Exchange Traded Funds (ETFs)"
+- **applies_to:** exchange, clearing-corp
+- **in_force_date:** 2026-09-07
+- **status:** in-force
+- **impact_areas:** mutual-funds, settlement, rms
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/aug-2026/1787914585756.pdf
+
+Moves implementation of the June 15, 2026 ETF trading and close-out circular from September 1 to September 7, 2026 (clauses 1–3). Its other provisions remain unchanged, and MIIs must implement systems and disseminate the changes (clauses 4–5).
+
+### HO/47/18/11(1)2026-MRD-TPD1/I/19509/2026
+
+- **date_issued:** 2026-08-24
+- **issuer:** SEBI-MRD
+- **title:** "IT Resilience Index for Market Infrastructure Institutions (MIIs)"
+- **applies_to:** exchange, clearing-corp, depository
+- **in_force_date:** [unknown — verify]
+- **status:** [unknown — verify]
+- **impact_areas:** cyber-security, bcp-dr, reporting
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/aug-2026/1787568759364.pdf
+
+Requires system-driven half-yearly IT Resilience Index computation and reporting to the technology committee and governing board, with standardised parameters and scoring (clauses 5.1–5.7). MIIs must implement early-warning and continuous service-monitoring systems (clauses 6–9). Operationalisation is due February 28, 2027, SOP submission January 31, 2027, and the first computation covers the half-year ending March 31, 2027 (clause 10).
+
+### HO/(449)2026-ITD-5_DIV1/I/19448/2026
+
+- **date_issued:** 2026-08-24
+- **issuer:** SEBI-MRD
+- **title:** "Alignment of SEBI’s Cyber Incident Reporting Portal with FIRE format"
+- **applies_to:** all-intermediaries, broker, depository, exchange, clearing-corp
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** cyber-security, reporting, file-format
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/aug-2026/1787569463244.pdf
+
+Aligns SEBI incident reporting with the Financial Stability Board FIRE framework and requires staged initial, intermediate and closure reporting through the SEBI intermediary portal (clauses 3–5). Recalls the existing six-hour email and 24-hour portal deadlines and requires this circular to be read with applicable cyber-security circulars (clauses 2 and 6).
+
+### HO/19/34/14(8)2026-AFD-POD2/ I/19251/2026
+
+- **date_issued:** 2026-08-20
+- **issuer:** SEBI-MRD
+- **title:** "Acceptance of digitally signed Power of Attorney from FPIs"
+- **applies_to:** all-intermediaries, depository, exchange, clearing-corp
+- **in_force_date:** 2026-08-20
+- **status:** in-force
+- **impact_areas:** onboarding, esign, nri
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/aug-2026/1787224027885.pdf
+
+Permits <abbr title="Foreign Portfolio Investor">FPI</abbr> powers of attorney signed digitally under the Information Technology Act, 2000, removing notarisation, apostillisation or consularisation for that route (clause 3). Revises the FPI Master Circular proof-of-address provision to include this alternative from August 20, 2026 (clauses 4–5).
+
+### HO/17/11/(2)2026-DDHS-POD1/I/18769/2026
+
+- **date_issued:** 2026-08-14
+- **issuer:** SEBI-MRD
+- **title:** "Modification in the regulatory framework for Online Bond Platform Providers (OBPPs) including measures for promoting ease of doing business"
+- **applies_to:** broker, exchange
+- **in_force_date:** immediate
+- **status:** in-force
+- **impact_areas:** grievance, other
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/aug-2026/1786705729757.pdf
+
+Permits OBPPs to offer <abbr title="International Financial Services Centres Authority">IFSCA</abbr>-regulated products and specified tax-saving bonds, subject to separate presentation, regulatory disclosures and grievance-route requirements (clause 3.1). Replaces the company-secretary requirement with a compliance officer under the Stock Brokers Regulations, 2026 holding the prescribed NISM certification (clause 3.2). The amendments apply immediately (clause 5).
+
+### HO/47/16/14(1)2026-MRD-POD1/I/18580/2026
+
+- **date_issued:** 2026-08-12
+- **issuer:** SEBI-MRD
+- **title:** "Review of Inclusion of Historical Scenarios in Stress Testing for Commodity Derivatives Segment"
+- **applies_to:** clearing-corp
+- **in_force_date:** immediate
+- **status:** in-force
+- **impact_areas:** commodities, rms
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/aug-2026/1786537329546.pdf
+
+Changes the historical-scenario stress-testing cap from a Z-score of 10 to 5 for commodity derivatives, using mean and sigma over the applicable margin period of risk across 15 years (clause 3). The amendment to Annexure O, paragraph 22 of the commodity Master Circular applies immediately (clause 4).
+
+### HO/17/11/24(1)2026-DDHS-POD1/I/18526/2026
+
+- **date_issued:** 2026-08-11
+- **issuer:** SEBI-MRD
+- **title:** "Amendment to SEBI (Issue and Listing of Municipal Debt Securities) Regulations, 2015 (“ILMDS Regulations”)"
+- **applies_to:** exchange, depository
+- **in_force_date:** immediate
+- **status:** in-force
+- **impact_areas:** reporting, other
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/aug-2026/1786447511614.pdf
+
+Permits privately placed municipal debt face values of ₹1 lakh or ₹10,000, with trading lots equal to face value and conditions on the ₹10,000 route (clause 2). Adds two-step escrow requirements for pooled finance vehicles and extends half-yearly and annual financial-result deadlines to 60 and 90 days (clauses 3–4). The circular applies immediately (clause 5).
+
+### HO/(411)2026-ITD-5_DIV2/I/17922/2026
+
+- **date_issued:** 2026-07-31
+- **issuer:** SEBI-MRD
+- **title:** "Extension of timelines with respect to compliance of Digital Accessibility Circulars."
+- **applies_to:** all-intermediaries, exchange, clearing-corp, depository
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** system-audit, other
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/jul-2026/1785493077212.pdf
+
+Extends the deadline for digital-platform accessibility audits and remediation of audit findings to October 31, 2026 (clause 3). All other requirements of the referenced accessibility circulars continue unchanged (clause 4).
+
+### SEBI/LAD-NRO/GN/2026/314
+
+- **date_issued:** 2026-07-23
+- **issuer:** SEBI-LAD-<abbr title="Non-Resident Ordinary (Rupee) account">NRO</abbr>
+- **title:** "SECURITIES AND EXCHANGE BOARD OF INDIA (ISSUE AND LISTING OF MUNICIPAL DEBT SECURITIES) (AMENDMENT) REGULATIONS, 2026"
+- **applies_to:** exchange
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** other
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/aug-2026/1785732346247.pdf
+
+Corrects clause numbering in Schedule IB paragraphs 9.a and 9.b inserted by SEBI/LAD-NRO/GN/2026/305 (corrigendum paragraph 1). The English-version numbering changes cover clauses (vi)–(x) and (iv)–(vi), respectively (paragraph 1(I)–1(<abbr title="—">II</abbr>)).
+
+### HO/49/14/13(11)2026-CFD-POD1/I/16864/2026
+
+- **date_issued:** 2026-07-21
+- **issuer:** SEBI-CFD
+- **title:** "Operationalisation of freezing of holdings of promoter and promoter group including their associates (promoter holdings) at the ISIN level under Regulation 24(i)(ea) of the SEBI (Buy-back of Securities) Regulations, 2018"
+- **applies_to:** exchange, depository
+- **in_force_date:** immediate
+- **status:** in-force
+- **impact_areas:** surveillance, settlement
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/jul-2026/1784632576164.pdf
+
+Requires depositories to implement ISIN-level freezes on promoter-group and associate holdings during buybacks, with permitted tender-offer participation and treatment of pre-existing encumbrances (clauses 1–3). Operational guidelines and system enhancements must be ready before August 1, 2026; the circular is immediately effective (clauses 4–6).
+
+### HO/24/13/17(1)2026-IMD-POD-1/I/16895/2026
+
+- **date_issued:** 2026-07-21
+- **issuer:** SEBI-IMD
+- **title:** "Certification Requirements for Distribution of Specialized Investment Funds (SIFs)"
+- **applies_to:** broker
+- **in_force_date:** immediate
+- **status:** in-force
+- **impact_areas:** mutual-funds
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/jul-2026/1784633350069.pdf
+
+Requires NISM Series V-D certification for SIF distribution and permits its holders to distribute mutual funds without a separate Series V-A certificate (clause 3, paragraph 21.10.1). Distributors holding valid Series XIII certification obtained by September 21, 2026 may retain it until expiry, together with Series V-A; AMFI and AMCs must enforce compliance (paragraphs 21.10.3–21.10.5).
+
+### HO/47/14/13(2)2026-MRD-POD2/I/16590/2026
+
+- **date_issued:** 2026-07-17
+- **issuer:** SEBI-MRD
+- **title:** "Extending facility of creating standing instructions for Systematic Withdrawal Plan (SWP)/ Systematic Transfer Plan (STP) for Mutual Fund units held in demat form"
+- **applies_to:** depository, exchange
+- **in_force_date:** immediate
+- **status:** in-force
+- **impact_areas:** mutual-funds, mandate, settlement
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/jul-2026/1784285542603.pdf
+
+Extends SWP/STP standing instructions to dematerialised mutual-fund units in unit-based and amount-based phases (clauses 3–4). Depositories must publish a joint framework by October 31, 2026 and implement the phases by January 31 and April 30, 2027 respectively (clauses 5–6). The circular itself takes effect immediately (clause 7).
+
+### HO/(92)2026-IMD-POD-2/I/16006/2026
+
+- **date_issued:** 2026-07-10
+- **issuer:** SEBI-IMD
+- **title:** "Intraday borrowing facility availed by mutual funds"
+- **applies_to:** [unknown — verify]
+- **in_force_date:** 2026-09-01
+- **status:** in-force
+- **impact_areas:** mutual-funds, settlement
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/jul-2026/1783685402131.pdf
+
+Permits intraday borrowing for investor payouts, investment pay-ins, <abbr title="Mark-to-Market">MTM</abbr> and foreign-exchange settlements, and repayment of borrowings, subject to the receivable limits and conditions in clauses 2.1–2.3. AMCs must maintain scheme records and approved policies and bear borrowing costs (clauses 2.4–2.7). Supersedes Master Circular clause 5.9.1 and the March 25, 2026 borrowing circular from September 1, 2026 (clauses 2–3).
+
+### SEBI/LAD-NRO/GN/2026/312
+
+- **date_issued:** 2026-07-10
+- **issuer:** SEBI-LAD-NRO
+- **title:** "SECURITIES AND EXCHANGE BOARD OF INDIA (LISTING OBLIGATIONS AND DISCLOSURE REQUIREMENTS) (SECOND AMENDMENT) REGULATIONS, 2026"
+- **applies_to:** depository
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** transmission
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/jul-2026/1784180328047.pdf
+
+Revises regulation 40(7) so transfer and transmission procedures are specified by SEBI from time to time, makes the corresponding change in regulation 61(4), and removes Schedule VII clause C (regulation 3). The amendment takes effect on Gazette publication (regulation 2 and Gazette publication page).
+
+### HO/47/14/13(4)2026-MRD-POD3/ I/15577/2026
+
+- **date_issued:** 2026-07-07
+- **issuer:** SEBI-MRD
+- **title:** "Review of norms for utilization of interest or income from <abbr title="Investor Protection Fund">IPF</abbr> of the Depositories"
+- **applies_to:** depository
+- **in_force_date:** 2026-09-01
+- **status:** in-force
+- **impact_areas:** other
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/jul-2026/1783423471963.pdf
+
+Requires at least 95% of annual interest or investment income from depository IPFs to be returned to the corpus (clause 4). Up to 5% may meet specified staffing, administrative and statutory expenses; excess expenses fall on the depository and unused allowances return to the IPF (clause 4). The changes apply September 1, 2026 (clause 5).
+
+### SEBI/LAD-NRO/GN/2026/307
+
+- **date_issued:** 2026-07-03
+- **issuer:** SEBI-LAD-NRO
+- **title:** "SECURITIES AND EXCHANGE BOARD OF INDIA (MUTUAL FUNDS) (AMENDMENT) REGULATIONS, 2026"
+- **applies_to:** [unknown — verify]
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** mutual-funds, settlement
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/jul-2026/1783489470324.pdf
+
+Replaces regulation 42(2) to allow mutual-fund intraday borrowing to address scheme inflow/outflow timing mismatches, subject to SEBI conditions (regulation 3). The amendment commences on Gazette publication (regulation 2 and Gazette publication page).
+
+### SEBI/LAD-NRO/GN/2026/308
+
+- **date_issued:** 2026-07-03
+- **issuer:** SEBI-LAD-NRO
+- **title:** "SECURITIES AND EXCHANGE BOARD OF INDIA (CUSTODIAN) (AMENDMENT) REGULATIONS, 2026"
+- **applies_to:** [unknown — verify]
+- **in_force_date:** 2026-10-01
+- **status:** [unknown — verify]
+- **impact_areas:** other
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/jul-2026/1783504086593.pdf
+
+Changes custodian fees from annual to monthly and revises the Second Schedule fee amounts and payment requirements (regulation 3). Monthly fees are payable within 15 days after month-end, with proportionate transitional adjustments, from October 1, 2026 (regulations 2 and 3(<abbr title="—">III</abbr>)).
+
+### SEBI/LAD-NRO/GN/2026/310
+
+- **date_issued:** 2026-07-03
+- **issuer:** SEBI-LAD-NRO
+- **title:** "SECURITIES AND EXCHANGE BOARD OF INDIA (FOREIGN PORTFOLIO INVESTORS) (AMENDMENT) REGULATIONS, 2026"
+- **applies_to:** depository
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** onboarding, nri, other
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/jul-2026/1783504296315.pdf
+
+Adds the FPI birth/incorporation or equivalent formation date to the registration certificate from Gazette publication (regulations 2 and 3(III)). Revises fee denominations and payment timing, including <abbr title="Designated Depository Participant">DDP</abbr> remittance deadlines, with those provisions commencing on the 180th day after publication (regulations 2 and 3(I)–3(II), 3(IV)–3(V)).
+
+### SEBI/LAD-NRO/GN/2026/304
+
+- **date_issued:** 2026-07-01
+- **issuer:** SEBI-LAD-NRO
+- **title:** "SECURITIES AND EXCHANGE BOARD OF INDIA (ISSUE AND LISTING OF SECURITISED DEBT INSTRUMENTS AND SECURITY RECEIPTS) (AMENDMENT) REGULATIONS, 2026"
+- **applies_to:** [unknown — verify]
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** other
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/jul-2026/1783416164542.pdf
+
+Limits <abbr title="Reserve Bank of India">RBI</abbr>-regulated originator representation on the special-purpose entity board and restricts acquisitions from originators connected to the trustee (regulation 3(I)–3(II)). Reassigns specified responsibilities to the servicer, adds trustee-replacement provisions and requires single-asset concentration-risk disclosure (regulation 3(III)–3(VIII)). Commencement is on Gazette publication (regulation 2).
+
+### SEBI/LAD-NRO/GN/2026/305
+
+- **date_issued:** 2026-07-01
+- **issuer:** SEBI-LAD-NRO
+- **title:** "Securities And Exchange Board of India (Issue And Listing of Municipal Debt Securities) (Amendment) Regulations, 2026"
+- **applies_to:** exchange
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** other
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/jul-2026/1783921291975.pdf
+
+Defines retail municipal-debt applicants by a ₹2 lakh application ceiling and adds provisions for ESG debt and pooled-finance SPVs (regulation 3(I)–3(III)). Permits specified investor-category incentives limited to initial allottees and introduces Schedule IB disclosures for eligible SPVs (regulation 3(VII) and 3(XI)). The amendment commences on Gazette publication (regulation 2).
+
+### SEBI/LAD-NRO/GN/2026/306
+
+- **date_issued:** 2026-07-01
+- **issuer:** SEBI-LAD-NRO
+- **title:** "SECURITIES AND EXCHANGE BOARD OF INDIA (BUY-BACK OF SECURITIES) (AMENDMENT) REGULATIONS, 2026"
+- **applies_to:** broker, exchange, depository
+- **in_force_date:** 2026-08-01
+- **status:** in-force
+- **impact_areas:** settlement, surveillance, other
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/jul-2026/1783400483408.pdf
+
+Reopens exchange-route open-market buybacks below 15% of paid-up capital and free reserves from August 1, 2026 and prescribes opening and closing timelines (regulation 3(I) and 3(VI)). Introduces ISIN-level promoter-holding freezes and allows companies to dispense with merchant bankers subject to reassigned responsibilities (regulation 3(X)–3(XI)). The amendment takes effect August 1, 2026 (regulation 2).
+
+### HO/47/16/13(4)2026-MRD-POD1/I/14266/2026
+
+- **date_issued:** 2026-06-19
+- **issuer:** SEBI-MRD
+- **title:** "Clarification with respect to applicability of the benefit of early pay-in in Commodity Derivatives Segment"
+- **applies_to:** broker, exchange, clearing-corp
+- **in_force_date:** 2026-09-21
+- **status:** [unknown — verify]
+- **impact_areas:** commodities, margin, settlement
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/jun-2026/1781863954185.pdf
+
+Revises paragraph 11.3.1 to permit early pay-in of certified goods against relevant derivatives contracts, with margin exemptions determined by clearing-corporation risk perception (clause 2). Mark-to-market margins remain collectible; implementation starts September 21, 2026 (clauses 2–3).
+
+### HO/47/11/11(1)2026-MRD-POD3/I/13804/2026
+
+- **date_issued:** 2026-06-15
+- **issuer:** SEBI-MRD
+- **title:** "Norms for Base Price, Price Bands, Call Auction in pre-open session and Close-out procedure for Exchange Traded Funds (ETFs)"
+- **applies_to:** broker, exchange, clearing-corp
+- **in_force_date:** 2026-09-07
+- **status:** in-force
+- **impact_areas:** mutual-funds, commodities, rms, settlement
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/jun-2026/1781524158363.pdf
+
+Replaces the ETF base-price method with previous-day closing price and specified fallbacks, and requires a transition to previous-day closing NAV from April 1, 2027 (clause 4). Sets differentiated ETF price bands, overnight/liquid ETF close-out pricing and commodity ETF pre-open auctions (clauses 5–7). Clause 8 originally specified September 1, 2026; <abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/47/11/11(1)2026-MRD-POD3/I/19839/2026, clauses 3–4, moves implementation to September 7 while preserving other provisions.
+
+### SEBI/HO/OIAE/OIAE_IAD-3/P/CIR/2026/12676
+
+- **date_issued:** 2026-05-29
+- **issuer:** SEBI-OIAE
+- **title:** "Ease of doing investments - Modified Norms for Nomination in Demat Accounts and Mutual Fund Folios"
+- **applies_to:** depository
+- **in_force_date:** 2026-09-01
+- **status:** in-force
+- **impact_areas:** nominee, onboarding, mutual-funds, minor-joint, esign
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/jun-2026/1780397706130.pdf
+
+Requires nomination or opt-out for new single-holder accounts, makes nomination optional for joint holdings, and permits up to three nominees (clauses 4–5). Specifies authentication and mandatory versus optional nominee fields, plus biannual reminders and first-login daily prompts for accounts without nomination (clauses 6–10). Implementation starts September 1, 2026, while clause 15 expressly supersedes earlier nomination circulars from the date of issuance (clauses 13 and 15).
+
+### HO/24/11/24(62)2026-IMD-RAC4/I/11872/2026
+
+- **date_issued:** 2026-05-19
+- **issuer:** SEBI-IMD
+- **title:** "Revision of Monthly Cumulative Report (MCR) Format"
+- **applies_to:** [unknown — verify]
+- **in_force_date:** 2026-06-01
+- **status:** in-force
+- **impact_areas:** mutual-funds, reporting, file-format
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/may-2026/1779193408747.pdf
+
+Replaces the monthly cumulative report format from the June 2026 reporting period to reflect revised mutual-fund scheme categories (clause 2 and Annexure A). Provides a separate SIF reporting format in Annexure B while retaining other Master Circular conditions (clauses 2–3).
+
+### HO/43/15/12(3)2025-ISD-POD2/I/11734/2026
+
+- **date_issued:** 2026-05-15
+- **issuer:** SEBI-MRD
+- **title:** "Master Circular on Surveillance of Securities Market"
+- **applies_to:** all-intermediaries, exchange, depository
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** surveillance, reporting
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/may-2026/1778851789798.pdf
+
+Consolidates surveillance directions including <abbr title="Market Infrastructure Institution">MII</abbr> surveillance-lapse disincentives, non-convertible-security subscriptions during trading-window closure, and automated freezes for designated persons’ immediate relatives (cover clauses 2(a)–2(c)). Rescinds the listed prior directions only to the extent of surveillance, while preserving past actions and liabilities (cover clauses 3–4). The header identifies May 15, 2026 as the last-update date and March 23, 2023 as the original issue date.
+
+### HO/47/11/11(3)2025-MRD-POD2/I/2765/2026
+
+- **date_issued:** 2026-01-16
+- **issuer:** SEBI-MRD
+- **title:** "Introduction of Closing Auction Session (<abbr title="Consolidated Account Statement">CAS</abbr>) in the Equity Cash Segment and certain modifications in the Pre-Open Auction Session"
+- **applies_to:** broker, exchange, clearing-corp
+- **in_force_date:** 2026-08-03
+- **status:** in-force
+- **impact_areas:** settlement, derivatives, surveillance, rms
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/jan-2026/1768576287344.pdf
+
+Introduces a 3:15–3:35 p.m. closing auction initially for cash stocks with derivatives, with a ±3% reference-price band and revised order-priority rules (clauses 4.1–4.7). Equity derivatives continue until 3:40 p.m. and the cash post-close session runs 3:50–4 p.m. (clauses 4.2.3–4.2.4). CAS starts August 3, 2026, and the revised pre-open framework starts September 7, 2026 (clause 6).
+
 ### SEBI/LAD-NRO/GN/2026/291
 
 - **date_issued:** 2026-01-07
-- **issuer:** SEBI-LAD-<abbr title="Non-Resident Ordinary (Rupee) account">NRO</abbr>
+- **issuer:** SEBI-LAD-NRO
 - **title:** "Securities and Exchange Board of India (Stock Brokers) Regulations, 2026"
 - **applies_to:** broker, clearing-corp
 - **in_force_date:** 2026-01-07
@@ -108,7 +485,7 @@ Establishes the MF Lite framework operationalizing the SEBI (Mutual Funds) (Thir
 - **impact_areas:** settlement, margin, rms, surveillance, reporting, derivatives, cyber-security, bcp-dr, system-audit, t0-t1, file-format
 - **primary_url:** https://www.sebi.gov.in/legal/master-circulars/dec-2024/master-circular-for-stock-exchanges-and-clearing-corporations_89941.html
 
-Updates and consolidates the SE/<abbr title="Clearing Corporation (NCL, ICCL, MCXCCL — context-dependent).">CC</abbr> master circular with all circulars issued after the October 2023 master through November 30, 2024. Incorporates <abbr title="Trade-date Plus N settlement">T+0</abbr> expansion, Index Derivatives Framework, <abbr title="Market Infrastructure Institution">MII</abbr> Shareholding Monitoring, and other major MRD circulars. Supersedes SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/MRD2/PoD-2/CIR/P/2023/171.
+Updates and consolidates the SE/<abbr title="Clearing Corporation (NCL, ICCL, MCXCCL — context-dependent).">CC</abbr> master circular with all circulars issued after the October 2023 master through November 30, 2024. Incorporates <abbr title="Trade-date Plus N settlement">T+0</abbr> expansion, Index Derivatives Framework, MII Shareholding Monitoring, and other major MRD circulars. Supersedes SEBI/HO/MRD2/PoD-2/CIR/P/2023/171.
 
 ### SEBI/LAD-NRO/GN/2024/218
 
@@ -277,7 +654,7 @@ Updates the SOP for financial disincentives payable by MIIs for technical glitch
 - **impact_areas:** reporting, other
 - **primary_url:** https://www.sebi.gov.in/legal/regulations/jul-2024/securities-and-exchange-board-of-india-listing-obligations-and-disclosure-requirements-second-amendment-regulations-2024_85013.html
 
-Second LODR amendment of 2024 - further refinements to listing obligations, RPT thresholds, and structured digital database (SDD) provisions for listed entities.
+Second LODR amendment of 2024 - further refinements to listing obligations, RPT thresholds, and structured digital database (<abbr title="Structured Digital Database">SDD</abbr>) provisions for listed entities.
 
 ### SEBI/HO/MRD/TPD-1/P/CIR/2024/92
 
@@ -687,7 +1064,7 @@ Establishes a framework for verifying upfront collection of margins from clients
 
 ## Verified through
 
-2026-05-14
+2026-09-11
 
 ---
 

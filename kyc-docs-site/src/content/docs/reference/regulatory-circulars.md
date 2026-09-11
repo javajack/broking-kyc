@@ -1,17 +1,15 @@
 ---
 title: Regulatory Circulars
-description: "Verified index of SEBI / RBI / NPCI / CERSAI / MeitY / FIU-IND / exchange / depository / clearing-corp circulars affecting Indian stock broking, 2020-01-01 to 2026-05-14."
+description: "Verified index of SEBI / RBI / NPCI / CERSAI / MeitY / FIU-IND / exchange / depository / clearing-corp circulars affecting Indian stock broking, 2020-01-01 to 2026-09-11."
 ---
 
-> **Who reads this section?** Compliance officers tracking regulatory change. Auditors verifying citations. Engineers checking what's in force. Anyone writing an observation that needs a circular ID. New to the site? Try [Choose Your Role](/broking-kyc/personas/) first.
-
-Each issuer is dense enough to deserve its own sub-page, so this master page is navigation + highlights + coverage notes. Operators looking for a specific issuer drill into the relevant sub-page; reviewers scanning impact start with the highlight panel; KB users follow the per-issuer counts to gauge coverage.
+> **Why this page is structured this way:** Each issuer is dense enough to deserve its own sub-page, so this master page is navigation + highlights + coverage notes. Operators looking for a specific issuer drill into the relevant sub-page; reviewers scanning impact start with the highlight panel; KB users follow the per-issuer counts to gauge coverage.
 
 ## TL;DR
 
-- **884 circulars** indexed across 13 issuer groupings.
-- Window: **2020-01-01 → 2026-05-14**. Verified 2026-05-14.
-- **222 circulars** issued in 2025 or later.
+- **1059 circulars** indexed across 13 issuer groupings.
+- Window: **2020-01-01 → 2026-09-11**. Verified 2026-09-11.
+- **397 circulars** issued in 2025 or later.
 - **103** entries flagged `[unknown — verify]` in at least one field (primary URL not re-fetchable or date ambiguous in source).
 - Coverage spans **regulatory** norms AND **operational / file-format** circulars (<abbr title="Beginning Of Day">BOD</abbr>/<abbr title="End Of Day">EOD</abbr> files, settlement specs, margin frameworks).
 - AI-generated; summaries are paraphrased. **Read the linked PDF before acting on any provision.**
@@ -29,6 +27,7 @@ Hand-picked from the full set. Selection criteria: each row materially changes b
 | 2024-03-21 | SEBI-<abbr title="Market Regulation Department (SEBI)">MRD</abbr> | [SEBI/HO/MRD/MRD-PoD-3/P/CIR/2024/20](./circulars/sebi-other/#sebi-ho-mrd-mrd-pod-3-p-cir-2024-20) | Introduction of Beta version of <abbr title="Trade-date Plus N settlement">T+0</abbr> rolling settlement cycle on optional basis i | settlement, t0-t1, rms |
 | 2025-03-19 | SEBI-<abbr title="Office of Investor Assistance and Education (SEBI)">OIAE</abbr> | [SEBI/HO/OIAE/OIAE_IAD-3/P/CIR/2025/32](./circulars/sebi-other/#sebi-ho-oiae-oiae-iad-3-p-cir-2025-32) | Harnessing DigiLocker as a Digital Public Infrastructure for reducing Unclaimed  | digi-locker, transmission, nominee, dormant |
 | 2026-01-07 | SEBI-<abbr title="Legal Affairs Department — Northern Regional Office (SEBI)">LAD-NRO</abbr> | [SEBI/LAD-<abbr title="Non-Resident Ordinary (Rupee) account">NRO</abbr>/GN/2026/291](./circulars/sebi-other/#sebi-lad-nro-gn-2026-291) | Securities and Exchange Board of India (Stock Brokers) Regulations, 2026 | onboarding, surveillance, reporting, other |
+| 2025-06-17 | SEBI-MIRSD | [SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](./circulars/sebi-mirsd/#sebi-ho-mirsd-mirsd-pod-p-cir-2025-90) | Master Circular for Stock Brokers | onboarding, client-funds, margin, settlement, rms, mtf, slbm, surveillance, reporting, bcp-dr, cyber-security, grievance, file-format, t0-t1, upstreaming, system-audit, nominee |
 
 ## Browse by issuer
 
@@ -36,18 +35,18 @@ All entries live on per-issuer sub-pages, sorted descending by date.
 
 | Issuer | Entries | Page |
 | --- | --- | --- |
-| <abbr title="National Stock Exchange of India">NSE</abbr> | 156 | [nse](./circulars/nse/) |
-| <abbr title="National Securities Depository Limited">NSDL</abbr> | 112 | [nsdl](./circulars/nsdl/) |
-| <abbr title="Central Depository Services (India) Limited">CDSL</abbr> | 108 | [cdsl](./circulars/cdsl/) |
-| Clearing Corporations (<abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NSCCL</abbr> / <abbr title="Indian Clearing Corporation Limited">ICCL</abbr> / <abbr title="Multi Commodity Exchange Clearing Corporation Limited">MCXCCL</abbr>) | 107 | [clearing-corps](./circulars/clearing-corps/) |
-| <abbr title="Multi Commodity Exchange of India">MCX</abbr> | 84 | [mcx](./circulars/mcx/) |
-| SEBI-MIRSD | 56 | [sebi-mirsd](./circulars/sebi-mirsd/) |
-| SEBI (MRD / <abbr title="Investment Management Department (within SEBI)">IMD</abbr> / OIAE / LAD-NRO / <abbr title="Corporate Finance Department (within SEBI)">CFD</abbr>) | 50 | [sebi-other](./circulars/sebi-other/) |
-| <abbr title="National Payments Corporation of India">NPCI</abbr> | 50 | [npci](./circulars/npci/) |
-| <abbr title="Reserve Bank of India">RBI</abbr> | 47 | [rbi](./circulars/rbi/) |
+| <abbr title="National Stock Exchange of India">NSE</abbr> | 161 | [nse](./circulars/nse/) |
+| <abbr title="Central Depository Services (India) Limited">CDSL</abbr> | 156 | [cdsl](./circulars/cdsl/) |
+| <abbr title="National Securities Depository Limited">NSDL</abbr> | 143 | [nsdl](./circulars/nsdl/) |
+| Clearing Corporations (<abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NSCCL</abbr> / <abbr title="Indian Clearing Corporation Limited">ICCL</abbr> / <abbr title="Multi Commodity Exchange Clearing Corporation Limited">MCXCCL</abbr>) | 115 | [clearing-corps](./circulars/clearing-corps/) |
+| <abbr title="Multi Commodity Exchange of India">MCX</abbr> | 102 | [mcx](./circulars/mcx/) |
+| SEBI (MRD / <abbr title="Investment Management Department (within SEBI)">IMD</abbr> / OIAE / LAD-NRO / <abbr title="Corporate Finance Department (within SEBI)">CFD</abbr>) | 79 | [sebi-other](./circulars/sebi-other/) |
+| SEBI-MIRSD | 63 | [sebi-mirsd](./circulars/sebi-mirsd/) |
+| <abbr title="Reserve Bank of India">RBI</abbr> | 62 | [rbi](./circulars/rbi/) |
+| <abbr title="National Payments Corporation of India">NPCI</abbr> | 57 | [npci](./circulars/npci/) |
 | <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> | 45 | [bse](./circulars/bse/) |
-| MeitY / <abbr title="Controller of Certifying Authorities">CCA</abbr> | 29 | [meity](./circulars/meity/) |
-| <abbr title="Central Registry of Securitisation Asset Reconstruction and Security Interest of India">CERSAI</abbr> / <abbr title="Central KYC (records registry)">CKYC</abbr> | 20 | [cersai](./circulars/cersai/) |
+| MeitY / <abbr title="Controller of Certifying Authorities">CCA</abbr> | 31 | [meity](./circulars/meity/) |
+| <abbr title="Central Registry of Securitisation Asset Reconstruction and Security Interest of India">CERSAI</abbr> / <abbr title="Central KYC (records registry)">CKYC</abbr> | 25 | [cersai](./circulars/cersai/) |
 | <abbr title="Financial Intelligence Unit — India">FIU-IND</abbr> | 20 | [fiu-ind](./circulars/fiu-ind/) |
 
 ## Coverage notes
@@ -71,7 +70,7 @@ See the [circulars changelog](./circulars-changelog/) for the diff against the p
 
 ## Verified through
 
-2026-05-14
+2026-09-11
 
 ---
 

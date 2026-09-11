@@ -1,14 +1,14 @@
 ---
 title: MCX Circulars
-description: "Verified index of MCX circulars affecting Indian stock broking, 2020-01-01 to 2026-05-14. 84 entries."
+description: "Verified index of MCX circulars affecting Indian stock broking, 2020-01-01 to 2026-09-11. 102 entries."
 ---
 
 > **Why this page is structured this way:** All in-window entries are listed descending by date so the most recent regulatory state is the first thing a reader sees. Use Cmd-F / Ctrl-F for ID-based lookup. Cross-references from the rest of the site point at anchors on this page.
 
 ## TL;DR
 
-- **84 circulars** indexed in this issuer's section.
-- **30** issued in 2025 or later.
+- **102 circulars** indexed in this issuer's section.
+- **48** issued in 2025 or later.
 - **66** entries flagged `[unknown — verify]` in at least one field.
 - All entries trace to a primary issuer URL (or Wayback fallback) where research could verify the source.
 - AI-generated; **read the linked PDF before acting on any provision**.
@@ -18,6 +18,241 @@ description: "Verified index of MCX circulars affecting Indian stock broking, 20
 This page is the complete listing of <abbr title="Multi Commodity Exchange of India">MCX</abbr> circulars in the project's 2020–2026 sweep window. Each entry contains the verbatim circular ID, issue date, in-force date, status (in-force / superseded / withdrawn), applicable entity types, impact-area tags, a 2–4 sentence summary traceable to clauses, and the primary URL. Where the primary URL could not be re-fetched, an archive URL is provided in its place.
 
 ## Entries (descending date)
+
+### MCX/S&I/513/2026
+
+- **date_issued:** 2026-09-09
+- **issuer:** MCX
+- **title:** "Review of Position Limits for Clients and Penalty Provisions for Violation / Breach of Position Limits for Commodity Derivatives Segment"
+- **applies_to:** broker
+- **in_force_date:** immediate
+- **status:** in-force
+- **impact_areas:** commodities, derivatives, rms, surveillance
+- **primary_url:** https://www.mcxindia.com/docs/default-source/circulars/english/2026/september/circular-513-2026.pdf?sfvrsn=956808f7_1
+
+Forwards <abbr title="Securities and Exchange Board of India">SEBI</abbr>'s revised commodity position-limit framework for member compliance (covering page). The enclosure caps monetary penalties, revises the broad-commodity definition and specifies client limits by commodity category, with immediate effect (enclosure clauses 2.1–3).
+
+### MCX/S&I/504/2026
+
+- **date_issued:** 2026-09-04
+- **issuer:** MCX
+- **title:** "Extension of Implementation of New Interface - MCX <abbr title="Unique Client Code">UCC</abbr> File Formats (Version 1.1) and UCC-API (Version 1.0)"
+- **applies_to:** broker
+- **in_force_date:** immediate
+- **status:** in-force
+- **impact_areas:** onboarding, file-format
+- **primary_url:** https://www.mcxindia.com/docs/default-source/circulars/english/2026/september/circular---504---2026.pdf?sfvrsn=348bfc36_1
+
+Defers the September 7 implementation of UCC file version 1.1 and UCC-API version 1.0 until further communication (opening paragraph). The Exchange will communicate a revised implementation date separately (second paragraph).
+
+### MCX/MEM/498/2026
+
+- **date_issued:** 2026-09-02
+- **issuer:** MCX
+- **title:** "Submission of Accessibility Audit Report for Digital Platforms"
+- **applies_to:** broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** system-audit, reporting, other
+- **primary_url:** https://www.mcxindia.com/docs/default-source/circulars/english/2026/september/circular-498-2026.pdf?sfvrsn=81a241a7_1
+
+Requires members to submit accessibility audit reports and remediation findings by October 31, 2026 (covering page, second paragraph). Specifies submission through the Enhanced Supervision Portal's Membership section, following Annexure A (covering page, third paragraph).
+
+### MCX/TECH/501/2026
+
+- **date_issued:** 2026-09-02
+- **issuer:** MCX
+- **title:** "Standardisation Testing & Quality Certification (STQC) and other compliance requirements for vendors as per Cyber Security & Cyber Resilience Framework (<abbr title="Cybersecurity and Cyber Resilience Framework">CSCRF</abbr>) of SEBI"
+- **applies_to:** broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** cyber-security, system-audit
+- **primary_url:** https://www.mcxindia.com/docs/default-source/circulars/english/2026/september/circular-501---2026.pdf?sfvrsn=957b61e1_1
+
+Requires STQC application-security testing and functional audit of vendor products (covering page and Section A). Existing registered products require certificates by February 28, 2027; annual submissions begin with the period ending March 31, 2028 (Section B.2). Sets registration, member baseline-confirmation and vulnerability-management requirements (Sections C–D).
+
+### MCX/S&I/495/2026
+
+- **date_issued:** 2026-08-31
+- **issuer:** MCX
+- **title:** "Mobile Numbers appearing under Mobile Number Revocation list (MNRL) published by Department of Telecommunication (DoT)"
+- **applies_to:** broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** kyc-modification, reporting
+- **primary_url:** https://www.mcxindia.com/docs/default-source/circulars/english/2026/august/circular---495---2026.pdf?sfvrsn=6d239299_1
+
+Makes the mobile-number revocation report available in the member SFTP MNRL folder following availability of DoT's real-time list on its Digital Intelligence Platform (middle paragraphs). Directs members to check the report and take necessary action (final substantive paragraph).
+
+### MCX/ISD/492/2026
+
+- **date_issued:** 2026-08-28
+- **issuer:** MCX
+- **title:** "Amendment in the existing “Policy on Evaluation of Client Claims against the Defaulter/ Expelled Member”"
+- **applies_to:** broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** grievance, client-funds
+- **primary_url:** https://www.mcxindia.com/docs/default-source/circulars/english/2026/august/circular---492-2026.pdf?sfvrsn=dc71f580_1
+
+Adopts the claims-policy amendment proposed in MCX/ISD/454/2026 (opening paragraphs). Sets eligibility, verification and conditional late-claim provisions, and excludes unregistered portfolio-management services and specified unauthorized schemes or assurances of returns (clauses i–ii).
+
+### MCX/TRD/490/2026
+
+- **date_issued:** 2026-08-27
+- **issuer:** MCX
+- **title:** "Modification in the Contract Specification of Lead Mini, Lead, Zinc Mini and Zinc Futures Contracts"
+- **applies_to:** broker
+- **in_force_date:** 2026-09-07
+- **status:** in-force
+- **impact_areas:** commodities, derivatives, settlement
+- **primary_url:** https://www.mcxindia.com/docs/default-source/circulars/english/2026/august/circular-490-2026.pdf?sfvrsn=2e45a191_1
+
+Changes lead-mini and zinc-mini quotation/delivery locations and removes specified additional delivery centres for the four products, for November 2026 and later expiries (covering-page table). Permits fresh positions in affected expiries from September 7 and requires members to notify clients (page 2 note and opening paragraphs).
+
+### MCX/TECH/484/2026
+
+- **date_issued:** 2026-08-26
+- **issuer:** MCX
+- **title:** "Alignment of SEBI's Cyber Incident Reporting Portal with FIRE Format"
+- **applies_to:** broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** cyber-security, reporting, file-format
+- **primary_url:** https://www.mcxindia.com/docs/default-source/circulars/english/2026/august/alignment-of-sebi%27s-cyber-incident-reporting-portal-with-fire-format.pdf?sfvrsn=f4228e09_1
+
+Circulates SEBI's August 24, 2026 circular concerning alignment of its cyber-incident portal with the FIRE format (covering page, second paragraph). Directs trading members to comply and encloses the SEBI circular (covering page, final substantive paragraphs).
+
+### MCX/TRD/485/2026
+
+- **date_issued:** 2026-08-26
+- **issuer:** MCX
+- **title:** "Modification in Contract Launch Calendar of Crude Oil and Crude Oil Mini Futures Contracts"
+- **applies_to:** broker
+- **in_force_date:** 2026-09-10
+- **status:** in-force
+- **impact_areas:** commodities, derivatives
+- **primary_url:** https://www.mcxindia.com/docs/default-source/circulars/english/2026/august/circular-485-2026.pdf?sfvrsn=ef669401_1
+
+Adds four far-dated crude-oil and crude-oil-mini futures to the existing six-month contract structure (opening paragraphs). Sets the revised launch calendar from September 10 and binds members and clients to the annexed specifications (covering-page calendar and concluding paragraph).
+
+### MCX/COMP/480/2026
+
+- **date_issued:** 2026-08-21
+- **issuer:** MCX
+- **title:** "Action taken report for observations reported in Inspection of Authorised Persons"
+- **applies_to:** broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** reporting
+- **primary_url:** https://www.mcxindia.com/docs/default-source/circulars/english/2026/august/circular-480-2026.pdf?sfvrsn=b7774268_1
+
+Requires disciplinary action within two months of quarter-end and an <abbr title="Action Taken Report.">ATR</abbr> with observation-closure status within three months (second paragraph). Termination cases require action within seven days of report receipt or identification; the requirements apply to July–September 2026 inspection reports onward (fourth and fifth paragraphs).
+
+### MCX/TRD/479/2026
+
+- **date_issued:** 2026-08-21
+- **issuer:** MCX
+- **title:** "Modification in the Contract Launch Calendar of Aluminium Mini, Aluminium, Copper, Zinc Mini and Zinc Futures Contracts"
+- **applies_to:** broker
+- **in_force_date:** 2026-09-01
+- **status:** in-force
+- **impact_areas:** commodities, derivatives
+- **primary_url:** https://www.mcxindia.com/docs/default-source/circulars/english/2026/august/circular-479-2026.pdf?sfvrsn=594fa21e_1
+
+Revises launch calendars for the five named base-metal futures from September 1, including far-dated expiries (covering-page calendar). Requires members to notify their clients and follow the revised specifications in Annexures 1–5 (opening paragraphs and page 2 annexure list).
+
+### MCX/TECH/473/2026
+
+- **date_issued:** 2026-08-19
+- **issuer:** MCX
+- **title:** "Contingency Pool Facility"
+- **applies_to:** broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** bcp-dr
+- **primary_url:** https://www.mcxindia.com/docs/default-source/circulars/english/2026/august/mcxtech4732026_contingency-pool-facility.pdf?sfvrsn=966e2681_1
+
+Provides trading access from Exchange premises or designated regional centres during member connectivity, technical or power failures (opening paragraphs). Requires a written request and due diligence, with allocation on a first-come basis during trading hours for the requested day (covering page).
+
+### MCX/S&I/464/2026
+
+- **date_issued:** 2026-08-13
+- **issuer:** MCX
+- **title:** "Guidelines in pursuance of amendment to SEBI <abbr title="Know Your Customer (process).">KYC</abbr> (Know Your client) Registration Agency (<abbr title="KYC Registration Agency">KRA</abbr>) Regulations, 2011"
+- **applies_to:** broker
+- **in_force_date:** 2026-08-31
+- **status:** in-force
+- **impact_areas:** onboarding, re-KYC, dormant, transmission, rms
+- **primary_url:** https://www.mcxindia.com/docs/default-source/circulars/english/2026/august/circular---464---2026.pdf?sfvrsn=37a9d19d_1
+
+Prohibits trading and position square-up from August 31 for the specified July-upload cohort whose KYC remains on hold; positions expire naturally (paragraph beginning ‘It is hereby informed’). Requires monitoring open positions and permits subsequently compliant PANs to trade on <abbr title="Trade-date Plus N settlement">T+1</abbr> based on KRA information received by the Exchange (following paragraphs).
+
+### MCX/MEM/461/2026
+
+- **date_issued:** 2026-08-11
+- **issuer:** MCX
+- **title:** "Clarification regarding implementation of \"@valid\" <abbr title="Unified Payments Interface">UPI</abbr> IDs"
+- **applies_to:** broker
+- **in_force_date:** immediate
+- **status:** in-force
+- **impact_areas:** client-funds, upstreaming, reporting
+- **primary_url:** https://www.mcxindia.com/docs/default-source/circulars/english/2026/august/circular-461-2026.pdf?sfvrsn=f941ab3e_1
+
+Requires all investor-facing upstream accounts receiving individual/non-institutional funds to be linked to a validated UPI ID by September 6, 2026 (covering page). New accounts opened after issue must also be linked; members on multiple exchanges should apply through only one exchange and complete the bank's process (covering page).
+
+### MCX/TRD/456/2026
+
+- **date_issued:** 2026-08-07
+- **issuer:** MCX
+- **title:** "Modifications in contract specification of MCX iCOMDEX Bullion Index (MCX BULLDEX®) Futures Contract"
+- **applies_to:** broker
+- **in_force_date:** 2026-08-20
+- **status:** in-force
+- **impact_areas:** commodities, derivatives
+- **primary_url:** https://www.mcxindia.com/docs/default-source/circulars/english/2026/august/circular-456-2026.pdf?sfvrsn=612707c9_1
+
+Halves the BULLDEX futures multiplier from Rs.30 to Rs.15 times the index for November 2026 and later expiries, effective August 20 (covering-page table). Requires members to notify clients and comply with the annexed contract parameters (covering-page paragraphs).
+
+### MCX/TRD/457/2026
+
+- **date_issued:** 2026-08-07
+- **issuer:** MCX
+- **title:** "Modifications in contract specification of MCX iCOMDEX Bullion Index (MCX BULLDEX®) Options Contracts"
+- **applies_to:** broker
+- **in_force_date:** 2026-08-20
+- **status:** in-force
+- **impact_areas:** commodities, derivatives
+- **primary_url:** https://www.mcxindia.com/docs/default-source/circulars/english/2026/august/circular-457-2026.pdf?sfvrsn=14d4d26d_1
+
+Halves the BULLDEX options multiplier from Rs.30 to Rs.15 times the index for November 2026 and later expiries, effective August 20 (covering-page table). Requires client notification and makes the annexed specifications binding on members and their constituents (covering-page paragraphs).
+
+### MCX/ISD/454/2026
+
+- **date_issued:** 2026-08-06
+- **issuer:** MCX
+- **title:** "Amendment in the existing “Policy on Evaluation of Client Claims against the Defaulter/ Expelled Member”"
+- **applies_to:** broker
+- **in_force_date:** [unknown — verify]
+- **status:** superseded
+- **superseded_by:** MCX/ISD/492/2026
+- **impact_areas:** grievance, client-funds
+- **primary_url:** https://www.mcxindia.com/docs/default-source/circulars/english/2026/august/circular-454-2026.pdf?sfvrsn=e11a49bd_1
+
+Proposes inclusion and exclusion criteria for defaulting-member claims and invites comments by August 27 (clauses i–ii and closing paragraph). This was a consultation rather than an operative policy amendment; MCX/ISD/492/2026 subsequently adopted the amendment (that circular, opening paragraphs).
+
+### MCX/S&I/453/2026
+
+- **date_issued:** 2026-08-06
+- **issuer:** MCX
+- **title:** "New Interface - MCX UCC File Formats (Version 1.1) and UCC-API (Version 1.0)"
+- **applies_to:** broker
+- **in_force_date:** [unknown — verify]
+- **status:** [unknown — verify]
+- **impact_areas:** onboarding, closure, nominee, file-format
+- **primary_url:** https://www.mcxindia.com/docs/default-source/about-us/circular---453---2026.pdf?sfvrsn=15bcd2c9_1
+
+Prescribes revised UCC files and APIs, originally scheduled for September 7, 2026 (covering page). Annexure A's introductory notes replace screen creation with file/API creation, introduce irreversible Closed status and add nomination; the implementation date was subsequently deferred by MCX/S&I/504/2026 (that circular, opening paragraph).
 
 ### MCX/TECH/179/2026
 
@@ -214,7 +449,7 @@ Publishes the August 2025 contract-launch calendar across Aluminium, Copper, Cot
 - **impact_areas:** settlement, commodities
 - **primary_url:** [unknown — verify direct MCX URL]
 
-Eliminates additional delivery centres in NCR, Chennai and Kolkata regions for Copper Futures. From December 2025 expiries, warehouses within a 100 km radius of main delivery centres will be accredited per <abbr title="Securities and Exchange Board of India">SEBI</abbr> guidelines. Brokers update client communications regarding delivery logistics.
+Eliminates additional delivery centres in NCR, Chennai and Kolkata regions for Copper Futures. From December 2025 expiries, warehouses within a 100 km radius of main delivery centres will be accredited per SEBI guidelines. Brokers update client communications regarding delivery logistics.
 
 ### MCX/MCXCCL/337/2025
 
@@ -493,7 +728,7 @@ Revises concentration-margin threshold limits. For non-agricultural commodities,
 
 - **date_issued:** 2024-11-08
 - **issuer:** MCX
-- **title:** "Increase in the maximum limit to upload <abbr title="Unique Client Code">UCC</abbr> records in one file"
+- **title:** "Increase in the maximum limit to upload UCC records in one file"
 - **applies_to:** broker
 - **in_force_date:** 2024-11-11
 - **status:** in-force
@@ -1128,7 +1363,7 @@ Shortens the staggered-delivery tender period for the Precious Metals product ca
 
 ## Verified through
 
-2026-05-14
+2026-09-11
 
 ---
 

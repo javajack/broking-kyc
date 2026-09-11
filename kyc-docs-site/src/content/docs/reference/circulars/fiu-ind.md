@@ -1,6 +1,6 @@
 ---
 title: FIU-IND Circulars
-description: "Verified index of FIU-IND circulars affecting Indian stock broking, 2020-01-01 to 2026-05-14. 20 entries."
+description: "Verified index of FIU-IND circulars affecting Indian stock broking, 2020-01-01 to 2026-09-11. 20 entries."
 ---
 
 > **Why this page is structured this way:** All in-window entries are listed descending by date so the most recent regulatory state is the first thing a reader sees. Use Cmd-F / Ctrl-F for ID-based lookup. Cross-references from the rest of the site point at anchors on this page.
@@ -257,7 +257,7 @@ As reported in FIU-IND's Annual Report 2022-23 (publicised in April 2024 press c
 - **primary_url:** https://fiuindia.gov.in/pdfs/downloads/All%20FAQs%20for%20CBWT.pdf
 - **archive_url:** [unknown - verify]
 
-FAQ document interpreting CBWTR (Cross-Border Wire Transfer Report) obligations under Rule 3(1)(D) of the PML (Maintenance of Records) Rules. Every cross-border wire transfer where the value exceeds Rs.5 lakh (or foreign currency equivalent) and where the origin or destination of funds is in India must be reported by the 15th of the succeeding month. Sender and receiver legs must be reported separately ("P" for sender / "R" for receiver). Applies to all reporting entities executing or facilitating cross-border wire transfers, including stock brokers conducting <abbr title="Non-Resident Indian">NRI</abbr>/FPI-linked or merchant remittances on behalf of clients.
+FAQ document interpreting CBWTR (Cross-Border Wire Transfer Report) obligations under Rule 3(1)(D) of the PML (Maintenance of Records) Rules. Every cross-border wire transfer where the value exceeds Rs.5 lakh (or foreign currency equivalent) and where the origin or destination of funds is in India must be reported by the 15th of the succeeding month. Sender and receiver legs must be reported separately ("P" for sender / "R" for receiver). Applies to all reporting entities executing or facilitating cross-border wire transfers, including stock brokers conducting <abbr title="Non-Resident Indian">NRI</abbr>/<abbr title="Foreign Portfolio Investor">FPI</abbr>-linked or merchant remittances on behalf of clients.
 
 ### FIU-IND-CTR-BANKING-FORMAT
 
@@ -309,7 +309,7 @@ Technical reporting format reference document under FIU-IND's Project FINnet 2.0
 
 ## Verified through
 
-2026-05-14
+2026-09-11
 
 ---
 

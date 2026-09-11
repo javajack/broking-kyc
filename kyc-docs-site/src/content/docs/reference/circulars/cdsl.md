@@ -1,14 +1,14 @@
 ---
 title: CDSL Circulars
-description: "Verified index of CDSL circulars affecting Indian stock broking, 2020-01-01 to 2026-05-14. 108 entries."
+description: "Verified index of CDSL circulars affecting Indian stock broking, 2020-01-01 to 2026-09-11. 156 entries."
 ---
 
 > **Why this page is structured this way:** All in-window entries are listed descending by date so the most recent regulatory state is the first thing a reader sees. Use Cmd-F / Ctrl-F for ID-based lookup. Cross-references from the rest of the site point at anchors on this page.
 
 ## TL;DR
 
-- **108 circulars** indexed in this issuer's section.
-- **42** issued in 2025 or later.
+- **156 circulars** indexed in this issuer's section.
+- **90** issued in 2025 or later.
 - **0** entries flagged `[unknown — verify]` in at least one field.
 - All entries trace to a primary issuer URL (or Wayback fallback) where research could verify the source.
 - AI-generated; **read the linked PDF before acting on any provision**.
@@ -18,6 +18,630 @@ description: "Verified index of CDSL circulars affecting Indian stock broking, 2
 This page is the complete listing of <abbr title="Central Depository Services (India) Limited">CDSL</abbr> circulars in the project's 2020–2026 sweep window. Each entry contains the verbatim circular ID, issue date, in-force date, status (in-force / superseded / withdrawn), applicable entity types, impact-area tags, a 2–4 sentence summary traceable to clauses, and the primary URL. Where the primary URL could not be re-fetched, an archive URL is provided in its place.
 
 ## Entries (descending date)
+
+### CDSL/SURV/DP/POLCY/2026/621
+
+- **date_issued:** 2026-09-09
+- **issuer:** CDSL
+- **title:** "CHANGES IN THE FORMAT OF ONLINE FREEZE MASTER REPORT (DPE6)"
+- **applies_to:** depository, broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** file-format, surveillance, reporting
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-621&method=communique
+
+Revises DPE6 to include other regulatory authority, authority details, order type and reason for delay (page 1, field list). The format is already implemented and available to DPs, who should adapt their back-office systems using Annexure A (page 1, closing implementation paragraphs).
+
+### CDSL/OPS/DP/POLCY/2026/617
+
+- **date_issued:** 2026-09-08
+- **issuer:** CDSL
+- **title:** "<abbr title="Securities and Exchange Board of India">SEBI</abbr> CIR - EASE OF REGULATORY COMPLIANCES FOR <abbr title="Foreign Portfolio Investor">FPI</abbr>’S INVESTING ONLY IN GOVERNMENT SECURITIES"
+- **applies_to:** depository, broker
+- **in_force_date:** immediate
+- **status:** in-force
+- **impact_areas:** onboarding, non-individual
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-617&method=communique
+
+Circulates SEBI’s removal of investor-group-detail requirements for FPIs investing only in government securities (cover letter; Annexure, clauses 3–4). Depositories, custodians and DDPs must adjust their systems; the underlying circular has immediate effect (Annexure, clauses 5–6).
+
+### CDSL/OPS/DP/POLCY/2026/615
+
+- **date_issued:** 2026-09-07
+- **issuer:** CDSL
+- **title:** "INTRODUCTION OF NEW TRANSACTION STATUS IN DP89 REPORT"
+- **applies_to:** depository, broker
+- **in_force_date:** 2026-09-18
+- **status:** in-force
+- **impact_areas:** file-format, margin, settlement
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-615&method=communique
+
+Changes DP89 reporting for invocation and pledge release for early pay-in while obligation matching is pending: U—Under Process replaces F—Failed (page 1, transaction list and status table). Final status continues to follow existing logic after matching, and the change is effective September 18, 2026 <abbr title="End Of Day">EOD</abbr> (page 1, implementation paragraphs).
+
+### CDSL/OPS/DP/POLCY/2026/611
+
+- **date_issued:** 2026-09-03
+- **issuer:** CDSL
+- **title:** "NON-CHARGING OF <abbr title="Asset Management Company (mutual funds context) / Annual Maintenance Charges (depository context).">AMC</abbr> IN DEMAT ACCOUNTS CONSISTING OF ILLIQUID, SUSPENDED OR DELISTED SECURITIES"
+- **applies_to:** depository, broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** closure
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-611&method=communique
+
+Shares the September 3 billing-folder list of “To be Closed” accounts holding only illiquid, suspended or delisted securities (page 1, paragraphs 2–3). DPs must review the list and refrain from charging AMC subject to the September 30, 2025 conditions (paragraph 4).
+
+### CDSL/IT/DP/SYSTM/2026/594
+
+- **date_issued:** 2026-08-27
+- **issuer:** CDSL
+- **title:** "AVAILABILITY OF EDIS FACILITY"
+- **applies_to:** depository, broker
+- **in_force_date:** 2026-08-28
+- **status:** in-force
+- **impact_areas:** settlement, bcp-dr
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-594&method=communique
+
+Notifies DPs of maintenance-related eDIS unavailability (page 1). The interruption runs from August 28, 2026 at 7 p.m. until August 29 at 7 a.m. (page 1, opening paragraph).
+
+### CDSL/OPS/DP/POLCY/2026/580
+
+- **date_issued:** 2026-08-25
+- **issuer:** CDSL
+- **title:** "SIMPLIFICATION AND STANDARDISATION OF THE FRAMEWORK FOR TRANSMISSION OF SECURITIES"
+- **applies_to:** depository, broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** transmission, nominee
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-580&method=communique
+
+Corrects annexure numbering for communiqué 575: SOP A1, QTP form 2, transmission request 3, indemnity 4 and affidavit 5 (page 1, list). Other provisions remain unchanged, and the corrected annexures are attached (page 1).
+
+### CDSL/OPS/DP/CAIPO/2026/578
+
+- **date_issued:** 2026-08-24
+- **issuer:** CDSL
+- **title:** "CREATION OF NEW SECURITY TYPE IN CDSL SYSTEM"
+- **applies_to:** depository, broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** file-format
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-578&method=communique
+
+Introduces security type 41 for Rights Entitlement Preference Shares, with harmonised value REPRF (page 1, table). DPs must incorporate corresponding back-office changes where necessary (page 1, instruction following table).
+
+### CDSL/OPS/DP/POLCY/2026/579
+
+- **date_issued:** 2026-08-24
+- **issuer:** CDSL
+- **title:** "EASE OF DOING INVESTMENTS - MODIFIED NORMS FOR NOMINATION IN DEMAT ACCOUNTS"
+- **applies_to:** depository, broker
+- **in_force_date:** 2026-08-28
+- **status:** in-force
+- **impact_areas:** nominee, minor-joint, file-format
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-579&method=communique
+
+Clarifies that a minor nominee requires both date of birth and the minor indicator, while guardian details remain optional (page 1, paragraphs 2–3). If guardian first and last names are supplied, relationship with the nominee becomes mandatory; live availability is scheduled for August 28 (paragraphs 4–5).
+
+### CDSL/OPS/DP/POLCY/2026/571
+
+- **date_issued:** 2026-08-21
+- **issuer:** CDSL
+- **title:** "SEBI CIR - ACCEPTANCE OF DIGITALLY SIGNED POWER OF ATTORNEY FROM FPIS"
+- **applies_to:** depository, broker
+- **in_force_date:** 2026-08-20
+- **status:** in-force
+- **impact_areas:** onboarding, esign, non-individual
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-571&method=communique
+
+Circulates SEBI’s permission to accept FPI powers of attorney executed using digital signatures under the Information Technology Act, 2000 (cover letter; Annexure, clauses 3–4). This route removes the need for notarisation, apostillisation or consularisation of that <abbr title="Power of Attorney">POA</abbr>, with the underlying amendment effective August 20, 2026 (Annexure, clauses 3–5).
+
+### CDSL/OPS/DP/POLCY/2026/575
+
+- **date_issued:** 2026-08-21
+- **issuer:** CDSL
+- **title:** "SIMPLIFICATION AND STANDARDISATION OF THE FRAMEWORK FOR TRANSMISSION OF SECURITIES"
+- **applies_to:** depository, broker
+- **in_force_date:** 2026-08-22
+- **status:** in-force
+- **impact_areas:** transmission, nominee
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-575&method=communique
+
+Requires DPs to follow the attached transmission SOP and common revised forms implementing SEBI’s July 23 framework (page 1). The transmission request, indemnity, QTP and affidavit forms apply from August 22, 2026; operating-instruction amendments will be communicated separately (page 1, forms list and applicability paragraph).
+
+### CDSL/OPS/DP/POLCY/2026/567
+
+- **date_issued:** 2026-08-20
+- **issuer:** CDSL
+- **title:** "ADDITIONAL FEATURES IN DEMAT-DESTAT AND REMAT-RESTAT MODULE"
+- **applies_to:** depository, broker
+- **in_force_date:** 2026-08-21
+- **status:** in-force
+- **impact_areas:** other, file-format
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-567&method=communique
+
+Adds mandatory delay-reason capture for demat/destat and remat/restat requests not processed within seven days of receipt (page 1, paragraphs 1–2). DPs should make necessary back-office changes for the August 21 release (paragraph 3).
+
+### CDSL/OPS/DP/POLCY/2026/562
+
+- **date_issued:** 2026-08-18
+- **issuer:** CDSL
+- **title:** "VALIDATION OF <abbr title="Know Your Customer (process).">KYC</abbr> RECORDS WITH <abbr title="KYC Registration Agency">KRA</abbr>"
+- **applies_to:** depository, broker
+- **in_force_date:** 2026-09-05
+- **status:** in-force
+- **impact_areas:** re-KYC, kyc-modification
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-562&method=communique
+
+Shares deficient-account lists for KRA <abbr title="Permanent Account Number">PAN</abbr> records updated during July 2026 and requires follow-up with affected BOs (page 1, paragraphs 2–3). Debit and credit freezes under reason code 27 are scheduled for September 5 using KRA data as of September 3, with the existing September 2023 unfreezing procedure retained (paragraphs 4–5).
+
+### CDSL/OPS/DP/SETTL/2026/561
+
+- **date_issued:** 2026-08-18
+- **issuer:** CDSL
+- **title:** "MULTIPLE SETTLEMENTS SCHEDULED ON THURSDAY, AUGUST 27, 2026"
+- **applies_to:** depository, broker
+- **in_force_date:** 2026-08-27
+- **status:** in-force
+- **impact_areas:** settlement, t0-t1, slbm
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-561&method=communique
+
+Notifies DPs of multiple <abbr title="Indian Clearing Corporation Limited">ICCL</abbr> and <abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr> settlements on August 27 because August 26 is a settlement holiday (page 1, opening paragraph). The tables identify the relevant cash, SME, SLB, mutual-fund and EGR schedules for operational reference (pages 1–2).
+
+### CDSL/OPS/DP/CAIPO/2026/550
+
+- **date_issued:** 2026-08-13
+- **issuer:** CDSL
+- **title:** "MODIFICATION IN DP97 REPORT"
+- **applies_to:** depository, broker
+- **in_force_date:** 2026-08-28
+- **status:** in-force
+- **impact_areas:** file-format, reporting
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-550&method=communique
+
+Adds the original corporate-action type to DP97 for Transfer on Listing actions moving securities from a temporary ISIN to the existing ISIN (page 1, paragraphs 1–3). The value comes from the RTA’s Previous CA Type field and is scheduled for August 28 EOD release; DPs should adjust their back offices where needed (paragraphs 3–5).
+
+### CDSL/ADM/DP/GENRL/2026/543
+
+- **date_issued:** 2026-08-10
+- **issuer:** CDSL
+- **title:** "CLARIFICATION REGARDING IMPLEMENTATION OF \"@VALID\" <abbr title="Unified Payments Interface">UPI</abbr> IDs FOR ALL INVESTOR-FACING COLLECTION BANK ACCOUNTS."
+- **applies_to:** depository, broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** client-funds, other
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-543&method=communique
+
+Requires all investor-facing collection bank accounts receiving money or fees from individual/non-institutional investors to be linked to @valid UPI IDs so they are verifiable through SEBI Check (cover letter). The attached FAQ includes <abbr title="Depository Participant">DP</abbr>-charge accounts and sets a T+30-day timetable for depository participants, with T defined as the clarification issuance date (FAQ questions 1–3).
+
+### CDSL/SURV/DP/POLCY/2026/532
+
+- **date_issued:** 2026-08-05
+- **issuer:** CDSL
+- **title:** "ENHANCEMENTS INTRODUCED IN THE CDAS FREEZE & UNFREEZE MODULE"
+- **applies_to:** depository, broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** surveillance, file-format, kyc-modification
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-532&method=communique
+
+Adds regulatory-order information to the CDAS freeze/unfreeze workflow and references UDiFF catalogue 3.0.1.2 (page 1). Authority details are optional, order date is mandatory, and order type is mandatory when regulatory freeze reason code 3 is selected (sections 1.1–1.3).
+
+### CDSL/OPS/DP/POLCY/2026/527
+
+- **date_issued:** 2026-08-04
+- **issuer:** CDSL
+- **title:** "NON-CHARGING OF AMC IN DEMAT ACCOUNTS CONSISTING OF ILLIQUID, SUSPENDED OR DELISTED SECURITIES"
+- **applies_to:** depository, broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** closure
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-527&method=communique
+
+Shares the August 4 billing-folder list of “To be Closed” accounts holding only illiquid, suspended or delisted securities (page 1, paragraphs 2–3). DPs must review these accounts and not charge AMC subject to the September 30, 2025 conditions (paragraph 4).
+
+### CDSL/DP/SURV/2026/521
+
+- **date_issued:** 2026-07-31
+- **issuer:** CDSL
+- **title:** "COMPREHENSIVE SURVEILLANCE FRAMEWORK FOR DEPOSITORY PARTICIPANTS (DPs)"
+- **applies_to:** depository, broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** surveillance, aml, onboarding
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-521&method=communique
+
+Consolidates surveillance obligations and adds requirements for DP policies, SOPs and daily operations (page 1). DPs must close alerts within 45 days, review the surveillance policy annually and implement SOP approval, maker/checker separation, resource adequacy and alert-parameter review arrangements (Part I, section A).
+
+### CDSL/OPS/DP/POLCY/2026/522
+
+- **date_issued:** 2026-07-31
+- **issuer:** CDSL
+- **title:** "ENHANCEMENT IN TRANSMISSION PROCESSING"
+- **applies_to:** depository, broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** transmission, nominee, file-format
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-522&method=communique
+
+Requires transmission maker and checker activities to finish on the same day (point 1). Confirms that TS, TN and TC transmission reason codes apply to both inter-depository and intra-depository requests for surviving holders, nominees and legal heirs respectively (point 2).
+
+### CDSL/OPS/DP/POLCY/2026/517
+
+- **date_issued:** 2026-07-30
+- **issuer:** CDSL
+- **title:** "VERIFICATION OF MOBILE NUMBER REVOCATION LIST (MNRL) PUBLISHED BY TRAI"
+- **applies_to:** depository, broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** kyc-modification, reporting
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-517&method=communique
+
+Requires DPs to create DoT portal credentials for handling MNRL grievances (page 1, paragraph 2). Attaches the quick-reference guide for using DoT Digital Intelligence Platform information and updating action-taken reports (page 1, paragraph 3; Annexure A).
+
+### CDSL/OPS/DP/POLCY/2026/511
+
+- **date_issued:** 2026-07-29
+- **issuer:** CDSL
+- **title:** "UDIFF CATALOGUE CHANGES"
+- **applies_to:** depository, broker
+- **in_force_date:** 2026-07-31
+- **status:** in-force
+- **impact_areas:** file-format, nominee, non-individual, kyc-modification
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-511&method=communique
+
+Splits UDiFF 3.0.1.2 deployment between July 31 standard-value changes and August 28 structural changes (opening paragraphs). Disability remains scheduled for July 31 EOD, while DARPAN ID, nomination flags and freeze-related fields are scheduled for August 28 EOD; centralised death-reporting deployment will be communicated separately (points 1–2).
+
+### CDSL/OPS/DP/POLCY/2026/509
+
+- **date_issued:** 2026-07-28
+- **issuer:** CDSL
+- **title:** "OPERATIONAL GUIDELINES FOR CAPTURING DARPAN REGISTRATION ID IN DEMAT ACCOUNTS OF NON-PROFIT ORGANISATION"
+- **applies_to:** depository, broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** onboarding, non-individual, aml, kyc-modification
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-509&method=communique
+
+Corrects the status/sub-status categories in communiqué 470 to Trust status 29/sub-status 256 and Corporate status 25/sub-status 265, both charitable institutions classified as NPO (page 1, table). DARPAN ID is mandatory at opening and at modification of existing accounts in those categories (page 1).
+
+### CDSL/OPS/DP/POLCY/2026/504
+
+- **date_issued:** 2026-07-27
+- **issuer:** CDSL
+- **title:** "ENHANCEMENT IN TRANSMISSION PROCESSING BY INTRODUING PAN VALIDATIONS"
+- **applies_to:** depository, broker
+- **in_force_date:** 2026-07-31
+- **status:** in-force
+- **impact_areas:** transmission, nominee, file-format
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-504&method=communique
+
+Introduces PAN checks against surviving holders and, where available, recorded nominees for intra-depository transmission (pages 1–2, points 1–3). DPs must capture date of death and death-intimation date in <abbr title="Beneficial Owner">BO</abbr> Modify before transmission; the validations are scheduled for July 31 EOD (page 2).
+
+### CDSL/OPS/DP/POLCY/2026/500
+
+- **date_issued:** 2026-07-24
+- **issuer:** CDSL
+- **title:** "SEBI CIR - SIMPLIFICATION AND STANDARDISATION OF THE FRAMEWORK FOR TRANSMISSION OF SECURITIES"
+- **applies_to:** depository, broker
+- **in_force_date:** 2026-08-22
+- **status:** in-force
+- **impact_areas:** transmission, nominee
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-500&method=communique
+
+Circulates SEBI’s July 23, 2026 revised transmission framework (cover letter). For dematerialised holdings, the annexure introduces Quick Transmission Processing up to ₹30,000 and simplified documentation up to ₹30 lakh per BO, with standardised documentation and death-certificate verification options (Annexure, clauses 3.2–3.3).
+
+### CDSL/OPS/DP/POLCY/2026/494
+
+- **date_issued:** 2026-07-22
+- **issuer:** CDSL
+- **title:** "SEBI CIR - OPERATIONALISATION OF FREEZING OF HOLDINGS OF PROMOTER AND PROMOTER GROUP INCLUDING THEIR ASSOCIATES"
+- **applies_to:** depository, broker
+- **in_force_date:** immediate
+- **status:** in-force
+- **impact_areas:** surveillance, settlement
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-494&method=communique
+
+Circulates the buyback framework requiring ISIN-level freezing of promoter holdings while allowing tender-offer participation and invocation of pre-existing encumbrances (cover letter; Annexure, clause 1). Depositories must establish operational instructions and system enhancements before August 1, 2026, including continued freezing of invoked or released shares (Annexure, clauses 2–6).
+
+### CDSL/OPS/DP/POLCY/2026/495
+
+- **date_issued:** 2026-07-22
+- **issuer:** CDSL
+- **title:** "EASE OF DOING INVESTMENTS - MODIFIED NORMS FOR NOMINATION IN DEMAT ACCOUNTS"
+- **applies_to:** depository, broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** nominee
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-495&method=communique
+
+Clarifies point 13 of communiqué 478: biannual email and <abbr title="Short Message Service.">SMS</abbr> nomination reminders also cover sole-holder accounts that opted out and accounts without either choice (page 1, clarification paragraphs). It applies to existing and new accounts without registered nomination; other provisions of communiqué 478 remain unchanged (page 1).
+
+### CDSL/OPS/DP/POLCY/2026/489
+
+- **date_issued:** 2026-07-21
+- **issuer:** CDSL
+- **title:** "SEBI CIR - CREATING STANDING INSTRUCTIONS FOR SWP, STP FOR MUTUAL FUND UNITS HEALD IN DEMAT FORM"
+- **applies_to:** depository, broker
+- **in_force_date:** immediate
+- **status:** in-force
+- **impact_areas:** mutual-funds, mandate
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-489&method=communique
+
+Circulates the framework extending SWP/STP standing instructions to dematerialised mutual-fund units (cover letter). Depositories must publish a joint framework by October 31, 2026 and implement unit-based instructions by January 31, 2027 and amount-based instructions by April 30, 2027; the underlying circular takes immediate effect (Annexure, clauses 4–7).
+
+### CDSL/OPS/DP/POLCY/2026/487
+
+- **date_issued:** 2026-07-20
+- **issuer:** CDSL
+- **title:** "DP OPERATING INSTRUCTIONS AS OF JUNE - 2026 CHAPTERS & ANNEXURES"
+- **applies_to:** depository, broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** onboarding, closure, transmission, nominee
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-487&method=communique
+
+Publishes the consolidated DP Operating Instructions chapters and annexures as of June 30, 2026 (page 1). The cover letter states that they incorporate amendments already communicated through communiqués up to that date and provides separate links for chapters and annexures (page 1, opening paragraph and links).
+
+### CDSL/OPS/DP/POLCY/2026/478
+
+- **date_issued:** 2026-07-17
+- **issuer:** CDSL
+- **title:** "EASE OF DOING INVESTMENTS - MODIFIED NORMS FOR NOMINATION IN DEMAT ACCOUNTS"
+- **applies_to:** depository, broker
+- **in_force_date:** 2026-08-28
+- **status:** in-force
+- **impact_areas:** onboarding, nominee, minor-joint, file-format
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-478&method=communique
+
+Requires sole individual holders to nominate or opt out, makes joint-account nomination optional and specifies mandatory nominee name, relationship and minor date of birth (points 1–8). It requires acknowledgements, statement disclosure choices, reminders and BO-upload nomination flags; live availability is scheduled for August 28, 2026 (points 9–15 and implementation paragraph).
+
+### CDSL/OPS/DP/POLCY/2026/481
+
+- **date_issued:** 2026-07-17
+- **issuer:** CDSL
+- **title:** "VALIDATION OF KYC RECORDS WITH KRA"
+- **applies_to:** depository, broker
+- **in_force_date:** 2026-08-01
+- **status:** in-force
+- **impact_areas:** re-KYC, kyc-modification
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-481&method=communique
+
+Shares deficient-account lists for KRA records updated in June 2026 and directs follow-up with affected BOs (page 1, paragraphs 2–3). Both debits and credits will be frozen on August 1 under reason code 27 using KRA data as of July 30; the September 2023 unfreezing procedure continues to apply (paragraphs 4–5).
+
+### CDSL/OPS/DP/SYSTM/2026/479
+
+- **date_issued:** 2026-07-17
+- **issuer:** CDSL
+- **title:** "RECORDING OF NON-DISPOSAL UNDERTAKING (NDU)"
+- **applies_to:** depository, broker
+- **in_force_date:** 2026-07-31
+- **status:** in-force
+- **impact_areas:** file-format, bod-eod, other
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-479&method=communique
+
+Introduces EOD cancellation reporting where same-day NDU checker activity is incomplete, with cancellation remarks and notifications to borrower and lender BOs (pages 1–2). DPs must accommodate new <abbr title="Close-Out Debit">COD</abbr> transaction/status values and cancellation-date fields before the July 31 EOD release (points 1–4 and implementation paragraph).
+
+### CDSL/OPS/DP/POLCY/2026/470
+
+- **date_issued:** 2026-07-15
+- **issuer:** CDSL
+- **title:** "OPERATIONAL GUIDELINES FOR CAPTURING DARPAN REGISTRATION ID IN DEMAT ACCOUNTS OF NON-PROFIT ORGANISATION"
+- **applies_to:** depository, broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** onboarding, non-individual, aml, file-format
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-470&method=communique
+
+Introduces mandatory DARPAN ID capture for specified charitable-institution account categories at opening and for existing accounts when modified; registration records must be retained for five years after closure (page 1). The original table and tentative August 7 release must be read with the corrected category codes in communiqué 509 and revised deployment schedule in communiqué 511 (page 1, table and implementation paragraph).
+
+### CDSL/OPS/DP/POLICY/2026/468
+
+- **date_issued:** 2026-07-15
+- **issuer:** CDSL
+- **title:** "INTRODUCTION OF LOAN AGAINST SECURITIES (LAS) MODULE IN EASIEST"
+- **applies_to:** depository, broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** other, file-format
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-468&method=communique
+
+Requires DPs to approve or reject participating lenders’ LAS pledge requests through Easiest on the day of request generation, capturing rejection reasons (page 1, operational bullets). DPs may configure automatic approval for a pledgor–pledgee combination, and approved transactions appear in DP97, DP37 and DPC9 reports (page 1; Annexure A, step 5).
+
+### CDSL/OPS/DP/POLCY/2026/461
+
+- **date_issued:** 2026-07-09
+- **issuer:** CDSL
+- **title:** "SYSTEM ENHANCEMENTS TO CAPTURE THE FLAG FOR DISABLED PERSONS"
+- **applies_to:** depository, broker
+- **in_force_date:** 2026-07-31
+- **status:** in-force
+- **impact_areas:** onboarding, kyc-modification, file-format
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-461&method=communique
+
+Renames the BO/UDiFF Mental Disability field to Disability and specifies M/MDP, O/OTH and N/NO values (page 1, points 1–2). Guardian details are mandatory for mentally disabled persons; the circular gives a tentative July 31 live release, subsequently confirmed in communiqué 511 (point 2 and implementation paragraph).
+
+### CDSL/OPS/DP/POLCY/2026/449
+
+- **date_issued:** 2026-07-06
+- **issuer:** CDSL
+- **title:** "SEBI CIR - HANDLING OF CLIENT’S UNPAID SECURITIES BY TRADING MEMBERS"
+- **applies_to:** depository, broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** settlement, margin, rms
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-449&method=communique
+
+Circulates SEBI’s July 3, 2026 revision of the unpaid-securities framework (cover letter). Non-<abbr title="Margin Trading Facility">MTF</abbr> unpaid securities are paid directly to client demat accounts and auto-pledged to <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr>; the <abbr title="Trading Member">TM</abbr> policy must specify a payment period no longer than five trading days from payout and cannot permit exposure against these securities (Annexure, paragraphs 46.1–46.5).
+
+### CDSL/OPS/DP/POLCY/2026/450
+
+- **date_issued:** 2026-07-06
+- **issuer:** CDSL
+- **title:** "NON-CHARGING OF AMC IN DEMAT ACCOUNTS CONSISTING OF ILLIQUID, SUSPENDED OR DELISTED SECURITIES"
+- **applies_to:** depository, broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** closure
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-450&method=communique
+
+Shares the July 6 billing-folder list of “To be Closed” accounts holding only illiquid, suspended or delisted securities (page 1, paragraphs 2–3). DPs must review the list and not charge AMC where the September 30, 2025 conditions apply (paragraph 4).
+
+### CDSL/OPS/DP/POLCY/2026/438
+
+- **date_issued:** 2026-07-01
+- **issuer:** CDSL
+- **title:** "VERIFICATION OF MOBILE NUMBER REVOCATION LIST (MNRL) PUBLISHED BY TRAI"
+- **applies_to:** depository, broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** kyc-modification, re-KYC, file-format
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-438&method=communique
+
+Requires removal from enhanced due diligence/action of numbers reconnected to the same subscriber within 90 days and unfreezing of accounts frozen for MNRL where the DoT reactivation data identifies them (page 1, paragraphs 2–3). CDSL will share matching BO lists monthly by the fifteenth from July 2026, and DPs must obtain DoT portal credentials for MNRL grievances (paragraphs 3–5).
+
+### CDSL/PMLA/DP/POLCY/2026/439
+
+- **date_issued:** 2026-07-01
+- **issuer:** CDSL
+- **title:** "INTRODUCTION OF APPLICATION PROGRAMMING INTERFACE (API) FACILITY FOR MULTIPLE BENEFICIARY OWNER (BO) ACCOUNTS ACROSS CDSL"
+- **applies_to:** depository, broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** onboarding, aml, file-format
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-439&method=communique
+
+Introduces an API giving the count of BO accounts associated with first-holder attributes across CDSL and advises DPs to use it during onboarding (pages 1–2). Where counts exceed prescribed limits, DPs should perform due diligence and retain declarations; the annexure describes PAN, mobile and email request fields and integration requirements (page 2; API specification, sections 3 and 7).
+
+### CDSL/OPS/DP/POLCY/2026/433
+
+- **date_issued:** 2026-06-30
+- **issuer:** CDSL
+- **title:** "FACILITY FOR BASIC SERVICES DEMAT ACCOUNT (<abbr title="Basic Services Demat Account">BSDA</abbr>)"
+- **applies_to:** depository, broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** onboarding, kyc-modification, file-format, nri
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-433&method=communique
+
+Provides quarterly BSDA eligibility files based on June 20, 2026 holdings and cross-depository first-holder account checks, covering individual, <abbr title="Non-Resident Indian">NRI</abbr> and foreign-national accounts with combined securities value not exceeding ₹10 lakh (page 1, criteria I–<abbr title="—">III</abbr>). The billing archive contains eligible, PAN-exempt, multiple-account and BSDA-flag files; DPs may use BO-modify uploads to remove incorrect BSDA marking and notify BOs (pages 1–2, points 1–5).
+
+### CDSL/OPS/DP/POLCY/2026/434
+
+- **date_issued:** 2026-06-30
+- **issuer:** CDSL
+- **title:** "DISCONTINUATION OF MONTHLY STAMP DUTY UTILIZATION REPORT"
+- **applies_to:** depository, broker
+- **in_force_date:** 2026-07-01
+- **status:** in-force
+- **impact_areas:** reporting, file-format, bod-eod
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-434&method=communique
+
+Replaces the monthly stamp-duty utilisation report with a daily report containing the previous business day’s debited transactions, generated only when stamp duty is debited (page 1, points 1–6). June 2026 is the final monthly reporting period, and DPs must accommodate the daily tilde-separated format in Annexure A (page 1, closing implementation paragraph; page 2).
+
+### CDSL/OPS/DP/POLCY/2026/414
+
+- **date_issued:** 2026-06-18
+- **issuer:** CDSL
+- **title:** "VALIDATION OF KYC RECORDS WITH KRA"
+- **applies_to:** depository, broker
+- **in_force_date:** 2026-07-04
+- **status:** in-force
+- **impact_areas:** re-KYC, kyc-modification
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-414&method=communique
+
+Identifies demat accounts against non-validated KRA PAN records updated during May 2026 and shares DP-wise deficient-account files for follow-up (page 1, paragraphs 2–3). Both debits and credits are to be frozen on July 4, 2026 under reason code 27 using updated KRA data as of July 2; unfreezing follows the referenced September 5, 2023 procedure (paragraphs 4–5).
+
+### CDSL/AUDIT/DP/POLCY/2026/409
+
+- **date_issued:** 2026-06-17
+- **issuer:** CDSL
+- **title:** "CONVERSION OF DEMAT ACCOUNT TO BSDA IN EACH QUARTER"
+- **applies_to:** depository, broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** onboarding, kyc-modification
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-409&method=communique
+
+Requires reassessment of existing BOs for BSDA eligibility each quarter and conversion unless the BO gives authenticated, verifiable consent to retain a regular account (page 1, paragraph 2). Eligible accounts must be converted within ten working days after quarter-end (page 1, paragraph 3).
+
+### CDSL/OPS/DP/POLCY/2026/373
+
+- **date_issued:** 2026-06-03
+- **issuer:** CDSL
+- **title:** "NON-CHARGING OF AMC IN DEMAT ACCOUNTS CONSISTING OF ILLIQUID, SUSPENDED OR DELISTED SECURITIES"
+- **applies_to:** depository, broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** closure
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-373&method=communique
+
+Provides DP-wise lists of accounts in “To be Closed” status holding only illiquid, suspended or delisted securities (page 1, paragraphs 2–3). DPs must review the billing-folder file and refrain from charging AMC subject to the conditions in the September 30, 2025 communiqué (page 1, paragraph 4).
+
+### CDSL/OPS/DP/POLCY/2026/369
+
+- **date_issued:** 2026-06-02
+- **issuer:** CDSL
+- **title:** "AMENDMENTS TO DP OPERATING INSTRUCTIONS CHAPTER - 4"
+- **applies_to:** depository, broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** onboarding, transmission
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-369&method=communique
+
+Amends Chapter 4 for investor-service-request dematerialisation without a letter of confirmation (cover letter). The revised clause requires DP verification and attestation of BO signatures on the Demat Conversion Request Form and retains the requirement for a client master list no older than two months (Annexure A, clause 4.10).
+
+### CDSL/OPS/DP/SETTL/2026/366
+
+- **date_issued:** 2026-06-02
+- **issuer:** CDSL
+- **title:** "FACILITY FOR CANCELLATIONS OF OVERDUE EARLY PAY-IN (EP) TRANSACTIONS"
+- **applies_to:** depository, broker
+- **in_force_date:** 2026-06-06
+- **status:** in-force
+- **impact_areas:** settlement, file-format
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-366&method=communique
+
+Introduces cancellation of overdue intra-depository early pay-in transactions from June 6, 2026 (page 1). DPs must accommodate the enclosed cancellation upload and response formats, including transaction type 51 and the DPU8 success/failure report (pages 2–4).
+
+### CDSL/OPS/DP/SETTL/2026/367
+
+- **date_issued:** 2026-06-02
+- **issuer:** CDSL
+- **title:** "ENHANCEMENTS IN PROCESSING OF PAYIN TRANSACTIONS"
+- **applies_to:** depository, broker
+- **in_force_date:** 2026-06-06
+- **status:** in-force
+- **impact_areas:** settlement, file-format, margin
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-367&method=communique
+
+Changes processing of normal and early pay-in instructions for trading clients under the block mechanism, effective June 6, 2026 (page 1). Post-cut-off early pay-in transactions wait for <abbr title="Clearing Corporation (NCL, ICCL, MCXCCL — context-dependent).">CC</abbr> obligation matching, with PCCOM, DBCS, <abbr title="Officially Valid Document">OVD</abbr> and OEPCAN statuses reflected in DP97; unmatched inter-depository early pay-in securities are unblocked on settlement day (points 1–4).
+
+### CDSL/OPS/DP/POLCY/2026/362
+
+- **date_issued:** 2026-06-01
+- **issuer:** CDSL
+- **title:** "SEBI CIR - MODIFIED NORMS FOR NOMINATION IN DEMAT ACCOUNTS AND MUTUAL FUND FOLIOS"
+- **applies_to:** depository, broker
+- **in_force_date:** 2026-09-01
+- **status:** in-force
+- **impact_areas:** onboarding, nominee, minor-joint
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-362&method=communique
+
+Circulates SEBI’s May 29, 2026 nomination circular and asks DPs to take note (cover letter). The annexure permits up to three nominees and makes nomination optional for jointly held accounts, with all joint holders consenting to nomination changes (Annexure, clauses 4–5).
+
+### CDSL/OPS/DP/POLCY/2026/354
+
+- **date_issued:** 2026-05-27
+- **issuer:** CDSL
+- **title:** "AMENDMENTS TO DP OPERATING INSTRUCTIONS CHAPTER - 10"
+- **applies_to:** depository, broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** closure
+- **primary_url:** https://www.cdslindia.com/eservices/Publications/DownloadFile?eventID=DP2026-354&method=communique
+
+Amends the account-closure operating instructions and associated forms (cover letter; Annexure A, Annexures 2.7 and 10.1). DPs must complete transfer-cum-shifting of free balances within two working days after receiving a complete signed request where no dues remain (Annexure A, clause 10.5.3.5).
 
 ### CDSL/OPS/DP/POLCY/2026/316
 
@@ -30,7 +654,7 @@ This page is the complete listing of <abbr title="Central Depository Services (I
 - **impact_areas:** onboarding, settlement, transmission
 - **primary_url:** https://www.cdslindia.com/common/DownLoadFile.aspx?eventid=DP2026-316&action=communique
 
-Revised process for direct credit of securities in dematerialisation accounts of investors per <abbr title="Securities and Exchange Board of India">SEBI</abbr> direction. Refers to CDSL/OPS/<abbr title="Depository Participant">DP</abbr>/POLCY/2026/202 (Mar 23, 2026) and SEBI Circular <abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/38/13/(3)2026-<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>-POD/I/3763/2026 (Jan 30, 2026). Lays out dematerialisation process for investor service requests via RTAs/Issuers in the enhanced module.
+Revised process for direct credit of securities in dematerialisation accounts of investors per SEBI direction. Refers to CDSL/OPS/DP/POLCY/2026/202 (Mar 23, 2026) and SEBI Circular <abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/38/13/(3)2026-<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>-POD/I/3763/2026 (Jan 30, 2026). Lays out dematerialisation process for investor service requests via RTAs/Issuers in the enhanced module.
 
 ### CDSL/OPS/DP/POLCY/2026/261
 
@@ -62,7 +686,7 @@ Disseminates SEBI Circular HO/49/(17)2026-<abbr title="Corporate Finance Departm
 
 - **date_issued:** 2026-04-02
 - **issuer:** CDSL
-- **title:** "FREEZING OF DEMAT ACCOUNTS FOR <abbr title="Know Your Customer (process).">KYC</abbr> NOT UPLOADED WITH <abbr title="KYC Registration Agency">KRA</abbr>"
+- **title:** "FREEZING OF DEMAT ACCOUNTS FOR KYC NOT UPLOADED WITH KRA"
 - **applies_to:** depository, broker
 - **in_force_date:** [unknown — verify]
 - **status:** in-force
@@ -109,7 +733,7 @@ Implements SEBI Circular HO/38/13/(3)2026-MIRSD-POD/I/3763/2026 (Jan 30, 2026) �
 - **impact_areas:** onboarding, non-individual
 - **primary_url:** https://www.cdslindia.com/common/DownLoadFile.aspx?eventid=DP2026-196&action=communique
 
-Clarifies that an HUF demat account can be opened where there is only one co-parcener (acting as Karta) and at least one HUF member (wife/mother/widow). Account stays in the HUF's name as per <abbr title="Permanent Account Number">PAN</abbr>; Karta identified with list of co-parceners and members and prescribed KYC documents.
+Clarifies that an HUF demat account can be opened where there is only one co-parcener (acting as Karta) and at least one HUF member (wife/mother/widow). Account stays in the HUF's name as per PAN; Karta identified with list of co-parceners and members and prescribed KYC documents.
 
 ### CDSL/OPS/DP/SETTL/2026/188
 
@@ -122,7 +746,7 @@ Clarifies that an HUF demat account can be opened where there is only one co-par
 - **impact_areas:** settlement, file-format
 - **primary_url:** https://www.cdslindia.com/common/DownLoadFile.aspx?eventid=DP2026-188&action=communique
 
-Mandates DPs to complete system/back-office/operational changes for the March 21, 2026 EP-account discontinuation. Includes FAQs and asks DPs to disseminate to trading clients, <abbr title="Trading Member">TM</abbr> clients and <abbr title="Clearing Member">CM</abbr> clients. References CDSL/OPS/DP/SETTL/2026/122 (Feb 19, 2026) and CDSL/OPS/DP/POLCY/2026/183 (Mar 13, 2026).
+Mandates DPs to complete system/back-office/operational changes for the March 21, 2026 EP-account discontinuation. Includes FAQs and asks DPs to disseminate to trading clients, TM clients and <abbr title="Clearing Member">CM</abbr> clients. References CDSL/OPS/DP/SETTL/2026/122 (Feb 19, 2026) and CDSL/OPS/DP/POLCY/2026/183 (Mar 13, 2026).
 
 ### CDSL/OPS/DP/SETT/2026/180
 
@@ -161,7 +785,7 @@ SOP for handling cyber incidents (jointly developed by depositories and exchange
 - **impact_areas:** settlement, file-format
 - **primary_url:** https://www.cdslindia.com/common/DownLoadFile.aspx?eventid=DP2026-122&action=communique
 
-Effective March 21, 2026, CMs no longer required to maintain a separate Early Pay-in (EP) account with CCs; CM Pool account (with valid <abbr title="Beneficial Owner">BO</abbr> Status / BO Sub-status) suffices for EP transactions. Provides operational modalities and changes to back-office.
+Effective March 21, 2026, CMs no longer required to maintain a separate Early Pay-in (EP) account with CCs; CM Pool account (with valid BO Status / BO Sub-status) suffices for EP transactions. Provides operational modalities and changes to back-office.
 
 ### CDSL/OPS/DP/POLCY/2026/91
 
@@ -304,7 +928,7 @@ New "RDG Transfer" transaction type to support Government Securities transfers b
 - **impact_areas:** settlement, pledge, file-format
 - **primary_url:** https://www.cdslindia.com/common/DownLoadFile.aspx?eventid=DP2025-720&action=communique
 
-New transaction status "Overdue – Insufficient Stamp Duty" introduced for off-market and pledge-invocation transactions. CDSL system verifies stamp duty balance availability until <abbr title="End Of Day">EOD</abbr>; transactions cancelled at EOD if insufficient balance.
+New transaction status "Overdue – Insufficient Stamp Duty" introduced for off-market and pledge-invocation transactions. CDSL system verifies stamp duty balance availability until EOD; transactions cancelled at EOD if insufficient balance.
 
 ### CDSL/OPS/DP/POLCY/2025/707
 
@@ -375,7 +999,7 @@ After death-certificate verification, the intermediary must (same day) raise a K
 
 - **date_issued:** 2025-09-18
 - **issuer:** CDSL
-- **title:** "FACILITY FOR PAYMENT OF STAMP DUTY BY BENEFICIAL OWNERS (BOs) THROUGH VALID <abbr title="Unified Payments Interface">UPI</abbr> HANDLE"
+- **title:** "FACILITY FOR PAYMENT OF STAMP DUTY BY BENEFICIAL OWNERS (BOs) THROUGH VALID UPI HANDLE"
 - **applies_to:** depository
 - **in_force_date:** 2025-09-18
 - **status:** in-force
@@ -421,7 +1045,7 @@ Common Standard Operating Procedure (SOP) (CDSL+NSDL+AMFI) for operating demat a
 - **impact_areas:** margin, pledge, settlement, file-format
 - **primary_url:** https://www.cdslindia.com/common/DownLoadFile.aspx?eventid=DP2025-518&action=communique
 
-UDiFF catalogue update for PR-EP / IV-EP / IV-RD: re-uses existing fields (originally for Confiscation-cum-Early Pay-in of <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr> pledge) for the new transaction types. "Auto Pledge Flag for Unpaid Securities / CUSPA Transaction Flag" renamed. No new columns added.
+UDiFF catalogue update for PR-EP / IV-EP / IV-RD: re-uses existing fields (originally for Confiscation-cum-Early Pay-in of CUSPA pledge) for the new transaction types. "Auto Pledge Flag for Unpaid Securities / CUSPA Transaction Flag" renamed. No new columns added.
 
 ### CDSL/OPS/DP/SETT/2025/443
 
@@ -434,7 +1058,7 @@ UDiFF catalogue update for PR-EP / IV-EP / IV-RD: re-uses existing fields (origi
 - **impact_areas:** margin, pledge, settlement, file-format
 - **primary_url:** https://www.cdslindia.com/common/DownLoadFile.aspx?eventid=DP2025-443&action=communique
 
-Operational modalities for the automated combined unpledge/invocation + sale flow under SEBI's June 3, 2025 circular: CUSPA Pledge, Margin Pledge, <abbr title="Margin Trading Facility">MTF</abbr> Pledge. Lays out new transaction types — Pledge Release for Early Pay-in (PR-EP), Invocation (Confiscation) for Early Pay-in (IV-EP), Invocation for Redemption (IV-RD).
+Operational modalities for the automated combined unpledge/invocation + sale flow under SEBI's June 3, 2025 circular: CUSPA Pledge, Margin Pledge, MTF Pledge. Lays out new transaction types — Pledge Release for Early Pay-in (PR-EP), Invocation (Confiscation) for Early Pay-in (IV-EP), Invocation for Redemption (IV-RD).
 
 ### CDSL/OPS/DP/POLCY/2025/411
 
@@ -486,7 +1110,7 @@ CDSL feeds DPs with identified demat accounts of demised holders (received from 
 - **impact_areas:** nominee, onboarding, file-format
 - **primary_url:** https://www.cdslindia.com/common/DownLoadFile.aspx?eventid=DP2025-289&action=communique
 
-Implements the SEBI Revise-and-Revamp Nomination directives in the BO upload file format. Makes Nominee name, address, email, phone mandatory; PAN or last-4 Aadhaar or DL or (OCI/PIO/Passport for <abbr title="Non-Resident Indian">NRI</abbr>) — at least one mandatory at account opening.
+Implements the SEBI Revise-and-Revamp Nomination directives in the BO upload file format. Makes Nominee name, address, email, phone mandatory; PAN or last-4 Aadhaar or DL or (<abbr title="Overseas Citizen of India">OCI</abbr>/PIO/Passport for NRI) — at least one mandatory at account opening.
 
 ### CDSL/RCD/DP/GENRL/2025/280
 
@@ -656,7 +1280,7 @@ Pop-up made available for nomination-deficient demat accounts on easi/easiest, C
 - **impact_areas:** settlement, t0-t1
 - **primary_url:** https://www.cdslindia.com/common/DownLoadFile.aspx?eventid=DP2024-549&action=communique
 
-Extends T+0 rolling settlement framework to trades with custodial-participant (CP) code effective September 30, 2024 per <abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr>/CMPT/63165 and <abbr title="Indian Clearing Corporation Limited">ICCL</abbr> Circular 20240731-47. Provides operational guidelines for custodian clients. References CDSL/OPS/DP/SETT/2024/164 (Mar 21, 2024).
+Extends T+0 rolling settlement framework to trades with custodial-participant (CP) code effective September 30, 2024 per NCL/CMPT/63165 and ICCL Circular 20240731-47. Provides operational guidelines for custodian clients. References CDSL/OPS/DP/SETT/2024/164 (Mar 21, 2024).
 
 ### CDSL/OPS/DP/POLCY/2024/538
 
@@ -714,7 +1338,7 @@ Non-financial transactions (e.g., KYC updation on client request) shall also be 
 
 - **date_issued:** 2024-07-02
 - **issuer:** CDSL
-- **title:** "SEBI CIR - DISPATCH OF CONSOLIDATED ACCOUNT STATEMENT (CAS) FOR ALL SECURITIES ASSETS"
+- **title:** "SEBI CIR - DISPATCH OF CONSOLIDATED ACCOUNT STATEMENT (<abbr title="Consolidated Account Statement">CAS</abbr>) FOR ALL SECURITIES ASSETS"
 - **applies_to:** depository
 - **in_force_date:** [unknown — verify]
 - **status:** in-force
@@ -734,7 +1358,7 @@ Disseminates SEBI Circular SEBI/HO/MRD-PoD2/CIR/P/2024/93 dated July 1, 2024 —
 - **impact_areas:** onboarding, closure, other
 - **primary_url:** https://www.cdslindia.com/common/DownLoadFile.aspx?eventid=DP2024-358&action=communique
 
-Disseminates SEBI Circular SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2024/91 dated June 28, 2024 — revised BSDA framework with raised value limit (10 lakh) and revised <abbr title="Asset Management Company (mutual funds context) / Annual Maintenance Charges (depository context).">AMC</abbr> slabs for promoting financial inclusion.
+Disseminates SEBI Circular SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2024/91 dated June 28, 2024 — revised BSDA framework with raised value limit (10 lakh) and revised AMC slabs for promoting financial inclusion.
 
 ### CDSL/OPS/DP/SYSTM/2024/341
 
@@ -879,7 +1503,7 @@ Periodic KRA invalid-KYC update covering Sep 1, 2023 to Jan 31, 2024. Identifies
 - **impact_areas:** kyc-modification, non-individual, file-format
 - **primary_url:** https://www.cdslindia.com/common/DownLoadFile.aspx?eventid=DP2024-51&action=communique
 
-Introduces new freeze reason code "30 — LEI Expiry / Lapse" in CDSL system, supporting LEI mandate for non-individual FPIs (reference: CDSL/OPS/DP/POLCY/2023/435 dated Jul 28, 2023).
+Introduces new freeze reason code "30 — <abbr title="Legal Entity Identifier">LEI</abbr> Expiry / Lapse" in CDSL system, supporting LEI mandate for non-individual FPIs (reference: CDSL/OPS/DP/POLCY/2023/435 dated Jul 28, 2023).
 
 ### CDSL/A,I&C/DP/POLCY/2024/12
 
@@ -1129,7 +1753,7 @@ Consolidated reference of DDPI-related communiques: CDSL/OPS/DP/POLCY/2022/194 (
 - **impact_areas:** settlement, pledge, margin, file-format
 - **primary_url:** https://www.cdslindia.com/common/DownLoadFile.aspx?eventid=DP2022-332&action=communique
 
-Operational guidelines for DDPI: discontinuation of optional Settlement-Specific <abbr title="Power of Attorney">POA</abbr> linking on demat accounts; activation flow for clients who voluntarily authorize TM/CM for transfer / margin pledge; mapping of CM accounts with CM POA / PMS POA / DDPI Master; file formats and technical specs.
+Operational guidelines for DDPI: discontinuation of optional Settlement-Specific POA linking on demat accounts; activation flow for clients who voluntarily authorize TM/CM for transfer / margin pledge; mapping of CM accounts with CM POA / PMS POA / DDPI Master; file formats and technical specs.
 
 ### CDSL/OPS/DP/POLCY/2022/194
 
@@ -1181,7 +1805,7 @@ Follow-up to CDSL/OPS/DP/GENRL/2021/447 (Oct 4, 2021). Reiterates online-opening
 - **impact_areas:** settlement, file-format, derivatives, nri, minor-joint
 - **primary_url:** https://www.cdslindia.com/common/DownLoadFile.aspx?eventid=DP2021-446&action=communique
 
-Extends e-DIS facility to all investor categories including joint holders, minor through guardian, sole NRI (subject to suitable undertaking obtained by DP), in addition to sole resident individuals. Specifies TPIN+OTP authentication; e-DIS valid for one calendar day.
+Extends e-DIS facility to all investor categories including joint holders, minor through guardian, sole NRI (subject to suitable undertaking obtained by DP), in addition to sole resident individuals. Specifies <abbr title="Transaction PIN">TPIN</abbr>+OTP authentication; e-DIS valid for one calendar day.
 
 ### CDSL/OPS/DP/GENRL/2021/447
 
@@ -1445,7 +2069,7 @@ Disseminates SEBI Circular SEBI/HO/MIRSD/DOP/CIR/P/2020/28 dated February 25, 20
 
 ## Verified through
 
-2026-05-14
+2026-09-11
 
 ---
 

@@ -1,14 +1,14 @@
 ---
 title: NPCI Circulars
-description: "Verified index of NPCI circulars affecting Indian stock broking, 2020-01-01 to 2026-05-14. 50 entries."
+description: "Verified index of NPCI circulars affecting Indian stock broking, 2020-01-01 to 2026-09-11. 57 entries."
 ---
 
 > **Why this page is structured this way:** All in-window entries are listed descending by date so the most recent regulatory state is the first thing a reader sees. Use Cmd-F / Ctrl-F for ID-based lookup. Cross-references from the rest of the site point at anchors on this page.
 
 ## TL;DR
 
-- **50 circulars** indexed in this issuer's section.
-- **7** issued in 2025 or later.
+- **57 circulars** indexed in this issuer's section.
+- **14** issued in 2025 or later.
 - **23** entries flagged `[unknown — verify]` in at least one field.
 - All entries trace to a primary issuer URL (or Wayback fallback) where research could verify the source.
 - AI-generated; **read the linked PDF before acting on any provision**.
@@ -19,11 +19,102 @@ This page is the complete listing of <abbr title="National Payments Corporation 
 
 ## Entries (descending date)
 
+### NPCI/UPI/OC-227A/2026-27
+
+- **date_issued:** 2026-09-10
+- **issuer:** NPCI
+- **title:** "Addendum to <abbr title="Unified Payments Interface">UPI</abbr> OC 227 – “MyUPI” - AI powered support for UPI payments (UPI HELP 2.0)"
+- **applies_to:** broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** upi-block, mandate, grievance
+- **primary_url:** https://www.ricago.com/assets/front/base/file/file_management/7371.pdf
+
+MyUPI adds transaction replay, payee-context information, a UPI safety switch, mapper delinking and automated processing of eligible complaints into chargebacks (per features 1–4). The safety switch excludes <abbr title="Initial Public Offering">IPO</abbr>, Retail Direct Scheme and SBMD secondary-market transactions (per feature 3(a)). Members and applications must restrict MyUPI data use to its specified functions and refer to separately shared feature and technical documents (per page 2 closing paragraphs).
+
+### NPCI/UPI/OC-115F/2026-27
+
+- **date_issued:** 2026-07-30
+- **issuer:** NPCI
+- **title:** "Addendum to OC NPCI/UPI/OC-115E/2024-25 on the Numeric UPI ID"
+- **applies_to:** [unknown — verify]
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** client-funds, cyber-security
+- **primary_url:** https://www.ricago.com/assets/front/base/file/file_management/6867.pdf
+
+Banks, PSPs and UPI applications must regularly update their databases using the Mobile Number Revocation List, with PSPs/applications liable for failures to update the Numeric UPI ID Mapper (per clause a). Mobile-number payments must use that mapper; local resolution is permitted only when its response exceeds one second, with the payer PSP/application bearing the resulting liability (per clause b).
+
+### NPCI/UPI/OC No. 235/2026-27
+
+- **date_issued:** 2026-07-16
+- **issuer:** NPCI
+- **title:** "Revision of Turnaround Time (TAT) for Responding to Fraud and Wrong Credit Chargebacks in UPI URCS Back-Office System"
+- **applies_to:** [unknown — verify]
+- **in_force_date:** 2026-08-01
+- **status:** in-force
+- **impact_areas:** client-funds, grievance
+- **primary_url:** https://www.ricago.com/assets/front/base/file/file_management/6621.pdf
+
+The beneficiary-bank response window for fraud and wrong-credit chargebacks falls from 35 to 15 calendar days from August 1, 2026, including chargebacks raised before that date (per page 1, first two body paragraphs). Failure to accept or reject within that window results in deemed acceptance and settlement; banks must monitor open cases for the transition (per page 1, third body paragraph).
+
+### NPCI/UPI/OC-128A/2026-27
+
+- **date_issued:** 2026-07-03
+- **issuer:** NPCI
+- **title:** "Addendum to OC-128 Extension of additional response codes under Deemed Debit for mandate execution"
+- **applies_to:** broker, clearing-corp
+- **in_force_date:** 2026-07-15
+- **status:** in-force
+- **impact_areas:** upi-block, mandate, settlement
+- **primary_url:** https://www.ricago.com/assets/front/base/file/file_management/6430.pdf
+
+Response codes 59 and K1 enter the deemed-debit scope; VO, VH, VU/QD and VS remain excluded (per the page 1 response-code table). For IPO, RDS and SBMD secondary-market cases, acquirers/payees may use BGGD for the specified excluded codes where the amount conforms to the mandate (per paragraph 1). Members must reconcile mandate and transaction files, unblock expired mandates and prevent duplicate or out-of-validity execution; the applicability changes start July 15, 2026 (per paragraphs 5–6 and page 2 commencement paragraph).
+
+### NPCI/UPI/OC-226A/2026-27
+
+- **date_issued:** 2026-07-03
+- **issuer:** NPCI
+- **title:** "Enhancement of Transaction Limit for On-Device Biometric Authentication in UPI"
+- **applies_to:** [unknown — verify]
+- **in_force_date:** 2026-08-07
+- **status:** in-force
+- **impact_areas:** client-funds
+- **primary_url:** https://www.ricago.com/assets/front/base/file/file_management/6429.pdf
+
+The per-transaction limit for on-device biometric authentication rises from ₹5,000 to ₹10,000 on August 7, 2026 (per page 1, second body paragraph). Issuer banks, PSP banks and UPI applications must communicate the change to customers and continue complying with existing validations and specifications (per the following two paragraphs).
+
+### NPCI/UPI/OC-234/2026-27
+
+- **date_issued:** 2026-06-05
+- **issuer:** NPCI
+- **title:** "Safeguarding User Information in UPI"
+- **applies_to:** [unknown — verify]
+- **in_force_date:** 2026-09-04
+- **status:** in-force
+- **impact_areas:** cyber-security, client-funds
+- **primary_url:** https://www.ricago.com/assets/front/base/file/file_management/6154.pdf
+
+UPI member banks and applications must mask UPI IDs, mobile numbers and account numbers across customer interfaces and communications, and allow non-mobile-number UPI IDs to be set as default (per page 1, second body paragraph). The Annexure specifies last-four-digit visibility for mobile-number UPI IDs, mobile numbers and accounts; implementation is due September 4, 2026 (per Annexure a–c and page 1, final body paragraph).
+
+### NPCI / 2026-27 / NACH / 002
+
+- **date_issued:** 2026-05-15
+- **issuer:** NPCI
+- **title:** "Introduction of ACH Debit settlement on realization under <abbr title="National Automated Clearing House">NACH</abbr>"
+- **applies_to:** broker
+- **in_force_date:** 2026-07-01
+- **status:** in-force
+- **impact_areas:** mandate, settlement, client-funds
+- **primary_url:** https://avantiscdnprodstorage.blob.core.windows.net/legalupdatedocs/56103/NPCI-issued-circular-regarding-the-introduction-of-ACH-Debit-settlement-on-realization-under-NACH-may202026.pdf
+
+Financial settlement at ACH Debit presentation is discontinued; settlement occurs only after destination-bank confirmation or deemed acceptance within existing return-session timelines (per Operational Directions 1–2). Negatively confirmed transactions are not settled, and response files carry those results to presenting banks (per Operational Direction 3). The circular covers existing and new mandates and takes effect July 1, 2026 (per Scope and Applicability and the page 1 Effective Date panel).
+
 ### NPCI/UPI/OC No. 228/2025-26
 
 - **date_issued:** 2025-10-08
 - **issuer:** NPCI
-- **title:** "Enhancements in <abbr title="Unified Payments Interface">UPI</abbr> Single Block Multiple Debits (UPI Reserve Pay)"
+- **title:** "Enhancements in UPI Single Block Multiple Debits (UPI Reserve Pay)"
 - **applies_to:** broker, all-intermediaries
 - **in_force_date:** [unknown — verify]
 - **status:** in-force
@@ -115,7 +206,7 @@ Formally introduced the e-KYC Setu facility for regulated financial-sector entit
 
 - **date_issued:** 2024-11-27
 - **issuer:** NPCI
-- **title:** "Changes in Rejection Code description in <abbr title="National Automated Clearing House">NACH</abbr>"
+- **title:** "Changes in Rejection Code description in NACH"
 - **applies_to:** broker, all-intermediaries
 - **in_force_date:** [unknown — verify]
 - **status:** in-force
@@ -162,7 +253,7 @@ Introduces auto-top-up for UPI Lite where balance auto-replenishes from the link
 - **impact_areas:** settlement, upi-block, mandate, onboarding
 - **primary_url:** https://www.npci.org.in/PDF/npci/upi/circular/2024/UPI-OC-No-185A-FY-24-25-Implementation-of-Rs-5-Lakh-limit-per-transaction-for-specific-categories-in-UPI.pdf
 
-Added Tax Payments (MCC 9311) to Rs.5 lakh per-transaction limit list, restricted to Verified Merchants. Existing categories retained: Hospitals & Educational Services (multiple MCCs); <abbr title="Initial Public Offering">IPO</abbr> & G-Sec (MCC 6211, purpose code 01 IPO and 25 RDS). Acquirers must classify merchants correctly and conduct due diligence before adding to Verified Merchant list. Compliance by 15 September 2024. Confirms MCC 6211 securities-broker IPO/G-Sec eligibility for Rs.5 lakh limit.
+Added Tax Payments (MCC 9311) to Rs.5 lakh per-transaction limit list, restricted to Verified Merchants. Existing categories retained: Hospitals & Educational Services (multiple MCCs); IPO & G-Sec (MCC 6211, purpose code 01 IPO and 25 RDS). Acquirers must classify merchants correctly and conduct due diligence before adding to Verified Merchant list. Compliance by 15 September 2024. Confirms MCC 6211 securities-broker IPO/G-Sec eligibility for Rs.5 lakh limit.
 
 ### NPCI/UPI/OC No. 200/2024-25
 
@@ -682,7 +773,7 @@ Addendum to OC 76A revising merchant/transaction-type limits. Operational impact
 
 ## Verified through
 
-2026-05-14
+2026-09-11
 
 ---
 

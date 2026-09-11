@@ -1,14 +1,14 @@
 ---
 title: SEBI-MIRSD Circulars
-description: "Verified index of SEBI-MIRSD circulars affecting Indian stock broking, 2020-01-01 to 2026-05-14. 56 entries."
+description: "Verified index of SEBI-MIRSD circulars affecting Indian stock broking, 2020-01-01 to 2026-09-11. 63 entries."
 ---
 
 > **Why this page is structured this way:** All in-window entries are listed descending by date so the most recent regulatory state is the first thing a reader sees. Use Cmd-F / Ctrl-F for ID-based lookup. Cross-references from the rest of the site point at anchors on this page.
 
 ## TL;DR
 
-- **56 circulars** indexed in this issuer's section.
-- **10** issued in 2025 or later.
+- **63 circulars** indexed in this issuer's section.
+- **17** issued in 2025 or later.
 - **0** entries flagged `[unknown — verify]` in at least one field.
 - All entries trace to a primary issuer URL (or Wayback fallback) where research could verify the source.
 - AI-generated; **read the linked PDF before acting on any provision**.
@@ -19,11 +19,102 @@ This page is the complete listing of <abbr title="Securities and Exchange Board 
 
 ## Entries (descending date)
 
+### HO/38/15/(7)2026-MIRSD-POD/I/19255/2026
+
+- **date_issued:** 2026-08-20
+- **issuer:** SEBI-MIRSD
+- **title:** "Enabling sharing of information by <abbr title="Know Your Customer (process).">KYC</abbr> Registration Agencies (KRAs) with entities regulated by International Financial Services Centres Authority."
+- **applies_to:** all-intermediaries
+- **in_force_date:** immediate
+- **status:** in-force
+- **impact_areas:** onboarding, kyc-modification
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/aug-2026/1787285998826.pdf
+
+Specifies <abbr title="International Financial Services Centres Authority">IFSCA</abbr> under regulation 16A(1), enabling its regulated entities to access <abbr title="KYC Registration Agency">KRA</abbr> systems for client KYC (clause 2). Accessing entities must follow the KRA Regulations, the securities-market KYC Master Circular and, for <abbr title="Foreign Portfolio Investor">FPI</abbr> clients, the specified data-security guidelines (clauses 3–5); implementation is immediate (clause 6).
+
+### HO/38/14/(11)2026-MIRSD-POD1/ I/18038/2026
+
+- **date_issued:** 2026-08-03
+- **issuer:** SEBI-MIRSD
+- **title:** "Extension of timeline for enrolment with PaRRVA as specified in SEBI Circular No. <abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/38/14/(4)2026-MIRSD-POD/I/10557/2026 dated April 29, 2026"
+- **applies_to:** [unknown — verify]
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** other
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/aug-2026/1785760104221.pdf
+
+Extends the PaRRVA enrolment deadline for investment advisers and research analysts wishing to communicate certified past performance to September 3, 2026 (clauses 1–3). The earlier April 29 circular had specified August 3 following PaRRVA operationalisation on May 4, 2026 (clause 2).
+
+### HO/38/13/11(14)2026-MIRSD-POD/I/17111/2026
+
+- **date_issued:** 2026-07-23
+- **issuer:** SEBI-MIRSD
+- **title:** "Ease of Doing Investment and Ease of Doing Business – Simplification and standardisation of the framework for transmission of securities"
+- **applies_to:** depository
+- **in_force_date:** 2026-08-22
+- **status:** in-force
+- **impact_areas:** transmission, mutual-funds, reporting
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/jul-2026/1784869499027.pdf
+
+Introduces Quick Transmission Processing up to ₹10,000 for physical holdings and ₹30,000 for demat holdings, with simplified-documentation thresholds of ₹10 lakh and ₹30 lakh respectively (clause 3.2 and Annexure 3). Standardises documents, removes mandatory probate and accepts QR-coded death certificates (clause 3.3). The framework applies after 30 days; processing entities must report monthly for six months (clauses 4–6).
+
+### HO/38/11/(9)2026-MIRSD-POD/I/15382/2026
+
+- **date_issued:** 2026-07-03
+- **issuer:** SEBI-MIRSD
+- **title:** "Handling of Client’s Unpaid Securities by Trading Members"
+- **applies_to:** broker, exchange, depository
+- **in_force_date:** [unknown — verify]
+- **status:** [unknown — verify]
+- **impact_areas:** settlement, margin, rms, client-funds
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/jul-2026/1783077132079.pdf
+
+Replaces broker Master Circular paragraph 46 with direct client payout and auto-pledge to <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr>, daily excess-pledge release and a payment window capped at five trading days (clause 3, paragraphs 46.1–46.7). Unresolved pledges auto-release at the end of the sixth trading day; specified liquidation obstacles permit extensions requested by 6 p.m. on the fifth day (paragraphs 46.10–46.14). Paragraphs 46.1–46.11 start three months after exchange operational guidelines, while paragraphs 46.12–46.14 start six months after issuance (clauses 5–7).
+
+### HO/38/12/11(5)2026-MIRSD-POD/I/14660/2026
+
+- **date_issued:** 2026-06-24
+- **issuer:** SEBI-MIRSD
+- **title:** "Ease of Doing Business – Relaxation in certification requirement for Persons Associated with Investment Advice (PAIA) – Sales and other non-core services"
+- **applies_to:** [unknown — verify]
+- **in_force_date:** immediate
+- **status:** in-force
+- **impact_areas:** other
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/jun-2026/1782299902147.pdf
+
+Requires the NISM Series XXV-B examination for PAIA performing only sales and other non-core services; other PAIA retain the Series X-A and X-B requirements (clauses 3–4). Existing X-A/X-B holders need the new certificate only before their current certificates expire, and the circular applies immediately (clauses 5–6).
+
+### HO/38/44/12(3)2025-MIRSD-TPD1/I/10705/2026
+
+- **date_issued:** 2026-05-07
+- **issuer:** SEBI-MIRSD
+- **title:** "Discontinuation of Investor Risk Reduction Access (<abbr title="Investor Risk Reduction Access">IRRA</abbr>) platform"
+- **applies_to:** exchange, broker
+- **in_force_date:** immediate
+- **status:** in-force
+- **impact_areas:** bcp-dr, rms, other
+- **primary_url:** https://www.sebi.gov.in/legal/circulars/may-2026/discontinuation-of-investor-risk-reduction-access-irra-platform_101300.html
+
+Discontinues the IRRA platform introduced by the circular dated December 30, 2022 and operationalised from October 1, 2023, with immediate effect (para 1, para 5). Cites BCP-DR requirements, the Cyber Security and Cyber Resilience Framework, the market Security Operations Centre and the technical-glitch framework as the measures that now cover the platform's purpose (para 2), and notes that no stock broker used IRRA while the exchanges' contingency pool trading facility was used (para 4). Directs stock exchanges to review the contingency pool trading facility and to amend their bye-laws, rules and regulations accordingly.
+
+### HO/38/11/(5)2026-MIRSD-POD/I/5130/2026
+
+- **date_issued:** 2026-02-17
+- **issuer:** SEBI-MIRSD
+- **title:** "Forms for registration of stock brokers and clearing members"
+- **applies_to:** broker, exchange, clearing-corp
+- **in_force_date:** 2026-01-07
+- **status:** in-force
+- **impact_areas:** other
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/feb-2026/1771327465440.pdf
+
+Specifies application forms and registration certificates under the Stock Brokers Regulations, 2026 (clause 2 and Annexure, Forms A–C). The forms apply retrospectively from January 7, 2026; exchanges and clearing corporations must inform members and amend their rules (clauses 3–4).
+
 ### SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/108
 
 - **date_issued:** 2025-07-29
 - **issuer:** SEBI-MIRSD
-- **title:** "Extension of timeline for implementation of SEBI Circular SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/MIRSD/MIRSD-PoD/P/CIR/2025/0000013 dated February 04, 2025"
+- **title:** "Extension of timeline for implementation of SEBI Circular SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/0000013 dated February 04, 2025"
 - **applies_to:** broker, exchange
 - **in_force_date:** 2025-10-01
 - **status:** in-force
@@ -56,9 +147,9 @@ Streamlines monitoring of NRI position limits in exchange-traded derivatives con
 - **impact_areas:** onboarding, grievance, surveillance
 - **primary_url:** https://www.sebi.gov.in/legal/circulars/jul-2025/frequently-asked-questions-faqs-on-research-analysts-under-sebi-research-analysts-regulations-2014_95527.html
 
-18-page FAQ clarifying provisions of the SEBI (Research Analysts) Regulations 2014 read with the May 2024 Research Analysts circular. Covers registration, qualification/experience, <abbr title="Know Your Customer (process).">KYC</abbr> of clients, fee structure, segregation of distribution/advisory, recordkeeping and association with regulated entities.
+18-page FAQ clarifying provisions of the SEBI (Research Analysts) Regulations 2014 read with the May 2024 Research Analysts circular. Covers registration, qualification/experience, KYC of clients, fee structure, segregation of distribution/advisory, recordkeeping and association with regulated entities.
 
-### SEBI/HO/MIRSD/POD-1/P/CIR/2025/94
+### SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90
 
 - **date_issued:** 2025-06-17
 - **issuer:** SEBI-MIRSD
@@ -82,7 +173,7 @@ Updated Master Circular for stock brokers consolidating directives issued up to 
 - **impact_areas:** grievance, onboarding, reporting, scores-odr
 - **primary_url:** https://www.sebi.gov.in/legal/circulars/feb-2025/investor-charter-for-stock-brokers_92547.html
 
-Updated Investor Charter for stock brokers reflecting <abbr title="SEBI Complaints Redress System">SCORES</abbr> 2.0 (21-day initial resolution), the <abbr title="Online Dispute Resolution">ODR</abbr> portal, the revamped nomination framework, BSDA Rs 10 lakh threshold, direct payout of securities, and disclosure of investor complaint statistics. Replaces the December 2021 Investor Charter; to be published on broker websites and shared in account-opening kits.
+Updated Investor Charter for stock brokers reflecting <abbr title="SEBI Complaints Redress System">SCORES</abbr> 2.0 (21-day initial resolution), the <abbr title="Online Dispute Resolution">ODR</abbr> portal, the revamped nomination framework, <abbr title="Basic Services Demat Account">BSDA</abbr> Rs 10 lakh threshold, direct payout of securities, and disclosure of investor complaint statistics. Replaces the December 2021 Investor Charter; to be published on broker websites and shared in account-opening kits.
 
 ### SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/15
 
@@ -183,7 +274,7 @@ Replaces earlier sectoral cyber circulars with a unified Cybersecurity and Cyber
 - **applies_to:** broker
 - **in_force_date:** 2024-08-09
 - **status:** superseded
-- **superseded_by:** SEBI/HO/MIRSD/POD-1/P/CIR/2025/94
+- **superseded_by:** SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90
 - **impact_areas:** onboarding, client-funds, margin, settlement, rms, mtf, slbm, surveillance, reporting, bcp-dr, cyber-security, grievance, file-format, t0-t1, upstreaming, system-audit
 - **primary_url:** https://www.sebi.gov.in/legal/master-circulars/aug-2024/master-circular-for-stock-brokers_85605.html
 
@@ -252,7 +343,7 @@ Updated AML/CFT Master Circular replacing the February 2023 master circular. Cov
 - **impact_areas:** onboarding, re-KYC, file-format, reporting
 - **primary_url:** https://www.sebi.gov.in/legal/circulars/jun-2024/uploading-of-kyc-information-by-kyc-registration-agencies-kras-to-central-kyc-records-registry-ckycrr-_84006.html
 
-Mandates KRAs to upload KYC records of all clients (new and existing) to the Central KYC Records Registry (CKYCRR) operated by <abbr title="Central Registry of Securitisation Asset Reconstruction and Security Interest of India">CERSAI</abbr>, effecting dual upload obligations under both <abbr title="KYC Registration Agency">KRA</abbr> and <abbr title="Central KYC (records registry)">CKYC</abbr> regimes. Specifies cut-off dates from which KRAs must transmit prescribed KYC fields to CKYCRR and report exceptions.
+Mandates KRAs to upload KYC records of all clients (new and existing) to the Central KYC Records Registry (CKYCRR) operated by <abbr title="Central Registry of Securitisation Asset Reconstruction and Security Interest of India">CERSAI</abbr>, effecting dual upload obligations under both KRA and <abbr title="Central KYC (records registry)">CKYC</abbr> regimes. Specifies cut-off dates from which KRAs must transmit prescribed KYC fields to CKYCRR and report exceptions.
 
 ### SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2024/75
 
@@ -519,7 +610,7 @@ Master compilation of all extant circulars/directions to stock brokers from 1 Ju
 - **impact_areas:** onboarding, re-KYC, nominee, kyc-modification, transmission
 - **primary_url:** https://www.sebi.gov.in/legal/circulars/mar-2023/common-and-simplified-norms-for-processing-investor-s-service-request-by-rtas-and-norms-for-furnishing-pan-kyc-details-and-nomination_69323.html
 
-Replaces the November 2021 RTA service-request circular with revised norms. Mandates RTAs to obtain PAN, contact details (mobile/email), bank details and nomination from all physical securities holders; folios without these to be frozen and where unfrozen for 7+ years, transferred to IEPF as per LODR.
+Replaces the November 2021 RTA service-request circular with revised norms. Mandates RTAs to obtain PAN, contact details (mobile/email), bank details and nomination from all physical securities holders; folios without these to be frozen and where unfrozen for 7+ years, transferred to <abbr title="Investor Education and Protection Fund">IEPF</abbr> as per LODR.
 
 ### SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/24
 
@@ -772,7 +863,7 @@ Mandates that client securities given to brokers as margin shall be by way of pl
 
 ## Verified through
 
-2026-05-14
+2026-09-11
 
 ---
 

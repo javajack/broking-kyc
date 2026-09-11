@@ -1,14 +1,14 @@
 ---
 title: MeitY / CCA Circulars
-description: "Verified index of MeitY / CCA circulars affecting Indian stock broking, 2020-01-01 to 2026-05-14. 29 entries."
+description: "Verified index of MeitY / CCA circulars affecting Indian stock broking, 2020-01-01 to 2026-09-11. 31 entries."
 ---
 
 > **Why this page is structured this way:** All in-window entries are listed descending by date so the most recent regulatory state is the first thing a reader sees. Use Cmd-F / Ctrl-F for ID-based lookup. Cross-references from the rest of the site point at anchors on this page.
 
 ## TL;DR
 
-- **29 circulars** indexed in this issuer's section.
-- **9** issued in 2025 or later.
+- **31 circulars** indexed in this issuer's section.
+- **11** issued in 2025 or later.
 - **4** entries flagged `[unknown — verify]` in at least one field.
 - All entries trace to a primary issuer URL (or Wayback fallback) where research could verify the source.
 - AI-generated; **read the linked PDF before acting on any provision**.
@@ -18,6 +18,32 @@ description: "Verified index of MeitY / CCA circulars affecting Indian stock bro
 This page is the complete listing of MeitY / <abbr title="Controller of Certifying Authorities">CCA</abbr> circulars in the project's 2020–2026 sweep window. Each entry contains the verbatim circular ID, issue date, in-force date, status (in-force / superseded / withdrawn), applicable entity types, impact-area tags, a 2–4 sentence summary traceable to clauses, and the primary URL. Where the primary URL could not be re-fetched, an archive URL is provided in its place.
 
 ## Entries (descending date)
+
+### CCA-CRYPTO
+
+- **date_issued:** 2026-08-14
+- **issuer:** MeitY
+- **title:** "Security Requirements for Crypto Devices"
+- **applies_to:** all-intermediaries
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** esign, cyber-security
+- **primary_url:** https://cca.gov.in/sites/files/pdf/guidelines/CCA-CRYPTO.pdf
+
+Version 2.4 requires device software to permit only SHA-2 or stronger approved algorithms for new digital signatures and timestamps, and CAs to empanel compliant devices (per section 4(a)). Devices relying on historical FIPS 140-2 status must stop fresh-eKYC <abbr title="Digital Signature Certificate (CCA-licensed; aka Class 2/3 DSC).">DSC</abbr> issuance after September 21, 2026 except where specifically permitted (per section 2.18(g)).
+
+### CCA-IOG
+
+- **date_issued:** 2026-06-16
+- **issuer:** MeitY
+- **title:** "Interoperability Guidelines for Digital Signature Certificates issued under Information Technology Act"
+- **applies_to:** all-intermediaries
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** esign, cyber-security
+- **primary_url:** https://cca.gov.in/sites/files/pdf/guidelines/CCA-IOG.pdf
+
+Version 4.1 revises SSL certificate subject-name and extension requirements, including restrictions on Common Name and Organisation Unit and algorithm-specific key usage (per June 16, 2026 change history and Annexure <abbr title="—">II</abbr>, SSL Certificate). It also changes SSL serial-number, validity and certificate-profile requirements (per Annexure <abbr title="—">III</abbr>, SSL Certificate Profile and change-history items 5–6).
 
 ### CCA-IOG-4-0-2026
 
@@ -30,7 +56,7 @@ This page is the complete listing of MeitY / <abbr title="Controller of Certifyi
 - **impact_areas:** esign, file-format
 - **primary_url:** https://cca.gov.in/sites/files/pdf/guidelines/CCA-IOG.pdf
 
-Updated <abbr title="Digital Signature Certificate (CCA-licensed; aka Class 2/3 DSC).">DSC</abbr> interoperability specification (v4.0) prescribing certificate profile, OIDs, key usage and revocation-information requirements for DSCs issued by all licensed CAs. Brokers' <abbr title="Know Your Customer (process).">KYC</abbr>-acceptance, e-contract and order-confirmation systems must validate signatures against this profile.
+Updated DSC interoperability specification (v4.0) prescribing certificate profile, OIDs, key usage and revocation-information requirements for DSCs issued by all licensed CAs. Brokers' <abbr title="Know Your Customer (process).">KYC</abbr>-acceptance, e-contract and order-confirmation systems must validate signatures against this profile.
 
 ### CCA-IVG-2-5-2026
 
@@ -56,7 +82,7 @@ Current CCA identity-verification guideline (v2.5) for DSC issuance and Aadhaar-
 - **impact_areas:** onboarding, re-KYC, esign, dpdp
 - **primary_url:** https://uidai.gov.in/en/about-uidai/legal-framework/regulations/19549-aadhaar-authentication-and-offline-verification-amendment-regulations-2025.html
 
-Gazette of India Extraordinary Part <abbr title="—">III</abbr> Section 4 dated 9 December 2025 substantially amends the Aadhaar (Authentication and Offline Verification) Regulations, 2021. Introduces "Aadhaar Application", "Aadhaar Verifiable Credential" and "Offline Face Verification" definitions; restructures permissible offline-verification modes (QR, paperless e-KYC, verifiable credential, e-Aadhaar, paper-based) with optional facial verification; mandates registration of Offline Verification Seeking Entities (OVSEs) and surrender procedures. Brokers using DigiLocker-fetched offline-Aadhaar XML or e-Aadhaar for KYC are OVSEs under this framework.
+Gazette of India Extraordinary Part III Section 4 dated 9 December 2025 substantially amends the Aadhaar (Authentication and Offline Verification) Regulations, 2021. Introduces "Aadhaar Application", "Aadhaar Verifiable Credential" and "Offline Face Verification" definitions; restructures permissible offline-verification modes (QR, paperless e-KYC, verifiable credential, e-Aadhaar, paper-based) with optional facial verification; mandates registration of Offline Verification Seeking Entities (OVSEs) and surrender procedures. Brokers using DigiLocker-fetched offline-Aadhaar XML or e-Aadhaar for KYC are OVSEs under this framework.
 
 ### DPDP-GSR-843-E-2025
 
@@ -409,7 +435,7 @@ CCA criteria and procedure for empanelment of eSign Service Providers (ESPs). Th
 
 ## Verified through
 
-2026-05-14
+2026-09-11
 
 ---
 

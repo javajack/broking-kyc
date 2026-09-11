@@ -1,14 +1,14 @@
 ---
 title: NSE Circulars
-description: "Verified index of NSE circulars affecting Indian stock broking, 2020-01-01 to 2026-05-14. 156 entries."
+description: "Verified index of NSE circulars affecting Indian stock broking, 2020-01-01 to 2026-09-11. 161 entries."
 ---
 
 > **Why this page is structured this way:** All in-window entries are listed descending by date so the most recent regulatory state is the first thing a reader sees. Use Cmd-F / Ctrl-F for ID-based lookup. Cross-references from the rest of the site point at anchors on this page.
 
 ## TL;DR
 
-- **156 circulars** indexed in this issuer's section.
-- **31** issued in 2025 or later.
+- **161 circulars** indexed in this issuer's section.
+- **36** issued in 2025 or later.
 - **0** entries flagged `[unknown — verify]` in at least one field.
 - All entries trace to a primary issuer URL (or Wayback fallback) where research could verify the source.
 - AI-generated; **read the linked PDF before acting on any provision**.
@@ -18,6 +18,58 @@ description: "Verified index of NSE circulars affecting Indian stock broking, 20
 This page is the complete listing of <abbr title="National Stock Exchange of India">NSE</abbr> circulars in the project's 2020–2026 sweep window. Each entry contains the verbatim circular ID, issue date, in-force date, status (in-force / superseded / withdrawn), applicable entity types, impact-area tags, a 2–4 sentence summary traceable to clauses, and the primary URL. Where the primary URL could not be re-fetched, an archive URL is provided in its place.
 
 ## Entries (descending date)
+
+### NSE/INSP/75169
+
+- **date_issued:** 2026-07-13
+- **issuer:** NSE
+- **title:** "Clarification with respect to applicability of the benefit of early pay-in in Commodity Derivatives Segment"
+- **applies_to:** broker
+- **in_force_date:** 2026-09-21
+- **status:** [unknown — verify]
+- **impact_areas:** commodities, margin, settlement
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/INSP75169.pdf
+
+Forwards <abbr title="Securities and Exchange Board of India">SEBI</abbr>'s clarification on early delivery of certified goods to accredited warehouses (covering page and Annexure A, clause 2). Clearing corporations may exempt margins based on risk perception but must continue collecting <abbr title="Mark-to-Market">MTM</abbr>; the change takes effect September 21 (Annexure A, clauses 2–3).
+
+### NSE/CMTR/74792
+
+- **date_issued:** 2026-06-19
+- **issuer:** NSE
+- **title:** "Mock trading on Saturday, June 20, 2026 – Testing of Trading modalities related to Introduction of Closing Auction Session (<abbr title="Consolidated Account Statement">CAS</abbr>) in Equity Cash segment"
+- **applies_to:** broker
+- **in_force_date:** 2026-06-20
+- **status:** in-force
+- **impact_areas:** bcp-dr, rms
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMTR74792.pdf
+
+Schedules a June 20 cash-market mock to test CAS modalities (opening paragraph and mock timetable). Requires NEATPlus 7.8.9 for session 1 and reinstallation/login using 7.8.8 for sessions 2–3, which use existing modalities (second paragraph).
+
+### NSE/FAOP/74791
+
+- **date_issued:** 2026-06-19
+- **issuer:** NSE
+- **title:** "Mock trading on Saturday, June 20, 2026 – Testing of Trading modalities related to Introduction of Closing Auction Session (CAS) in Equity Cash segment"
+- **applies_to:** broker
+- **in_force_date:** 2026-06-20
+- **status:** in-force
+- **impact_areas:** bcp-dr, derivatives, rms
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/FAOP74791.pdf
+
+Schedules a June 20 F&O mock for changes associated with cash-market CAS (opening paragraph). Requires NEATPlus 7.8.9 in the first session, followed by 7.8.8 in sessions 2–3; the timetable includes stock-future price-band alignment (second paragraph and timetable).
+
+### NSE/COMP/74300
+
+- **date_issued:** 2026-05-19
+- **issuer:** NSE
+- **title:** "Mandatory Insurance Cover for FY 2026-27"
+- **applies_to:** broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** reporting, other
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/COMP74300.pdf
+
+Requires indemnity-policy details on ENIT by July 31 for policies expiring May 31; other expiries receive one month to submit renewed-policy details (opening paragraphs). Exempts policies obtained through ANMI/BBF from ENIT submission and references disciplinary action for late submission (points 1–4).
 
 ### NSE/SURV/74008
 
@@ -30,7 +82,7 @@ This page is the complete listing of <abbr title="National Stock Exchange of Ind
 - **impact_areas:** surveillance, reporting, file-format
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/SURV74008.pdf
 
-Latest Master consolidated Surveillance and Investigation circular compiling departmental circulars up to April 30, 2026. Supersedes NSE/SURV/61848 (Apr 30, 2024) and NSE/SURV/67801 (Apr 30, 2025). Single reference for all current surveillance and investigation policies including Cautionary Messages, RTCM, <abbr title="Enhanced Surveillance Measure">ESM</abbr>, <abbr title="Graded Surveillance Measure">GSM</abbr>, <abbr title="Additional Surveillance Measure">ASM</abbr>, OTR, OBSM-PNC, Position Limits.
+Latest Master consolidated Surveillance and Investigation circular compiling departmental circulars up to April 30, 2026. Supersedes NSE/SURV/61848 (Apr 30, 2024) and NSE/SURV/67801 (Apr 30, 2025). Single reference for all current surveillance and investigation policies including Cautionary Messages, RTCM, <abbr title="Enhanced Surveillance Measure">ESM</abbr>, <abbr title="Graded Surveillance Measure">GSM</abbr>, <abbr title="Additional Surveillance Measure">ASM</abbr>, <abbr title="Order-to-Trade Ratio">OTR</abbr>, OBSM-PNC, Position Limits.
 
 ### NSE/INSP/73849
 
@@ -43,7 +95,7 @@ Latest Master consolidated Surveillance and Investigation circular compiling dep
 - **impact_areas:** cyber-security, system-audit, reporting
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/INSP73849.pdf
 
-Operationalises Cyber Audit framework for FY2026-27 under <abbr title="Securities and Exchange Board of India">SEBI</abbr> <abbr title="Cybersecurity and Cyber Resilience Framework">CSCRF</abbr> (SEBI Circular dated August 20, 2024). Continues clause-4.4 framework (100% critical systems audit, 25% non-critical on sample basis), web-portal mediated monitoring, geo-tagged auditor visits. Builds on NSE/INSP/71214 dated November 10, 2025.
+Operationalises Cyber Audit framework for FY2026-27 under SEBI <abbr title="Cybersecurity and Cyber Resilience Framework">CSCRF</abbr> (SEBI Circular dated August 20, 2024). Continues clause-4.4 framework (100% critical systems audit, 25% non-critical on sample basis), web-portal mediated monitoring, geo-tagged auditor visits. Builds on NSE/INSP/71214 dated November 10, 2025.
 
 ### NSE/INSP/73436
 
@@ -57,6 +109,19 @@ Operationalises Cyber Audit framework for FY2026-27 under <abbr title="Securitie
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/INSP73436.pdf
 
 Forwards SEBI Circular <abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/38/11/(1)2026-<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>-POD/I/7656/2026 dated March 23, 2026 introducing ease-of-doing-business relaxations for certain trading members. Removes the requirement of demat-account-tagging reporting and other periodic submissions; aligns with SEBI Master Circular for Stock Brokers (June 17, 2025).
+
+### NSE/CMTR/73362
+
+- **date_issued:** 2026-03-18
+- **issuer:** NSE
+- **title:** "Operational guidelines and Standard Operating Procedure (SOP) on Introduction of Closing Auction Session (CAS) in the Equity Cash Segment"
+- **applies_to:** broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** derivatives, rms, surveillance
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMTR73362.pdf
+
+Defines phased CAS applicability, reference-price fallbacks and 3% cash/stock-futures bands (clauses 1–3). Allows limit and market orders, excludes stop-loss and disclosed-quantity orders, and permits algo market orders during CAS (clause 4). Specifies closing-price and imbalance-data dissemination mechanisms (clauses 5–6).
 
 ### NSE/INSP/72118
 
@@ -789,7 +854,7 @@ Partial modification to Part C 1.8 of NSE/CMTR/57270 (Jun 26, 2023) revising Auc
 - **impact_areas:** onboarding, closure, rms, surveillance
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/INSP61529.pdf
 
-Operationalises voluntary freeze/block framework finalised under SEBI Circular dated January 12, 2024. Annexure 1: framework specifying acceptable freeze-channels (registered email, app, web, IVR), TAT (15 minutes for online; T+1 EOD acknowledgement; permanent block after 7 days), unfreeze procedure, position-square-off rules, MITC-and-website disclosure obligations. Members must update their Risk Management Policy accordingly.
+Operationalises voluntary freeze/block framework finalised under SEBI Circular dated January 12, 2024. Annexure 1: framework specifying acceptable freeze-channels (registered email, app, web, IVR), TAT (15 minutes for online; T+1 EOD acknowledgement; permanent block after 7 days), unfreeze procedure, position-square-off rules, <abbr title="Most Important Terms and Conditions">MITC</abbr>-and-website disclosure obligations. Members must update their Risk Management Policy accordingly.
 
 ### NSE/INSP/61164
 
@@ -1979,7 +2044,7 @@ Implements SEBI Circular dated March 26, 2019 on BCP and DR for MIIs. Permits Ex
 - **impact_areas:** margin, peak-margin, reporting, derivatives
 - **primary_url:** https://archives.nseindia.com/content/circulars/INSP44459.pdf
 
-Clarifies the revised margin framework for F&O and Currency Derivatives segments prescribed via NCL/CMPT/44391 and NCL/CDS/44392 dated May 15, 2020. Specifies collection and reporting requirements for upfront margins and Mark-to-Market (<abbr title="Mark-to-Market">MTM</abbr>) by trading members, dovetailing with the COVID-era margin reforms.
+Clarifies the revised margin framework for F&O and Currency Derivatives segments prescribed via NCL/CMPT/44391 and NCL/CDS/44392 dated May 15, 2020. Specifies collection and reporting requirements for upfront margins and Mark-to-Market (MTM) by trading members, dovetailing with the COVID-era margin reforms.
 
 ### NSE/INSP/44009
 
@@ -2085,7 +2150,7 @@ Levies 5% Additional Surveillance Margin on shortlisted trading members in CM an
 
 ## Verified through
 
-2026-05-14
+2026-09-11
 
 ---
 

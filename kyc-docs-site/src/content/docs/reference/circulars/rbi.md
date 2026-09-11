@@ -1,14 +1,14 @@
 ---
 title: RBI Circulars
-description: "Verified index of RBI circulars affecting Indian stock broking, 2020-01-01 to 2026-05-14. 47 entries."
+description: "Verified index of RBI circulars affecting Indian stock broking, 2020-01-01 to 2026-09-11. 62 entries."
 ---
 
 > **Why this page is structured this way:** All in-window entries are listed descending by date so the most recent regulatory state is the first thing a reader sees. Use Cmd-F / Ctrl-F for ID-based lookup. Cross-references from the rest of the site point at anchors on this page.
 
 ## TL;DR
 
-- **47 circulars** indexed in this issuer's section.
-- **5** issued in 2025 or later.
+- **62 circulars** indexed in this issuer's section.
+- **20** issued in 2025 or later.
 - **0** entries flagged `[unknown — verify]` in at least one field.
 - All entries trace to a primary issuer URL (or Wayback fallback) where research could verify the source.
 - AI-generated; **read the linked PDF before acting on any provision**.
@@ -18,6 +18,201 @@ description: "Verified index of RBI circulars affecting Indian stock broking, 20
 This page is the complete listing of <abbr title="Reserve Bank of India">RBI</abbr> circulars in the project's 2020–2026 sweep window. Each entry contains the verbatim circular ID, issue date, in-force date, status (in-force / superseded / withdrawn), applicable entity types, impact-area tags, a 2–4 sentence summary traceable to clauses, and the primary URL. Where the primary URL could not be re-fetched, an archive URL is provided in its place.
 
 ## Entries (descending date)
+
+### RBI/2026-27/254
+
+- **date_issued:** 2026-09-08
+- **issuer:** RBI
+- **title:** "Review of Circulars issued under Foreign Exchange Management Act, 1999 (<abbr title="Foreign Exchange Management Act 1999">FEMA</abbr>)"
+- **applies_to:** broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** nri
+- **primary_url:** https://www.rbi.org.in/Scripts/BS_CircularIndexDisplay.aspx?Id=13696
+
+RBI withdraws seven obsolete FEMA circulars listed in the Annex, including the circular on non-resident investment in tax-free secured redeemable non-convertible bonds (per paragraph 2 and Annex item 4). Authorised Persons are asked to notify affected constituents (per paragraph 3).
+
+### RBI/2026-27/252
+
+- **date_issued:** 2026-09-07
+- **issuer:** RBI
+- **title:** "Implementation of Section 51A of UAPA, 1967: Updates to UNSC’s 1988 (2011) Taliban Sanctions List: Amendment of 01 Entry:"
+- **applies_to:** [unknown — verify]
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** aml
+- **primary_url:** https://www.rbi.org.in/Scripts/BS_CircularIndexDisplay.aspx?Id=13694
+
+RBI circulates the amendment of 01 entry notified in UNSC communication SC/16443 (per paragraph 2). Addressed regulated entities must act under Chapter IX of the <abbr title="Know Your Customer (process).">KYC</abbr> Directions and follow the UAPA Order dated February 2, 2021, as amended April 22, 2024 (per paragraph 4).
+
+### RBI/2026-27/253
+
+- **date_issued:** 2026-09-07
+- **issuer:** RBI
+- **title:** "Implementation of Section 51A of UAPA, 1967: Updates to UNSC’s 1267/ 1989 ISIL (Da'esh) & Al-Qaida Sanctions List: Amendment of 2 Entries"
+- **applies_to:** [unknown — verify]
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** aml
+- **primary_url:** https://www.rbi.org.in/Scripts/BS_CircularIndexDisplay.aspx?Id=13695
+
+RBI circulates the amendment of 2 entries notified in UNSC communication SC/16446 (per paragraph 2). Addressed regulated entities must act under Chapter IX of the KYC Directions and follow the UAPA Order dated February 2, 2021, as amended April 22, 2024 (per paragraph 5).
+
+### RBI/2026-27/251
+
+- **date_issued:** 2026-09-02
+- **issuer:** RBI
+- **title:** "Deposits and Accounts – Accounts of Non-resident banks"
+- **applies_to:** [unknown — verify]
+- **in_force_date:** immediate
+- **status:** in-force
+- **impact_areas:** nri, reporting
+- **primary_url:** https://www.rbi.org.in/Scripts/BS_CircularIndexDisplay.aspx?Id=13693
+
+AD Category-I banks no longer need to submit the annual list of branches maintaining rupee accounts of non-resident banks or report specified temporary overdrawals by overseas branches/correspondents (per paragraphs 1–2). The removal of these reporting requirements takes immediate effect (per paragraph 2).
+
+### RBI/2026-27/236
+
+- **date_issued:** 2026-08-19
+- **issuer:** RBI
+- **title:** "Implementation of Section 51A of UAPA, 1967: Updates to UNSC’s 1267/ 1989 ISIL (Da'esh) & Al-Qaida Sanctions List: Amendment of 21 Entries"
+- **applies_to:** [unknown — verify]
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** aml
+- **primary_url:** https://www.rbi.org.in/Scripts/BS_CircularIndexDisplay.aspx?Id=13678
+
+RBI circulates the amendment of 21 entries notified in UNSC communication SC/16435 (per paragraph 2). Addressed regulated entities must act under Chapter IX of the KYC Directions and follow the UAPA Order dated February 2, 2021, as amended April 22, 2024 (per paragraph 5).
+
+### RBI/2026-27/234
+
+- **date_issued:** 2026-08-18
+- **issuer:** RBI
+- **title:** "Implementation of Section 51A of UAPA, 1967: Updates to UNSC’s 1267/ 1989 ISIL (Da'esh) & Al-Qaida Sanctions List: Amendment of 04 Entries"
+- **applies_to:** [unknown — verify]
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** aml
+- **primary_url:** https://www.rbi.org.in/Scripts/BS_CircularIndexDisplay.aspx?Id=13676
+
+RBI circulates the amendment of 04 entries notified in UNSC communication SC/16432 (per paragraph 2). Addressed regulated entities must act under Chapter IX of the KYC Directions and follow the UAPA Order dated February 2, 2021, as amended April 22, 2024 (per paragraph 5).
+
+### RBI/2026-27/235
+
+- **date_issued:** 2026-08-18
+- **issuer:** RBI
+- **title:** "Implementation of Section 51A of UAPA, 1967: Updates to UNSC’s 1267/ 1989 ISIL (Da'esh) & Al-Qaida Sanctions List: Amendment of 04 Entries"
+- **applies_to:** [unknown — verify]
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** aml
+- **primary_url:** https://www.rbi.org.in/Scripts/BS_CircularIndexDisplay.aspx?Id=13677
+
+RBI circulates the amendment of 04 entries notified in UNSC communication SC/16433 (per paragraph 2). Addressed regulated entities must act under Chapter IX of the KYC Directions and follow the UAPA Order dated February 2, 2021, as amended April 22, 2024 (per paragraph 5).
+
+### RBI/2026-27/222
+
+- **date_issued:** 2026-07-31
+- **issuer:** RBI
+- **title:** "Implementation of Section 51A of UAPA, 1967: Updates to UNSC’s 1988 (2011) Taliban Sanctions List: Amendment of 05 Entries:"
+- **applies_to:** [unknown — verify]
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** aml
+- **primary_url:** https://www.rbi.org.in/Scripts/BS_CircularIndexDisplay.aspx?Id=13664
+
+RBI circulates the amendment of 05 entries notified in UNSC communication SC/16425 (per paragraph 2). Addressed regulated entities must act under Chapter IX of the KYC Directions and follow the UAPA Order dated February 2, 2021, as amended April 22, 2024 (per paragraph 4).
+
+### RBI/2026-27/203
+
+- **date_issued:** 2026-07-17
+- **issuer:** RBI
+- **title:** "Special Rupee Vostro Accounts (SRVAs)"
+- **applies_to:** broker
+- **in_force_date:** immediate
+- **status:** in-force
+- **impact_areas:** nri, settlement
+- **primary_url:** https://www.rbi.org.in/Scripts/BS_CircularIndexDisplay.aspx?Id=13581
+
+This circular supersedes the five earlier SRVA circulars identified in paragraphs 1–2. AD banks may settle permissible FEMA capital and current account transactions through SRVAs, while investments in debt instruments from SRVA balances remain governed by the non-resident debt-investment directions (per paragraphs 4–6). Cross-border documentation and reporting continue under extant FEMA guidelines, and the instructions take immediate effect (per paragraphs 7–8).
+
+### RBI/2026-27/176
+
+- **date_issued:** 2026-07-09
+- **issuer:** RBI
+- **title:** "Implementation of Section 51A of UAPA, 1967: Updates to UNSC’s 1267/ 1989 ISIL (Da'esh) & Al-Qaida Sanctions List: Amendment of 1 Entry"
+- **applies_to:** [unknown — verify]
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** aml
+- **primary_url:** https://www.rbi.org.in/Scripts/BS_CircularIndexDisplay.aspx?Id=13554
+
+RBI circulates the amendment of 1 entry notified in UNSC communication SC/16407 (per paragraph 2). Addressed regulated entities must act under Chapter IX of the KYC Directions and follow the UAPA Order dated February 2, 2021, as amended April 22, 2024 (per paragraph 5).
+
+### RBI/2026-27/174
+
+- **date_issued:** 2026-06-24
+- **issuer:** RBI
+- **title:** "Modification of Returns / Reporting requirements under FEMA, 1999"
+- **applies_to:** [unknown — verify]
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** nri, reporting
+- **primary_url:** https://www.rbi.org.in/Scripts/BS_CircularIndexDisplay.aspx?Id=13550
+
+RBI revises FLM-8 and related FEMA reporting arrangements, including quarterly franchisee and MTSS sub-agent lists due within 15 days of quarter-end (per paragraph 3). It discontinues specified register formats and returns while preserving complete foreign-exchange records and MTSS collateral adequacy obligations (per paragraph 4).
+
+### RBI/2026-27/175
+
+- **date_issued:** 2026-06-24
+- **issuer:** RBI
+- **title:** "Review of Circulars issued under Foreign Exchange Management Act, 1999 (FEMA)"
+- **applies_to:** [unknown — verify]
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** nri, reporting
+- **primary_url:** https://www.rbi.org.in/Scripts/BS_CircularIndexDisplay.aspx?Id=13551
+
+RBI withdraws the obsolete FEMA circulars listed in the linked Annex following its review of circulars issued since June 2000 (per paragraph 1). Authorised Persons are asked to bring the circular to the notice of affected constituents (per paragraph 2).
+
+### RBI/2026-27/114
+
+- **date_issued:** 2026-06-15
+- **issuer:** RBI
+- **title:** "Liberalisation of Foreign Portfolio Investment under Schedule <abbr title="—">III</abbr> of the Foreign Exchange Management (Non-debt Instruments) Rules, 2019"
+- **applies_to:** broker
+- **in_force_date:** immediate
+- **status:** in-force
+- **impact_areas:** nri
+- **primary_url:** https://www.rbi.org.in/Scripts/BS_CircularIndexDisplay.aspx?Id=13483
+
+AD Category-I banks may open repatriable INR accounts for individual persons resident outside India to invest under Schedule III, following the extension beyond NRIs/OCIs described in paragraph 1 (per paragraph 2). Banks must retain the existing <abbr title="Non-Resident Indian">NRI</abbr>/<abbr title="Overseas Citizen of India">OCI</abbr> reporting and investment-limit monitoring approach and apply the <abbr title="Foreign Portfolio Investor">FPI</abbr>-to-FDI reclassification framework where applicable (per paragraph 2). Banks must establish compliance systems and obtain necessary investor documents; the directions take immediate effect (per paragraphs 3–4).
+
+### RBI/2026-27/97
+
+- **date_issued:** 2026-06-05
+- **issuer:** RBI
+- **title:** "Investments by Foreign Portfolio Investors in Government Securities – Amendments to the regulatory framework"
+- **applies_to:** broker
+- **in_force_date:** immediate
+- **status:** in-force
+- **impact_areas:** nri, settlement
+- **primary_url:** https://www.rbi.org.in/Scripts/BS_CircularIndexDisplay.aspx?Id=13464
+
+RBI removes short-term, security-wise and concentration limits for FPI government-security investments through the General Route and merges the general and long-term sub-limits (per paragraphs 2–3). It expands Fully Accessible Route eligibility to the new tenors and existing securities listed in paragraph 4. These changes take immediate effect (per paragraph 5).
+
+### RBI/2026-27/93
+
+- **date_issued:** 2026-05-22
+- **issuer:** RBI
+- **title:** "Implementation of Section 51A of UAPA, 1967: Updates to UNSC’s 1267/ 1989 ISIL (Da'esh) & Al-Qaida Sanctions List: Removal of 7 Entries"
+- **applies_to:** [unknown — verify]
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** aml
+- **primary_url:** https://www.rbi.org.in/Scripts/BS_CircularIndexDisplay.aspx?Id=13460
+
+RBI circulates the removal of 7 entries notified in UNSC communication SC/16365 (per paragraph 2). Addressed regulated entities must act under Chapter IX of the KYC Directions and follow the UAPA Order dated February 2, 2021, as amended April 22, 2024 (per paragraph 4).
 
 ### RBI/DPSS/2025-26/141
 
@@ -49,7 +244,7 @@ Mandates acquiring banks to onboard AePS touchpoint operators with full due dili
 
 - **date_issued:** 2025-06-12
 - **issuer:** RBI
-- **title:** "Reserve Bank of India (Know Your Customer (<abbr title="Know Your Customer (process).">KYC</abbr>)) (Amendment) Directions, 2025"
+- **title:** "Reserve Bank of India (Know Your Customer (KYC)) (Amendment) Directions, 2025"
 - **applies_to:** all-intermediaries
 - **in_force_date:** immediate
 - **status:** in-force
@@ -187,7 +382,7 @@ Issues a unified IT governance, risk, controls and assurance framework for SCBs 
 - **impact_areas:** client-funds, settlement, aml, nri, reporting
 - **primary_url:** https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=12561&Mode=0
 
-Brings non-bank entities facilitating cross-border import/export payments under direct RBI authorisation as PA-CBs, mandating minimum net-worth (Rs.15 cr at application, Rs.25 cr by 31-Mar-2026), Import Collection Account (ICA) / Export Collection Account (ECA) with AD-I banks, <abbr title="Financial Intelligence Unit">FIU</abbr>-India registration, per-transaction cap of Rs.25 lakh, and <abbr title="Prevention of Money Laundering Act 2002">PMLA</abbr>/KYC compliance. Relevant to brokers using PAs for inbound <abbr title="Non-Resident Indian">NRI</abbr> fund transfers and outbound payouts.
+Brings non-bank entities facilitating cross-border import/export payments under direct RBI authorisation as PA-CBs, mandating minimum net-worth (Rs.15 cr at application, Rs.25 cr by 31-Mar-2026), Import Collection Account (ICA) / Export Collection Account (ECA) with AD-I banks, <abbr title="Financial Intelligence Unit">FIU</abbr>-India registration, per-transaction cap of Rs.25 lakh, and <abbr title="Prevention of Money Laundering Act 2002">PMLA</abbr>/KYC compliance. Relevant to brokers using PAs for inbound NRI fund transfers and outbound payouts.
 
 ### RBI/2023-24/106
 
@@ -464,7 +659,7 @@ Enhances V-CIP with facial recognition, formalises risk-based periodic KYC updat
 - **impact_areas:** settlement, reporting, non-individual
 - **primary_url:** https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=12022&Mode=0
 
-Mandates LEI for all <abbr title="Real Time Gross Settlement">RTGS</abbr>/NEFT transactions of Rs.50 crore and above by non-individual entities, effective 01-Apr-2021. Applies to brokers, exchanges and clearing corps for high-value fund movements; non-individual broker entities also require LEI for cross-border transactions of Rs.50 crore+ effective 01-Oct-2022.
+Mandates <abbr title="Legal Entity Identifier">LEI</abbr> for all <abbr title="Real Time Gross Settlement">RTGS</abbr>/NEFT transactions of Rs.50 crore and above by non-individual entities, effective 01-Apr-2021. Applies to brokers, exchanges and clearing corps for high-value fund movements; non-individual broker entities also require LEI for cross-border transactions of Rs.50 crore+ effective 01-Oct-2022.
 
 ### RBI/2020-21/80
 
@@ -648,7 +843,7 @@ The foundational RBI KYC Master Direction codifying CDD, EDD, simplified DD, ben
 
 ## Verified through
 
-2026-05-14
+2026-09-11
 
 ---
 

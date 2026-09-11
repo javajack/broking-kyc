@@ -1,14 +1,14 @@
 ---
 title: Clearing Corporations (NSCCL / ICCL / MCXCCL) Circulars
-description: "Verified index of Clearing Corporations (NSCCL / ICCL / MCXCCL) circulars affecting Indian stock broking, 2020-01-01 to 2026-05-14. 107 entries."
+description: "Verified index of Clearing Corporations (NSCCL / ICCL / MCXCCL) circulars affecting Indian stock broking, 2020-01-01 to 2026-09-11. 115 entries."
 ---
 
 > **Why this page is structured this way:** All in-window entries are listed descending by date so the most recent regulatory state is the first thing a reader sees. Use Cmd-F / Ctrl-F for ID-based lookup. Cross-references from the rest of the site point at anchors on this page.
 
 ## TL;DR
 
-- **107 circulars** indexed in this issuer's section.
-- **23** issued in 2025 or later.
+- **115 circulars** indexed in this issuer's section.
+- **31** issued in 2025 or later.
 - **0** entries flagged `[unknown — verify]` in at least one field.
 - All entries trace to a primary issuer URL (or Wayback fallback) where research could verify the source.
 - AI-generated; **read the linked PDF before acting on any provision**.
@@ -18,6 +18,110 @@ description: "Verified index of Clearing Corporations (NSCCL / ICCL / MCXCCL) ci
 This page is the complete listing of Clearing Corporations (<abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NSCCL</abbr> / <abbr title="Indian Clearing Corporation Limited">ICCL</abbr> / <abbr title="Multi Commodity Exchange Clearing Corporation Limited">MCXCCL</abbr>) circulars in the project's 2020–2026 sweep window. Each entry contains the verbatim circular ID, issue date, in-force date, status (in-force / superseded / withdrawn), applicable entity types, impact-area tags, a 2–4 sentence summary traceable to clauses, and the primary URL. Where the primary URL could not be re-fetched, an archive URL is provided in its place.
 
 ## Entries (descending date)
+
+### MCXCCL/RISK/196/2026
+
+- **date_issued:** 2026-09-09
+- **issuer:** MCXCCL
+- **title:** "Review of Margin Period of Risk (MPOR)"
+- **applies_to:** broker
+- **in_force_date:** 2026-10-01
+- **status:** [unknown — verify]
+- **impact_areas:** commodities, margin, rms
+- **primary_url:** https://www.mcxindia.com/docs/default-source/circulars/english/2026/september/circular-511-2026.pdf?sfvrsn=c1dc2b01_1
+
+Prescribes minimum MPOR for October 2026 following a liquidity review (covering page). Initial-margin VaR is scaled by the commodity-specific MPOR, including three days for electricity and four for cardamom (Annexure 1).
+
+### MCXCCL/RISK/197/2026
+
+- **date_issued:** 2026-09-09
+- **issuer:** MCXCCL
+- **title:** "Review of minimum Volatility Scan Range (VSR)"
+- **applies_to:** broker
+- **in_force_date:** 2026-10-01
+- **status:** [unknown — verify]
+- **impact_areas:** commodities, margin, rms
+- **primary_url:** https://www.mcxindia.com/docs/default-source/circulars/english/2026/september/circular-512-2026.pdf?sfvrsn=ee25c743_1
+
+Reviews VSR using back-testing under the cited <abbr title="Securities and Exchange Board of India">SEBI</abbr> framework (covering page). Provides the commodity-specific VSR applicable for October 2026 in Annexure 1 (covering page, final substantive paragraph).
+
+### MCXCCL/RISK/194/2026
+
+- **date_issued:** 2026-09-08
+- **issuer:** MCXCCL
+- **title:** "Revision in Threshold Limits for Concentration Margin"
+- **applies_to:** broker
+- **in_force_date:** 2026-09-15
+- **status:** [unknown — verify]
+- **impact_areas:** commodities, margin, reporting, file-format
+- **primary_url:** https://www.mcxindia.com/docs/default-source/circulars/english/2026/september/circular-507-2026.pdf?sfvrsn=c4d584c0_1
+
+Revises concentration-margin thresholds and client/member slabs from September 15 (pages 1–4 and Annexures 1–3). Requires end-of-day calculation, next-day collateral blocking and reporting of client collection; index-option concentration margin applies at client level only (additional points i, viii–x).
+
+### MCXCCL/RISK/193/2026
+
+- **date_issued:** 2026-09-07
+- **issuer:** MCXCCL
+- **title:** "Review of Margin Framework for Commodity Derivatives Segment"
+- **applies_to:** broker
+- **in_force_date:** 2026-10-01
+- **status:** [unknown — verify]
+- **impact_areas:** commodities, margin, rms
+- **primary_url:** https://www.mcxindia.com/docs/default-source/circulars/english/2026/september/circular-506-2026.pdf?sfvrsn=44e287d0_1
+
+Sets commodity volatility categories and minimum initial margin, SOMM, MPOR and VSR from October 1 (covering page and Annexure 1). Adds 2% lean-period margin for agricultural contracts and retains specified higher minima for crude oil, natural gas and silver (covering page and Annexure 1 footnote).
+
+### MCXCCL/C&S/190/2026
+
+- **date_issued:** 2026-09-02
+- **issuer:** MCXCCL
+- **title:** "Acceptance of Electronic Fixed Deposit Receipts (eFDRs)"
+- **applies_to:** broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** margin
+- **primary_url:** https://www.mcxindia.com/docs/default-source/circulars/english/2026/september/circular-499---2026.pdf?sfvrsn=886b3064_1
+
+Adds Canara Bank to banks eligible to provide electronic fixed-deposit receipts (covering page). Provides the revised nine-bank empanelment list in Annexure 1.
+
+### MCXCCL/RISK/191/2026
+
+- **date_issued:** 2026-09-02
+- **issuer:** MCXCCL
+- **title:** "Alternate Risk Management Framework Applicable in case of Near Zero and Negative Prices"
+- **applies_to:** broker
+- **in_force_date:** 2026-10-01
+- **status:** [unknown — verify]
+- **impact_areas:** commodities, margin, rms
+- **primary_url:** https://www.mcxindia.com/docs/default-source/circulars/english/2026/september/circular-500-2026.pdf?sfvrsn=568b94b1_1
+
+Sets October thresholds for crude oil and natural gas contracts and variants under the conditional negative-price framework (Sections A–B). Specifies absolute margin floors, withdrawal of spread benefits, Bachelier option pricing and additional price-movement margins when activated; a formal activation decision is communicated separately (Sections B–C).
+
+### NCL/CMPT/74898
+
+- **date_issued:** 2026-06-25
+- **issuer:** NSCCL
+- **title:** "Risk Management for Closing Auction Session (<abbr title="Consolidated Account Statement">CAS</abbr>) in the Equity Cash Segment"
+- **applies_to:** broker
+- **in_force_date:** 2026-08-03
+- **status:** in-force
+- **impact_areas:** margin, rms
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPT74898.pdf
+
+Exempts unchanged orders carried from continuous trading into CAS from order-level margin-sufficiency checks (first bullet). Modified carry-over orders and all new CAS orders require sufficient available capital before acceptance, effective August 3 (second and third bullets and effective-date paragraph).
+
+### NCL/CD/74520
+
+- **date_issued:** 2026-06-03
+- **issuer:** NSCCL
+- **title:** "CDS - MONTHLY SETTLEMENT SCHEDULE FOR JULY 2026"
+- **applies_to:** broker
+- **in_force_date:** 2026-07-01
+- **status:** in-force
+- **impact_areas:** settlement, derivatives, bod-eod
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/CD74520.pdf
+
+Publishes July currency-derivative mark-to-market settlement dates (settlement table). Specifies July final settlement on July 30 for 91-day Treasury-bill futures, July 31 for cash-settled interest-rate and currency futures/options, and August 3 for MIBOR contracts (table footnotes).
 
 ### MCX/MCXCCL/094/2026
 
@@ -31,7 +135,7 @@ This page is the complete listing of Clearing Corporations (<abbr title="NSE Cle
 - **impact_areas:** rms, file-format, settlement, commodities
 - **primary_url:** https://kunvarjiwealth.com/uploads/resources/ApprovedCashCollateral-Commodity-MCX.pdf
 
-Quarterly revision of approved collaterals list (Annexure 1.1 — equity shares as non-cash collaterals subject to 25% per-security cap of total collateral with VAR-rate haircut; Annexure 1.2 — ETF cash/non-cash; Annexure 1.3 — Cash MF units; Annexure 1.4 — Non-cash MF units; Annexure 2 — G-Sec/T-Bills/SGBs cash collaterals; Annexure 3 — Approved commodities; Annexure 4 — Approved banks). Same operational rules as prior issues: no own-group/associate-entity issued collateral; physical FDR min 7-day tenure; G-Sec/T-Bill/SGB margin-benefit withdrawn two days prior to maturity; LIFO bank-exposure adjustments; <abbr title="Reserve Bank of India">RBI</abbr>-issued SGB/T-Bill all accepted. Effective March 2, 2026.
+Quarterly revision of approved collaterals list (Annexure 1.1 — equity shares as non-cash collaterals subject to 25% per-security cap of total collateral with VAR-rate haircut; Annexure 1.2 — ETF cash/non-cash; Annexure 1.3 — Cash MF units; Annexure 1.4 — Non-cash MF units; Annexure 2 — G-Sec/T-Bills/SGBs cash collaterals; Annexure 3 — Approved commodities; Annexure 4 — Approved banks). Same operational rules as prior issues: no own-group/associate-entity issued collateral; physical FDR min 7-day tenure; G-Sec/T-Bill/<abbr title="Sovereign Gold Bond">SGB</abbr> margin-benefit withdrawn two days prior to maturity; LIFO bank-exposure adjustments; <abbr title="Reserve Bank of India">RBI</abbr>-issued SGB/T-Bill all accepted. Effective March 2, 2026.
 
 ### NCL/CMPT/72224
 
@@ -83,7 +187,7 @@ MCX Circular MCX/MCXCCL/640/2025. Reminder of MCXCCL/MEM/219/2025 (Oct 7, 2025) 
 - **impact_areas:** settlement, file-format
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPT71441.pdf
 
-FAQ accompanying NCL/CMPT/71045 (Oct 30, 2025). Clarifies that auction is conducted for both <abbr title="Clearing Corporation (NCL, ICCL, MCXCCL — context-dependent).">CC</abbr> and internal shortages (per CMPT66688 dated Feb 14, 2025). Auction rate based on auction-offer price (for auctioned quantity) and close-out price (for unsuccessful auctions); close-out rate per <abbr title="Securities and Exchange Board of India">SEBI</abbr> Master Circular SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/MRDPoD2/CIR/P/2024/00181 (Dec 30, 2024) = higher of highest scrip price in settlement-to-auction-date OR 20% above latest closing on auction-call day. Auction difference collected from short-delivering member when auction rate exceeds settlement price. Close-out files: Auction Delivery P_0000 (unsuccessful internal), F_0000 (CC shortage close-out, CA close-out, non-actionable BL/G-Sec close-out, auction pay-in shortage close-out); EquityT1 Delivery F_0000 for trade-for-trade. Per clause 7.13(iv) of NCL/CMPT/67751 (Apr 29, 2025), close-out for internal shortage where valuation debit unpaid by member and for G-Secs/corporate-action scenarios handled by member.
+FAQ accompanying NCL/CMPT/71045 (Oct 30, 2025). Clarifies that auction is conducted for both <abbr title="Clearing Corporation (NCL, ICCL, MCXCCL — context-dependent).">CC</abbr> and internal shortages (per CMPT66688 dated Feb 14, 2025). Auction rate based on auction-offer price (for auctioned quantity) and close-out price (for unsuccessful auctions); close-out rate per SEBI Master Circular SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/MRDPoD2/CIR/P/2024/00181 (Dec 30, 2024) = higher of highest scrip price in settlement-to-auction-date OR 20% above latest closing on auction-call day. Auction difference collected from short-delivering member when auction rate exceeds settlement price. Close-out files: Auction Delivery P_0000 (unsuccessful internal), F_0000 (CC shortage close-out, CA close-out, non-actionable BL/G-Sec close-out, auction pay-in shortage close-out); EquityT1 Delivery F_0000 for trade-for-trade. Per clause 7.13(iv) of NCL/CMPT/67751 (Apr 29, 2025), close-out for internal shortage where valuation debit unpaid by member and for G-Secs/corporate-action scenarios handled by member.
 
 ### MCX/MCXCCL/588/2025
 
@@ -435,7 +539,7 @@ Representative SLBS MWPL/limit-revision circular. Increases MWPL for SAPPHIRE fr
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPT63669.pdf
 - **archive_url:** https://www.ricago.com/assets/front/base/file/file_management/2449.pdf
 
-Full operational guidelines for direct payout of securities to client demat accounts pursuant to SEBI/HO/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD1/P/CIR/2024/75 (Jun 5, 2024). Mandates: (i) TMs to update primary demat in UCC database for all clearing-clients; (ii) TMs of CM/F&O clearing through other CM open <abbr title="Trading Member">TM</abbr> pool accounts in both depositories; (iii) TMs maintain TM <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr> only (or both with CM CUSPA if TM-cum-CM), self-clearing TMs maintain only TM CUSPA, professional CMs maintain only CM CUSPA; (iv) TMs offering <abbr title="Margin Trading Facility">MTF</abbr> maintain CSMFA where client's demat resides; (v) facility for release-payout-with-pledge-in-favour-of-CUSPA(Unpaid) / CSMFA(MTF). Discontinues legacy direct-payout-to-investor-accounts facility (NCL/CMPT/61800 Part C point 6).
+Full operational guidelines for direct payout of securities to client demat accounts pursuant to SEBI/HO/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD1/P/CIR/2024/75 (Jun 5, 2024). Mandates: (i) TMs to update primary demat in UCC database for all clearing-clients; (ii) TMs of CM/F&O clearing through other CM open <abbr title="Trading Member">TM</abbr> pool accounts in both depositories; (iii) TMs maintain TM <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr> only (or both with CM CUSPA if TM-cum-CM), self-clearing TMs maintain only TM CUSPA, professional CMs maintain only CM CUSPA; (iv) TMs offering <abbr title="Margin Trading Facility">MTF</abbr> maintain <abbr title="Client Securities Margin Funded Account">CSMFA</abbr> where client's demat resides; (v) facility for release-payout-with-pledge-in-favour-of-CUSPA(Unpaid) / CSMFA(MTF). Discontinues legacy direct-payout-to-investor-accounts facility (NCL/CMPT/61800 Part C point 6).
 
 ### NCL/CMPT/63561
 
@@ -448,7 +552,7 @@ Full operational guidelines for direct payout of securities to client demat acco
 - **impact_areas:** settlement, file-format
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPT63561.pdf
 
-Representative buyback tender-offer settlement-calendar circular: trade window 26-30 Aug 2024 (settlement X 2024094), obligation download Sep 5, 2024, settlement Sep 6, 2024. Demat shares tendered only via EPI Market Type Buyback; cut-off 03:30 p.m. on trade-end date. STT collected on settlement day; 26 NSCCL rejection codes annexed. Template circular for subsequent buyback/takeover offers across FY2024-25.
+Representative buyback tender-offer settlement-calendar circular: trade window 26-30 Aug 2024 (settlement X 2024094), obligation download Sep 5, 2024, settlement Sep 6, 2024. Demat shares tendered only via EPI Market Type Buyback; cut-off 03:30 p.m. on trade-end date. <abbr title="Securities Transaction Tax">STT</abbr> collected on settlement day; 26 NSCCL rejection codes annexed. Template circular for subsequent buyback/takeover offers across FY2024-25.
 
 ### NCL/CMPT/63165
 
@@ -961,7 +1065,7 @@ Update to NCL/CMPT/55330 clarifying voluntary-auction request format/process. CM
 
 - **date_issued:** 2023-03-22
 - **issuer:** ICCL
-- **title:** "Fund settlement for trades executed on the Request for Quote (RFQ) platform - Additional bank account"
+- **title:** "Fund settlement for trades executed on the Request for Quote (<abbr title="Request for Quote">RFQ</abbr>) platform - Additional bank account"
 - **applies_to:** broker, clearing-corp
 - **in_force_date:** 2023-04-03
 - **status:** in-force
@@ -1312,7 +1416,7 @@ Per SEBI Circular MRD/DoP/SE/Dep/Cir-14/2007 (Dec 20, 2007), publishes stock-spe
 - **impact_areas:** settlement, bod-eod, file-format
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPT50078.pdf
 
-Specifies operational timings for trades on Muhurat Trading day November 4, 2021: Obligation Transfer Request (OTR) cut-off 18:30 hrs, Custodial NCIS log-off 18:30-19:00 hrs, trade-modification (CP code) window 18:00-19:45 hrs, T-day confirmation window 20:15-20:45 hrs, EPI cut-off 21:30 hrs. Settlement calendar (Rolling T+2) and client margin reporting cut-off dates published. Sets template for subsequent Muhurat timings circulars.
+Specifies operational timings for trades on Muhurat Trading day November 4, 2021: Obligation Transfer Request (<abbr title="Order-to-Trade Ratio">OTR</abbr>) cut-off 18:30 hrs, Custodial NCIS log-off 18:30-19:00 hrs, trade-modification (CP code) window 18:00-19:45 hrs, T-day confirmation window 20:15-20:45 hrs, EPI cut-off 21:30 hrs. Settlement calendar (Rolling T+2) and client margin reporting cut-off dates published. Sets template for subsequent Muhurat timings circulars.
 
 ### NCL/CMPL/49348
 
@@ -1445,7 +1549,7 @@ Annual consolidated circular for Capital Market segment compiling all NCL circul
 
 ## Verified through
 
-2026-05-14
+2026-09-11
 
 ---
 
