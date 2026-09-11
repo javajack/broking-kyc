@@ -83,19 +83,26 @@ npm install
 | SEBI Stock Brokers Master Circular | SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90 (Jun 2025) |
 | SEBI Stock Brokers Regulations 2026 | SEBI/LAD-NRO/GN/2026/291 (Jan 7, 2026) — replaces 1992 regulations |
 | Client Fund Upstreaming | SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/84 (Jun 2023) |
-| UPI Block Mechanism (QSBs) | SEBI consultation paper (Aug 2024) — mandatory from Feb 1, 2025 |
+| UPI Block Mechanism (QSBs) | SEBI/HO/MRD/MRD-PoD-2/P/CIR/2024/153 (Nov 2024) — mandatory from Feb 1, 2025 |
 | T+0 Settlement | SEBI/HO/MRD/MRD-PoD-3/P/CIR/2024/20 (Mar 2024) — top 500 stocks Dec 2024 |
 | e-KYC Setu (NPCI) | SEBI press release (Jun 2025) — Aadhaar e-KYC without AUA/KUA license |
 | UPI AutoPay Rs 1 Lakh Limit | RBI/2023-2024/88 + NPCI/UPI/OC-151A (Dec 2023) |
 | Account Aggregator Master Direction | RBI/DNBR/2016-17/46 (Sep 2016, updated Sep 2024) |
 | DPDP Act 2023 + Rules 2025 | Notified Nov 13, 2025 — full compliance deadline May 2027 |
 | KYC Onboarding Consultation Paper | SEBI (Jan 16, 2026) — proposes centralized KYC, 5-year review cycle |
+| IRRA platform discontinued | HO/38/44/12(3)2025-MIRSD-TPD1/I/10705/2026 (May 7, 2026) |
+| Modified nomination norms for demat accounts and MF folios | SEBI/HO/OIAE/OIAE_IAD-3/P/CIR/2026/12676 (May 29, 2026) |
+| Handling of clients' unpaid securities by trading members | HO/38/11/(9)2026-MIRSD-POD/I/15382/2026 (Jul 3, 2026) |
+| FPI Regulations amendment | SEBI/LAD-NRO/GN/2026/310 (Jul 3, 2026) |
+| Simplified and standardised transmission framework | HO/38/13/11(14)2026-MIRSD-POD/I/17111/2026 (Jul 23, 2026) |
+| KRA information sharing with IFSCA-regulated entities | HO/38/15/(7)2026-MIRSD-POD/I/19255/2026 (Aug 20, 2026) |
+| Cyber incident reporting portal aligned to the FIRE format | HO/(449)2026-ITD-5_DIV1/I/19448/2026 (Aug 24, 2026) |
 
 See the [Regulatory Circulars master index](https://javajack.github.io/broking-kyc/reference/regulatory-circulars/) (curated highlights + per-issuer navigation), the [per-issuer sub-pages](https://javajack.github.io/broking-kyc/reference/circulars/sebi-mirsd/) (1,058 verified entries with primary URLs, in-force dates, supersession chains, and impact-area tags), the [circulars changelog](https://javajack.github.io/broking-kyc/reference/circulars-changelog/) (2026-09-11 delta on top of the 2026-05-14 rebuild), and the [References & Sources](https://javajack.github.io/broking-kyc/reference/references-sources/) (130+ URLs) page for complete listings.
 
 ## Compliance & Vendor Coverage
 
-- **[Compliance Blueprint](https://javajack.github.io/broking-kyc/operations/compliance-blueprint/)** — inventory of 400 verifiable operational, one-time, and edge-case compliance touchpoints a broker must address. Each row: regulator, frequency, owner role, trigger, evidence artefact, penalty, and linked circular(s). Domains: KYC lifecycle, AML/PMLA, margin, client funds, settlement, surveillance, cyber, BCP/DR, audit, reporting, grievance, DPDP, member compliance, investor servicing, exchange/depository registration, edge cases.
+- **[Compliance Blueprint](https://javajack.github.io/broking-kyc/operations/compliance-blueprint/)** — inventory of 422 verifiable operational, one-time, and edge-case compliance touchpoints a broker must address. Each row: regulator, frequency, owner role, trigger, evidence artefact, penalty, and linked circular(s). Domains: KYC lifecycle, AML/PMLA, margin, client funds, settlement, surveillance, cyber, BCP/DR, audit, reporting, grievance, DPDP, member compliance, investor servicing, exchange/depository registration, edge cases.
 - **[Vendor Atlas](https://javajack.github.io/broking-kyc/vendors/atlas/)** — named-product enumeration of 233 real products across 22 categories spanning the full broking technology stack: OMS/EMS/RMS, back-office, surveillance, AML, KYC verification, face/liveness, OCR, CKYC connectors, eSign, account aggregator, payment/mandate, DLT/SMS/WhatsApp, email, ITR/income, credit bureau, mutual fund platforms, IPO/OFS, pledge tech, algo/quant API, market data, CRM/comms. Endorsement-free; descriptive positioning only.
 - **[Field-level Data Flow Atlas](https://javajack.github.io/broking-kyc/reference/field-atlas/)** — bidirectional mapping of 1,314 field-destination relationships across 14 destinations (KRA, CKYC, NSE/BSE/MCX UCC, CDSL/NSDL BO, back-office, RMS, contract notes, regulatory reports, DLT comms, FATCA/CRS, AML/FIU). Browse by section (field-first) or destination (system-first); downloadable [master CSV](https://javajack.github.io/broking-kyc/field-atlas-master.csv) (~1,300 rows × 11 columns).
 - **[Integration Choreography DAG](https://javajack.github.io/broking-kyc/operations/integration-dag/)** — dependency graph of 163 integration nodes across six phases (Onboarding, BOD, Trading Hours, EOD & Settlement, Recurring Cycles, Lifecycle Events). ASCII DAGs + per-node detail (idempotency, retry policy, rollback, SLA, failure surface, spec source).
