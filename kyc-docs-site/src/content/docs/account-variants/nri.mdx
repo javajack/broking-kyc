@@ -1,0 +1,192 @@
+---
+title: "Account Variants: NRI accounts"
+description: NRI onboarding end to end — FEMA versus income-tax residence, NRE and NRO accounts, PIS and non-PIS routes, designated AD bank, repatriability, OCI and foreign nationals, derivatives after the CP-code removal, tax residency and in-person verification abroad.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** An <abbr title="Non-Resident Indian">NRI</abbr> account is not a resident account with a passport attached. Three separate legal frameworks decide what it can do — <abbr title="Foreign Exchange Management Act 1999">FEMA</abbr> decides whether money may cross the border, <abbr title="Securities and Exchange Board of India">SEBI</abbr> decides what may be traded, and the Income-tax Act decides what is withheld — and each one has its own definition of the same client. The page settles residence first, then the bank-account architecture the routes are built on, then the route choice, then the segment and tax consequences, then the mechanics that break for a client who is not in India.
+
+## TL;DR
+
+- **Residence is defined twice.** FEMA decides which investment schedule applies; the Income-tax Act decides withholding. The two tests use different day counts, and a client can change one status without changing the other.
+- **The bank architecture drives everything else.** <abbr title="Non-Resident External (Rupee) account">NRE</abbr> holds repatriable funds, <abbr title="Non-Resident Ordinary (Rupee) account">NRO</abbr> holds India-sourced funds. Because repatriability must be traceable per holding, an NRI normally maintains **two demat accounts** with distinct depository sub-statuses.
+- **<abbr title="Portfolio Investment Scheme (RBI / NRI)">PIS</abbr> versus non-PIS is a routing decision, not a product tier.** PIS runs listed-equity purchases through a designated Authorised Dealer Category-I branch that monitors limits and reports; non-PIS on NRO funds has no designated-branch monitoring and no repatriation beyond the general NRO allowance.
+- **Individual non-resident access widened on 12 June 2026.** **[<abbr title="Reserve Bank of India">RBI</abbr>/2026-27/114](/broking-kyc/reference/circulars/rbi/#rbi2026-27114)** (15 June 2026) permits AD Category-I banks to open repatriable INR accounts for individual persons resident outside India investing under Schedule <abbr title="—">III</abbr>, extending the route beyond NRIs and OCIs.
+- **The CP code is gone.** **[SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/109](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir2025109)** (29 July 2025) removed the Custodial Participant code and single-clearing-member requirement for exchange-traded derivatives; NRI limits are monitored as client-level limits.
+- **Verification mechanics break, not the verification standard.** Aadhaar e-<abbr title="Know Your Customer (process).">KYC</abbr> and Aadhaar e-Sign cannot be assumed abroad, so the requirements of **[SEBI/HO/MIRSD/SECFATF/P/CIR/2023/169](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir2023169)** (12 October 2023) are met through video <abbr title="In-Person Verification">IPV</abbr>, attested documents or a <abbr title="Digital Signature Certificate (CCA-licensed; aka Class 2/3 DSC).">DSC</abbr>.
+
+## Conceptual overview
+
+Two questions decide an NRI account, and they are frequently confused. May this person's money enter and leave India, and under which schedule of the Foreign Exchange Management (Non-debt Instruments) Rules, 2019? And what may this person trade, under whose monitoring? FEMA answers the first, SEBI and the exchanges answer the second, and the answers meet at one place — the bank account through which pay-in and pay-out settle.
+
+That is why the bank-account architecture, not the trading account, is the design centre of an NRI onboarding. An NRE (Non-Resident External) rupee account holds funds remitted from abroad and is repatriable; an NRO (Non-Resident Ordinary) rupee account holds India-sourced income — rent, dividends, pension, sale proceeds of pre-existing assets — and is repatriable only within the general remittance allowance RBI permits from NRO balances. Once money has been mixed, its repatriability cannot be reconstructed, so the market never mixes it: separate bank accounts, separate demat accounts, separate ledgers, and a repatriability flag on every holding. The depository encodes this as distinct beneficial-owner sub-statuses — see [<abbr title="Central Depository Services (India) Limited">CDSL</abbr> <abbr title="Beneficial Owner">BO</abbr> master destination](/broking-kyc/reference/field-atlas/destinations/cdsl-bo/).
+
+The Portfolio Investment Scheme sits on top of the repatriable side. Under Schedule III of the NDI Rules, a non-resident individual investing in listed Indian equity on a repatriation basis routes the investment through a designated Authorised Dealer Category-I branch, which holds the designated account exclusively for those investments, monitors the shareholding ceilings, and reports to RBI. The broker sees a permission letter and a settlement instruction; the bank carries the monitoring obligation. The non-PIS route dispenses with the designated branch by dispensing with repatriability: investment from NRO funds on a non-repatriation basis is treated as domestic investment, so there is no scheme to be admitted to.
+
+Everything else here is downstream of those two facts. Segments differ because delivery-based purchase is what Schedule III contemplates; tax differs because withholding applies to a non-resident's gains; verification differs because the client is not standing in front of anyone. The rest of the relationship is unchanged — see [Broker process narrative](/broking-kyc/broker-process/narrative/).
+
+## 1. Regulatory framework
+
+- **Foreign Exchange Management (Non-debt Instruments) Rules, 2019** — the governing instrument. Schedule III covers purchase of listed equity by a non-resident individual on a repatriation basis through the Portfolio Investment Scheme; Schedule IV covers purchase on a non-repatriation basis, treated as domestic investment. `[not yet in index]`
+- **Foreign Exchange Management (Non-debt Instruments) (Third Amendment) Rules, 2026**, notified as S.O. 3030(E) on 12 June 2026 — substitutes "an individual" for "non-resident Indian or overseas citizen of India", opening Schedule III to individual persons resident outside India generally, with a land-border proviso requiring prior government approval where the investment results in control or beneficial ownership by citizens of a land-border country. The ceilings were revised at the same time; read the gazette notification before relying on any ceiling figure. `[not yet in index]`
+- **[RBI/2026-27/114](/broking-kyc/reference/circulars/rbi/#rbi2026-27114)** (15 June 2026) — AD Category-I banks may open repatriable INR accounts for individual persons resident outside India investing under Schedule III; banks retain the existing NRI and <abbr title="Overseas Citizen of India">OCI</abbr> reporting and limit-monitoring approach. Immediate effect.
+- **[RBI/2026-27/254](/broking-kyc/reference/circulars/rbi/#rbi2026-27254)** (8 September 2026) — withdraws seven obsolete FEMA circulars listed in its annex; a reminder to re-check FEMA citations rather than copy them forward.
+- **[SEBI/HO/MIRSD/SECFATF/P/CIR/2023/169](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir2023169)** (12 October 2023) — KYC master circular. The standard does not relax for a non-resident; the means of meeting it change.
+- **[SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202478)** (6 June 2024) — <abbr title="Anti-Money Laundering">AML</abbr>/<abbr title="Combating the Financing of Terrorism">CFT</abbr> guidelines. Cross-border and non-face-to-face onboarding raise the due-diligence bar rather than lowering it.
+- **[SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/109](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir2025109)** (29 July 2025) — removes the mandate for an NRI to obtain a CP code and deal with a single clearing member; NRI positions are monitored as client-level positions. Existing clients could exit the CP-code arrangement on an email request.
+- **[SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202412)** (20 February 2024) — centralises <abbr title="Foreign Account Tax Compliance Act (US)">FATCA</abbr> and <abbr title="Common Reporting Standard">CRS</abbr> self-certifications at the KRAs, effective 1 July 2024; the intermediary remains responsible for the reasonableness check. Binding on every account with a foreign tax residence. See [Section J](/broking-kyc/reference/field-atlas/sections/j-fatca-crs/).
+- **[<abbr title="National Stock Exchange of India">NSE</abbr>/<abbr title="Investor Service Centre.">ISC</abbr>/61817](/broking-kyc/reference/circulars/nse/#nseisc61817)** (30 April 2024) — <abbr title="Unique Client Code">UCC</abbr> master circular; residential status and client category fields, and the segment activation flags.
+- **[CDSL/OPS/<abbr title="Depository Participant">DP</abbr>/POLCY/2026/433](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolcy2026433)** (30 June 2026) — confirms that quarterly <abbr title="Basic Services Demat Account">BSDA</abbr> eligibility assessment covers NRI and foreign-national accounts as well as resident individuals.
+
+<Aside type="caution" title="The two residence tests are not the same test">
+FEMA residence turns on intent and period of stay for a purpose indicating an indefinite stay; income-tax residence turns on prescribed day counts, with separate rules for deemed residence and for "resident but not ordinarily resident". In a transition year a client can be a person resident outside India under FEMA while being taxed as a resident, or the reverse. Capture both as separate fields with separate evidence and never derive one from the other. The specific error to avoid is treating the FATCA/CRS self-certification as a FEMA determination — it establishes tax residence and nothing else.
+</Aside>
+
+## 2. The account architecture
+
+| Layer | Repatriable side | Non-repatriable side |
+| --- | --- | --- |
+| Bank account | NRE rupee account at an AD Category-I bank | NRO rupee account at an AD Category-I bank |
+| Source of funds | Inward remittance from abroad; transfer from another NRE or <abbr title="Foreign Currency Non-Resident (Bank) account">FCNR</abbr> account | India-sourced income and permitted local receipts |
+| FEMA schedule | Schedule III, through the Portfolio Investment Scheme | Schedule IV, non-repatriation basis, treated as domestic investment |
+| Designated branch | Required; holds the designated account exclusively for these investments and reports to RBI | Not applicable |
+| Demat account | Separate BO account with the repatriable NRI sub-status | Separate BO account with the non-repatriable NRI sub-status |
+| Repatriation | Sale proceeds repatriable, subject to tax clearance and the scheme's conditions | Only within RBI's general remittance allowance from NRO balances, with the prescribed certification |
+| Typical use | Fresh money from abroad intended to come back out | India-sourced money, and any activity the repatriable route does not support |
+
+The two-account structure is the architecture, not an option: it makes repatriability a property of the account rather than a reconstruction from transaction history. A broker that maps both NRE and NRO settlement to one demat account has built an unreconcilable ledger, and the error surfaces when the client first tries to repatriate.
+
+## 3. PIS versus non-PIS
+
+| Dimension | PIS route | Non-PIS route |
+| --- | --- | --- |
+| FEMA basis | Schedule III, repatriation basis | Schedule IV, non-repatriation basis |
+| Funding account | NRE (and NRO where the client runs a non-repatriable PIS variant offered by the bank) | NRO |
+| Designated AD branch | Required; one designated account per client for the scheme | Not required |
+| Limit monitoring | The designated branch monitors the individual and aggregate shareholding ceilings and reports | No scheme-level monitoring; the general ceilings still bind the issuer side |
+| Permission letter | Required from the AD bank; broker-agnostic, reusable across brokers | None |
+| Equity delivery | Permitted | Permitted |
+| Intraday and short selling | Not available — the scheme contemplates delivery-based purchase and sale | Not available on the same basis; the constraint is the delivery requirement, not the route |
+| Exchange-traded derivatives | Not the route used; derivatives run off NRO non-PIS funds | Available, on non-repatriable funds, after the CP-code removal |
+| Repatriation of proceeds | Yes, subject to the scheme's conditions and tax | Only under the general NRO remittance allowance |
+| Bank charges | PIS account maintenance and per-transaction charges levied by the AD bank | No PIS charges |
+
+Both routes exist because they solve different problems. A client moving overseas savings into Indian equities and intending to take the proceeds home needs Schedule III, and accepts the designated-branch monitoring and the bank's charges. A client whose Indian income accumulates in an NRO account, or who wants exchange-traded derivatives, takes the non-PIS route and accepts that the money largely stays in India.
+
+<Aside type="tip" title="One PIS letter, many brokers">
+The PIS permission is a relationship between the client and the AD bank, not the broker. A client with an existing letter does not need a new one to add a second broker; the broker is added to the designated account's mapping. Onboarding flows that treat the letter as a per-broker document create avoidable delay, and only the bank can confirm the current mapping.
+</Aside>
+
+## 4. Who qualifies
+
+| Client type | Position |
+| --- | --- |
+| NRI holding an Indian passport | The base case. Eligible on both routes |
+| Overseas Citizen of India | Eligible on both routes. The PIO card scheme was merged into OCI `[verify current position with the issuing authority]` |
+| Foreign national who is not an NRI or OCI | Repatriable Schedule III access opened up by the June 2026 amendment and [RBI/2026-27/114](/broking-kyc/reference/circulars/rbi/#rbi2026-27114), subject to the land-border proviso and the AD bank's systems |
+| Person resident in Nepal or Bhutan | Distinct treatment under the NDI Rules; do not infer from the general NRI position `[verify]` |
+| Non-resident who is also a US or Canadian tax resident | Eligible, but many Indian mutual funds restrict or refuse them for FATCA-compliance reasons — a fund-level restriction, not a securities-market rule `[industry practice — unverified]` |
+
+## 5. Documents and verification
+
+| Document | Verification method | Mandatory |
+| --- | --- | --- |
+| <abbr title="Permanent Account Number">PAN</abbr> | PAN validation; name and date-of-birth match | Yes |
+| Passport, relevant pages | Attested copy or verified original | Yes |
+| Visa, residence permit or work permit | Attested copy | Yes, for the residence determination |
+| OCI card | Attested copy | Conditional |
+| Overseas address proof | Utility bill, lease, bank statement or equivalent per the KYC master circular | Yes |
+| Indian address proof | Per the KYC master circular | Conditional, where an Indian correspondence address is retained |
+| NRE or NRO bank proof | Bank statement or cancelled cheque, plus account verification | Yes |
+| PIS permission letter | Original or bank-confirmed copy | Yes, on the PIS route only |
+| FATCA and CRS self-certification | Self-certification with a reasonableness check against the collected indicia | Yes |
+| Tax Residency Certificate | Issued by the foreign tax authority | Conditional, where treaty benefit is claimed |
+| In-person verification record | Video IPV, or attestation by a permitted authority abroad | Yes |
+
+### 5.1 In-person verification and signing from abroad
+
+The obligation is unchanged; the mechanism has to be chosen from what is actually available to a client outside India:
+
+1. **Video in-person verification.** The primary route: a recorded session capturing the client with the original documents, geotagged and time-stamped per the KYC master circular's <abbr title="Video In-Person Verification (sometimes &quot;Video CIP&quot; / V-CIP)">VIPV</abbr> conditions. See [Section N](/broking-kyc/reference/field-atlas/sections/n-ipv-vipv/).
+2. **Attestation abroad.** Where VIPV is not usable — documents attested by an Indian embassy or consulate, a notary public, a court magistrate or judge, or an authorised official of an overseas branch of a scheduled commercial bank registered in India.
+3. **Signing.** Aadhaar <abbr title="One-Time Password">OTP</abbr> e-Sign needs a live Aadhaar with a reachable registered mobile, which many NRIs lack. A DSC is the standard alternative and wet signature with attestation the fallback. Build all three rather than discovering the gap at the e-Sign screen — see [Journey: review and e-Sign](/broking-kyc/journey/09-review-esign/).
+
+## 6. Field-level deltas
+
+| name | type | length | mandatory | source-system | destination-system(s) | notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| Residential Status | Code | 2 | Yes | Residence determination | <abbr title="KYC Registration Agency">KRA</abbr>, UCC, BO master, back office | Site code table uses `RI` / `NRI` / `FN` / `PIO`; drives client type |
+| NRI Sub-Status | Code | 2 | Yes | Classification | CDSL BO master | Repatriable and non-repatriable are different values; see [CDSL BO destination](/broking-kyc/reference/field-atlas/destinations/cdsl-bo/) |
+| UCC Client Category | Code | 2 | Yes | Approved classification | NSE, <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> and <abbr title="Multi Commodity Exchange of India">MCX</abbr> UCC | `NR` in the site code table; the exchange annexures also use numeric encodings `[unknown — verify]` |
+| Passport Number | Alphanumeric | per document | Yes | Passport | Back office, KRA | Expiry must be tracked; an expired passport is a re-KYC trigger |
+| Passport Expiry | Date | 8 | Yes | Passport | Back office | Drives the document-refresh workflow |
+| Country of Residence | Code | 2 | Yes | Address evidence | Back office, FATCA/CRS, AML reporting | ISO 3166-1 alpha-2 |
+| Overseas Address and country | Text | per destination | Yes | Address evidence | Back office, FATCA/CRS, AML | Also the CRS account-holder address; see [Section V](/broking-kyc/reference/field-atlas/sections/v-nri-specific/) |
+| NRI Trading Route | Code | 2 | Yes | Route decision | Back office, <abbr title="Risk Management System">RMS</abbr>, regulatory reports | PIS or non-PIS; the RMS reads it to enforce the delivery-only constraint |
+| Repatriation Status | Code | 2 | Yes | Account architecture | Back office, RMS | Repatriable or non-repatriable; drives the ledger bucket and the margin envelope |
+| PIS Bank Name | Text | per destination | Conditional | PIS letter | Back office | Prints on the NRI account-statement header |
+| PIS Account Number | Alphanumeric | per destination | Conditional | PIS letter | Back office | Designated AD-bank account; the settlement route |
+| PIS Permission Status | Char | 1 | Conditional | PIS letter verification | Back office | Gates the repatriable-route ledger flag |
+| NRE / NRO Account Type | Code | 3 | Yes | Bank proof | Back office, CDSL and <abbr title="National Securities Depository Limited">NSDL</abbr> BO master | Settlement routing; the depository validates it against the NRI sub-status |
+| SWIFT Code | Alphanumeric | 11 | Conditional | Bank proof | AML reporting | Required on the foreign leg of a cross-border wire report |
+| Tax Residency Certificate | Document | — | Conditional | Foreign tax authority | FATCA/CRS records | Supports a treaty-rate claim |
+
+## 7. Segments and what the client can actually do
+
+| Segment | Repatriable PIS route | Non-repatriable non-PIS route |
+| --- | --- | --- |
+| Equity delivery, cash segment | Available | Available |
+| Intraday and same-day square-off | Not available | Not available |
+| Short selling | Not available | Not available |
+| Exchange-traded equity derivatives | Not the route | Available on NRO funds; no CP code required since [SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/109](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir2025109) |
+| Currency derivatives | Not available on the ordinary retail non-resident route `[verify]` | Not available on the ordinary retail non-resident route `[verify]` |
+| Commodity derivatives | Not available on the ordinary retail non-resident route; where permitted at all, through specified routes `[verify]` | Same |
+| <abbr title="Initial Public Offering">IPO</abbr> and public issues | Available, through the non-resident application category | Available, on a non-repatriation basis |
+| Mutual funds | Available, subject to fund-level restrictions on some tax residences | Available, same caveat |
+| Margin Trading Facility | Offered selectively; a broker policy matter `[industry practice — unverified]` | Same. See [<abbr title="Margin Trading Facility">MTF</abbr> operational](/broking-kyc/deep-dives/settlement/mtf-operational/) |
+
+The delivery-only constraint surprises clients and is not a broker preference: it follows from what a purchase on a repatriation basis under Schedule III contemplates — an acquisition that is delivered and held — and it must be enforced at pre-trade, because a rejection after execution is a compliance problem rather than a control. [Segment rules comparison](/broking-kyc/deep-dives/foundational/segment-rules-comparison/) sets out the framework this sits inside.
+
+## 8. Tax at the account level
+
+Withholding at source on a non-resident's gains is the structural difference from a resident account. On the PIS route the AD bank customarily computes and withholds on the capital gain before crediting sale proceeds to the designated account, relying on the acquisition data the client and broker supply; on the non-PIS route the arrangement depends on the bank and broker setup. Either way the broker must supply accurate trade and cost data, reflect the correct route and repatriability on the ledger, and hold the Tax Residency Certificate where a treaty rate is claimed. Rates, holding periods and exemption limits for listed equity were revised by the Finance (No. 2) Act, 2024 and change with each Finance Act; do not hard-code them from this page. `[AI inference — verify before acting]`
+
+## 9. Alternatives
+
+| Option A | Option B | When to pick which | Who uses what |
+| --- | --- | --- | --- |
+| PIS on NRE funds | Non-PIS on NRO funds | A where the money must be able to leave India again; B where it is India-sourced or derivatives access matters | A dominates fresh-remittance investing; B dominates NRO-balance deployment `[industry practice — unverified]` |
+| Two demat accounts | One account for the single route actually used | Two where the client will use both routes | Two is the safe default: adding the second later is an account opening; mixing the first is unrecoverable |
+| Broker-direct derivatives | A retained custodian arrangement | Direct for a retail non-resident; custodian for institutional-style clearing | The July 2025 change made direct the normal case |
+| VIPV | Attestation abroad | VIPV where bandwidth, original documents and time zones allow; attestation where VIPV fails | VIPV is the default; attestation is the fallback with a multi-week tail |
+
+## Practical notes
+
+- **[gotcha]** The PIS letter is the longest lead-time item in an NRI onboarding and the broker cannot shorten it. Start it in parallel with document collection, not after KYC approval; the AD bank's designated branch sets the clock, as it does in [Lifecycle: NRI conversion](/broking-kyc/lifecycle/nri-conversion/).
+- **[gotcha]** A client who moved abroad and never said so is running a resident account in a non-resident's name, and the broker has no reliable detector — FATCA and CRS self-certification answers a different question. Periodic re-KYC and address changes are the practical detection points; see [Lifecycle: re-KYC](/broking-kyc/lifecycle/re-kyc/).
+- **[gotcha]** Penny-drop name matching fails more often on NRI accounts, because transliterations, dropped middle names and surname-first conventions all appear in overseas-linked bank records. Budget for manual review rather than treating a mismatch as fraud — see [Journey: bank account](/broking-kyc/journey/05-bank-account/).
+- **[industry practice]** Where the client holds both a repatriable and a non-repatriable account, keep the client code, ledger and contract-note series distinct per route. Merging them for reporting convenience destroys the audit trail the architecture exists to preserve.
+- **[risk trade-off]** The CP-code removal made non-resident derivatives simpler to offer and no less risky: margined positions held in another time zone, often outside the margin-call window. Set the intraday monitoring and square-off policy deliberately rather than inheriting the resident default.
+- **[cost optimization]** PIS charges are levied per transaction as well as annually, so the PIS route is materially more expensive for a client who trades frequently in small sizes. For an India-sourced buy-and-hold portfolio, non-PIS is usually cheaper — the trade-off is repatriability, not execution quality.
+- **[AI inference — verify before acting]** The Schedule III individual and aggregate ceilings were revised in June 2026 and the figures in secondary commentary do not all agree. Read the gazette notification and the AD bank's confirmation before stating a ceiling to a client.
+
+## Cross-references
+
+- [Account variants overview](./) — the selector table across all eleven variants.
+- [Appendix: NRI deep dive](/broking-kyc/appendix/nri-deep-dive/) — the earlier vendor-by-vendor note; this page carries the current process and route detail.
+- [Lifecycle: NRI to resident conversion](/broking-kyc/lifecycle/nri-conversion/) — the status-change walkthrough for an existing client.
+- [Section V: NRI-specific fields](/broking-kyc/reference/field-atlas/sections/v-nri-specific/) — every NRI field with its destinations.
+- [Section J: FATCA and CRS](/broking-kyc/reference/field-atlas/sections/j-fatca-crs/) — self-certification data and where it flows.
+- [Segment rules comparison](/broking-kyc/deep-dives/foundational/segment-rules-comparison/) — the framework the NRI restrictions sit inside.
+- [NSE vendor spec](/broking-kyc/vendors/exchanges/nse/) — UCC registration and segment activation flags.
+- [BSDA](./bsda/) — NRI accounts sit inside the quarterly BSDA eligibility assessment.
+- [Bank-led 3-in-1 accounts](./bank-broker-3in1/) — what changes when the group bank is also the client's AD bank.
+
+## Verified through
+
+2026-09-11
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

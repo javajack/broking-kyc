@@ -1,0 +1,151 @@
+---
+title: "Account Variants: Basic Services Demat Account (BSDA)"
+description: BSDA after the June 2024 revision — the Rs.10 lakh eligibility ceiling, the nil and Rs.100 AMC slabs, opt-in-by-default opening, quarterly re-assessment and auto-conversion, holding-value computation, and the opt-out consent record.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** <abbr title="Basic Services Demat Account">BSDA</abbr> is not an account type a client chooses; it is a charging status a depository participant is obliged to apply unless the client opts out. The page therefore starts with the eligibility test, then the default-on opening rule that follows from it, then the charges, then the recurring re-assessment machinery that keeps the status accurate — which is where nearly all of the operational work lives.
+
+## TL;DR
+
+- **BSDA is the default, not the option.** Under **[<abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/POD-1/P/CIR/2024/91](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir202491)** (28 June 2024, effective 1 September 2024) a <abbr title="Depository Participant">DP</abbr> "shall open only BSDA" for an eligible beneficial owner unless that owner gives specific consent by email from his registered email address to take a regular account instead.
+- **Three eligibility conditions, all of which must hold.** The individual has or proposes to have only one demat account where he is the sole or first holder; he has only one BSDA across all depositories; and the value of securities in the account does not exceed Rs.10 lakh, debt and non-debt combined, at any point in time.
+- **Two charge slabs.** Maximum annual maintenance charge is nil up to Rs.4 lakh of holdings and Rs.100 above Rs.4 lakh up to Rs.10 lakh. Above Rs.10 lakh the account is not a BSDA and regular <abbr title="Asset Management Company (mutual funds context) / Annual Maintenance Charges (depository context).">AMC</abbr> may be levied. All other charges are at par with a non-BSDA account — a DP may not levy *higher* charges on a BSDA for any other service.
+- **Statements.** Electronic statements free; a physical statement may be charged at a fee not exceeding Rs.25 per statement.
+- **Re-assessment is recurring, not one-off.** The circular required DPs to reassess all existing beneficial owners within two months of the effective date and thereafter at the end of every billing cycle. <abbr title="Central Depository Services (India) Limited">CDSL</abbr> has since put this on a quarterly footing with a ten-working-day conversion window in **[CDSL/AUDIT/DP/POLCY/2026/409](/broking-kyc/reference/circulars/cdsl/#cdslauditdppolcy2026409)** (17 June 2026), supported by quarterly eligibility files in **[CDSL/OPS/DP/POLCY/2026/433](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolcy2026433)** (30 June 2026).
+- **<abbr title="Non-Resident Indian">NRI</abbr> and foreign-national accounts are in scope.** The CDSL quarterly eligibility files cover individual, NRI and foreign-national accounts with combined securities value not exceeding Rs.10 lakh.
+
+## Conceptual overview
+
+The Basic Services Demat Account began as a financial-inclusion instrument: a small investor should not pay a full annual maintenance charge to hold a few thousand rupees of securities. The original framework set the ceiling at Rs.2 lakh with two slabs. The June 2024 revision raised the ceiling to Rs.10 lakh combined across debt and non-debt securities, reset the slabs, and — the change that mattered most operationally — inverted the default. Before the revision a client could ask for a BSDA. After it, the DP must give an eligible client a BSDA unless the client positively declines in writing from his registered email.
+
+That inversion moves the burden from the client to the participant, and it moves the work from account opening to the billing cycle. Determining eligibility at opening is easy: the account is empty, so the value test passes, and the only real question is whether the applicant already holds another account as sole or first holder anywhere in either depository. Keeping the determination correct afterwards is harder, because the value of holdings drifts every day and a client who crosses Rs.10 lakh on a rally and falls back below it a week later has to be charged correctly for each period. The depositories solve this by generating eligibility files centrally — they can see across their own books, and they cross-check first-holder accounts across depositories — and by giving participants an upload utility to correct wrongly flagged accounts.
+
+The status is therefore best understood as three things bolted together: a *test* (three conditions), a *charging consequence* (two slabs), and a *reconciliation process* (quarterly files, conversions, and an opt-out consent record with a date). The first two are short. The third is the whole of the operational cost.
+
+## 1. Regulatory framework
+
+- **CIR/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>/DP/22/2012** (27 August 2012), read with **MRD/DoP2DSA2/CIR/P/2019/51** (10 April 2019) and paragraphs 1.8.1 to 1.8.5 of the **Master Circular for Depositories dated 6 October 2023** — the original BSDA framework. Paragraphs 1.8.1 to 1.8.5 were superseded from 1 September 2024. `[not yet in index]`
+- **[SEBI/HO/MIRSD/POD-1/P/CIR/2024/91](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir202491)** (28 June 2024, effective 1 September 2024) — the current framework: eligibility at clause 2.1, default-BSDA opening and re-assessment at clause 2.2, charges and holding-value determination at clause 2.3, services at clause 2.4.
+- **[CDSL/OPS/DP/POLCY/2024/358](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolcy2024358)** (29 June 2024) — CDSL's dissemination of the SEBI circular.
+- **[<abbr title="National Securities Depository Limited">NSDL</abbr>/POLICY/2024/0122](/broking-kyc/reference/circulars/nsdl/#nsdlpolicy20240122)** (29 August 2024, effective 1 September 2024) — NSDL's operational guidelines: participants open only BSDA for eligible owners absent explicit email consent for a regular account, the BSDA flag is enabled by default at opening, and existing-client re-assessment is required within two months.
+- **[CDSL/OPS/DP/POLCY/2024/208](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolcy2024208)** — the CDSL field-level implementation: BSDA flag on the <abbr title="Beneficial Owner">BO</abbr> master and the BSDA opt-out consent date.
+- **[NSDL/POLICY/2025/0042](/broking-kyc/reference/circulars/nsdl/#nsdlpolicy20250042)** (3 April 2025, effective 4 April 2025) — UDiFF Catalogue V2.0.0.0 introduces the BSDA opt-out option in the NSDL system, makes certain Client Master Export and BO Upload fields conditionally required, and requires the date of email consent for the opt-out.
+- **[CDSL/AUDIT/DP/POLCY/2026/409](/broking-kyc/reference/circulars/cdsl/#cdslauditdppolcy2026409)** (17 June 2026) — quarterly re-assessment of existing beneficial owners, with conversion of eligible accounts within ten working days after quarter-end unless the owner gives authenticated, verifiable consent to retain a regular account.
+- **[CDSL/OPS/DP/POLCY/2026/433](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolcy2026433)** (30 June 2026) — quarterly eligibility files based on 20 June 2026 holdings with cross-depository first-holder checks, covering individual, NRI and foreign-national accounts up to Rs.10 lakh; the billing archive carries eligible, <abbr title="Permanent Account Number">PAN</abbr>-exempt, multiple-account and BSDA-flag files, and participants may use BO-modify uploads to remove incorrect BSDA marking and notify owners.
+- **[NSDL/POLICY/2026/0121](/broking-kyc/reference/circulars/nsdl/#nsdlpolicy20260121)** (24 August 2026, effective 28 August 2026 end of day) — the Local <abbr title="Depository Participant Module (CDSL terminology).">DPM</abbr> BSDA Modification Upload utility for files in UDiFF 3.0.1.2 format, reached through the Client Maintenance menu, to support timely conversion of eligible accounts.
+- **[SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2025/22](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-pod1pcir202522)** (21 February 2025) — the Investor Charter for stock brokers carries the Rs.10 lakh BSDA threshold into the disclosure set that must appear in the account-opening kit.
+
+## 2. Eligibility
+
+| Condition | Clause | Test | Where it is checked |
+| --- | --- | --- | --- |
+| Only one demat account as sole or first holder | 2.1(a) | Applicant has, or proposes to have, exactly one such account | At opening, and in the depositories' quarterly cross-depository first-holder check |
+| Only one BSDA across all depositories | 2.1(b) | No other BSDA in the same name anywhere | Depository-generated multiple-account file |
+| Value of securities not exceeding Rs.10 lakh | 2.1(c) | Debt and non-debt securities combined, at any point in time | Daily, from closing price or NAV |
+
+Three properties of the test are worth stating because they are the source of most disputes:
+
+- **"Sole or first holder" is not "sole holder".** A joint account qualifies if the individual is its first holder and has no other account as sole or first holder. Being a second or third holder somewhere else does not disqualify him. See [Joint accounts](./joint-accounts/).
+- **The combined figure includes debt.** Bonds, debentures and mutual-fund units held in demat form all count. A client whose equity holding is modest but whose bond holding is not can be ineligible without ever noticing.
+- **"At any point in time" means the test is continuous.** A single day above Rs.10 lakh ends BSDA status prospectively, under clause 2.3(d), which permits regular charges "from that date onwards". It does not retrospectively invalidate the earlier period.
+
+### 2.1 How the holding value is computed
+
+Clause 2.3(c) sets the method and it is more prescriptive than it first appears:
+
+| Security | Basis |
+| --- | --- |
+| Listed securities | Daily closing price |
+| Mutual-fund units | NAV |
+| Where a closing price or NAV is unavailable | Last traded price |
+| Unlisted securities other than mutual-fund units | Face value |
+| Suspended securities | Excluded from the eligibility determination |
+
+<Aside type="caution" title="The suspended-securities exclusion cuts both ways">
+Excluding suspended securities from the value computation is a relief for a client holding a large position in a suspended scrip — it keeps him inside the Rs.10 lakh ceiling. It is also the mechanism behind the separate problem of accounts that hold nothing but illiquid, suspended or delisted securities: those accounts look eligible, look active, and generate AMC that the depositories have separately asked participants to refrain from charging in defined circumstances. The eligibility engine and the billing engine must read the same exclusion list, or the account will be flagged BSDA-eligible and billed as if it were not.
+</Aside>
+
+## 3. Charges
+
+| Value of holdings in the demat account (debt and non-debt combined) | Maximum annual maintenance charge |
+| --- | --- |
+| Up to Rs.4 lakh | Nil |
+| More than Rs.4 lakh and up to Rs.10 lakh | Rs.100 |
+| More than Rs.10 lakh | Not a BSDA; regular AMC may be levied |
+
+Two constraints sit alongside the table. First, these are *maxima* — a participant may charge less. Second, clause 2.3(b) is explicit that for every service other than AMC, a BSDA is at par with a non-BSDA and the participant "shall not levy higher charges to BSDA". A tariff sheet that recovers the foregone AMC through a higher transaction or DIS charge on BSDA clients is non-compliant, not clever.
+
+On services, clause 2.4 gives electronic statements free of cost and caps a physical statement at Rs.25. Everything else applicable to a regular demat account continues to apply.
+
+## 4. Field-level implementation
+
+| name | type | length | mandatory | source-system | destination-system(s) | notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| BSDA Flag | Char | 1 | Yes | Eligibility determination at opening; quarterly file thereafter | CDSL and NSDL BO master, back office, billing | Default `Y` at opening for an eligible owner; see [CDSL BO destination](/broking-kyc/reference/field-atlas/destinations/cdsl-bo/) |
+| BSDA Opt-Out Consent Date | Date | 8 | Conditional — required where the flag is `N` by client choice | Email from the owner's registered address | CDSL and NSDL BO master | `YYYYMMDD`. The date of the email consent, required by UDiFF V2.0.0.0 |
+| Holding Pattern | Code | 2 | Yes | Account structure | BO master | Determines whether the owner is the first holder for clause 2.1(a) |
+| First Holder PAN | Alphanumeric | 10 | Yes | <abbr title="Know Your Customer (process).">KYC</abbr> record | BO master, depository eligibility engine | The key for the cross-depository first-holder check |
+| PAN-exempt indicator | Char | 1 | Conditional | Documented exemption | Depository eligibility file | The CDSL quarterly archive carries a separate PAN-exempt file; these accounts need manual handling |
+| Value of holdings | Numeric | per system | Derived | Daily closing price, NAV, last traded price or face value | Billing engine, depository eligibility engine | Suspended securities excluded |
+| AMC slab applied | Code | per system | Derived | Value of holdings | Billing engine, client tariff record | Nil, Rs.100, or regular |
+| Conversion effective date | Date | 8 | On event | Quarterly conversion run | BO master, billing engine | CDSL requires conversion within ten working days after quarter-end |
+
+The mechanics of applying a change are file-based on both sides. CDSL exposes the quarterly eligibility, PAN-exempt, multiple-account and BSDA-flag files in the billing archive and accepts BO-modify uploads to correct incorrect marking. NSDL, from 28 August 2026, exposes the Local DPM BSDA Modification Upload utility under Client Maintenance, taking files in UDiFF 3.0.1.2 format. Neither is a screen-by-screen process at retail scale; treat BSDA maintenance as a batch job with an exception queue, alongside the other recurring runs in [Operations: batch pipeline](/broking-kyc/operations/batch-pipeline/).
+
+## 5. The quarterly cycle
+
+1. **Receive the depository eligibility files** after quarter-end — eligible accounts, PAN-exempt accounts, accounts appearing multiple times, and the current BSDA flag state.
+2. **Reconcile against the participant's own books.** Differences arise from same-day value movement, from securities the participant values differently, and from first-holder accounts at the other depository that the participant cannot see directly.
+3. **Identify accounts to convert into BSDA** and accounts whose BSDA status must end. Conversion into BSDA is the default outcome for an eligible account; retaining a regular account requires authenticated, verifiable consent from the owner.
+4. **Collect or confirm opt-out consent** where the owner wants a regular account, recording the consent date against the account. The consent must come from the email address registered with the participant.
+5. **Upload the changes** through the depository's modification utility within the prescribed window — ten working days after quarter-end on the CDSL side.
+6. **Notify the owners** whose status changed, and correct any incorrect BSDA marking through a BO-modify upload.
+7. **Align the billing engine** so that the slab applied in the next billing run matches the flag state and the conversion effective date.
+
+<Aside type="tip" title="The opt-out is a record, not a preference">
+An opt-out with no consent date, or a consent arriving from an unregistered email address, is an opt-out that will not survive inspection. The field exists in both depositories' upload formats precisely so the date is auditable. Capture the email itself, not a call-centre note, and store it against the account the way other consent artefacts are stored — see [Section P: consent and declarations](/broking-kyc/reference/field-atlas/sections/p-consent-declarations/).
+</Aside>
+
+## 6. Alternatives
+
+| Option A — BSDA | Option B — regular demat account | When to pick which | Who uses what |
+| --- | --- | --- | --- |
+| AMC nil or Rs.100 by slab; all other charges at par | Regular AMC per the tariff sheet; otherwise identical services | A for any eligible owner — it is the default and cheaper. B only where the owner positively wants it, or expects to exceed Rs.10 lakh and prefers not to switch back and forth | A is the regulatory default; B survives mainly among clients who were on it before September 2024 and declined to convert |
+
+| Option A — convert on every quarterly file | Option B — convert only on a material, sustained change | When to pick which | Who uses what |
+| --- | --- | --- | --- |
+| Follows the circular literally; more churn, more client notifications | Fewer status changes, but no basis in the circular's wording | A. The CDSL quarterly instruction sets an explicit ten-working-day window, which does not accommodate a participant's own materiality filter | A `[industry practice — unverified]` for the notification design, but the conversion obligation itself is not discretionary |
+
+There is no "BSDA with add-ons" tier. The status changes the AMC and nothing else; segment activation, pledge, <abbr title="Demat Debit and Pledge Instruction">DDPI</abbr> and every other facility work identically. A client who is told he must leave BSDA to get a facility is being told something the framework does not support.
+
+## Practical notes
+
+- **[gotcha]** The verbatim header on the SEBI PDF reads `SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2024/91`, while the circular's listing metadata and several secondary sources render the department segment as `POD-1`. Both refer to the same 28 June 2024 circular. Search on the date and subject rather than on the ID string when reconciling references.
+- **[gotcha]** Opening is where the first-holder condition is actually decided, and it is the one condition the participant cannot verify alone — the other depository's books are not visible. Ask the applicant, record the answer, and expect the quarterly cross-depository file to correct it. The multiple-account file exists because the declaration is unreliable.
+- **[gotcha]** Crossing Rs.10 lakh does not close the account or convert it to anything; it ends BSDA charging prospectively from that date. Falling back below the ceiling makes the account eligible again at the next assessment. Systems that treat the status as sticky produce both overcharging and undercharging in the same quarter.
+- **[industry practice]** Minor accounts, NRI accounts and dormant small accounts are the natural BSDA population. Eligibility is tested on the account itself, not on the guardian's or the family's aggregate portfolio — see [Minor accounts](./minor/) and [NRI accounts](./nri/).
+- **[risk trade-off]** Automating the conversion wholly from the depository file is fast and occasionally wrong; the eligible-account file cannot know about an opt-out consent the participant holds. Gate the automated conversion on the absence of a valid opt-out record rather than on the file alone.
+- **[cost optimization]** For a broker whose retail book is largely small accounts, the BSDA default is a revenue reduction that arrived by regulation and cannot be recovered through other DP charges under clause 2.3(b). Model it as a structural change to DP economics, not as a leakage to be plugged — the DP charge lines in [Reference: cost analysis](/broking-kyc/reference/cost-analysis/) are the place it shows up.
+- **[AI inference — verify before acting]** The quarterly-cycle sequence in section 5 is a proposed operational decomposition of the cited circulars, not an issuer-prescribed workflow. File names, archive locations and menu paths change between depository releases; confirm against the current communiqué before building to them.
+
+## Cross-references
+
+- [Account variants overview](./) — the selector table across all eleven variants.
+- [CDSL BO master destination](/broking-kyc/reference/field-atlas/destinations/cdsl-bo/) — the BSDA flag and opt-out consent date as they land in the BO master.
+- [CDSL vendor spec](/broking-kyc/vendors/depositories/cdsl/) — the DP-side account and billing interfaces the quarterly files arrive through.
+- [NSDL vendor spec](/broking-kyc/vendors/depositories/nsdl/) — UDiFF formats and the Local DPM utilities.
+- [Operations: batch pipeline](/broking-kyc/operations/batch-pipeline/) — where the quarterly BSDA run belongs among the other recurring jobs.
+- [Lifecycle: dormancy and reactivation](/broking-kyc/lifecycle/dormancy-reactivation/) — the adjacent question of what to charge an account that holds nothing and does nothing.
+- [Joint accounts](./joint-accounts/) — why a first holder of a joint account can still be BSDA-eligible.
+- [Minor accounts](./minor/) — the most common BSDA candidate.
+- [Reference: cost analysis](/broking-kyc/reference/cost-analysis/) — per-account cost lines the AMC slabs affect.
+
+## Verified through
+
+2026-09-11
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

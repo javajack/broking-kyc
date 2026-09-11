@@ -1,0 +1,174 @@
+---
+title: "Account Variants: HUF (Hindu Undivided Family)"
+description: Onboarding a Hindu Undivided Family — Karta authority, coparcener declaration, HUF PAN and deed, screen and field deltas, Karta succession and female Karta, and HUF demat specifics.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** an <abbr title="Hindu Undivided Family">HUF</abbr> is the smallest step away from a resident-individual account — one <abbr title="Permanent Account Number">PAN</abbr>, one natural person operating it — so the page starts from what the resident-individual journey already does and then states only the deltas: the extra documents, the extra screens, the extra fields at each destination system, and the one lifecycle event (change of Karta) that has no individual-account equivalent.
+
+## TL;DR
+
+- **An HUF is a separate tax person with its own PAN, operated by one natural person (the Karta).** Non-individual client categories, including HUF, are covered by the non-individual annexure of the [Master Circular on <abbr title="Know Your Customer (process).">KYC</abbr> norms for the securities market](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir2023169) (12 October 2023).
+- **Two PANs are always in play.** The HUF's own PAN (4th character `H`) identifies the client; the Karta's individual PAN identifies the person who signs and operates. Both must pass PAN validation at the exchange — see the [<abbr title="National Stock Exchange of India">NSE</abbr> <abbr title="Unique Client Code">UCC</abbr> integration](/broking-kyc/vendors/exchanges/nse/) non-individual field matrix.
+- **Exchange client category is `03`.** HUF is one of only two categories (with `01` Individual) for which <abbr title="Unified Payments Interface">UPI</abbr>-based secondary-market payment is applicable, per the client-category tables on the [NSE](/broking-kyc/vendors/exchanges/nse/) and [<abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr>](/broking-kyc/vendors/exchanges/bse/) pages.
+- **Demat account type is `HU` with a single holder — the Karta.** Coparceners are not recorded as holders at the depository; see the [<abbr title="Central Depository Services (India) Limited">CDSL</abbr> <abbr title="Beneficial Owner">BO</abbr> account reference](/broking-kyc/vendors/depositories/cdsl/) Section 9.2.
+- **Beneficial-ownership determination still applies.** Under the PML (Maintenance of Records) Rules read with the [<abbr title="Anti-Money Laundering">AML</abbr>/<abbr title="Combating the Financing of Terrorism">CFT</abbr> Master Circular](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202478) (June 2024), an HUF's controlling natural person is the Karta; the CDD file must say so explicitly rather than leaving the field blank.
+- **A daughter can be Karta.** The Hindu Succession (Amendment) Act 2005 made daughters coparceners by birth, confirmed by the Supreme Court in *Vineeta Sharma v. Rakesh Sharma* (2020); the Delhi High Court in *Sujata Sharma v. Manu Gupta* (2016) held that the eldest coparcener, irrespective of gender, can act as Karta.
+- **Nomination does not apply.** The revised nomination framework applies to individual demat accounts and mutual-fund folios; non-individual accounts including HUF are outside it. Devolution follows the coparcenary, not a nominee record.
+
+## Conceptual overview
+
+A Hindu Undivided Family is not created by a contract or a registration; it exists by operation of Hindu law the moment a Hindu male or female has lineal descendants, and it is recognised as a distinct "person" for income-tax purposes under Section 2(31) of the Income-tax Act 1961. That is the whole commercial reason HUF accounts exist in broking: a family can hold securities in a pool that is taxed separately from any individual member, with its own basic exemption and its own capital-gains computation.
+
+Operationally, though, an HUF behaves almost like an individual. There is one decision-maker — the Karta, the senior-most coparcener — and everybody else (the coparceners) has a beneficial interest but no signing authority. There is no board, no partnership deed governing who may sign, no registrar holding a public record of office-bearers. This is why HUF is usually the first non-individual type a retail broker supports: the identity graph is one entity plus one operating natural person, which is a small extension of the individual data model rather than a new one.
+
+The friction sits in three places. First, evidence: because an HUF is not registered anywhere, the only documents that exist are the HUF's PAN card and a self-declaration by the Karta, which places more weight on the declaration than a broker is used to. Second, the coparcener list: the depository does not want it, the exchange does not want it, but the broker's own AML file and the <abbr title="Central KYC (records registry)">CKYC</abbr> legal-entity record benefit from it. Third, succession: when a Karta dies or steps down, the account does not close and does not transmit — it continues under a new Karta, and every downstream system has to be told about a change of operating person on an unchanged client. The [modifications walkthrough](/broking-kyc/lifecycle/modifications/) covers the generic mechanics; Section 6 below covers what is specific to a Karta change.
+
+## 1. Regulatory framework
+
+- **[<abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/SECFATF/P/CIR/2023/169](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir2023169)** (12 October 2023) — Master Circular on KYC norms for the securities market. Consolidates KYC directions up to 30 September 2023, including the client-category treatment of non-individuals and the annexure listing documents obtained from each non-individual constitution type.
+- **[SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202478)** (June 2024) — AML/CFT Master Circular. Customer acceptance policy, customer due diligence including beneficial-owner identification, ongoing monitoring and record retention. This is the instrument that makes "who controls this HUF" a mandatory determination rather than a formality.
+- **[Prevention of Money-laundering (Maintenance of Records) Amendment Rules, 2023](/broking-kyc/reference/circulars/fiu-ind/#fiu-ind-pmlr-amend-2023-03-07)** (effective 7 March 2023) — lowers beneficial-owner thresholds for companies and partnerships to 10 per cent and requires beneficial ownership to be determined at the commencement of the account-based relationship. For an HUF there is no percentage test; the controlling natural person is identified directly.
+- **[SEBI/HO/MIRSD/SECFATF/P/CIR/2024/79](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202479)** — uploading of KYC information by KRAs to the Central KYC Records Registry. The dual <abbr title="KYC Registration Agency">KRA</abbr>-plus-CKYC obligation applies to non-individual records using the CKYC legal-entity template, not the individual template.
+- **Hindu Succession Act 1956 as amended by the Hindu Succession (Amendment) Act 2005** — Section 6 confers coparcenary status on daughters by birth. *Vineeta Sharma v. Rakesh Sharma* (Supreme Court, 11 August 2020) held this operates irrespective of whether the father was alive on 9 September 2005.
+- **Income-tax Act 1961, Section 2(31)** — treats an HUF as a person distinct from its members; Section 139A and the PAN structure give the HUF its own PAN with `H` as the fourth character.
+- **CDSL and <abbr title="National Securities Depository Limited">NSDL</abbr> <abbr title="Depository Participant">DP</abbr> operating instructions** — account type `HU` at CDSL; the equivalent NSDL holding pattern for an HUF account. Field-level references live on the [CDSL](/broking-kyc/vendors/depositories/cdsl/) and [NSDL](/broking-kyc/vendors/depositories/nsdl/) pages.
+
+## 2. Eligibility and preconditions
+
+| Precondition | Requirement | Where it is checked |
+|---|---|---|
+| HUF exists in fact | Karta declares the HUF's existence, date of formation and the coparcener list | Broker CDD file; CKYC legal-entity record |
+| HUF PAN | Allotted in the HUF's name; 4th character `H`; must be operative and not linked to a deceased-Karta-only record | PAN validation at KRA and exchange UCC |
+| Karta identified | Senior-most coparcener, or a coparcener acting as Karta with the consent of the others | Board of the family is informal — evidenced by declaration |
+| Karta individual KYC | Karta must have a complete individual KYC record and CKYC identifier in their own name | KRA lookup on Karta PAN |
+| Bank account in HUF name | Payments must move between the HUF's bank account and the HUF's trading ledger; a Karta's personal account is a third-party account | Bank-account verification, see [Bank account screen](/broking-kyc/journey/05-bank-account/) |
+| Demat in HUF name | Account type `HU`, single holder, Karta operating | CDSL / NSDL BO setup |
+| Minor Karta | Not permitted — a minor cannot contract or act as Karta | Broker rule |
+
+Two exclusions are worth stating at onboarding time because clients ask about both. An HUF cannot hold a Basic Services Demat Account: the <abbr title="Basic Services Demat Account">BSDA</abbr> concession is framed for individual holders, so an HUF account carries the standard annual maintenance charge — see [BSDA](./bsda/). And an HUF account cannot be a joint account; if a family wants two signatories, the instrument they need is a private trust or a partnership, not an HUF (Section 8 compares them).
+
+## 3. Documents
+
+| Document | Purpose | Form in which it is accepted | Notes |
+|---|---|---|---|
+| HUF PAN card | Client identity | DigiLocker pull where available, else upload | PAN validated against Income-tax records for name and status |
+| HUF declaration / deed | Establishes the HUF, its date of formation and the coparcener list | Signed or eSigned declaration by the Karta on the broker's format | Most HUFs have no registered deed; a declaration is the normal evidence |
+| Karta's individual KYC set | Identity and address of the operating person | Standard individual <abbr title="Officially Valid Document">OVD</abbr> set — Aadhaar-based eKYC, DigiLocker or physical | Karta's own KRA record is reused, not re-created |
+| Coparcener list with PANs | AML / beneficial-interest record | Annexure to the declaration | Not pushed to the depository; retained in the CDD file |
+| HUF bank proof | Payment instrument in the entity's name | Cancelled cheque, bank statement or penny-drop verification | Name-match against HUF PAN name |
+| <abbr title="Foreign Account Tax Compliance Act (US)">FATCA</abbr> / <abbr title="Common Reporting Standard">CRS</abbr> self-certification | Tax-residency reporting | Entity self-certification, signed by Karta | Non-individual template; see [FATCA/CRS field section](/broking-kyc/reference/field-atlas/sections/j-fatca-crs/) |
+| Rights and obligations, tariff, policies | Client agreement set | eSign by Karta | Same document set as an individual, executed by the Karta on behalf of the HUF |
+
+<Aside type="caution" title="The declaration is the weakest link — treat it as such">
+Because no registrar records the existence of an HUF or the identity of its Karta, the HUF declaration is the only document establishing both. A broker that accepts a declaration without also verifying the HUF PAN's name against Income-tax records, and without matching the declared Karta against the PAN holder's own KRA record, has no independent evidence of the relationship at all. Build the name-match as a hard gate, not a maker-checker comment.
+</Aside>
+
+## 4. Journey deltas versus the resident-individual flow
+
+The [nine-screen resident-individual journey](/broking-kyc/journey/) is the baseline. An HUF application reuses most of it and changes these points:
+
+| Screen | Individual behaviour | HUF behaviour |
+|---|---|---|
+| 1 — Mobile registration | Client's own mobile and email | Karta's mobile and email, tagged as the HUF's registered contact; the same mobile may already exist against the Karta's individual account, so the duplicate check must key on PAN, not mobile |
+| 2 — [PAN and DOB](/broking-kyc/journey/02-pan-dob/) | One PAN, DOB | Two-step: HUF PAN plus date of formation, then Karta PAN plus Karta DOB. Both PANs are validated |
+| 3 — DigiLocker consent | Aadhaar-linked documents of the applicant | DigiLocker can only serve the Karta's documents; the HUF PAN is uploaded or fetched separately |
+| 4 — Confirm identity | Applicant photo, signature, <abbr title="In-Person Verification">IPV</abbr> | Karta's photo, signature and IPV; the HUF has no face |
+| 5 — [Bank account](/broking-kyc/journey/05-bank-account/) | Individual account | HUF-name account; penny-drop name must match HUF PAN name, not Karta name |
+| 6 — [Trading preferences](/broking-kyc/journey/06-trading-preferences/) | Segment selection, income proof for derivatives | Same, with income proof in the HUF's name (HUF ITR is the cleanest evidence) |
+| 7 — [Nominations](/broking-kyc/journey/07-nominations/) | Nomination or explicit opt-out | Screen suppressed — nomination is not available for non-individual accounts |
+| 8 — [Declarations gate](/broking-kyc/journey/08-declarations-gate/) | <abbr title="Politically Exposed Person">PEP</abbr>, FATCA, related-party declarations | Entity-level FATCA/CRS classification plus PEP screening of Karta and each coparcener |
+| 9 — [Review and eSign](/broking-kyc/journey/09-review-esign/) | Applicant eSigns | Karta eSigns in the capacity "Karta of [HUF name]"; the capacity string must appear in the signed document |
+
+Two new screens appear that have no individual equivalent: an HUF details screen (date of formation, whether a deed exists, coparcener table) and a Karta authority screen (Karta's relationship to the HUF, declaration that the Karta is the senior-most coparcener or acts with the others' consent).
+
+## 5. Field deltas at each destination system
+
+| Field | Type | Length | Mandatory | Source system | Destination systems | Notes |
+|---|---|---|---|---|---|---|
+| Client category | N | 2 | Yes | Onboarding form | NSE UCC, BSE UCC | Value `03`; drives the guardian/Karta conditional block |
+| HUF PAN | AN | 10 | Yes | Onboarding form | KRA, CKYC, NSE/BSE UCC, CDSL/NSDL BO, back-office | 4th character `H` |
+| Karta name | AN | 70–100 | Yes | Onboarding form | NSE/BSE UCC, CKYC related-person block, CDSL `karta_name` | Must match Karta PAN name |
+| Karta PAN | AN | 10 | Yes | Onboarding form | NSE/BSE UCC, CKYC, CDSL `karta_pan` | Passes the three-parameter PAN check independently |
+| Karta DOB | Date | 10 | Yes | Onboarding form | NSE/BSE UCC, CDSL `karta_dob` | DD/MM/YYYY at CDSL |
+| HUF formation date | Date | 10 | Optional | HUF declaration | CDSL `huf_formation_date`, CKYC | Populate it — it is the only age signal the entity has |
+| Account type | AN | 2 | Yes | Derived | CDSL BO Line 01 | `HU` |
+| Holding pattern / holders | — | — | Yes | Derived | CDSL BO, NSDL BO | Single holder; no joint-holder lines |
+| CKYC constitution type | N | 2 | Yes | Derived | CKYC | `05` per the [CKYC constitution table](/broking-kyc/vendors/identity/ckyc/) |
+| Trading account type | AN | 10 | Yes | Derived | KRA Part <abbr title="—">II</abbr> | `HUF` |
+| FATCA entity classification | AN | — | Yes | Declarations | KRA, FATCA/CRS reporting | Typically `PASSIVE_NFFE` for a family investment pool |
+| Nomination block | — | — | Not applicable | — | CDSL BO Line 04 | Suppressed for non-individual accounts |
+| <abbr title="Legal Entity Identifier">LEI</abbr> | AN | 20 | Conditional | Client | CDSL / NSDL BO | Only where the HUF undertakes large-value transactions that attract the LEI mandate — see [Company](./company/) |
+
+Coparcener details are deliberately absent from the destination columns: no exchange or depository field carries them. They live in the broker's CDD record and, where the entity type supports related-person blocks, in the CKYC legal-entity record. The generic field tables are in the [field atlas](/broking-kyc/reference/field-atlas/).
+
+## 6. Karta succession and change of Karta
+
+An HUF does not die when its Karta does; the coparcenary continues and the next senior coparcener becomes Karta. That produces a lifecycle event that is neither a modification of an individual's details nor a transmission.
+
+1. **Intimation and evidence.** Death certificate of the outgoing Karta (or a resignation letter if the change is voluntary), a fresh HUF declaration naming the new Karta, and consent of the remaining coparceners. Under the simplified transmission framework the broker should not demand affidavits or indemnities where the standard document set is complete.
+2. **New Karta KYC.** The incoming Karta's individual KRA record is fetched; if absent, individual KYC is completed first. PAN of the HUF is unchanged.
+3. **Bank mandate.** The HUF's bank account signatory changes at the bank; the broker re-verifies the account so that payouts do not fail name-or-mandate checks.
+4. **Depository modification.** BO modification updating Karta name, PAN and DOB, plus specimen signature. The account number does not change.
+5. **Exchange UCC modification.** Karta fields in the UCC record are updated; the client code and HUF PAN stay the same.
+6. **KRA and CKYC.** Modification of the non-individual record's related-person block; the HUF's own KYC identifier is retained.
+7. **Fresh document execution.** Rights and obligations and the running-account authorisation are re-executed by the new Karta, because authority to operate flows from the person, not the entity.
+
+<Aside type="note" title="Female Karta — what to configure, not what to debate">
+The question brokers actually face is whether their onboarding software will accept a daughter as Karta. It must. Section 6 of the Hindu Succession Act as amended in 2005 makes daughters coparceners by birth; *Vineeta Sharma v. Rakesh Sharma* (2020) settled its retrospective operation; and *Sujata Sharma v. Manu Gupta* (Delhi High Court, 2016) held that the eldest coparcener may act as Karta irrespective of gender. A validation rule that requires the Karta's gender to be male, or that ranks male coparceners above older female coparceners in a seniority check, is a defect. `[AI inference — verify before acting]` on whether a specific state's practice or a specific depository's forms still carry legacy gender wording.
+</Aside>
+
+## 7. Activation and trading privileges
+
+| Capability | HUF | Basis |
+|---|---|---|
+| Cash / equity delivery | Yes | Category `03` is a full trading category |
+| Intraday and margin products | Yes | Subject to the broker's risk policy |
+| Equity derivatives, currency, commodity | Yes, with income proof in the HUF's name | Segment activation rules are unchanged; see [segment rules comparison](/broking-kyc/deep-dives/foundational/segment-rules-comparison/) |
+| Margin Trading Facility | Yes | Agreement executed by Karta; see [<abbr title="Margin Trading Facility">MTF</abbr> operational deep dive](/broking-kyc/deep-dives/settlement/mtf-operational/) |
+| UPI-based secondary-market payment | Yes — categories `01` and `03` only | Client-category tables on the [NSE](/broking-kyc/vendors/exchanges/nse/) and [BSE](/broking-kyc/vendors/exchanges/bse/) pages |
+| BSDA | No | Individual holders only — see [BSDA](./bsda/) |
+| Nomination | No | Non-individual accounts are outside the nomination framework |
+| <abbr title="Demat Debit and Pledge Instruction">DDPI</abbr> / demat debit authorisation | Yes, executed by Karta | Same instrument as an individual account |
+| <abbr title="Initial Public Offering">IPO</abbr> application | Yes, under the non-retail or retail bucket per the HUF's bid size | See [IPO and <abbr title="Offer for Sale (through stock exchange)">OFS</abbr> broker-side](/broking-kyc/deep-dives/specialty/ipo-ofs-broker-side/) |
+
+## 8. Alternatives
+
+| Option | What it gives the family | What it costs | Who picks it |
+|---|---|---|---|
+| HUF account | Separate tax person, single signatory, minimal paperwork, UPI-eligible | No nomination, no BSDA, succession by coparcenary rather than by choice, demat limited to a single holder | Families with ancestral or gifted pooled capital and a clear senior coparcener |
+| Individual accounts plus joint demat | Nomination available, BSDA possible, either-or-survivor operation | No separate tax person; income clubs with the holder | Families whose objective is survivorship, not tax separation — see [Joint accounts](./joint-accounts/) |
+| Private trust | Chosen beneficiaries, defined trustee powers, survives generations | Registration, stamp duty, trustee KYC, no UPI, heavier CDD | Families who want to direct devolution rather than accept coparcenary — see [Trust, society and AOP](./trust-society-aop/) |
+| Partnership or <abbr title="—">LLP</abbr> | Contractual profit sharing among adults | Deed, annual filings, no HUF tax benefit | Family businesses trading treasury surplus — see [Partnership and LLP](./partnership-llp/) |
+| Company | Perpetual existence, limited liability, LEI-ready | Board resolutions, MOA/AOA, SBO register, highest ongoing cost | Family offices at scale — see [Company](./company/) |
+
+## Practical notes
+
+- **[gotcha]** The fourth character of a PAN encodes holder type: `H` HUF, `C` company, `F` firm or LLP, `A` association of persons, `T` trust, `B` body of individuals, `J` artificial juridical person, `L` local authority, `G` government, `P` individual. Validate it server-side at PAN entry; an applicant who types a personal PAN on the HUF screen is the single most common HUF onboarding rejection. `[industry practice]`
+- **[gotcha]** The Karta's mobile and email are usually already registered against the Karta's individual account. If the uniqueness constraint is on mobile rather than on PAN plus mobile, the HUF application will collide with the Karta's own. Model the relationship as one person operating two clients.
+- **[gotcha]** Penny-drop on the HUF bank account returns the HUF's registered name, which frequently carries a suffix such as "HUF" spelled differently from the PAN name ("H U F", "(HUF)"). Normalise before matching or every application will land in manual review. `[industry practice — unverified]`
+- **[risk trade-off]** Coparcener PANs are not required by any destination system, so it is tempting to skip them. They are, however, the only way to screen the family against sanctions and PEP lists, which the [AML/CFT Master Circular](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202478) expects for a non-individual's controlling and beneficially interested persons. Collect them at onboarding; retrofitting a coparcener list into a live book is far more expensive.
+- **[industry practice]** Income proof for derivatives activation in an HUF is cleanest as the HUF's own income-tax return, because a bank statement in the HUF's name shows only pooled balances and a Karta's salary slip proves nothing about the entity.
+- **[cost optimization]** Because the HUF reuses the Karta's existing individual KRA record for the related-person block, an HUF onboarding for an existing individual client consumes no additional identity-verification API calls beyond PAN validation on the entity — the incremental vendor cost is close to the non-individual CKYC upload fee alone. See the [CKYC integration](/broking-kyc/vendors/identity/ckyc/) cost table.
+- **[gotcha]** On a change of Karta, the depository account number and the exchange client code both survive. Systems that model "new signatory" as "new client" will orphan the position and ledger history. Treat it as a modification event in the [status machine](/broking-kyc/operations/status-machine/).
+- **[industry practice — unverified]** Some depository participants additionally ask for a notarised HUF deed where the HUF holds inherited immovable property or where the coparcener list is disputed. This is a DP-level risk practice rather than a regulatory requirement.
+
+## Cross-references
+
+- [Non-individual entities appendix](/broking-kyc/appendix/non-individual-entities/) — the short planning-stage summary of all non-individual types and the vendor touchpoints this page expands on.
+- [CKYC integration](/broking-kyc/vendors/identity/ckyc/) — constitution-type codes, the legal-entity template and the non-individual upload endpoint.
+- [KRA integration](/broking-kyc/vendors/kra/) — Section 7 non-individual entity fields, including `trading_account_type` and the FATCA entity classification.
+- [CDSL BO account reference](/broking-kyc/vendors/depositories/cdsl/) — Section 9.2 HUF account fields and the `HU` account type.
+- [NSE UCC integration](/broking-kyc/vendors/exchanges/nse/) — client category `03`, Karta field block and the UPI-applicability rule.
+- [Modifications walkthrough](/broking-kyc/lifecycle/modifications/) — the generic change-of-details machinery a Karta change rides on.
+- [Company](./company/) and [Trust, society and AOP](./trust-society-aop/) — the two structures families most often compare against an HUF.
+- [Glossary](/broking-kyc/reference/glossary/) — Karta, coparcener, constitution type, related person.
+
+## Verified through
+
+2026-09-11
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

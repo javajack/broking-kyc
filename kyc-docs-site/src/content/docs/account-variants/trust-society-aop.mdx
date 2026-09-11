@@ -1,0 +1,201 @@
+---
+title: "Account Variants: Trust, Society and AOP"
+description: Onboarding trusts, societies and AOPs — registration evidence, trustee authority, the trust UBO cascade, NPO and DARPAN obligations, and the unregistered-trust demat rule.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** these four constitution types are grouped because they share one operational fault line — whether the entity can hold securities in its own name. The page settles registration status first, because everything else (demat naming, document set, exchange category, NPO treatment) follows from it, and then treats the trust-specific beneficial-ownership cascade, which is the hardest determination in non-individual onboarding.
+
+## TL;DR
+
+- **Registration status, not entity label, decides how the demat account is named.** <abbr title="Central Depository Services (India) Limited">CDSL</abbr> <abbr title="Depository Participant">DP</abbr> operating instructions place associations of persons, unregistered trusts and similar bodies in the "opened in the names of the natural persons, with the entity name recorded above" bucket; a registered public or private trust with its own <abbr title="Permanent Account Number">PAN</abbr> and registration is opened in the entity's name as account type `TR`. See the [CDSL <abbr title="Beneficial Owner">BO</abbr> reference](/broking-kyc/vendors/depositories/cdsl/) Section 9.5.
+- **Exchange client categories are `08` Trust, `09` Society and `05` AOP**, with `39` reserved for FCRA entities and `37` for the <abbr title="National Pension System">NPS</abbr> Trust — see the [<abbr title="National Stock Exchange of India">NSE</abbr>](/broking-kyc/vendors/exchanges/nse/) and [<abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr>](/broking-kyc/vendors/exchanges/bse/) client-category tables.
+- **<abbr title="Ultimate Beneficial Owner">UBO</abbr> for a trust is a four-part cascade, not a percentage.** Under the PML (Maintenance of Records) Rules read with the [<abbr title="Anti-Money Laundering">AML</abbr>/<abbr title="Combating the Financing of Terrorism">CFT</abbr> Master Circular](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202478), the author or settlor, the trustees, the beneficiaries with 10 per cent or more interest, and any other natural person exercising ultimate effective control are all identified.
+- **Non-profit clients trigger a DARPAN obligation on the broker.** Rule 9A of the PML (Maintenance of Records) Rules requires a reporting entity to register the details of an NPO client on the DARPAN portal of NITI Aayog if not already registered, and to retain those records for five years after the relationship ends.
+- **The depositories now enforce NPO tagging.** [CDSL/OPS/DP/POLCY/2026/509](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolcy2026509) (28 July 2026) corrects the mapping to Trust status 29 / sub-status 256 and Corporate status 25 / sub-status 265 for charitable institutions classified as NPO, and makes the DARPAN identifier mandatory at opening and at modification of existing accounts in those categories.
+- **<abbr title="Central KYC (records registry)">CKYC</abbr> constitution types are `04` Trust, `07` Society and `08` AOP/BOI** in the [CKYC legal-entity template](/broking-kyc/vendors/identity/ckyc/).
+- **Trust deeds frequently prohibit what the client wants to do.** An investment-power clause that does not cover derivatives or margin funding is a hard stop on segment activation, not a documentation gap.
+
+## Conceptual overview
+
+Four different legal animals arrive at a broking desk wearing similar clothes. A private trust under the Indian Trusts Act 1882 is a relationship, not a person: property vests in the trustees, who hold it for beneficiaries. A public charitable trust is registered under a state Public Trusts Act and, in most states, obtains a registration number and its own PAN. A society under the Societies Registration Act 1860 is a registered association with a governing body and a memorandum of association. An association of persons or body of individuals is the residual category the Income-tax Act uses for groups that are neither a firm nor a company nor a trust — a residents' welfare group, an unregistered club, a co-owners' pool.
+
+The operational question that separates them is title. Where the entity is registered and holds a PAN in its own name, the depository can open an account in that name and the exchange can register a <abbr title="Unique Client Code">UCC</abbr> against it. Where it is not — an unregistered trust, a plain AOP — the securities must be held in the names of the natural persons who constitute or administer it, with the entity's name recorded on the account so that statements and contract notes read correctly. This is the same rule that governs partnership firms, covered in [Partnership and <abbr title="—">LLP</abbr>](./partnership-llp/).
+
+The second distinctive feature is the authority document. A trust's authority comes from the trust deed's investment-powers clause plus a resolution of the trustees; a society's from its memorandum and rules plus a governing-body resolution naming office bearers. Neither is verifiable against a public register in the way a company's articles and director list are. The broker is reading a private instrument and forming a view — which is why trust onboarding is the slowest non-individual path and the one most often declined.
+
+Third, and increasingly, there is the anti-money-laundering overlay. Charitable and religious entities are the archetypal non-profit organisation under <abbr title="Prevention of Money Laundering Act 2002">PMLA</abbr>, and Rule 9A puts a positive duty on the broker — not merely on the client — to ensure DARPAN registration. Both depositories have now wired that duty into their account-opening and modification validations.
+
+## 1. Regulatory framework
+
+- **[<abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/SECFATF/P/CIR/2023/169](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir2023169)** (12 October 2023) — Master Circular on <abbr title="Know Your Customer (process).">KYC</abbr> norms for the securities market; non-individual annexure covers registration certificate, trust deed, list and OVDs of trustees, settlors, beneficiaries and authorised signatories.
+- **[SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202478)** (June 2024) — AML/CFT Master Circular. Beneficial-owner identification for trusts, enhanced due diligence, non-profit organisation transaction reporting to <abbr title="Financial Intelligence Unit — India">FIU-IND</abbr>.
+- **[Prevention of Money-laundering (Maintenance of Records) Amendment Rules, 2023](/broking-kyc/reference/circulars/fiu-ind/#fiu-ind-pmlr-amend-2023-03-07)** (effective 7 March 2023) — Rule 9A inserted: reporting entities must register an NPO client's details on the DARPAN portal of NITI Aayog and maintain the record for five years after the relationship ends or the account is closed, whichever is later. The amendment also expands the NPO definition to cover entities constituted for religious or charitable purposes within Section 2(15) of the Income-tax Act 1961, trusts and societies registered under the Societies Registration Act 1860 or corresponding state law, and companies registered under Section 8 of the Companies Act 2013.
+- **[SEBI/HO/MIRSD/SECFATF/P/CIR/2024/79](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202479)** — <abbr title="KYC Registration Agency">KRA</abbr> uploads to the Central KYC Records Registry using the legal-entity template.
+- **[CDSL/OPS/DP/POLCY/2026/509](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolcy2026509)** (28 July 2026) — corrects communiqué 470's status and sub-status categories to Trust status 29 / sub-status 256 and Corporate status 25 / sub-status 265, both charitable institutions classified as NPO, and makes DARPAN identifier capture mandatory at opening and at modification of existing accounts in those categories.
+- **[CDSL/OPS/DP/POLCY/2026/511](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolcy2026511)** (29 July 2026) — UDiFF catalogue changes carrying the corresponding file-format updates, scheduled for 31 July 2026.
+- **Indian Trusts Act 1882** — Sections 3 and 11 (private trust, trustee duties); Sections 20 and 20A (investment powers of trustees, subject to the deed).
+- **Societies Registration Act 1860** — Sections 1–4 (registration, memorandum, annual list of governing body).
+- **Income-tax Act 1961** — Section 2(31) (person includes AOP and BOI); Section 2(15) (charitable purpose); PAN fourth character `T` for trust, `A` for AOP, `B` for BOI, `J` for artificial juridical person.
+- **Foreign Contribution (Regulation) Act 2010** — where the entity receives foreign contributions, its FCRA registration and designated bank account govern fund flow; exchange client category `39` exists for FCRA entities.
+
+## 2. Registration status decides everything
+
+| Entity | Registered? | PAN 4th char | Demat account opened in | Exchange category | CKYC constitution |
+|---|---|---|---|---|---|
+| Private trust, registered deed | Yes | `T` | Trust's name, account type `TR` | `08` | `04` |
+| Public charitable trust, registered under state Public Trusts Act | Yes | `T` | Trust's name, account type `TR` | `08` | `04` |
+| Private trust, unregistered deed | No | `T` or `A` depending on PAN allotment | Names of the trustees, trust name recorded | `08` or `05` `[industry practice — unverified]` | `04` or `08` |
+| Society under the Societies Registration Act | Yes | `A` or `T` per allotment | Society's name | `09` | `07` |
+| Section 8 company | Yes | `C` | Company's name — see [Company](./company/) | `04` | `03` |
+| Association of persons | No public register | `A` | Names of the members, AOP name recorded | `05` | `08` |
+| Body of individuals | No public register | `B` | Names of the members | `05` | `08` |
+| FCRA-registered entity | Yes | Per constitution | Per constitution | `39` | Per constitution |
+| NPS Trust | Statutory | `T` | Trust's name | `37` | `04` |
+
+<Aside type="caution" title="Unregistered trusts and AOPs cannot hold securities in the entity's name">
+This is the rejection that surprises clients most. An unregistered family trust may have a PAN, a bank account and audited accounts, and still cannot have a demat account in its own name, because there is no registered legal person to take title. The account is opened in the names of the trustees as holders with the trust's name recorded above, and the trading account and ledger sit on the trust's PAN. Tell the client this at the first conversation: after eSign, changing the holder names requires a fresh signed form from every trustee.
+</Aside>
+
+## 3. Documents
+
+| Document | Trust | Society | AOP / BOI | Purpose |
+|---|---|---|---|---|
+| Entity PAN card | Required | Required | Required | Client identity |
+| Registration certificate | Public trust registration, or deed registration number | Societies Registration Act certificate | Usually none exists | Existence and legal personality |
+| Constitutive instrument | Trust deed with every supplementary deed | Memorandum of association and rules | Constitution, bye-laws or formation document | Powers and permitted investments |
+| Authority document | Trustees' resolution naming authorised signatories and mode of operation | Governing-body resolution | Members' resolution or authority letter | Who may operate |
+| List of trustees / office bearers / members with PANs | All trustees | Governing body with designations | All members | Related-person and UBO determination |
+| Settlor or author details | Required | Not applicable | Not applicable | UBO cascade element one |
+| Beneficiary details | Where determinable; those with 10 per cent or more interest | Not applicable | Members' shares | UBO cascade element three |
+| OVDs of authorised signatories | Each signatory | Each signatory | Each signatory | Individual identity and address |
+| Investment-powers extract | Clause of the deed permitting securities, derivatives and margin | Rules permitting investment | Formation document clause | Segment activation gate |
+| Entity bank proof | Trust account | Society account | AOP account | Payment routing |
+| <abbr title="Foreign Account Tax Compliance Act (US)">FATCA</abbr> / <abbr title="Common Reporting Standard">CRS</abbr> entity self-certification | Required | Required | Required | Entity classification and controlling persons |
+| Income-tax registration status | Section 12A/12AB and 80G where charitable | Same where applicable | Not usually | NPO classification |
+| DARPAN registration identifier | Mandatory where NPO | Mandatory where NPO | Where NPO | Rule 9A and CDSL 2026/509 |
+| FCRA registration and designated account | Where foreign contributions are received | Same | Same | Category `39` handling |
+| Latest audited accounts | Required for derivative activation | Same | Same | Income proof and risk categorisation |
+
+## 4. Beneficial ownership for trusts
+
+There is no single percentage test for a trust. The cascade identifies, in this order and cumulatively rather than alternatively:
+
+1. **The author or settlor of the trust** — the person who created it and endowed the property.
+2. **The trustees** — every trustee, because they hold legal title and exercise the investment power.
+3. **The beneficiaries with 10 per cent or more interest** in the trust.
+4. **Any other natural person exercising ultimate effective control** through a chain of control or ownership — a protector, an appointor, a person with power to remove trustees.
+
+Each identified person needs full individual KYC and sanctions and <abbr title="Politically Exposed Person">PEP</abbr> screening, as with any beneficial owner; the mechanics are on the [AML screening page](/broking-kyc/vendors/fraud/trackwizz/).
+
+Two situations recur and both need a documented answer rather than a blank field:
+
+- **Discretionary trusts with indeterminate beneficiaries.** The class of beneficiaries is described ("the settlor's descendants") rather than enumerated. The correct treatment is to record the class, identify the settlor, all trustees and any controlling person, and note why individual beneficiaries cannot be enumerated.
+- **Trusts whose trustee is a corporate trustee company.** The cascade continues into the trustee company: its own directors and beneficial owners come into scope, which means a corporate-onboarding exercise nested inside a trust onboarding. Budget for it — see [Company](./company/).
+
+For societies and AOPs the analogous determination is the members or office bearers holding more than 10 per cent of the property or income, failing which the persons exercising control, failing which the senior managing official.
+
+## 5. Non-profit organisations: the DARPAN obligation
+
+Rule 9A shifts the burden. It is not enough that the client says it is registered on DARPAN; the reporting entity must register the client's details on the portal if not already registered, and keep the record for five years after the relationship ends or the account closes, whichever is later.
+
+| Step | What the broker does | Where the value lands |
+|---|---|---|
+| 1. Classify | Determine whether the client is an NPO within the expanded definition — charitable or religious purpose under Section 2(15), a registered trust or society, or a Section 8 company | Client master flag; drives depository status / sub-status selection |
+| 2. Collect | Obtain the DARPAN unique identifier from the client | CDD file; BO setup field |
+| 3. Register if absent | Where the client is not registered, register the client's details on the DARPAN portal | Broker's record of registration |
+| 4. Tag at the depository | Use Trust status 29 with sub-status 256, or Corporate status 25 with sub-status 265, per [CDSL/OPS/DP/POLCY/2026/509](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolcy2026509) | CDSL BO account status and sub-status |
+| 5. Modify existing accounts | The DARPAN identifier is mandatory at modification of existing accounts in those categories, not only at opening | BO modification — see [Modifications](/broking-kyc/lifecycle/modifications/) |
+| 6. Monitor and report | NPO transaction reporting to <abbr title="Financial Intelligence Unit">FIU</abbr>-IND under the AML/CFT Master Circular | Regulatory reporting pipeline |
+| 7. Retain | Five years after relationship end or account closure, whichever is later | Record-retention schedule — see [Closure](/broking-kyc/lifecycle/closure/) |
+
+Step 5 is the one that creates work on an existing book: brokers with charitable-trust clients onboarded before the 2026 communiqués must backfill DARPAN identifiers as a modification campaign, not wait for the next re-KYC cycle.
+
+## 6. Field deltas at each destination system
+
+| Field | Type | Length | Mandatory | Source system | Destination systems | Notes |
+|---|---|---|---|---|---|---|
+| Client category | N | 2 | Yes | Onboarding form | NSE UCC, BSE UCC | `08` trust, `09` society, `05` AOP, `39` FCRA, `37` NPS Trust |
+| Entity PAN | AN | 10 | Yes | Onboarding form | KRA, CKYC, UCC, BO, back-office | 4th character `T`, `A`, `B` or `J` |
+| CKYC constitution type | N | 2 | Yes | Derived | CKYC | `04` trust, `07` society, `08` AOP/BOI |
+| Account type | AN | 2 | Yes | Derived | CDSL BO Line 01 | `TR` for a registered trust |
+| Trust PAN | AN | 10 | Yes | Onboarding form | CDSL `trust_pan` | |
+| Trust registration number | AN | 30 | Yes | Registration certificate | CDSL `trust_registration_number`, CKYC | Deed registration or Public Trusts Act number |
+| Trust type | AN | 2 | Yes | Deed | CDSL `trust_type` | `PR` private, `PU` public, `CH` charitable |
+| Trustee count | N | 2 | Yes | Deed / resolution | CDSL `trustee_count` | Drives the repeating block |
+| Trustee name (repeating) | AN | 100 | Yes | Deed / resolution | CDSL `trustee_N_name`, CKYC related person | One row per trustee |
+| Trustee PAN (repeating) | AN | 10 | Yes | Deed / resolution | CDSL `trustee_N_pan` | Each validated |
+| Settlor name and PAN | AN | 100 / 10 | Yes for trusts | Deed | CKYC related person, CDD file | UBO cascade element one |
+| Beneficiary block | — | — | Conditional | Deed | CKYC related person, CDD file | Beneficiaries with 10 per cent or more interest |
+| Demat holder names | AN | 100 each | Yes where unregistered | Authority document | CDSL / <abbr title="National Securities Depository Limited">NSDL</abbr> BO holder lines | Unregistered trust or AOP: trustees' or members' names |
+| Operating instruction | AN | 2 | Yes | Resolution | CDSL `operating_instruction` | `SI` singly, `JO` jointly |
+| BO status / sub-status | N | 2 / 3 | Yes | Derived from NPO classification | CDSL BO | Trust 29/256 or Corporate 25/265 for NPO-classified charitable institutions |
+| DARPAN identifier | AN | — | Conditional | NITI Aayog portal | CDSL BO | Mandatory at opening and modification for NPO categories |
+| Trading account type | AN | 10 | Yes | Derived | KRA Part <abbr title="—">II</abbr> | `TRUST` for trusts |
+| FATCA entity classification | AN | — | Yes | Declarations | KRA, FATCA/CRS reporting | Charitable trusts are commonly `ACTIVE_NFFE`; investment trusts may be `FINANCIAL_INSTITUTION` |
+| Nomination block | — | — | Not applicable | — | CDSL BO Line 04 | Suppressed |
+| <abbr title="Legal Entity Identifier">LEI</abbr> | AN | 20 | Conditional | Client | CDSL / NSDL BO | Where large-value thresholds apply — see [Company](./company/) |
+
+Provenance for each destination field is in the [field atlas](/broking-kyc/reference/field-atlas/); the CKYC destination view is at [CKYC destination](/broking-kyc/reference/field-atlas/destinations/ckyc/).
+
+## 7. Journey deltas and segment activation
+
+| Stage | Behaviour |
+|---|---|
+| Entry | Constitution-type selector, then a registration-status question. The answer branches demat naming, document list and CKYC template |
+| Identity | Entity PAN validated; trustee or office-bearer block captured, each fetched from the KRA on their individual PAN |
+| Documents | Deed or memorandum, registration certificate, resolution, trustee list, investment-powers extract, accounts — all uploaded |
+| Investment-powers review | Compliance reads the deed clause and records which segments it permits. This is the gate, not the trading-preferences screen |
+| [Nominations](/broking-kyc/journey/07-nominations/) | Suppressed |
+| [Declarations](/broking-kyc/journey/08-declarations-gate/) | Entity FATCA/CRS classification, settlor and beneficiary declarations, UBO cascade, PEP screening of trustees and controlling persons |
+| NPO classification | Determines DARPAN handling and depository status / sub-status |
+| [Review and eSign](/broking-kyc/journey/09-review-esign/) | Multi-signatory eSign per the resolution's mandate; each signatory signs in their trustee or office-bearer capacity |
+| Registration | KRA and CKYC non-individual upload, UCC upload, BO setup with `TR` or holder-name lines, NPO status/sub-status and DARPAN identifier |
+| Segment activation | Cash where the deed permits securities investment; derivatives only where the deed permits derivative or hedging transactions; <abbr title="Margin Trading Facility">MTF</abbr> and pledge only where the deed permits borrowing against securities |
+
+Segment activation is genuinely narrower here than for any other entity type. A public charitable trust's deed commonly restricts investments to the modes specified in Section 11(5) of the Income-tax Act, which does not contemplate equity derivatives; activating derivatives for such a client on the strength of an income-proof upload alone is a control failure, not a service.
+
+## 8. Alternatives
+
+| Option | Strength | Weakness | Typical adopter |
+|---|---|---|---|
+| Registered private trust | Demat in the trust's own name; chosen beneficiaries; survives the settlor | Registration and stamp duty; trustee KYC; investment powers limited by the deed | Families directing devolution rather than accepting coparcenary |
+| Unregistered private trust | Cheapest to create; private | Demat in trustees' names; every trustee change disturbs the holding | Small family arrangements — usually better served by an <abbr title="Hindu Undivided Family">HUF</abbr> or joint account |
+| Public charitable trust | Recognised charitable status, 12AB and 80G benefits | NPO treatment, DARPAN, narrow investment powers, FIU-IND reporting | Endowments and religious institutions |
+| Society | Democratic governance; simple registration | Annual governing-body list; investment powers limited by rules | Clubs, professional associations, welfare bodies |
+| Section 8 company | Best governance record, verifiable directors, demat in own name | Companies Act compliance burden, still NPO-treated — see [Company](./company/) | Larger not-for-profits and CSR vehicles |
+| AOP / BOI | No formation formality | No entity-name demat; weakest authority evidence | Co-owner pools and informal groups |
+| HUF | Single signatory, separate tax person, minimal paperwork | Only coparcenary capital — see [HUF](./huf/) | Families with pooled ancestral capital |
+
+## Practical notes
+
+- **[gotcha]** "Registered trust" is ambiguous in client conversations: a deed can be *registered* with a sub-registrar under the Registration Act without the trust being *registered* under a state Public Trusts Act, and the two produce different depository outcomes. Ask for the registration number and the Act under which it was granted, as two separate fields.
+- **[gotcha]** A trust's PAN fourth character is not a reliable constitution indicator — some trusts hold PANs allotted with `A` (association of persons) because of how the original application was filed. Drive logic off the constitution-type field and the registration evidence.
+- **[risk trade-off]** Discretionary trusts cannot enumerate beneficiaries, so the temptation is to leave the beneficiary block empty. The defensible position is to record the beneficiary class in text, identify the settlor, all trustees and any protector or appointor, and document why enumeration is impossible. An empty field with no explanation is the finding an inspection will pick up. `[industry practice]`
+- **[gotcha]** Rule 9A places the DARPAN registration duty on the broker, not only on the client. A workflow that merely *asks* for a DARPAN identifier and proceeds when the client says "not registered" does not discharge it.
+- **[industry practice]** Many brokers decline unregistered trusts and AOPs outright rather than operate trustee-name demat accounts, because trustee turnover creates a holder-change event with the same signature burden as a fresh account opening. If you accept them, set an expectation with the client about that cost. `[industry practice — unverified]`
+- **[cost optimization]** Capture the deed's investment-powers clause as a structured field — permitted segments, permitted instruments, whether borrowing against securities is allowed — at onboarding. Re-reading a forty-page deed every time the client requests a new segment is the largest avoidable cost in servicing trust accounts.
+- **[gotcha]** Corporate trustees nest an entire corporate onboarding inside a trust onboarding: the trustee company's directors, signatories and own beneficial owners all come into scope. Size the case as two onboardings, not one.
+- **[gotcha]** Existing charitable-trust and Section 8 company accounts need the DARPAN identifier backfilled, because [CDSL/OPS/DP/POLCY/2026/509](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolcy2026509) makes it mandatory at modification of existing accounts and not only at opening. Run it as a campaign before the next modification the client happens to request.
+- **[industry practice — unverified]** Where a society's governing body changes annually, some depository participants require the latest annual list of the governing body filed under the Societies Registration Act at every re-KYC rather than only on intimation of change.
+
+## Cross-references
+
+- [Non-individual entities appendix](/broking-kyc/appendix/non-individual-entities/) — planning-stage entity summary and per-vendor touchpoints.
+- [CKYC integration](/broking-kyc/vendors/identity/ckyc/) — constitution types `04`, `07` and `08`, trust fields including settlor and trustee blocks.
+- [KRA integration](/broking-kyc/vendors/kra/) — Section 7 non-individual fields and the `TRUST` trading-account type.
+- [CDSL BO account reference](/broking-kyc/vendors/depositories/cdsl/) — Section 9.5 trust account fields, `TR` account type and trustee block.
+- [NSE UCC integration](/broking-kyc/vendors/exchanges/nse/) — client categories `05`, `08`, `09`, `37` and `39`.
+- [AML screening](/broking-kyc/vendors/fraud/trackwizz/) — screening of settlors, trustees, beneficiaries and controlling persons.
+- [Modifications](/broking-kyc/lifecycle/modifications/) — the BO and UCC modification path a DARPAN backfill or trustee change rides on.
+- [Closure](/broking-kyc/lifecycle/closure/) — record-retention obligations that Rule 9A extends for NPO clients.
+- [Company](./company/) and [Partnership and LLP](./partnership-llp/) — the authority-chain and natural-person-holder rules this page reuses.
+
+## Verified through
+
+2026-09-11
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

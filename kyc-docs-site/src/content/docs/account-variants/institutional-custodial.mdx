@@ -1,0 +1,177 @@
+---
+title: "Account Variants: Institutional and Custodial Accounts"
+description: Onboarding PMS, AIF, mutual fund, insurance and pension clients cleared through a custodian — CP code, give-up and take-up, family CP accounts, institutional UCC and sole proprietors.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** an institutional account is defined less by who the client is than by who settles the trade. The page therefore starts with the clearing model — execution member, clearing member, custodian — because that single fact determines the <abbr title="Unique Client Code">UCC</abbr> category, the order-tagging rules, the intraday cut-offs and the margin treatment. Client types, family mapping and the sole-proprietor case follow, because each is a variation on the same clearing skeleton.
+
+## TL;DR
+
+- **Institutional clients separate execution from clearing.** The broker executes; a custodian acting as clearing member confirms the trade and takes on the settlement obligation. The link between the two is the custodial-participant code carried on the order.
+- **Unconfirmed means unsettled by the custodian and therefore the broker's own obligation.** <abbr title="National Stock Exchange of India">NSE</abbr> Clearing's custodial-participant procedures set the intraday windows — CP-code modification to 16:15, custodian trade confirmation to 19:30 on T, and obligation-transfer-request submission to 20:00 on T with confirmation into the following morning (NSE Clearing, "Custodial Participant Deals" and the <abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr> Clearing FAQ) `[industry practice — unverified]` on current values, which move with each settlement calendar. The published-timings template is [NCL/CMPT/50078](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt50078).
+- **A generic institutional code allows allocation after execution.** Orders may be executed under a single institutional code and allocated to the underlying CP codes afterwards, with the break-up uploaded against the contract-note reference the same working day.
+- **Custodial participants can settle <abbr title="Trade-date Plus N settlement">T+0</abbr>, with a dedicated family mechanism.** Eligible since 31 July 2024 per [NCL/CMPT/63165](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt63165), with the Family Account CP code (name suffix `FAMILYAC`, placeholder <abbr title="Permanent Account Number">PAN</abbr> `FAMIL999999Y`) active from 10 February 2025 per [NCL/CMPT/66135](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt66135) — the mechanics are in the [T+0 and <abbr title="Trade-date Plus N settlement">T+1</abbr> settlement deep dive](/broking-kyc/deep-dives/settlement/t0-t1-settlement/).
+- **Institutional client categories occupy a distinct band of the UCC table** — `12` development financial institution, `23` foreign institutional investor, `31` to `34` provident, superannuation, gratuity and pension funds, `36` mutual fund fund-of-funds schemes, `37` <abbr title="National Pension System">NPS</abbr> Trust, `38` global development network, `39` FCRA — per the [NSE](/broking-kyc/vendors/exchanges/nse/) and [<abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr>](/broking-kyc/vendors/exchanges/bse/) client-category tables.
+- **A sole proprietorship is registered as category `13` on the proprietor's PAN**, because the proprietorship has no separate PAN of its own.
+- **<abbr title="Unified Payments Interface">UPI</abbr>-based secondary-market payment does not reach institutional accounts** — it applies only to categories `01` and `03`.
+- **The CP-code requirement was removed for <abbr title="Non-Resident Indian">NRI</abbr> clients** by [<abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/109](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir2025109) (29 July 2025, in force 1 September 2025); it remains the model for genuine custodian-cleared flow.
+
+## Conceptual overview
+
+In the retail model the broker is both the execution member and the clearing member: it places the order, it carries the obligation, it collects the margin, it settles. In the institutional model those roles split. A mutual fund, an alternative investment fund, a portfolio manager's client, an insurance company or a pension fund appoints a custodian — a bank or a specialised custodian registered under the SEBI (Custodian) Regulations — to hold its assets and to clear its trades. The client then distributes execution across several brokers, and each executed trade is tagged with the custodian's CP code so that the obligation lands with the custodian rather than the executing broker.
+
+Everything operationally distinctive about these accounts follows from that split. The broker does not call for margin from the client in the retail sense, because the custodian posts margin against the confirmed obligation. The broker's risk is not market risk on the position but confirmation risk on the trade: if the custodian rejects or fails to confirm within the window, the obligation reverts to the executing member, who then has an unhedged position and a pay-in to fund. Institutional desks therefore reconcile confirmations continuously through the day rather than in an end-of-day batch.
+
+The <abbr title="Know Your Customer (process).">KYC</abbr> picture is correspondingly thinner and sharper. The broker still registers a unique client code against the client's PAN and still holds the client agreement set, the authorised-signatory list and the beneficial-ownership record appropriate to the entity's constitution — a mutual-fund scheme is a trust, an AIF is usually a trust, an insurer is a company, a portfolio manager's client may be an individual. What it does not do is build the depository relationship: the securities sit in the custodian's demat arrangement, not in a demat account the broker's <abbr title="Depository Participant">DP</abbr> opened.
+
+The sole-proprietor case sits at the opposite end and is included here because it is the last remaining non-individual shape a retail broker meets. A proprietorship is not a person at all: it is an individual trading under a business name, so the PAN, the KYC and the liability are the proprietor's, while the bank account and the trade name are the business's.
+
+## 1. Regulatory framework
+
+- **[SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** — Master Circular for Stock Brokers (April 2025), consolidating broker obligations to 31 March 2025 including client registration, running-account settlement and margin obligations that apply differently to custodian-cleared clients.
+- **[SEBI/HO/MIRSD/SECFATF/P/CIR/2023/169](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir2023169)** (12 October 2023) — Master Circular on KYC norms; the non-individual annexure governs the constitution-specific document set for each institutional client type.
+- **[SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202478)** (June 2024) — <abbr title="Anti-Money Laundering">AML</abbr>/<abbr title="Combating the Financing of Terrorism">CFT</abbr> Master Circular: customer due diligence and beneficial-owner identification, which for a fund means tracing to the sponsor, trustee, investment manager and controlling persons.
+- **[SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/109](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir2025109)** (29 July 2025, in force 1 September 2025) — operational efficiency in monitoring NRI position limits in exchange-traded derivatives; removes the CP-code requirement that had applied to NRI clients, leaving CP codes to genuine custodial flow. See [NRI](./nri/).
+- **[NCL/CMPT/63165](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt63165)** (31 July 2024) — extends the T+0 rolling settlement cycle to custodial-participant transactions.
+- **[NCL/CMPT/66135](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt66135)** (15 January 2025, effective 10 February 2025) — operational clarifications for T+0 custodial-participant transactions; activates the Family Account CP code with name suffix `FAMILYAC` and placeholder PAN and SEBI registration `FAMIL999999Y`, restricted to non-marginable CP codes, with trade confirmation at family-account level and obligations at individual CP level. Annexure 1 timings: regular market close 13:30, early-pay-in cut-off 13:45, custodian trade-confirmation cut-off 14:45, securities pay-in 15:30, funds pay-in 16:00.
+- **[NCL/CMPT/50078](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt50078)** (22 October 2021) — the template for how obligation-transfer-request, CP-code modification and confirmation windows are published for a given session.
+- **SEBI (Portfolio Managers) Regulations 2020** — a portfolio manager must appoint an independent custodian except where it provides only advisory services, and cannot hold client securities in its own name; client-level accounts are maintained by the custodian.
+- **SEBI (Custodian) Regulations 1996, as amended by [SEBI/<abbr title="Legal Affairs Department — Northern Regional Office (SEBI)">LAD-NRO</abbr>/GN/2026/308](/broking-kyc/reference/circulars/sebi-other/#sebilad-nrogn2026308)** (3 July 2026) — custodian fees move from annual to monthly, payable within 15 days after month-end, from 1 October 2026.
+- **NSE Clearing, "Custodial Participant Deals" and the NCL Clearing FAQ** — CP-code allotment through the clearing front-end, the generic institutional code, obligation-transfer-request mechanics and the intraday cut-offs. Named public documents rather than numbered circulars.
+
+## 2. The clearing model and the CP code
+
+| Step | Who acts | What happens | Timing reference |
+|---|---|---|---|
+| 1. CP-code allotment | Clearing member or custodian | Applies through the clearing corporation's front-end; the code is unique to the constituent and active from the next trading day | NSE Clearing, "Custodial Participant Deals" |
+| 2. Client-to-CP mapping at the broker | Broker | Maps the client's UCC to the CP code in the order-management system so that orders carry it automatically | Broker configuration |
+| 3. Order entry | Broker | Order carries the CP code, or a generic institutional code where allocation will follow | Intraday |
+| 4. CP-code modification | Broker | Correcting or assigning the CP code on executed trades | Up to 16:15 `[industry practice — unverified]` |
+| 5. Allocation break-up | Broker | Uploads the break-up of obligations across institutional clients with the contract-note reference | Same working day |
+| 6. Custodian confirmation | Custodian | Confirms the trades; on confirmation the obligation is the custodian's | Up to 19:30 on T `[industry practice — unverified]` |
+| 7. Obligation transfer request | Broker | Reallocates CP codes after trading hours where confirmation or allocation needs correction | Up to 20:00 on T, confirmed into T+1 morning `[industry practice — unverified]` |
+| 8. Rejection handling | Broker | Unconfirmed or rejected obligations revert to the executing member | Immediately on window expiry |
+| 9. Settlement | Custodian or broker | Confirmed obligations settle through the custodian; reverted obligations settle through the broker | Per settlement calendar |
+
+<Aside type="danger" title="Confirmation risk is the whole risk">
+For a retail client the broker's exposure is the client's ability to pay. For an institutional client it is the custodian's willingness to confirm. A trade executed against a limit the custodian's own system does not recognise — a stale limit file, a mandate breach, a wrong CP code — will be rejected, and the obligation lands on the executing member after the market has closed and with no ability to square off until the next session. Reconcile confirmations at least hourly through the afternoon, alert on any unconfirmed institutional trade by 18:00, and treat the confirmation cut-off, not the market close, as the end of the trading day for these accounts.
+</Aside>
+
+### Give-up and take-up
+
+Give-up and take-up is the same idea expressed through membership rather than custody: the executing member "gives up" the trade and a different clearing member "takes it up" and carries the obligation. The exchange and clearing corporation define the file format and the confirmation window; the broker-side mechanics are summarised in the [broker process narrative](/broking-kyc/broker-process/narrative/), and the order-management plumbing — trade-capture reports for off-book and give-up flows — is in [<abbr title="Order Management System">OMS</abbr> internals](/broking-kyc/deep-dives/trading-day/oms-internals/). From the client-facing side the only thing that changes is the mapping table: the client agreement must name the clearing member, and the broker must hold that member's acceptance before the first trade.
+
+## 3. Client types and how each is onboarded
+
+| Client type | Constitution | UCC category | Who signs | What the broker holds |
+|---|---|---|---|---|
+| Mutual fund scheme | Trust; the asset management company acts for it | `36` for fund-of-funds schemes; other schemes registered per exchange guidance | Authorised officials of the <abbr title="Asset Management Company (mutual funds context) / Annual Maintenance Charges (depository context).">AMC</abbr> | Trust deed, SEBI registration, AMC authorisation, scheme PAN, custodian mapping |
+| Alternative investment fund | Usually a trust; sometimes an <abbr title="—">LLP</abbr> or company | Per constitution and exchange guidance `[industry practice — unverified]` | Trustee or investment manager under the fund documents | Trust deed, SEBI AIF registration, investment-management agreement, PAN, custodian mapping |
+| Portfolio management client | The client is an individual or entity; the portfolio manager acts under a power of attorney | The client's own category — `01`, `03`, `04` and so on | Client, with the portfolio manager operating under the <abbr title="Portfolio Management Services">PMS</abbr> agreement and <abbr title="Power of Attorney">POA</abbr> | PMS agreement, POA, client KYC per the client's own constitution, custodian mapping |
+| Insurance company | Company | `04` or `07` | Board-authorised officials | Certificate of incorporation, IRDAI registration, board resolution, PAN |
+| Provident, superannuation, gratuity, pension fund | Trust | `31`, `32`, `33`, `34` | Trustees | Trust deed, recognition or approval, trustee resolution, PAN |
+| NPS Trust | Statutory trust | `37` | Authorised officials | Constitutive instrument, authorisation, PAN |
+| Development financial institution | Statutory or corporate | `12` | Authorised officials | Constitutive statute or incorporation documents, authorisation, PAN |
+| Foreign institutional investor / <abbr title="Foreign Portfolio Investor">FPI</abbr> | Per home jurisdiction | `23` | Investment manager or custodian under POA | Registration certificate, PAN, <abbr title="Legal Entity Identifier">LEI</abbr>, POA — see [FPI and <abbr title="Foreign Venture Capital Investor">FVCI</abbr>](./fpi-fvci/) |
+| FCRA entity | Trust, society or Section 8 company | `39` | Trustees or office bearers | FCRA registration, designated account details, constitutive documents — see [Trust, society and AOP](./trust-society-aop/) |
+| Sole proprietorship | Not a separate person | `13` | The proprietor | Proprietor's PAN and KYC, business registration proof, business bank account |
+
+The entity-level document sets are not repeated here: a fund that is a trust is onboarded using the trust document set in [Trust, society and AOP](./trust-society-aop/), and an insurer using the company set in [Company](./company/). What this page adds is the clearing layer that sits on top of whichever constitution applies.
+
+### Portfolio management clients are not institutional clients
+
+This distinction causes more implementation confusion than any other on this page. In a PMS relationship the *client* is the account holder — an individual, an <abbr title="Hindu Undivided Family">HUF</abbr>, a company — and the portfolio manager operates under an agreement and a power of attorney. The UCC is registered in the client's name and category, the client's own KYC applies, and the custodian maintains client-level accounts because the portfolio manager may not hold client securities in its own name. The portfolio manager is an operator, not the client. A system that registers the portfolio manager as the client will produce wrong tax reporting, wrong contract notes and wrong position limits.
+
+## 4. Sole proprietorship accounts
+
+| Aspect | Treatment |
+|---|---|
+| PAN | The proprietor's individual PAN; a proprietorship has no PAN of its own |
+| UCC category | `13` Sole Proprietorship |
+| Client name | The proprietor's name, with the trade name recorded as the business name where the exchange record supports it |
+| KYC | Individual KYC of the proprietor, plus business-existence proof |
+| Business proof | GST registration, Shops and Establishments registration, Udyam registration, professional licence, or an income-tax return showing business income `[industry practice]` |
+| Bank account | Current account in the business name, with the proprietor as the sole authorised signatory |
+| Demat account | In the proprietor's own name; the trade name cannot hold securities |
+| Liability | Unlimited and personal to the proprietor |
+| Nomination | Available, because the underlying holder is an individual |
+| Third-party payment risk | The business current account is not a third-party account, because the proprietor and the business are the same person — but the name mismatch will trip naive penny-drop matching |
+
+The recurring implementation defect is treating category `13` as a non-individual path. It is an individual account with a business overlay: individual KYC, individual demat, individual nomination, business bank account and business proof.
+
+## 5. Field deltas at each destination system
+
+| Field | Type | Length | Mandatory | Source system | Destination systems | Notes |
+|---|---|---|---|---|---|---|
+| Client category | N | 2 | Yes | Onboarding form | NSE UCC, BSE UCC | `12`, `13`, `23`, `31`–`34`, `36`–`39` per client type |
+| Client PAN | AN | 10 | Yes | Onboarding form | <abbr title="KYC Registration Agency">KRA</abbr>, <abbr title="Central KYC (records registry)">CKYC</abbr>, UCC, back-office | Scheme PAN for a fund; proprietor PAN for category `13` |
+| CP code | AN | — | Yes for custodian-cleared | Clearing corporation | Order-management system, obligation allocation, back-office | Mapped to the UCC; wrong mapping causes rejection |
+| Clearing member code | AN | — | Yes where give-up applies | Exchange membership records | OMS, clearing files | Names the member taking up the trade |
+| Custodian name and identifier | AN | — | Yes | Client instruction | Client master, reconciliation | Drives the confirmation workflow |
+| Family Account CP code | AN | — | Conditional | Clearing corporation | T+0 allocation | Name suffix `FAMILYAC`, PAN and SEBI registration `FAMIL999999Y`; only non-marginable CP codes may be linked |
+| Institutional generic code | AN | — | Conditional | Exchange convention | Order entry | Used where allocation follows execution |
+| Authorised-signatory block | AN | — | Yes | Constitutive documents | Instruction verification, CKYC related persons | Per the entity's own constitution |
+| Beneficial-owner block | — | — | Yes | Declaration | CKYC, AML screening, CDD file | Traced per the entity's constitution type |
+| SEBI registration number | AN | — | Yes for regulated entities | Registration certificate | Client master, risk categorisation | Mutual fund, AIF, portfolio manager, FPI |
+| <abbr title="Foreign Account Tax Compliance Act (US)">FATCA</abbr> entity classification and <abbr title="Global Intermediary Identification Number">GIIN</abbr> | AN | — | Yes | Declarations | KRA, FATCA/<abbr title="Common Reporting Standard">CRS</abbr> reporting | Funds and insurers classify as financial institutions |
+| Margin source flag | AN | — | Yes | Configuration | Risk-management system | Distinguishes custodian-posted margin from client-collected margin |
+| UPI eligibility | — | — | Not applicable | — | Payment rails | Categories `01` and `03` only |
+| Business name | AN | — | Conditional | Business proof | UCC, back-office, contract notes | Category `13` only |
+
+Field provenance across destinations is in the [field atlas](/broking-kyc/reference/field-atlas/); the exchange-registration block is at [U — exchange registration](/broking-kyc/reference/field-atlas/sections/u-exchange-registration/).
+
+## 6. Family and mapped accounts
+
+Two unrelated things travel under the word "family" and they should not be conflated.
+
+| Mechanism | What it is | Where it operates | Constraint |
+|---|---|---|---|
+| Family Account CP code | A clearing-corporation construct for T+0 custodial settlement: a parent CP code with the `FAMILYAC` suffix and placeholder PAN `FAMIL999999Y`, to which participating CP codes are tagged; confirmation happens at family level, obligations remain at individual CP level, and the custodian settles to the end investor within the day | Clearing corporation and custodian, per [NCL/CMPT/66135](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt66135) | Only non-marginable CP codes may be linked; custodian maintains the audit trail |
+| Broker-level family mapping | A servicing convenience: linking a client's accounts to those of declared family members for a consolidated view, a combined holdings statement, or to whitelist a family member's bank account against third-party-payment controls | Broker's own systems and, for consolidated demat viewing, depository investor-facing services | Does not permit pooling of funds, securities or margin across PANs `[industry practice — unverified]` |
+
+The line that must not be crossed is margin and ledger pooling. Each PAN is a separate client with a separate ledger, a separate margin obligation and a separate reporting trail; a family mapping that lets one PAN's credit support another PAN's position is an inter-client transfer, not a feature. Consolidated *viewing* is safe; consolidated *obligation* is not. The upstreaming and segregation machinery that makes this concrete is in [client funds upstreaming](/broking-kyc/deep-dives/settlement/client-funds-upstreaming/).
+
+## 7. Alternatives
+
+| Option | Who it suits | Trade-off |
+|---|---|---|
+| Broker as both execution and clearing member | Mid-size corporates and funds without a custodian mandate | Broker carries the full obligation and collects margin directly; simpler operationally, heavier on the broker's capital |
+| Custodian-cleared with CP code | Mutual funds, AIFs, insurers, pension funds, FPIs | Obligation moves to the custodian, but the broker lives inside the confirmation cut-offs and carries rejection risk |
+| Give-up to a separate clearing member | Clients who execute with many brokers but clear with one member | Requires the clearing member's standing acceptance; adds a second confirmation dependency |
+| Direct corporate account without custodian | Corporate treasuries trading modest size — see [Company](./company/) | Full corporate CDD on the broker, direct margin and pay-in |
+| PMS relationship | Individuals and entities delegating discretion | The client remains the client; the portfolio manager operates under POA with an independent custodian |
+| Sole proprietorship account | Individual businesses | It is an individual account with business documents, not a non-individual account |
+
+## Practical notes
+
+- **[gotcha]** The CP-code-to-UCC mapping table is the single highest-consequence configuration object on an institutional desk. A stale entry produces a trade the custodian will not recognise, discovered after the confirmation window. Version-control it, review it on every client or custodian change, and reconcile it against the clearing corporation's master weekly. `[industry practice]`
+- **[gotcha]** Cut-off times published in settlement-calendar and session-timing circulars move — holiday sessions and Muhurat sessions have their own schedules, of which [NCL/CMPT/50078](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt50078) is the template. Read the timings from the applicable circular each session rather than hard-coding them.
+- **[risk trade-off]** Allocating under a generic institutional code and breaking up afterwards improves execution quality but concentrates operational risk into the post-close window. Desks that execute large institutional blocks should staff the allocation and confirmation window as deliberately as they staff the open.
+- **[gotcha]** The CP-code requirement was removed for NRI clients from 1 September 2025 by [SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/109](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir2025109). Code paths that branch on "foreign or institutional" rather than on the actual clearing arrangement will either keep demanding a CP code from NRIs or drop it from genuine custodial clients.
+- **[industry practice]** Institutional clients are the group for whom the broker's obligations under running-account settlement and margin collection differ most from retail, because the custodian posts margin. Model the margin source as an explicit flag rather than inferring it from the client category. `[industry practice — unverified]`
+- **[gotcha]** A PMS client's contract notes, capital-gains statements and tax reporting must be in the client's name, not the portfolio manager's. Registering the portfolio manager as the client corrupts all three and is very expensive to unwind after a financial year has closed.
+- **[cost optimization]** For sole proprietorships, reuse the individual onboarding flow end to end and add only two artefacts: business-existence proof and a business bank account with relaxed name matching. Building a separate non-individual path for category `13` duplicates work and produces the wrong demat treatment.
+- **[gotcha]** Family mapping must never be implemented as shared margin or shared ledger across PANs. Consolidated viewing, consolidated statements and whitelisted family bank accounts are defensible; anything that lets one PAN's balance meet another PAN's obligation is an inter-client transfer.
+- **[industry practice — unverified]** Custodians commonly publish their own daily limit files to executing brokers, and many rejections trace to the broker trading against a limit file it did not refresh. Automate the refresh and alert on staleness rather than relying on the desk to notice.
+
+## Cross-references
+
+- [FPI and FVCI](./fpi-fvci/) — the foreign-investor variant of the same custodian-cleared model, with the <abbr title="Designated Depository Participant">DDP</abbr> registration layer on top.
+- [T+0 and T+1 settlement](/broking-kyc/deep-dives/settlement/t0-t1-settlement/) — custodial-participant eligibility, the Family Account CP code and the T+0 timing annexure.
+- [OMS internals](/broking-kyc/deep-dives/trading-day/oms-internals/) — order tagging, trade-capture reports and give-up handling.
+- [Broker process narrative](/broking-kyc/broker-process/narrative/) — where give-up and take-up sits in the trading day end to end.
+- [Client funds upstreaming](/broking-kyc/deep-dives/settlement/client-funds-upstreaming/) — segregation rules that constrain what family mapping may do.
+- [NSE UCC integration](/broking-kyc/vendors/exchanges/nse/) — the full client-category table including the institutional band and the UPI-applicability rule.
+- [Company](./company/) and [Trust, society and AOP](./trust-society-aop/) — the constitution-specific document sets that institutional clients are onboarded with.
+- [NRI](./nri/) — the variant from which the CP-code requirement was removed in 2025.
+- [Field atlas — exchange registration](/broking-kyc/reference/field-atlas/sections/u-exchange-registration/) — provenance for the UCC fields referenced above.
+
+## Verified through
+
+2026-09-11
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

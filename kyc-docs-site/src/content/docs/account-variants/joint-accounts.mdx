@@ -1,0 +1,151 @@
+---
+title: "Account Variants: Joint accounts"
+description: Joint demat holding with a single-holder trading account — up to three holders, mode of operation, survivorship, the 2026 nomination interplay, freeze propagation, and the field deltas for second and third holders.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** The single fact that explains every joint-account oddity is that the demat account can be joint and the trading account cannot. The page establishes that asymmetry first, then works outward: who signs what, what happens when one holder dies, how nomination now interacts with joint holding after the 2026 norms, and what a freeze on one holder does to the others.
+
+## TL;DR
+
+- **Joint holding exists only on the depository side.** A demat account may have up to three holders; a trading account is always in one name. The first holder is the trading-account holder, and it is his income, risk profile and <abbr title="Permanent Account Number">PAN</abbr> that govern segment activation and reporting.
+- **Every holder is a full <abbr title="Know Your Customer (process).">KYC</abbr> subject.** Each holder needs PAN, identity, address and verification in his own right, and each must sign or e-Sign the application. The onboarding cost of a three-holder demat account is close to three individual onboardings.
+- **Mode of operation is a depository field, not a bank convention.** <abbr title="National Securities Depository Limited">NSDL</abbr>'s guidelines on mode of operation in joint demat accounts (**NSDL/POLICY/2022/053**, 13 April 2022, following the bye-law and business-rule amendment in NSDL/POLICY/2022/025) set out the permitted modes; the site's code table renders them as jointly, anyone-or-survivor and either-or-survivor. A depository account is not operated on a bank's either-or-survivor default.
+- **Survivorship comes before nomination.** On the death of a joint holder the securities pass to the surviving holder or holders by deletion of name, not to the nominee. The nominee's claim arises only when no holder survives — the position set out in **[<abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/04](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202504)** (10 January 2025) and carried into the 2026 norms.
+- **Nomination is now optional for joint accounts.** **[SEBI/HO/<abbr title="Office of Investor Assistance and Education (SEBI)">OIAE</abbr>/OIAE_IAD-3/P/CIR/2026/12676](/broking-kyc/reference/circulars/sebi-other/#sebihooiaeoiae_iad-3pcir202612676)** (29 May 2026) requires nomination or an explicit opt-out for new sole-holder accounts and makes it optional for joint holdings, with up to three nominees; the depository implementations require all holders' consent where a joint account does nominate.
+- **A freeze reaches every holder.** Under **[NSDL/POLICY/2026/0094](/broking-kyc/reference/circulars/nsdl/#nsdlpolicy20260094)** (29 June 2026), where a statutory order against one joint holder freezes the account, the other holders must obtain a specific order from the issuing authority to unfreeze their share of the joint ownership.
+
+## Conceptual overview
+
+Indian market structure keeps ownership and dealing in different containers. The demat account is the ownership container, and joint ownership of securities is ordinary — spouses, parent and adult child, siblings holding inherited shares. The trading account is the dealing container, and dealing is an act by one contracting person: the broker takes orders from a client, computes that client's margin, issues that client a contract note, and settles against that client's bank account. There is no coherent way to margin a two-person order or to issue a contract note to two risk profiles, so the trading account stays single.
+
+The consequence is that a joint demat account with a linked trading account is really two arrangements bolted together. The first holder is the client of the broker; the second and third holders are co-owners of whatever the first holder's trades deliver into the account. Everything the broker computes — financial profile, segment eligibility, income-proof requirements, running-account settlement, tax reporting — reads off the first holder. Everything the depository records — title, survivorship, nomination, freeze — reads off all holders.
+
+This is also why joint holding and nomination are not substitutes even though clients treat them as such. Joint holding transfers title immediately and by operation of survivorship; nomination transfers title on death of the last holder, through a transmission process. Joint holding gives the second holder a present interest and a present say in operating the account; nomination gives the nominee nothing until death. The 2026 norms recognise this by making nomination mandatory-or-opt-out for sole holders and merely optional for joint accounts: a joint account already has a survivorship mechanism.
+
+Two structures are commonly mistaken for joint accounts and are not. A minor's account cannot be joint in any position — the minor is sole and first holder with a guardian operating, per [Minor accounts](./minor/). An <abbr title="Hindu Undivided Family">HUF</abbr> account is a single account held by the Karta on behalf of the family; the coparceners are not joint holders. See [Appendix: non-individual entities](/broking-kyc/appendix/non-individual-entities/).
+
+## 1. Regulatory framework
+
+- **[SEBI/HO/MIRSD/SECFATF/P/CIR/2023/169](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir2023169)** (12 October 2023) — KYC master circular. Applies in full to each holder; there is no reduced standard for a second or third holder.
+- **NSDL/POLICY/2022/025** (28 February 2022), amending NSDL's Bye Laws and Business Rules, and **[NSDL/POLICY/2022/053](/broking-kyc/reference/circulars/nsdl/#nsdlpolicy2022053)** (13 April 2022), "Operational guidelines w.r.t. Mode of Operation in joint demat accounts" — the permitted modes of operation and how a beneficial owner changes the mode. The 2022/025 amendment is `[not yet in index]`.
+- **[SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/04](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202504)** (10 January 2025) — revised and revamped nomination facilities: up to ten nominees with percentage allocation, the rule of survivorship for joint holdings, simplified transmission requiring death certificate and nominee KYC, and the bar on demanding affidavits, indemnities or notarised documents from nominees.
+- **[SEBI/HO/OIAE/OIAE_IAD-3/P/CIR/2026/12676](/broking-kyc/reference/circulars/sebi-other/#sebihooiaeoiae_iad-3pcir202612676)** (29 May 2026) — modified nomination norms. Nomination or opt-out for new single-holder accounts; nomination optional for joint holdings; up to three nominees; prescribed authentication; biannual reminders and first-login prompts for accounts without a nomination. Operative provisions from 1 September 2026, with the supersession of earlier nomination circulars expressed from the date of issuance.
+- **[<abbr title="Central Depository Services (India) Limited">CDSL</abbr>/OPS/<abbr title="Depository Participant">DP</abbr>/POLCY/2026/478](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolcy2026478)** (17 July 2026, live 28 August 2026) and **[NSDL/POLICY/2026/0124](/broking-kyc/reference/circulars/nsdl/#nsdlpolicy20260124)** / **[NSDL/POLICY/2026/0130](/broking-kyc/reference/circulars/nsdl/#nsdlpolicy20260130)** — the depository implementations: mandatory nominee name and relationship, date of birth for a minor nominee, all-holder consent for a joint-account nomination, statement-disclosure choices, reminder cadence.
+- **[NSDL/POLICY/2026/0094](/broking-kyc/reference/circulars/nsdl/#nsdlpolicy20260094)** (29 June 2026) — amendment to Annexure K, the Rights and Obligations of the Beneficial Owner and Participant: a statutory freeze against one joint holder requires a specific order from the issuing authority before the other holders' share can be unfrozen.
+- **[NSDL/POLICY/2026/0123](/broking-kyc/reference/circulars/nsdl/#nsdlpolicy20260123)** (24 August 2026) — revised procedure for freezing a demat account on intimation of a holder's demise, with the demise, notifier and <abbr title="KYC Registration Agency">KRA</abbr>-intimation fields captured before the debit freeze.
+- **[SEBI/HO/MIRSD/POD-1/P/CIR/2024/91](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir202491)** (28 June 2024) — <abbr title="Basic Services Demat Account">BSDA</abbr> eligibility is framed on the individual who is the "sole or first holder", which is what makes a joint account capable of being a BSDA at all. See [BSDA](./bsda/).
+
+## 2. Structure and eligibility
+
+| Attribute | Rule |
+| --- | --- |
+| Maximum holders | Three — first holder plus two joint holders |
+| Trading account | Single holder only; the first holder |
+| Minor as a holder | Not permitted in any position |
+| Holder types | Individuals. A joint account is not the mechanism for an entity holding |
+| KYC | Full KYC for every holder, each with its own PAN and KRA record |
+| Signatures | Every holder signs or e-Signs the account-opening documents |
+| Order of holders | Fixed at opening; changing the order is not a modification but a fresh account plus transfer `[industry practice — unverified]` |
+| Linked bank account | Must belong to the first holder, alone or jointly; third-party funding is prohibited |
+| Nomination | Optional after the 2026 norms; where made, requires all holders' consent |
+| BSDA | Possible where the first holder has no other account as sole or first holder |
+
+<Aside type="caution" title="The bank account is the constraint clients trip over">
+Because the trading account belongs to the first holder, the settlement bank account must belong to the first holder too. Funds received from a second or third holder's own bank account are third-party funds, and the prohibition on accepting third-party funds does not bend because the payer is a co-owner of the demat account. The practical workaround is a bank account held jointly with the first holder as one of its holders — and the mapping has to be verified, not assumed, at [Journey: bank account](/broking-kyc/journey/05-bank-account/).
+</Aside>
+
+## 3. Mode of operation
+
+| Mode | Site code | Who may instruct | Typical use |
+| --- | --- | --- | --- |
+| Jointly | `JO` | All holders must sign every debit instruction | The default. Suits holdings where both parties want a veto |
+| Anyone or survivor | `AS` | Any one holder may instruct, and the survivor or survivors continue | Suits a household where either party needs to act without the other present |
+| Either or survivor | `ES` | As recorded in the site code table for two-holder accounts | Recorded in the depository field set; confirm the depository's current availability before offering it `[verify]` |
+
+Codes are as carried in [CDSL <abbr title="Beneficial Owner">BO</abbr> master destination](/broking-kyc/reference/field-atlas/destinations/cdsl-bo/) and [Section W](/broking-kyc/reference/field-atlas/sections/w-minor-joint/). Three consequences follow from the mode, and all three are frequently missed:
+
+1. **Signature verification.** The mode determines how many specimen signatures a delivery instruction slip must carry. A back office that verifies only the first holder's signature on a jointly-operated account has an unenforceable instruction on file.
+2. **<abbr title="Demat Debit and Pledge Instruction">DDPI</abbr> and <abbr title="Power of Attorney">POA</abbr>.** A demat debit and pledge instruction executed for a jointly-operated account needs the authority of the holders the mode requires. A DDPI signed by the first holder alone on a jointly-operated account is the commonest defect found in this area `[industry practice — unverified]`. See [CDSL DDPI](/broking-kyc/vendors/depositories/cdsl-ddpi/).
+3. **Changing the mode.** It is a modification request at the depository with the consent the depository prescribes, not a preference toggle in the broker's app. It runs through the modification pipeline in [Lifecycle: modifications](/broking-kyc/lifecycle/modifications/).
+
+## 4. Field-level deltas
+
+| name | type | length | mandatory | source-system | destination-system(s) | notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| Holding Pattern | Code | 2 | Yes | Account structure | CDSL and NSDL BO master, back office, contract notes | `SI` single, `J2` two holders, `J3` three holders; `J2` and `J3` trigger replication of the holder blocks |
+| Operation Mode | Code | 2 | Yes for joint | Signed mandate | CDSL and NSDL BO master, back office | `JO` / `AS` / `ES`; drives the signature-verification rule |
+| Second Holder Name | Text | per destination | Yes for `J2` and `J3` | Holder's identity documents | BO master | Full KYC subject in his own right |
+| Second Holder PAN | Alphanumeric | 10 | Yes for `J2` and `J3` | Holder's PAN | BO master, KRA | Own PAN, own KRA record |
+| Second Holder KYC status | Code | per destination | Yes | KRA response | BO master, back office | A non-validated holder record blocks the account, not just that holder |
+| Third Holder Name / PAN / KYC status | as above | as above | Yes for `J3` | as above | as above | Same treatment as the second holder |
+| First Holder flag | Char | 1 | Yes | Account structure | Back office, <abbr title="Unique Client Code">UCC</abbr> | Identifies the trading-account holder and the reporting subject |
+| Nominee block | Group | per destination | Optional for joint after the 2026 norms | Nomination instruction | BO master | Name and relationship mandatory where a nominee is recorded; date of birth mandatory for a minor nominee |
+| All-holder nomination consent | Char or date | per destination | Yes where a joint account nominates | Signed or authenticated consent from every holder | BO master | Required by the 2026 depository implementations |
+| Freeze reason code | Code | 2 | On event | Statutory order or demise intimation | BO master, <abbr title="Risk Management System">RMS</abbr>, back office | A holder-level event sets an account-level freeze |
+
+The trading side carries no joint fields at all. UCC registration under **[<abbr title="National Stock Exchange of India">NSE</abbr>/<abbr title="Investor Service Centre.">ISC</abbr>/61817](/broking-kyc/reference/circulars/nse/#nseisc61817)** takes the first holder's name as per the PAN record, the first holder's PAN and the first holder's date of birth. Sending a concatenated "A and B" client name is the classic three-parameter validation failure — see [NSE UCC destination](/broking-kyc/reference/field-atlas/destinations/nse-ucc/).
+
+## 5. Death of a holder
+
+The sequence is deliberately different from a sole-holder death.
+
+1. **Intimation and freeze.** On intimation of demise, the account is frozen for debit under the revised procedure in [NSDL/POLICY/2026/0123](/broking-kyc/reference/circulars/nsdl/#nsdlpolicy20260123), with the demise, notifier and KRA-intimation details captured before the freeze is applied.
+2. **Survivorship, not transmission to a nominee.** The surviving holder or holders apply for deletion of the deceased holder's name. The securities remain in the same account with a reduced holder set. The nominee is not involved.
+3. **Documents.** Death certificate and the surviving holders' instruction. The January 2025 nomination circular barred intermediaries from demanding affidavits, indemnities or notarised documents from claimants in the simplified cases, and the 2026 norms carry the simplification forward.
+4. **Only when no holder survives** does the nominee's claim arise, and the process becomes ordinary transmission — see [Lifecycle: transmission](/broking-kyc/lifecycle/transmission/).
+5. **The trading account is a separate closure question.** If the deceased was the first holder, the trading account belonged to him and ends with him; the surviving holders hold securities in a demat account with no live trading relationship until one of them opens their own. See [Lifecycle: closure](/broking-kyc/lifecycle/closure/).
+
+<Aside type="note" title="Why the order of holders matters more than clients expect">
+Naming the elder spouse as first holder is intuitive and is usually the wrong choice operationally. The first holder carries the trading account, the bank mapping, the segment activation and the tax reporting; when the first holder dies, all of that has to be rebuilt even though the securities simply pass by survivorship. There is no supported way to promote the second holder to first — the holder order is fixed at opening. Decide it with the succession case in mind, not the age order.
+</Aside>
+
+## 6. Freeze propagation
+
+A joint account has one balance and several holders, and statutory action reaches the balance. Where an income-tax, court or regulatory order attaches one holder's interest, the freeze applies at the account. Under the Annexure K amendment in [NSDL/POLICY/2026/0094](/broking-kyc/reference/circulars/nsdl/#nsdlpolicy20260094), the remaining holders cannot have their share released by asserting they are not the subject of the order; they must obtain a specific order from the issuing authority. The same pattern appears in the KRA-validation freezes: a non-validated PAN record for any holder can hold up the account, as in the deficient-record freeze exercises the depositories run periodically.
+
+Operationally this means holder-level risk is account-level risk. When onboarding a joint account, run the <abbr title="Politically Exposed Person">PEP</abbr>, sanctions and adverse-media screening on every holder with the same rigour, per [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202478) — the <abbr title="Anti-Money Laundering">AML</abbr> consequence of a weak second holder is borne by the first.
+
+## 7. Alternatives
+
+| Option A — joint holding | Option B — nomination on a sole account | When to pick which | Who uses what |
+| --- | --- | --- | --- |
+| Co-ownership now; survivorship on death; every holder has a present say subject to the mode | Sole ownership now; transmission to the nominee on death; nominee has no present rights | A where both parties should be able to act and should own now; B where one person owns and only succession needs settling | B is the volume case; A is chosen for spousal holdings and inherited blocks |
+| Three KYC subjects, three signatures, joint-mode signature rules | One KYC subject, simple operation | A carries real ongoing friction for every instruction | The friction is the reason most retail accounts stay sole with a nominee |
+
+| Option A — one joint account | Option B — two sole accounts | When to pick which | Who uses what |
+| --- | --- | --- | --- |
+| Single holding, single statement, survivorship built in | Independent trading accounts, independent segment activation, independent tax position | A where the portfolio is genuinely shared; B where each person trades separately | B plus family mapping for reporting is common where both parties are active traders `[industry practice — unverified]` |
+
+A third option worth naming is the joint demat account with **no** trading account: co-owned custody with nothing dealt through an exchange, which avoids the first-holder asymmetry entirely. It suits inherited holdings that nobody intends to sell soon.
+
+## Practical notes
+
+- **[gotcha]** A joint demat account is not a bank account, and the either-or-survivor habit imported from banking is the source of most disputes. Set the mode explicitly at opening, record it on the client's copy, and show it on the account statement so it is discoverable before the first delivery instruction rather than during one.
+- **[gotcha]** Multi-signatory e-Sign is a workflow, not a field. All holders must complete their own authentication, and a stalled second holder leaves the application in a partial state that the KRA and UCC submissions must not be triggered from. Gate the downstream submissions on completion of the last holder's signature — the partial-acknowledgement discipline in [Integration <abbr title="Directed Acyclic Graph.">DAG</abbr>: onboarding](/broking-kyc/operations/integration-dag/onboarding/) applies here too.
+- **[gotcha]** Corporate-action entitlements, dividends and the consolidated account statement follow the first holder's records. Clients who assumed a 50-50 economic split are surprised when the dividend and the tax credit land entirely with the first holder. Say so at onboarding; it is not something the broker can restructure later.
+- **[industry practice]** Re-KYC and periodic-review cycles have to be tracked per holder, not per account. A second holder's stale KYC record will freeze the account on the next validation sweep, and the first holder will be the one who calls — see [Lifecycle: re-KYC](/broking-kyc/lifecycle/re-kyc/).
+- **[risk trade-off]** Anyone-or-survivor mode removes friction and removes a control at the same time. For a large holding where the holders are not in the same household, jointly is the defensible default even though it is inconvenient.
+- **[cost optimization]** A joint account can be a BSDA if the first holder has no other account as sole or first holder, which is a real saving on a low-value co-owned holding. Eligibility is tested on the first holder's account footprint, not on the second holder's — see [BSDA](./bsda/).
+- **[AI inference — verify before acting]** The statement that the holder order cannot be changed after opening, and the availability of the either-or-survivor mode, are stated from the depositories' field sets and general practice. Confirm both against the chosen depository's current operating instructions before writing them into a product specification.
+
+## Cross-references
+
+- [Account variants overview](./) — the selector table across all eleven variants.
+- [Appendix: Minor and joint accounts](/broking-kyc/appendix/minor-joint-accounts/) — the earlier short note on vendor-side handling of joint holder records.
+- [Section W: Minor / joint / POA fields](/broking-kyc/reference/field-atlas/sections/w-minor-joint/) — holding type and operation mode with their destination systems.
+- [Journey: Nominations](/broking-kyc/journey/07-nominations/) — the nomination screen the 2026 norms rewrote.
+- [Lifecycle: transmission](/broking-kyc/lifecycle/transmission/) — the process that applies only once no joint holder survives.
+- [Lifecycle: closure](/broking-kyc/lifecycle/closure/) — what happens to the trading account when the first holder dies.
+- [Minor accounts](./minor/) — why a minor cannot be a joint holder.
+- [BSDA](./bsda/) — first-holder eligibility for a joint account.
+- [CDSL BO master destination](/broking-kyc/reference/field-atlas/destinations/cdsl-bo/) — holding pattern and operation-mode encodings.
+
+## Verified through
+
+2026-09-11
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

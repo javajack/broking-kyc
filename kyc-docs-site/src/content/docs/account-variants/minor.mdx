@@ -1,0 +1,169 @@
+---
+title: "Account Variants: Minor accounts"
+description: Minor demat and restricted trading accounts — natural and court guardian, guardian PAN and KYC, permitted holdings and sale-only trading, attaining-majority conversion, guardian death and change.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** A minor account has two people in it — the holder who owns nothing he can operate, and the guardian who operates something she does not own. Every other difference follows from that split, so the page establishes the ownership model first, then eligibility, then the documents and field deltas that encode the split, then the two events that dissolve it (majority, guardian death).
+
+## TL;DR
+
+- The minor is the **sole and first holder** of the demat account; the guardian is an operator, not a co-owner. A minor cannot be a second or third holder in any demat account, per the <abbr title="Central Depository Services (India) Limited">CDSL</abbr> account-constitution rules in Chapter 2 of the [CDSL <abbr title="Depository Participant">DP</abbr> Operating Instructions](/broking-kyc/vendors/depositories/cdsl/) and <abbr title="Securities and Exchange Board of India">SEBI</abbr>'s minor-account FAQ.
+- Both parties need <abbr title="Know Your Customer (process).">KYC</abbr>. The minor's own <abbr title="Permanent Account Number">PAN</abbr> goes into the depository, <abbr title="KYC Registration Agency">KRA</abbr> and <abbr title="Central KYC (records registry)">CKYC</abbr> records under the identity baseline of **[SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/SECFATF/P/CIR/2023/169](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir2023169)** (12 October 2023); the guardian's PAN and KYC are captured and verified separately as the authorised representative.
+- A trading account in a minor's name exists **only to sell** securities already acquired through a permitted route — <abbr title="Initial Public Offering">IPO</abbr> allotment, transmission, corporate action, gift or other permitted off-market transfer. It is not an ordinary buy-and-sell account, and F&O, currency, commodity, intraday and short selling are out of scope.
+- **Attaining majority is not automatic.** The former minor must execute a fresh account-opening form and KYC in his own name, give his own signature and confirm holdings before the account can continue to be operated.
+- **Guardian death freezes the account, not the ownership.** The securities remain the minor's; operating authority is rebuilt with death evidence, a court order where applicable, fresh KYC and a new mandate, and every <abbr title="Power of Attorney">POA</abbr> or <abbr title="Demat Debit and Pledge Instruction">DDPI</abbr> signed by the deceased guardian is cancelled.
+- Nomination on a minor account follows the current depository implementation of **[SEBI/HO/<abbr title="Office of Investor Assistance and Education (SEBI)">OIAE</abbr>/OIAE_IAD-3/P/CIR/2026/12676](/broking-kyc/reference/circulars/sebi-other/#sebihooiaeoiae_iad-3pcir202612676)** (29 May 2026, operative provisions from 1 September 2026), not the guardian's personal nomination.
+
+## Conceptual overview
+
+Indian securities law lets a minor own securities but not contract for them. The depository framework resolves this by separating title from operation: the beneficial-owner account is opened in the minor's name as sole and first holder, and a guardian — the father, the mother in his absence, or a person appointed by a court — signs and instructs on the minor's behalf. Nothing about the arrangement makes the guardian a co-owner, and nothing about it makes the guardian's heirs successors to the child's securities.
+
+That separation is why a minor account is not a resident-individual account with a flag. The identity record belongs to the minor; the authority record belongs to the guardian; the signature on file is the guardian's, held against a relationship rather than the account title. Both sets of fields live on the form and both stay alive in the back office, because they expire on different events — the minor's identity record persists through majority, while the guardian's authority ends on majority, on guardian death, or on a court order changing custody.
+
+The trading side is narrower still. SEBI's published FAQ on demat and trading accounts for minors permits a trading account in the minor's name only to sell securities already held — shares allotted in an IPO applied for in the minor's name, securities received on transmission, securities arising from a corporate action, or securities received through a permitted gift or family transfer. It does not permit ordinary secondary-market purchases, and so does not permit the leveraged or same-day products that depend on them. Exchange <abbr title="Unique Client Code">UCC</abbr> registration has no "minor" client category, so the restriction lives in the broker's own product controls rather than in an exchange code — which means a mis-set flag produces a real order, not a rejection.
+
+Mutual funds run on a parallel track. A minor folio at an <abbr title="Asset Management Company (mutual funds context) / Annual Maintenance Charges (depository context).">AMC</abbr> has its own guardian-bank-account and majority-formalities rules, and a demat opening does not by itself activate every mutual-fund facility: the depository rules here govern the holding, the AMC's rules still govern subscription and redemption. See [MF platforms](/broking-kyc/deep-dives/specialty/mutual-fund-platforms/).
+
+## 1. Regulatory framework
+
+- **[SEBI/HO/MIRSD/SECFATF/P/CIR/2023/169](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir2023169)** (12 October 2023) — Master Circular on KYC norms for the securities market. Supplies the identity, address and verification baseline applied to the minor as holder and, separately, to the guardian as the person signing.
+- **[SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202478)** (6 June 2024) — <abbr title="Anti-Money Laundering">AML</abbr>/<abbr title="Combating the Financing of Terrorism">CFT</abbr> guidelines. Client due diligence, ownership and control tests, and the obligation to keep due-diligence information current, which is what makes a guardian change a CDD event and not a clerical update.
+- **SEBI FAQ, "Frequently Asked Questions on Demat / Trading Account for Minor"** — establishes guardian-operated sole-holder demat accounts, the sale-only trading purpose, the bar on a minor being a joint holder, and the majority transition. Published FAQ rather than a numbered circular; treat it as SEBI's stated position and read it alongside the depository instructions. `[not yet in index]`
+- **CDSL DP Operating Instructions, Chapter 2 (account constitution and servicing)** and the corresponding annexures, including the Additional KYC Form for Opening a Demat Account for Individuals — supply the minor-and-guardian field labels, the sole-holder requirement, the majority-continuation condition and the guardian-death freeze. See [CDSL vendor spec](/broking-kyc/vendors/depositories/cdsl/).
+- **<abbr title="National Securities Depository Limited">NSDL</abbr> Master Circular for Participants, Account Opening chapter** — the NSDL-side equivalent, with Form 11 and the guardian fields. See [NSDL vendor spec](/broking-kyc/vendors/depositories/nsdl/).
+- **[<abbr title="National Stock Exchange of India">NSE</abbr>/<abbr title="Investor Service Centre.">ISC</abbr>/61817](/broking-kyc/reference/circulars/nse/#nseisc61817)** (30 April 2024) — Master Circular for Unique Client Code. Supplies the UCC upload fields and validations used when a sale-only trading account is registered. There is no minor-specific constituent code in the category set.
+- **[SEBI/HO/OIAE/OIAE_IAD-3/P/CIR/2026/12676](/broking-kyc/reference/circulars/sebi-other/#sebihooiaeoiae_iad-3pcir202612676)** (29 May 2026) — modified nomination norms: nomination or opt-out for new sole-holder accounts, up to three nominees, prescribed authentication. Depository implementation in **[CDSL/OPS/DP/POLCY/2026/478](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolcy2026478)** (17 July 2026, live 28 August 2026), clarified by **[CDSL/OPS/DP/POLCY/2026/579](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolcy2026579)** (24 August 2026) for minor nominees, and in **[NSDL/POLICY/2026/0124](/broking-kyc/reference/circulars/nsdl/#nsdlpolicy20260124)** and **[NSDL/POLICY/2026/0130](/broking-kyc/reference/circulars/nsdl/#nsdlpolicy20260130)**.
+
+## 2. Eligibility and preconditions
+
+| Condition | Rule | Where it binds |
+| --- | --- | --- |
+| Holder count | Exactly one. Minor is sole and first holder | Depository account constitution |
+| Minor as joint holder | Not permitted, in any position | Depository account constitution; SEBI minor FAQ |
+| Minor's PAN | Required; the holder's own PAN, not the guardian's | KYC master circular; depository <abbr title="Beneficial Owner">BO</abbr> master |
+| Guardian identity | Father; mother in the father's absence; person appointed by a court | SEBI minor FAQ |
+| Guardian KYC | Full KYC on the guardian as representative, separate from the minor's record | KYC master circular |
+| Trading account | Permitted only to sell securities already acquired through a permitted route | SEBI minor FAQ |
+| Segments | Cash-segment sale only. No F&O, currency, commodity, intraday or short selling | Broker product control; no exchange minor category |
+| Nomination | Per the current depository implementation for sole-holder accounts | 2026 nomination norms and depository circulars |
+
+Two preconditions are worth resolving before any screen collects a signature. First, establish the date of birth from an accepted document, because it fixes the majority date and therefore the date the guardian's authority ends. Second, establish *whose* authority is being relied on. A declaration of guardianship is not evidence of guardianship where custody is disputed; an onboarding screen cannot adjudicate that, and the correct outcome is an exception queue with a named owner, not a pass.
+
+<Aside type="caution" title="An existing KRA record for the guardian is not a record for the minor">
+The guardian usually already has a validated KYC record. Fetching it satisfies nothing about the minor. The minor needs his own PAN-based identity record at the KRA and, where applicable, at CKYC — see [KRA integration](/broking-kyc/vendors/kra/) and [CKYC integration](/broking-kyc/vendors/identity/ckyc/). Substituting the guardian's PAN into the holder field does not create a minor account; it creates an adult account with a child's name on the statement, and the error usually surfaces years later at majority or transmission.
+</Aside>
+
+## 3. Documents
+
+| Document | Who provides | Verification method | Mandatory | Notes |
+| --- | --- | --- | --- | --- |
+| Minor's PAN | Guardian, for the minor | PAN validation against the income-tax service | Yes | Holder's PAN; fourth character P for an individual |
+| Minor's date-of-birth evidence | Guardian | Accepted KYC document per the KYC master circular | Yes | Fixes the majority date |
+| Guardian's PAN, identity and address KYC | Guardian | Originals or equivalent, plus any existing KRA record | Yes | Separate record from the minor's |
+| Guardianship or relationship evidence | Guardian | Natural-guardianship evidence, or the court order | Yes for authority; court order conditional | Disputed authority cannot be cured by declaration |
+| Additional KYC / account-opening form | Guardian signs for the minor | Inspect both the holder block and the guardian block | Yes | CDSL individual annexure; NSDL Form 11 equivalent |
+| Bank proof and operating mandate | Guardian | Match to the banking capacity shown on the signed documents | Yes for bank linkage | Acceptance of a guardian-operated minor bank account is provider-specific |
+| Acquisition evidence for securities to be sold | Guardian | Match to IPO allotment, transmission record or permitted transfer | Conditional, on any sale | The basis of the sale-only permission |
+| Fresh AOF, KYC, own signature, holdings confirmation | Former minor | Adult identity, executed directly | At majority | Replaces the guardian mandate |
+| Death certificate; court order for a new guardian | New guardian | Verify certificate and appointment | On guardian death | Triggers fresh AOF, KYC and mandate |
+
+## 4. Screen and field deltas against the resident-individual journey
+
+The nine-screen resident-individual flow in [Journey](/broking-kyc/journey/) is the baseline. A minor account changes five of those screens and adds one.
+
+| Baseline screen | Delta for a minor account |
+| --- | --- |
+| [PAN and DOB](/broking-kyc/journey/02-pan-dob/) | Two PAN captures — minor as holder, guardian as representative. DOB validation asserts minority and computes the majority date |
+| Identity confirmation | Guardian's identity is verified as the signer; the minor's identity is verified as the holder. Aadhaar-based e-KYC for a minor depends on the minor having an Aadhaar and is not assumable |
+| New screen — guardianship | Relationship, guardianship basis (natural or court-appointed), and evidence upload. Joint-holder entry is refused at this branch |
+| [Bank account](/broking-kyc/journey/05-bank-account/) | Bank title must match the minor-and-guardian capacity, not the guardian alone. Penny-drop name matching needs a rule for guardian-operated titles |
+| [Trading preferences](/broking-kyc/journey/06-trading-preferences/) | Only cash-segment sale is offered. Derivatives, currency, commodity, intraday and <abbr title="Margin Trading Facility">MTF</abbr> are suppressed rather than disabled, so the option never reaches the order channel |
+| [Nominations](/broking-kyc/journey/07-nominations/) | Sole-holder nomination rules apply to the minor's account; the guardian's own nomination is not inherited |
+| [Review and e-Sign](/broking-kyc/journey/09-review-esign/) | The guardian executes in that capacity. The specimen signature is stored against the guardian relationship, not as the holder's signature |
+
+### 4.1 Field-level delta — minor and guardian
+
+| name | type | length | mandatory | source-system | destination-system(s) | notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| First Holder's Name | Text | form label; no machine limit published | Yes | Minor identity documents | DP BO master, KRA, CKYC | Do not append the word "minor" mechanically — see practical notes |
+| PAN | Alphanumeric | 10 | Yes | Minor's PAN | DP BO master, KRA, UCC | Holder's PAN |
+| Date of Birth | Date | as per form | Yes | DOB evidence | DP BO master, KRA, back office | Derives the majority date |
+| Guardian's Name | Text | form label; no machine limit published | Yes | Guardian KYC | DP BO master, back office | Representative, not a holder |
+| Guardian PAN | Alphanumeric | 10 | Yes | Guardian KYC | DP BO master, back office | Separate identity record |
+| Relationship with the applicant | Text or code | form label | Yes | Relationship or court evidence | DP BO master | Site code table uses `FA` / `MO` / `CG`; `CG` requires the court order |
+| Status / Sub-Status | Enum | 2 | Yes | Approved classification | CDSL BO master | Individual / Minor; the numeric sub-status value is depository-specific `[unknown — verify]` |
+| BO Account Type | Code | 2 | Yes | Approved classification | CDSL BO master | `MN` in the site code table for minor — see [CDSL BO destination](/broking-kyc/reference/field-atlas/destinations/cdsl-bo/) |
+| Holding Pattern | Code | 2 | Yes | Account structure | CDSL BO master | `SI` only. `J2` / `J3` are invalid for a minor holder |
+| Minor Account Flag | Char | 1 | Yes | Derived from DOB | Back office, <abbr title="Risk Management System">RMS</abbr>, contract notes | Blocks F&O and intraday at pre-trade — see [Section W](/broking-kyc/reference/field-atlas/sections/w-minor-joint/) |
+| Date of Majority | Date | 8 | Derived | DOB plus 18 years | Back office | Drives the conversion workflow trigger |
+| Conversion to Major Done | Char | 1 | Yes after majority | Ops confirmation | Back office, RMS | `N` past the majority date freezes order entry |
+
+### 4.2 UCC registration for a sale-only trading account
+
+Registration uses the ordinary individual path. Per [NSE/ISC/61817](/broking-kyc/reference/circulars/nse/#nseisc61817), the upload carries `Account Type` of `CLIENT`, the cash-segment code, the client code, the client name as per the PAN record, the client category, the PAN and the date of birth; the site code table renders the category set as `IN`, `HU`, `NR` and `CO` — see [NSE UCC destination](/broking-kyc/reference/field-atlas/destinations/nse-ucc/) and [code tables](/broking-kyc/reference/code-tables/). The exchange annexures also express categories numerically, and the two encodings are not interchangeable `[unknown — verify]`.
+
+The material point is the absence: there is no minor category. A minor is registered as an individual, and the only thing preventing a buy order is the broker's own flag. Register the client name from the PAN record, not the guardian's, or the three-parameter validation fails.
+
+## 5. Attaining majority
+
+1. **Anticipate the date.** Raise the conversion task ahead of the eighteenth birthday. Under the field convention in [Section W](/broking-kyc/reference/field-atlas/sections/w-minor-joint/), an unset conversion flag past the majority date freezes order entry — intended behaviour, but a poor experience unannounced. A 30-day advance trigger is the common implementation `[industry practice — unverified]`.
+2. **Collect the former minor's own record.** Fresh account-opening form, KYC in his own name, his own specimen signature, and confirmation of the holdings.
+3. **Remove the guardian.** Guardian name, PAN, relationship and signature are deleted. Any POA or DDPI executed by the guardian ends with the guardian's authority; a fresh DDPI in the adult's name is a separate execution.
+4. **Decide continuation versus fresh account.** CDSL permits the existing BO account to continue only if the word "minor" is not embedded in the holder's name; where it is, the account is closed, a new one opened and the holdings transferred. This is why the naming convention chosen at opening has an eighteen-year consequence.
+5. **Rebuild the trading side separately.** Adult segment activation is a fresh decision with its own income-proof and risk-disclosure requirements, and re-KYC runs on its own clock — see [Lifecycle: re-KYC](/broking-kyc/lifecycle/re-kyc/).
+
+<Aside type="note" title="The conversion is a modification, not an opening">
+Operationally it lands in the modification pipeline described in [Lifecycle: modifications](/broking-kyc/lifecycle/modifications/): holder-name and signature changes at the depository, status changes at the KRA, and a UCC modification where the trading account persists. Treat it as one workflow with several destination acknowledgements rather than several independent requests, and reconcile a partial success before resending — the partial-acknowledgement pattern is the same one described in [Integration <abbr title="Directed Acyclic Graph.">DAG</abbr>: onboarding](/broking-kyc/operations/integration-dag/onboarding/).
+</Aside>
+
+## 6. Guardian death and guardian change
+
+These are two different cases and only one of them has a settled procedure.
+
+**Guardian death.** CDSL requires the account to be frozen pending the new guardian's formalities: death certificate; a court order appointing the new guardian where the surviving parent is not the natural guardian; fresh account-opening form and KYC for the new guardian; fresh Rights and Obligations acknowledgement; fresh nomination; replaced specimen signature; and deletion of every POA or DDPI executed under the deceased guardian's signature. The securities never move — ownership was always the minor's and the guardian's heirs have no claim. This is the reverse of [Lifecycle: transmission](/broking-kyc/lifecycle/transmission/), where the holder has died.
+
+**Guardian change while the guardian is alive.** A custody change or a court order varying guardianship produces a request to substitute the operator. The death procedure is not authority for this; each case needs its own documentary basis, and the obligation to keep due-diligence information current under [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202478) means the substitution is re-verified, not merely recorded.
+
+## 7. Alternatives
+
+| Option A — demat-only custody | Option B — custody plus sale-only trading | When to pick which | Who uses what |
+| --- | --- | --- | --- |
+| Demat alone; securities held, nothing sold through an exchange | Demat plus a trading account restricted to selling acquired securities | A where the intent is long-term holding of gifted or inherited securities; B where an allotment or inherited holding must be liquidated | A is the common default for gift and inheritance custody; B is opened on demand `[industry practice — unverified]` |
+
+| Option A — continue the existing BO at majority | Option B — close and open fresh | When to pick which | Who uses what |
+| --- | --- | --- | --- |
+| Same BO ID, holdings undisturbed, holder record amended | New BO ID, holdings transferred, old account closed | Continue where the holder name carries no "minor" annotation and the adult formalities are complete; open fresh where the name field was annotated | Determined by the naming convention chosen at opening, not by client preference |
+
+A third axis is the channel: a fully online guardian-executed opening needs multi-party execution support and a usable e-Sign path for the guardian, while a paper-assisted process remains common where the minor has no Aadhaar. Neither is prescribed, and the SEBI FAQ promises no turnaround.
+
+## Practical notes
+
+- **[gotcha]** Do not append "minor" to the holder's name to make the account obvious in a list. CDSL's majority-continuation condition turns that cosmetic choice into a forced account closure eighteen years later. Carry the status in the sub-status and flag fields, which is where downstream systems read it from anyway.
+- **[gotcha]** The sale-only restriction must hold on every channel, not just the web order form. An API key, a dealer terminal or an app reading a different permission table will accept a buy order the screen would have refused. The restriction belongs in the RMS pre-trade rule, per the `minor_block_flg` treatment in [Section W](/broking-kyc/reference/field-atlas/sections/w-minor-joint/).
+- **[gotcha]** "Beneficial owner" means two things in the same file: in the depository title it is the securities holder — here, the minor; in AML due diligence it asks which natural person ultimately controls the client. Keep both distinct, or a reviewer reading the AML field concludes the guardian owns the securities.
+- **[industry practice]** Keep the acquisition provenance for each holding — allotment advice, transmission record, gift deed — as a first-class record. It is the evidence for sale eligibility and, separately, the cost basis when the securities are sold. Both uses are audited.
+- **[risk trade-off]** Freezing order entry the moment the majority date passes is correct and unpopular. A grace period instead produces trades executed by a person whose authority has lapsed. Prefer the freeze with early notification.
+- **[cost optimization]** A minor account is usually small and low-activity, so a natural Basic Services Demat Account. Eligibility is assessed on the minor's own sole-holder account, not the guardian's portfolio — see [<abbr title="Basic Services Demat Account">BSDA</abbr>](./bsda/).
+- **[AI inference — verify before acting]** The screen sequence, queue names and 30-day trigger in section 5 are a proposed decomposition of the cited requirements, not an issuer-prescribed interface. No depository publishes a freeze-and-reopen SLA for the eighteenth birthday; obtain the DP's operating procedure.
+
+## Cross-references
+
+- [Account variants overview](./) — the selector table comparing all eleven variants on eligibility, documents, segments and codes.
+- [Appendix: Minor and joint accounts](/broking-kyc/appendix/minor-joint-accounts/) — the earlier short note on vendor-by-vendor handling of the guardian relationship; this page supersedes its process content.
+- [Section W: Minor / joint / POA fields](/broking-kyc/reference/field-atlas/sections/w-minor-joint/) — every minor and guardian field with its destination systems and quirks.
+- [Journey: Nominations](/broking-kyc/journey/07-nominations/) — the nomination screen whose sole-holder rules apply to the minor's account.
+- [Lifecycle: transmission](/broking-kyc/lifecycle/transmission/) — the inverse case, where the holder rather than the guardian has died.
+- [Lifecycle: modifications](/broking-kyc/lifecycle/modifications/) — the pipeline the majority conversion and guardian change run through.
+- [BSDA](./bsda/) — whether the minor's account should be a Basic Services Demat Account.
+- [Joint accounts](./joint-accounts/) — why a minor cannot appear in one, and what joint holding does instead.
+- [CDSL BO master destination](/broking-kyc/reference/field-atlas/destinations/cdsl-bo/) — BO account type, holding pattern and guardian field encodings.
+
+## Verified through
+
+2026-09-11
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

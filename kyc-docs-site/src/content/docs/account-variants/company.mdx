@@ -1,0 +1,207 @@
+---
+title: "Account Variants: Company and Body Corporate"
+description: Onboarding companies — board resolution, MOA and AOA, CIN and DIN, authorised signatories, UBO and significant beneficial owners, LEI thresholds, and the CKYC legal-entity record.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** a company account is the reference implementation for every non-individual type — everything the others need is a subset of it. The page therefore builds the full stack once: the authority chain (resolution over articles over incorporation), then the ownership chain (<abbr title="Ultimate Beneficial Owner">UBO</abbr> and significant beneficial owner), then the identifiers (CIN, DIN, <abbr title="Legal Entity Identifier">LEI</abbr>), then screens and field deltas. Read it before the partnership, trust or institutional pages.
+
+## TL;DR
+
+- **Authority flows from a board resolution read against the articles.** The non-individual annexure of the [Master Circular on <abbr title="Know Your Customer (process).">KYC</abbr> norms](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir2023169) (12 October 2023) requires the certificate of incorporation, memorandum and articles, a board resolution authorising the account, and the officially valid documents of the persons authorised to transact.
+- **Beneficial ownership threshold is 10 per cent, not 25.** The [PML (Maintenance of Records) Amendment Rules 2023](/broking-kyc/reference/circulars/fiu-ind/#fiu-ind-pmlr-amend-2023-03-07) (effective 7 March 2023) lowered the company threshold from 25 per cent to 10 per cent of shares, capital or profits.
+- **Significant beneficial owner is a separate, company-law concept.** Section 90 of the Companies Act 2013 with the SBO Rules sets a 10 per cent test and produces declarations in Form BEN-1, a company filing in Form BEN-2 and a register in Form BEN-3. A company's own SBO register is the best corroboration a broker can get for its UBO declaration.
+- **Exchange client category is `04` Company or `07` Body Corporate**, with date of incorporation, CIN and a repeating director block mandatory — see the [<abbr title="National Stock Exchange of India">NSE</abbr>](/broking-kyc/vendors/exchanges/nse/) and [<abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr>](/broking-kyc/vendors/exchanges/bse/) client-category tables.
+- **LEI is threshold-driven, not universal.** [<abbr title="Reserve Bank of India">RBI</abbr>/2020-21/87](/broking-kyc/reference/circulars/rbi/#rbi2020-2187) (5 January 2021) mandates LEI for <abbr title="Real Time Gross Settlement">RTGS</abbr> and <abbr title="National Electronic Funds Transfer">NEFT</abbr> transactions of Rs.50 crore and above by non-individual entities from 1 April 2021; RBI separately phased LEI onto non-individual borrowers down to Rs.5 crore aggregate exposure by 30 April 2025.
+- **The depository enforces LEI validity once captured.** [<abbr title="Central Depository Services (India) Limited">CDSL</abbr>/OPS/<abbr title="Depository Participant">DP</abbr>/POLCY/2024/51](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolcy202451) introduced freeze reason code `30 — LEI Expiry / Lapse`, so a lapsed LEI freezes the demat account rather than merely flagging it.
+- **<abbr title="Central KYC (records registry)">CKYC</abbr> constitution type is `03` Company**, with the legal-entity template carrying CIN, incorporation details, director and authorised-signatory blocks and UBO details — see the [CKYC integration](/broking-kyc/vendors/identity/ckyc/).
+
+## Conceptual overview
+
+A company is the only non-individual client whose entire existence and control structure is publicly verifiable. The Ministry of Corporate Affairs holds the certificate of incorporation, the 21-character CIN, the registered office, the director list keyed by DIN, the charge register and the annual filings. Nothing about a partnership deed or an <abbr title="Hindu Undivided Family">HUF</abbr> declaration is verifiable in that way. The onboarding design should exploit this: verify against MCA first, collect documents second, and treat any mismatch as a hard stop rather than a maker-checker note.
+
+What a company adds over an <abbr title="—">LLP</abbr> or a firm is a two-layer authority problem. The articles of association say what the board may delegate; the board resolution says what has actually been delegated and to whom. A resolution authorising "any two directors jointly" is worthless if the articles reserve investment decisions to the board as a whole, and a resolution naming a chief financial officer who is not an officer of the company under the articles is equally defective. This is the substantive review that cannot be automated, and it is the reason corporate onboarding timelines are measured in days rather than minutes.
+
+The third layer is ownership. A broker has to answer "which natural persons own or control this client" to a 10 per cent threshold, for a structure that may run through holding companies, foreign parents, trusts and nominee arrangements. Company law gives a parallel answer through the significant-beneficial-owner regime, and the two answers should agree. Where they diverge — a common outcome when a foreign parent sits above an Indian subsidiary — the divergence itself is the finding, and it has to be documented rather than reconciled away.
+
+## 1. Regulatory framework
+
+- **[<abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/SECFATF/P/CIR/2023/169](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir2023169)** (12 October 2023) — Master Circular on KYC norms for the securities market. Non-individual annexure: certificate of incorporation, memorandum and articles of association, board resolution, list and OVDs of authorised signatories, <abbr title="Permanent Account Number">PAN</abbr>.
+- **[SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202478)** (June 2024) — <abbr title="Anti-Money Laundering">AML</abbr>/<abbr title="Combating the Financing of Terrorism">CFT</abbr> Master Circular. Beneficial-owner identification cascade, enhanced due diligence, sanctions and <abbr title="Politically Exposed Person">PEP</abbr> screening, record retention for ten years after the relationship ends.
+- **[Prevention of Money-laundering (Maintenance of Records) Amendment Rules, 2023](/broking-kyc/reference/circulars/fiu-ind/#fiu-ind-pmlr-amend-2023-03-07)** — company beneficial-owner threshold reduced to 10 per cent; determination required at commencement of the account-based relationship; group-wide AML policy obligations.
+- **[SEBI/HO/MIRSD/SECFATF/P/CIR/2024/79](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202479)** — <abbr title="KYC Registration Agency">KRA</abbr> uploads to the Central KYC Records Registry; non-individual records travel on the legal-entity template.
+- **[SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202412)** — centralisation of <abbr title="Foreign Account Tax Compliance Act (US)">FATCA</abbr> and <abbr title="Common Reporting Standard">CRS</abbr> certifications at KRAs. For an entity this means the entity classification and its controlling-person declarations are held centrally rather than per intermediary.
+- **Companies Act 2013** — Section 7 (incorporation and CIN), Section 152 with 153–154 (DIN), Section 179 with Rule 8 of the Companies (Meetings of Board and its Powers) Rules 2014 (powers exercisable only by board resolution, including investment of funds), Section 89 (declaration of beneficial interest), Section 90 with the Companies (Significant Beneficial Owners) Rules 2018 (SBO at 10 per cent; Forms BEN-1, BEN-2, BEN-3).
+- **[RBI/2020-21/87](/broking-kyc/reference/circulars/rbi/#rbi2020-2187)** (5 January 2021) — Legal Entity Identifier for large-value transactions in centralised payment systems: LEI mandatory for RTGS and NEFT transactions of Rs.50 crore and above by non-individual entities from 1 April 2021, extended to cross-border transactions of Rs.50 crore and above from 1 October 2022.
+- **RBI LEI directions for borrowers** — non-individual borrowers with aggregate exposure above Rs.25 crore by 30 April 2023, Rs.10 crore to Rs.25 crore by 30 April 2024, and Rs.5 crore to Rs.10 crore by 30 April 2025; no new or enhanced exposure without LEI. Cited from RBI's phased borrower-LEI directions `[not yet in index]`.
+- **[CDSL/OPS/DP/POLCY/2024/51](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolcy202451)** — freeze reason code `30 — LEI Expiry / Lapse` in the CDSL system.
+- **[CDSL/OPS/DP/POLCY/2026/509](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolcy2026509)** (28 July 2026) — corrects the non-profit status and sub-status mapping to Trust status 29 / sub-status 256 and Corporate status 25 / sub-status 265, both classified as NPO, and makes the DARPAN registration identifier mandatory at account opening and at modification for those categories. Relevant to Section 8 companies.
+
+## 2. Eligibility and preconditions
+
+| Precondition | Requirement | Verification route |
+|---|---|---|
+| CIN | 21-character Corporate Identification Number | MCA master data lookup |
+| Company PAN | 4th character `C` | Income-tax PAN validation |
+| Status on MCA | Active; not struck off, under liquidation or dormant | MCA company master data |
+| Registered office | As on MCA; correspondence address may differ | MCA plus address proof in entity name |
+| Directors | Every director with DIN and PAN; foreign-resident flag per director | MCA director signatory list |
+| Board resolution | Specific to opening a broking and demat account, naming signatories and mode of operation, and referencing the relevant articles | Substantive review against MOA/AOA |
+| Authorised signatories | Named individuals with designation, PAN, DIN if director, specimen signature | Individual KYC per signatory |
+| Beneficial owners | Natural persons with more than 10 per cent, or the control-test person, or the senior managing official | UBO declaration plus SBO register |
+| Entity bank account | In the company's name; a director's account is a third-party account | Penny-drop or bank statement |
+| LEI | Where a threshold applies; 20-character ISO 17442 code | GLEIF-registered Local Operating Unit certificate |
+| DARPAN identifier | Mandatory for Section 8 / non-profit companies | NITI Aayog DARPAN portal |
+| Nomination and <abbr title="Basic Services Demat Account">BSDA</abbr> | Not available to non-individual accounts | — |
+
+## 3. Documents
+
+| Document | Purpose | Notes |
+|---|---|---|
+| Certificate of Incorporation | Existence and CIN | Cross-check CIN, name and incorporation date against MCA |
+| Memorandum of Association | Object clause permits investment in securities | A company whose objects do not permit securities investment is a defect, not a formality |
+| Articles of Association | Delegation powers of the board | Determines whether the resolution's mandate is valid |
+| Board resolution | Authorises account opening, names signatories, sets the mode of operation, authorises pledge and <abbr title="Demat Debit and Pledge Instruction">DDPI</abbr> where needed | Certified true copy on letterhead, signed by a director or company secretary |
+| Company PAN card | Client identity | |
+| List of directors with DIN and PAN | Exchange <abbr title="Unique Client Code">UCC</abbr> director block | Include foreign-resident flag per director |
+| Authorised-signatory list with specimen signatures | Signature verification for instructions | Designation must be an office recognised in the articles |
+| OVDs of authorised signatories | Individual identity and address | DigiLocker or standard <abbr title="Officially Valid Document">OVD</abbr> set |
+| UBO / SBO declaration | Beneficial ownership at 10 per cent | Pair with the company's BEN-3 register where it exists |
+| Shareholding pattern | Supports the UBO computation | For a listed company, the public shareholding pattern substitutes |
+| Latest audited financials and ITR | Risk categorisation and derivative-segment income proof | |
+| FATCA / CRS entity self-certification | Entity classification and controlling persons | `ACTIVE_NFFE`, `PASSIVE_NFFE` or `FINANCIAL_INSTITUTION`; <abbr title="Global Intermediary Identification Number">GIIN</abbr> where applicable |
+| LEI certificate | Where a threshold applies | Note the next renewal date — the depository freezes on lapse |
+| DARPAN registration | Section 8 companies | Per CDSL 2026/509 |
+| Entity bank proof | Payment routing | |
+| Rights and obligations, tariff, policy documents | Client agreement set | Executed per the operating mandate |
+
+<Aside type="caution" title="Read the articles, not just the resolution">
+A board resolution is evidence of a decision; the articles determine whether the board could make it in that form. Two recurring defects: a resolution delegating operation to an officer where the articles reserve the power to the board, and a resolution that authorises trading but is silent on pledging securities — which then blocks margin-pledge and <abbr title="Margin Trading Facility">MTF</abbr> activation later, requiring a second board meeting. Build a resolution checklist that lists every authority the account will ever need (open, operate, pledge, DDPI, running-account settlement, segment addition, closure) and check them off against the submitted resolution before eSign, not after.
+</Aside>
+
+## 4. UBO and significant beneficial owner
+
+Two regimes, one evidence set.
+
+**Under <abbr title="Prevention of Money Laundering Act 2002">PMLA</abbr>, the broker determines the beneficial owner:**
+
+1. Any natural person who, alone or together, owns or is entitled to more than 10 per cent of the shares, capital or profits of the company.
+2. Failing that, the natural person who exercises control through other means — voting agreements, board-appointment rights, dominant influence.
+3. Failing both, the natural person holding the position of senior managing official, with the reason recorded.
+
+**Under the Companies Act, the company determines its significant beneficial owners** — Section 90 with the SBO Rules 2018 applies a 10 per cent test on shares, voting rights, dividend or distributable rights, or the right to exercise significant influence or control. Individuals declare in Form BEN-1, the company files Form BEN-2 with the Registrar and maintains the register in Form BEN-3.
+
+| Aspect | PMLA beneficial owner | Companies Act SBO |
+|---|---|---|
+| Who determines | The reporting entity (the broker) | The company itself |
+| Threshold | More than 10 per cent of shares, capital or profits | 10 per cent of shares, voting rights, distributable rights, or significant influence |
+| Evidence artefact | UBO declaration held by the broker | BEN-1 declarations, BEN-2 filing, BEN-3 register |
+| Fallback where no natural person qualifies | Senior managing official | No equivalent fallback; may legitimately be nil |
+| Where it lands in the broker's stack | CKYC related-person block, AML screening, CDD file | Corroborating document in the CDD file |
+
+Practically: ask for the BEN-3 register. If the company says it has none because no SBO exists, that statement is itself useful — it tells you the ownership is either widely held or held through entities whose own chains you must trace. Listed companies are the easy case, because the public shareholding pattern gives a defensible answer.
+
+Every identified beneficial owner requires full individual KYC and sanctions and PEP screening, per the [AML screening reference](/broking-kyc/vendors/fraud/trackwizz/).
+
+## 5. Field deltas at each destination system
+
+| Field | Type | Length | Mandatory | Source system | Destination systems | Notes |
+|---|---|---|---|---|---|---|
+| Client category | N | 2 | Yes | Onboarding form | NSE UCC, BSE UCC | `04` Company, `07` Body Corporate |
+| Company PAN | AN | 10 | Yes | Onboarding form | KRA, CKYC, UCC, <abbr title="Beneficial Owner">BO</abbr>, back-office | 4th character `C` |
+| CIN | AN | 21 | Yes | Certificate of Incorporation | UCC, CKYC, CDSL `cin` | Validate against MCA master data |
+| Date of incorporation | Date | 10 | Yes | Certificate of Incorporation | UCC, CKYC, CDSL `date_of_incorporation` | DD/MM/YYYY at CDSL |
+| Company type | AN | 2 | Yes | Derived | CDSL `company_type` | `PV` private, `PU` public, `OPC` one-person, `SE` Section 8 |
+| Director name (repeating) | AN | 100 | Yes | MCA / director list | UCC director block, CKYC | One row per director |
+| Director DIN (repeating) | AN | 8 | Yes | MCA | UCC director block, CKYC | |
+| Director PAN (repeating) | AN | 10 | Yes | Director list | UCC director block | Each validated |
+| Director foreign-resident flag | AN | 1 | Yes | Declaration | UCC director block | Drives FATCA and residency questions |
+| Authorised-signatory count | N | 2 | Yes | Board resolution | CDSL `authorized_signatory_count` | Range 1–10 at CDSL |
+| Signatory name / PAN / DIN / designation | AN | 100 / 10 / 8 / 50 | Yes | Board resolution | CDSL `signatory_N_*`, CKYC related person | DIN conditional on the signatory being a director |
+| Operating instruction | AN | 2 | Yes | Board resolution | CDSL `operating_instruction` | `SI` singly, `JO` jointly |
+| Account type | AN | 2 | Yes | Derived | CDSL BO Line 01 | `CO` |
+| CKYC constitution type | N | 2 | Yes | Derived | CKYC | `03` |
+| Trading account type | AN | 10 | Yes | Derived | KRA Part <abbr title="—">II</abbr> | `CORPORATE` |
+| FATCA entity classification | AN | — | Yes | Declarations | KRA, FATCA/CRS reporting | `ACTIVE_NFFE` / `PASSIVE_NFFE` / `FINANCIAL_INSTITUTION` |
+| GIIN | AN | 19 | Conditional | Declarations | KRA, FATCA reporting | Where the entity is a financial institution |
+| Sponsoring entity name and GIIN | AN | — | Conditional | Declarations | KRA | For sponsored entities |
+| UBO block (repeating) | — | — | Yes | UBO declaration | CKYC related person, AML screening, CDD file | Name, PAN, DOB, address, photo, signature, percentage |
+| LEI | AN | 20 | Conditional | LEI certificate | CDSL `LEI_NUMBER`, <abbr title="National Securities Depository Limited">NSDL</abbr> `LEI` element | 20-character ISO 17442; lapse triggers freeze reason `30` |
+| DARPAN identifier | AN | — | Conditional | NITI Aayog | CDSL BO | Mandatory for NPO categories per CDSL 2026/509 |
+| Nomination block | — | — | Not applicable | — | CDSL BO Line 04 | Suppressed |
+
+Field provenance and the full destination matrix are in the [field atlas](/broking-kyc/reference/field-atlas/); the demat-account block, including the LEI element at both depositories, is at [H — demat account](/broking-kyc/reference/field-atlas/sections/h-demat-account/).
+
+## 6. LEI: which thresholds actually bite
+
+LEI is not a blanket requirement for corporate broking clients. It becomes mandatory through three separate doors, and a broker's onboarding logic should ask which door applies rather than asking for an LEI by default.
+
+| Trigger | Threshold | Instrument | Effect on the broking relationship |
+|---|---|---|---|
+| Large-value payment | RTGS or NEFT transaction of Rs.50 crore and above by a non-individual | [RBI/2020-21/87](/broking-kyc/reference/circulars/rbi/#rbi2020-2187), from 1 April 2021 | A corporate client funding a large margin call by RTGS needs an LEI for the payment to go through |
+| Cross-border payment | Rs.50 crore and above | [RBI/2020-21/87](/broking-kyc/reference/circulars/rbi/#rbi2020-2187), from 1 October 2022 | Relevant to foreign-parent funding routes |
+| Borrower exposure | Above Rs.25 crore by 30 Apr 2023; Rs.10–25 crore by 30 Apr 2024; Rs.5–10 crore by 30 Apr 2025 | RBI phased borrower-LEI directions `[not yet in index]` | A client funding trading through bank borrowing will already hold an LEI |
+| Non-individual <abbr title="Foreign Portfolio Investor">FPI</abbr> | All non-individual FPIs | SEBI/HO/AFD/AFD–PoD–2/CIR/P/2023/0127 (27 July 2023) `[not yet in index]`, link to [SEBI other circulars](/broking-kyc/reference/circulars/sebi-other/) | LEI in the Common Application Form; existing FPIs had 180 days, after which further purchases are blocked — see [FPI and <abbr title="Foreign Venture Capital Investor">FVCI</abbr>](./fpi-fvci/) |
+| Once captured at the depository | Any non-individual BO account carrying an LEI | [CDSL/OPS/DP/POLCY/2024/51](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolcy202451) | Expiry or lapse triggers freeze reason code `30` |
+
+The operational consequence of the last row is the one to design for: an LEI has an annual renewal, and a client who lets it lapse gets a frozen demat account rather than a warning. Track LEI expiry as a first-class date field with a renewal reminder cycle, alongside the re-KYC due date handled in [re-KYC](/broking-kyc/lifecycle/re-kyc/).
+
+## 7. Journey deltas and activation
+
+| Stage | Company behaviour |
+|---|---|
+| Entry | Entity-type selector; CIN captured before PAN so MCA verification can run in parallel |
+| Verification | MCA lookup on CIN returns name, status, incorporation date, registered office and director signatory list; mismatches block progress |
+| Signatories | Repeating signatory block; each signatory's individual KYC fetched from the KRA on their own PAN |
+| Documents | Certificate of incorporation, MOA, AOA, board resolution, director list, UBO declaration, financials — all uploaded; DigiLocker serves only the signatories' personal documents |
+| Address | Registered office plus correspondence address if different; utility bill, GST certificate or lease in the entity's name |
+| Bank | Company-name account; name match against PAN name |
+| [Nominations](/broking-kyc/journey/07-nominations/) | Suppressed |
+| [Declarations](/broking-kyc/journey/08-declarations-gate/) | Entity FATCA/CRS classification, controlling persons, UBO declaration, PEP screening of directors, signatories and UBOs |
+| [Review and eSign](/broking-kyc/journey/09-review-esign/) | Multi-signatory eSign per the board-resolution mandate; signing capacity recorded |
+| Compliance review | Substantive review of resolution against articles; object-clause check; UBO reconciliation against BEN-3 — see [admin workflow](/broking-kyc/operations/admin-workflow/) |
+| Registration | KRA and CKYC non-individual upload, UCC upload with director block, BO setup with account type `CO` |
+| Segment activation | Cash by default; derivatives on financials; MTF and pledge only if the resolution authorises them — see [MTF operational](/broking-kyc/deep-dives/settlement/mtf-operational/) |
+
+## 8. Alternatives
+
+| Option | When to pick it | Trade-off |
+|---|---|---|
+| Direct corporate trading account with the broker | Company trades its own treasury, moderate volumes, no custodian | Full corporate CDD burden on the broker; margin and pay-in handled directly |
+| Corporate account cleared through a custodian on a CP code | Larger positions, institutional-style operations, give-up flows | Custodian confirmation cut-offs govern the day — see [Institutional and custodial](./institutional-custodial/) |
+| Body corporate category `07` instead of `04` | Statutory corporations, cooperative bodies and entities not incorporated under the Companies Act | Director block still applies; CIN replaced by the registration number |
+| LLP | Fewer filings, demat still in the entity's name | No board-resolution machinery, so authority is harder to verify externally — see [Partnership and LLP](./partnership-llp/) |
+| Section 8 company | Not-for-profit purposes | Attracts NPO treatment: DARPAN identifier and NPO status/sub-status per CDSL 2026/509 — see [Trust, society and AOP](./trust-society-aop/) |
+
+## Practical notes
+
+- **[gotcha]** CIN is 21 characters and encodes listing status, industry, state, year and registration number. Validate length and structure at entry, then confirm against MCA master data — a transposed CIN produces a valid-looking string and a silent UCC mismatch later.
+- **[gotcha]** A struck-off or dormant company on MCA can still hold a valid PAN and a bank account. PAN validation will pass and the client is nonetheless ineligible. MCA status is the authoritative existence check.
+- **[risk trade-off]** Foreign-parent structures frequently cannot identify any natural person above 10 per cent because the chain ends at a widely held listed parent or a sovereign fund. The senior-managing-official fallback is the correct answer, but it must be recorded with the reason and the chain traced as far as it goes, not asserted as a shortcut. `[industry practice]`
+- **[cost optimization]** MCA verification before document collection is the highest-leverage control in corporate onboarding: one lookup eliminates name, status, incorporation-date and director-list mismatches that would otherwise be found after a board meeting has already been held to pass the resolution.
+- **[gotcha]** The board resolution is the document clients most often submit in the wrong form — an extract without the certification, or a resolution of a committee rather than the board. Publish a model resolution with the account-opening kit; it converts a multi-week loop into a single meeting.
+- **[industry practice]** Request the shareholding pattern as at a stated date and require re-confirmation at re-KYC. A UBO set captured once and never refreshed is the most common finding in inspections of non-individual books. `[industry practice — unverified]`
+- **[gotcha]** LEI renewal is annual and independent of any broking event, so nothing in the broking workflow naturally surfaces it until [CDSL/OPS/DP/POLCY/2024/51](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolcy202451) freeze reason `30` appears. Put LEI expiry in the same reminder pipeline as re-KYC and nomination follow-ups.
+- **[gotcha]** A resolution silent on pledge blocks margin pledge, MTF and DDPI. Ask for the full authority set up front; a client who wants only cash-segment trading today will want MTF within a quarter.
+- **[industry practice — unverified]** Some brokers require a company secretary's certificate confirming that the resolution is in accordance with the articles, which shifts the substantive review to the client's own professional. It shortens internal review but does not remove the broker's obligation to read the articles.
+
+## Cross-references
+
+- [Non-individual entities appendix](/broking-kyc/appendix/non-individual-entities/) — the planning-stage summary of entity types and per-vendor touchpoints.
+- [CKYC integration](/broking-kyc/vendors/identity/ckyc/) — constitution type `03`, legal-entity template, UBO fields and the non-individual upload endpoint.
+- [KRA integration](/broking-kyc/vendors/kra/) — Section 7 corporate fields, FATCA entity classification, GIIN and sponsoring-entity fields.
+- [CDSL BO account reference](/broking-kyc/vendors/depositories/cdsl/) — Section 9.1 corporate account fields, `CO` account type, signatory and operating-instruction codes.
+- [NSE UCC integration](/broking-kyc/vendors/exchanges/nse/) — client categories `04` and `07`, the director block and non-individual mandatory fields.
+- [Field atlas — demat account](/broking-kyc/reference/field-atlas/sections/h-demat-account/) — LEI element at both depositories with its provenance.
+- [AML screening](/broking-kyc/vendors/fraud/trackwizz/) — UBO, director and signatory screening against sanctions and PEP lists.
+- [Re-KYC](/broking-kyc/lifecycle/re-kyc/) — periodic updation cadence that UBO and LEI refresh ride on.
+- [Partnership and LLP](./partnership-llp/), [Trust, society and AOP](./trust-society-aop/) and [Institutional and custodial](./institutional-custodial/) — the variants that reuse this page's authority and ownership machinery.
+
+## Verified through
+
+2026-09-11
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

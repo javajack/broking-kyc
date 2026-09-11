@@ -1,0 +1,149 @@
+---
+title: "Account Variants: Bank-led 3-in-1 and bank-referral accounts"
+description: The 3-in-1 account as SEBI defines it — savings, demat and trading integration, order-time blocking of funds and securities, post-market pay-in, and how the model differs from bank-referral tie-ups and from the UPI block alternative.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** "3-in-1" is marketing language for two quite different things — a genuinely integrated account with a regulatory definition, and a bank tie-up that merely bundles three products. <abbr title="Securities and Exchange Board of India">SEBI</abbr> defined the first in November 2024, so the page starts with that definition, uses it to separate the two models, and then works through what the integration actually changes: the fund flow, the securities flow, the pledge path, and the client's cash position.
+
+## TL;DR
+
+- **SEBI defines the 3-in-1 account by its features, not by who offers it.** **[SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>/MRD-PoD-2/P/CIR/2024/153](/broking-kyc/reference/circulars/sebi-other/#sebihomrdmrd-pod-2pcir2024153)** (11 November 2024, effective 1 February 2025) lists four salient features at clause 4 and requires at clause 5.2 that a 3-in-1 facility "shall, at least have" them.
+- **The four features:** integration of the trading account with the client's demat and bank accounts; blocking of funds in the bank account to the extent of the obligation when a buy order is placed, released if the order is not executed; blocking of securities in the demat account when a sell order is placed, released if the order is not executed; and pay-in carried out post market hours from the blocked bank or demat account and upstreamed to the clearing corporation, with the client earning interest on the funds until pay-in.
+- **It is one of two ways a Qualified Stock Broker discharges an obligation.** Clause 5.1 requires every <abbr title="Qualified Stock Broker">QSB</abbr> to provide, in addition to the conventional mode, either trading supported by blocked amount in the cash segment using the <abbr title="Unified Payments Interface">UPI</abbr> block mechanism or the 3-in-1 trading account facility. Clause 5.3 preserves the client's option to keep using the conventional mode.
+- **A bank-referral tie-up is not a 3-in-1 account.** Bundling a savings account, a demat account with the bank as depository participant and a trading account with an affiliated or partner broker gives the client one relationship manager and three separate money movements. Without order-time blocking and post-market pay-in it does not meet clause 4.
+- **The fund-flow difference is the whole point.** In the conventional model the client transfers money to the broker before trading and the broker upstreams it to the clearing corporation. In a 3-in-1 the money never leaves the client's bank account until pay-in, which removes the client's credit exposure to the broker for that balance.
+- **Both integrated routes reduce, but do not remove, the broker's client-funds machinery.** Running-account settlement, upstreaming and the third-party-funds prohibition still apply to whatever balance the broker does hold.
+
+## Conceptual overview
+
+The conventional Indian broking model asks the client to part with money before he trades. Funds are transferred to the broker's client bank account, the broker recognises the credit in the client's ledger, and the broker upstreams the balance to the clearing corporation under the client-funds framework described in [Client funds upstreaming](/broking-kyc/deep-dives/settlement/client-funds-upstreaming/). It works, and a long series of SEBI measures — segregation, upstreaming, running-account settlement, the monthly and quarterly return of credit balances — exists to manage the fact that a broker is holding client money it does not own.
+
+The integrated alternatives remove the holding rather than managing it. Two versions exist. The UPI block mechanism keeps the money in the client's bank account and blocks it in favour of the clearing corporation, which is the <abbr title="Applications Supported by Blocked Amount">ASBA</abbr> idea applied to secondary-market trading; it went live for the secondary market on 1 January 2024 as a non-mandatory facility under the Master Circular for Stock Exchanges and Clearing Corporations. The 3-in-1 account keeps the money in the client's bank account and blocks it because the bank, the depository participant and the broker are already wired together — some trading members were doing this before SEBI described it. In November 2024 SEBI wrote down what the second one has to contain, and made QSBs offer one or the other.
+
+The difference between the two is where the plumbing sits. UPI block is an inter-institution protocol: any broker can use it with any client's bank, mediated by <abbr title="National Payments Corporation of India">NPCI</abbr>. The 3-in-1 is an intra-group arrangement: it works because the same group holds the savings account, runs the depository participant and owns the broking entity, so blocking and debiting are internal operations. That makes the 3-in-1 smoother for the client and available only where the group is complete.
+
+This is also why the second model — the bank-referral or bundled tie-up — persists and is often mislabelled. A bank that is a depository participant but whose broking is a partner's, or a bank that refers clients to an unaffiliated broker for a share of brokerage, can give the client a single onboarding journey and a single point of contact. What it cannot give, without the integration, is order-time blocking and post-market pay-in. The client still transfers funds to the broker. That is a distribution arrangement, not a 3-in-1 account.
+
+<Aside type="note" title="Who can be what in this structure">
+Under the depository framework, banks, financial institutions and SEBI-registered stock-exchange members may act as depository participants, which is why a bank can hold the client's demat account directly. Stock-broker registration, by contrast, is granted to the entity that is the exchange member, so a bank group's broking arm is a separate company from the bank. A "bank 3-in-1" is therefore normally a bank account at the bank, a demat account with the bank as <abbr title="Depository Participant">DP</abbr>, and a trading account with the group's broking company — three legal relationships behind one interface. Confirm the specific group's structure rather than assuming it; the variants matter for grievance routing and for which entity the client's agreement is with. `[AI inference — verify before acting]`
+</Aside>
+
+## 1. Regulatory framework
+
+- **[SEBI/HO/MRD/MRD-PoD-2/P/CIR/2024/153](/broking-kyc/reference/circulars/sebi-other/#sebihomrdmrd-pod-2pcir2024153)** (11 November 2024, effective 1 February 2025), "Trading supported by Blocked Amount in Secondary Market" — clause 4 sets out the salient features of the 3-in-1 trading account; clause 5.1 requires a QSB to provide either the UPI block facility in the cash segment or the 3-in-1 facility in addition to the current mode; clause 5.2 requires any 3-in-1 facility to have at least the clause 4 features; clause 5.3 preserves the client's option to continue transferring funds to the trading member. The verbatim header on the circular reads `SEBI/HO/MRD-PoD2/CIR/P/2024/153`.
+- **Master Circular for Stock Exchanges and Clearing Corporations dated 16 October 2023, Chapter 1 paragraph 25** — the originating framework for trading on blocked funds in the secondary market, live from 1 January 2024, introduced at paragraph 25.4.1.2 as a non-mandatory facility for stock brokers. `[not yet in index]`
+- **[SEBI/HO/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD-1/P/CIR/2023/24](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-pod-1pcir202324)** and **[SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2024/14](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-pod-1pcir202414)** — the Qualified Stock Broker designation and its expansion. Which brokers carry the clause 5.1 obligation follows from these.
+- **[NPCI/UPI/OC No. 217/2025-26](/broking-kyc/reference/circulars/npci/)** (3 July 2025, mandatory from 1 October 2025) — standardised, validated and exclusive UPI handles for payment collection by SEBI-registered intermediaries, implementing a SEBI directive of 11 June 2025. Relevant to the UPI-block alternative and to any collection a 3-in-1 broker still does outside the integrated flow. The SEBI directive itself is `[not yet in index]`.
+- **[NPCI/UPI/OC No. 228/2025-26](/broking-kyc/reference/circulars/npci/)** (8 October 2025) — renames Single Block Multiple Debits as UPI Reserve Pay and specifies the block mechanics, notification and revocation controls. The same engine underlies the SEBI secondary-market block facility.
+- **[SEBI/HO/MIRSD/POD-1/P/CIR/2024/91](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir202491)** (28 June 2024) — <abbr title="Basic Services Demat Account">BSDA</abbr> applies to the demat account in a 3-in-1 exactly as it does elsewhere. A bank DP has the same default-BSDA obligation as any other participant. See [BSDA](./bsda/).
+
+## 2. The two models compared
+
+| Dimension | Bank-led 3-in-1 | Bank-referral or bundled tie-up |
+| --- | --- | --- |
+| Meets clause 4 of the 2024 circular | Yes, by definition | No, unless order-time blocking and post-market pay-in are actually implemented |
+| Bank account | Held with the group bank; integrated with order entry | Held with the bank; funds transferred out to the broker before trading |
+| Demat account | With the bank as depository participant | With the bank as DP, or with the broker as DP |
+| Trading account | With the group's broking entity | With the partner or affiliated broker |
+| Funds on buy order | Blocked in the client's bank account to the extent of the obligation; released if unexecuted | Transferred to the broker in advance; sits in the broker's client bank account |
+| Securities on sell order | Blocked in the client's demat account; released if unexecuted | Delivered by <abbr title="Demat Debit and Pledge Instruction">DDPI</abbr>, eDIS or early pay-in |
+| Pay-in | Post market hours, from the blocked accounts, upstreamed to the clearing corporation | From the broker's client bank account and pool, per the normal settlement cycle |
+| Interest to the client | Earns interest on the blocked funds until pay-in | None on funds held by the broker |
+| Client's credit exposure to the broker | Limited to balances outside the blocked flow | The full ledger credit balance |
+| Onboarding | Single journey, often pre-filled from the bank's <abbr title="Know Your Customer (process).">KYC</abbr> record | Single journey, but three onboardings behind it |
+| Grievance routing | Split across bank, DP and broker by subject | Same split, with an additional partner boundary |
+
+## 3. What the integration changes operationally
+
+### 3.1 Fund flow
+
+In the conventional flow the broker receives money, recognises it, upstreams it, computes margin against it, settles obligations from it, and returns the unused balance on the running-account settlement date. In the integrated flow the block replaces the transfer: the obligation amount is blocked at order placement, the block is released if the order does not execute, and the pay-in is made after market hours directly to the clearing corporation. The broker's ledger still exists, but the balance it carries for that client is far smaller.
+
+The knock-on effects are worth listing because they are usually treated as separate projects:
+
+- **Third-party funds.** The prohibition on accepting funds from anyone other than the client is satisfied structurally — the blocked account is the client's own. It is the same benefit the UPI block route delivers, and it removes a whole class of manual review.
+- **Running-account settlement.** Less client money with the broker means smaller quarterly and monthly returns of credit balance. The obligation does not disappear; its magnitude does.
+- **Upstreaming.** The client-funds upstreaming computation applies to what the broker holds. A largely blocked book shrinks the daily upstreaming requirement described in [Client funds upstreaming](/broking-kyc/deep-dives/settlement/client-funds-upstreaming/).
+- **Interest.** Clause 4.4 says the client earns interest on the available funds until pay-in. That is a real economic difference from the conventional model and is the feature most worth surfacing in client-facing material.
+
+### 3.2 Securities flow and the pledge path
+
+Clause 4.3 blocks securities in the demat account on placement of a sell order and releases the block if the order does not execute. This displaces the mechanism most retail brokers use today — a DDPI authorising the broker to debit, or an eDIS or <abbr title="Transaction PIN">TPIN</abbr> authorisation per transaction. Blocking at order placement is both safer for the client and simpler for the broker, because the authority is exercised against a specific order rather than standing against the account.
+
+It does not displace margin pledge. Pledging securities as collateral remains a depository instruction with the client's authentication, and in a bank-led 3-in-1 that instruction goes to the bank as depository participant. Where the broker and the DP are in the same group, the pledge and the margin benefit reconcile more easily; where the demat account is with the bank and the trading account is with a partner broker, the pledge is a cross-entity flow and the haircut, invocation and release paths need explicit design. See [<abbr title="Central Depository Services (India) Limited">CDSL</abbr> <abbr title="Margin Trading Facility">MTF</abbr> and pledge](/broking-kyc/vendors/depositories/cdsl-mtf-pledge/) for the pledge mechanics and [CDSL DDPI](/broking-kyc/vendors/depositories/cdsl-ddpi/) for what the blocking model replaces.
+
+### 3.3 The UPI block alternative
+
+| Dimension | UPI block (trading supported by blocked amount) | 3-in-1 |
+| --- | --- | --- |
+| Who must hold the accounts together | Nobody — the client's bank can be any participating bank | The group must have the bank, the DP and the broker |
+| Block instrument | UPI single-block-multiple-debits mandate, now UPI Reserve Pay | Internal lien or hold on the savings account |
+| Block beneficiary | The clearing corporation | Per the group's implementation `[verify]` |
+| Client experience | Mandate creation and approval in the UPI app; per-mandate limits apply | Invisible; happens inside the order flow |
+| Availability | Cash segment, per the circular | Cash segment on the same basis |
+| Collection handle | Must use a standardised validated UPI handle per [NPCI/UPI/OC No. 217/2025-26](/broking-kyc/reference/circulars/npci/) | Not applicable to the internal flow |
+| Constraint to watch | Mandate caps and per-merchant block limits in the UPI specification | Group completeness, and portability if the client wants a different broker |
+
+Both satisfy clause 5.1. The choice is structural: a broker without a bank in the group has only the UPI route, and a bank group can offer both. See [Payment and mandates](/broking-kyc/vendors/payment-mandates/) for the mandate rails.
+
+## 4. Field-level deltas
+
+| name | type | length | mandatory | source-system | destination-system(s) | notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| Linked savings account number | Alphanumeric | per bank | Yes | Bank core system | Broker back office, <abbr title="Risk Management System">RMS</abbr>, order gateway | Must be the client's own account; the integration key |
+| <abbr title="Indian Financial System Code.">IFSC</abbr> of the linked account | Char | 11 | Yes | Bank core system | Back office | Standard format; see [Journey: bank account](/broking-kyc/journey/05-bank-account/) |
+| Block or lien reference | Alphanumeric | per implementation | On event | Bank core system | RMS, back office, settlement | Ties an order's blocked amount to the bank-side hold `[AI inference — verify before acting]` |
+| Blocked amount | Numeric | per implementation | On event | Order value plus charges | RMS, margin computation | Released on non-execution per clause 4.2 |
+| Securities block reference | Alphanumeric | per implementation | On event | Depository instruction | Back office, settlement | Released on non-execution per clause 4.3 |
+| Facility election | Code | per implementation | Yes | Client's choice under clause 5.3 | Back office, RMS, order gateway | Conventional, UPI block, or 3-in-1; determines the pay-in path |
+| Interest credit on blocked funds | Numeric | per implementation | Derived | Bank core system | Client bank statement | Accrues to the client under clause 4.4, not to the broker |
+| UPI handle used for collection | Text | up to 10 characters for the suffix | Conditional | Acquiring bank handle allotment | Payment gateway, client-facing collection screens | `@validbankpsp` nomenclature per [NPCI/UPI/OC No. 217/2025-26](/broking-kyc/reference/circulars/npci/) |
+| Depository participant identity | Code | per depository | Yes | DP master | Back office, depository | Distinguishes the bank-as-DP case from the broker-as-DP case |
+
+Field names and lengths for the block references are implementation-specific: neither SEBI nor the depositories publish a common schema for the 3-in-1 block, which is a consequence of the model being an intra-group arrangement rather than an inter-institution protocol.
+
+<Aside type="caution" title="The convenience has a lock-in the client should be told about">
+A 3-in-1 works because the three accounts are in one group. Moving the trading relationship to another broker means unwinding the integration: a new trading account, a fresh bank mapping, and either a demat transfer or a cross-DP arrangement. The UPI block route, by contrast, is portable — the client's bank does not change when the broker does. Neither is wrong, but the disclosure at onboarding should say which one the client is choosing, alongside the clause 5.3 right to stay on the conventional mode.
+</Aside>
+
+## 5. Alternatives
+
+| Option A — bank-led 3-in-1 | Option B — UPI block with any broker | Option C — conventional transfer | When to pick which | Who uses what |
+| --- | --- | --- | --- | --- |
+| Seamless, interest until pay-in, group lock-in | Portable, mandate-driven, subject to UPI limits | Simplest to operate, client funds sit with the broker | A for clients already banked in the group who value the integration; B for clients who want blocking without changing bank or broker; C where the client trades sizes or segments the blocked routes do not cover | A is the bank-group retail default; B is the route a non-bank QSB must build; C remains the volume case and is expressly preserved by clause 5.3 |
+
+| Option A — bank is the depository participant | Option B — broker is the depository participant | When to pick which | Who uses what |
+| --- | --- | --- | --- |
+| Demat servicing, pledge and statements sit with the bank | All securities servicing sits with the broker | A where the client's primary relationship is the bank; B where the client's primary relationship is the broker | A in bank-led models; B in broker-led models, including most discount brokers |
+
+## Practical notes
+
+- **[gotcha]** "3-in-1" on a marketing page is not evidence of clause 4 compliance. Before relying on a partner's 3-in-1 for the clause 5.1 obligation, check that funds are blocked at order placement and released on non-execution, that securities are blocked on sell orders, and that pay-in is post-market from the blocked accounts. A bundled tie-up that fails those tests leaves the QSB obligation undischarged.
+- **[gotcha]** The blocked amount must cover the obligation, which is the trade value plus the charges that will be debited. A block sized to the order value alone produces a short pay-in and a debit balance the model was supposed to avoid `[industry practice — unverified]`.
+- **[gotcha]** Grievance routing is the practical weak point of every bundled model. A client with a failed pay-in does not know whether the bank, the DP or the broker caused it, and each entity has its own escalation and its own regulator. Define the single intake point at onboarding rather than at the first complaint — the investor-grievance obligations in [Investor Charter](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-pod1pcir202522) apply to the broker regardless of where the fault was.
+- **[industry practice]** Bank-led onboarding is materially cheaper per account because the bank already holds a verified KYC record and a verified bank account, so the identity, address and penny-drop steps collapse into a consent to reuse. That, rather than the trading experience, is usually the commercial case for the model.
+- **[risk trade-off]** Blocking at order placement reduces client credit risk and increases order-rejection rates, because an insufficient bank balance now fails at order entry rather than being absorbed by a ledger credit. Set the client-facing messaging for that failure deliberately; it is the most common complaint the model generates `[industry practice — unverified]`.
+- **[cost optimization]** A largely blocked book reduces the broker's upstreaming and running-account settlement volumes, and with them a real operational cost. It also reduces float income, which for some brokers is a meaningful revenue line. The net effect is business-model specific and should be computed, not assumed.
+- **[AI inference — verify before acting]** The block-reference and lien field treatment in section 4, and the group-structure description in the Aside, are inferred from the circular's feature list and from how bank groups are organised. No issuer publishes a common 3-in-1 field schema; obtain the specific group's interface specification.
+
+## Cross-references
+
+- [Account variants overview](./) — the selector table across all eleven variants.
+- [Client funds upstreaming](/broking-kyc/deep-dives/settlement/client-funds-upstreaming/) — the machinery the blocked models shrink.
+- [Payment and mandates](/broking-kyc/vendors/payment-mandates/) — UPI block, autopay and the mandate rails behind the alternative route.
+- [Journey: bank account](/broking-kyc/journey/05-bank-account/) — bank capture and verification, which a bank-led flow largely pre-fills.
+- [CDSL DDPI](/broking-kyc/vendors/depositories/cdsl-ddpi/) — the standing-authority mechanism that order-time securities blocking replaces.
+- [CDSL MTF and pledge](/broking-kyc/vendors/depositories/cdsl-mtf-pledge/) — pledge mechanics, which the integration does not change.
+- [Segment rules comparison](/broking-kyc/deep-dives/foundational/segment-rules-comparison/) — where the UPI block and 3-in-1 obligation sits in the segment framework.
+- [BSDA](./bsda/) — the bank as DP carries the same default-BSDA obligation.
+- [<abbr title="Non-Resident Indian">NRI</abbr> accounts](./nri/) — where the client's AD bank and the group bank are the same, the <abbr title="Portfolio Investment Scheme (RBI / NRI)">PIS</abbr> and settlement mapping simplifies.
+
+## Verified through
+
+2026-09-11
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

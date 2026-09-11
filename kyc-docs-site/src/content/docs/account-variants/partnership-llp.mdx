@@ -1,0 +1,176 @@
+---
+title: "Account Variants: Partnership Firm and LLP"
+description: Onboarding partnership firms and LLPs — deed and LLPIN evidence, authorised signatories, partner KYC, beneficial ownership at 10 per cent, and whose name the demat account is opened in.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** a partnership firm and an <abbr title="—">LLP</abbr> look like the same client to a sales team and are completely different clients to a depository, because one is a legal person and the other is not. The page establishes that distinction first, then runs documents, mandate, screens and field deltas for both side by side, so the one decision that matters — whose name the demat account is opened in — is settled before any form is filled.
+
+## TL;DR
+
+- **An LLP is a body corporate; a partnership firm is not.** Section 3 of the Limited Liability Partnership Act 2008 gives an LLP separate legal personality and perpetual succession. The Indian Partnership Act 1932 gives a firm neither, which is why the two are onboarded differently below the surface.
+- **Consequence: demat account naming differs.** For a partnership firm, <abbr title="Central Depository Services (India) Limited">CDSL</abbr> <abbr title="Depository Participant">DP</abbr> operating instructions require the account to be opened in the names of the natural persons (the partners) with the firm's name recorded alongside; for an LLP the account is opened in the LLP's own name. See the [CDSL <abbr title="Beneficial Owner">BO</abbr> reference](/broking-kyc/vendors/depositories/cdsl/) Sections 9.3 and 9.6.
+- **The trading account, ledger and <abbr title="Unique Client Code">UCC</abbr> always sit on the entity's <abbr title="Permanent Account Number">PAN</abbr>.** Firm PAN and LLP PAN both carry `F` as the fourth character, and the exchange client category for a partnership is `06` per the [<abbr title="National Stock Exchange of India">NSE</abbr>](/broking-kyc/vendors/exchanges/nse/) and [<abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr>](/broking-kyc/vendors/exchanges/bse/) client-category tables.
+- **Beneficial ownership threshold is 10 per cent of capital or profits.** The [PML (Maintenance of Records) Amendment Rules 2023](/broking-kyc/reference/circulars/fiu-ind/#fiu-ind-pmlr-amend-2023-03-07) (effective 7 March 2023) lowered the partnership-firm threshold from 15 per cent to 10 per cent and the company threshold from 25 per cent to 10 per cent.
+- **Documents come from the non-individual annexure** of the [Master Circular on <abbr title="Know Your Customer (process).">KYC</abbr> norms](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir2023169) (12 October 2023): registration certificate, deed or LLP agreement, PAN, authorised-signatory list, and the officially valid documents of the persons authorised to transact.
+- **<abbr title="Central KYC (records registry)">CKYC</abbr> constitution types differ.** Partnership firm is `02` and LLP is `09` in the [CKYC legal-entity template](/broking-kyc/vendors/identity/ckyc/); they are not interchangeable even though the exchange may map both to the same client category.
+
+## Conceptual overview
+
+Under the Indian Partnership Act 1932 a firm is a compendious name for the persons who have agreed to share the profits of a business. It owns nothing in its own right: the partners own the assets jointly, and the firm's "registration" with a Registrar of Firms is optional and confers only procedural advantages. An LLP, by contrast, is created by incorporation with the Ministry of Corporate Affairs, receives an LLPIN, can sue and be sued in its own name, and continues to exist when partners change.
+
+For a broker the practical fallout is narrow but sharp. Everything that keys on PAN — the trading account, the client ledger, the exchange UCC record, the <abbr title="KYC Registration Agency">KRA</abbr> and CKYC records, contract notes, tax reporting — works identically for both, on the entity's PAN. Everything that keys on legal ownership of securities diverges: securities of a partnership firm cannot be registered in the firm's name because the firm is not a person capable of holding title, so the depository account is opened in the names of the partners with the firm name recorded, while an LLP holds securities in its own name like any body corporate.
+
+The second axis of difference is the authority document. A partnership's authority to open and operate a broking account comes from the partnership deed plus a partners' authority letter or resolution signed by all partners; there is no public register to verify it against. An LLP's authority comes from the LLP agreement plus a resolution of the designated partners, and the designated partners themselves are verifiable on the MCA portal against the LLPIN and DPIN. That verifiability is the single biggest reason LLP onboarding is operationally cheaper than partnership onboarding even though the document count looks similar.
+
+## 1. Regulatory framework
+
+- **[<abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/SECFATF/P/CIR/2023/169](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir2023169)** (12 October 2023) — Master Circular on KYC norms for the securities market; non-individual annexure specifies the document set for partnership firms and for other non-individual constitutions, and requires the officially valid documents of persons authorised to transact on behalf of the entity.
+- **[SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202478)** (June 2024) — <abbr title="Anti-Money Laundering">AML</abbr>/<abbr title="Combating the Financing of Terrorism">CFT</abbr> Master Circular: customer due diligence, identification of beneficial owners, and the requirement to identify the natural person exercising ultimate effective control where no owner crosses the threshold.
+- **[Prevention of Money-laundering (Maintenance of Records) Amendment Rules, 2023](/broking-kyc/reference/circulars/fiu-ind/#fiu-ind-pmlr-amend-2023-03-07)** — beneficial-owner threshold for partnership firms reduced to 10 per cent of capital or profits; beneficial ownership to be determined at the commencement of the relationship.
+- **[SEBI/HO/MIRSD/SECFATF/P/CIR/2024/79](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202479)** — KRA upload of KYC records to the Central KYC Records Registry; non-individual records use the legal-entity template.
+- **Indian Partnership Act 1932** — Sections 4 and 58–59 (definition of firm; optional registration with the Registrar of Firms).
+- **Limited Liability Partnership Act 2008** — Section 3 (LLP is a body corporate with perpetual succession), Section 7 (designated partners and DPIN), Sections 34–35 (annual Statement of Account and Solvency in Form 8, Annual Return in Form 11).
+- **CDSL and <abbr title="National Securities Depository Limited">NSDL</abbr> DP operating instructions** — the account-opening instruction that for firms, associations of persons, partnership firms and unregistered trusts the account is opened in the names of the natural persons with the entity's name recorded above. Depository field detail sits on the [CDSL](/broking-kyc/vendors/depositories/cdsl/) and [NSDL](/broking-kyc/vendors/depositories/nsdl/) pages.
+
+## 2. Eligibility and preconditions
+
+| Precondition | Partnership firm | LLP |
+|---|---|---|
+| Entity PAN | Firm PAN, 4th character `F` | LLP PAN, 4th character `F` |
+| Public registration identifier | Registration number with Registrar of Firms — only if registered | LLPIN from MCA — always present |
+| Constitutive document | Partnership deed (and supplementary deeds) | LLP agreement filed in Form 3 |
+| Authority to open the account | Authority letter or resolution signed by all partners | Resolution of designated partners under the LLP agreement |
+| Who may sign | Partners named in the authority letter | Designated partners or persons they authorise |
+| Demat account name | Names of authorised partners as holders, firm name recorded | LLP's own name |
+| Minimum participants | Two partners | Two partners, of whom at least two designated partners, at least one resident in India |
+| Annual filings to expect | Income-tax return; Registrar of Firms filings where registered | MCA Form 8 and Form 11 |
+| Nomination | Not applicable — non-individual | Not applicable — non-individual |
+| <abbr title="Basic Services Demat Account">BSDA</abbr> | Not available | Not available |
+
+<Aside type="caution" title="Decide the demat naming convention before you build the form">
+The single most expensive mistake in partnership onboarding is building one non-individual demat flow and pointing both constitution types at it. A partnership firm's depository account carries partner names as holders; an LLP's carries the LLP name as sole holder. If the form collects only an entity name, every partnership BO setup will be rejected at the depository and every rejection will require a fresh signed form from all partners, because the holder names are on the signed document. Branch the flow at the constitution-type selection, not at review.
+</Aside>
+
+## 3. Documents
+
+| Document | Partnership firm | LLP | Purpose |
+|---|---|---|---|
+| Entity PAN card | Required | Required | Client identity, exchange and KRA validation |
+| Registration certificate | If registered under the Partnership Act | Certificate of Incorporation with LLPIN | Existence of the entity |
+| Constitutive document | Partnership deed, plus every supplementary deed changing partners or shares | LLP agreement and any amendment | Who the partners are and their profit shares |
+| Authority document | Authority letter or partners' resolution naming authorised signatories and the mode of operation | Resolution of designated partners | Who may open, operate, sign and pledge |
+| Officially valid documents of signatories | For each authorised signatory | For each authorised signatory | Identity and address of the persons transacting |
+| Partner list with PANs and profit shares | All partners | All partners, with DPIN for designated partners | Beneficial-owner determination at 10 per cent |
+| Beneficial-owner declaration | Required | Required | Natural persons owning or controlling more than 10 per cent |
+| Entity bank proof | Firm account | LLP account | Third-party payment prevention |
+| <abbr title="Foreign Account Tax Compliance Act (US)">FATCA</abbr> / <abbr title="Common Reporting Standard">CRS</abbr> entity self-certification | Required | Required | Entity classification and controlling persons |
+| Latest financials or ITR | For derivatives activation and risk categorisation | Same | Income-proof requirement for derivative segments |
+| Board-equivalent GST or business proof | Optional supporting | Optional supporting | Address and activity corroboration |
+
+## 4. Authorised signatories and mode of operation
+
+The operating mandate is a structured field, not free text, because every downstream system needs it as a code. The depository carries it as an operating-instruction code; the broker's order-management and risk layers need it to decide whether a single eSign is sufficient.
+
+| Mandate | Meaning | Typical use |
+|---|---|---|
+| Singly | Any one named signatory may act alone | Small firms with a managing partner |
+| Jointly — any two | Any two of the named signatories together | Most professional firms |
+| Jointly — all | Every named signatory must sign | Firms with disputed control or external investors |
+| Either or survivor | Not applicable to entity accounts | — |
+
+Practical consequences of a joint mandate that teams routinely miss: the eSign workflow must be multi-signatory and sequential or parallel by design; the <abbr title="Demat Debit and Pledge Instruction">DDPI</abbr> or demat debit authorisation needs the same number of signatures as the account-opening form; and any running-account settlement authorisation, segment-addition request or closure request inherits the same mandate. The [eSign integration](/broking-kyc/vendors/esign/leegality/) covers the multi-signatory mechanics.
+
+## 5. Beneficial ownership and UBO determination
+
+For both constitution types, the beneficial owner is determined by a cascade rather than a single test:
+
+1. **Ownership or entitlement test.** Any natural person who, whether acting alone or together, has ownership of or entitlement to more than 10 per cent of the capital or profits of the firm or LLP. The threshold was lowered from 15 per cent to 10 per cent by the [PML (Maintenance of Records) Amendment Rules 2023](/broking-kyc/reference/circulars/fiu-ind/#fiu-ind-pmlr-amend-2023-03-07).
+2. **Control test.** Where no natural person is identified by the ownership test — for example where partners are themselves companies or trusts — the natural person exercising control through other means is identified, which requires tracing the chain of ownership upward.
+3. **Senior managing official fallback.** Where no natural person is identified under either test, the natural person holding the position of senior managing official is recorded as the beneficial owner, with the reason documented.
+
+Each identified beneficial owner needs full individual KYC — name, PAN, date of birth, address, photograph and signature — and must be screened against sanctions and <abbr title="Politically Exposed Person">PEP</abbr> lists in the same way as a primary holder. The screening mechanics are covered on the [AML screening page](/broking-kyc/vendors/fraud/trackwizz/).
+
+A partnership whose partners are themselves LLPs or companies is the case that breaks naive implementations: the <abbr title="Ultimate Beneficial Owner">UBO</abbr> table needs to model a chain, not a flat list, because the 10 per cent test applies to effective rather than direct holding.
+
+## 6. Field deltas at each destination system
+
+| Field | Type | Length | Mandatory | Source system | Destination systems | Notes |
+|---|---|---|---|---|---|---|
+| Client category | N | 2 | Yes | Onboarding form | NSE UCC, BSE UCC | `06` Partnership Firm; LLP mapping is broker-configured, commonly `06` or `07` Body Corporate `[industry practice — unverified]` |
+| Entity PAN | AN | 10 | Yes | Onboarding form | KRA, CKYC, UCC, BO, back-office | 4th character `F` for both |
+| CKYC constitution type | N | 2 | Yes | Derived | CKYC | `02` partnership firm, `09` LLP |
+| Registration number | AN | 20 | Conditional | Registration certificate | CDSL `partnership_registration_no`, CKYC | Only if registered under the Partnership Act |
+| LLPIN | AN | 8 | Yes for LLP | Certificate of Incorporation | CKYC, UCC entity block | MCA identifier; verify on the MCA portal |
+| Date of formation / incorporation | Date | 10 | Yes | Deed or CoI | UCC, CKYC, BO | UCC requires date of incorporation for body-corporate categories |
+| Authorised partner count | N | 2 | Yes | Authority letter | CDSL `authorized_partner_count` | Drives the repeating partner block |
+| Partner name (repeating) | AN | 100 | Yes | Deed | CDSL `partner_N_name`, UCC partner block | One row per partner |
+| Partner PAN (repeating) | AN | 10 | Yes | Deed | CDSL `partner_N_pan`, UCC partner block | Each passes PAN validation |
+| DPIN (repeating) | AN | 8 | Yes for LLP designated partners | MCA | CKYC related-person block | LLP only |
+| Profit share percentage | N | 5,2 | Yes | Deed | Broker CDD, UBO computation | Not carried by exchange or depository; drives the 10 per cent test |
+| Operating instruction | AN | 2 | Yes | Authority letter | CDSL `operating_instruction` | `SI` singly, `JO` jointly |
+| Demat holder names | AN | 100 each | Yes for partnership | Authority letter | CDSL / NSDL BO holder lines | Partnership: partner names as holders. LLP: LLP name as sole holder |
+| Trading account type | AN | 10 | Yes | Derived | KRA Part <abbr title="—">II</abbr> | Entity type value |
+| FATCA entity classification | AN | — | Yes | Declarations | KRA, FATCA/CRS reporting | `ACTIVE_NFFE`, `PASSIVE_NFFE` or `FINANCIAL_INSTITUTION` |
+| Beneficial owner block (repeating) | — | — | Yes | UBO declaration | CKYC related-person, broker CDD, AML screening | Name, PAN, DOB, address, photo, signature per UBO |
+| <abbr title="Legal Entity Identifier">LEI</abbr> | AN | 20 | Conditional | Client | CDSL / NSDL BO | Required where large-value transaction thresholds apply — see [Company](./company/) |
+
+Generic per-field provenance is in the [field atlas](/broking-kyc/reference/field-atlas/); the demat-account section is at [H — demat account](/broking-kyc/reference/field-atlas/sections/h-demat-account/).
+
+## 7. Journey deltas versus the resident-individual flow
+
+| Stage | What changes |
+|---|---|
+| Entry | Constitution-type selector before anything else: partnership firm or LLP. This choice branches the demat naming, the signatory model and the CKYC template |
+| Identity | Entity PAN validated first; then a repeating signatory block, each signatory fetched from the KRA on their individual PAN where a record exists |
+| Documents | Deed or LLP agreement, authority letter, partner list — uploaded, not DigiLocker-fetched. DigiLocker serves individual documents of signatories only |
+| Address | Registered office or principal place of business, corroborated by registration certificate, GST registration or utility bill in the entity's name |
+| Bank | Entity-name account; penny-drop name match against entity PAN name |
+| [Nominations](/broking-kyc/journey/07-nominations/) | Screen suppressed |
+| [Declarations](/broking-kyc/journey/08-declarations-gate/) | Entity FATCA/CRS classification, controlling-person declarations, UBO declaration, PEP screening of every partner and UBO |
+| [Review and eSign](/broking-kyc/journey/09-review-esign/) | Multi-signatory eSign matching the operating mandate; signing capacity recorded per signatory |
+| Activation | Exchange UCC upload with the repeating partner block; BO setup with the correct holder names; KRA and CKYC non-individual upload |
+
+An extra internal step appears between eSign and UCC upload: verification of the authority document against the deed. There is no API for this — the deed's clause on who may bind the firm has to be read against the authority letter. Budget maker-checker time for it; see the [admin workflow](/broking-kyc/operations/admin-workflow/).
+
+## 8. Alternatives
+
+| Option | Strength | Weakness | Typical adopter |
+|---|---|---|---|
+| Partnership firm account | Cheapest entity to form; deed is fully private | Demat in partners' names complicates transfers on partner exit; no perpetual succession; every partner change is a document event | Small family businesses and professional firms trading treasury surplus |
+| LLP account | Separate legal person, demat in own name, partners verifiable on MCA, partner changes do not disturb title | MCA filings, LLPIN maintenance, higher formation cost | Advisory and professional firms, and small fund-adjacent vehicles |
+| Private limited company | Strongest asset-holding vehicle, LEI-ready, SBO register gives a defensible ownership record | Board resolutions for every change, statutory audit, highest cost — see [Company](./company/) | Family offices and corporate treasuries |
+| <abbr title="Hindu Undivided Family">HUF</abbr> | Separate tax person with a single signatory | Only for coparcenary capital; no chosen membership — see [HUF](./huf/) | Families with pooled ancestral capital |
+| Individual accounts of partners | No entity documentation at all | Profits and tax sit with the individual; no firm-level book | Two-partner firms that do not need an entity-level ledger |
+
+## Practical notes
+
+- **[gotcha]** An unregistered partnership firm is a perfectly valid client — registration under the Partnership Act is optional. Rejecting an application for want of a Registrar of Firms certificate is a self-inflicted conversion loss; the deed plus the firm's PAN is the substantive evidence. `[industry practice]`
+- **[gotcha]** Supplementary deeds matter more than the original. A firm formed in 2011 with a partner added in 2019 and another retired in 2023 has three instruments, and only the latest tells you who can sign today. Capture the complete deed chain and date-order it in the CDD file.
+- **[gotcha]** Both firm PAN and LLP PAN have `F` as the fourth character, so PAN alone cannot distinguish the two. Drive the branch off the constitution-type field and the presence of an LLPIN, never off PAN parsing.
+- **[risk trade-off]** For a partnership, opening the demat with a minimal set of holders (typically two authorised partners) reduces form-signature overhead, but every subsequent change in those partners requires a holder change at the depository, which is heavier than an authority-letter update. Firms with stable senior partners should use them as holders; firms with churn should consider converting to an LLP.
+- **[industry practice]** Brokers commonly cap the number of partner rows accepted through the digital flow (often at ten) and route larger firms to an assisted path, because the UCC and depository repeating blocks and the UBO screening fan out quickly. `[industry practice — unverified]`
+- **[cost optimization]** Verify LLPIN, DPIN and designated-partner names against the MCA master data before collecting documents. A mismatch found at that point costs one API call; found after eSign it costs a fresh multi-signatory execution.
+- **[gotcha]** Where a partner is itself a company or LLP, the 10 per cent beneficial-ownership test applies to effective holding through the chain, not to the direct partner. Model UBO as a graph with effective-percentage computation, not as a flat table.
+- **[industry practice — unverified]** Some depository participants decline partnership demat accounts entirely and serve such clients only through an LLP or company structure, on the view that partner-name holdings create title risk on partner exit. Confirm the DP's stance before promising the client a firm-level demat.
+
+## Cross-references
+
+- [Non-individual entities appendix](/broking-kyc/appendix/non-individual-entities/) — the planning-stage summary of entity types and vendor touchpoints that this page expands.
+- [CKYC integration](/broking-kyc/vendors/identity/ckyc/) — constitution types `02` and `09`, legal-entity template and non-individual upload endpoint.
+- [KRA integration](/broking-kyc/vendors/kra/) — Section 7 non-individual fields, entity FATCA classification and <abbr title="Global Intermediary Identification Number">GIIN</abbr> handling.
+- [CDSL BO account reference](/broking-kyc/vendors/depositories/cdsl/) — Sections 9.3 and 9.6, partnership and LLP account fields and the operating-instruction code.
+- [NSE UCC integration](/broking-kyc/vendors/exchanges/nse/) — client category `06`, partner block and non-individual mandatory-field matrix.
+- [AML screening](/broking-kyc/vendors/fraud/trackwizz/) — UBO and signatory screening, PEP and sanctions matching.
+- [eSign integration](/broking-kyc/vendors/esign/leegality/) — multi-signatory execution for joint mandates.
+- [Company](./company/) — the LEI, SBO and board-resolution machinery that an LLP's larger sibling carries.
+- [Trust, society and AOP](./trust-society-aop/) — the other constitution types that share the "account in the names of natural persons" rule.
+
+## Verified through
+
+2026-09-11
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

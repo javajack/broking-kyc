@@ -1,0 +1,163 @@
+---
+title: "Account Variants: FPI and FVCI"
+description: Onboarding foreign portfolio and venture capital investors — Categories I and II, the DDP and custodian model, Common Application Form, CP code, LEI, SWAGAT-FI and the 2026 amendments.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** for a broker, an <abbr title="Foreign Portfolio Investor">FPI</abbr> is the one client type it does not actually <abbr title="Know Your Customer (process).">KYC</abbr> — the designated depository participant does. The page therefore starts by drawing the boundary between the <abbr title="Designated Depository Participant">DDP</abbr>'s registration work and the broker's own work, then covers the categories and the Common Application Form so the broker understands the artefacts it will be handed, then the broker-side mechanics (<abbr title="Unique Client Code">UCC</abbr>, CP code, custodian confirmation), and finally the 2026 amendment sequence that changed onboarding evidence.
+
+## TL;DR
+
+- **Registration is granted through a designated depository participant, not by <abbr title="Securities and Exchange Board of India">SEBI</abbr> directly and not by the broker.** The SEBI (Foreign Portfolio Investors) Regulations 2019 collapsed the old three-category scheme into two: Category I for government and government-related investors and other low-risk regulated entities, Category <abbr title="—">II</abbr> for everything else.
+- **The Common Application Form is a single form for SEBI registration, <abbr title="Permanent Account Number">PAN</abbr> and bank-account opening.** A fresh Gazette notification of the CAF and its annexure was published on 11 June 2026, circulated by [<abbr title="National Securities Depository Limited">NSDL</abbr>/POLICY/DDP/2026/0009](/broking-kyc/reference/circulars/nsdl/#nsdlpolicyddp20260009) (24 June 2026).
+- **<abbr title="Legal Entity Identifier">LEI</abbr> is mandatory for every non-individual FPI.** SEBI's circular SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/AFD/AFD–PoD–2/CIR/P/2023/0127 (27 July 2023) `[not yet in index]` requires LEI in the CAF, gave existing non-individual FPIs 180 days, and blocks further purchases where it is not provided.
+- **SWAGAT-FI creates a light-touch lane.** SEBI's circular HO/19/34/14(5)2025-AFD-POD2/I/2703/2026 (16 January 2026) `[not yet in index]` introduced Single Window Automatic and Generalised Access for Trusted Foreign Investors, with registration validity and KYC review periodicity extended to ten years for qualifying sovereign, regulated-retail-fund, insurance and pension investors, effective 1 June 2026; the implementation SOP of 25 May 2026 was circulated by [NSDL/POLICY/DDP/2026/0008](/broking-kyc/reference/circulars/nsdl/#nsdlpolicyddp20260008) (4 June 2026).
+- **Digitally signed powers of attorney are now acceptable.** SEBI's circular [HO/19/34/14(8)2026-AFD-POD2/ I/19251/2026](/broking-kyc/reference/circulars/sebi-other/) (20 August 2026) permits FPI powers of attorney signed under the Information Technology Act 2000, removing notarisation, apostillisation and consularisation for that route; circulated as [NSDL/POLICY/DDP/2026/0010](/broking-kyc/reference/circulars/nsdl/#nsdlpolicyddp20260010) and [<abbr title="Central Depository Services (India) Limited">CDSL</abbr>/OPS/<abbr title="Depository Participant">DP</abbr>/POLCY/2026/571](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolcy2026571).
+- **Government-securities-only FPIs lost their investor-group obligation.** SEBI's circular [HO/(485)2026-AFD-POD2/I/20296/2026](/broking-kyc/reference/circulars/sebi-other/) (7 September 2026) removes investor-group-details requirements for all FPIs investing only in government securities, with immediate effect; circulated as [CDSL/OPS/DP/POLCY/2026/617](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolcy2026617).
+- **<abbr title="Foreign Venture Capital Investor">FVCI</abbr> registration now runs through DDPs too.** The SEBI (Foreign Venture Capital Investors) (Amendment) Regulations 2024 with operational guidelines SEBI/HO/AFD/AFD-PoD-3/P/CIR/2024/130 (26 September 2024) `[not yet in index]` moved FVCI application clearing and oversight to DDPs from 1 January 2025.
+
+## Conceptual overview
+
+The foreign-investor stack has three distinct actors and a broker is the smallest of them. The designated depository participant — in practice a custodian bank that is also a depository participant, authorised by SEBI to act as DDP — receives the Common Application Form, runs the KYC and beneficial-ownership work, obtains the PAN, and grants the FPI registration certificate. The custodian holds the securities and the cash, confirms trades, and settles with the clearing corporation. The broker executes.
+
+That division is why an FPI onboarding at a broking firm is short but unusual. The broker does not build a KYC record from officially valid documents; it relies on the registration certificate, the PAN, the CAF annexures and the custodian's confirmations, and it registers a unique client code against the FPI's PAN with the exchanges. Its real work is downstream: mapping the FPI to the correct custodial-participant code, getting orders tagged correctly at entry, and living inside the custodian's confirmation cut-offs, because an unconfirmed institutional trade becomes the broker's own obligation.
+
+The FVCI route is the venture-capital analogue: a foreign investor registered to invest in unlisted Indian venture undertakings under the SEBI (FVCI) Regulations 2000. It matters to a broking desk far less often, because FVCI investments are largely unlisted, but the registration mechanics have converged with FPI — since the 2024 amendments, FVCI applications are cleared and supervised by DDPs rather than SEBI, and an entity may hold both FPI and FVCI registrations. The SWAGAT-FI framework is deliberately written across both routes.
+
+The 2026 amendment sequence is worth internalising as a direction of travel rather than as five separate circulars: registration validity lengthened, KYC review periodicity lengthened, notarisation of powers of attorney dropped, investor-group disclosure dropped for government-securities-only investors, and formation date added to the registration certificate. The regulator is reducing friction for identifiable low-risk foreign capital while keeping the identification itself — LEI, beneficial ownership, jurisdiction — intact.
+
+## 1. Regulatory framework
+
+- **SEBI (Foreign Portfolio Investors) Regulations 2019** — Regulation 5 sets the two-category scheme; Regulation 32 and the schedules govern investment conditions. Registration is granted by a DDP on SEBI's behalf.
+- **SEBI Master Circular for Foreign Portfolio Investors, Designated Depository Participants and Eligible Foreign Investors** (30 May 2024) `[not yet in index]`, link to [SEBI other circulars](/broking-kyc/reference/circulars/sebi-other/) — consolidates the FPI operating framework including the CAF, KYC documentation, beneficial-ownership disclosure and periodic review.
+- **SEBI/HO/AFD/AFD–PoD–2/CIR/P/2023/0127** (27 July 2023) `[not yet in index]` — mandates LEI for all non-individual FPIs: LEI in the CAF for new registrations, PAN and bank-account opening; existing non-individual FPIs to supply LEI to their DDP within 180 days; accounts blocked for further purchases on failure.
+- **[SEBI/<abbr title="Legal Affairs Department — Northern Regional Office (SEBI)">LAD-NRO</abbr>/GN/2026/310](/broking-kyc/reference/circulars/sebi-other/#sebilad-nrogn2026310)** (3 July 2026) — SEBI (Foreign Portfolio Investors) (Amendment) Regulations 2026: adds the FPI's date of birth, incorporation or equivalent formation to the registration certificate from Gazette publication; revises fee denominations and payment timing including DDP remittance deadlines, those provisions commencing on the 180th day after publication.
+- **[SEBI/LAD-<abbr title="Non-Resident Ordinary (Rupee) account">NRO</abbr>/GN/2026/308](/broking-kyc/reference/circulars/sebi-other/#sebilad-nrogn2026308)** (3 July 2026) — SEBI (Custodian) (Amendment) Regulations 2026: custodian fees move from annual to monthly, payable within 15 days after month-end with proportionate transitional adjustment, from 1 October 2026.
+- **HO/19/34/14(5)2025-AFD-POD2/I/2703/2026** (16 January 2026) `[not yet in index]` — SWAGAT-FI framework for FPIs and FVCIs, amending the FPI Master Circular in line with the SEBI (Foreign Portfolio Investors) (Second Amendment) Regulations 2025; effective 1 June 2026. Implementation SOP shared 25 May 2026 and circulated by [NSDL/POLICY/DDP/2026/0008](/broking-kyc/reference/circulars/nsdl/#nsdlpolicyddp20260008).
+- **[HO/19/34/14(8)2026-AFD-POD2/ I/19251/2026](/broking-kyc/reference/circulars/sebi-other/)** (20 August 2026) — acceptance of digitally signed powers of attorney from FPIs under the Information Technology Act 2000; revises the FPI Master Circular's proof-of-address provision. Circulated as [NSDL/POLICY/DDP/2026/0010](/broking-kyc/reference/circulars/nsdl/#nsdlpolicyddp20260010) (24 August 2026) and [CDSL/OPS/DP/POLCY/2026/571](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolcy2026571) (21 August 2026).
+- **[HO/(485)2026-AFD-POD2/I/20296/2026](/broking-kyc/reference/circulars/sebi-other/)** (7 September 2026) — removes investor-group-details requirements for all FPIs investing only in government securities, extending the earlier Fully Accessible Route exemption; immediate effect. Circulated as [CDSL/OPS/DP/POLCY/2026/617](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolcy2026617) (8 September 2026).
+- **Gazette notification of the Common Application Form and Annexure for Foreign Portfolio Investors, 2026** (11 June 2026) `[not yet in index]` — circulated by [NSDL/POLICY/DDP/2026/0009](/broking-kyc/reference/circulars/nsdl/#nsdlpolicyddp20260009) (24 June 2026).
+- **SEBI (Foreign Venture Capital Investors) Regulations 2000, as amended by the Amendment Regulations 2024** — DDP-cleared applications, revised eligibility, <abbr title="Indian Financial System Code.">IFSC</abbr>-incorporated entities within scope; operational guidelines in SEBI/HO/AFD/AFD-PoD-3/P/CIR/2024/130 (26 September 2024) `[not yet in index]`, effective from 1 January 2025.
+- **[SEBI/HO/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/109](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir2025109)** — removal of the CP-code requirement for <abbr title="Non-Resident Indian">NRI</abbr> clients. Relevant by contrast: the CP-code mechanism remains the operating model for custodian-cleared foreign and institutional flow, but no longer applies to NRIs. See [NRI](./nri/).
+- **[HO/38/15/(7)2026-MIRSD-POD/I/19255/2026](/broking-kyc/reference/circulars/sebi-mirsd/)** (20 August 2026) — specifies <abbr title="International Financial Services Centres Authority">IFSCA</abbr> under regulation 16A(1) of the <abbr title="KYC Registration Agency">KRA</abbr> Regulations, enabling IFSCA-regulated entities to access KRA systems for client KYC; accessing entities must follow the KRA Regulations, the securities-market KYC Master Circular and, for FPI clients, the specified data-security guidelines.
+
+## 2. Categories and what they change
+
+| Aspect | Category I | Category II |
+|---|---|---|
+| Who qualifies | Government and government-related investors — central banks, sovereign wealth funds, international and multilateral organisations and agencies, including entities at least 75 per cent owned or controlled by them — together with other appropriately regulated low-risk entities from <abbr title="Financial Action Task Force">FATF</abbr>-member jurisdictions | Entities not qualifying as Category I, including unregulated funds whose investment manager is appropriately regulated, and funds from non-FATF-member jurisdictions |
+| KYC depth at the DDP | Lighter documentation set | Fuller documentation set, including beneficial-ownership disclosure at lower thresholds |
+| Offshore derivative instruments | May issue and subscribe, subject to conditions | Not permitted to issue or subscribe |
+| Registration validity | Continuous subject to fee payment; ten years for SWAGAT-FI-eligible investors | Continuous subject to fee payment |
+| SWAGAT-FI eligibility | Government and government-related investors; appropriately regulated retail mutual funds or unit trusts operating as diversified blind pools with independent managers; appropriately regulated insurance companies investing proprietary funds without segregated portfolios; appropriately regulated pension funds | Generally outside the framework |
+| LEI | Mandatory for all non-individual FPIs | Mandatory for all non-individual FPIs |
+
+From the broker's seat the category matters in exactly two ways: it determines whether the client can be on the other side of an offshore derivative instrument, and it tells the broker how much reliance it can place on the DDP's KYC when performing its own risk categorisation. It does not change UCC registration or CP-code mechanics.
+
+## 3. The Common Application Form
+
+The CAF is a single form serving SEBI registration, PAN allotment and bank-account opening, submitted to the DDP with annexures. Its structure, per the form published with the FPI Master Circular and re-notified in the June 2026 Gazette:
+
+| Part | Content | Fields the broker will later see |
+|---|---|---|
+| Applicant details | Legal name, address, country of residence, contact details, constitution | Client name as it must appear on the UCC and contract notes |
+| Category and jurisdiction | FPI category, country of incorporation or establishment, regulator details | Category I or II; jurisdiction drives risk categorisation |
+| Tax identification | PAN application details, foreign tax identification number | PAN, once allotted, is the client key everywhere downstream |
+| Banking details | Bank name, account, SWIFT, branch, operating currency | Rupee account for settlement |
+| Custodian and depository | Custodian name, DP details, settlement instructions | Custodian identity determines the CP code |
+| Beneficial owner declaration | Ownership and control structure up to natural persons | Sanctions and <abbr title="Politically Exposed Person">PEP</abbr> screening inputs |
+| <abbr title="Foreign Account Tax Compliance Act (US)">FATCA</abbr> and <abbr title="Common Reporting Standard">CRS</abbr> | Tax-residency self-certification, entity classification | Reportable-account determination |
+| KYC documents annexure | Supporting documents, certification and attestation requirements | The set now affected by the digital-<abbr title="Power of Attorney">POA</abbr> relaxation |
+| Declarations and undertakings | Regulatory undertakings, authorised-signatory acknowledgement | Authorised signatories for instructions to the broker |
+| Annexure | Additional details prescribed with the form, including LEI | LEI, the field that blocks further purchases if absent |
+
+<Aside type="note" title="What the broker holds versus what the DDP holds">
+A broker onboarding an FPI should hold: the FPI registration certificate (now carrying the date of formation, per SEBI/LAD-NRO/GN/2026/310), the PAN, the LEI, the custodian and CP-code mapping, the authorised-signatory list and specimen signatures, the power of attorney in favour of the custodian or investment manager, the FATCA and CRS certification, and the client agreement set. It does not need to reconstruct the underlying officially valid documents — the DDP holds those. What it must not do is treat the DDP's work as a substitute for its own risk categorisation, sanctions screening and order-level controls.
+</Aside>
+
+## 4. Broker-side registration and field deltas
+
+| Field | Type | Length | Mandatory | Source system | Destination systems | Notes |
+|---|---|---|---|---|---|---|
+| Client category | N | 2 | Yes | Onboarding form | <abbr title="National Stock Exchange of India">NSE</abbr> UCC, <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> UCC | `23` FII is the legacy code used for foreign portfolio investor flow in the client-category table |
+| PAN | AN | 10 | Yes | CAF / Income-tax | KRA, UCC, <abbr title="Beneficial Owner">BO</abbr>, back-office | Allotted through the CAF route |
+| FPI registration number | AN | — | Yes | Registration certificate | Broker client master, custodian mapping | Granted by the DDP |
+| FPI category | AN | 1 | Yes | Registration certificate | Risk categorisation, ODI eligibility | `I` or `II` |
+| Date of formation | Date | 10 | Yes | Registration certificate | Client master | Added to the certificate by SEBI/LAD-NRO/GN/2026/310 |
+| LEI | AN | 20 | Yes | GLEIF LOU certificate | CDSL `LEI_NUMBER` / NSDL `LEI`, client master | Absence blocks further purchases; lapse triggers CDSL freeze reason `30` per [CDSL/OPS/DP/POLCY/2024/51](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolcy202451) |
+| Jurisdiction | AN | 2 | Yes | CAF | Risk categorisation, FATCA/CRS | ISO country code |
+| Custodian name and code | AN | — | Yes | Client instruction | Order-management system, clearing mapping | Determines the CP code |
+| CP code | AN | — | Yes | Clearing corporation | Order entry, obligation allocation | Allotted by the clearing corporation on the custodian's application |
+| Authorised signatory block | AN | — | Yes | CAF / POA | Instruction verification | Signatories of the investment manager or custodian |
+| Power of attorney | Document | — | Yes | Client | CDD file | Digitally signed POA acceptable from 20 August 2026 |
+| FATCA entity classification and <abbr title="Global Intermediary Identification Number">GIIN</abbr> | AN | — | Yes | CAF | KRA, FATCA/CRS reporting | Most FPIs classify as financial institutions |
+| Investor-group details | — | — | Conditional | CAF | DDP, depository systems | No longer required for FPIs investing only in government securities, per HO/(485)2026-AFD-POD2/I/20296/2026 |
+| Nomination block | — | — | Not applicable | — | Depository BO | Non-individual account |
+| <abbr title="Unified Payments Interface">UPI</abbr> payment eligibility | — | — | Not applicable | — | Payment rails | Only client categories `01` and `03` are UPI-applicable per the [NSE](/broking-kyc/vendors/exchanges/nse/) client-category table |
+
+## 5. Trading, clearing and settlement mechanics
+
+An FPI's orders do not settle through the broker's own clearing obligation. They are tagged at entry with the custodian's CP code and the custodian confirms them; once confirmed, the obligation is the custodian's. The consequences for the broker are operational and time-boxed:
+
+1. **CP code at order entry.** Orders carry the CP code, or the generic institutional code with allocation afterwards. The clearing corporation allots CP codes on the custodian's or clearing member's application through its clearing front-end.
+2. **Allocation after execution.** Where a block was executed under a generic institutional code, the broker allocates the executed quantity across the underlying CP codes and uploads the break-up with the contract-note reference. NSE Clearing's custodial-participant procedures set the windows: CP-code modification is permitted up to 16:15, custodian trade confirmation up to 19:30 on T, and the obligation-transfer-request deadline is 20:00 on T with an <abbr title="Order-to-Trade Ratio">OTR</abbr>-confirmation window into the following morning (NSE Clearing, "Custodial Participant Deals" and the <abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr> Clearing FAQ) `[industry practice — unverified]` on exact current values, which move with each settlement-calendar circular. The template for how these windows are published is [NCL/CMPT/50078](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt50078).
+3. **Rejection is the broker's risk.** If the custodian does not confirm, the obligation reverts to the executing member. This is why institutional desks reconcile confirmations intraday rather than at end of day.
+4. **<abbr title="Trade-date Plus N settlement">T+0</abbr> for custodial participants.** Custodial participants became eligible for the T+0 cycle from 31 July 2024 per [NCL/CMPT/63165](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt63165), with the Family Account CP-code mechanism activated on 10 February 2025 per [NCL/CMPT/66135](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt66135). The mechanics are covered in the [T+0 and <abbr title="Trade-date Plus N settlement">T+1</abbr> settlement deep dive](/broking-kyc/deep-dives/settlement/t0-t1-settlement/) and summarised for the client-facing view in [Institutional and custodial](./institutional-custodial/).
+5. **Position limits and reporting.** FPI-level position limits in derivatives are monitored at exchange level; the broker's risk system must reflect the client's limit rather than only the member limit. See [<abbr title="Risk Management System">RMS</abbr> and <abbr title="Standard Portfolio Analysis of Risk">SPAN</abbr> methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/).
+
+## 6. FVCI
+
+| Aspect | Position after the 2024 amendments |
+|---|---|
+| Registration route | Application to a DDP, which clears it and exercises ongoing oversight, from 1 January 2025 |
+| Eligibility | Revised conditions; entities incorporated in an International Financial Services Centre brought within the definition |
+| Investment universe | Primarily unlisted venture undertakings under the FVCI Regulations; listed-market access remains the FPI route |
+| Operational guidelines | SEBI/HO/AFD/AFD-PoD-3/P/CIR/2024/130 (26 September 2024) `[not yet in index]` |
+| Interaction with SWAGAT-FI | SWAGAT-FI is written across FPI and FVCI, giving qualifying investors unified access across routes |
+| Relevance to a broking desk | Low for secondary-market execution; material where the same group holds both registrations and the broker must keep the PANs and CP codes distinct |
+
+The practical instruction for a broker is narrow: do not merge an FVCI registration and an FPI registration of the same group into one client record. They are separate registrations with separate PANs and separate custodial arrangements, and merging them corrupts position and limit computation.
+
+## 7. Alternatives — routes for foreign capital into Indian listed securities
+
+| Route | Who uses it | Broker's role | Principal constraint |
+|---|---|---|---|
+| FPI Category I | Sovereign funds, regulated retail funds, insurers, pension funds | Execution only; custodian clears | SWAGAT-FI lane available for qualifying investors |
+| FPI Category II | Other funds, corporates, family offices abroad | Execution only; custodian clears | No offshore derivative instruments |
+| FVCI | Venture and private-equity investors | Rarely involved | Largely unlisted universe |
+| NRI on the portfolio investment scheme | Individuals of Indian origin resident abroad | Full onboarding by the broker | CP-code requirement removed in 2025 — see [NRI](./nri/) |
+| Foreign direct investment | Strategic investors | Not a broking relationship | Sectoral caps and approvals |
+| Offshore derivative instruments issued by a Category I FPI | Investors wanting Indian exposure without registration | None directly | Issuer-side conditions and reporting |
+| IFSC-based routes | Entities regulated by IFSCA | Emerging; IFSCA entities can now access KRA systems per [HO/38/15/(7)2026-MIRSD-POD/I/19255/2026](/broking-kyc/reference/circulars/sebi-mirsd/) | Separate regulatory perimeter |
+
+## Practical notes
+
+- **[gotcha]** An FPI's PAN is the only identifier that every downstream system agrees on. The registration number, the LEI, the CP code and the custodian's internal client identifier are all real and all different; key the client master on PAN and carry the others as attributes.
+- **[gotcha]** LEI lapse is a live operational risk for foreign clients whose LEI is maintained by an offshore administrator on a different renewal calendar from the Indian relationship. The consequence is not a warning but a frozen demat account under [CDSL/OPS/DP/POLCY/2024/51](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolcy202451) freeze reason `30`, and blocked further purchases under the 2023 SEBI LEI circular.
+- **[industry practice]** The digital-POA relaxation of 20 August 2026 removes weeks from onboarding, but only for powers of attorney executed under the Information Technology Act 2000. A POA executed under foreign law and merely scanned is not within the relaxation and still needs the traditional attestation chain.
+- **[risk trade-off]** Relying wholly on the DDP's KYC is efficient and permitted, but the broker remains the entity placing orders and reporting to the exchange. Keep independent sanctions screening on the FPI name and its disclosed beneficial owners, and independent order-level limit checks, regardless of the DDP's work.
+- **[cost optimization]** For a broker serving multiple FPIs of the same custodian, the CP-code mapping table is the single highest-value configuration artefact: a wrong mapping produces an unconfirmed trade, and an unconfirmed trade becomes the member's own obligation. Treat it as a reviewed, version-controlled reference table, not a per-client field.
+- **[gotcha]** Investor-group details are no longer required for FPIs investing only in government securities. Onboarding forms that still make the field mandatory for every FPI will now block a class of clients that the regulator has explicitly relieved. `[AI inference — verify before acting]` on whether a given client's mandate is genuinely government-securities-only before removing the field.
+- **[industry practice — unverified]** Custodian fee changes from annual to monthly under [SEBI/LAD-NRO/GN/2026/308](/broking-kyc/reference/circulars/sebi-other/#sebilad-nrogn2026308) from 1 October 2026 affect the custodian, not the broker, but they show up in the client's total cost of access and therefore in commercial conversations about brokerage.
+- **[gotcha]** Do not reuse the NRI playbook for FPIs. NRIs no longer need a CP code after the 2025 removal; custodian-cleared FPIs still do. A shared code path that dropped CP-code handling for "foreign clients" breaks institutional flow.
+
+## Cross-references
+
+- [Non-individual entities appendix](/broking-kyc/appendix/non-individual-entities/) — the planning-stage entity summary, including the FII and foreign categories.
+- [Institutional and custodial](./institutional-custodial/) — CP code, give-up and take-up, and the family-account CP mechanism in client-facing detail.
+- [NRI](./nri/) — the other cross-border variant, where the broker does the full KYC and the CP code no longer applies.
+- [T+0 and T+1 settlement](/broking-kyc/deep-dives/settlement/t0-t1-settlement/) — custodial-participant eligibility and the Family Account CP-code mechanism.
+- [<abbr title="Order Management System">OMS</abbr> internals](/broking-kyc/deep-dives/trading-day/oms-internals/) — order tagging, trade-capture reports and give-up handling at the order-management layer.
+- [NSE UCC integration](/broking-kyc/vendors/exchanges/nse/) — client-category table including `23`, and the non-individual mandatory-field matrix.
+- [NSDL integration](/broking-kyc/vendors/depositories/nsdl/) — the depository side of the DDP relationship and the LEI element.
+- [Field atlas — demat account](/broking-kyc/reference/field-atlas/sections/h-demat-account/) — LEI provenance at both depositories.
+- [Company](./company/) — the LEI threshold map and the beneficial-ownership cascade that FPI disclosure parallels.
+
+## Verified through
+
+2026-09-11
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*
