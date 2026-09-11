@@ -7,9 +7,9 @@ description: "Verified index of SEBI / RBI / NPCI / CERSAI / MeitY / FIU-IND / e
 
 ## TL;DR
 
-- **1059 circulars** indexed across 13 issuer groupings.
+- **1130 circulars** indexed across 13 issuer groupings.
 - Window: **2020-01-01 → 2026-09-11**. Verified 2026-09-11.
-- **397 circulars** issued in 2025 or later.
+- **465 circulars** issued in 2025 or later.
 - **103** entries flagged `[unknown — verify]` in at least one field (primary URL not re-fetchable or date ambiguous in source).
 - Coverage spans **regulatory** norms AND **operational / file-format** circulars (<abbr title="Beginning Of Day">BOD</abbr>/<abbr title="End Of Day">EOD</abbr> files, settlement specs, margin frameworks).
 - AI-generated; summaries are paraphrased. **Read the linked PDF before acting on any provision.**
@@ -35,16 +35,16 @@ All entries live on per-issuer sub-pages, sorted descending by date.
 
 | Issuer | Entries | Page |
 | --- | --- | --- |
-| <abbr title="National Stock Exchange of India">NSE</abbr> | 161 | [nse](./circulars/nse/) |
+| <abbr title="National Stock Exchange of India">NSE</abbr> | 190 | [nse](./circulars/nse/) |
 | <abbr title="Central Depository Services (India) Limited">CDSL</abbr> | 156 | [cdsl](./circulars/cdsl/) |
 | <abbr title="National Securities Depository Limited">NSDL</abbr> | 143 | [nsdl](./circulars/nsdl/) |
-| Clearing Corporations (<abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NSCCL</abbr> / <abbr title="Indian Clearing Corporation Limited">ICCL</abbr> / <abbr title="Multi Commodity Exchange Clearing Corporation Limited">MCXCCL</abbr>) | 115 | [clearing-corps](./circulars/clearing-corps/) |
+| Clearing Corporations (<abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NSCCL</abbr> / <abbr title="Indian Clearing Corporation Limited">ICCL</abbr> / <abbr title="Multi Commodity Exchange Clearing Corporation Limited">MCXCCL</abbr>) | 140 | [clearing-corps](./circulars/clearing-corps/) |
 | <abbr title="Multi Commodity Exchange of India">MCX</abbr> | 102 | [mcx](./circulars/mcx/) |
-| SEBI (MRD / <abbr title="Investment Management Department (within SEBI)">IMD</abbr> / OIAE / LAD-NRO / <abbr title="Corporate Finance Department (within SEBI)">CFD</abbr>) | 79 | [sebi-other](./circulars/sebi-other/) |
+| SEBI (MRD / <abbr title="Investment Management Department (within SEBI)">IMD</abbr> / OIAE / LAD-NRO / <abbr title="Corporate Finance Department (within SEBI)">CFD</abbr>) | 85 | [sebi-other](./circulars/sebi-other/) |
 | SEBI-MIRSD | 63 | [sebi-mirsd](./circulars/sebi-mirsd/) |
 | <abbr title="Reserve Bank of India">RBI</abbr> | 62 | [rbi](./circulars/rbi/) |
 | <abbr title="National Payments Corporation of India">NPCI</abbr> | 57 | [npci](./circulars/npci/) |
-| <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> | 45 | [bse](./circulars/bse/) |
+| <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> | 56 | [bse](./circulars/bse/) |
 | MeitY / <abbr title="Controller of Certifying Authorities">CCA</abbr> | 31 | [meity](./circulars/meity/) |
 | <abbr title="Central Registry of Securitisation Asset Reconstruction and Security Interest of India">CERSAI</abbr> / <abbr title="Central KYC (records registry)">CKYC</abbr> | 25 | [cersai](./circulars/cersai/) |
 | <abbr title="Financial Intelligence Unit — India">FIU-IND</abbr> | 20 | [fiu-ind](./circulars/fiu-ind/) |

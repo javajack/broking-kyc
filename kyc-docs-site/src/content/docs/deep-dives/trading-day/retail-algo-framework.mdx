@@ -17,7 +17,7 @@ import { Aside } from '@astrojs/starlight/components';
 - **Pre-trade controls under [NSE/FAOP/69296](/broking-kyc/reference/circulars/nse/#nsefaop69296):** Algo Market Order pre-emptive cancellation introduced to prevent runaway market orders; NNF Terminal ID to Algo ID validation enforced.
 - **Audit trail retention:** **5 years** per [NSE/INVG/67858](/broking-kyc/reference/circulars/nse/#nseinvg67858) — broker traces every algo-tagged order to its registered algo-ID and the API vendor.
 - **Approval chain:** Algo providers register with their broker; brokers register their empanelled algo / vendor with NSE / <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> / <abbr title="Multi Commodity Exchange of India">MCX</abbr> (per exchange); each segment / each algo / each broker requires its own approval.
-- **Vendor-empanelled vs in-house algos:** Both paths exist; empanelled-vendor algos must be in the broker's registered list; in-house algos require broker-level Type-<abbr title="—">III</abbr> system audit per [NSE/INSP/64438](/broking-kyc/reference/circulars/nse/) / [NSE/INSP/70900](/broking-kyc/reference/circulars/nse/).
+- **Vendor-empanelled vs in-house algos:** Both paths exist; empanelled-vendor algos must be in the broker's registered list; in-house algos require broker-level Type-<abbr title="—">III</abbr> system audit per [NSE/INSP/64438](/broking-kyc/reference/circulars/nse/#nseinsp64438) / [NSE/INSP/70900](/broking-kyc/reference/circulars/nse/#nseinsp70900).
 - **Predecessor frameworks:** 2022–2024 institutional-algo framework provided the foundation (<abbr title="Computer-to-Computer Link.">CTCL</abbr> approval, NNF terminal IDs, Type-III audit cadence); 2025 retail framework is the extension to retail-API access.
 
 ## Conceptual overview
@@ -112,7 +112,7 @@ The broker must obtain approval for each algo and each segment from each exchang
 | Empanel the algo provider | Vendor due diligence (security review, financial soundness, prior incident record, technology architecture review). Vendor's algos are catalogued in the broker's algo registry |
 | For each algo, register algo-ID with NSE | NSE assigns / approves the unique algo-ID; broker maintains an internal mapping (algo-ID → vendor → strategy description → broker contact owner) |
 | Register the algo server | The broker (or the vendor, depending on the architecture) registers the physical server / hosting location with NSE — must be at an exchange-approved facility |
-| Submit broker-level system audit | If the broker is Type-III (algo-capable), the broker submits the half-yearly system audit (per [NSE/INSP/64438](/broking-kyc/reference/circulars/nse/) and successors) |
+| Submit broker-level system audit | If the broker is Type-III (algo-capable), the broker submits the half-yearly system audit (per [NSE/INSP/64438](/broking-kyc/reference/circulars/nse/#nseinsp64438) and successors) |
 | Submit broker-level cyber audit | Half-yearly cyber audit for Type-III brokers per the <abbr title="Cybersecurity and Cyber Resilience Framework">CSCRF</abbr> and earlier framework circulars |
 | Maintain audit trail | 5-year retention, accessible to NSE inspection on request |
 
@@ -233,7 +233,7 @@ A consolidated list of broker responsibilities under the principal model:
 | Train staff | Internal training on algo monitoring and incident response |
 | Insurance / capital cushion | Higher exposure from algo-misuse; some brokers maintain higher capital buffer or specific algo-related insurance |
 
-The accountability is real — penalty schedules per [NSE/INSP/53530](/broking-kyc/reference/circulars/nse/) apply to algo-related defaults, and serious algo incidents can trigger SEBI Section 11B action against the broker.
+The accountability is real — penalty schedules per [NSE/INSP/53530](/broking-kyc/reference/circulars/nse/#nseinsp53530) apply to algo-related defaults, and serious algo incidents can trigger SEBI Section 11B action against the broker.
 
 ## 8. Vendor-empanelled algos vs in-house algos
 
@@ -260,7 +260,7 @@ The broker builds and operates its own algos. This is typically for:
 - Internal arbitrage between segments,
 - Market-making on illiquid instruments.
 
-For in-house algos, the broker is the algo provider — there's no separate empanelment, but the broker still must register each algo, undergo the Type-III system audit (per [NSE/INSP/64438](/broking-kyc/reference/circulars/nse/) / [NSE/INSP/70900](/broking-kyc/reference/circulars/nse/)), and maintain the audit trail.
+For in-house algos, the broker is the algo provider — there's no separate empanelment, but the broker still must register each algo, undergo the Type-III system audit (per [NSE/INSP/64438](/broking-kyc/reference/circulars/nse/#nseinsp64438) / [NSE/INSP/70900](/broking-kyc/reference/circulars/nse/#nseinsp70900)), and maintain the audit trail.
 
 ### 8.3 Hybrid
 
@@ -307,7 +307,7 @@ NSE's CTCL framework (Computer-to-Computer Link) — see [OMS internals deep-div
 
 ### 10.2 Type-III system audit
 
-Algo-capable trading members are classified as Type-III for system audit purposes. Type-III members undergo half-yearly audits (rather than annual for Type-I / <abbr title="—">II</abbr>). Empanelment per [NSE/INSP/69631](/broking-kyc/reference/circulars/nse/) (Aug 2025); current cycle [NSE/INSP/64438](/broking-kyc/reference/circulars/nse/) / [NSE/INSP/70900](/broking-kyc/reference/circulars/nse/).
+Algo-capable trading members are classified as Type-III for system audit purposes. Type-III members undergo half-yearly audits (rather than annual for Type-I / <abbr title="—">II</abbr>). Empanelment per [NSE/INSP/69631](/broking-kyc/reference/circulars/nse/#nseinsp69631) (Aug 2025); current cycle [NSE/INSP/64438](/broking-kyc/reference/circulars/nse/#nseinsp64438) / [NSE/INSP/70900](/broking-kyc/reference/circulars/nse/#nseinsp70900).
 
 The Type-III audit covers:
 - Algo architecture review,
@@ -385,7 +385,7 @@ The surveillance team typically has a dedicated algo-monitoring desk for high-OP
 - **Algos and <abbr title="Margin Trading Facility">MTF</abbr>.** MTF positions (broker-funded purchases) can be exited via algo orders if the broker permits; the algo flow respects the MTF settlement rules.
 - **Algos handling <abbr title="Non-Resident Indian">NRI</abbr> flow.** Post Sep 2025 CP-code removal ([SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/109](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir2025109)), NRI algo flow routes direct broker-side without CP-code intermediation. NRI segment / <abbr title="Portfolio Investment Scheme (RBI / NRI)">PIS</abbr> restrictions still apply.
 - **Algos on commodity segment.** MCX commodity algos have their own registration path via MCX Inspection; the SEBI framework applies but MCX operational paths differ from NSE.
-- **Algos on SLB segment.** SLB transactions can be algorithm-driven; SLBS framework (per [<abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr>/CMPT/61810](/broking-kyc/reference/circulars/clearing-corps/) / [NCL/CMPT/67763](/broking-kyc/reference/circulars/clearing-corps/)) interacts with the algo framework.
+- **Algos on SLB segment.** SLB transactions can be algorithm-driven; SLBS framework (per [<abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr>/CMPT/61810](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt61810) / [NCL/CMPT/67763](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt67763)) interacts with the algo framework.
 - **Algos and pension / mutual-fund clients.** Institutional algo flow (mutual funds executing baskets via VWAP) is governed by the broader institutional algo framework rather than the retail framework; the algo-ID tagging and approval still apply.
 - **Algo-related grievances.** Client grievances about algo strategy performance flow through the broker's grievance mechanism (<abbr title="SEBI Complaints Redress System">SCORES</abbr>, broker-internal). The broker may be required to demonstrate the algo behaved within approved parameters.
 

@@ -1,14 +1,14 @@
 ---
 title: SEBI (MRD / IMD / OIAE / LAD-NRO / CFD) Circulars
-description: "Verified index of SEBI (MRD / IMD / OIAE / LAD-NRO / CFD) circulars affecting Indian stock broking, 2020-01-01 to 2026-09-11. 79 entries."
+description: "Verified index of SEBI (MRD / IMD / OIAE / LAD-NRO / CFD) circulars affecting Indian stock broking, 2020-01-01 to 2026-09-11. 85 entries."
 ---
 
 > **Why this page is structured this way:** All in-window entries are listed descending by date so the most recent regulatory state is the first thing a reader sees. Use Cmd-F / Ctrl-F for ID-based lookup. Cross-references from the rest of the site point at anchors on this page.
 
 ## TL;DR
 
-- **79 circulars** indexed in this issuer's section.
-- **33** issued in 2025 or later.
+- **85 circulars** indexed in this issuer's section.
+- **38** issued in 2025 or later.
 - **0** entries flagged `[unknown — verify]` in at least one field.
 - All entries trace to a primary issuer URL (or Wayback fallback) where research could verify the source.
 - AI-generated; **read the linked PDF before acting on any provision**.
@@ -383,6 +383,19 @@ Replaces the monthly cumulative report format from the June 2026 reporting perio
 
 Consolidates surveillance directions including <abbr title="Market Infrastructure Institution">MII</abbr> surveillance-lapse disincentives, non-convertible-security subscriptions during trading-window closure, and automated freezes for designated persons’ immediate relatives (cover clauses 2(a)–2(c)). Rescinds the listed prior directions only to the extent of surveillance, while preserving past actions and liabilities (cover clauses 3–4). The header identifies May 15, 2026 as the last-update date and March 23, 2023 as the original issue date.
 
+### HO/47/15/11(2)2025-MRD-TPD1/ I/4226/2026
+
+- **date_issued:** 2026-02-05
+- **issuer:** SEBI-MRD
+- **title:** "Calendar Spread margin benefit for Single Stock Derivatives on expiry day"
+- **applies_to:** exchange, clearing-corp, broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** derivatives, margin
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/feb-2026/1770288869049.pdf
+
+Backfill: Withdraws the calendar-spread offset for single-stock derivatives on expiry day for contracts expiring that day, matching the existing index-derivative treatment (clauses 1–2 and 5). Calendar spreads between contracts that do not expire that day keep calendar-spread margin treatment; clause 4 gives an example (clauses 3–4). The circular takes effect three months after its date (clause 6).
+
 ### HO/47/11/11(3)2025-MRD-POD2/I/2765/2026
 
 - **date_issued:** 2026-01-16
@@ -408,6 +421,58 @@ Introduces a 3:15–3:35 p.m. closing auction initially for cash stocks with der
 - **primary_url:** https://www.sebi.gov.in/legal/regulations/jan-2026/securities-and-exchange-board-of-india-stock-brokers-regulations-2026_98974.html
 
 Replaces the SEBI (Stock Brokers and Sub-Brokers) Regulations, 1992 with a complete rewrite. Introduces eligibility criteria including a minimum two-year securities-trading experience for applicants, requires at least one designated director resident in India for 182+ days per financial year, codifies operational/general/enhanced obligations for trading members and clearing members, and aligns the framework with Qualified Stock Brokers and modern market structure.
+
+### SEBI/HO/MRD/TPD/CIR/P/2025/ 122
+
+- **date_issued:** 2025-09-01
+- **issuer:** SEBI-MRD
+- **title:** "Framework for Intraday Position Limits Monitoring for Equity Index Derivatives"
+- **applies_to:** exchange, clearing-corp, depository, broker
+- **in_force_date:** 2025-10-01
+- **status:** in-force
+- **impact_areas:** derivatives, rms, surveillance
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/sep-2025/1756745625835.pdf
+
+Backfill: Sets entity-level intraday index-options limits of INR 5,000 crore net and INR 10,000 crore gross FutEq, monitored through at least four random snapshots, including one between 14:45 and 15:30 hrs (clauses 4.1–4.3). Entities may take additional exposure against securities or cash holdings under paragraph 5.5.3 of the May 29, 2025 circular (clause 4.5). Exchanges examine entities that breach the limits, and expiry-day breaches attract a penalty or additional surveillance deposit (clauses 4.6–4.7). The framework applies from October 1, 2025, except the expiry-day penalty, which applies from December 6, 2025 (clause 6).
+
+### SEBI/HO/MRD/TPD-1/P/CIR/2025/79
+
+- **date_issued:** 2025-05-29
+- **issuer:** SEBI-MRD
+- **title:** "Measures for Enhancing Trading Convenience and Strengthening Risk Monitoring in Equity Derivatives"
+- **applies_to:** exchange, clearing-corp, broker
+- **in_force_date:** 2025-07-01
+- **status:** in-force
+- **impact_areas:** derivatives, rms, surveillance
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/may-2025/1748521484014.pdf
+
+Backfill: Measures OI on a delta-based futures-equivalent (FutEq) basis and resets single-stock <abbr title="Market Wide Position Limit">MWPL</abbr> to the lower of 15% of free float or 65x ADDV, with a 10% floor. Trading during a ban period must reduce end-of-day FutEq OI (clauses 5.1–5.3). Index options carry <abbr title="Permanent Account Number">PAN</abbr>-level limits of INR 1,500 crore net and INR 10,000 crore gross FutEq, with a July 1–December 5, 2025 glide path; index futures limits are measured on a gross notional basis (clauses 5.5.1–5.5.4). The circular also extends pre-open sessions to futures, adds eligibility norms for non-benchmark index derivatives and recalibrates single-stock entity limits, such as 10% of MWPL for clients; measures phase in from July 1 to December 6, 2025 (clauses 5.6–5.8 and 6).
+
+### SEBI/HO/MRD/MRD-TPD-1/P/CIR/2025/76
+
+- **date_issued:** 2025-05-26
+- **issuer:** SEBI-MRD
+- **title:** "Final Settlement Day (Expiry Day) for Equity Derivatives Contracts"
+- **applies_to:** exchange, clearing-corp
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** derivatives, settlement
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/may-2025/1748266377271.pdf
+
+Backfill: Each exchange must limit all equity-derivatives expiries to either Tuesday or Thursday, with one weekly benchmark index options contract on the chosen day (clauses 3.1–3.2). All other equity derivatives must have a minimum one-month tenor and expire in the last week of the month (clause 3.3). Changing the settlement day requires prior SEBI approval, and exchanges had to submit compliant proposals by June 15, 2025 (clauses 3.4 and 4).
+
+### SEBI/HO/MRD/TPD-1/P/CIR/2025/41
+
+- **date_issued:** 2025-03-28
+- **issuer:** SEBI-MRD
+- **title:** "Intraday Monitoring of Position Limits for Index Derivatives"
+- **applies_to:** exchange, clearing-corp, broker
+- **in_force_date:** 2025-04-01
+- **status:** [unknown — verify]
+- **impact_areas:** derivatives, rms, surveillance
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/mar-2025/1743161645941.pdf
+
+Backfill: Exchanges begin intraday monitoring of index-derivative position limits from April 1, 2025, using at least four random snapshots a day (clauses 1 and 3.1). Intraday breaches of existing limits attract no penalty and are not treated as violations until further directions (clause 3.2). Exchanges must issue a joint SOP and inform clients and trading members of intraday breaches (clause 3.3).
 
 ### SEBI/HO/OIAE/OIAE_IAD-3/P/CIR/2025/32
 
@@ -577,6 +642,19 @@ Consolidates all relevant LODR circulars issued on/before September 30, 2024 int
 - **primary_url:** https://www.sebi.gov.in/legal/circulars/nov-2024/trading-supported-by-blocked-amount-in-secondary-market_88339.html
 
 Mandates that every Qualified Stock Broker (<abbr title="Qualified Stock Broker">QSB</abbr>) must offer its clients either (a) the facility of trading supported by blocked amount in the cash segment using <abbr title="Unified Payments Interface">UPI</abbr> block mechanism, or (b) the 3-in-1 trading account facility, in addition to the conventional mode. Brings <abbr title="Applications Supported by Blocked Amount">ASBA</abbr>-like protection of investor cash collateral to the secondary market; effective February 1, 2025.
+
+### SEBI/HO/MRD/MRD-PoD-2/P/CIR/2024/140
+
+- **date_issued:** 2024-10-15
+- **issuer:** SEBI-MRD
+- **title:** "Monitoring of position limits for equity derivative segment"
+- **applies_to:** exchange, clearing-corp, broker
+- **in_force_date:** immediate
+- **status:** [unknown — verify]
+- **impact_areas:** derivatives, rms, surveillance
+- **primary_url:** https://www.sebi.gov.in/sebi_data/attachdocs/oct-2024/1728990538428.pdf
+
+Backfill: Sets trading-member position limits in index futures and index options, client plus proprietary, at the higher of INR 7,500 crore or 15% of total market OI, applied separately to futures and options (clauses 2.1–2.2). Positions are monitored against the previous day's end-of-day market OI, and passive breaches caused by a fall in market OI attract no penalty and need not be unwound (clauses 3.1–3.3). Clause 2 applies immediately and clause 3 from April 1, 2025 (clause 4).
 
 ### SEBI/HO/MRD/MRD-PoD-3/P/CIR/2024/139
 

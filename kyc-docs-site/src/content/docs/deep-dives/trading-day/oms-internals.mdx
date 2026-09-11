@@ -223,7 +223,7 @@ The exchange's IT team reviews, possibly conducts an on-site or remote inspectio
 | BSE | BOLT-IML approval | BSE Compliance / Inspection | BSE master member scheme |
 | MCX | MCX-TWS / IML approval | MCX Inspection | MCX member scheme |
 
-For algo-capable software, additional half-yearly system audit applies (see [NSE/INSP/64438](/broking-kyc/reference/circulars/nse/) / [NSE/INSP/70900](/broking-kyc/reference/circulars/nse/)). The audit is a CERT-In-empanelled auditor producing a report covering architecture, controls, and any drift from the approved configuration.
+For algo-capable software, additional half-yearly system audit applies (see [NSE/INSP/64438](/broking-kyc/reference/circulars/nse/#nseinsp64438) / [NSE/INSP/70900](/broking-kyc/reference/circulars/nse/#nseinsp70900)). The audit is a CERT-In-empanelled auditor producing a report covering architecture, controls, and any drift from the approved configuration.
 
 ### 5.3 CTCL revocation triggers
 
@@ -347,7 +347,7 @@ When an OMS issue surfaces, run through this checklist before diving into code:
 - **API access for <abbr title="Authorized Person">AP</abbr> / sub-broker chains** — the broker exposes a constrained API to its authorised persons (APs) for their own client flow. The AP's orders pass through the same pre-trade pipeline but with additional `AP-ID` tagging in the audit trail.
 - **<abbr title="Non-Resident Indian">NRI</abbr> flow post Sep 2025 CP-code removal** — NRI orders no longer route via CP code; direct broker-side handling replaces it ([SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/109](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir2025109)). The OMS must validate the NRI client's <abbr title="Portfolio Investment Scheme (RBI / NRI)">PIS</abbr> letter, <abbr title="Non-Resident External (Rupee) account">NRE</abbr> / <abbr title="Non-Resident Ordinary (Rupee) account">NRO</abbr> bank tagging, and segment restrictions on every order.
 - **Algo orders from in-house algos vs vendor-empanelled algos** — see the [retail algo framework deep dive](/broking-kyc/deep-dives/trading-day/retail-algo-framework/).
-- **Cross-margin orders** — orders that benefit from spread-margin offsets (correlated index / constituent pairs, calendar spreads). The RMS margin computation must apply the cross-margin rule from [<abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr>/CMPT/62978](/broking-kyc/reference/circulars/clearing-corps/) (same-expiry 25–30%, different-expiry 35–40% spread margins). Misapplied cross-margin is a frequent source of audit findings.
+- **Cross-margin orders** — orders that benefit from spread-margin offsets (correlated index / constituent pairs, calendar spreads). The RMS margin computation must apply the cross-margin rule from [<abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr>/CMPT/62978](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt62978) (same-expiry 25–30%, different-expiry 35–40% spread margins). Misapplied cross-margin is a frequent source of audit findings.
 
 ## Practical notes
 

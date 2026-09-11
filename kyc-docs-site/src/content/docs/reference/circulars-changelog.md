@@ -8,13 +8,13 @@ description: "Delta against the prior 37-entry hand-curated list, after the 2026
 ## TL;DR
 
 - **Prior list:** ~37 entries (20 with full circular IDs; rest named-only).
-- **New list:** 1059 verified entries across 13 issuer groupings.
+- **New list:** 1130 verified entries across 13 issuer groupings.
 - **Carried forward** (prior IDs present in new index): 10.
-- **Newly added:** 1049.
+- **Newly added:** 1120.
 - **Superseded since prior compile:** 147 entries flagged.
 - **Withdrawn since prior compile:** 0.
 - **Prior IDs not located in new index:** 9 — see below.
-- **2026-09-11 sweep:** 175 entries added for 2026-05-15 → 2026-09-11; index total now 1059.
+- **2026-09-11 sweep:** 246 entries added for 2026-05-15 → 2026-09-11; index total now 1130.
 
 ## 2026-09-11 sweep — delta since 2026-05-14
 
@@ -25,23 +25,27 @@ Circulars issued 2026-05-15 → 2026-09-11 (plus a few earlier finalisations tha
 | Issuer | New entries |
 | --- | --- |
 | <abbr title="Central Depository Services (India) Limited">CDSL</abbr> | 48 |
+| <abbr title="Securities and Exchange Board of India">SEBI</abbr> (<abbr title="Market Regulation Department (SEBI)">MRD</abbr> / <abbr title="Investment Management Department (within SEBI)">IMD</abbr> / <abbr title="Office of Investor Assistance and Education (SEBI)">OIAE</abbr> / <abbr title="Legal Affairs Department — Northern Regional Office (SEBI)">LAD-NRO</abbr> / <abbr title="Corporate Finance Department (within SEBI)">CFD</abbr>) | 35 |
+| <abbr title="National Stock Exchange of India">NSE</abbr> | 34 |
+| Clearing Corporations (<abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NSCCL</abbr> / <abbr title="Indian Clearing Corporation Limited">ICCL</abbr> / <abbr title="Multi Commodity Exchange Clearing Corporation Limited">MCXCCL</abbr>) | 33 |
 | <abbr title="National Securities Depository Limited">NSDL</abbr> | 31 |
-| <abbr title="Securities and Exchange Board of India">SEBI</abbr> (<abbr title="Market Regulation Department (SEBI)">MRD</abbr> / <abbr title="Investment Management Department (within SEBI)">IMD</abbr> / <abbr title="Office of Investor Assistance and Education (SEBI)">OIAE</abbr> / <abbr title="Legal Affairs Department — Northern Regional Office (SEBI)">LAD-NRO</abbr> / <abbr title="Corporate Finance Department (within SEBI)">CFD</abbr>) | 29 |
 | <abbr title="Multi Commodity Exchange of India">MCX</abbr> | 18 |
 | <abbr title="Reserve Bank of India">RBI</abbr> | 15 |
-| Clearing Corporations (<abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NSCCL</abbr> / <abbr title="Indian Clearing Corporation Limited">ICCL</abbr> / <abbr title="Multi Commodity Exchange Clearing Corporation Limited">MCXCCL</abbr>) | 8 |
+| <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> | 11 |
 | <abbr title="National Payments Corporation of India">NPCI</abbr> | 7 |
 | SEBI-<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr> | 7 |
 | <abbr title="Central Registry of Securitisation Asset Reconstruction and Security Interest of India">CERSAI</abbr> / <abbr title="Central KYC (records registry)">CKYC</abbr> | 5 |
-| <abbr title="National Stock Exchange of India">NSE</abbr> | 5 |
 | MeitY / <abbr title="Controller of Certifying Authorities">CCA</abbr> | 2 |
 
 ### New entries
 
 | ID | Date | Issuer | Title | Impact areas |
 | --- | --- | --- | --- | --- |
+| [<abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr>/CMPL/76318](./circulars/clearing-corps/#ncl-cmpl-76318) | 2026-09-11 | NSCCL | FAQ on Segregation and Monitoring of collateral at client level | client-funds, margin, reporting |
+| [NSE/<abbr title="Investor Service Centre.">ISC</abbr>/76299](./circulars/nse/#nse-isc-76299) | 2026-09-11 | NSE | Enhancement of Validations in Unique Client Code Fields | onboarding, kyc-modification, file-format |
 | [NPCI/<abbr title="Unified Payments Interface">UPI</abbr>/OC-227A/2026-27](./circulars/npci/#npci-upi-oc-227a-2026-27) | 2026-09-10 | NPCI | Addendum to UPI OC 227 – “MyUPI” - AI powered support for UPI payments (UPI HELP 2.0) | upi-block, mandate, grievance |
 | [CDSL/SURV/<abbr title="Depository Participant">DP</abbr>/POLCY/2026/621](./circulars/cdsl/#cdsl-surv-dp-polcy-2026-621) | 2026-09-09 | CDSL | CHANGES IN THE FORMAT OF ONLINE FREEZE MASTER REPORT (DPE6) | file-format, surveillance, reporting |
+| [20260909-1](./circulars/clearing-corps/#20260909-1) | 2026-09-09 | ICCL | Review of Margin Framework for Commodity Derivatives Segment | commodities, margin, rms |
 | [MCX/S&I/513/2026](./circulars/mcx/#mcx-s-i-513-2026) | 2026-09-09 | MCX | Review of Position Limits for Clients and Penalty Provisions for Violation / Breach of Pos | commodities, derivatives, rms, surveillance |
 | [MCXCCL/RISK/196/2026](./circulars/clearing-corps/#mcxccl-risk-196-2026) | 2026-09-09 | MCXCCL | Review of Margin Period of Risk (MPOR) | commodities, margin, rms |
 | [MCXCCL/RISK/197/2026](./circulars/clearing-corps/#mcxccl-risk-197-2026) | 2026-09-09 | MCXCCL | Review of minimum Volatility Scan Range (VSR) | commodities, margin, rms |
@@ -51,12 +55,16 @@ Circulars issued 2026-05-15 → 2026-09-11 (plus a few earlier finalisations tha
 | [RBI/2026-27/254](./circulars/rbi/#rbi-2026-27-254) | 2026-09-08 | RBI | Review of Circulars issued under Foreign Exchange Management Act, 1999 (<abbr title="Foreign Exchange Management Act 1999">FEMA</abbr>) | nri |
 | [CDSL/OPS/DP/POLCY/2026/615](./circulars/cdsl/#cdsl-ops-dp-polcy-2026-615) | 2026-09-07 | CDSL | INTRODUCTION OF NEW TRANSACTION STATUS IN DP89 REPORT | file-format, margin, settlement |
 | [MCXCCL/RISK/193/2026](./circulars/clearing-corps/#mcxccl-risk-193-2026) | 2026-09-07 | MCXCCL | Review of Margin Framework for Commodity Derivatives Segment | commodities, margin, rms |
+| [NCL/CMPT/76210](./circulars/clearing-corps/#ncl-cmpt-76210) | 2026-09-07 | NSCCL | NCMS - <abbr title="One-Time Password">OTP</abbr> based Two Factor Authentication and upgradation of NCMS version | cyber-security, derivatives |
 | [RBI/2026-27/252](./circulars/rbi/#rbi-2026-27-252) | 2026-09-07 | RBI | Implementation of Section 51A of UAPA, 1967: Updates to UNSC’s 1988 (2011) Taliban Sanctio | aml |
 | [RBI/2026-27/253](./circulars/rbi/#rbi-2026-27-253) | 2026-09-07 | RBI | Implementation of Section 51A of UAPA, 1967: Updates to UNSC’s 1267/ 1989 ISIL (Da'esh) &  | aml |
 | [HO/(485)2026-AFD-POD2/I/20296/2026](./circulars/sebi-other/#ho-485-2026-afd-pod2-i-20296-2026) | 2026-09-07 | SEBI-MRD | Ease of regulatory compliances for FPIs investing only in Government Securities | onboarding, nri, reporting |
 | [MCX/S&I/504/2026](./circulars/mcx/#mcx-s-i-504-2026) | 2026-09-04 | MCX | Extension of Implementation of New Interface - MCX <abbr title="Unique Client Code">UCC</abbr> File Formats (Version 1.1) and UCC- | onboarding, file-format |
+| [NCL/CMPT/76188](./circulars/clearing-corps/#ncl-cmpt-76188) | 2026-09-04 | NSCCL | Close-out procedure for shortages in overnight ETFs and liquid ETFs | settlement |
 | [CDSL/OPS/DP/POLCY/2026/611](./circulars/cdsl/#cdsl-ops-dp-polcy-2026-611) | 2026-09-03 | CDSL | NON-CHARGING OF <abbr title="Asset Management Company (mutual funds context) / Annual Maintenance Charges (depository context).">AMC</abbr> IN DEMAT ACCOUNTS CONSISTING OF ILLIQUID, SUSPENDED OR DELISTED SECURI | closure |
 | [CERSAI/CKYCRR 2.0/26-27/11053](./circulars/cersai/#cersai-ckycrr-2-0-26-27-11053) | 2026-09-03 | CERSAI | Readiness for Go-Live of Central <abbr title="Know Your Customer (process).">KYC</abbr> Records Registry 2.0 (CKYCRR 2.0) and participation i | onboarding, kyc-modification, file-format |
+| [NSE/CMTR/76170](./circulars/nse/#nse-cmtr-76170) | 2026-09-03 | NSE | Operational guidelines and Standard Operating Procedure (SOP) on Introduction of Closing A | derivatives, rms |
+| [NSE/MSD/76140](./circulars/nse/#nse-msd-76140) | 2026-09-03 | NSE | Live trading session from Disaster Recovery (DR) site | bcp-dr |
 | [MCX/MEM/498/2026](./circulars/mcx/#mcx-mem-498-2026) | 2026-09-02 | MCX | Submission of Accessibility Audit Report for Digital Platforms | system-audit, reporting, other |
 | [MCX/TECH/501/2026](./circulars/mcx/#mcx-tech-501-2026) | 2026-09-02 | MCX | Standardisation Testing & Quality Certification (STQC) and other compliance requirements f | cyber-security, system-audit |
 | [MCXCCL/C&S/190/2026](./circulars/clearing-corps/#mcxccl-c-s-190-2026) | 2026-09-02 | MCXCCL | Acceptance of Electronic Fixed Deposit Receipts (eFDRs) | margin |
@@ -64,6 +72,7 @@ Circulars issued 2026-05-15 → 2026-09-11 (plus a few earlier finalisations tha
 | [RBI/2026-27/251](./circulars/rbi/#rbi-2026-27-251) | 2026-09-02 | RBI | Deposits and Accounts – Accounts of Non-resident banks | nri, reporting |
 | [MCX/S&I/495/2026](./circulars/mcx/#mcx-s-i-495-2026) | 2026-08-31 | MCX | Mobile Numbers appearing under Mobile Number Revocation list (MNRL) published by Departmen | kyc-modification, reporting |
 | [NSDL/POLICY/2026/0130](./circulars/nsdl/#nsdl-policy-2026-0130) | 2026-08-31 | NSDL | Additional guidelines for implementation of SEBI Circular on Ease of doing investments - M | onboarding, nominee, minor-joint, esign |
+| [NSE/FAOP/76068](./circulars/nse/#nse-faop-76068) | 2026-08-31 | NSE | Quantity Freeze Limits for Indices | derivatives, rms |
 | [MCX/ISD/492/2026](./circulars/mcx/#mcx-isd-492-2026) | 2026-08-28 | MCX | Amendment in the existing “Policy on Evaluation of Client Claims against the Defaulter/ Ex | grievance, client-funds |
 | [HO/47/11/11(1)2026-MRD-POD3/I/19839/2026](./circulars/sebi-other/#ho-47-11-11-1-2026-mrd-pod3-i-19839-2026) | 2026-08-28 | SEBI-MRD | Extension of timeline for implementation of provisions of SEBI Circular dated June 15, 202 | mutual-funds, settlement, rms |
 | [CDSL/IT/DP/SYSTM/2026/594](./circulars/cdsl/#cdsl-it-dp-systm-2026-594) | 2026-08-27 | CDSL | AVAILABILITY OF EDIS FACILITY | settlement, bcp-dr |
@@ -74,7 +83,7 @@ Circulars issued 2026-05-15 → 2026-09-11 (plus a few earlier finalisations tha
 | [CDSL/OPS/DP/CAIPO/2026/578](./circulars/cdsl/#cdsl-ops-dp-caipo-2026-578) | 2026-08-24 | CDSL | CREATION OF NEW SECURITY TYPE IN CDSL SYSTEM | file-format |
 | [CDSL/OPS/DP/POLCY/2026/579](./circulars/cdsl/#cdsl-ops-dp-polcy-2026-579) | 2026-08-24 | CDSL | EASE OF DOING INVESTMENTS - MODIFIED NORMS FOR NOMINATION IN DEMAT ACCOUNTS | nominee, minor-joint, file-format |
 | [NSDL/POLICY/2026/0121](./circulars/nsdl/#nsdl-policy-2026-0121) | 2026-08-24 | NSDL | Enhancement in the <abbr title="Basic Services Demat Account">BSDA</abbr> Modification Process in the Local <abbr title="Depository Participant Module (CDSL terminology).">DPM</abbr> system | onboarding, kyc-modification, file-format |
-| [NSDL/POLICY/2026/0122](./circulars/nsdl/#nsdl-policy-2026-0122) | 2026-08-24 | NSDL | Change in Pay-in and Pay-out time for NSE and <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> settlements | settlement, slbm, commodities |
+| [NSDL/POLICY/2026/0122](./circulars/nsdl/#nsdl-policy-2026-0122) | 2026-08-24 | NSDL | Change in Pay-in and Pay-out time for NSE and BSE settlements | settlement, slbm, commodities |
 | [NSDL/POLICY/2026/0123](./circulars/nsdl/#nsdl-policy-2026-0123) | 2026-08-24 | NSDL | Modification in the Operating Procedure for Freezing of Demat Accounts upon Intimation of  | transmission, nominee, file-format |
 | [NSDL/POLICY/2026/0124](./circulars/nsdl/#nsdl-policy-2026-0124) | 2026-08-24 | NSDL | Operational Guidelines for Implementation of SEBI Circular on Ease of doing investments -  | onboarding, nominee, minor-joint, file-format |
 | [NSDL/POLICY/<abbr title="Designated Depository Participant">DDP</abbr>/2026/0010](./circulars/nsdl/#nsdl-policy-ddp-2026-0010) | 2026-08-24 | NSDL | SEBI Circular regarding Acceptance of digitally signed Power of Attorney from FPIs. | onboarding, non-individual, esign |
@@ -103,51 +112,72 @@ Circulars issued 2026-05-15 → 2026-09-11 (plus a few earlier finalisations tha
 | [HO/17/11/(2)2026-DDHS-POD1/I/18769/2026](./circulars/sebi-other/#ho-17-11-2-2026-ddhs-pod1-i-18769-2026) | 2026-08-14 | SEBI-MRD | Modification in the regulatory framework for Online Bond Platform Providers (OBPPs) includ | grievance, other |
 | [CDSL/OPS/DP/CAIPO/2026/550](./circulars/cdsl/#cdsl-ops-dp-caipo-2026-550) | 2026-08-13 | CDSL | MODIFICATION IN DP97 REPORT | file-format, reporting |
 | [MCX/S&I/464/2026](./circulars/mcx/#mcx-s-i-464-2026) | 2026-08-13 | MCX | Guidelines in pursuance of amendment to SEBI KYC (Know Your client) Registration Agency (K | onboarding, re-KYC, dormant, transmission, rms |
+| [NSE/ISC/75724](./circulars/nse/#nse-isc-75724) | 2026-08-13 | NSE | Guidelines in pursuance of amendment to SEBI KYC (Know Your Client) Registration Agency (K | onboarding, transmission |
 | [HO/47/16/14(1)2026-MRD-POD1/I/18580/2026](./circulars/sebi-other/#ho-47-16-14-1-2026-mrd-pod1-i-18580-2026) | 2026-08-12 | SEBI-MRD | Review of Inclusion of Historical Scenarios in Stress Testing for Commodity Derivatives Se | commodities, rms |
 | [MCX/MEM/461/2026](./circulars/mcx/#mcx-mem-461-2026) | 2026-08-11 | MCX | Clarification regarding implementation of \"@valid\" UPI IDs | client-funds, upstreaming, reporting |
+| [NCL/CMPT/75670](./circulars/clearing-corps/#ncl-cmpt-75670) | 2026-08-11 | NSCCL | <abbr title="Clearing Member">CM</abbr> - Multiple Settlements scheduled on August 27, 2026 | settlement, t0-t1 |
+| [NSE/COMP/75700](./circulars/nse/#nse-comp-75700) | 2026-08-11 | NSE | Clarification regarding implementation of \"@valid\" UPI IDs | upstreaming, client-funds |
 | [HO/17/11/24(1)2026-DDHS-POD1/I/18526/2026](./circulars/sebi-other/#ho-17-11-24-1-2026-ddhs-pod1-i-18526-2026) | 2026-08-11 | SEBI-MRD | Amendment to SEBI (Issue and Listing of Municipal Debt Securities) Regulations, 2015 (“ILM | reporting, other |
 | [CDSL/ADM/DP/GENRL/2026/543](./circulars/cdsl/#cdsl-adm-dp-genrl-2026-543) | 2026-08-10 | CDSL | CLARIFICATION REGARDING IMPLEMENTATION OF \"@VALID\" UPI IDs FOR ALL INVESTOR-FACING COLLE | client-funds, other |
 | [NSDL/POLICY/2026/0113](./circulars/nsdl/#nsdl-policy-2026-0113) | 2026-08-10 | NSDL | Clarification regarding implementation of “@valid” UPI IDs | client-funds, other |
 | [MCX/TRD/456/2026](./circulars/mcx/#mcx-trd-456-2026) | 2026-08-07 | MCX | Modifications in contract specification of MCX iCOMDEX Bullion Index (MCX BULLDEX®) Future | commodities, derivatives |
 | [MCX/TRD/457/2026](./circulars/mcx/#mcx-trd-457-2026) | 2026-08-07 | MCX | Modifications in contract specification of MCX iCOMDEX Bullion Index (MCX BULLDEX®) Option | commodities, derivatives |
+| [NCL/CMPT/75636](./circulars/clearing-corps/#ncl-cmpt-75636) | 2026-08-07 | NSCCL | Member Interface Testing of Two-way portability across Clearing Corporations- Software as  | bcp-dr |
 | [MCX/ISD/454/2026](./circulars/mcx/#mcx-isd-454-2026) | 2026-08-06 | MCX | Amendment in the existing “Policy on Evaluation of Client Claims against the Defaulter/ Ex | grievance, client-funds |
 | [MCX/S&I/453/2026](./circulars/mcx/#mcx-s-i-453-2026) | 2026-08-06 | MCX | New Interface - MCX UCC File Formats (Version 1.1) and UCC-API (Version 1.0) | onboarding, closure, nominee, file-format |
 | [CDSL/SURV/DP/POLCY/2026/532](./circulars/cdsl/#cdsl-surv-dp-polcy-2026-532) | 2026-08-05 | CDSL | ENHANCEMENTS INTRODUCED IN THE CDAS FREEZE & UNFREEZE MODULE | surveillance, file-format, kyc-modification |
 | [CDSL/OPS/DP/POLCY/2026/527](./circulars/cdsl/#cdsl-ops-dp-polcy-2026-527) | 2026-08-04 | CDSL | NON-CHARGING OF AMC IN DEMAT ACCOUNTS CONSISTING OF ILLIQUID, SUSPENDED OR DELISTED SECURI | closure |
 | [CERSAI/CKYCRR 2.0/26-27/10959](./circulars/cersai/#cersai-ckycrr-2-0-26-27-10959) | 2026-08-04 | CERSAI | REs onboarding and performing Mock Run before final Go-live of CKYCRR 2.0 | onboarding, kyc-modification, file-format |
 | [HO/38/14/(11)2026-MIRSD-POD1/ I/18038/2026](./circulars/sebi-mirsd/#ho-38-14-11-2026-mirsd-pod1-i-18038-2026) | 2026-08-03 | SEBI-MIRSD | Extension of timeline for enrolment with PaRRVA as specified in SEBI Circular No. HO/38/14 | other |
+| [20260731-39](./circulars/bse/#20260731-39) | 2026-07-31 | BSE | Operational Guideline for Market Orders emanating from Algo on Introduction of Closing Auc | surveillance |
 | [CDSL/DP/SURV/2026/521](./circulars/cdsl/#cdsl-dp-surv-2026-521) | 2026-07-31 | CDSL | COMPREHENSIVE SURVEILLANCE FRAMEWORK FOR DEPOSITORY PARTICIPANTS (DPs) | surveillance, aml, onboarding |
 | [CDSL/OPS/DP/POLCY/2026/522](./circulars/cdsl/#cdsl-ops-dp-polcy-2026-522) | 2026-07-31 | CDSL | ENHANCEMENT IN TRANSMISSION PROCESSING | transmission, nominee, file-format |
 | [NSDL/POLICY/2026/0108](./circulars/nsdl/#nsdl-policy-2026-0108) | 2026-07-31 | NSDL | Extension of timeline for implementation of Enhancements in NSDL Depository System- UDiFF  | file-format |
+| [NSE/COMP/75511](./circulars/nse/#nse-comp-75511) | 2026-07-31 | NSE | Extension of timelines with respect to compliance of Digital Accessibility Circulars | system-audit, other |
+| [NSE/INSP/75505](./circulars/nse/#nse-insp-75505) | 2026-07-31 | NSE | <abbr title="Financial Action Task Force">FATF</abbr> Public statement on jurisdictions on call for action and increased monitoring – June  | aml, reporting |
+| [NSE/INSP/75508](./circulars/nse/#nse-insp-75508) | 2026-07-31 | NSE | Operational guidelines on Handling of Client’s Unpaid Securities by Trading Members | client-funds, margin, settlement |
 | [RBI/2026-27/222](./circulars/rbi/#rbi-2026-27-222) | 2026-07-31 | RBI | Implementation of Section 51A of UAPA, 1967: Updates to UNSC’s 1988 (2011) Taliban Sanctio | aml |
 | [HO/(411)2026-ITD-5_DIV2/I/17922/2026](./circulars/sebi-other/#ho-411-2026-itd-5-div2-i-17922-2026) | 2026-07-31 | SEBI-MRD | Extension of timelines with respect to compliance of Digital Accessibility Circulars. | system-audit, other |
 | [CDSL/OPS/DP/POLCY/2026/517](./circulars/cdsl/#cdsl-ops-dp-polcy-2026-517) | 2026-07-30 | CDSL | VERIFICATION OF MOBILE NUMBER REVOCATION LIST (MNRL) PUBLISHED BY TRAI | kyc-modification, reporting |
 | [NPCI/UPI/OC-115F/2026-27](./circulars/npci/#npci-upi-oc-115f-2026-27) | 2026-07-30 | NPCI | Addendum to OC NPCI/UPI/OC-115E/2024-25 on the Numeric UPI ID | client-funds, cyber-security |
 | [CDSL/OPS/DP/POLCY/2026/511](./circulars/cdsl/#cdsl-ops-dp-polcy-2026-511) | 2026-07-29 | CDSL | UDIFF CATALOGUE CHANGES | file-format, nominee, non-individual, kyc-modification |
 | [CERSAI/CKYCRR/2026/10921](./circulars/cersai/#cersai-ckycrr-2026-10921) | 2026-07-29 | CERSAI | CKYCRR 2.0 Go-live preparedness for REs | onboarding, kyc-modification, file-format |
+| [NCL/CMPT/75459](./circulars/clearing-corps/#ncl-cmpt-75459) | 2026-07-29 | NSCCL | Change in Collateral Timings | margin, bod-eod |
+| [20260728-42](./circulars/bse/#20260728-42) | 2026-07-28 | BSE | Introduction of Closing Auction Session in the Equity Segment – Detailed Operating Guideli | rms |
 | [CDSL/OPS/DP/POLCY/2026/509](./circulars/cdsl/#cdsl-ops-dp-polcy-2026-509) | 2026-07-28 | CDSL | OPERATIONAL GUIDELINES FOR CAPTURING DARPAN REGISTRATION ID IN DEMAT ACCOUNTS OF NON-PROFI | onboarding, non-individual, aml, kyc-modification |
+| [20260728-3](./circulars/clearing-corps/#20260728-3) | 2026-07-28 | ICCL | Additional Exposure Margin on Securities under MWPL_31072026 | margin, derivatives, rms |
 | [CDSL/OPS/DP/POLCY/2026/504](./circulars/cdsl/#cdsl-ops-dp-polcy-2026-504) | 2026-07-27 | CDSL | ENHANCEMENT IN TRANSMISSION PROCESSING BY INTRODUING <abbr title="Permanent Account Number">PAN</abbr> VALIDATIONS | transmission, nominee, file-format |
 | [NSDL/POLICY/2026/0103](./circulars/nsdl/#nsdl-policy-2026-0103) | 2026-07-27 | NSDL | SEBI Circular regarding, “Ease of Doing Investment and Ease of Doing Business – Simplifica | transmission, nominee |
 | [NSDL/POLICY/2026/0104](./circulars/nsdl/#nsdl-policy-2026-0104) | 2026-07-27 | NSDL | Suspension of demat accounts of existing clients whose KYC records are not found to be val | re-KYC, kyc-modification |
 | [CDSL/OPS/DP/POLCY/2026/500](./circulars/cdsl/#cdsl-ops-dp-polcy-2026-500) | 2026-07-24 | CDSL | SEBI CIR - SIMPLIFICATION AND STANDARDISATION OF THE FRAMEWORK FOR TRANSMISSION OF SECURIT | transmission, nominee |
+| [NCL/CMPT/75369](./circulars/clearing-corps/#ncl-cmpt-75369) | 2026-07-23 | NSCCL | NCMS - OTP based Two Factor Authentication and upgradation of NCMS version | cyber-security |
 | [NSDL/POLICY/2026/0101](./circulars/nsdl/#nsdl-policy-2026-0101) | 2026-07-23 | NSDL | SEBI Circular regarding, “Operationalisation of freezing of holdings of promoter and promo | surveillance, settlement |
 | [SEBI/LAD-<abbr title="Non-Resident Ordinary (Rupee) account">NRO</abbr>/GN/2026/314](./circulars/sebi-other/#sebi-lad-nro-gn-2026-314) | 2026-07-23 | SEBI-LAD-NRO | SECURITIES AND EXCHANGE BOARD OF INDIA (ISSUE AND LISTING OF MUNICIPAL DEBT SECURITIES) (A | other |
 | [HO/38/13/11(14)2026-MIRSD-POD/I/17111/2026](./circulars/sebi-mirsd/#ho-38-13-11-14-2026-mirsd-pod-i-17111-2026) | 2026-07-23 | SEBI-MIRSD | Ease of Doing Investment and Ease of Doing Business – Simplification and standardisation o | transmission, mutual-funds, reporting |
 | [CDSL/OPS/DP/POLCY/2026/494](./circulars/cdsl/#cdsl-ops-dp-polcy-2026-494) | 2026-07-22 | CDSL | SEBI CIR - OPERATIONALISATION OF FREEZING OF HOLDINGS OF PROMOTER AND PROMOTER GROUP INCLU | surveillance, settlement |
 | [CDSL/OPS/DP/POLCY/2026/495](./circulars/cdsl/#cdsl-ops-dp-polcy-2026-495) | 2026-07-22 | CDSL | EASE OF DOING INVESTMENTS - MODIFIED NORMS FOR NOMINATION IN DEMAT ACCOUNTS | nominee |
 | [CDSL/OPS/DP/POLCY/2026/489](./circulars/cdsl/#cdsl-ops-dp-polcy-2026-489) | 2026-07-21 | CDSL | SEBI CIR - CREATING STANDING INSTRUCTIONS FOR SWP, STP FOR MUTUAL FUND UNITS HEALD IN DEMA | mutual-funds, mandate |
+| [NCL/CMPT/75318](./circulars/clearing-corps/#ncl-cmpt-75318) | 2026-07-21 | NSCCL | Change in Collateral Timings | margin, bod-eod |
 | [NSDL/POLICY/2026/0100](./circulars/nsdl/#nsdl-policy-2026-0100) | 2026-07-21 | NSDL | SEBI Circular regarding, “Extending facility of creating standing instructions for Systema | mutual-funds, mandate |
 | [HO/49/14/13(11)2026-CFD-POD1/I/16864/2026](./circulars/sebi-other/#ho-49-14-13-11-2026-cfd-pod1-i-16864-2026) | 2026-07-21 | SEBI-CFD | Operationalisation of freezing of holdings of promoter and promoter group including their  | surveillance, settlement |
 | [HO/24/13/17(1)2026-IMD-POD-1/I/16895/2026](./circulars/sebi-other/#ho-24-13-17-1-2026-imd-pod-1-i-16895-2026) | 2026-07-21 | SEBI-IMD | Certification Requirements for Distribution of Specialized Investment Funds (SIFs) | mutual-funds |
 | [CDSL/OPS/DP/POLCY/2026/487](./circulars/cdsl/#cdsl-ops-dp-polcy-2026-487) | 2026-07-20 | CDSL | DP OPERATING INSTRUCTIONS AS OF JUNE - 2026 CHAPTERS & ANNEXURES | onboarding, closure, transmission, nominee |
+| [NCL/CMPT/75289](./circulars/clearing-corps/#ncl-cmpt-75289) | 2026-07-20 | NSCCL | Revision in member wise bank wise limits and member wise limits prescribed for acceptance  | margin |
 | [CDSL/OPS/DP/POLCY/2026/478](./circulars/cdsl/#cdsl-ops-dp-polcy-2026-478) | 2026-07-17 | CDSL | EASE OF DOING INVESTMENTS - MODIFIED NORMS FOR NOMINATION IN DEMAT ACCOUNTS | onboarding, nominee, minor-joint, file-format |
 | [CDSL/OPS/DP/POLCY/2026/481](./circulars/cdsl/#cdsl-ops-dp-polcy-2026-481) | 2026-07-17 | CDSL | VALIDATION OF KYC RECORDS WITH KRA | re-KYC, kyc-modification |
 | [CDSL/OPS/DP/SYSTM/2026/479](./circulars/cdsl/#cdsl-ops-dp-systm-2026-479) | 2026-07-17 | CDSL | RECORDING OF NON-DISPOSAL UNDERTAKING (NDU) | file-format, bod-eod, other |
+| [NSE/ISC/75249](./circulars/nse/#nse-isc-75249) | 2026-07-17 | NSE | General Operational Guidelines on Unique Client Code (UCC) | onboarding, kyc-modification, dormant |
 | [RBI/2026-27/203](./circulars/rbi/#rbi-2026-27-203) | 2026-07-17 | RBI | Special Rupee Vostro Accounts (SRVAs) | nri, settlement |
 | [HO/47/14/13(2)2026-MRD-POD2/I/16590/2026](./circulars/sebi-other/#ho-47-14-13-2-2026-mrd-pod2-i-16590-2026) | 2026-07-17 | SEBI-MRD | Extending facility of creating standing instructions for Systematic Withdrawal Plan (SWP)/ | mutual-funds, mandate, settlement |
 | [NPCI/UPI/OC No. 235/2026-27](./circulars/npci/#npci-upi-oc-no-235-2026-27) | 2026-07-16 | NPCI | Revision of Turnaround Time (TAT) for Responding to Fraud and Wrong Credit Chargebacks in  | client-funds, grievance |
+| [NSE/COMP/75240](./circulars/nse/#nse-comp-75240) | 2026-07-16 | NSE | Compliance Guidelines for Digital Accessibility Circular - ‘Rights of Persons with Disabil | system-audit, other |
 | [CDSL/OPS/DP/POLCY/2026/470](./circulars/cdsl/#cdsl-ops-dp-polcy-2026-470) | 2026-07-15 | CDSL | OPERATIONAL GUIDELINES FOR CAPTURING DARPAN REGISTRATION ID IN DEMAT ACCOUNTS OF NON-PROFI | onboarding, non-individual, aml, file-format |
 | [CDSL/OPS/DP/POLICY/2026/468](./circulars/cdsl/#cdsl-ops-dp-policy-2026-468) | 2026-07-15 | CDSL | INTRODUCTION OF LOAN AGAINST SECURITIES (LAS) MODULE IN EASIEST | other, file-format |
+| [NCL/CMPT/75211](./circulars/clearing-corps/#ncl-cmpt-75211) | 2026-07-15 | NSCCL | Maintenance and Operation of Clearing Bank Account | settlement |
+| [NSE/ISC/75191](./circulars/nse/#nse-isc-75191) | 2026-07-14 | NSE | Guidelines in pursuance of amendment to SEBI KYC (Know Your Client) Registration Agency (K | onboarding, transmission |
+| [20260713-28](./circulars/bse/#20260713-28) | 2026-07-13 | BSE | Penalty for failure to maintain minimum prescribed Networth | reporting |
+| [NCL/CMPT/75183](./circulars/clearing-corps/#ncl-cmpt-75183) | 2026-07-13 | NSCCL | Update in formats - Capital Market Segment | margin, client-funds |
+| [NSE/COMP/75164](./circulars/nse/#nse-comp-75164) | 2026-07-13 | NSE | Penalty for failure to maintain minimum prescribed Networth | reporting |
 | [NSE/INSP/75169](./circulars/nse/#nse-insp-75169) | 2026-07-13 | NSE | Clarification with respect to applicability of the benefit of early pay-in in Commodity De | commodities, margin, settlement |
 | [HO/(92)2026-IMD-POD-2/I/16006/2026](./circulars/sebi-other/#ho-92-2026-imd-pod-2-i-16006-2026) | 2026-07-10 | SEBI-IMD | Intraday borrowing facility availed by mutual funds | mutual-funds, settlement |
 | [SEBI/LAD-NRO/GN/2026/312](./circulars/sebi-other/#sebi-lad-nro-gn-2026-312) | 2026-07-10 | SEBI-LAD-NRO | SECURITIES AND EXCHANGE BOARD OF INDIA (LISTING OBLIGATIONS AND DISCLOSURE REQUIREMENTS) ( | transmission |
@@ -158,39 +188,58 @@ Circulars issued 2026-05-15 → 2026-09-11 (plus a few earlier finalisations tha
 | [CDSL/OPS/DP/POLCY/2026/449](./circulars/cdsl/#cdsl-ops-dp-polcy-2026-449) | 2026-07-06 | CDSL | SEBI CIR - HANDLING OF CLIENT’S UNPAID SECURITIES BY TRADING MEMBERS | settlement, margin, rms |
 | [CDSL/OPS/DP/POLCY/2026/450](./circulars/cdsl/#cdsl-ops-dp-polcy-2026-450) | 2026-07-06 | CDSL | NON-CHARGING OF AMC IN DEMAT ACCOUNTS CONSISTING OF ILLIQUID, SUSPENDED OR DELISTED SECURI | closure |
 | [NSDL/POLICY/2026/0097](./circulars/nsdl/#nsdl-policy-2026-0097) | 2026-07-06 | NSDL | SEBI Circular regarding “Handling of Client’s Unpaid Securities by Trading Members” | settlement, margin, rms |
+| [20260703-20](./circulars/bse/#20260703-20) | 2026-07-03 | BSE | Handling of Client’s Unpaid Securities by Trading Members | client-funds, margin, settlement |
 | [NPCI/UPI/OC-128A/2026-27](./circulars/npci/#npci-upi-oc-128a-2026-27) | 2026-07-03 | NPCI | Addendum to OC-128 Extension of additional response codes under Deemed Debit for mandate e | upi-block, mandate, settlement |
 | [NPCI/UPI/OC-226A/2026-27](./circulars/npci/#npci-upi-oc-226a-2026-27) | 2026-07-03 | NPCI | Enhancement of Transaction Limit for On-Device Biometric Authentication in UPI | client-funds |
+| [NSE/INSP/75046](./circulars/nse/#nse-insp-75046) | 2026-07-03 | NSE | Handling of Client’s Unpaid Securities by Trading Members | client-funds, margin, settlement |
 | [SEBI/LAD-NRO/GN/2026/307](./circulars/sebi-other/#sebi-lad-nro-gn-2026-307) | 2026-07-03 | SEBI-LAD-NRO | SECURITIES AND EXCHANGE BOARD OF INDIA (MUTUAL FUNDS) (AMENDMENT) REGULATIONS, 2026 | mutual-funds, settlement |
 | [SEBI/LAD-NRO/GN/2026/308](./circulars/sebi-other/#sebi-lad-nro-gn-2026-308) | 2026-07-03 | SEBI-LAD-NRO | SECURITIES AND EXCHANGE BOARD OF INDIA (CUSTODIAN) (AMENDMENT) REGULATIONS, 2026 | other |
 | [SEBI/LAD-NRO/GN/2026/310](./circulars/sebi-other/#sebi-lad-nro-gn-2026-310) | 2026-07-03 | SEBI-LAD-NRO | SECURITIES AND EXCHANGE BOARD OF INDIA (FOREIGN PORTFOLIO INVESTORS) (AMENDMENT) REGULATIO | onboarding, nri, other |
 | [HO/38/11/(9)2026-MIRSD-POD/I/15382/2026](./circulars/sebi-mirsd/#ho-38-11-9-2026-mirsd-pod-i-15382-2026) | 2026-07-03 | SEBI-MIRSD | Handling of Client’s Unpaid Securities by Trading Members | settlement, margin, rms, client-funds |
 | [CDSL/OPS/DP/POLCY/2026/438](./circulars/cdsl/#cdsl-ops-dp-polcy-2026-438) | 2026-07-01 | CDSL | VERIFICATION OF MOBILE NUMBER REVOCATION LIST (MNRL) PUBLISHED BY TRAI | kyc-modification, re-KYC, file-format |
 | [CDSL/<abbr title="Prevention of Money Laundering Act 2002">PMLA</abbr>/DP/POLCY/2026/439](./circulars/cdsl/#cdsl-pmla-dp-polcy-2026-439) | 2026-07-01 | CDSL | INTRODUCTION OF APPLICATION PROGRAMMING INTERFACE (API) FACILITY FOR MULTIPLE BENEFICIARY  | onboarding, aml, file-format |
+| [NSE/CMTR/74969](./circulars/nse/#nse-cmtr-74969) | 2026-07-01 | NSE | Modifications in the Pre-Open Call Auction framework | rms, bod-eod |
+| [NSE/FAOP/74970](./circulars/nse/#nse-faop-74970) | 2026-07-01 | NSE | Modifications in the Pre-Open Call Auction framework | derivatives, rms |
 | [SEBI/LAD-NRO/GN/2026/304](./circulars/sebi-other/#sebi-lad-nro-gn-2026-304) | 2026-07-01 | SEBI-LAD-NRO | SECURITIES AND EXCHANGE BOARD OF INDIA (ISSUE AND LISTING OF SECURITISED DEBT INSTRUMENTS  | other |
 | [SEBI/LAD-NRO/GN/2026/305](./circulars/sebi-other/#sebi-lad-nro-gn-2026-305) | 2026-07-01 | SEBI-LAD-NRO | Securities And Exchange Board of India (Issue And Listing of Municipal Debt Securities) (A | other |
 | [SEBI/LAD-NRO/GN/2026/306](./circulars/sebi-other/#sebi-lad-nro-gn-2026-306) | 2026-07-01 | SEBI-LAD-NRO | SECURITIES AND EXCHANGE BOARD OF INDIA (BUY-BACK OF SECURITIES) (AMENDMENT) REGULATIONS, 2 | settlement, surveillance, other |
 | [CDSL/OPS/DP/POLCY/2026/433](./circulars/cdsl/#cdsl-ops-dp-polcy-2026-433) | 2026-06-30 | CDSL | FACILITY FOR BASIC SERVICES DEMAT ACCOUNT (BSDA) | onboarding, kyc-modification, file-format, nri |
 | [CDSL/OPS/DP/POLCY/2026/434](./circulars/cdsl/#cdsl-ops-dp-polcy-2026-434) | 2026-06-30 | CDSL | DISCONTINUATION OF MONTHLY STAMP DUTY UTILIZATION REPORT | reporting, file-format, bod-eod |
 | [NSDL/POLICY/2026/0095](./circulars/nsdl/#nsdl-policy-2026-0095) | 2026-06-30 | NSDL | Amendments to NSDL Business Rules regarding Transaction in Government Securities and form  | settlement, file-format |
+| [NSE/SURV/74956](./circulars/nse/#nse-surv-74956) | 2026-06-30 | NSE | Same Group Trade Cancellation Mechanism (SGTCM) in Equity & Equity Derivatives Segments | surveillance, file-format |
 | [NSDL/POLICY/2026/0094](./circulars/nsdl/#nsdl-policy-2026-0094) | 2026-06-29 | NSDL | Amendment to Business Rule of NSDL - Annexure K (Rights and Obligations of the Beneficial  | onboarding, minor-joint, surveillance |
-| [<abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr>/CMPT/74898](./circulars/clearing-corps/#ncl-cmpt-74898) | 2026-06-25 | NSCCL | Risk Management for Closing Auction Session (<abbr title="Consolidated Account Statement">CAS</abbr>) in the Equity Cash Segment | margin, rms |
+| [NCL/CMPT/74885](./circulars/clearing-corps/#ncl-cmpt-74885) | 2026-06-25 | NSCCL | Change in timings for Early pay-in and Collateral allocation | settlement, client-funds, bod-eod |
+| [NCL/CMPT/74898](./circulars/clearing-corps/#ncl-cmpt-74898) | 2026-06-25 | NSCCL | Risk Management for Closing Auction Session (<abbr title="Consolidated Account Statement">CAS</abbr>) in the Equity Cash Segment | margin, rms |
 | [NSDL/POLICY/2026/0093](./circulars/nsdl/#nsdl-policy-2026-0093) | 2026-06-25 | NSDL | Suspension of demat accounts of existing clients whose KYC records are not found to be val | re-KYC, kyc-modification |
 | [NSDL/POLICY/DDP/2026/0009](./circulars/nsdl/#nsdl-policy-ddp-2026-0009) | 2026-06-24 | NSDL | Gazette Notification – Common Application Form (CAF) and Annexure for Foreign Portfolio In | onboarding, non-individual |
 | [RBI/2026-27/174](./circulars/rbi/#rbi-2026-27-174) | 2026-06-24 | RBI | Modification of Returns / Reporting requirements under FEMA, 1999 | nri, reporting |
 | [RBI/2026-27/175](./circulars/rbi/#rbi-2026-27-175) | 2026-06-24 | RBI | Review of Circulars issued under Foreign Exchange Management Act, 1999 (FEMA) | nri, reporting |
 | [HO/38/12/11(5)2026-MIRSD-POD/I/14660/2026](./circulars/sebi-mirsd/#ho-38-12-11-5-2026-mirsd-pod-i-14660-2026) | 2026-06-24 | SEBI-MIRSD | Ease of Doing Business – Relaxation in certification requirement for Persons Associated wi | other |
+| [20260623-29](./circulars/bse/#20260623-29) | 2026-06-23 | BSE | Clarification to Rule 8(1)(f) and 8(3)(f) of Securities Contracts (Regulation) Rules, 1957 | other |
+| [20260623-37](./circulars/clearing-corps/#20260623-37) | 2026-06-23 | ICCL | Availability of BSECL Trade API Plus – Enhanced Real-Time Trade Data Service | other |
+| [NCL/CMPL/74821](./circulars/clearing-corps/#ncl-cmpl-74821) | 2026-06-23 | NSCCL | Digital representation of penalty review requests – New category introduced | margin, reporting |
+| [NSE/INSP/74836](./circulars/nse/#nse-insp-74836) | 2026-06-23 | NSE | Clarification to Rule 8(1)(f) and 8(3)(f) of Securities Contracts (Regulation) Rules, 1957 | other |
 | [NSE/CMTR/74792](./circulars/nse/#nse-cmtr-74792) | 2026-06-19 | NSE | Mock trading on Saturday, June 20, 2026 – Testing of Trading modalities related to Introdu | bcp-dr, rms |
 | [NSE/FAOP/74791](./circulars/nse/#nse-faop-74791) | 2026-06-19 | NSE | Mock trading on Saturday, June 20, 2026 – Testing of Trading modalities related to Introdu | bcp-dr, derivatives, rms |
 | [HO/47/16/13(4)2026-MRD-POD1/I/14266/2026](./circulars/sebi-other/#ho-47-16-13-4-2026-mrd-pod1-i-14266-2026) | 2026-06-19 | SEBI-MRD | Clarification with respect to applicability of the benefit of early pay-in in Commodity De | commodities, margin, settlement |
 | [CDSL/OPS/DP/POLCY/2026/414](./circulars/cdsl/#cdsl-ops-dp-polcy-2026-414) | 2026-06-18 | CDSL | VALIDATION OF KYC RECORDS WITH KRA | re-KYC, kyc-modification |
+| [NSE/FAOP/74758](./circulars/nse/#nse-faop-74758) | 2026-06-18 | NSE | Revision in Scheme of Strikes in Stock Options | derivatives, file-format |
 | [CDSL/AUDIT/DP/POLCY/2026/409](./circulars/cdsl/#cdsl-audit-dp-polcy-2026-409) | 2026-06-17 | CDSL | CONVERSION OF DEMAT ACCOUNT TO BSDA IN EACH QUARTER | onboarding, kyc-modification |
+| [20260617-11](./circulars/clearing-corps/#20260617-11) | 2026-06-17 | ICCL | Ease of Doing Compliance- Submission of Action Taken Report for non-compliance(s) reported | reporting |
+| [20260617-36](./circulars/clearing-corps/#20260617-36) | 2026-06-17 | ICCL | Provision of Facility for Monitoring Intraday Uncrystallised Mark-to-Market (<abbr title="Mark-to-Market">MTM</abbr>) Losses f | rms, derivatives |
+| [NSE/COMP/74753](./circulars/nse/#nse-comp-74753) | 2026-06-17 | NSE | Integration and utilization of Department of Telecommunications' (DoT) Digital Intelligenc | cyber-security |
 | [CCA-IOG](./circulars/meity/#cca-iog) | 2026-06-16 | MeitY | Interoperability Guidelines for Digital Signature Certificates issued under Information Te | esign, cyber-security |
 | [NSDL/POLICY/2026/0090](./circulars/nsdl/#nsdl-policy-2026-0090) | 2026-06-16 | NSDL | Guidelines on Mobile Number Revocation List (MNRL) and Reactivation List provided by DoT | re-KYC, kyc-modification, reporting |
 | [RBI/2026-27/114](./circulars/rbi/#rbi-2026-27-114) | 2026-06-15 | RBI | Liberalisation of Foreign Portfolio Investment under Schedule <abbr title="—">III</abbr> of the Foreign Exchange  | nri |
 | [HO/47/11/11(1)2026-MRD-POD3/I/13804/2026](./circulars/sebi-other/#ho-47-11-11-1-2026-mrd-pod3-i-13804-2026) | 2026-06-15 | SEBI-MRD | Norms for Base Price, Price Bands, Call Auction in pre-open session and Close-out procedur | mutual-funds, commodities, rms, settlement |
+| [20260612-26](./circulars/bse/#20260612-26) | 2026-06-12 | BSE | Guidelines in pursuance of amendment to SEBI KYC (Know Your Client) Registration Agency (K | onboarding, transmission |
+| [20260612-6](./circulars/bse/#20260612-6) | 2026-06-12 | BSE | Integration and utilization of Department of Telecommunications' (DoT) Digital Intelligenc | cyber-security |
+| [20260612-9](./circulars/bse/#20260612-9) | 2026-06-12 | BSE | Introduction of Closing Auction Session in the Equity Segment – Changes in trading timings | derivatives, rms |
+| [NSE/ISC/74672](./circulars/nse/#nse-isc-74672) | 2026-06-12 | NSE | Guidelines in pursuance of amendment to SEBI KYC (Know Your Client) Registration Agency (K | onboarding, transmission |
 | [NSDL/POLICY/2026/0007](./circulars/nsdl/#nsdl-policy-2026-0007) | 2026-06-08 | NSDL | Enhancements in the NSDL SPEED‑e Application for Password-based users. | onboarding, settlement, mutual-funds |
 | [CKYC/NOTIF/2026/01](./circulars/cersai/#ckyc-notif-2026-01) | 2026-06-05 | CERSAI | CKYCRR 2.0 API integration & Reporting entity onboarding guide | onboarding, kyc-modification, file-format |
 | [NPCI/UPI/OC-234/2026-27](./circulars/npci/#npci-upi-oc-234-2026-27) | 2026-06-05 | NPCI | Safeguarding User Information in UPI | cyber-security, client-funds |
+| [NCL/CMPT/74569](./circulars/clearing-corps/#ncl-cmpt-74569) | 2026-06-05 | NSCCL | Changes in Extreme Loss Margin file | margin, file-format, derivatives |
 | [RBI/2026-27/97](./circulars/rbi/#rbi-2026-27-97) | 2026-06-05 | RBI | Investments by Foreign Portfolio Investors in Government Securities – Amendments to the re | nri, settlement |
 | [NSDL/POLICY/2026/0088](./circulars/nsdl/#nsdl-policy-2026-0088) | 2026-06-04 | NSDL | Guidelines on updation of Sub-Types for Charitable Institution which is Non-Profit Organiz | onboarding, non-individual, aml, file-format |
 | [NSDL/POLICY/DDP/2026/0008](./circulars/nsdl/#nsdl-policy-ddp-2026-0008) | 2026-06-04 | NSDL | SEBI Circular on Single Window Automatic and Generalised Access for Trusted Foreign Invest | onboarding, non-individual |
@@ -201,20 +250,43 @@ Circulars issued 2026-05-15 → 2026-09-11 (plus a few earlier finalisations tha
 | [CDSL/OPS/DP/SETTL/2026/366](./circulars/cdsl/#cdsl-ops-dp-settl-2026-366) | 2026-06-02 | CDSL | FACILITY FOR CANCELLATIONS OF OVERDUE EARLY PAY-IN (EP) TRANSACTIONS | settlement, file-format |
 | [CDSL/OPS/DP/SETTL/2026/367](./circulars/cdsl/#cdsl-ops-dp-settl-2026-367) | 2026-06-02 | CDSL | ENHANCEMENTS IN PROCESSING OF PAYIN TRANSACTIONS | settlement, file-format, margin |
 | [CDSL/OPS/DP/POLCY/2026/362](./circulars/cdsl/#cdsl-ops-dp-polcy-2026-362) | 2026-06-01 | CDSL | SEBI CIR - MODIFIED NORMS FOR NOMINATION IN DEMAT ACCOUNTS AND MUTUAL FUND FOLIOS | onboarding, nominee, minor-joint |
+| [20260529-1](./circulars/bse/#20260529-1) | 2026-05-29 | BSE | Payment of SEBI Turnover Fees across segments including applicable GST. | settlement, reporting |
+| [20260529-13](./circulars/bse/#20260529-13) | 2026-05-29 | BSE | Enhancements in Trading System APIs in Equity, Equity Derivatives, Currency Derivatives, C | file-format |
+| [NSE/CMTR/74466](./circulars/nse/#nse-cmtr-74466) | 2026-05-29 | NSE | Introduction of Closing Auction Session (CAS) in the Equity Cash segment - Trading Modalit | rms, bod-eod |
+| [NSE/FAOP/74467](./circulars/nse/#nse-faop-74467) | 2026-05-29 | NSE | Introduction of Closing Auction Session (CAS) in the Equity Cash segment - Change in tradi | derivatives, rms, file-format |
 | [SEBI/HO/OIAE/OIAE_IAD-3/P/CIR/2026/12676](./circulars/sebi-other/#sebi-ho-oiae-oiae-iad-3-p-cir-2026-12676) | 2026-05-29 | SEBI-OIAE | Ease of doing investments - Modified Norms for Nomination in Demat Accounts and Mutual Fun | nominee, onboarding, mutual-funds, minor-joint, esign |
 | [CDSL/OPS/DP/POLCY/2026/354](./circulars/cdsl/#cdsl-ops-dp-polcy-2026-354) | 2026-05-27 | CDSL | AMENDMENTS TO DP OPERATING INSTRUCTIONS CHAPTER - 10 | closure |
+| [NSE/COMP/74433](./circulars/nse/#nse-comp-74433) | 2026-05-27 | NSE | Reminder for Submission of Half Yearly Networth Certificate as on March 31, 2026 | reporting |
+| [NSE/COMP/74381](./circulars/nse/#nse-comp-74381) | 2026-05-25 | NSE | Revised List of Specified stockbrokers for the Framework on Technical Glitches | bcp-dr |
 | [NSDL/POLICY/2026/0082](./circulars/nsdl/#nsdl-policy-2026-0082) | 2026-05-22 | NSDL | Suspension of demat accounts of existing clients whose KYC records are not found to be val | re-KYC, kyc-modification |
 | [NSDL/POLICY/2026/0083](./circulars/nsdl/#nsdl-policy-2026-0083) | 2026-05-22 | NSDL | Directions issued by TRAI for Mandatory Phase-wise Adoption of 1600-Series Numbers | other |
+| [NSE/INSP/74370](./circulars/nse/#nse-insp-74370) | 2026-05-22 | NSE | Reminder for Submission of Risk Based Supervision Data for the period April 01, 2025 – Mar | reporting |
 | [RBI/2026-27/93](./circulars/rbi/#rbi-2026-27-93) | 2026-05-22 | RBI | Implementation of Section 51A of UAPA, 1967: Updates to UNSC’s 1267/ 1989 ISIL (Da'esh) &  | aml |
+| [20260520-33](./circulars/bse/#20260520-33) | 2026-05-20 | BSE | Discontinuation of old version of Online Trade download (OTD) for Trading Members | file-format |
+| [NSE/INSP/74326](./circulars/nse/#nse-insp-74326) | 2026-05-20 | NSE | Clarification on Waiver requests with respect to Penalty on Modification of Client Codes ( | surveillance, reporting |
+| [NCL/CMPT/74286](./circulars/clearing-corps/#ncl-cmpt-74286) | 2026-05-19 | NSCCL | Additional Exposure Margin on Securities under <abbr title="Market Wide Position Limit">MWPL</abbr> | margin, derivatives, rms |
 | [NSE/COMP/74300](./circulars/nse/#nse-comp-74300) | 2026-05-19 | NSE | Mandatory Insurance Cover for FY 2026-27 | reporting, other |
+| [NSE/INSP/74287](./circulars/nse/#nse-insp-74287) | 2026-05-19 | NSE | Reminder for submission of Internal Audit Report for the half year ended March 31, 2026 | reporting |
 | [HO/24/11/24(62)2026-IMD-RAC4/I/11872/2026](./circulars/sebi-other/#ho-24-11-24-62-2026-imd-rac4-i-11872-2026) | 2026-05-19 | SEBI-IMD | Revision of Monthly Cumulative Report (MCR) Format | mutual-funds, reporting, file-format |
+| [NCL/CMPL/74279](./circulars/clearing-corps/#ncl-cmpl-74279) | 2026-05-18 | NSCCL | System Audit of Professional Clearing Members (PCM) | system-audit, reporting |
 | [NPCI / 2026-27 / <abbr title="National Automated Clearing House">NACH</abbr> / 002](./circulars/npci/#npci-2026-27-nach-002) | 2026-05-15 | NPCI | Introduction of ACH Debit settlement on realization under NACH | mandate, settlement, client-funds |
 | [NSDL/POLICY/2026/0077](./circulars/nsdl/#nsdl-policy-2026-0077) | 2026-05-15 | NSDL | Intimation of Speed-e deadline time for Electronic Gold Receipt NSE | settlement, commodities |
 | [HO/43/15/12(3)2025-ISD-POD2/I/11734/2026](./circulars/sebi-other/#ho-43-15-12-3-2025-isd-pod2-i-11734-2026) | 2026-05-15 | SEBI-MRD | Master Circular on Surveillance of Securities Market | surveillance, reporting |
 | [HO/38/44/12(3)2025-MIRSD-TPD1/I/10705/2026](./circulars/sebi-mirsd/#ho-38-44-12-3-2025-mirsd-tpd1-i-10705-2026) | 2026-05-07 | SEBI-MIRSD | Discontinuation of Investor Risk Reduction Access (<abbr title="Investor Risk Reduction Access">IRRA</abbr>) platform | bcp-dr, rms, other |
+| [NCL/CMPT/73864](./circulars/clearing-corps/#ncl-cmpt-73864) | 2026-04-23 | NSCCL | Adjustment of Futures & Options Contracts and Physical Settlement in Vedanta Limited (VEDL | derivatives, settlement |
 | [NSE/CMTR/73362](./circulars/nse/#nse-cmtr-73362) | 2026-03-18 | NSE | Operational guidelines and Standard Operating Procedure (SOP) on Introduction of Closing A | derivatives, rms, surveillance |
 | [HO/38/11/(5)2026-MIRSD-POD/I/5130/2026](./circulars/sebi-mirsd/#ho-38-11-5-2026-mirsd-pod-i-5130-2026) | 2026-02-17 | SEBI-MIRSD | Forms for registration of stock brokers and clearing members | other |
+| [HO/47/15/11(2)2025-MRD-TPD1/ I/4226/2026](./circulars/sebi-other/#ho-47-15-11-2-2025-mrd-tpd1-i-4226-2026) | 2026-02-05 | SEBI-MRD | Calendar Spread margin benefit for Single Stock Derivatives on expiry day | derivatives, margin |
 | [HO/47/11/11(3)2025-MRD-POD2/I/2765/2026](./circulars/sebi-other/#ho-47-11-11-3-2025-mrd-pod2-i-2765-2026) | 2026-01-16 | SEBI-MRD | Introduction of Closing Auction Session (CAS) in the Equity Cash Segment and certain modif | settlement, derivatives, surveillance, rms |
+| [SEBI/HO/MRD/TPD/CIR/P/2025/ 122](./circulars/sebi-other/#sebi-ho-mrd-tpd-cir-p-2025-122) | 2025-09-01 | SEBI-MRD | Framework for Intraday Position Limits Monitoring for Equity Index Derivatives | derivatives, rms, surveillance |
+| [NSE/INSP/68487](./circulars/nse/#nse-insp-68487) | 2025-06-11 | NSE | Issuance of Daily Margin Statement | margin, reporting, client-funds |
+| [SEBI/HO/MRD/TPD-1/P/CIR/2025/79](./circulars/sebi-other/#sebi-ho-mrd-tpd-1-p-cir-2025-79) | 2025-05-29 | SEBI-MRD | Measures for Enhancing Trading Convenience and Strengthening Risk Monitoring in Equity Der | derivatives, rms, surveillance |
+| [SEBI/HO/MRD/MRD-TPD-1/P/CIR/2025/76](./circulars/sebi-other/#sebi-ho-mrd-mrd-tpd-1-p-cir-2025-76) | 2025-05-26 | SEBI-MRD | Final Settlement Day (Expiry Day) for Equity Derivatives Contracts | derivatives, settlement |
+| [SEBI/HO/MRD/TPD-1/P/CIR/2025/41](./circulars/sebi-other/#sebi-ho-mrd-tpd-1-p-cir-2025-41) | 2025-03-28 | SEBI-MRD | Intraday Monitoring of Position Limits for Index Derivatives | derivatives, rms, surveillance |
+| [NCL/CMPT/66371](./circulars/clearing-corps/#ncl-cmpt-66371) | 2025-01-29 | NSCCL | Revised list of Cross Margin Eligible Exchange Traded Funds (ETFs) | margin |
+| [NCL/CMPT/65890](./circulars/clearing-corps/#ncl-cmpt-65890) | 2024-12-31 | NSCCL | Adjustment in Cross margin weightages on account of demerger in ITC Limited (ITC) | margin, derivatives |
+| [SEBI/HO/MRD/MRD-PoD-2/P/CIR/2024/140](./circulars/sebi-other/#sebi-ho-mrd-mrd-pod-2-p-cir-2024-140) | 2024-10-15 | SEBI-MRD | Monitoring of position limits for equity derivative segment | derivatives, rms, surveillance |
+| [NCL/CMPT/43262](./circulars/clearing-corps/#ncl-cmpt-43262) | 2020-01-17 | NSCCL | Delivery margins for Delivery Settlement in Equity Derivatives | margin, derivatives, settlement, reporting |
 
 ### Supersessions introduced by this sweep
 
@@ -230,6 +302,13 @@ Circulars issued 2026-05-15 → 2026-09-11 (plus a few earlier finalisations tha
 - **bse:** Failed document URLs: https://www.bseindia.com/markets/MarketInfo/DispNewNoticesCirculars.aspx?page=20260612-9 ; https://www.bseindia.com/markets/MarketInfo/DispNewNoticesCirculars.aspx?page=20260728-42 ; https://www.bseindia.com/markets/MarketInfo/DispNewNoticesCirculars.aspx?page=20260731-39 . The PDF alternative https://www.bseindia.com/downloads/UploadDocs/Notices/20260612-9/20260612-9.pdf returned 403.
 - **bse:** Wayback https://web.archive.org/web/*/https://www.bseindia.com/markets/MarketInfo/DispNewNoticesCirculars.aspx?page=20260612-9 failed to provide a usable snapshot. No archive URL is claimed as verified.
 - **bse:** All requested BSE focus areas and the earlier-finalisation exception still require full issuer-document research. No circular blocks were fabricated from search summaries.
+- **bse:** 2026-09-12 run: 11 BSE entries added for 2026-05-15 to 2026-09-11. The SUMMARY block and the BLOCKED/zero-count notes above predate this run; their counts were not updated.
+- **bse:** Access in this run: https://www.bseindia.com/markets/MarketInfo/NoticesCirculars.aspx returned HTTP 200 but is an Angular shell with no notice rows. DispNewNoticesCirculars.aspx?page=<id> returned a 4 KB page with empty fields. Notice PDFs at https://www.bseindia.com/downloads/UploadDocs/Notices/<id>/<id>.pdf returned HTTP 200, resolving the earlier 403 for every primary_url above. The RSS feed https://www.bseindia.com/data/xml/notices.xml carries only the latest 50 notices.
+- **bse:** Enumeration method: probed notice numbers 1–60 on 18 targeted dates: May 19, 20 and 29; June 12, 17, 23 and 25; July 1, 3, 13, 16, 28 and 31; August 7 and 11; September 3, 4 and 11. Parallel probing triggered 403 responses (747 of 1,080 first-pass requests), which were retried sequentially. Dates from July 31 onward were still being retried when entries were written, so coverage there is partial.
+- **bse:** Earlier CAS candidates 20260612-9, 20260728-42 and 20260731-39 are now document-verified and entered. The pre-window SOP 20260319-21 was not fetched.
+- **bse:** Fetched but not entered: 20260612-24 and 20260612-25 (DIP notices addressed to research analysts and investment advisers; same content as 20260612-6); 20260716-11 (UAPA list update); 20260716-15 (BOLT Pro TWS release); 20260617-33 and 20260625-30/31/32 (market data and trading API releases); and 20260612-29 (StAR MF nomination norms). Mock-trading, surveillance-list, listing and StAR MF scheme notices were also skipped.
+- **bse:** Notice numbers labelled Department "ICCL" or "BSECL" belong to BSE Clearing Limited and share BSE's numbering. They are recorded in clearing-corps.md under issuer ICCL.
+- **bse:** 20260728-42 cites "no. 0260119-17" (a digit missing) for the January 19, 2026 CAS notice. The in_force_date is unresolved for 20260612-6, 20260623-29, 20260703-20, 20260728-42 and 20260731-39, as none states a commencement date. 20260623-29 is tagged `other` (SCRR Rule 8 business restriction).
 - **cdsl:** Listing coverage: fetched https://www.cdslindia.com/eservices/Publications/Communique (page says updated September 11, 2026; full HTML listing) and https://www.cdslindia.com/Publications/DP-COMMUNIQUES-INDEX.aspx (227-page PDF). Reviewed DP2026-326 through DP2026-626 for the window; last visible issuance is September 10. No September 11 DP issuance was visible. Listing snapshot rows are retained in evidence/cdsl-window-listing.json.
 - **cdsl:** The supplied Publications/Communiques.aspx and DP/DPCommunique.aspx seeds returned HTTP 200 error documents, not circular listings. Wayback wildcard URLs were attempted but the web reader rejected them. Working replacement listing and download endpoints were found; no included circular needs a dead-link archive.
 - **cdsl:** Tag exceptions: other covers LAS pledge processing (468), non-disposal undertakings (479), @valid fee-collection identifiers (543), and demat/remat processing-delay capture (567), because the closed vocabulary has no exact tag for these subjects.
@@ -254,15 +333,31 @@ Circulars issued 2026-05-15 → 2026-09-11 (plus a few earlier finalisations tha
 - **clearing-corps:** NCL is represented as issuer NSCCL because working/SCHEMA.md has that closed issuer value; exact NCL/... identifiers are preserved. MCX-hosted clearing PDFs carry both MCX forwarding IDs and MCXCCL issuing IDs; only the MCXCCL issuing ID is indexed, avoiding double-counting.
 - **clearing-corps:** NCL seed https://www.nseindia.com/clearing-and-settlement-circulars failed. https://www.nseclearing.in/circulars failed; https://www.archive.nseclearing.in/circulars returned no usable rows. Search documentation indicates Custom date filtering and department filters, but complete date-filtered enumeration was not recovered.
 - **clearing-corps:** ICCL https://www.icclindia.com/ and https://www.icclindia.com/Static/Downloads/Circulars.aspx failed. Search identified a possible rename/domain-change notice 20260618-29 (June 18) to https://www.bseclearing.com/; both the proposed new homepage and the BSE notice URL failed. Wayback attempts for the old and new homepages failed. The rename is a lead pending primary-document verification, not an indexed conclusion.
-- **clearing-corps:** ICCL search also identified a June 17, 2026 intraday uncrystallised <abbr title="Mark-to-Market">MTM</abbr> monitoring notice. Its ID and source remain unverified. Do not confuse ICCL/BSE Clearing with CCIL, which is a different clearing corporation.
+- **clearing-corps:** ICCL search also identified a June 17, 2026 intraday uncrystallised MTM monitoring notice. Its ID and source remain unverified. Do not confuse ICCL/BSE Clearing with CCIL, which is a different clearing corporation.
 - **clearing-corps:** MCXCCL listing https://www.mcxccl.com/all-circulars was fetched; a page=2 attempt failed. The MCX combined listing exposed clearing PDFs, used here as issuer-document hosts. Complete earlier-window pagination and monthly supersession chains remain unresolved.
 - **clearing-corps:** MCXCCL/RISK/193/2026, /196/2026, /197/2026 and /191/2026 apply in October; /194/2026 applies September 15. These dates fall after the research cutoff, so the schema needs a scheduled status or an explicit consolidation policy. Their status fields are unresolved.
 - **clearing-corps:** MCXCCL/RISK/193/2026 cites MCXCCL/RISK/049/2025 as dated March 6, 2026; the apparent year mismatch is in the PDF and has not been silently corrected. Earlier /170/2026, /174/2026, /173/2026 and /169/2026, referenced respectively by /197, /196, /194 and /191, require fetching to complete the August-to-October chains.
 - **clearing-corps:** MCXCCL/C&S/190/2026 announces Canara Bank eFDR acceptance but no explicit effective date. Direct payout, UNPAIDMTF, collateral reporting, <abbr title="Securities Lending and Borrowing Mechanism">SLBM</abbr> and settlement calendars remain incompletely covered across all three clearing corporations.
+- **clearing-corps:** 2026-09-12 run: NCL backfills NCL/CMPT/43262, 65890, 66371 and 73864 are prefixed "Backfill:". Sixteen NCL window entries were added (2026-05-15 to 2026-09-11). The SUMMARY block at the top of this file predates this run, and its counts were not updated.
+- **clearing-corps:** Transport verification for this run: every NCL primary_url above returned HTTP 200 via curl (application/pdf or zip) from nsearchives.nseindia.com on 2026-09-12. This resolves the earlier 403/timeout concern for these URLs only.
+- **clearing-corps:** NCL window enumeration source: https://www.nseindia.com/api/circulars?fromDate=15-05-2026&toDate=11-09-2026 returned HTTP 200 (2,450 rows) without a cookie handshake. NCL rows: CMPT 181, COM 37, EGR 20, CD 19, DS 11, CMPL 8, MFSS 6, LEGAL 1. Routine items were deliberately not indexed: early pay-in per scrip, MWPL/limit revisions, approved securities and banks lists, buyback calendars, monthly settlement schedules and CD/COM/DS duplicates of CMPT circulars.
+- **clearing-corps:** Fetched but not entered: NCL/CMPT/75188 (F&O counterpart of the 75183 format update) and NCL/CMPT/74670 (NCMS EXE decommissioning extended to December 14, 2026; only other would fit). Commodity-segment NCL/COM/74231 (VSR for commodity options) and NCL/COM/75034 (bullion collateral) were also fetched but not entered.
+- **clearing-corps:** ID spacing: several NCL headers print a space after the department (e.g. "NCL/CMPL/ 74279", "NCL/CMPT/ 74885", "NCL/CMPL/ 76318"). Entries use the space-less form the issuer API returns (circDisplayNo).
+- **clearing-corps:** NCL/CMPT/74569 prints Circular Ref. No 070/2025 although dated June 5, 2026. The download ref is the key; the year in the circular ref looks like an issuer typo.
+- **clearing-corps:** NCL/CMPT/43262 and NCL/CMPT/66371 status unresolved. Later consolidated circulars (43079 → 55097 chain) and periodic ETF list revisions likely replaced them, but no superseding document was fetched.
+- **clearing-corps:** NCL/CMPT/76210 takes effect 2026-09-15, after the cutoff; status left unresolved following this file's convention.
+- **clearing-corps:** 2026-09-12 run, ICCL (BSE Clearing Limited, formerly Indian Clearing Corporation Ltd): five entries added under issuer ICCL, keyed by BSE-style notice numbers, whose Department field reads "ICCL" or "BSECL".
+- **clearing-corps:** ICCL listing https://www.icclindia.com/DynamicPages/NoticesCirculars.aspx returned HTTP 200 but shows only the latest 12 notices. ASP.NET postbacks (Next Page, Day, Period, Notice No; several date formats) all returned that same first page. Enumeration therefore used BSE notice-PDF probing (see bse.md OPEN_QUESTIONS).
+- **clearing-corps:** The icclindia.com PDF path served 20260909-1 (HTTP 200) but 302-redirected other notice numbers (20260612-9, 20260703-29/30/31).
+- **clearing-corps:** Not entered because the notice body is an image with no extractable text (<abbr title="Optical Character Recognition.">OCR</abbr> not attempted): 20260623-1, BSECL's early pay-in clarification for commodity derivatives (the underlying SEBI circular HO/47/16/13(4)2026-MRD-POD1/I/14266/2026 is already in sebi-other.md), and 20260713-1, "Go-Live of Pledge Release API between BSE Clearing Limited (BSECL) and Depositories".
+- **clearing-corps:** Routine ICCL notices not entered: demat auctions, monthly trading and settlement programmes, SLB corporate actions and MWPL lists, takeover acquisition-window settlement schedules, and 20260728-1 (BCX tender period margin tracker).
+- **clearing-corps:** 20260728-3 is a monthly renewed list (effective until the August 2026 expiry), and 20260909-1 takes effect October 1, 2026; status is unresolved for both. 20260623-37 (Trade API Plus) is tagged `other` because the vocabulary has no tag for trade-data dissemination services.
 - **fiu:** Zero entries admitted, not a certification that no circular was issued. Fetched https://fiuindia.gov.in/ , https://fiuindia.gov.in/files/Downloads/Downloads.html , https://fiuindia.gov.in/files/AML_Legislation/notification.html and https://fiuindia.gov.in/files/misc/archive.html . Reviewed the 2026 archive sections and targeted searches for 2026 reporting changes.
 - **fiu:** The archive shows non-compliant NBFC lists as of June 30 and August 17, 2026, not new broker <abbr title="Suspicious Transaction Report">STR</abbr>/<abbr title="Cash Transaction Report">CTR</abbr>/<abbr title="Non-Profit Organization Transaction Report">NTR</abbr> reporting-format circulars. These lists are not UNSC sanctions lists and were not recast as broker sanctions notices.
 - **fiu:** The downloads listing continues to show the January 8, 2026 VDA <abbr title="Anti-Money Laundering">AML</abbr>/<abbr title="Combating the Financing of Terrorism">CFT</abbr> guidelines, which are already indexed. That existing circular and the April 2026 MoU were not duplicated; no qualifying earlier finalisation was found.
 - **fiu:** No new publicly retrievable broker STR/CTR/NTR schema or FINnet filing-format circular was verified in the requested window. Authenticated FINGate communications and member-specific notices remain outside the accessible public coverage. Do not infer a new 2026 issuance date from an undated download or current-page timestamp.
+- **fiu:** 2026-09-12 re-check for the window 2026-05-15 to 2026-09-11: no <abbr title="Financial Intelligence Unit — India">FIU-IND</abbr> entries were verified, so zero is a result, not an access failure. Pages fetched, all HTTP 200: https://fiuindia.gov.in/ , files/misc/archive.html (What's New archive), files/misc/UNsanctionList.html, files/misc/IndividualList.html, files/misc/DPKRsanctionList.html, files/misc/IRANsanctionList.html, files/misc/finnet2.html (FINnet 2.0 resources), and files/Compliance_Orders/orders.html.
+- **fiu:** The only in-window archive items are pdfs/downloads/NonCompliantNBFC30062026.pdf and NonCompliantNBFC17082026.pdf, lists of NBFCs not registered on FINnet 2.0. They are not reporting-format or obligation circulars for brokers. The UAPA Section 51A update page shows its latest notifications dated February 21 and March 12, 2025, and the compliance-orders page lists only 2025 orders. No REIL or reporting-format page showed a 2026 change.
 - **mcx:** PARTIAL / NOT READY FOR VERIFIED-INDEX INGESTION. Eighteen documents were read through successful web PDF fetches. Independent direct GETs returned 403; HTTP 200 was not established. See exchange-http-verification.json. These are source-read research entries pending transport verification.
 - **mcx:** The seed https://www.mcxindia.com/market-operations/circulars is a not-found page. Its Circulars navigation leads to https://www.mcxindia.com/circulars/all-circulars, which provides department tabs, date controls and client-side pagination. The fetched page exposed predominantly August–September rows. The attempted fromDate/toDate/page query failed; full May 15–September 11 enumeration remains incomplete.
 - **mcx:** The classic issuer page https://classic.mcxindia.com/products/index exposed a June 12 KRA-validation circular, May 28 June contract-launch calendar, and May 21 Silver Micro February 2027 launch. Clicking each circular link failed, so none was converted into a circular block.
@@ -307,6 +402,17 @@ Circulars issued 2026-05-15 → 2026-09-11 (plus a few earlier finalisations tha
 - **nse:** Additional candidate NSE/FAOP/75958 (individual-stock F&O introductions) was discovered through search, but https://nsearchives.nseindia.com/content/circulars/FAOP75958.pdf failed to fetch. Search also identified mock supersession NSE/CMTR/75366 → NSE/CMTR/75401; neither document was verified and both remain to be acquired.
 - **nse:** NSE/INSP/75169 takes effect 2026-09-21, after the cutoff. The schema has no scheduled/not-yet-effective status; status is unresolved rather than in-force. Insurance circular NSE/COMP/74300 gives deadlines but no unambiguous commencement date. Its other tag covers compulsory professional indemnity insurance, absent from the closed vocabulary.
 - **nse:** Finalisation searches for KYC centralisation, 2026 Stock Brokers Regulations operations and <abbr title="Trade-date Plus N settlement">T+0</abbr> expansion did not establish an additional eligible issuer document. This is an unresolved search gap, not evidence that no final circular exists. IRRA/kill-switch, colocation, surveillance, peak-margin, direct-payout and UNPAIDMTF coverage also remains incomplete.
+- **nse:** 2026-09-12 run: NSE/INSP/68487 was added as a backfill (Summary prefixed "Backfill:"), plus 28 NSE window entries (2026-05-15 to 2026-09-11). The SUMMARY block at the top of this file predates this run, and its counts were not updated.
+- **nse:** Transport verification for this run: every NSE primary_url added above returned HTTP 200 via curl from nsearchives.nseindia.com on 2026-09-12. This resolves the 403/timeout concern for these URLs only; the five earlier entries were not re-checked.
+- **nse:** Previously unverified candidates now resolved: NSE/CMTR/74466, NSE/FAOP/74467 and NSE/CMTR/74969 were fetched as ZIPs (HTTP 200) and entered. NSE/CMTR/73845, NSE/FAOP/75958 and NSE/CMTR/75366/75401 were not re-attempted.
+- **nse:** Enumeration source: https://www.nseindia.com/api/circulars?fromDate=15-05-2026&toDate=11-09-2026 returned HTTP 200 (2,450 rows, 2,095 unique NSE/NCL display numbers), with no cookie handshake. NSE rows by department: CML 781, SURV 347, NMF 319, CMTR 68, FAOP 62, INVG 46, COMP 37, COM 28, MSD 26, EGR 25, CD 18, INSP 19, SLBS 16, ISC 13. Listing, corporate-action, mock-trading, per-scrip surveillance-list, SEBI-order and commodity/currency items were filtered out.
+- **nse:** Fetched but not entered: NSE/FAOP/74469 (May quantity freeze limits, replaced by later monthly circulars; only the latest, NSE/FAOP/76068, was entered) and NSE/FAOP/75809 (single-stock strike revision). Also not entered: NSE/SURV/74388 (RTCM list), NSE/ISC/74395 (UAPA list update), NSE/ISC/75328 (FATF statement; its member action is covered by NSE/INSP/75505), NSE/COMP/74341 (SME market maker) and NSE/MSD/75498 (colocation bulk upload). NSE/INVG/76131 (STQC/<abbr title="Cybersecurity and Cyber Resilience Framework">CSCRF</abbr> requirements, addressed "To All Vendors", not members) was also excluded.
+- **nse:** Algo-provider provisional empanelment lists (NSE/INVG/74530, 74750, 75504) were not fetched.
+- **nse:** `other` tags: NSE/INSP/74836 concerns the SCRR Rule 8(1)(f)/8(3)(f) business-activity restriction. NSE/COMP/75240 and NSE/COMP/75511 concern RPwD Act digital accessibility. Neither topic has a closed-vocabulary tag.
+- **nse:** NSE/INSP/75046 in_force_date unresolved: the enclosed SEBI circular sets relative dates (three months after exchange guidelines; six months after July 3, 2026). NSE/INSP/75508 resolves these to October 31, 2026 and January 3, 2027. NSE/INSP/75508 and NSE/ISC/76299 take effect after the cutoff, so their status is left unresolved.
+- **nse:** NSE/SURV/74956 (SGTCM) says its implementation date will be intimated separately; no follow-up circular was identified in the API listing.
+- **nse:** Issuer anomalies: NSE/COMP/75164 and NSE/COMP/75240 both print Circular Ref. No 66/2026. NSE/COMP/75700 prints "NSE/COMP/ 75700" with a space; the entry uses the API display form.
+- **nse:** NSE/ISC/74672, 75191 and 75724 are monthly KRA "On Hold" cohort circulars with identical titles, each for a separate upload month and trading-block date, so none supersedes another.
 - **rbi:** Coverage: fetched both RBI seed listings. The circular index uses GetYearMonth to POST hdnYear/hdnMonth; submitted hdnYear=2026, hdnMonth=0 and reviewed the full annual listing, filtering issue dates from 2026-05-15 through 2026-09-11. Candidate document pages were separately fetched with HTTP 200. No in-window KYC-direction amendment or Account Aggregator circular appeared in that listing; targeted web searches did not identify one.
 - **rbi:** Applicability vocabulary gap: the eight sanctions circulars and RBI/2026-27/251, /175 and /174 address RBI-regulated entities/Authorised Persons, not the securities-intermediary categories permitted by the schema. Their applies_to fields remain unresolved. Broker tags on /114, /97, /203 and /254 indicate operational relevance through AD banks and securities investments, not a direct extension of RBI bank obligations to every broker.
 - **rbi:** The eleven unresolved in_force_date fields have no explicit commencement date in the fetched text. Do not substitute the UNSC press-release date or the issue date for an effective date without confirmation.
@@ -344,6 +450,12 @@ Circulars issued 2026-05-15 → 2026-09-11 (plus a few earlier finalisations tha
 - **sebi-other:** Publication-date caution: notification date is copied from the Gazette notification itself, not SEBI’s upload/listing date. Several Gazette printed issue dates precede electronic publication stamps; commencement tied to Gazette publication remains flagged rather than treating the website upload as the legal effective date.
 - **sebi-other:** No new final circular was verified for the January 16 KYC-centralisation/re-KYC consultation, T+0 expansion, SIM binding, SEBI Check/validated UPI, MTF, SLBM or grievance/ODR during the requested window. This is a search outcome, not a conclusion that no such instrument exists. The June 18 MTF item is a consultation: https://www.sebi.gov.in/reports-and-statistics/reports/jun-2026/consultation-paper-on-review-of-margin-trading-facility-mtf-framework_102211.html .
 - **sebi-other:** Knowledge-base write was not attempted: /home/rakesh/work/obsidian is outside the permitted write roots and approval is disabled. These files and sebi-verification.json retain the session research for later promotion to the broking-kyc vault workspace.
+- **sebi-other:** 2026-09-12 backfill run (equity-derivatives framework): six SEBI-MRD circulars added, each prefixed "Backfill:". The SUMMARY block at the top of this file predates this run, and its counts were not updated.
+- **sebi-other:** Requested IDs that differ from the circular text: "SEBI/HO/MRD/TPD-1/P/CIR/2025/76" reads SEBI/HO/MRD/MRD-TPD-1/P/CIR/2025/76 in the PDF. "SEBI/HO/MRD/TPD-1/P/CIR/2025/122" reads SEBI/HO/MRD/TPD/CIR/P/2025/ 122, including the space. Entries use the document forms; site citations using the requested forms need reconciling.
+- **sebi-other:** HO/47/15/11(2)2025-MRD-TPD1/ I/4226/2026: the PDF header title ("Calendar Spread margin benefit for Single Stock Derivatives on expiry day") differs from the SEBI listing title ("Review of Calendar Spread margin benefit in Single stock derivatives on expiry day"). The entry uses the PDF header. in_force_date is unresolved because clause 6 states only "three months from the date of the circular" (about May 5, 2026).
+- **sebi-other:** SEBI/HO/MRD/MRD-PoD-2/P/CIR/2024/140 and SEBI/HO/MRD/TPD-1/P/CIR/2025/41: status is unresolved. SEBI/HO/MRD/TPD-1/P/CIR/2025/79 (Annexure-1 rewrite of Chapter 5 position-limit clauses) and SEBI/HO/MRD/TPD/CIR/P/2025/ 122 restate index position limits and intraday monitoring, but neither expressly withdraws the earlier circulars, so superseded_by was left empty.
+- **sebi-other:** SEBI/HO/MRD/MRD-TPD-1/P/CIR/2025/76 gives no commencement date; clause 4 set a June 15, 2025 deadline for exchange proposals.
+- **sebi-other:** Discovery method: the listing https://www.sebi.gov.in/sebiweb/home/HomeAction.do?doListing=yes&sid=1&ssid=7&smid=0 was paged by POSTing to /sebiweb/ajax/home/getnewslistinfo.jsp with doDirect=<page>, using a fresh session cookie per page. Reusing a cookie returned empty 2.5 KB responses. Landing pages _87567, _93123, _94189, _94293, _96376 and _99533 returned HTTP 200.
 
 ## 2026-05-14 rebuild — delta against the prior 37-entry list
 
@@ -351,19 +463,19 @@ Circulars issued 2026-05-15 → 2026-09-11 (plus a few earlier finalisations tha
 
 | Issuer | New entries |
 | --- | --- |
-| NSE | 161 |
+| NSE | 190 |
 | CDSL | 156 |
 | NSDL | 143 |
-| Clearing Corporations (NSCCL / ICCL / MCXCCL) | 115 |
+| Clearing Corporations (NSCCL / ICCL / MCXCCL) | 140 |
 | MCX | 102 |
-| SEBI (MRD / IMD / OIAE / LAD-NRO / CFD) | 76 |
+| SEBI (MRD / IMD / OIAE / LAD-NRO / CFD) | 82 |
 | RBI | 62 |
 | NPCI | 57 |
 | SEBI-MIRSD | 56 |
-| BSE | 45 |
+| BSE | 56 |
 | MeitY / CCA | 31 |
 | CERSAI / CKYC | 25 |
-| <abbr title="Financial Intelligence Unit — India">FIU-IND</abbr> | 20 |
+| <abbr title="Financial Intelligence Unit">FIU</abbr>-IND | 20 |
 
 ## Carried forward from prior list
 
@@ -377,7 +489,7 @@ Circulars issued 2026-05-15 → 2026-09-11 (plus a few earlier finalisations tha
 | [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/41](./circulars/sebi-mirsd/#sebi-ho-mirsd-secfatf-p-cir-2024-41) | 2024-05-14 | SEBI-MIRSD | Review of validation of KYC records by KRAs under Risk Management Framework |
 | [SEBI/HO/MRD/MRD-PoD-3/P/CIR/2024/20](./circulars/sebi-other/#sebi-ho-mrd-mrd-pod-3-p-cir-2024-20) | 2024-03-21 | SEBI-MRD | Introduction of Beta version of T+0 rolling settlement cycle on optional basis i |
 | [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12](./circulars/sebi-mirsd/#sebi-ho-mirsd-secfatf-p-cir-2024-12) | 2024-02-20 | SEBI-MIRSD | Centralization of certifications under Foreign Account Tax Compliance Act (<abbr title="Foreign Account Tax Compliance Act (US)">FATCA</abbr> |
-| [SEBI/HO/MIRSD/<abbr title="Financial Action Task Force">FATF</abbr>/P/CIR/2023/0144](./circulars/sebi-mirsd/#sebi-ho-mirsd-fatf-p-cir-2023-0144) | 2023-08-11 | SEBI-MIRSD | Simplification of KYC process and rationalisation of Risk Management Framework a |
+| [SEBI/HO/MIRSD/FATF/P/CIR/2023/0144](./circulars/sebi-mirsd/#sebi-ho-mirsd-fatf-p-cir-2023-0144) | 2023-08-11 | SEBI-MIRSD | Simplification of KYC process and rationalisation of Risk Management Framework a |
 | [SEBI/HO/MIRSD/DOP/CIR/P/2020/73](./circulars/sebi-mirsd/#sebi-ho-mirsd-dop-cir-p-2020-73) | 2020-04-24 | SEBI-MIRSD | Clarification on Know Your Client (KYC) Process and Use of Technology for KYC |
 
 ## Prior IDs not located in the new index

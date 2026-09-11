@@ -1132,7 +1132,7 @@ In day-to-day operations, you will mostly care about "KYC Registered" and "On Ho
 | 8 | DDPI replacing POA | SEBI/HO/MIRSD/DoP/P/CIR/2022/44 | Apr 4, 2022 | DDPI mandatory from Nov 18, 2022 |
 | 9 | Nomination Revamp | SEBI circular | Jan 10, 2025 | Up to 10 nominees, video opt-out |
 | 10 | Nomination Simplification | SEBI circular | Jun 10, 2024 | Only 3 mandatory fields for nomination |
-| 11 | DigiLocker for Assets | [SEBI/HO/<abbr title="Office of Investor Assistance and Education (SEBI)">OIAE</abbr>/OIAE_IAD-3/P/CIR/2025/32](/broking-kyc/reference/circulars/sebi-other/) | Mar 19, 2025 | Demat statements in DigiLocker |
+| 11 | DigiLocker for Assets | [SEBI/HO/<abbr title="Office of Investor Assistance and Education (SEBI)">OIAE</abbr>/OIAE_IAD-3/P/CIR/2025/32](/broking-kyc/reference/circulars/sebi-other/#sebihooiaeoiae_iad-3pcir202532) | Mar 19, 2025 | Demat statements in DigiLocker |
 | 12 | Stock Brokers Master | SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90 | Jun 17, 2025 | Consolidated broker operations circular |
 | 13 | KYC Overhaul Consultation | SEBI consultation paper | Jan 16, 2026 | Proposed: centralized supplementary KYC, 5-yr review cycle |
 

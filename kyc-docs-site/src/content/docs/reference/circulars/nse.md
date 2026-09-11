@@ -1,14 +1,14 @@
 ---
 title: NSE Circulars
-description: "Verified index of NSE circulars affecting Indian stock broking, 2020-01-01 to 2026-09-11. 161 entries."
+description: "Verified index of NSE circulars affecting Indian stock broking, 2020-01-01 to 2026-09-11. 190 entries."
 ---
 
 > **Why this page is structured this way:** All in-window entries are listed descending by date so the most recent regulatory state is the first thing a reader sees. Use Cmd-F / Ctrl-F for ID-based lookup. Cross-references from the rest of the site point at anchors on this page.
 
 ## TL;DR
 
-- **161 circulars** indexed in this issuer's section.
-- **36** issued in 2025 or later.
+- **190 circulars** indexed in this issuer's section.
+- **65** issued in 2025 or later.
 - **0** entries flagged `[unknown — verify]` in at least one field.
 - All entries trace to a primary issuer URL (or Wayback fallback) where research could verify the source.
 - AI-generated; **read the linked PDF before acting on any provision**.
@@ -18,6 +18,175 @@ description: "Verified index of NSE circulars affecting Indian stock broking, 20
 This page is the complete listing of <abbr title="National Stock Exchange of India">NSE</abbr> circulars in the project's 2020–2026 sweep window. Each entry contains the verbatim circular ID, issue date, in-force date, status (in-force / superseded / withdrawn), applicable entity types, impact-area tags, a 2–4 sentence summary traceable to clauses, and the primary URL. Where the primary URL could not be re-fetched, an archive URL is provided in its place.
 
 ## Entries (descending date)
+
+### NSE/ISC/76299
+
+- **date_issued:** 2026-09-11
+- **issuer:** NSE
+- **title:** "Enhancement of Validations in Unique Client Code Fields"
+- **applies_to:** broker
+- **in_force_date:** 2026-10-09
+- **status:** [unknown — verify]
+- **impact_areas:** onboarding, kyc-modification, file-format
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/ISC76299.zip
+
+Adds field-level validations for <abbr title="Unique Client Code">UCC</abbr> creation and modification, set out in the Enhanced Validation in UCC file and revised bulk upload, bulk modification and UCI external interface specifications (Annexures A–D; first and second paragraphs). Members should complete UAT on the listed member portal and API endpoints before go-live at end of day on October 9, 2026, and send only fields that need changing in bulk modification files (third to fifth paragraphs).
+
+### NSE/CMTR/76170
+
+- **date_issued:** 2026-09-03
+- **issuer:** NSE
+- **title:** "Operational guidelines and Standard Operating Procedure (SOP) on Introduction of Closing Auction Session (<abbr title="Consolidated Account Statement">CAS</abbr>) in the Equity Cash Segment - Update"
+- **applies_to:** broker
+- **in_force_date:** 2026-09-07
+- **status:** in-force
+- **impact_areas:** derivatives, rms
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMTR76170.pdf
+
+From September 7, 2026, the CAS reference-price and price-band rules in clauses 2.3 and 3.2 of NSE/CMTR/73362 apply to index futures as well as stock futures (first and second paragraphs). The futures reference price is the 3:00–3:15 p.m. VWAP, falling back to day LTP, then theoretical price, then base price (revised clauses 2.3.1–2.3.4). From 3:15 to 3:40 p.m., futures carry a ±3% band around the reference price and dynamic band flexing is suspended; the last half hour becomes 2:45–3:15 p.m. (revised clause 3.2.1.1).
+
+### NSE/MSD/76140
+
+- **date_issued:** 2026-09-03
+- **issuer:** NSE
+- **title:** "Live trading session from Disaster Recovery (DR) site"
+- **applies_to:** broker
+- **in_force_date:** 2026-09-03
+- **status:** in-force
+- **impact_areas:** bcp-dr
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/MSD76140.pdf
+
+Under NSE/MSD/44692 on unannounced DR sessions, NSE runs live trading from its Disaster Recovery site on September 3–4, 2026 and returns to the primary site on September 7 (first paragraph and schedule table). The session covers the Equity, Equity Derivatives, Currency, Commodity, SLB and EGR segments, with no NEAT Adapter changes, and lease-line members use the listed extranet IP (instructions). Co-location and MTBT feeds stay available, but colocation latencies on DR days differ from normal trading days (instructions).
+
+### NSE/FAOP/76068
+
+- **date_issued:** 2026-08-31
+- **issuer:** NSE
+- **title:** "Quantity Freeze Limits for Indices"
+- **applies_to:** broker
+- **in_force_date:** 2026-09-01
+- **status:** in-force
+- **impact_areas:** derivatives, rms
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/FAOP76068.pdf
+
+Under chapter 1.9 of F&O consolidated circular NSE/FAOP/73928, sets index-derivatives quantity freeze limits from September 1, 2026: BANKNIFTY 600, NIFTY 1,800, FINNIFTY 1,800, MIDCPNIFTY 2,800, NIFTYNXT50 600 and NIFTYFPI 8,500 (first paragraph and table). Members must load the updated contract.gz and NSE_FO_contract files before the effective date (bullets).
+
+### NSE/ISC/75724
+
+- **date_issued:** 2026-08-13
+- **issuer:** NSE
+- **title:** "Guidelines in pursuance of amendment to <abbr title="Securities and Exchange Board of India">SEBI</abbr> <abbr title="Know Your Customer (process).">KYC</abbr> (Know Your Client) Registration Agency (<abbr title="KYC Registration Agency">KRA</abbr>) Regulations, 2011"
+- **applies_to:** broker
+- **in_force_date:** 2026-08-29
+- **status:** in-force
+- **impact_areas:** onboarding, transmission
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/ISC75724.pdf
+
+Monthly KRA follow-up to NSE/<abbr title="Investor Service Centre.">ISC</abbr>/75191. Members must ensure all client KYCs are uploaded to KRAs and allow trading only for clients with "KYC Registered" or "KYC Validated" status (opening paragraphs). Clients whose KYC uploaded from July 1 to July 31, 2026 is still "On Hold" cannot trade or square off from August 29, 2026 until validated (fourth paragraph). Non-compliant PANs are flagged Not Permitted to Trade and re-enabled on <abbr title="Trade-date Plus N settlement">T+1</abbr> once compliant; client lists are on ENIT (fifth and sixth paragraphs).
+
+### NSE/COMP/75700
+
+- **date_issued:** 2026-08-11
+- **issuer:** NSE
+- **title:** "Clarification regarding implementation of \"@valid\" <abbr title="Unified Payments Interface">UPI</abbr> IDs"
+- **applies_to:** broker
+- **in_force_date:** 2026-09-06
+- **status:** in-force
+- **impact_areas:** upstreaming, client-funds
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/COMP75700.pdf
+
+Forwards SEBI's August 7, 2026 clarification and FAQs on "@valid" UPI IDs (first and second paragraphs; Annexures A–B). Every investor-facing upstreaming bank account receiving funds from individual or non-institutional investors must be linked to an "@valid" UPI ID verifiable through SEBI Check. Members request the handle through one exchange's ENIT UPI IDs Request Portal, then complete the bank process (third to fifth paragraphs). Compliance is due by September 6, 2026 (T+30 from August 7), and any new upstreaming account must be linked from opening (sixth and seventh paragraphs).
+
+### NSE/COMP/75511
+
+- **date_issued:** 2026-07-31
+- **issuer:** NSE
+- **title:** "Extension of timelines with respect to compliance of Digital Accessibility Circulars"
+- **applies_to:** broker
+- **in_force_date:** immediate
+- **status:** in-force
+- **impact_areas:** system-audit, other
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/COMP75511.pdf
+
+Forwards SEBI circular <abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/(411)2026-<abbr title="Information Technology Department (within SEBI)">ITD</abbr>-5_DIV2/I/17922/2026 of July 31, 2026, which extends the deadline for accessibility audits of digital platforms and remediation of findings to October 31, 2026 (second paragraph and Annexure). Trading members must note the extension and comply (third paragraph).
+
+### NSE/INSP/75505
+
+- **date_issued:** 2026-07-31
+- **issuer:** NSE
+- **title:** "<abbr title="Financial Action Task Force">FATF</abbr> Public statement on jurisdictions on call for action and increased monitoring – June 2026 Plenary"
+- **applies_to:** broker
+- **in_force_date:** immediate
+- **status:** in-force
+- **impact_areas:** aml, reporting
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/INSP75505.pdf
+
+Following NSE/ISC/75328 on the June 2026 FATF plenary statement, members must record actions taken in the FATF module of ENIT New Compliance, or declare it not applicable (first and second paragraphs). Submissions are due August 21, 2026. Late or missing submissions attract penal charges under NSE/INSP/73792; the submission manual is Annexure A (third paragraph and Annexure A).
+
+### NSE/INSP/75508
+
+- **date_issued:** 2026-07-31
+- **issuer:** NSE
+- **title:** "Operational guidelines on Handling of Client’s Unpaid Securities by Trading Members"
+- **applies_to:** broker
+- **in_force_date:** 2026-10-31
+- **status:** [unknown — verify]
+- **impact_areas:** client-funds, margin, settlement
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/INSP75508.pdf
+
+Issues operational guidelines, framed with SEBI, the depositories and Brokers' ISF, for SEBI circular HO/38/11/(9)2026-<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>-POD/I/15382/2026 (covering page; Annexure A, background paragraph 1). Guidelines 1–11 cover <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr> pledge creation, client communication, the unpaid-securities policy, margin reporting, excess-pledge release, invocation and liquidation, auto-release, re-pledging restrictions and pledge extension. Guidelines 1–9 apply from October 31, 2026 and Guideline 10 from January 3, 2027 (Annexure A, background paragraph 2). Members must send the policy to existing CUSPA clients before October 31, 2026 and keep communication logs (Guideline 3.5).
+
+### NSE/ISC/75249
+
+- **date_issued:** 2026-07-17
+- **issuer:** NSE
+- **title:** "General Operational Guidelines on Unique Client Code (UCC)"
+- **applies_to:** broker
+- **in_force_date:** 2026-07-24
+- **status:** in-force
+- **impact_areas:** onboarding, kyc-modification, dormant
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/ISC75249.pdf
+
+Consolidates UCC rules: client changes must be updated immediately. Demat details are sent only when changed, in the <abbr title="National Securities Depository Limited">NSDL</abbr>/<abbr title="Central Depository Services (India) Limited">CDSL</abbr> format with a primary account flagged (points 1–3). Clients may trade only when their KRA status is Validated or Registered, and income details must be kept current. UCCs compliant at 22:00 hrs can trade the next day, and members must monitor the permitted-to-trade, revocation and verification files (points 4–8). From July 24, 2026, the UCI-Online Client Status module no longer moves clients from Inactive to Active; members use Query Client, New Client Bulk Upload or the Client Profiling API (Updation of Client Status section).
+
+### NSE/COMP/75240
+
+- **date_issued:** 2026-07-16
+- **issuer:** NSE
+- **title:** "Compliance Guidelines for Digital Accessibility Circular - ‘Rights of Persons with Disabilities Act, 2016 and rules made thereunder mandatory compliance by all Regulated Entities’"
+- **applies_to:** broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** system-audit, other
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/COMP75240.pdf
+
+All trading-member digital platforms must undergo an accessibility audit by an IAAP-certified professional (clause 1). For standard, uncustomised vendor platforms, members may rely on the vendor's IAAP audit report and covering letter, and system auditors confirm no customisation. Customised or in-house platforms need the member's own independent audit (clauses 2–3). Compliance remains the member's responsibility, and the final accessibility audit report was due by July 31, 2026 (clauses 4–5 and closing paragraph).
+
+### NSE/ISC/75191
+
+- **date_issued:** 2026-07-14
+- **issuer:** NSE
+- **title:** "Guidelines in pursuance of amendment to SEBI KYC (Know Your Client) Registration Agency (KRA) Regulations, 2011"
+- **applies_to:** broker
+- **in_force_date:** 2026-07-25
+- **status:** in-force
+- **impact_areas:** onboarding, transmission
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/ISC75191.pdf
+
+Monthly KRA follow-up to NSE/ISC/74672 that repeats the requirement to act on investor deaths reported through KRAs (opening paragraphs). Clients whose KYC uploaded to KRAs from June 1 to June 30, 2026 is still "On Hold" cannot trade or square off from July 25, 2026 until validated (third paragraph). Non-compliant PANs are flagged Not Permitted to Trade and re-enabled on T+1 once compliant; client lists are on ENIT (fourth and fifth paragraphs).
+
+### NSE/COMP/75164
+
+- **date_issued:** 2026-07-13
+- **issuer:** NSE
+- **title:** "Penalty for failure to maintain minimum prescribed Networth"
+- **applies_to:** broker
+- **in_force_date:** immediate
+- **status:** in-force
+- **impact_areas:** reporting
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/COMP75164.pdf
+
+Registration under Regulation 10(g) of the SEBI (Stock Brokers) Regulations, 2026 requires members to maintain minimum net worth at all times. Net worth is submitted half-yearly as on March 31 and September 30, plus an audited annual figure (second to fourth paragraphs). A shortfall reported in any periodic submission attracts a penalty of 2% of the shortfall, subject to a INR 10,000 minimum and a INR 2,00,000 cap. Consecutive repeat instances attract 50% escalation (Table 1). The penalty applies immediately, including to cases under process (paragraph after Table 1).
 
 ### NSE/INSP/75169
 
@@ -30,13 +199,78 @@ This page is the complete listing of <abbr title="National Stock Exchange of Ind
 - **impact_areas:** commodities, margin, settlement
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/INSP75169.pdf
 
-Forwards <abbr title="Securities and Exchange Board of India">SEBI</abbr>'s clarification on early delivery of certified goods to accredited warehouses (covering page and Annexure A, clause 2). Clearing corporations may exempt margins based on risk perception but must continue collecting <abbr title="Mark-to-Market">MTM</abbr>; the change takes effect September 21 (Annexure A, clauses 2–3).
+Forwards SEBI's clarification on early delivery of certified goods to accredited warehouses (covering page and Annexure A, clause 2). Clearing corporations may exempt margins based on risk perception but must continue collecting <abbr title="Mark-to-Market">MTM</abbr>; the change takes effect September 21 (Annexure A, clauses 2–3).
+
+### NSE/INSP/75046
+
+- **date_issued:** 2026-07-03
+- **issuer:** NSE
+- **title:** "Handling of Client’s Unpaid Securities by Trading Members"
+- **applies_to:** broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** client-funds, margin, settlement
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/INSP75046.pdf
+
+Forwards SEBI circular HO/38/11/(9)2026-MIRSD-POD/I/15382/2026 of July 3, 2026, which amends paragraph 46 of the Master Circular for Stock Brokers on clients' unpaid securities (covering page; Annexure A, paragraphs 1 and 4). Exchanges must issue operational guidelines with the depositories within 30 days (Annexure A, paragraph 5). Paragraphs 46.1–46.11 take effect three months after those guidelines issue, and 46.12–46.14 six months after the SEBI circular (Annexure A, paragraphs 6–7).
+
+### NSE/CMTR/74969
+
+- **date_issued:** 2026-07-01
+- **issuer:** NSE
+- **title:** "Modifications in the Pre-Open Call Auction framework"
+- **applies_to:** broker
+- **in_force_date:** 2026-09-07
+- **status:** in-force
+- **impact_areas:** rms, bod-eod
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMTR74969.zip
+
+Aligns the cash-market pre-open session with the CAS framework under SEBI's January 16, 2026 circular, partially modifying chapter 1.1 of consolidated circular 73927 (opening paragraphs). Limit and market orders are accepted 9:00–9:05 am, then limit orders only until 9:10 am with a random close; matching runs to 9:12 am and a buffer to 9:15 am (Table A). The changes take effect from September 7, 2026 (closing paragraphs).
+
+### NSE/FAOP/74970
+
+- **date_issued:** 2026-07-01
+- **issuer:** NSE
+- **title:** "Modifications in the Pre-Open Call Auction framework"
+- **applies_to:** broker
+- **in_force_date:** 2026-09-07
+- **status:** in-force
+- **impact_areas:** derivatives, rms
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/FAOP74970.zip
+
+Aligns the equity-derivatives pre-open session with the CAS framework, partially modifying chapter 1.1 of F&O consolidated circular 73928 (opening paragraphs). The session runs 15 minutes: limit and market orders 9:00–9:05 am, limit orders only until 9:10 am with a random close, matching to 9:12 am and a buffer to 9:15 am (session table). Algo market orders are allowed only in the first five minutes, and the circular applies from September 7, 2026 (additional note and closing paragraph).
+
+### NSE/SURV/74956
+
+- **date_issued:** 2026-06-30
+- **issuer:** NSE
+- **title:** "Same Group Trade Cancellation Mechanism (SGTCM) in Equity & Equity Derivatives Segments"
+- **applies_to:** broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** surveillance, file-format
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/SURV74956.pdf
+
+Introduces intraday, <abbr title="Permanent Account Number">PAN</abbr>-based cancellation of trades between same-group or related entities as reported by trading members, including trades executed through different members (paras 1–4). Members email TMCode_SGTCM_DDMMYYYY.csv (<abbr title="Trading Member">TM</abbr> code, group number, PAN, add/delete flag) by 3:30 p.m. on T day, for application from T+1. Qualifying client code modifications are also cancelled (paras 5–6). The mechanism applies only in the continuous session, is optional for members, and its implementation date will be notified separately (paras 7, 9 and 10).
+
+### NSE/INSP/74836
+
+- **date_issued:** 2026-06-23
+- **issuer:** NSE
+- **title:** "Clarification to Rule 8(1)(f) and 8(3)(f) of Securities Contracts (Regulation) Rules, 1957"
+- **applies_to:** broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** other
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/INSP74836.pdf
+
+Reflects the May 19, 2025 SCRR amendment: a member's investments are not treated as business unless they involve client funds or securities or create a financial liability for the broker (opening paragraphs). Items 1–2 of the NSE/COMP/50957 illustrative non-compliance list now cover corporate guarantees and pledged deposits for credit facilities of any entity, including group companies. Items 3–12 are deleted (third and fourth paragraphs). FAQs are in Annexure A (fifth paragraph).
 
 ### NSE/CMTR/74792
 
 - **date_issued:** 2026-06-19
 - **issuer:** NSE
-- **title:** "Mock trading on Saturday, June 20, 2026 – Testing of Trading modalities related to Introduction of Closing Auction Session (<abbr title="Consolidated Account Statement">CAS</abbr>) in Equity Cash segment"
+- **title:** "Mock trading on Saturday, June 20, 2026 – Testing of Trading modalities related to Introduction of Closing Auction Session (CAS) in Equity Cash segment"
 - **applies_to:** broker
 - **in_force_date:** 2026-06-20
 - **status:** in-force
@@ -58,6 +292,123 @@ Schedules a June 20 cash-market mock to test CAS modalities (opening paragraph a
 
 Schedules a June 20 F&O mock for changes associated with cash-market CAS (opening paragraph). Requires NEATPlus 7.8.9 in the first session, followed by 7.8.8 in sessions 2–3; the timetable includes stock-future price-band alignment (second paragraph and timetable).
 
+### NSE/FAOP/74758
+
+- **date_issued:** 2026-06-18
+- **issuer:** NSE
+- **title:** "Revision in Scheme of Strikes in Stock Options"
+- **applies_to:** broker
+- **in_force_date:** 2026-07-01
+- **status:** in-force
+- **impact_areas:** derivatives, file-format
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/FAOP74758.zip
+
+Under chapter 1.11 of F&O consolidated circular NSE/FAOP/73928, publishes revised step values and number of strikes for stock options, effective July 1, 2026; the stock list is in the Annexure (first and second paragraphs). Members must load the updated contract.gz from /faoftp/faocommon before trading on July 1 (third paragraph).
+
+### NSE/COMP/74753
+
+- **date_issued:** 2026-06-17
+- **issuer:** NSE
+- **title:** "Integration and utilization of Department of Telecommunications' (DoT) Digital Intelligence Platform (DIP) to strengthen cyber fraud prevention"
+- **applies_to:** broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** cyber-security
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/COMP74753.pdf
+
+Forwards a SEBI communication directing trading members to onboard to DoT's Digital Intelligence Platform and use it for intelligence sharing (first and second paragraphs; Annexure A). DIP links more than 1,400 organisations for two-way exchange of information on cyber and financial fraud involving misused telecom resources (Annexure A, paragraph 2). Contacts are given for Financial Fraud Risk Indicator API and onboarding queries (third paragraph).
+
+### NSE/ISC/74672
+
+- **date_issued:** 2026-06-12
+- **issuer:** NSE
+- **title:** "Guidelines in pursuance of amendment to SEBI KYC (Know Your Client) Registration Agency (KRA) Regulations, 2011"
+- **applies_to:** broker
+- **in_force_date:** 2026-06-26
+- **status:** in-force
+- **impact_areas:** onboarding, transmission
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/ISC74672.pdf
+
+When KRAs report an investor's death (shared daily), members must block debits, suspend trading and inactivate or close the UCC on all exchanges (second paragraph). Clients whose KYC uploaded to KRAs from May 1 to May 31, 2026 is still "On Hold" cannot trade or square off from June 26, 2026 until validated (third paragraph). PANs that later become compliant can trade from T+1, and the non-compliant client file is on ENIT under Log > Downloads (fourth and fifth paragraphs).
+
+### NSE/CMTR/74466
+
+- **date_issued:** 2026-05-29
+- **issuer:** NSE
+- **title:** "Introduction of Closing Auction Session (CAS) in the Equity Cash segment - Trading Modalities"
+- **applies_to:** broker
+- **in_force_date:** 2026-08-03
+- **status:** in-force
+- **impact_areas:** rms, bod-eod
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMTR74466.zip
+
+CAS applies first to stocks with derivatives on any exchange. It is skipped on a scheme-of-arrangement ex-date without price discovery, or after an index circuit halt (section A). CAS runs daily from 3:15 to 3:35 pm: reference price calculation, then limit and market order entry from 3:20 pm, limit-only entry from 3:25 pm with a random close, then order matching (section B). CAS trading starts August 3, 2026, with testing in mock sessions; FAQs are in Annexure B (closing paragraphs and annexures).
+
+### NSE/FAOP/74467
+
+- **date_issued:** 2026-05-29
+- **issuer:** NSE
+- **title:** "Introduction of Closing Auction Session (CAS) in the Equity Cash segment - Change in trading modalities in the Equity Derivatives segment"
+- **applies_to:** broker
+- **in_force_date:** 2026-08-03
+- **status:** in-force
+- **impact_areas:** derivatives, rms, file-format
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/FAOP74467.zip
+
+Moves the equity-derivatives normal market close to 15:40 hrs; pre-open and trade-modification end times are unchanged (section A). Price bands follow point 3.2 of NSE/CMTR/73362, and NEAT terminals show a broadcast when stock-futures price bands are reset and out-of-range orders cancelled (sections B–C). The close-price VWAP window becomes 15:10–15:40 hrs. The changes apply from August 3, 2026, and members must load updated contract files (section D and closing paragraphs).
+
+### NSE/COMP/74433
+
+- **date_issued:** 2026-05-27
+- **issuer:** NSE
+- **title:** "Reminder for Submission of Half Yearly Networth Certificate as on March 31, 2026"
+- **applies_to:** broker
+- **in_force_date:** immediate
+- **status:** in-force
+- **impact_areas:** reporting
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/COMP74433.pdf
+
+Trading members must submit the half-yearly net worth certificate as on March 31, 2026, digitally signed by the auditor, by May 31, 2026 (first paragraph). Submission goes through ENIT-NEW-COMPLIANCE, and non-submission attracts action under NSE/INSP/73792 (second and third paragraphs).
+
+### NSE/COMP/74381
+
+- **date_issued:** 2026-05-25
+- **issuer:** NSE
+- **title:** "Revised List of Specified stockbrokers for the Framework on Technical Glitches"
+- **applies_to:** broker
+- **in_force_date:** 2026-07-25
+- **status:** in-force
+- **impact_areas:** bcp-dr
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/COMP74381.pdf
+
+Under SEBI's January 9, 2026 technical-glitch framework, specified stockbrokers are the top 20 by IBT/STWT clients with more than 10,000 registered clients as on the previous March 31 (first and second paragraphs). Five newly identified brokers must meet the enhanced obligations by July 25, 2026 (Table-1 and following paragraph). Four brokers no longer qualify and may continue voluntarily; the revised full list is in the Annexure (Table-2 and closing paragraphs).
+
+### NSE/INSP/74370
+
+- **date_issued:** 2026-05-22
+- **issuer:** NSE
+- **title:** "Reminder for Submission of Risk Based Supervision Data for the period April 01, 2025 – March 31, 2026 (Financial Year ended March - 2026)"
+- **applies_to:** broker
+- **in_force_date:** immediate
+- **status:** in-force
+- **impact_areas:** reporting
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/INSP74370.pdf
+
+Every member active during April 1, 2025–March 31, 2026, meaning at least one trade in that period, must submit Risk Based Supervision data (first and second paragraphs). Submission is electronic, through the Member Portal Inspection module, by May 31, 2026, to avoid penal or disciplinary action under NSE/INSP/73795 (second paragraph).
+
+### NSE/INSP/74326
+
+- **date_issued:** 2026-05-20
+- **issuer:** NSE
+- **title:** "Clarification on Waiver requests with respect to Penalty on Modification of Client Codes (All Segments)"
+- **applies_to:** broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** surveillance, reporting
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/INSP74326.pdf
+
+For a genuine-error penalty waiver, client codes count as similar only if they differ by one character or one swap of adjacent characters. At most one waiver per quarter is allowed for a given code pair (Clarification I, point 1). Name similarity follows Rule 8 of the Companies (Incorporation) Rules, 2014 (Clarification I, point 2). Trades moved to the error account must be liquidated in the market within 3 working days, including trade date, and not settled against the original or any other client code (Clarification <abbr title="—">II</abbr>).
+
 ### NSE/COMP/74300
 
 - **date_issued:** 2026-05-19
@@ -70,6 +421,19 @@ Schedules a June 20 F&O mock for changes associated with cash-market CAS (openin
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/COMP74300.pdf
 
 Requires indemnity-policy details on ENIT by July 31 for policies expiring May 31; other expiries receive one month to submit renewed-policy details (opening paragraphs). Exempts policies obtained through ANMI/BBF from ENIT submission and references disciplinary action for late submission (points 1–4).
+
+### NSE/INSP/74287
+
+- **date_issued:** 2026-05-19
+- **issuer:** NSE
+- **title:** "Reminder for submission of Internal Audit Report for the half year ended March 31, 2026"
+- **applies_to:** broker
+- **in_force_date:** immediate
+- **status:** in-force
+- **impact_areas:** reporting
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/INSP74287.pdf
+
+Reminds trading members to submit the internal audit report for the half year ended March 31, 2026, required by NSE/INSP/73630, through the Member Portal Inspection module by May 31, 2026 (first and second paragraphs). Late or missing submission attracts penal charges or disciplinary action under NSE/INSP/73792 (second paragraph).
 
 ### NSE/SURV/74008
 
@@ -108,7 +472,7 @@ Operationalises Cyber Audit framework for FY2026-27 under SEBI <abbr title="Cybe
 - **impact_areas:** reporting, file-format, onboarding
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/INSP73436.pdf
 
-Forwards SEBI Circular <abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/38/11/(1)2026-<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>-POD/I/7656/2026 dated March 23, 2026 introducing ease-of-doing-business relaxations for certain trading members. Removes the requirement of demat-account-tagging reporting and other periodic submissions; aligns with SEBI Master Circular for Stock Brokers (June 17, 2025).
+Forwards SEBI Circular HO/38/11/(1)2026-MIRSD-POD/I/7656/2026 dated March 23, 2026 introducing ease-of-doing-business relaxations for certain trading members. Removes the requirement of demat-account-tagging reporting and other periodic submissions; aligns with SEBI Master Circular for Stock Brokers (June 17, 2025).
 
 ### NSE/CMTR/73362
 
@@ -238,7 +602,7 @@ Issues NSE-specific clarifications to CSCRF implementation including how to comp
 - **impact_areas:** cyber-security
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/INSP69906.pdf
 
-Forwards SEBI clarification circular SEBI/HO/<abbr title="Information Technology Department (within SEBI)">ITD</abbr>-1/ITD_CSC_EXT/P/CIR/2025/119 dated August 28, 2025 with further clarifications on the CSCRF framework introduced via SEBI Circular dated August 20, 2024 (NSE/INSP/63502).
+Forwards SEBI clarification circular SEBI/HO/ITD-1/ITD_CSC_EXT/P/CIR/2025/119 dated August 28, 2025 with further clarifications on the CSCRF framework introduced via SEBI Circular dated August 20, 2024 (NSE/INSP/63502).
 
 ### NSE/INSP/69631
 
@@ -304,6 +668,19 @@ Forwards SEBI extension of CSCRF adoption and implementation timeline beyond the
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/INSP68566.pdf
 
 Issues joint-exchange Regulatory framework for Distribution of third-party products by Trading Members on their own/partner/group platforms (third-party app or parent app). Addresses observed proliferation of broker-app and group-entity platforms offering non-broking products alongside trading services. Sets disclosure, segregation, risk and <abbr title="Authorized Person">AP</abbr>-registration norms.
+
+### NSE/INSP/68487
+
+- **date_issued:** 2025-06-11
+- **issuer:** NSE
+- **title:** "Issuance of Daily Margin Statement"
+- **applies_to:** broker
+- **in_force_date:** immediate
+- **status:** in-force
+- **impact_areas:** margin, reporting, client-funds
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/INSP68487.pdf
+
+Backfill: Following Brokers' ISF representations considered by SEBI, members may now issue the daily margin statement before the next trading day's session begins instead of by end of T day, amending NSE/INSP/36786 from the circular's date (second paragraph). FAQ 21 of the Inspection Master Circular dated April 30, 2025 is revised to match, and NSE/INSP/45191 remains the indicative statement format (third paragraph and revised FAQ 21). Members must keep client collateral records and an audit trail, and use collateral only for that client's margins or pay-ins (revised FAQ 21).
 
 ### NSE/INVG/67858
 
@@ -408,7 +785,7 @@ Partial modification to NSE/FAOP/62175 (May 24, 2024) for revised tick-size grid
 - **impact_areas:** settlement, client-funds, file-format, onboarding
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/ISC66717.pdf
 
-Continues direct-payout demat-mapping operational stream — covers NSE/<abbr title="Investor Service Centre.">ISC</abbr>/64984 (Nov 08, 2024), NSE/ISC/66165 (Jan 16, 2025). Communicates further implementation steps for Trading Members on <abbr title="Unique Client Code">UCC</abbr> demat-account validation, error handling and direct-pay-out reconciliation.
+Continues direct-payout demat-mapping operational stream — covers NSE/ISC/64984 (Nov 08, 2024), NSE/ISC/66165 (Jan 16, 2025). Communicates further implementation steps for Trading Members on UCC demat-account validation, error handling and direct-pay-out reconciliation.
 
 ### NSE/INVG/66524
 
@@ -447,7 +824,7 @@ Forwards SEBI Circular SEBI/HO/MIRSD/TPD/CIR/2025/10 dated January 31, 2025 esta
 - **impact_areas:** upi-block, mandate, settlement, onboarding, file-format
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPT66281.pdf
 
-NSE Clearing operational update on <abbr title="Unified Payments Interface">UPI</abbr>-Block (ASBA-like) Trading Supported by Blocked Amount in Secondary Market mechanism per SEBI Circular dated June 23, 2023 and <abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr>/CMPT/58895 (Oct 12, 2023), NCL/CMPT/63735 (Sep 04, 2024). UCC deregistration request received on T-day made effective on T-day itself; UCC marked "Not Opted for UPI Block facility" upon successful <abbr title="Clearing Corporation (NCL, ICCL, MCXCCL — context-dependent).">CC</abbr> API notification. Effective January 27, 2025.
+NSE Clearing operational update on UPI-Block (ASBA-like) Trading Supported by Blocked Amount in Secondary Market mechanism per SEBI Circular dated June 23, 2023 and <abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr>/CMPT/58895 (Oct 12, 2023), NCL/CMPT/63735 (Sep 04, 2024). UCC deregistration request received on T-day made effective on T-day itself; UCC marked "Not Opted for UPI Block facility" upon successful <abbr title="Clearing Corporation (NCL, ICCL, MCXCCL — context-dependent).">CC</abbr> API notification. Effective January 27, 2025.
 
 ### NSE/INSP/66284
 
@@ -656,7 +1033,7 @@ Revises NSE/INSP/53525 — permits members to pass on peak-margin penalty to cli
 - **impact_areas:** client-funds, reporting, file-format
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/INSP64053.pdf
 
-Resolves Broker's ISF representation on lack of UCC for unidentified credits/suspense funds. Members must create a designated UCC "SUSPE1234N" on member <abbr title="Permanent Account Number">PAN</abbr> in back office for allocating/reporting unidentified credits to clearing corporations, while not creating it in Exchange UCC database (no orders to be permitted). Members must keep unidentified/suspense funds upstreamed; compliance deadline December 19, 2024.
+Resolves Broker's ISF representation on lack of UCC for unidentified credits/suspense funds. Members must create a designated UCC "SUSPE1234N" on member PAN in back office for allocating/reporting unidentified credits to clearing corporations, while not creating it in Exchange UCC database (no orders to be permitted). Members must keep unidentified/suspense funds upstreamed; compliance deadline December 19, 2024.
 
 ### NSE/CMTR/63915
 
@@ -811,7 +1188,7 @@ Schedules special live trading session on Saturday, May 18, 2024 with intra-day 
 - **applies_to:** broker
 - **in_force_date:** 2024-04-30
 - **status:** in-force
-- **impact_areas:** onboarding, re-<abbr title="Know Your Customer (process).">KYC</abbr>, file-format, reporting, aml, fatca-crs
+- **impact_areas:** onboarding, re-KYC, file-format, reporting, aml, fatca-crs
 - **primary_url:** https://www.ricago.com/assets/front/base/file/file_management/1806.pdf
 
 Updated UCC Master Circular consolidating all UCC-related circulars up to March 31, 2024. Annexure file formats: API TDD-UCI External Interface UAT v2.0, bulk category-disclosure (COM segment), Active/Inactive/Closed status update file structure, weekly UCC-upload data report (Annexure H Sheet E). Applicable across CM, F&O, CD, COM, <abbr title="Securities Lending and Borrowing Mechanism">SLBM</abbr> and Debt segments. Replaces NSE/ISC/57393 (June 30, 2023).
@@ -841,7 +1218,7 @@ Master consolidated circular compiling all Surveillance and Investigation Depart
 - **impact_areas:** settlement, bod-eod, other
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMTR61805.pdf
 
-Partial modification to Part C 1.8 of NSE/CMTR/57270 (Jun 26, 2023) revising Auction Market timings in the CM Segment. Adjusts <abbr title="Trade-date Plus N settlement">T+2</abbr> / <abbr title="Trade-date Plus N settlement">T+1</abbr> auction window in line with shortened settlement cycle, sets pay-in/pay-out cut-offs and BOD/EOD file publication times.
+Partial modification to Part C 1.8 of NSE/CMTR/57270 (Jun 26, 2023) revising Auction Market timings in the CM Segment. Adjusts <abbr title="Trade-date Plus N settlement">T+2</abbr> / T+1 auction window in line with shortened settlement cycle, sets pay-in/pay-out cut-offs and BOD/EOD file publication times.
 
 ### NSE/INSP/61529
 
@@ -991,7 +1368,7 @@ Partial modification to F&O consolidated circular NSE/FAOP/57264 (Jun 23, 2023) 
 
 - **date_issued:** 2023-12-28
 - **issuer:** NSE
-- **title:** "Settlement of Running Account of Client's Funds lying with Trading Member (<abbr title="Trading Member">TM</abbr>)"
+- **title:** "Settlement of Running Account of Client's Funds lying with Trading Member (TM)"
 - **applies_to:** broker
 - **in_force_date:** 2024-04-01
 - **status:** in-force
@@ -1065,7 +1442,7 @@ First NSE forwarding of SEBI Circular SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/180 d
 - **impact_areas:** onboarding, re-KYC, aml, fatca-crs, digi-locker, esign
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/INSP58955.pdf
 
-Forwards SEBI Master Circular SEBI/HO/MIRSD/SECFATF/P/CIR/2023/169 dated October 12, 2023 consolidating SEBI KYC norms for the securities market — Digital KYC, In-Person Verification, Aadhaar-based eKYC (UIDAI), eSign, OVDs, <abbr title="Foreign Account Tax Compliance Act (US)">FATCA</abbr>-<abbr title="Common Reporting Standard">CRS</abbr>, KYC Registration Agency (<abbr title="KYC Registration Agency">KRA</abbr>) and KYC modification process. Single reference for member KYC compliance.
+Forwards SEBI Master Circular SEBI/HO/MIRSD/SECFATF/P/CIR/2023/169 dated October 12, 2023 consolidating SEBI KYC norms for the securities market — Digital KYC, In-Person Verification, Aadhaar-based eKYC (UIDAI), eSign, OVDs, <abbr title="Foreign Account Tax Compliance Act (US)">FATCA</abbr>-<abbr title="Common Reporting Standard">CRS</abbr>, KYC Registration Agency (KRA) and KYC modification process. Single reference for member KYC compliance.
 
 ### NSE/COMP/58570
 
@@ -1250,7 +1627,7 @@ Strengthens framework for supervision of APs by trading members further to SEBI/
 - **impact_areas:** surveillance
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/SURV56948.pdf
 
-Introduces Enhanced Surveillance Measure (ESM) framework for Micro-Small Companies (main-board market cap < ₹500 crore) effective June 05, 2023, jointly with BSE and SEBI. Stage I/<abbr title="—">II</abbr> measures (T+1 settlement-only, 100% margin, no upper-price-band relaxation, restricted intra-day) apply on objective criteria. Subsequently expanded via NSE/SURV/57609, /63361, /64400.
+Introduces Enhanced Surveillance Measure (ESM) framework for Micro-Small Companies (main-board market cap < ₹500 crore) effective June 05, 2023, jointly with BSE and SEBI. Stage I/II measures (T+1 settlement-only, 100% margin, no upper-price-band relaxation, restricted intra-day) apply on objective criteria. Subsequently expanded via NSE/SURV/57609, /63361, /64400.
 
 ### NSE/INSP/56927
 

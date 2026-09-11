@@ -1,14 +1,14 @@
 ---
 title: BSE Circulars
-description: "Verified index of BSE circulars affecting Indian stock broking, 2020-01-01 to 2026-09-11. 45 entries."
+description: "Verified index of BSE circulars affecting Indian stock broking, 2020-01-01 to 2026-09-11. 56 entries."
 ---
 
 > **Why this page is structured this way:** All in-window entries are listed descending by date so the most recent regulatory state is the first thing a reader sees. Use Cmd-F / Ctrl-F for ID-based lookup. Cross-references from the rest of the site point at anchors on this page.
 
 ## TL;DR
 
-- **45 circulars** indexed in this issuer's section.
-- **12** issued in 2025 or later.
+- **56 circulars** indexed in this issuer's section.
+- **23** issued in 2025 or later.
 - **0** entries flagged `[unknown — verify]` in at least one field.
 - All entries trace to a primary issuer URL (or Wayback fallback) where research could verify the source.
 - AI-generated; **read the linked PDF before acting on any provision**.
@@ -18,6 +18,149 @@ description: "Verified index of BSE circulars affecting Indian stock broking, 20
 This page is the complete listing of <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> circulars in the project's 2020–2026 sweep window. Each entry contains the verbatim circular ID, issue date, in-force date, status (in-force / superseded / withdrawn), applicable entity types, impact-area tags, a 2–4 sentence summary traceable to clauses, and the primary URL. Where the primary URL could not be re-fetched, an archive URL is provided in its place.
 
 ## Entries (descending date)
+
+### 20260731-39
+
+- **date_issued:** 2026-07-31
+- **issuer:** BSE
+- **title:** "Operational Guideline for Market Orders emanating from Algo on Introduction of Closing Auction Session (<abbr title="Consolidated Account Statement">CAS</abbr>) in the Equity Segment."
+- **applies_to:** broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** surveillance
+- **primary_url:** https://www.bseindia.com/downloads/UploadDocs/Notices/20260731-39/20260731-39.pdf
+
+Issued under <abbr title="Securities and Exchange Board of India">SEBI</abbr>'s January 16, 2026 CAS circular and BSE notice 20260119-17 (first paragraph). Penalties on algorithmic market orders in the normal market session continue under notice 20251010-20, but algorithmic market orders during the Closing Auction Session attract no penalty (second paragraph).
+
+### 20260728-42
+
+- **date_issued:** 2026-07-28
+- **issuer:** BSE
+- **title:** "Introduction of Closing Auction Session in the Equity Segment – Detailed Operating Guidelines Update"
+- **applies_to:** broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** rms
+- **primary_url:** https://www.bseindia.com/downloads/UploadDocs/Notices/20260728-42/20260728-42.pdf
+
+Issues an updated CAS FAQ, attached as the Annexure, following SEBI's January 16, 2026 circular and BSE's earlier CAS notices, including 20260319-21 and 20260610-41 (first and second paragraphs). From July 31, 2026 the FAQ is also posted on the BSE website under Markets >> Equity >> Market Information >> Closing Auction Session (second paragraph). Contacts are given for technical and functional queries (third paragraph).
+
+### 20260713-28
+
+- **date_issued:** 2026-07-13
+- **issuer:** BSE
+- **title:** "Penalty for failure to maintain minimum prescribed Networth"
+- **applies_to:** broker
+- **in_force_date:** immediate
+- **status:** in-force
+- **impact_areas:** reporting
+- **primary_url:** https://www.bseindia.com/downloads/UploadDocs/Notices/20260713-28/20260713-28.pdf
+
+Under Regulation 10(g) of the SEBI (Stock Brokers) Regulations, 2026, members must maintain minimum net worth at all times. Net worth is reported half-yearly (March 31, September 30) and annually on an audited basis (second and third paragraphs). A shortfall in a periodic submission attracts a penalty of 2% of the shortfall, minimum INR 10,000 and capped at INR 2,00,000, with 50% escalation for consecutive repeats, effective immediately (Table 1 and following paragraph). A shortfall or incorrect reporting found during inspection draws a 5% penalty plus administrative action under notice 20260417-45 (Table 2).
+
+### 20260703-20
+
+- **date_issued:** 2026-07-03
+- **issuer:** BSE
+- **title:** "Handling of Client’s Unpaid Securities by Trading Members"
+- **applies_to:** broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** client-funds, margin, settlement
+- **primary_url:** https://www.bseindia.com/downloads/UploadDocs/Notices/20260703-20/20260703-20.pdf
+
+Forwards SEBI circular <abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/38/11/(9)2026-<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>-POD/I/15382/2026 of July 3, 2026 on handling of clients' unpaid securities, enclosed as an annexure (first and second paragraphs). Members must note the SEBI circular and comply; Member Oversight contact details are given (third paragraph and contact table).
+
+### 20260623-29
+
+- **date_issued:** 2026-06-23
+- **issuer:** BSE
+- **title:** "Clarification to Rule 8(1)(f) and 8(3)(f) of Securities Contracts (Regulation) Rules, 1957"
+- **applies_to:** broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** other
+- **primary_url:** https://www.bseindia.com/downloads/UploadDocs/Notices/20260623-29/20260623-29.pdf
+
+Reflects the May 19, 2025 SCRR amendment: a member's investments are not treated as business unless they involve client funds or securities or create a financial liability for the broker (opening paragraphs). Items 1–2 of the illustrative non-compliance list in notice 20220107-45 now cover corporate guarantees and pledged deposits for credit facilities of any entity, including group companies. Items 3–12 are deleted (following paragraphs). FAQs are in Annexure A (closing paragraphs).
+
+### 20260612-26
+
+- **date_issued:** 2026-06-12
+- **issuer:** BSE
+- **title:** "Guidelines in pursuance of amendment to SEBI <abbr title="Know Your Customer (process).">KYC</abbr> (Know Your Client) Registration Agency (<abbr title="KYC Registration Agency">KRA</abbr>) Regulations, 2011"
+- **applies_to:** broker
+- **in_force_date:** 2026-06-26
+- **status:** in-force
+- **impact_areas:** onboarding, transmission
+- **primary_url:** https://www.bseindia.com/downloads/UploadDocs/Notices/20260612-26/20260612-26.pdf
+
+When KRAs report an investor's death (shared daily), members must block debits, suspend trading and inactivate or close the <abbr title="Unique Client Code">UCC</abbr> on all exchanges (second paragraph). Clients whose KYC uploaded to KRAs from May 1 to May 31, 2026 is still "On Hold" cannot trade or square off from June 26, 2026 until validated; PANs that later become compliant can trade from <abbr title="Trade-date Plus N settlement">T+1</abbr> (third and fourth paragraphs). The non-compliant client file is Non_Validated_Clients_by_KRAs_Clgno_xxxx.TXT under EQ\TRANSACTION\JUN-2026\12-06-2026 (fifth paragraph).
+
+### 20260612-6
+
+- **date_issued:** 2026-06-12
+- **issuer:** BSE
+- **title:** "Integration and utilization of Department of Telecommunications' (DoT) Digital Intelligence Platform (DIP) to strengthen cyber fraud prevention"
+- **applies_to:** broker
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** cyber-security
+- **primary_url:** https://www.bseindia.com/downloads/UploadDocs/Notices/20260612-6/20260612-6.pdf
+
+Forwards a SEBI communication, attached as Annexure A, on DoT's Digital Intelligence Platform for cyber-fraud prevention (first and second paragraphs). Trading members are advised to onboard to DIP and use it actively for intelligence sharing (third paragraph). DoT contacts are listed for FRI integration technical and API queries and for onboarding queries (fourth paragraph).
+
+### 20260612-9
+
+- **date_issued:** 2026-06-12
+- **issuer:** BSE
+- **title:** "Introduction of Closing Auction Session in the Equity Segment – Changes in trading timings in Equity Derivatives Segment"
+- **applies_to:** broker
+- **in_force_date:** 2026-08-03
+- **status:** in-force
+- **impact_areas:** derivatives, rms
+- **primary_url:** https://www.bseindia.com/downloads/UploadDocs/Notices/20260612-9/20260612-9.pdf
+
+Revises equity-derivatives trading timings under SEBI's January 16, 2026 CAS circular: log-in 7:50–9:00 am, pre-open 9:00–9:15 am with order entry closing randomly in the 7th–8th minute, continuous trading to 3:40 pm and trade modification to 4:15 pm (opening paragraphs and timing table). Close price keeps the existing method, but its VWAP window becomes 3:10–3:40 pm (close price computation paragraph). The changes apply from Monday, August 3, 2026, with testing in mock sessions (closing paragraph).
+
+### 20260529-1
+
+- **date_issued:** 2026-05-29
+- **issuer:** BSE
+- **title:** "Payment of SEBI Turnover Fees across segments including applicable GST."
+- **applies_to:** broker
+- **in_force_date:** 2026-06-03
+- **status:** in-force
+- **impact_areas:** settlement, reporting
+- **primary_url:** https://www.bseindia.com/downloads/UploadDocs/Notices/20260529-1/20260529-1.pdf
+
+SEBI turnover fees for the listed segments carry 18% GST (since July 18, 2022). May 2026 fees plus GST are debited from the settlement (valan) or Exchange dues account on June 3, 2026 (first paragraph). Turnover and fee amounts (TF2A–TF2J files) and invoices are on EXTRANET by June 2, 2026, and GST is calculated on column 26 of the TF2A file (second to fourth paragraphs). Members must keep sufficient funds in those accounts for the debit (sixth paragraph).
+
+### 20260529-13
+
+- **date_issued:** 2026-05-29
+- **issuer:** BSE
+- **title:** "Enhancements in Trading System APIs in Equity, Equity Derivatives, Currency Derivatives, Commodity Derivatives & EGR segments (Mandatory Release) – Update"
+- **applies_to:** broker
+- **in_force_date:** 2026-06-29
+- **status:** in-force
+- **impact_areas:** file-format
+- **primary_url:** https://www.bseindia.com/downloads/UploadDocs/Notices/20260529-13/20260529-13.pdf
+
+Updates notice 20260515-36 on mandatory ETI API changes: an Algo ID field in order and quote mass-cancellation messages, a new error code for debarred clients and revised Location ID identification (first paragraph). Simulation testing starts May 26, 2026 (June 3 for Equity), and the same v1.6.14 changes extend to EGR (bullets). The changes go live June 29, 2026 in the derivatives and EGR segments and July 6, 2026 in Equity; vendors and in-house developers must update their applications (go-live bullets and closing paragraph).
+
+### 20260520-33
+
+- **date_issued:** 2026-05-20
+- **issuer:** BSE
+- **title:** "Discontinuation of old version of Online Trade download (OTD) for Trading Members"
+- **applies_to:** broker
+- **in_force_date:** 2026-06-01
+- **status:** in-force
+- **impact_areas:** file-format
+- **primary_url:** https://www.bseindia.com/downloads/UploadDocs/Notices/20260520-33/20260520-33.pdf
+
+OTD version 3.01 is live in all segments (Equity, Equity Derivatives, Currency Derivatives, Commodity Derivatives and EGR) (first and second paragraphs). Old OTD versions up to 1.9 work until May 29, 2026 and are discontinued from June 1, 2026, making the new version mandatory (third paragraph). Members not yet on the new version must contact the BSE helpdesk for download and connectivity details (fourth paragraph).
 
 ### 20250915-52
 
@@ -69,7 +212,7 @@ Consolidated FAQ on running-account settlement of client funds held by trading m
 - **impact_areas:** grievance, scores-odr, reporting
 - **primary_url:** https://www.bseindia.com/markets/MarketInfo/DispNewNoticesCirculars.aspx?page=20250610-4
 
-Disseminates <abbr title="Securities and Exchange Board of India">SEBI</abbr> circular SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/81 dated June 2, 2025 updating the Investor Charter for Research Analysts to reflect the <abbr title="Online Dispute Resolution">ODR</abbr> platform and <abbr title="SEBI Complaints Redress System">SCORES</abbr> 2.0. RAs must display the charter on websites, apps, premises and onboarding material; publish complaint data monthly by the 7th; file FIRs for impersonation-related complaints with SCORES; and display prominent impersonation warnings on website homepage.
+Disseminates SEBI circular SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/81 dated June 2, 2025 updating the Investor Charter for Research Analysts to reflect the <abbr title="Online Dispute Resolution">ODR</abbr> platform and <abbr title="SEBI Complaints Redress System">SCORES</abbr> 2.0. RAs must display the charter on websites, apps, premises and onboarding material; publish complaint data monthly by the 7th; file FIRs for impersonation-related complaints with SCORES; and display prominent impersonation warnings on website homepage.
 
 ### 20250610-5
 
@@ -121,7 +264,7 @@ Reminds trading members of the May 31, 2025 deadline to submit the Internal Audi
 - **impact_areas:** nominee, mutual-funds, file-format, onboarding
 - **primary_url:** https://www.bseindia.com/markets/MarketInfo/DispNewNoticesCirculars.aspx?page=20250411-43
 
-Revises the <abbr title="Unique Client Code">UCC</abbr> structure to incorporate nominee-related fields for the Mutual Funds segment per SEBI nomination revamp guidelines. Maintains the 183-field UCC count while reorganising fields. Applies across Manual Interface, Bulk upload, Mobile app and API. Supersedes the March 27, 2025 notice; trading members and third-party / proprietary system users must prepare technical updates.
+Revises the UCC structure to incorporate nominee-related fields for the Mutual Funds segment per SEBI nomination revamp guidelines. Maintains the 183-field UCC count while reorganising fields. Applies across Manual Interface, Bulk upload, Mobile app and API. Supersedes the March 27, 2025 notice; trading members and third-party / proprietary system users must prepare technical updates.
 
 ### 20250127-22
 
@@ -147,7 +290,7 @@ Compiles recurring compliance irregularities observed during inspections of trad
 - **impact_areas:** settlement, t0-t1
 - **primary_url:** https://www.bseindia.com/markets/MarketInfo/DispNewNoticesCirculars.aspx?page=20250115-1
 
-Per SEBI December 2024 directive expanding optional T+0 scope, BSE enables T+0 trading for CP codes (excluding INST) effective February 10, 2025, with mock testing from February 8, 2025. Continues to operate alongside <abbr title="Trade-date Plus N settlement">T+1</abbr>.
+Per SEBI December 2024 directive expanding optional T+0 scope, BSE enables T+0 trading for CP codes (excluding INST) effective February 10, 2025, with mock testing from February 8, 2025. Continues to operate alongside T+1.
 
 ### 20250110-47
 
@@ -205,14 +348,14 @@ Disseminates SEBI circular SEBI/HO/<abbr title="Market Regulation Department (SE
 
 - **date_issued:** 2024-12-02
 - **issuer:** BSE
-- **title:** "Suspension/Freezing of Demat accounts at Depositories whose <abbr title="Know Your Customer (process).">KYC</abbr> records are not found to be valid by KRAs"
+- **title:** "Suspension/Freezing of Demat accounts at Depositories whose KYC records are not found to be valid by KRAs"
 - **applies_to:** broker
 - **in_force_date:** 2024-11-30
 - **status:** in-force
 - **impact_areas:** kyc-modification, mutual-funds, dormant, onboarding
 - **primary_url:** https://www.bseindia.com/markets/MarketInfo/DispNewNoticesCirculars.aspx?page=20241202-5
 
-Notifies that demat accounts with KYC records flagged invalid by KRAs were frozen for debits and credits from November 30, 2024 (based on <abbr title="KYC Registration Agency">KRA</abbr> data dated November 28, 2024). Members must ensure clients maintain valid KYC at their KRA before submitting orders on BSE StAR MF; otherwise depositories, RTAs and AMCs may reject orders. References prior exchange update of November 27, 2024.
+Notifies that demat accounts with KYC records flagged invalid by KRAs were frozen for debits and credits from November 30, 2024 (based on KRA data dated November 28, 2024). Members must ensure clients maintain valid KYC at their KRA before submitting orders on BSE StAR MF; otherwise depositories, RTAs and AMCs may reject orders. References prior exchange update of November 27, 2024.
 
 ### 20241021-13
 

@@ -1,14 +1,14 @@
 ---
 title: Clearing Corporations (NSCCL / ICCL / MCXCCL) Circulars
-description: "Verified index of Clearing Corporations (NSCCL / ICCL / MCXCCL) circulars affecting Indian stock broking, 2020-01-01 to 2026-09-11. 115 entries."
+description: "Verified index of Clearing Corporations (NSCCL / ICCL / MCXCCL) circulars affecting Indian stock broking, 2020-01-01 to 2026-09-11. 140 entries."
 ---
 
 > **Why this page is structured this way:** All in-window entries are listed descending by date so the most recent regulatory state is the first thing a reader sees. Use Cmd-F / Ctrl-F for ID-based lookup. Cross-references from the rest of the site point at anchors on this page.
 
 ## TL;DR
 
-- **115 circulars** indexed in this issuer's section.
-- **31** issued in 2025 or later.
+- **140 circulars** indexed in this issuer's section.
+- **54** issued in 2025 or later.
 - **0** entries flagged `[unknown — verify]` in at least one field.
 - All entries trace to a primary issuer URL (or Wayback fallback) where research could verify the source.
 - AI-generated; **read the linked PDF before acting on any provision**.
@@ -18,6 +18,32 @@ description: "Verified index of Clearing Corporations (NSCCL / ICCL / MCXCCL) ci
 This page is the complete listing of Clearing Corporations (<abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NSCCL</abbr> / <abbr title="Indian Clearing Corporation Limited">ICCL</abbr> / <abbr title="Multi Commodity Exchange Clearing Corporation Limited">MCXCCL</abbr>) circulars in the project's 2020–2026 sweep window. Each entry contains the verbatim circular ID, issue date, in-force date, status (in-force / superseded / withdrawn), applicable entity types, impact-area tags, a 2–4 sentence summary traceable to clauses, and the primary URL. Where the primary URL could not be re-fetched, an archive URL is provided in its place.
 
 ## Entries (descending date)
+
+### NCL/CMPL/76318
+
+- **date_issued:** 2026-09-11
+- **issuer:** NSCCL
+- **title:** "FAQ on Segregation and Monitoring of collateral at client level"
+- **applies_to:** broker, clearing-corp
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** client-funds, margin, reporting
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPL76318.pdf
+
+Lists common errors in daily client collateral segregation reporting, which has been required since <abbr title="Securities and Exchange Board of India">SEBI</abbr>'s July 20, 2021 circular (opening paragraphs). Error/own codes must be reported with account type "C", and segregated balances must be reported whenever client collateral is held, regardless of margin obligation. Non-reporting is penalised under <abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr>/CMPL/50662 (Annexure A, FAQs 1–2). When a broker changes clearing member, the existing <abbr title="Clearing Member">CM</abbr> reports on T day and the new CM from the next trading day (Annexure A, FAQ 3).
+
+### 20260909-1
+
+- **date_issued:** 2026-09-09
+- **issuer:** ICCL
+- **title:** "Review of Margin Framework for Commodity Derivatives Segment"
+- **applies_to:** broker, clearing-corp
+- **in_force_date:** 2026-10-01
+- **status:** [unknown — verify]
+- **impact_areas:** commodities, margin, rms
+- **primary_url:** https://www.icclindia.com/downloads/UploadDocs/Notices/20260909-1/20260909-1.pdf
+
+Recategorises commodities under SEBI's 2020 and 2021 commodity risk circulars, modifying BSECL circular 20260310-8 (opening paragraph). Minimum IM/SOMM/MPOR/VSR are 10%/10%/3 days/6% for Crude Oil, Brent Crude and Silver, and 8%/8%/2 days/5% for Gold. Following the lead exchange, Crude Oil and Brent carry 30% IM, SOMM and VSR, and Silver 11.50% IM and SOMM (table and footnotes). IM is not scaled up by MPOR, option MPOR is at least two days, and option sellers pay the higher of SOMM or MPOR-scaled VaR, from beginning of day October 1, 2026 (notes 1–4 and closing paragraph).
 
 ### MCXCCL/RISK/196/2026
 
@@ -43,7 +69,7 @@ Prescribes minimum MPOR for October 2026 following a liquidity review (covering 
 - **impact_areas:** commodities, margin, rms
 - **primary_url:** https://www.mcxindia.com/docs/default-source/circulars/english/2026/september/circular-512-2026.pdf?sfvrsn=ee25c743_1
 
-Reviews VSR using back-testing under the cited <abbr title="Securities and Exchange Board of India">SEBI</abbr> framework (covering page). Provides the commodity-specific VSR applicable for October 2026 in Annexure 1 (covering page, final substantive paragraph).
+Reviews VSR using back-testing under the cited SEBI framework (covering page). Provides the commodity-specific VSR applicable for October 2026 in Annexure 1 (covering page, final substantive paragraph).
 
 ### MCXCCL/RISK/194/2026
 
@@ -71,6 +97,32 @@ Revises concentration-margin thresholds and client/member slabs from September 1
 
 Sets commodity volatility categories and minimum initial margin, SOMM, MPOR and VSR from October 1 (covering page and Annexure 1). Adds 2% lean-period margin for agricultural contracts and retains specified higher minima for crude oil, natural gas and silver (covering page and Annexure 1 footnote).
 
+### NCL/CMPT/76210
+
+- **date_issued:** 2026-09-07
+- **issuer:** NSCCL
+- **title:** "NCMS - <abbr title="One-Time Password">OTP</abbr> based Two Factor Authentication and upgradation of NCMS version"
+- **applies_to:** broker, clearing-corp
+- **in_force_date:** 2026-09-15
+- **status:** [unknown — verify]
+- **impact_areas:** cyber-security, derivatives
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPT76210.zip
+
+Implements OTP-based two-factor authentication for NCMS-FO admin and sub-user logins from September 15, 2026; the user manual is Annexure 1 (first and third paragraphs). NCMS version 4.2.5 is available from September 12, 2026 at extranet path faoftp/faocommon/NCMSSetup_425 (second and fourth paragraphs).
+
+### NCL/CMPT/76188
+
+- **date_issued:** 2026-09-04
+- **issuer:** NSCCL
+- **title:** "Close-out procedure for shortages in overnight ETFs and liquid ETFs"
+- **applies_to:** broker, clearing-corp
+- **in_force_date:** 2026-09-07
+- **status:** in-force
+- **impact_areas:** settlement
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPT76188.pdf
+
+Partially modifies Part B Item 9 (Closing Out) of consolidated circular NCL/CMPT/73996 for overnight and liquid ETFs (opening paragraph). Shortages not bought in auction, or not delivered by the auction seller, close out at the higher of the highest cross-exchange price from trade date to auction day or 5% above the auction-day settlement price. The same price applies when auction pay-out cannot be completed by one business day before record date (bullets). The procedure applies from trade date September 7, 2026, settlement 2026169 (closing paragraph).
+
 ### MCXCCL/C&S/190/2026
 
 - **date_issued:** 2026-09-02
@@ -97,6 +149,136 @@ Adds Canara Bank to banks eligible to provide electronic fixed-deposit receipts 
 
 Sets October thresholds for crude oil and natural gas contracts and variants under the conditional negative-price framework (Sections A–B). Specifies absolute margin floors, withdrawal of spread benefits, Bachelier option pricing and additional price-movement margins when activated; a formal activation decision is communicated separately (Sections B–C).
 
+### NCL/CMPT/75670
+
+- **date_issued:** 2026-08-11
+- **issuer:** NSCCL
+- **title:** "CM - Multiple Settlements scheduled on August 27, 2026"
+- **applies_to:** broker, clearing-corp
+- **in_force_date:** 2026-08-27
+- **status:** in-force
+- **impact_areas:** settlement, t0-t1
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPT75670.pdf
+
+A settlement holiday on August 26, 2026 moves <abbr title="Trade-date Plus N settlement">T+1</abbr> settlements 2026159–2026161 (trade dates August 25–26) to August 27, with staggered pay-in/pay-out times from 08:00/10:00 hrs to 16:30/21:00 hrs (first paragraph and schedule table). Members must note the revised depository pay-in cut-offs and the revised auction trading and settlement schedule (following paragraphs and auction table).
+
+### NCL/CMPT/75636
+
+- **date_issued:** 2026-08-07
+- **issuer:** NSCCL
+- **title:** "Member Interface Testing of Two-way portability across Clearing Corporations- Software as a Service (SaaS) Model"
+- **applies_to:** broker, clearing-corp
+- **in_force_date:** 2026-08-08
+- **status:** in-force
+- **impact_areas:** bcp-dr
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPT75636.pdf
+
+Schedules a member SaaS mock session on August 8, 2026 under SEBI's December 20, 2023 clearing-corporation business-continuity circular (first paragraph). NCL invokes its SaaS setup between 13:45 and 14:15 hrs and operates through NCL@ICCL from 14:15 to 15:40 hrs (second paragraph). Members use credentials obtained under earlier SOP circulars or request them, and RTRMS, collateral and extranet links are provided (third and fourth paragraphs).
+
+### NCL/CMPT/75459
+
+- **date_issued:** 2026-07-29
+- **issuer:** NSCCL
+- **title:** "Change in Collateral Timings"
+- **applies_to:** broker, clearing-corp
+- **in_force_date:** 2026-07-30
+- **status:** in-force
+- **impact_areas:** margin, bod-eod
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPT75459.pdf
+
+Partially modifies NCL/CMPT/75318. The intraday cash/FDR release-request cut-off returns from 9:00 PM to 8:00 PM, and the securities <abbr title="End Of Day">EOD</abbr> release cut-off moves from 9:00 PM to 8:00 PM (opening paragraph and table). The revised timings apply from July 30, 2026 (closing paragraph).
+
+### 20260728-3
+
+- **date_issued:** 2026-07-28
+- **issuer:** ICCL
+- **title:** "Additional Exposure Margin on Securities under MWPL_31072026"
+- **applies_to:** broker, clearing-corp
+- **in_force_date:** 2026-07-31
+- **status:** [unknown — verify]
+- **impact_areas:** margin, derivatives, rms
+- **primary_url:** https://www.bseindia.com/downloads/UploadDocs/Notices/20260728-3/20260728-3.pdf
+
+Under <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr>'s March 18, 2019 notice, levies 15% additional exposure margin in equity derivatives on securities where the top 10 clients account for more than 20% of <abbr title="Market Wide Position Limit">MWPL</abbr>; if additional surveillance margin also applies, the higher is charged (first paragraph). Securities are identified on three-month rolling data and reviewed monthly. The margin on the annexed securities runs from July 31, 2026, after July expiry, until the August 2026 expiry (first and second paragraphs).
+
+### NCL/CMPT/75369
+
+- **date_issued:** 2026-07-23
+- **issuer:** NSCCL
+- **title:** "NCMS - OTP based Two Factor Authentication and upgradation of NCMS version"
+- **applies_to:** broker, clearing-corp
+- **in_force_date:** 2026-07-25
+- **status:** in-force
+- **impact_areas:** cyber-security
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPT75369.zip
+
+Implements OTP-based two-factor authentication for NCMS-CM admin and sub-user logins from July 25, 2026; the user manual is Annexure 1 (first and second paragraphs). NCMS executable version 4.2.3 is released the same day, downloadable from connect2nse or the member portal path /cmftp/common/NCMSSetup_423_25Jul2026 (third and fourth paragraphs).
+
+### NCL/CMPT/75318
+
+- **date_issued:** 2026-07-21
+- **issuer:** NSCCL
+- **title:** "Change in Collateral Timings"
+- **applies_to:** broker, clearing-corp
+- **in_force_date:** 2026-07-22
+- **status:** in-force
+- **impact_areas:** margin, bod-eod
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPT75318.pdf
+
+Following member feedback, moves the cash and FDR addition cut-off from 7:30 PM to 9:00 PM and the intraday cash/FDR release cut-off from 8:00 PM to 9:00 PM. The allocation cut-off moves to 11:30 PM (opening paragraphs and table). Pledged securities are released in scheduled batches starting 8:30 AM, and the timings apply from July 22, 2026 (batch table and closing paragraph).
+
+### NCL/CMPT/75289
+
+- **date_issued:** 2026-07-20
+- **issuer:** NSCCL
+- **title:** "Revision in member wise bank wise limits and member wise limits prescribed for acceptance of Bank Guarantee towards collaterals"
+- **applies_to:** broker, clearing-corp
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** margin
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPT75289.pdf
+
+Modifies Item 10.3.3.1 of consolidated circular 0153/2026 (opening paragraph). Member-wise bank-wise BG limits (other bank / clearing bank) are INR 3,500/4,400 crore for PCMs, custodians and <abbr title="Trading Member">TM</abbr>-CMs with net worth of at least INR 500 crore, INR 1,750/2,200 crore below that threshold, and INR 350/440 crore for self-clearing members (point 1). Overall member-wise BG limits across segments are INR 17,500 crore, INR 8,750 crore and INR 2,150 crore respectively (point 2).
+
+### NCL/CMPT/75211
+
+- **date_issued:** 2026-07-15
+- **issuer:** NSCCL
+- **title:** "Maintenance and Operation of Clearing Bank Account"
+- **applies_to:** broker, clearing-corp
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** settlement
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPT75211.pdf
+
+Prescribes letter formats that clearing members exchange with clearing banks for new settlement accounts, account changes, closures and name changes, under Part B Item 5 of consolidated circular NCL/CMPT/73996 (opening paragraph, table and Annexures 1–6). Primary accounts must be named "<Member name> <Segment> NCL Settlement Account" and secondary accounts "<Member name> <Segment> NCL Secondary Settlement Account" (closing paragraph).
+
+### NCL/CMPT/75183
+
+- **date_issued:** 2026-07-13
+- **issuer:** NSCCL
+- **title:** "Update in formats - Capital Market Segment"
+- **applies_to:** broker, clearing-corp
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** margin, client-funds
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPT75183.zip
+
+Revises capital-market collateral and client documentation formats issued under consolidated circular NCL/CMPT/73996 (opening paragraph). The revised formats cover fungible and non-fungible margin bank guarantees, BG renewal, the deed of pledge, the G-Sec/T-Bill collateral agreement, the member-custodian-constituent agreement and the member-client agreement (table; Annexures 1(A)–6).
+
+### NCL/CMPT/74885
+
+- **date_issued:** 2026-06-25
+- **issuer:** NSCCL
+- **title:** "Change in timings for Early pay-in and Collateral allocation"
+- **applies_to:** broker, clearing-corp
+- **in_force_date:** 2026-07-03
+- **status:** in-force
+- **impact_areas:** settlement, client-funds, bod-eod
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPT74885.pdf
+
+Moves final early pay-in cut-offs on July 3, 2026, citing SEBI's running-account settlement circular. Funds and securities both close at 7:00 PM, <abbr title="Unified Payments Interface">UPI</abbr>-block direct clients' securities at 6:00 PM, and the margin report downloads at 9:00 PM (opening paragraph and table). Cash/FDR up-streaming and down-streaming stays open until 8:00 PM and collateral allocation until 10:00 PM. NCL will endeavour to release collateral within one hour of a request (paragraphs after the table).
+
 ### NCL/CMPT/74898
 
 - **date_issued:** 2026-06-25
@@ -110,6 +292,71 @@ Sets October thresholds for crude oil and natural gas contracts and variants und
 
 Exempts unchanged orders carried from continuous trading into CAS from order-level margin-sufficiency checks (first bullet). Modified carry-over orders and all new CAS orders require sufficient available capital before acceptance, effective August 3 (second and third bullets and effective-date paragraph).
 
+### 20260623-37
+
+- **date_issued:** 2026-06-23
+- **issuer:** ICCL
+- **title:** "Availability of BSECL Trade API Plus – Enhanced Real-Time Trade Data Service"
+- **applies_to:** broker, clearing-corp
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** other
+- **primary_url:** https://www.bseindia.com/downloads/UploadDocs/Notices/20260623-37/20260623-37.pdf
+
+Introduces BSECL Trade API Plus, an event-driven real-time trade dissemination service for clearing and trading members in Equity Cash and Equity Derivatives. It adds to the existing OTD and Trade API facility under circular 20251029-23 (opening, second and final substantive paragraphs). The service is reachable over leased line or internet, will gain features in phases announced by later circulars, and onboarding runs through the BSECL Help Desk (third and fourth paragraphs).
+
+### NCL/CMPL/74821
+
+- **date_issued:** 2026-06-23
+- **issuer:** NSCCL
+- **title:** "Digital representation of penalty review requests – New category introduced"
+- **applies_to:** broker, clearing-corp
+- **in_force_date:** immediate
+- **status:** in-force
+- **impact_areas:** margin, reporting
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPL74821.pdf
+
+Clearing members can now submit penalty review requests for "Margin Violation" through the member portal, alongside the existing penalty categories (second paragraph). Requests are due within 7 working days of the penalty being made available. Appeals against Member Committee decisions are due within 45 calendar days, and any delay must be justified (third and fourth paragraphs). The circular applies with immediate effect (closing paragraph).
+
+### 20260617-11
+
+- **date_issued:** 2026-06-17
+- **issuer:** ICCL
+- **title:** "Ease of Doing Compliance- Submission of Action Taken Report for non-compliance(s) reported in the Internal Audit Report"
+- **applies_to:** broker, clearing-corp
+- **in_force_date:** [unknown — verify]
+- **status:** in-force
+- **impact_areas:** reporting
+- **primary_url:** https://www.bseindia.com/downloads/UploadDocs/Notices/20260617-11/20260617-11.pdf
+
+Clearing members must submit an Action Taken Report and close every non-compliance found in the half-yearly internal audit within two months of the report due date. For periods ending March 31 and September 30, the Action Taken Reports are due July 31 and January 31 (points 1–2). The internal auditor must certify the report, covering at least one month of sample verification, and open or late items trigger enforcement under ICCL circular 20231229-11 (points 3 and 5). The framework applies from the half year ended March 31, 2026, and critical findings such as client-collateral misuse or net-worth issues draw immediate action (paragraphs after point 5).
+
+### 20260617-36
+
+- **date_issued:** 2026-06-17
+- **issuer:** ICCL
+- **title:** "Provision of Facility for Monitoring Intraday Uncrystallised Mark-to-Market (<abbr title="Mark-to-Market">MTM</abbr>) Losses for Futures Contracts"
+- **applies_to:** broker, clearing-corp
+- **in_force_date:** immediate
+- **status:** in-force
+- **impact_areas:** rms, derivatives
+- **primary_url:** https://www.bseindia.com/downloads/UploadDocs/Notices/20260617-36/20260617-36.pdf
+
+Adds an optional RTRMS facility, activated on email request, for clearing members to set and monitor intraday uncrystallised MTM loss limits per trading member on open futures positions, separate from collateral-based margin monitoring (opening paragraphs; points 1–2 and 5). Email alerts fire at 70%, 80%, 90% and 100% utilisation, and by default "Set Unlimited M2M Limit" stays enabled with no limit configured (points 3 and 6). MTM is computed in real time on open futures across client and proprietary positions, with net losses aggregated per trading member. A breach triggers no automatic disablement or close-out unless BSECL notifies otherwise (points 7–8).
+
+### NCL/CMPT/74569
+
+- **date_issued:** 2026-06-05
+- **issuer:** NSCCL
+- **title:** "Changes in Extreme Loss Margin file"
+- **applies_to:** broker, clearing-corp
+- **in_force_date:** 2026-06-09
+- **status:** in-force
+- **impact_areas:** margin, file-format, derivatives
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPT74569.pdf
+
+Partially modifies NCL circular 125/2024 and point 40 of Part D of consolidated circular 050/2026 (opening paragraph). F_AEL_OPT_CONTRACTS_DDMMYYYY.CSV currently lists only option strikes. It will instead list every index and stock futures contract and option strike, with the applicable <abbr title="Extreme Loss Margin">ELM</abbr> percentage, keeping the same file name and format (second and third paragraphs). The change applies from June 9, 2026 (fourth paragraph).
+
 ### NCL/CD/74520
 
 - **date_issued:** 2026-06-03
@@ -122,6 +369,45 @@ Exempts unchanged orders carried from continuous trading into CAS from order-lev
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/CD74520.pdf
 
 Publishes July currency-derivative mark-to-market settlement dates (settlement table). Specifies July final settlement on July 30 for 91-day Treasury-bill futures, July 31 for cash-settled interest-rate and currency futures/options, and August 3 for MIBOR contracts (table footnotes).
+
+### NCL/CMPT/74286
+
+- **date_issued:** 2026-05-19
+- **issuer:** NSCCL
+- **title:** "Additional Exposure Margin on Securities under MWPL"
+- **applies_to:** broker, clearing-corp
+- **in_force_date:** 2026-05-29
+- **status:** in-force
+- **impact_areas:** margin, derivatives, rms
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPT74286.zip
+
+Levies a 15% additional exposure margin in equity derivatives on securities where the top 10 clients account for more than 20% of MWPL. Where additional surveillance margin also applies, the higher of the two is charged (first paragraph). Securities are identified on three-month rolling data and reviewed monthly; the framework applies from May 29, 2026, with the initial list in Annexure 1 (first and second paragraphs).
+
+### NCL/CMPL/74279
+
+- **date_issued:** 2026-05-18
+- **issuer:** NSCCL
+- **title:** "System Audit of Professional Clearing Members (PCM)"
+- **applies_to:** broker, clearing-corp
+- **in_force_date:** immediate
+- **status:** in-force
+- **impact_areas:** system-audit, reporting
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPL74279.zip
+
+PCMs must submit the System Audit Report for the year ended March 31, 2026 through the NCL member portal by June 30, 2026, in the prescribed format (first and second paragraphs). Submission manuals for members and auditors are in Annexures A and B; non-compliance attracts action under NCL/CMPL/63416 (second and third paragraphs).
+
+### NCL/CMPT/73864
+
+- **date_issued:** 2026-04-23
+- **issuer:** NSCCL
+- **title:** "Adjustment of Futures & Options Contracts and Physical Settlement in Vedanta Limited (VEDL)"
+- **applies_to:** broker, clearing-corp
+- **in_force_date:** 2026-04-29
+- **status:** in-force
+- **impact_areas:** derivatives, settlement
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPT73864.pdf
+
+Backfill: All VEDL monthly futures and options contracts that expire after April 29, 2026 instead expire on that date. Final settlement uses the VEDL capital-market settlement price, and final futures MTM settles April 30 (T+1) (points 1–3). Physical obligations are netted with capital-market obligations in settlement 2026079 on April 30, and delivery shortages are closed out directly (points 4–6). Final-settlement details are in the April 29 position reports, with additional physical-settlement reports and F_CA_PS03/PS04 files (points 7–9).
 
 ### MCX/MCXCCL/094/2026
 
@@ -141,14 +427,14 @@ Quarterly revision of approved collaterals list (Annexure 1.1 — equity shares 
 
 - **date_issued:** 2026-01-09
 - **issuer:** NSCCL
-- **title:** "<abbr title="Clearing Member">CM</abbr> - Changes in settlement schedule due to settlement holiday on January 15, 2026 on account of Municipal Corporation Elections in Maharashtra"
+- **title:** "CM - Changes in settlement schedule due to settlement holiday on January 15, 2026 on account of Municipal Corporation Elections in Maharashtra"
 - **applies_to:** broker, clearing-corp
 - **in_force_date:** 2026-01-15
 - **status:** in-force
 - **impact_areas:** settlement, t0-t1, mtf
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPT72224.pdf
 
-Partial modification to <abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr>/CMPT/71904 (Dec 22, 2025 on FY 2026 holidays) and NCL/CMPT/71926 (Dec 22, 2025 on <abbr title="Trade-date Plus N settlement">T+1</abbr> & <abbr title="Trade-date Plus N settlement">T+0</abbr> Jan 2026 calendar). January 15, 2026 declared settlement holiday on account of Maharashtra municipal-corporation elections; no T+0 settlement 2026511 on Jan 15. Revised T+1 schedule Jan 16, 2026: A 2026009 (auction) pay-in 08:00 / pay-out 10:00; M,Z,B 2026010 pay-in 10:30 / pay-out 15:30; M,Z,B 2026011 pay-in 16:30 / pay-out 21:00. UNPAIDMTF upload windows 15:30-22:00 (Jan 14-15) and 06:30-13:00 (Jan 16 for 2026011). EPI of securities cut-off 9 p.m. on Jan 16.
+Partial modification to NCL/CMPT/71904 (Dec 22, 2025 on FY 2026 holidays) and NCL/CMPT/71926 (Dec 22, 2025 on T+1 & <abbr title="Trade-date Plus N settlement">T+0</abbr> Jan 2026 calendar). January 15, 2026 declared settlement holiday on account of Maharashtra municipal-corporation elections; no T+0 settlement 2026511 on Jan 15. Revised T+1 schedule Jan 16, 2026: A 2026009 (auction) pay-in 08:00 / pay-out 10:00; M,Z,B 2026010 pay-in 10:30 / pay-out 15:30; M,Z,B 2026011 pay-in 16:30 / pay-out 21:00. UNPAIDMTF upload windows 15:30-22:00 (Jan 14-15) and 06:30-13:00 (Jan 16 for 2026011). EPI of securities cut-off 9 p.m. on Jan 16.
 
 ### NCL/CMPT/72025
 
@@ -161,7 +447,7 @@ Partial modification to <abbr title="NSE Clearing Limited (formerly National Sec
 - **impact_areas:** settlement, upi-block, upstreaming, bod-eod, client-funds
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPT72025.pdf
 
-Revises EPI/release/upstream cut-offs for January 2, 2026 quarterly running-account-settlement date. Funds EPI 07:00 PM; Securities EPI 07:00 PM (<abbr title="Unified Payments Interface">UPI</abbr>-block clients 06:00 PM); Download of margin report 09:00 PM; Upstreaming of cash/FDR 08:00 PM (revised from 07:00 PM); Downstreaming of cash/FDR 08:00 PM; Collateral allocation window 10:00 PM (revised from 08:00 PM). Cash/FDR/BG release within one hour subject to free-collateral availability.
+Revises EPI/release/upstream cut-offs for January 2, 2026 quarterly running-account-settlement date. Funds EPI 07:00 PM; Securities EPI 07:00 PM (UPI-block clients 06:00 PM); Download of margin report 09:00 PM; Upstreaming of cash/FDR 08:00 PM (revised from 07:00 PM); Downstreaming of cash/FDR 08:00 PM; Collateral allocation window 10:00 PM (revised from 08:00 PM). Cash/FDR/BG release within one hour subject to free-collateral availability.
 
 ### MCXCCL/MEM/282/2025
 
@@ -317,7 +603,7 @@ Annual consolidated circular for Capital Market segment compiling circulars Apri
 - **impact_areas:** settlement, commodities, derivatives
 - **primary_url:** https://www.steelcitynettrade.com/Circulars/Delivery%20&%20Settlement%20Procedure%20for%20GOLD%20TEN%20Contract%201.pdf
 
-Sub-circular MCXCCL/C&S/058/2025. Per MCX/TRD/134/2025 (Mar 18, 2025) on Gold Ten (10 grams) launch. Compulsory delivery; staggered tender period = last 5 trading days incl. expiry. Staggered tender-period margin 5% additional on outstanding positions over IM/special/additional. Mode of intention: MCXCCL eClear. Buyer/seller intentions submitted by 3:00 PM on tender day; dissemination by 3:30 PM TWS broadcast. Delivery-period margin = higher of (a) 3% + 5-day 99% VaR of spot price volatility or (b) 25%. EPI of goods exempts seller from all margins except <abbr title="Mark-to-Market">MTM</abbr>. Delivery allocation rate = settlement/closing on tender days, Due Date Rate on expiry. Pay-in via ComRIS earmarking.
+Sub-circular MCXCCL/C&S/058/2025. Per MCX/TRD/134/2025 (Mar 18, 2025) on Gold Ten (10 grams) launch. Compulsory delivery; staggered tender period = last 5 trading days incl. expiry. Staggered tender-period margin 5% additional on outstanding positions over IM/special/additional. Mode of intention: MCXCCL eClear. Buyer/seller intentions submitted by 3:00 PM on tender day; dissemination by 3:30 PM TWS broadcast. Delivery-period margin = higher of (a) 3% + 5-day 99% VaR of spot price volatility or (b) 25%. EPI of goods exempts seller from all margins except MTM. Delivery allocation rate = settlement/closing on tender days, Due Date Rate on expiry. Pay-in via ComRIS earmarking.
 
 ### ICCL 20250324-4
 
@@ -330,7 +616,7 @@ Sub-circular MCXCCL/C&S/058/2025. Per MCX/TRD/134/2025 (Mar 18, 2025) on Gold Te
 - **impact_areas:** mutual-funds, settlement, file-format
 - **primary_url:** https://www.icclindia.com/Dynamicpages/DispNoticesNCirculars.aspx?page=20250324-4
 
-Advisory ahead of high-volume April 2025 transactions on <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> StAR MF due to multiple holidays. Members/Payment Aggregators/Banks must (i) timely submit Fund Confirmation MIS with accurate UTR matching bank statements; (ii) ensure fund-confirmation amounts match actual credits to ICCL accounts; (iii) upload valid credit MIS and transfer funds before cut-off times. References prior notices 20230620-66 and 20240702-34 on procedures and guidelines.
+Advisory ahead of high-volume April 2025 transactions on BSE StAR MF due to multiple holidays. Members/Payment Aggregators/Banks must (i) timely submit Fund Confirmation MIS with accurate UTR matching bank statements; (ii) ensure fund-confirmation amounts match actual credits to ICCL accounts; (iii) upload valid credit MIS and transfer funds before cut-off times. References prior notices 20230620-66 and 20240702-34 on procedures and guidelines.
 
 ### NCL/CMPT/66779
 
@@ -362,7 +648,7 @@ ICCL pilot of direct securities payout to client demat accounts per SEBI guideli
 
 - **date_issued:** 2025-02-10
 - **issuer:** NSCCL
-- **title:** "Revised <abbr title="Market Wide Position Limit">MWPL</abbr>, Participant, Institutional & Non-Institutional Client Limits for JYOTISTRUC"
+- **title:** "Revised MWPL, Participant, Institutional & Non-Institutional Client Limits for JYOTISTRUC"
 - **applies_to:** broker, clearing-corp
 - **in_force_date:** 2025-02-11
 - **status:** in-force
@@ -370,6 +656,19 @@ ICCL pilot of direct securities payout to client demat accounts per SEBI guideli
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPT66597.pdf
 
 SLBS MWPL/limit revision per NCL/CMPT/61810. Increases JYOTISTRUC MWPL from 82,437,042 to 92,025,699; Institutional Client and Participant limits from 8,243,704 to 9,202,569 each; Non-Institutional Client limit from 824,370 to 920,256.
+
+### NCL/CMPT/66371
+
+- **date_issued:** 2025-01-29
+- **issuer:** NSCCL
+- **title:** "Revised list of Cross Margin Eligible Exchange Traded Funds (ETFs)"
+- **applies_to:** broker, clearing-corp
+- **in_force_date:** 2025-01-31
+- **status:** [unknown — verify]
+- **impact_areas:** margin
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPT66371.pdf
+
+Backfill: Revises the cross-margin-eligible ETF list issued under circular 0242/2024 (NCL/CMPT/65780), effective January 31, 2025 (opening paragraphs). The table gives each ETF's symbol, scheme name and minimum quantity multiple, for example NIFTYBEES 7,500 and BANKBEES 3,000 units (table).
 
 ### NCL/CMPT/66281
 
@@ -422,6 +721,19 @@ Operational clarifications for T+0 custodial-participant transactions pursuant t
 - **primary_url:** https://www.icclindia.com/Dynamicpages/DispNoticesNCirculars.aspx?page=20250102-15
 
 Representative takeover OTB settlement-calendar circular: bidding window 08/01/2025 - 21/01/2025, obligation download Feb 3, 2025, settlement Feb 4, 2025. Demat shares via EPI mechanism in both depositories using market type "(Takeover)" and settlement number 2025001. <abbr title="Central Depository Services (India) Limited">CDSL</abbr> = direct client payment; NSDL = security earmarking/blocking. No EPN files; reference MBRSTD_OTB_CM for stamp duty.
+
+### NCL/CMPT/65890
+
+- **date_issued:** 2024-12-31
+- **issuer:** NSCCL
+- **title:** "Adjustment in Cross margin weightages on account of demerger in ITC Limited (ITC)"
+- **applies_to:** broker, clearing-corp
+- **in_force_date:** 2025-01-03
+- **status:** in-force
+- **impact_areas:** margin, derivatives
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPT65890.pdf
+
+Backfill: Excludes ITC from cross-margin computation from end of day January 3, 2025; weightages for other index constituents are unchanged (point 1). Revised index weightages, based on ITC's January 6 close, apply from beginning of day January 8, 2025, and members must sync portfolios by end of day January 7 (points 2–3). The spread margin for NIFTY portfolios rises from 25% to 30% from January 3 to January 7, 2025 end of day (point 4).
 
 ### NCL/CMPT/65498
 
@@ -539,7 +851,7 @@ Representative SLBS MWPL/limit-revision circular. Increases MWPL for SAPPHIRE fr
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPT63669.pdf
 - **archive_url:** https://www.ricago.com/assets/front/base/file/file_management/2449.pdf
 
-Full operational guidelines for direct payout of securities to client demat accounts pursuant to SEBI/HO/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD1/P/CIR/2024/75 (Jun 5, 2024). Mandates: (i) TMs to update primary demat in UCC database for all clearing-clients; (ii) TMs of CM/F&O clearing through other CM open <abbr title="Trading Member">TM</abbr> pool accounts in both depositories; (iii) TMs maintain TM <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr> only (or both with CM CUSPA if TM-cum-CM), self-clearing TMs maintain only TM CUSPA, professional CMs maintain only CM CUSPA; (iv) TMs offering <abbr title="Margin Trading Facility">MTF</abbr> maintain <abbr title="Client Securities Margin Funded Account">CSMFA</abbr> where client's demat resides; (v) facility for release-payout-with-pledge-in-favour-of-CUSPA(Unpaid) / CSMFA(MTF). Discontinues legacy direct-payout-to-investor-accounts facility (NCL/CMPT/61800 Part C point 6).
+Full operational guidelines for direct payout of securities to client demat accounts pursuant to SEBI/HO/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD1/P/CIR/2024/75 (Jun 5, 2024). Mandates: (i) TMs to update primary demat in UCC database for all clearing-clients; (ii) TMs of CM/F&O clearing through other CM open TM pool accounts in both depositories; (iii) TMs maintain TM <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr> only (or both with CM CUSPA if TM-cum-CM), self-clearing TMs maintain only TM CUSPA, professional CMs maintain only CM CUSPA; (iv) TMs offering <abbr title="Margin Trading Facility">MTF</abbr> maintain <abbr title="Client Securities Margin Funded Account">CSMFA</abbr> where client's demat resides; (v) facility for release-payout-with-pledge-in-favour-of-CUSPA(Unpaid) / CSMFA(MTF). Discontinues legacy direct-payout-to-investor-accounts facility (NCL/CMPT/61800 Part C point 6).
 
 ### NCL/CMPT/63561
 
@@ -687,7 +999,7 @@ Annual consolidated circular for Capital Market segment compiling circulars Apri
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPT61801.pdf
 - **archive_url:** https://avantiscdnprodstorage.blob.core.windows.net/legalupdatedocs/31621/NSE_issued_the_Consolidated_Circular_on_the_Capital_Market_Segment_of_NCL_Apr292024.pdf
 
-Annual consolidated circular for F&O segment. Includes Item 10.13 "Cross Margining" Part B (subsequently partially modified by NCL/CMPT/62978 effective July 29, 2024 for offsetting positions with different expiry). Covers <abbr title="Standard Portfolio Analysis of Risk">SPAN</abbr>/scanrange parameters, <abbr title="Extreme Loss Margin">ELM</abbr>, delivery margin, margin on consolidated crystallised obligations, peak-margin snapshots at four random intraday windows.
+Annual consolidated circular for F&O segment. Includes Item 10.13 "Cross Margining" Part B (subsequently partially modified by NCL/CMPT/62978 effective July 29, 2024 for offsetting positions with different expiry). Covers <abbr title="Standard Portfolio Analysis of Risk">SPAN</abbr>/scanrange parameters, ELM, delivery margin, margin on consolidated crystallised obligations, peak-margin snapshots at four random intraday windows.
 
 ### NCL/CMPT/61810
 
@@ -901,7 +1213,7 @@ Communicates SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/187 (Dec 12, 2023) on upstream
 - **impact_areas:** upstreaming, client-funds, settlement, commodities
 - **primary_url:** https://www.mcxccl.com/circulars/clearing-settlement
 
-Operationalises SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/187 (Dec 12, 2023) upstreaming framework at MCXCCL. SB/CMs upstream all client clear credit balances to CC on <abbr title="End Of Day">EOD</abbr> basis via cash, lien on FDR (created out of client funds, residual maturity ≤ 1 year + 1 day, lien marked to MCXCCL, pre-terminable, principal protected), or pledge of MFOS units. Referenced by MCX/MCXCCL/350/2024 (May 28, 2024) for ongoing compliance. [unknown — verify] direct URL (canonical PDF on mcxccl.com returns 403; circular ID/reference confirmed via MCX/MCXCCL/350/2024).
+Operationalises SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/187 (Dec 12, 2023) upstreaming framework at MCXCCL. SB/CMs upstream all client clear credit balances to CC on EOD basis via cash, lien on FDR (created out of client funds, residual maturity ≤ 1 year + 1 day, lien marked to MCXCCL, pre-terminable, principal protected), or pledge of MFOS units. Referenced by MCX/MCXCCL/350/2024 (May 28, 2024) for ongoing compliance. [unknown — verify] direct URL (canonical PDF on mcxccl.com returns 403; circular ID/reference confirmed via MCX/MCXCCL/350/2024).
 
 ### ICCL 20231116-51
 
@@ -1526,6 +1838,19 @@ Implements revised margin framework for F&O segment pursuant to SEBI/HO/MRD2/DCA
 - **primary_url:** https://www.icclindia.com/Dynamicpages/DispNoticesNCirculars.aspx?page=20200201-13
 
 Settlement procedure for RFQ trades on NDS-RST platform. For corporate bonds, commercial papers, and certificates of deposit, existing process applies unchanged. For G-Secs, T-Bills, SDLs, participants transfer funds to ICCL ICICI Bank account (Beneficiary "ICCLRF", IFSC ICIC0000106) via NEFT/RTGS using bank account registered on RFQ platform. Securities/funds pay-in before 12:00 noon on T+1. References BSE Notice Jan 27, 2020 launching RFQ.
+
+### NCL/CMPT/43262
+
+- **date_issued:** 2020-01-17
+- **issuer:** NSCCL
+- **title:** "Delivery margins for Delivery Settlement in Equity Derivatives"
+- **applies_to:** broker, clearing-corp
+- **in_force_date:** 2020-01-24
+- **status:** [unknown — verify]
+- **impact_areas:** margin, derivatives, settlement, reporting
+- **primary_url:** https://nsearchives.nseindia.com/content/circulars/CMPT43262.pdf
+
+Backfill: Modifies Item 10.2.11 of Part B of consolidated circular 001/2020 by lowering delivery margins before expiry on physically settled contracts, from 20/40/60/80% to 10/25/45/70% at expiry −4 to −1 EOD (opening paragraph and table). Members must collect delivery margins by T+1 and include them in client margin reporting (paragraph after the table). The revision applies to contracts expiring January 30, 2020 and to delivery margins levied from January 24, 2020 (closing paragraph).
 
 ### NCL/CMPT/43079
 

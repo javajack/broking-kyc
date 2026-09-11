@@ -66,7 +66,7 @@ npm install
 
 ## Key Regulatory References
 
-**1,058 circulars** tracked across 13 issuer groupings — SEBI (MIRSD + MRD + IMD + OIAE + LAD-NRO + CFD), RBI, NPCI, CERSAI, MeitY/CCA, FIU-IND, CDSL, NSDL, NSE, BSE, MCX, and clearing corps (NSCCL / ICCL / MCXCCL) — over the 2020-01-01 → 2026-09-11 window. Coverage spans regulatory norms AND operational/file-format circulars (BOD/EOD specs, settlement files, margin frameworks). Here are the most critical ones:
+**1,130 circulars** tracked across 13 issuer groupings — SEBI (MIRSD + MRD + IMD + OIAE + LAD-NRO + CFD), RBI, NPCI, CERSAI, MeitY/CCA, FIU-IND, CDSL, NSDL, NSE, BSE, MCX, and clearing corps (NSCCL / ICCL / MCXCCL) — over the 2020-01-01 → 2026-09-11 window. Coverage spans regulatory norms AND operational/file-format circulars (BOD/EOD specs, settlement files, margin frameworks). Here are the most critical ones:
 
 | Regulation | Reference |
 |---|---|
@@ -98,7 +98,7 @@ npm install
 | KRA information sharing with IFSCA-regulated entities | HO/38/15/(7)2026-MIRSD-POD/I/19255/2026 (Aug 20, 2026) |
 | Cyber incident reporting portal aligned to the FIRE format | HO/(449)2026-ITD-5_DIV1/I/19448/2026 (Aug 24, 2026) |
 
-See the [Regulatory Circulars master index](https://javajack.github.io/broking-kyc/reference/regulatory-circulars/) (curated highlights + per-issuer navigation), the [per-issuer sub-pages](https://javajack.github.io/broking-kyc/reference/circulars/sebi-mirsd/) (1,058 verified entries with primary URLs, in-force dates, supersession chains, and impact-area tags), the [circulars changelog](https://javajack.github.io/broking-kyc/reference/circulars-changelog/) (2026-09-11 delta on top of the 2026-05-14 rebuild), and the [References & Sources](https://javajack.github.io/broking-kyc/reference/references-sources/) (130+ URLs) page for complete listings.
+See the [Regulatory Circulars master index](https://javajack.github.io/broking-kyc/reference/regulatory-circulars/) (curated highlights + per-issuer navigation), the [per-issuer sub-pages](https://javajack.github.io/broking-kyc/reference/circulars/sebi-mirsd/) (1,130 verified entries with primary URLs, in-force dates, supersession chains, and impact-area tags), the [circulars changelog](https://javajack.github.io/broking-kyc/reference/circulars-changelog/) (2026-09-11 delta on top of the 2026-05-14 rebuild), and the [References & Sources](https://javajack.github.io/broking-kyc/reference/references-sources/) (130+ URLs) page for complete listings.
 
 ## Compliance & Vendor Coverage
 
