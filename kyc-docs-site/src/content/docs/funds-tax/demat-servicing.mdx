@@ -1,0 +1,179 @@
+---
+title: "Funds & Tax: Demat servicing"
+description: Dematerialisation of physical certificates, rematerialisation, off-market transfers and the delivery instruction slip, gift of shares, freeze and unfreeze, the depository account statement, and how each interacts with account closure.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Demat servicing is the set of instructions a client gives the depository through the <abbr title="Depository Participant">DP</abbr>, as distinct from the trading instructions given to the broker. The page follows the asset: into the account (dematerialisation), out of it in paper form (rematerialisation), sideways to another account (off-market transfer and gift), then the controls that stop it moving (freeze), and finally the closure sequence that consumes all of the above. Procedure detail is taken from the <abbr title="Central Depository Services (India) Limited">CDSL</abbr> DP Operating Instructions, March 2026 edition, with <abbr title="National Securities Depository Limited">NSDL</abbr> equivalents noted where the mechanics differ.
+
+## TL;DR
+
+- **Dematerialisation has two hard clocks.** The DP despatches the physical documents to the issuer or registrar within **7 days** of receiving them, and the registrar completes processing within **15 days** of receipt ([CDSL DP Operating Instructions, Chapter 4](https://www.cdslindia.com/downloads/DP/currentDPs/DP-Operating-Instructions-Chapters-as-on-March-31-2026.pdf)).
+- **Rematerialisation runs on a 30-day clock and needs unencumbered balance.** Separate forms for free quantity and each lock-in combination; nothing under pledge or lien can be rematerialised, and securities sent for remat cannot be traded ([NSDL rematerialisation](https://nsdl.com/services/remat)).
+- **CDSL charges the DP nothing for demat and a fee for remat.** Rs.10 for every 100 securities or part thereof, capped at Rs.5,00,000, or a flat Rs.10 per certificate, whichever is higher, payable on confirmation; nil for government securities (Chapter 12 tariff). What the client pays is the DP's own tariff.
+- **Off-market transfers need <abbr title="One-Time Password">OTP</abbr> authentication and a registered beneficiary.** The transferor must add the transferee's demat account as a beneficiary before execution and authenticate by OTP; a transfer not authenticated by end of the execution date is rejected as "OTP validation not completed", and back-dated instructions cannot carry an execution date more than **10 days** ahead of entry.
+- **The delivery instruction slip is inventory-controlled like a cheque book** — pre-printed serials, pre-stamped <abbr title="Beneficial Owner">BO</abbr> ID, a requisition slip in each booklet, at most **10 loose slips** per account per financial year, and mandatory independent verification for an account dormant **12 months** or for any instruction moving all balances where the account holds **5 or more ISINs**.
+- **Freeze has three initiators and three scopes.** The beneficial owner, the DP or the depository can freeze; the scope is the full account, one or more ISINs, or a partial quantity; and the direction is debits, credits or both. From **28 August 2026** the regulatory authority and order date must be captured on order-driven freezes ([NSDL/POLICY/2026/0117](/broking-kyc/reference/circulars/nsdl/#nsdlpolicy20260117), [CDSL/SURV/DP/POLCY/2026/532](/broking-kyc/reference/circulars/cdsl/#cdslsurvdppolcy2026532)).
+- **Closure requires a zero balance**, reached by rematerialising or transferring out, and the account sits in a "to be closed" state until it gets there. See [Lifecycle: Voluntary closure](/broking-kyc/lifecycle/closure/).
+
+## Conceptual overview
+
+A beneficial-owner account is a custody record, and every change to it is an instruction the depository executes on the DP's entry. Two consequences follow that broker-side engineers underestimate. The DP acts as an agent of the depository, not of the broker, so the operating instructions it follows are the depository's — prescribed forms, prescribed verification steps, prescribed dispatch windows, an eight-year retention obligation on every form. And almost every servicing request is *irreversible once executed*, which is why the control set is heavy: signature verification against depository records, maker-checker verification, telephone confirmation for dormant accounts, inventory registers for instruction slips.
+
+The client's model is simpler — a wallet the broker runs — so most servicing tickets ask for something the broker cannot do unilaterally. The useful design surfaces the form, the evidence and the clock up front rather than accepting a request and discovering the gap three days later.
+
+## 1. Regulatory framework
+
+- **Depositories Act, 1996**, section 6 (surrender of certificate) and section 14 (option to opt out) — the statutory basis for demat and remat.
+- **<abbr title="Securities and Exchange Board of India">SEBI</abbr> (Depositories and Participants) Regulations, 2018** — Regulations 41, 42, 70 and 74 (eligibility and surrender), 47 (withdrawal by participant), 60 (statement of accounts), 61 (transfer or withdrawal by beneficial owner), 54, 66, 67 and 68 (records).
+- **CDSL Bye-Laws** 13.2 (demat), 13.4 (freezing), 13.5 (remat), 13.7 (closure), 13.8 (transfer of balances), 5.3.17 (DP lien).
+- **Prevention of Money-laundering Act, 2002**, Rule 6 — retention of records; CDSL applies a minimum of **8 years** to demat, remat, pledge, freeze and closure forms.
+- **[CDSL/OPS/DP/POLCY/2026/369](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolcy2026369)** (2 June 2026) — amends Chapter 4 to allow investor-service-request dematerialisation without a letter of confirmation, subject to DP verification and attestation of the beneficial owner's signature.
+- **[CDSL/OPS/DP/POLCY/2026/567](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolcy2026567)** (20 August 2026, effective 21 August 2026) — mandatory capture of a delay reason for demat / destat and remat / restat requests not processed within seven days of receipt.
+- **[NSDL/POLICY/2026/0095](/broking-kyc/reference/circulars/nsdl/#nsdlpolicy20260095)** (30 June 2026) — amends NSDL Business Rules and delivery-instruction forms 15, 16, 36 and 37, including the forms used by power-of-attorney and <abbr title="Demat Debit and Pledge Instruction">DDPI</abbr> holders, with provision for off-market instructions.
+- **[<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/38/13/11(14)2026-<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>-POD/I/17111/2026](/broking-kyc/reference/circulars/sebi-mirsd/#ho381311142026-mirsd-podi171112026)** (23 July 2026, effective 22 August 2026) — simplified transmission framework with Quick Transmission Processing up to **Rs.10,000** for physical holdings and **Rs.30,000** for demat holdings, and simplified-documentation thresholds of Rs.10 lakh and Rs.30 lakh; circulated as [CDSL/OPS/DP/POLCY/2026/500](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolcy2026500) and [NSDL/POLICY/2026/0103](/broking-kyc/reference/circulars/nsdl/#nsdlpolicy20260103).
+
+## 2. Dematerialisation
+
+### 2.1 The demat request form
+
+| Field | Type | Length | Mandatory | Source system | Destination system(s) | Notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| `bo_id` | numeric | 16 | Yes | DP master | Depository, registrar | 8-digit DP ID plus 8-digit client ID |
+| `holder_names` | text | 3 x 70 | Yes | DP master | Depository, registrar | Must match the certificate names, subject to the initials tolerance |
+| `isin` | alphanumeric | 12 | Yes | Depository security master | Depository, registrar | Mandatory; must be an ISIN admitted with the depository |
+| `company_name` | text | 60 | Yes | Security master | Registrar | Old name accepted where verified on the depository or MCA portal |
+| `security_nature` / `security_type` | code | 2 each | Yes | Security master | Depository | Equity, preference, debt |
+| `certificate_count` / `total_quantity` | integer | 5 / 12 | Yes | Client input | Depository, registrar | — |
+| `folio_no` | alphanumeric | 20 | Yes | Certificate | Registrar | Per certificate |
+| `distinctive_nos` | alphanumeric | 2 x 20 | Yes | Certificate | Registrar | Checked against the depository's distinctive-number database |
+| `certificate_nos` / `face_value` | alphanumeric / decimal | 20 / 10,2 | Yes | Certificate | Registrar | — |
+| `lock_in_reason` / `lock_in_release_date` | code / date | 4 / 8 | Conditional | Client input | Depository | Separate form per lock-in reason and expiry combination |
+| `drn` | numeric | 12 | Yes | Depository system | DP records, registrar | Demat request number, written back on the form |
+
+### 2.2 Procedure and controls
+
+The DP verifies that the ISIN is admitted, that certificate details tally with the form, and that the holder names and their order match the beneficial-owner account — matching names in a different order go down the transposition route below. It captures the request, generates the demat request number, **defaces** the certificates with a "surrendered for dematerialisation" stamp bearing the DP name and BO ID, and **mutilates** them by punching two holes at the top without obscuring the distinctive, folio or certificate numbers. Certificates and the original form go to the registrar with a system-generated covering letter within **7 days**, with the dispatch reference captured in the depository system. The registrar reconciles physical against electronic and either confirms — crediting the account — or returns everything under a rejection memo.
+
+Four rules generate most of the exceptions. **Part-dematerialisation of a single certificate is not allowed** — a holding can be part physical and part demat, but not by splitting one certificate. **No name can be added at demat**, so singly held shares cannot become jointly held through the request; that needs a transfer before, or an off-market transfer after. **Transposition-cum-demat** handles the same names in a different order, with a transposition request form per ISIN and combinations listed in separate boxes; no name may be added or deleted. **Transmission-cum-demat** handles a deceased joint holder: a death certificate, notarised or attested by a gazetted official, plus a transmission request form per demat request, and the certificates need not be re-issued by the issuer first.
+
+CDSL levies **no fee on the DP for dematerialisation** and none for transposition-cum-demat; any demat charge the client pays, postage included, is the DP's own.
+
+## 3. Rematerialisation
+
+Rematerialisation converts electronic balances back into paper. The client files a rematerialisation request form — signable by a registered power-of-attorney holder, provided the power of attorney is registered with the issuer or registrar — and the DP blocks the balance, generates a rematerialisation request number, and despatches the form to the issuer or registrar within **7 days**. The registrar prints and despatches the certificates directly to the client and confirms electronically, at which point the blocked balance is debited. The prescribed completion window is **30 days**, and the DP must follow up and keep a record of the follow-up if it is missed.
+
+| Constraint | Detail |
+| --- | --- |
+| Balance | Sufficient free or lock-in balance; ISIN not inactive or frozen for debits; account not closed |
+| Encumbrance | Must be completely free of pledge, hypothecation or lien — the pledge must be closed and confirmed first |
+| Separate forms | One for free quantity and one per lock-in reason and expiry-date combination |
+| Partial | Permitted; the client may rematerialise part and leave the rest electronic |
+| Certificates returned | New certificates, not the originals; new or existing folio at the registrar's discretion |
+| Stamp duty | None — rematerialisation is not a transfer |
+| Tradeability | Securities sent for rematerialisation cannot be traded |
+| CDSL fee to the DP | Rs.10 per 100 securities or part thereof, capped at Rs.5,00,000, or flat Rs.10 per certificate, whichever is higher, on confirmation; nil for government securities |
+
+**Repurchase** uses the same module: a repurchase request form is filed alongside the rematerialisation request form and the issuer or registrar pays cash against the expunged units. Bank details must be in the depository system or the request is rejected.
+
+## 4. Off-market transfers and the delivery instruction slip
+
+An off-market transfer moves securities between two beneficial-owner accounts without the exchange or the clearing corporation. It is the mechanism behind broker migration, family transfers, gifts, pledges settled bilaterally and renunciation of rights entitlements.
+
+### 4.1 Instruction-slip controls
+
+| Control | Rule |
+| --- | --- |
+| Format and numbering | Depository-prescribed combined, off-market and on-market variants, with grievance-redressal text inside the back cover; unique pre-printed serial on the slip and acknowledgement copy; BO ID pre-printed or pre-stamped |
+| Issuance | In booklets, against a signed requisition slip from the previous booklet, authorised by the compliance officer or a designated senior official; register of serial numbers maintained |
+| Lost booklet | Client intimates in writing; the DP cancels all unused slips of that booklet |
+| Loose slips | Issued only in person after signature and identity verification, one booklet open at a time, maximum **10 per account per financial year**, entered in the system the same day |
+| Address change | For a booklet request within **30 days** of an address change, the DP may confirm independently before despatch |
+| Dormant account | For an account with no transactions for **12 months**, independent verification by recorded phone call to the registered number is mandatory before execution, additionally authorised by the compliance officer |
+| All-balance transfers | Mandatory verification where the account holds **5 or more ISINs** and all balances move at once, even for an active account |
+| Pre-signed slips | DPs must not accept pre-signed slips with blank columns |
+
+Involuntary corporate-action credits such as bonus and split do **not** count as transactions when assessing dormancy; voluntary credits such as a rights subscription or a mutual-fund systematic investment plan do.
+
+### 4.2 Execution
+
+The DP accepts the slip from either the transferor or the transferee, sets up the instruction, and the depository holds it pending **one-time-password authentication by the transferor** unless the reason code is on the exemption list. Failure to authenticate by end of the execution date rejects the instruction. The transferee's account must first be **registered as a beneficiary** by the transferor — physically, digitally signed, or through the depository's internet or mobile channel — and the registration itself completes on the transferor's OTP. If the balance is short at debit time the instruction is retried at intervals through the day and fails at end of day without partial execution. Post-dated instructions may not carry an execution date more than **10 days** from entry.
+
+Where the transferee has waived credit confirmations the credit lands automatically; otherwise a purchase-waiver instruction form is needed. The electronic delivery-instruction channel carries the volume in practice and is subject to maintenance outages the DP must plan around — [CDSL/IT/DP/SYSTM/2026/594](/broking-kyc/reference/circulars/cdsl/#cdslitdpsystm2026594) is a recent example.
+
+<Aside type="danger" title="Off-market transfer is the highest-risk servicing instruction">
+An off-market transfer is irreversible, needs no consideration, and moves the asset outside any exchange audit trail. That is exactly why the control stack is heavier than for a market sale: beneficiary pre-registration, transferor OTP, dormancy call-back, the 5-or-more-ISIN rule, the prohibition on pre-signed slips, and a Rs.100 per transaction erroneous-transfer reversal charge that exists because reversals are exceptional. A broker building a self-service off-market flow must implement every one of these, not the OTP alone.
+</Aside>
+
+## 5. Gift of shares
+
+A gift of listed shares is executed as an off-market transfer with a gift reason code, no consideration, and the donee's account pre-registered as a beneficiary. The operational mechanics are those of section 4; the consequences are tax consequences.
+
+- **For the donor**, a transfer under a gift is not a transfer for capital-gains purposes (section 47(iii) of the Income-tax Act, 1961), so no capital gain arises on the giving.
+- **For the donee**, the cost of acquisition is the cost to the previous owner (section 49(1)) and the holding period includes the previous owner's period, so the gifted lot keeps its original acquisition date for the long-term test.
+- **Receipt** without consideration is taxable in the donee's hands as income from other sources where aggregate fair market value exceeds **Rs.50,000** in a year (section 56(2)(x)), unless received from a defined relative, on marriage, or under a will or inheritance.
+- Section numbering changes under the Income-tax Act, 2025 from 1 April 2026; see [Tax reporting](./tax-reporting/). `[AI inference — verify before acting]`
+- Stamp duty on an off-market transfer on a delivery basis is collected by the depository at the Schedule I rate in the Indian Stamp Act, 1899 as amended in 2019. `[industry practice — unverified]`
+
+The failure mode is on the donee's side: the receiving broker sees only a credit date, so the donee's capital-gains report shows the wrong acquisition date and unknown cost until the original figures are supplied.
+
+## 6. Freeze and unfreeze
+
+| Dimension | Options |
+| --- | --- |
+| Initiator | Beneficial owner (in writing), DP (statutory or regulatory order, or lien with prior depository approval), depository (order, or its own directions) |
+| Scope | Whole account; one or more ISINs at full or partial quantity; an ISIN across all accounts on a regulator's instruction |
+| Direction | Debits only, credits only, or both |
+| Timing | Immediate or from a future activation date |
+| Duration | Temporary with an expiry date, or permanent with none |
+| Form | Freeze / unfreeze request form, Annexure 13.1 |
+
+A beneficial-owner freeze generates a freeze identifier and a system-generated acknowledgement letter the DP signs, stamps and sends. A future-dated freeze can be modified or cancelled on written instruction before activation; a statutory-order freeze can be modified only on an order from the same or a superior authority. A **<abbr title="Know Your Customer (process).">KYC</abbr>-deficiency freeze** has its own sequence: the depository instructs the DP, which writes, emails and attempts to phone the client, allows **30 days** for rectified documents, and freezes for debit if nothing arrives, with an <abbr title="Short Message Service.">SMS</abbr> from the depository to the registered mobile. The DP reconciles freeze and unfreeze requests **daily** and retains forms and orders for at least 8 years.
+
+Since **28 August 2026** both depositories require regulatory-authority details and the order date to be captured on order-driven freezes, with the order type conditional on a SEBI-order freeze.
+
+## 7. Statements and closure interplay
+
+The depository-side statement obligations are covered in [Ledger and statements](./ledger-and-statements/). What matters here is the closure sequence, because it consumes every instruction type on this page.
+
+An account closes only when **all balances are zero**. The closure request form lets the client say whether balances should be rematerialised, transferred out, or both, and the DP takes the rematerialisation request form or delivery instruction slip alongside it — except on a **shifting of account**, where no instruction slip is needed. The request is entered in the depository system within **7 days** of receipt, after which the account carries a "to be closed" status and accepts no fresh credits. Where an ISIN cannot be moved because of a regulatory restraint such as pending listing after a public issue, the account stays in that status and the DP may process the transfer on the earlier form for up to **one year**; beyond that a fresh form is needed. Long-pending demat requests with non-responding companies are cleared by asking the issuer to reject them. The DP then issues a quarter-to-date transaction statement and, after closure at end of day, a final statement marked account closed, keeping proof of dispatch for both.
+
+## 8. Alternatives
+
+| Option A | Option B | When to pick which | Who uses what |
+| --- | --- | --- | --- |
+| Transfer holdings out off-market on closure | Sell in the market and close with cash | Off-market transfer avoids <abbr title="Securities Transaction Tax">STT</abbr> and a capital-gains event; selling is faster and needs no receiving account | Clients moving brokers transfer; clients exiting the market sell |
+| Gift via off-market transfer | Sell and gift the money | Off-market gift preserves the acquisition date and cost for the donee; selling crystallises the donor's gain | Family transfers use the off-market route |
+| Voluntary freeze by the beneficial owner | Leave the account open and rely on transaction alerts | Freeze for a dormant holding or a client travelling; alerts for an active trader | Long-term holders freeze; active clients do not |
+
+## Practical notes
+
+- **[gotcha]** Rematerialisation fails on encumbrance more often than on balance. Any open pledge, margin pledge or lien must be closed and confirmed in the depository system first, and a client who has an old margin pledge they have forgotten about will see a rejection with no obvious cause.
+- **[gotcha]** The dormancy test for instruction verification is **12 months** of no transactions, and involuntary corporate-action credits do not reset it: a client who held quietly through a bonus issue is still dormant, and their first sale instruction attracts a recorded call-back.
+- **[gotcha]** Name-order mismatches are the commonest demat rejection; the fix is transposition-cum-demat with a transposition request form per ISIN, not a fresh account in the other order.
+- **[industry practice]** A client cannot initiate an off-market transfer in-app without a pre-registered beneficiary; beneficiary registration has to be a separate, earlier step with its own OTP.
+- **[cost optimization]** Moving brokers by off-market transfer rather than by selling and rebuying avoids STT, brokerage, stamp duty and a realised capital gain, at the cost of the DP's per-ISIN transfer charge. For any holding of size the transfer wins by an order of magnitude. See [Lifecycle: Voluntary closure](/broking-kyc/lifecycle/closure/).
+- **[risk trade-off]** The eight-year retention obligation applies to the *forms*, not only the system record, and to freeze orders and closure forms as much as to instruction slips. Firms that digitise capture but leave physical retention to branches accumulate exactly the gap an inspection finds.
+
+## Cross-references
+
+- [Funds & Tax: Ledger and statements](./ledger-and-statements/) — depository statements and the freeze markers on them.
+- [Funds & Tax: Corporate actions](./corporate-actions/) — off-market renunciation of rights entitlements, and <abbr title="Investor Education and Protection Fund">IEPF</abbr> debits.
+- [Funds & Tax: Tax reporting](./tax-reporting/) — cost basis and holding period for transferred-in and gifted lots.
+- [Lifecycle: Voluntary closure](/broking-kyc/lifecycle/closure/) — the closure sequence this page feeds.
+- [Lifecycle: Transmission](/broking-kyc/lifecycle/transmission/) — the death-of-holder path, including transmission-cum-demat.
+- [Lifecycle: Modifications](/broking-kyc/lifecycle/modifications/) — signature, address and bank-detail changes that gate servicing requests.
+- [Lifecycle: Dormancy and reactivation](/broking-kyc/lifecycle/dormancy-reactivation/) — the dormancy state that triggers instruction verification.
+- [Vendors: CDSL](/broking-kyc/vendors/depositories/cdsl/) and [CDSL modifications](/broking-kyc/vendors/depositories/cdsl-modifications/) — depository interfaces for servicing requests.
+- [Vendors: CDSL DDPI](/broking-kyc/vendors/depositories/cdsl-ddpi/) — the authorisation replacing a power of attorney for debit instructions.
+- [Field Atlas — Section H (demat account)](/broking-kyc/reference/field-atlas/sections/h-demat-account/) — the demat field set captured at onboarding.
+- [Circulars — CDSL](/broking-kyc/reference/circulars/cdsl/), [Circulars — NSDL](/broking-kyc/reference/circulars/nsdl/) and [Circulars — SEBI MIRSD](/broking-kyc/reference/circulars/sebi-mirsd/) — the instruments cited above.
+
+## Verified through
+
+2026-09-11
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

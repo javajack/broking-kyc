@@ -1,0 +1,152 @@
+---
+title: "Funds & Tax: Delayed Payment Charges"
+description: DPC and debit-balance interest — the disclosure obligation, same-client netting, T+1 debit mechanics, day-count and tax treatment, liquidation as the alternative, and what is uncapped.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** a delayed-payment charge is an amount a broker bills its own client under a contract, not a statutory levy. So the page establishes the debit and its due date first, then the mandatory netting that reduces the chargeable principal, then the contractual terms that determine the amount, and only then the tax and reporting consequences — because getting the first two wrong makes the last two irrelevant.
+
+## TL;DR
+
+- **There is no regulatory rate cap on delayed payment charges.** What the regulator mandates is disclosure: paragraph 23.4.4 of the Master Circular for Stock Brokers (<abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/90, 17 June 2025 — `[not yet in index]`) requires a mandatory policies-and-procedures document covering "imposition of penalty/delayed payment charges by either party, specifying the rate and the period", with the caveat that it "must not result in funding by the broker in contravention of the applicable laws".
+- **The charge is bilateral in the circular's own wording** — "by either party". A client-only penalty clause is a narrower reading than the provision contemplates.
+- **Same-client balances must be netted across segments and exchanges before any <abbr title="Delayed Payment Charges">DPC</abbr> is levied,** per <abbr title="National Stock Exchange of India">NSE</abbr>'s clarification on client fund balance (NSE/INSP/38945, 24 September 2018 — `[not yet in index]`). Charging a segment debit while the same client holds a credit elsewhere with the same broker is the specific abuse that clarification addresses.
+- **Collateral is not cash.** Securities, fixed-deposit receipts and bank guarantees held for margin are not credits that reduce the chargeable debit, even though the trading terminal shows them as available margin.
+- **Liquidation is bounded.** Paragraph 23.4.5 permits selling client securities or closing positions without notice for non-payment of dues, but expressly limits that to the extent of the settlement or margin obligation.
+- **Unpaid securities now have their own framework.** [HO/38/11/(9)2026-MIRSD-POD/I/15382/2026](/broking-kyc/reference/circulars/sebi-mirsd/#ho381192026-mirsd-podi153822026) (3 July 2026) replaces master-circular paragraph 46: direct client payout with auto-pledge to <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr>, a trading-member payment period capped at five trading days from payout, and no exposure permitted against those securities.
+
+## Conceptual overview
+
+A delayed payment charge is what a broker bills a client whose money did not arrive when the obligation fell due. Brokers label it variously — DPC, delayed payment charges, debit balance interest, interest on ledger debit — and the label matters less than the three questions behind it: what became payable, when it became payable, and how much of it was still unpaid on each day.
+
+Its regulatory footing is thin by design. SEBI does not set the rate, the day count, the grace period or the compounding basis. It requires that the broker publish a policy stating the rate and the period, that the policy not be used to create funding that the law does not permit, and that any liquidation done instead of charging be limited to the obligation. Everything else is contract. This is genuinely different from a margin-shortfall penalty, which is levied by the clearing corporation on a published slab and passed through — a distinction covered in the [<abbr title="Risk Management System">RMS</abbr> and <abbr title="Standard Portfolio Analysis of Risk">SPAN</abbr> methodology deep-dive](/broking-kyc/deep-dives/trading-day/rms-span-methodology/).
+
+That thin footing cuts both ways. It gives brokers latitude, and it puts the entire burden of justification on the broker's own documents. An inspection or a client dispute over DPC is resolved by reading the accepted policy version, the consolidated ledger, and the daily working — not by citing a circular. Where the broker cannot reproduce the day-by-day principal, the charge is difficult to defend regardless of whether the annualised rate was reasonable.
+
+## 1. Regulatory framework
+
+- **SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90** (17 June 2025) — Master Circular for Stock Brokers. Paragraph 23.4 requires a mandatory policies-and-procedures document covering, among other headings, the applicable brokerage rate (23.4.3), imposition of penalty or delayed-payment charges by either party specifying the rate and the period (23.4.4), and the right to sell client securities or close positions without notice on non-payment of dues, limited to the extent of settlement or margin obligation (23.4.5). Paragraph 23.4.7 covers the conditions under which a client may be barred from taking further positions. Paragraph 23.6 requires a free copy of every executed document within seven days. `[not yet in index]`
+- **[SEBI/HO/MIRSD/POD-1/P/CIR/2024/118](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir2024118)** (9 August 2024) — the superseded master circular carrying the same policies-and-procedures structure; the version most legacy account-opening kits reference.
+- **NSE/INSP/38945** (24 September 2018), "Clarification on Client Fund Balance" — requires netting of the same client's credit and debit balances across exchanges and segments before applying a mutually agreed delayed-payment charge, and distinguishes margin collateral from available funds. `[not yet in index]`
+- **NSE/INSP/70591** (3 October 2025) — Risk Based Supervision submission for the half-year ended September 2025. Annexure A includes a reported total of late or delayed payment charges levied on clients across all exchanges for the assessment period. A reporting instruction, not a rate cap. `[not yet in index]`
+- **[HO/38/11/(9)2026-MIRSD-POD/I/15382/2026](/broking-kyc/reference/circulars/sebi-mirsd/#ho381192026-mirsd-podi153822026)** (3 July 2026) — handling of clients' unpaid securities. Replaces master-circular paragraph 46 with direct client payout and auto-pledge to CUSPA, daily excess-pledge release, a payment window capped at five trading days from payout, auto-release of unresolved pledges at the end of the sixth trading day, and extension requests for specified liquidation obstacles by 6 p.m. on the fifth day. Paragraphs 46.1 to 46.11 commence three months after exchange operational guidelines; 46.12 to 46.14 six months after issuance.
+- **CBIC Sectoral FAQs, stock broking, question 80** — the goods-and-services-tax treatment of interest and delayed-payment amounts associated with brokerage, settlement obligations and margin trading facility.
+
+## 2. How a debit arises on a T+1 cycle
+
+The cash-market default has been <abbr title="Trade-date Plus N settlement">T+1</abbr> since 27 January 2023. A buy executed on T creates a funds pay-in obligation that the clearing corporation calls on the morning of T+1 — typically around 10:30 for the first settlement and later for the second, per the settlement calendar in force. The broker meets that obligation from the client's balance; if the balance is short, the broker has funded it, and a debit appears in the client's ledger.
+
+Three things follow that are easy to state wrongly.
+
+The due date is a contractual construct, not an automatic consequence of the settlement cycle. T+1 creates the event, but the tariff may key the charge to an end-of-day balance, to a pay-in cut-off, or to some other disclosed period. Interest cannot be inferred to start at order placement.
+
+Holidays and settlement-calendar shifts move the due date. Where the clearing corporation reschedules pay-in around a settlement holiday, the chargeable period moves with it. Brokers that compute day counts from a plain calendar rather than the settlement calendar overcharge on exactly those days.
+
+An unexplained opening debit is not a chargeable principal. Before billing, the ledger posting should be traceable to a trade bill, a statutory levy, a settlement event, or a separately identified collateral utilisation. `[AI inference — verify before acting]`
+
+## 3. The netting rule
+
+NSE/INSP/38945 addresses a specific overcharge: a client held a debit in one segment while holding a credit with the same broker elsewhere, and was charged on the gross debit. The clarification requires the same client's credit and debit balances to be netted across exchanges and segments before a mutually agreed delayed-payment charge is applied.
+
+A worked illustration of the clarification, not a new tariff: if the equity-segment debit is ₹40,000 and the client holds an eligible cash credit of ₹25,000 in another segment with the same broker, the net chargeable debit is ₹15,000 before any other applicable adjustment. If instead the ₹25,000 represents pledged securities, it does not reduce the debit at all — the terminal's "available margin" display is answering a different question from the funds ledger.
+
+Two boundaries. Netting is *within the same client and the same broker*: balances of different clients cannot be offset (the running-account framework prohibits inter-client adjustment outright), and a balance at an unrelated broker is irrelevant. And netting is *of cash*: the clarification is explicit that securities, fixed-deposit receipts and bank guarantees held for margin are not cash credits to be subtracted.
+
+<Aside type="caution" title="Available margin and ledger balance are different numbers">
+A client can see a positive available margin and still be running a funds debit that accrues DPC, because the margin figure includes non-cash collateral after haircut while the ledger records cash. Client-facing screens that show only one of the two generate a predictable stream of disputes. Show both, label them distinctly, and state which one the delayed-payment charge is computed on.
+</Aside>
+
+## 4. Computing the charge
+
+Once the net chargeable principal is established, the amount is entirely a function of the disclosed policy. The variables that must be pinned down — and that the public sources do not supply — are the rate, the day-count basis, the rounding convention, the treatment of holidays, whether a grace period applies, and whether interest compounds.
+
+For a simple annual-rate implementation the daily amount is principal multiplied by the annual rate multiplied by eligible days divided by the disclosed year basis. Two cautions apply. Do not choose 360 or 365 silently — the choice changes the answer and must appear in the policy. And do not compound by default: compounding is a contractual term, not a default of arithmetic.
+
+Published broker tariffs illustrate the range without establishing any rule. One dominant discount broker publishes a debit-balance charge of 0.05 per cent per day, described as ₹50 per lakh and as "18 per cent per annum". Multiplying 0.05 per cent by 365 gives 18.25 per cent, so the rounded annual description is an approximation and not an exact conversion — a distinction that matters when a client recomputes a bill. The same broker publishes a separate, lower charge for non-cash collateral utilisation. These are named only as public tariff examples; no endorsement or inference about any other broker is intended, and neither figure is a cap.
+
+<Aside type="danger" title="No public source establishes an 18 per cent maximum">
+The "18 per cent per annum regulatory maximum" that circulates in broking commentary is not established by the SEBI master circular, by the NSE clarification, or by any other source verified for this page. It appears to be a widely repeated broker tariff figure that acquired the appearance of a rule. Where a client, a training deck or an internal policy asserts a statutory DPC cap, ask for the instrument — and where a policy relies on one, price the risk that no such cap exists. `[AI inference — verify before acting]`
+</Aside>
+
+## 5. Charges that look similar but are not the same
+
+| Charge | What it prices | Who levies it | Rate source | Typical tax treatment |
+| --- | --- | --- | --- | --- |
+| Delayed payment charge / debit-balance interest | Client money not received when due | Broker, under its disclosed policy | Broker tariff | CBIC stock-broking FAQ 80 treats specified interest and delayed-payment amounts tied to brokerage, settlement obligations and <abbr title="Margin Trading Facility">MTF</abbr> under the loan-and-advance interest treatment it cites |
+| Non-cash collateral utilisation charge | Margin met from pledged securities rather than cash | Broker, under its disclosed policy | Broker tariff | Published examples apply 18 per cent GST; substance determines classification |
+| Margin shortfall penalty | Margin not collected or reported | Clearing corporation, passed through | Published penalty slabs | Pass-through; see the broker-side treatment |
+| MTF interest | Broker-funded purchase under a regulated facility | Broker, under the MTF agreement | MTF rate schedule disclosed at activation | Follows the MTF arrangement |
+| Auction and close-out charges | Short delivery | Clearing corporation | Auction close-out formula | Statutory and exchange levies apply to the auction trade |
+
+The tax point deserves emphasis: classification follows the substance of the supply and the applicable notification, not the narration on the ledger. A line item labelled "interest" does not automatically attract the interest treatment, and a broker whose public tariff applies GST to one delayed-payment-style charge and not to another is not being inconsistent — it is classifying two different supplies. Verify against current clarifications before reclassifying a borderline fee.
+
+## 6. Liquidation, or charging
+
+Paragraph 23.4.5 lets a broker sell client securities or close client positions without notice for non-payment of dues, limited to the extent of the settlement or margin obligation. Paragraph 23.4.7 requires the policy to state the conditions under which a client may be barred from taking further positions.
+
+These are alternatives to carrying a debit, not additions to it. Liquidation resolves the cash obligation prospectively by creating another trade — with its own brokerage, statutory levies and settlement — but it does not retroactively erase the period during which the original amount was unpaid. Selling more than the obligation requires is outside what the paragraph permits.
+
+The July 2026 unpaid-securities framework narrows the space further for the specific case of securities the client has not paid for. Under [HO/38/11/(9)2026-MIRSD-POD/I/15382/2026](/broking-kyc/reference/circulars/sebi-mirsd/#ho381192026-mirsd-podi153822026), non-margin-trading unpaid securities are paid out directly to the client's demat account and auto-pledged to CUSPA, the trading member's policy must specify a payment period no longer than five trading days from payout, and the policy may not permit exposure against those securities. A broker cannot, under that framework, treat an unpaid purchase as an open-ended funded position carrying DPC indefinitely.
+
+### Field-level model — daily charge working
+
+A proposed working, not a published exchange wire format. `[AI inference — verify before acting]`
+
+| name | type | length | mandatory | source-system | destination-system(s) | notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| Client code | identifier | `[unknown — verify]` | Yes | Client master | Consolidated ledger | Same legal client, same broker |
+| Balance date | date | `[unknown — verify]` | Yes | Ledger | Charge engine | State whether value date or posting date governs |
+| Segment credits and debits | decimal INR | `[unknown — verify]` | Yes | Segment ledgers | Netting calculation | All exchanges and segments |
+| Net debit principal | decimal INR | `[unknown — verify]` | Yes | Netting calculation | Charge engine | Cash only; not collateral market value |
+| Underlying event reference | identifier | `[unknown — verify]` | Yes | Trade bill, levy, settlement record | Client statement | Makes the debit explainable |
+| Policy version and effective date | identifier, date | `[unknown — verify]` | Yes | Accepted tariff | Charge audit | The version in force on the balance date |
+| Rate, day-count basis, eligible days | decimal, enumeration, integer | `[unknown — verify]` | Yes | Tariff, settlement calendar | Calculation | Compounding stated explicitly |
+| Charge amount | decimal INR | `[unknown — verify]` | Yes | Calculation | Ledger | Posted as an identifiable entry |
+| Tax amount and classification | decimal INR, enumeration | `[unknown — verify]` | Conditional | Tax rules | Ledger, invoice | Classification follows the supply, not the narration |
+| Waiver or tolerance reference | identifier | `[unknown — verify]` | Where applied | Approval workflow | Charge audit | Recorded separately from the contractual rate |
+| Original entry reference | identifier | `[unknown — verify]` | On reversal | Ledger | Audit trail | Reverse against the original; do not delete |
+
+For reporting, NSE's Risk Based Supervision annexure asks for a single item:
+
+| name | type | length | mandatory | source-system | destination-system(s) | notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| Total amount of late/delayed payment charges levied on clients during the assessment period (across all Exchanges) | monetary amount | `[unknown — verify]` | Applicable RBS return | Broker accounts | Exchange inspection module | Single cross-exchange total; do not count a charge once per segment. Confirm the current submission schema before upload |
+
+## 7. Alternatives
+
+| Option A | Option B | When to pick which | Who uses what |
+| --- | --- | --- | --- |
+| Carry the debit and charge DPC | Liquidate to the extent of the obligation | Charge where the client has confirmed funding in transit; liquidate where exposure is growing or the client is unreachable | Retail brokers generally allow a short disclosed window before liquidating |
+| DPC under the policies document | MTF as a funded product | DPC prices an unintended delay; MTF is the regulated way to offer funding deliberately | Clients who routinely run debits belong in MTF, not in perpetual DPC |
+| Daily ledger postings | Periodic consolidated posting | Daily is self-explaining; periodic reduces ledger noise but needs the daily basis retained underneath | Both are used; neither is prescribed |
+| Cash transfer to clear the debit | Pledging additional securities | Cash clears the net debit; a pledge provides margin support but does not reduce the cash principal under the NSE netting rule | Clients often attempt the pledge route and are surprised the charge continues |
+
+## Practical notes
+
+- **[gotcha]** Netting is mandatory before charging, and it is netting of cash. A broker that computes DPC per segment will overcharge any client who runs a credit in one segment and a debit in another.
+- **[gotcha]** The circular's wording is "by either party". A policy that only ever charges the client is a narrower implementation than paragraph 23.4.4 describes.
+- **[gotcha]** Day counts must follow the settlement calendar, not the plain calendar. Settlement holidays and rescheduled pay-ins shift the chargeable period.
+- **[industry practice]** Published tariffs commonly separate debit-balance interest from a non-cash collateral utilisation charge at different rates and different tax treatments. Merging them to simplify a tariff screen destroys the classification basis.
+- **[cost optimization]** Reconcile the client's entire same-client cash position before billing. Avoidable segment isolation is the most common source of refundable overcharges.
+- **[risk trade-off]** Operational waivers keep clients, and they must be recorded separately from the disclosed contractual rate so that the tariff remains the tariff. `[AI inference — verify before acting]`
+- **[industry practice — unverified]** Where a client disputes a charge because a transfer was in flight, the bank's own timeline decides whether the money arrived — it does not by itself decide whether the disclosed policy supports reversal. Retain the transfer identifier and the bank status with the dispute record.
+
+## Cross-references
+
+- [Funds & Tax: Pay-in Rails](./payin-rails/) — how the money that would have prevented the debit arrives, and why a pending transfer is not a receipt.
+- [Funds & Tax: Payout and Running-Account Settlement](./payout-running-account/) — the same consolidated same-client balance, used there for the retention ceiling.
+- [Funds & Tax: Brokerage and Charges](./brokerage-and-charges/) — where DPC sits in the tariff sheet alongside brokerage and statutory levies.
+- [Deep Dive: MTF Operational Walkthrough](/broking-kyc/deep-dives/settlement/mtf-operational/) — the regulated funding product that DPC is not a substitute for, including the interest computation and pledge mechanics.
+- [Deep Dive: Pay-in Default and Core <abbr title="Settlement Guarantee Fund">SGF</abbr>](/broking-kyc/deep-dives/settlement/payin-default-core-sgf/) — what happens when the broker, rather than the client, fails to meet a pay-in obligation.
+- [Deep Dive: RMS and SPAN Methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/) — margin computation, shortfall penalties, and why those are not delayed-payment charges.
+- [Deep Dive: <abbr title="Trade-date Plus N settlement">T+0</abbr> / T+1 Settlement](/broking-kyc/deep-dives/settlement/t0-t1-settlement/) — the pay-in cut-offs that define when an obligation actually falls due.
+- [Deep Dive: <abbr title="Electronic Contract Note.">ECN</abbr> and Investor Servicing](/broking-kyc/deep-dives/member-compliance/ecn-investor-servicing/) — the statement that has to make the charge explainable to the client.
+
+## Verified through
+
+2026-09-11
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

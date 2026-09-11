@@ -1,0 +1,143 @@
+---
+title: "Funds & Tax: Pay-in Rails"
+description: How money reaches a trading account — UPI, payment-gateway net banking, NEFT/RTGS/IMPS, the UPI-block route for the secondary market, the third-party fund prohibition, and bank-account verification.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** money entering a trading account has to satisfy two independent tests — a *banking* test (did the transfer settle?) and a *regulatory* test (did it come from this client's own account?). The page separates them deliberately: rails first, then the client-origin rule that governs all of them, then the two arrangements that keep money at the bank instead of sending it to the broker, then the verification and reconciliation layer that decides whether a credit becomes usable trading balance.
+
+## TL;DR
+
+- **All client money must be received electronically from the client's own bank account, and never in cash.** Paragraph 28 of the [Master Circular for Stock Brokers](/broking-kyc/reference/circulars/sebi-mirsd/) (<abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/90, 17 June 2025 — `[not yet in index]`; supersedes the [August 2024 master](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir2024118)) requires account-payee instruments or direct electronic credit, and prohibits cash both ways.
+- **Pre-funded instruments of ₹50,000 or more per day per client need issuing-bank certification** of the account holder's name and the account number debited (paragraph 29.1.1, four permitted certification modes). Electronic transfers instead require an audit trail proving the funds came from the client (paragraph 29.1.2).
+- **Qualified Stock Brokers must offer either a <abbr title="Unified Payments Interface">UPI</abbr> block facility or a qualifying 3-in-1 account** for the secondary-market cash segment from 1 February 2025, per [SEBI/HO/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>/MRD-PoD-2/P/CIR/2024/153](/broking-kyc/reference/circulars/sebi-other/#sebihomrdmrd-pod-2pcir2024153) (11 November 2024). The client chooses whether to use it.
+- **Collection UPI handles are now standardised and verifiable.** SEBI/HO/DEPA-<abbr title="—">II</abbr>/DEPA-II_SRG/P/CIR/2025/86 (11 June 2025 — `[not yet in index]`) and [<abbr title="National Payments Corporation of India">NPCI</abbr>/UPI/OC No. 217/2025-26](/broking-kyc/reference/circulars/npci/#npciupioc-no-2172025-26) put intermediary collection under merchant category 6211 with `@valid`-suffixed handles from 1 October 2025; [<abbr title="Multi Commodity Exchange of India">MCX</abbr>/MEM/461/2026](/broking-kyc/reference/circulars/mcx/#mcxmem4612026) (11 August 2026) extends the linkage to every investor-facing upstream account by 6 September 2026.
+- **<abbr title="Real Time Gross Settlement">RTGS</abbr> has a ₹2,00,000 floor and no <abbr title="Reserve Bank of India">RBI</abbr> ceiling; <abbr title="National Electronic Funds Transfer">NEFT</abbr> runs 48 half-hourly batches a day.** Both are 24x7. A 24x7 banking rail is not a 24x7 broker back office — receipt, reconciliation and allocation are three separate checkpoints.
+
+## Conceptual overview
+
+A pay-in is the movement of money from a client's bank account into the pool the broker uses to meet that client's settlement and margin obligations. Operationally it looks like a payment; regulatorily it is closer to a custody event. The broker is not simply taking a payment for services — it is accepting money that will remain the client's property, be upstreamed to a clearing corporation, and be returned on a prescribed calendar. That is why the rules governing pay-in are about *provenance* far more than about speed.
+
+The rails themselves are ordinary Indian retail payment rails. UPI and payment-gateway net banking give an interactive, in-app experience; NEFT, RTGS and <abbr title="Immediate Payment Service">IMPS</abbr> let the client push money from their own banking channel to the broker's published collection account. A broker supports several because they fail differently: a gateway outage does not stop a NEFT push, and an RTGS floor of ₹2 lakh makes it useless for a ₹5,000 top-up.
+
+Layered on top are two arrangements that deliberately do *not* move money to the broker. The UPI block facility (built on the Single Block Multiple Debits mandate) and the qualifying 3-in-1 account both leave funds in the client's bank account, blocked, until a settlement obligation actually arises. SEBI required Qualified Stock Brokers to offer one of them for the secondary-market cash segment from 1 February 2025. For the broker's books these are not receipts at all: a block is a lien at the client's bank, not a credit in the client ledger, and treating it as one misstates both the client's balance and the broker's client-funds position. The broker-side consequences of that distinction are covered in the [client funds and upstreaming deep-dive](/broking-kyc/deep-dives/settlement/client-funds-upstreaming/); this page stays on the client-facing side.
+
+## 1. Regulatory framework
+
+- **SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90** (17 June 2025) — Master Circular for Stock Brokers, consolidating circulars issued up to 10 June 2025 and superseding the 9 August 2024 master. Paragraph 28 (mode of payment and delivery) bars cash in both directions and requires account-payee crossed cheques, demand drafts, or direct electronic credit; brokers may accept cheques drawn only by the client and issue cheques only in favour of the client. Paragraph 28.3 applies the same "beneficiary account only" logic to securities. Paragraph 29 governs pre-funded instruments and electronic fund transfers. Linked without an anchor: `[not yet in index]`.
+- **[SEBI/HO/MIRSD/POD-1/P/CIR/2024/118](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir2024118)** (9 August 2024) — the preceding Master Circular for Stock Brokers, superseded by the June 2025 edition but still the version most existing internal documents cite.
+- **[SEBI/HO/MRD/MRD-PoD-2/P/CIR/2024/153](/broking-kyc/reference/circulars/sebi-other/#sebihomrdmrd-pod-2pcir2024153)** (11 November 2024) — trading supported by blocked amount in the secondary market. Requires each Qualified Stock Broker to provide either the UPI block facility or a qualifying 3-in-1 trading account from 1 February 2025, limited to the cash segment, with the choice of whether to use it resting with the client.
+- **SEBI/HO/DEPA-II/DEPA-II_SRG/P/CIR/2025/86** (11 June 2025) — standardised, validated and exclusive UPI IDs for payment collection by SEBI-registered intermediaries. Establishes the merchant-category and bank-validated handle structure, with availability from 1 October 2025. `[not yet in index]`
+- **[NPCI/UPI/OC No. 217/2025-26](/broking-kyc/reference/circulars/npci/#npciupioc-no-2172025-26)** (3 July 2025) — the NPCI implementation of that SEBI direction: intermediaries under merchant category 6211 collect only through `@valid`-class handles, handle length capped at 10 characters, and paying apps display a distinguishing indicator when the payee is a `@valid` handle. Mandatory adoption from 1 October 2025.
+- **[MCX/MEM/461/2026](/broking-kyc/reference/circulars/mcx/#mcxmem4612026)** (11 August 2026) — clarification requiring every investor-facing upstream account that receives funds from individual or non-institutional clients to be linked to a validated UPI ID by 6 September 2026, including accounts opened after issue; members on multiple exchanges apply through one exchange only. Equivalent clarifications were circulated by the depositories in the same window.
+- **[NPCI/UPI/OC-128A/2026-27](/broking-kyc/reference/circulars/npci/#npciupioc-128a2026-27)** (3 July 2026, effective 15 July 2026) — extends deemed-debit treatment to response codes 59 and K1 for mandate execution, keeps VO, VH, VU/QD and VS excluded, and permits BGGD for the excluded codes in <abbr title="Initial Public Offering">IPO</abbr>, Retail Direct Scheme and SBMD secondary-market cases where the amount conforms to the mandate. Members must reconcile mandate and transaction files, unblock expired mandates, and prevent duplicate or out-of-validity execution.
+- **RBI NEFT and RTGS FAQs**, plus RBI's 30 December 2024 notification introducing beneficiary bank account name look-up for RTGS and NEFT — processing characteristics, customer charge ceilings, credit timelines, and payee-name confirmation before a transfer is released.
+
+## 2. The rails, compared
+
+| Rail | Initiated from | Floor / ceiling | Timing | Cost to payer | Notes |
+| --- | --- | --- | --- | --- | --- |
+| UPI | Broker app, authorised in the client's UPI app | NPCI category and payer-bank limits | Near-instant, 24x7 | Generally nil | Paid to the broker's allocated `@valid` handle |
+| Gateway net banking | Broker app, redirect to net banking | Bank-set | Minutes | Per-transaction gateway fee | Broker tariff item, not a statutory levy |
+| NEFT | The client's banking channel | No RBI ceiling | 48 half-hourly batches daily, 24x7 | Nil for online NEFT from savings accounts per the RBI FAQ; capped otherwise | Uses the published collection account and <abbr title="Indian Financial System Code.">IFSC</abbr> |
+| RTGS | The client's banking channel | ₹2,00,000 minimum, no RBI ceiling | Individual settlement; credit within 30 minutes of the message reaching the beneficiary bank | Outward ceilings ₹25 for ₹2–5 lakh, ₹50 above ₹5 lakh, exclusive of tax; inward free | 22-character UTR is the reconciliation key |
+| IMPS | Client mobile or net banking | NPCI and bank limits | Near-instant, 24x7 | Bank-specific | Verify the current NPCI operating circular before publishing limits `[AI inference — verify before acting]` |
+| UPI block / 3-in-1 | Broker app plus the client's bank | Mandate-level | Block held until an obligation arises | Nil | Not a receipt — see section 4 |
+
+RBI's charge ceilings are ceilings, not what every bank levies, and they say nothing about a broker's gateway cost. Both belong on the tariff sheet, not in a claim that one rail is "cheaper".
+
+## 3. The client-origin rule and the third-party prohibition
+
+The operative rule is short: money may be accepted only from the client, and paid only to the client. Everything else follows from it.
+
+Paragraph 28.2 of the master circular states the rule for instruments — cheques drawn only by the client, cheques issued only in favour of the client. Paragraph 29 addresses the two ways that rule gets circumvented. Pre-funded instruments (pay orders, demand drafts, banker's cheques) hide the remitter, so where the aggregate value is ₹50,000 or more per day per client the broker may accept them only with issuing-bank certification of the account holder's name and the account number debited. The circular lists four acceptable modes: a certificate on the issuing bank's letterhead or on plain paper with the bank's seal; a certified copy of the retained portion of the requisition slip; a certified copy of the passbook or bank statement for the debited account; or the bank's authentication of the account number and holder name on the reverse of the instrument. Electronic transfers hide the remitter differently — a credit arrives with a reference but not always with a verifiable owner — so paragraph 29.1.2 requires an audit trail demonstrating that funds were received from clients only.
+
+Three consequences are where disputes arise. A successful credit into the collection account does not by itself authorise allocation to whichever client code quotes its reference: allocation is a provenance decision, and a credit whose remitter does not match the client's bank master belongs in an exception queue rather than in tradeable balance. An authorised person cannot be an alternative collection point — paragraph 48.7 states that the authorised person is not permitted to accept client funds and securities, that the trading member must keep a proper check, and that proprietary trading by an authorised person is permitted only on the authorised person's own funds and securities. And the prohibition is not a threshold: the ₹50,000 figure governs when certification is required for pre-funded instruments, not when third-party money becomes acceptable.
+
+<Aside type="danger" title="A spouse's or parent's account is still a third party">
+Family relationship is not an exemption. A transfer from a spouse, parent or child into a client's trading account is a third-party receipt and must be handled as an exception — investigated and, ordinarily, returned to the remitting account rather than allocated. The same applies to a joint account where the client is a holder but not the first holder, unless that account is itself on the client's accepted bank master. Brokers that allocate such credits "because the surname matches" create an unidentified-money trail that inspection findings pick up directly.
+</Aside>
+
+## 4. The UPI block route and the qualifying 3-in-1 account
+
+[SEBI/HO/MRD/MRD-PoD-2/P/CIR/2024/153](/broking-kyc/reference/circulars/sebi-other/#sebihomrdmrd-pod-2pcir2024153) requires a Qualified Stock Broker to *offer* one of two facilities for the secondary-market cash segment from 1 February 2025. It does not require any client to use one, does not extend to derivatives, and does not oblige a non-<abbr title="Qualified Stock Broker">QSB</abbr> to build either.
+
+Under the UPI block route, the client authorises a block on their own bank account. Funds stay at the bank. When a buy obligation crystallises, the clearing corporation debits the block directly at settlement; unused portions are released. Under the qualifying 3-in-1 route the bank-broker combination achieves the same economics through the linked account: funds are blocked on buy orders, unexecuted blocks are released, securities are blocked on sell orders, and pay-in is effected post-market.
+
+The accounting consequence is the part most often got wrong. A block is not a receipt. It should be displayed to the client as a separate quantity — blocked amount, amount consumed, releasable remainder — sitting alongside, not inside, the broker-held cash balance. Posting the full block into the client ledger as a credit overstates both the client's free balance and the broker's client-funds liability, and it breaks the reconciliation between mandate references and settlement debits.
+
+Reconciliation for this route joins three streams: the mandate file (block created, amount, validity), the transaction file (debits executed against the mandate), and the release file. [NPCI/UPI/OC-128A/2026-27](/broking-kyc/reference/circulars/npci/#npciupioc-128a2026-27) is directly relevant here — it changes which response codes are treated as deemed debits, and requires members to unblock expired mandates and prevent duplicate or out-of-validity execution. Response-code handling that was correct before 15 July 2026 is not necessarily correct after it.
+
+A recurring UPI AutoPay mandate is a third, different arrangement. It authorises periodic debits (typically for systematic investment) and must not be described to a client as enabling the secondary-market block facility. The existing [payment mandates](/broking-kyc/vendors/payment-mandates/) page compares AutoPay, e-<abbr title="National Automated Clearing House">NACH</abbr> and the block mechanism at onboarding.
+
+## 5. Validated collection handles and SEBI Check
+
+Before October 2025 a client had no reliable way to tell a genuine broker collection address from a lookalike. SEBI/HO/DEPA-II/DEPA-II_SRG/P/CIR/2025/86 and [NPCI/UPI/OC No. 217/2025-26](/broking-kyc/reference/circulars/npci/#npciupioc-no-2172025-26) closed that gap structurally: registered investor-facing intermediaries sit under merchant category 6211, collect only through handles carrying the `@valid` suffix class, and the paying app renders a visual confirmation when the payee handle is of that class. The username portion is capped at 10 characters, and the AutoPay mandate identifier for SEBI-registered entities follows a prescribed merchant-aggregator-intermediary structure.
+
+Two cautions follow. The handle must be taken from the value the issuing bank's process allocates, never constructed from documentation examples — the SEBI PDF's own illustrative broker suffixes are internally inconsistent. And the obligation now reaches beyond the main trading collection account: [MCX/MEM/461/2026](/broking-kyc/reference/circulars/mcx/#mcxmem4612026) and the parallel depository clarifications require every investor-facing account receiving money or fees from individual and non-institutional investors — depository-participant charge collection accounts included — to be linked, on a stated timetable.
+
+## 6. Bank-account verification versus payment verification
+
+Bank-account verification establishes, at onboarding or on modification, that a named account belongs to the client. The site's [bank-account screen](/broking-kyc/journey/05-bank-account/) documents the penny-drop implementation and [Section G of the field atlas](/broking-kyc/reference/field-atlas/sections/g-bank-account/) documents where those fields travel. Penny drop is one implementation, not a statutory amount; an IFSC lookup identifies a bank and branch but proves nothing about ownership; RBI's beneficiary name look-up for NEFT and RTGS helps a payer confirm the payee before releasing money and does not substitute for the broker's client-origin trail.
+
+Payment verification establishes that one particular transfer arrived. A client screenshot is not evidence of final receipt; the bank or provider statement is. Pending, successful and reversed states must be distinguishable, and a locally generated initiation reference should be persisted separately from the bank's eventual transaction reference, because a timeout can occur before any bank reference exists. `[AI inference — verify before acting]`
+
+### Field-level model — pay-in initiation and reconciliation
+
+The table below is a logical screen and reconciliation model. Except where a characteristic is explicitly an RBI-published one, wire names and lengths are not specified by the public documents cited on this page and must be taken from the bank or provider contract. `[AI inference — verify before acting]`
+
+| name | type | length | mandatory | source-system | destination-system(s) | notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| Client code | identifier | `[unknown — verify]` | Yes | Broker client master | Allocation ledger, <abbr title="Risk Management System">RMS</abbr> | Never inferred from a payment narration |
+| Remitter account number | string | `[unknown — verify]` | Yes | Client bank master / bank response | Receipt reconciliation | Preserve leading zeroes; compare to bank master |
+| Remitter name as returned | string | `[unknown — verify]` | Yes for origin test | Bank / provider | Exception queue | Mismatch routes to exception, not to balance |
+| Beneficiary account and IFSC | strings | IFSC 11 | NEFT / RTGS / IMPS | Broker bank master | Payer's bank | Must be the configured collection account |
+| Collection UPI handle | string | username up to 10 characters | UPI route | Allocated `@valid` handle | Payer's UPI app | Use the issued value; MCC 6211 |
+| Amount | decimal INR | `[unknown — verify]` | Yes | Client / bank | Ledger, reconciliation | Compare to the bank receipt, not a screenshot |
+| UTR | string | 22 for RTGS | RTGS | Remitting bank | Broker reconciliation | Not a universal UPI reference length |
+| Initiation reference | identifier | `[unknown — verify]` | Yes | Broker | Support, reconciliation | Generated before any bank reference exists |
+| Provider status / response code | enumeration | `[unknown — verify]` | Yes | Bank / PSP / NPCI | Ledger, support | Deemed-debit scope changed 15 July 2026 |
+| Mandate reference and blocked / consumed / releasable amount | identifier, decimal INR | `[unknown — verify]` | Block route | Bank / NPCI | Block register, client display | Held outside the cash ledger |
+| Reversal reference | identifier | `[unknown — verify]` | On reversal | Bank / PSP | Ledger, audit trail | Links the reversal to the original credit |
+
+<Aside type="caution" title="Provisional allocation is a policy decision, not a default">
+Crediting a client's trading balance before the bank statement confirms receipt improves the funding experience and creates a real exposure when the transfer later reverses. If a broker does it, the tolerance, the reversal path and the treatment of trades executed against provisional funds have to be written into the disclosed policies-and-procedures document, because paragraph 23.4 of the master circular requires that document to cover exposure limits and delayed-payment charges. Undocumented provisional credit is where an ordinary payment failure turns into a client dispute. `[AI inference — verify before acting]`
+</Aside>
+
+## 7. Alternatives
+
+| Option A | Option B | When to pick which | Who uses what |
+| --- | --- | --- | --- |
+| UPI collect from the broker app | Payment-gateway net banking | UPI below the client's per-transaction limit at zero payer cost; net banking above it or when the UPI leg is failing | Retail overwhelmingly UPI; higher-ticket and non-individual clients net banking or push |
+| Broker-app initiated payment | Client-initiated NEFT / RTGS push | App-initiated for an immediately reconciled credit; push for large amounts or where a treasury process requires it | Non-individual and HNI clients favour push |
+| Ordinary pay-in to the broker | UPI block or qualifying 3-in-1 | Ordinary pay-in for frequent traders wanting a working balance; block for occasional cash-segment investors keeping money at their own bank | QSBs must offer a block route; use is client-elective |
+| UPI AutoPay mandate | One-off pay-in per trade | AutoPay for recurring systematic investment; one-off for discretionary trading | Mandates dominate systematic flows |
+
+## Practical notes
+
+- **[gotcha]** A bank debit at the client's end and an allocated credit in the trading account are different events with different timestamps. Publish both; never present a 24x7 rail as a 24x7 allocation guarantee.
+- **[gotcha]** Response-code handling for block mandates changed on 15 July 2026 under [NPCI/UPI/OC-128A/2026-27](/broking-kyc/reference/circulars/npci/#npciupioc-128a2026-27). Logic written against the earlier deemed-debit list will misclassify codes 59 and K1.
+- **[industry practice]** Brokers commonly publish a per-transaction net-banking gateway fee while keeping UPI free, which pushes almost all retail volume onto UPI. That fee belongs on the tariff sheet described in [brokerage and charges](./brokerage-and-charges/).
+- **[cost optimization]** Compare the client's actual bank charge against the broker's gateway fee before recommending a rail; RBI's ceilings do not settle which route is cheaper.
+- **[risk trade-off]** Fewer rails means simpler reconciliation and a smaller exception surface; more rails means better funding success when one leg fails.
+- **[industry practice — unverified]** Where a client's bank account is later closed or changed, credits from the old account fail the origin test even though the client owns both. Route these through bank-account modification rather than approving them case by case.
+
+## Cross-references
+
+- [Screen 5: Bank Account](/broking-kyc/journey/05-bank-account/) — where the client's bank account is captured and penny-drop verified during onboarding; the origin test on this page depends on that master being correct.
+- [Payment Mandates](/broking-kyc/vendors/payment-mandates/) — UPI AutoPay, e-NACH and the UPI block mechanism as they are set up during onboarding.
+- [Deep Dive: Client Funds and Upstreaming](/broking-kyc/deep-dives/settlement/client-funds-upstreaming/) — what happens to the money after it is received: nodal accounts, allocation, and the suspense <abbr title="Unique Client Code">UCC</abbr> for unidentified credits.
+- [Section G: Bank Account Details — Data Flow](/broking-kyc/reference/field-atlas/sections/g-bank-account/) — field-level destinations for the bank master that pay-in reconciliation reads.
+- [Decentro](/broking-kyc/vendors/verification/decentro/) — a bank-account verification (penny drop) implementation, one of several.
+- [Funds & Tax: Payout and Running-Account Settlement](./payout-running-account/) — the return leg, including the actual-payment requirement and the prescribed settlement calendar.
+- [Funds & Tax: Delayed Payment Charges](./delayed-payment-charges/) — what happens when the pay-in does not arrive in time.
+- [Deep Dive: IPO / <abbr title="Offer for Sale (through stock exchange)">OFS</abbr> Broker Side](/broking-kyc/deep-dives/specialty/ipo-ofs-broker-side/) — the primary-market UPI mandate rail, which predates and differs from the secondary-market block.
+
+## Verified through
+
+2026-09-11
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

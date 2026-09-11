@@ -1,0 +1,173 @@
+---
+title: "Funds & Tax: Corporate actions"
+description: Dividend, bonus, split, demerger, rights entitlement trading, buyback through the exchange tender window, delisting by reverse book building, IEPF claims and F&O contract adjustments, from both the client and the operations side.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Corporate actions are the one part of a client's portfolio the broker neither initiates nor controls, and the resulting date vocabulary is where clients and support desks lose each other. The page fixes the vocabulary first, then splits the events by who moves the asset — the issuer and its registrar for cash, the depository for non-cash, the exchange for voluntary corporate actions the client must act on — and closes with the derivatives adjustment mechanics, which follow a separate arithmetic.
+
+## TL;DR
+
+- **Cash corporate actions never touch the depository or the broker.** The depository supplies the beneficial-owner list as on the record date; the issuer pays the dividend or interest directly to the holder, so there is normally **no ledger entry** at the broker ([<abbr title="Central Depository Services (India) Limited">CDSL</abbr> Corporate Actions and <abbr title="Initial Public Offering">IPO</abbr> FAQ](https://www.cdslindia.com/downloads/Investors/FAQs/08%20Demat%20CDSL%20Way%20-%20VIII%20-%20Corporate%20actions%20%20IPO%20%20-%202025.pdf)).
+- **Non-cash corporate actions are the depository's job.** Automatic actions — bonus, merger, split — credit on the effective date from the ratio and ISIN the issuer set up, with no allotment file; voluntary actions — rights, buyback acceptance — need an allotment file from the registrar first.
+- **Bonus shares now trade on <abbr title="Trade-date Plus N settlement">T+2</abbr> where T is the record date.** Under **CIR/<abbr title="Corporate Finance Department (within SEBI)">CFD</abbr>/PoD/2024/122** (16 September 2024, applicable to bonus issues announced on or after 1 October 2024) `[not yet in index]` the deemed allotment date is <abbr title="Trade-date Plus N settlement">T+1</abbr>, documents reach the depositories by **12:00 on T+1**, and trading opens on **T+2**. Credit goes into the **existing permanent ISIN**, not a temporary one.
+- **Rights entitlements are dematerialised, tradeable and perishable.** Since **<abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/CFD/DIL2/CIR/P/2020/13** (22 January 2020) `[not yet in index]` REs are credited in a separate ISIN and traded during the RE window; an RE neither applied for nor sold **lapses worthless**.
+- **The buyback landscape changed twice in 2026.** Exchange-route open-market buybacks reopened from **1 August 2026** under **[SEBI/<abbr title="Legal Affairs Department — Northern Regional Office (SEBI)">LAD-NRO</abbr>/GN/2026/306](/broking-kyc/reference/circulars/sebi-other/#sebilad-nrogn2026306)** for sizes below 15% of paid-up capital and free reserves, and promoter-group holdings must be frozen at ISIN level during a buyback under **[HO/49/14/13(11)2026-CFD-POD1/I/16864/2026](/broking-kyc/reference/circulars/sebi-other/#ho491413112026-cfd-pod1i168642026)** (21 July 2026), circulated as [CDSL/OPS/<abbr title="Depository Participant">DP</abbr>/POLCY/2026/494](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolcy2026494) and [<abbr title="National Securities Depository Limited">NSDL</abbr>/POLICY/2026/0101](/broking-kyc/reference/circulars/nsdl/#nsdlpolicy20260101).
+- **F&O positions are adjusted, not closed, for stock benefits.** The adjustment principle is value neutrality on the cum and ex dates; adjustments are applied after trading hours on the **last cum date**, to strike price, futures base price, market lot and position ([<abbr title="National Stock Exchange of India">NSE</abbr> corporate-action adjustment methodology](https://www.nseindia.in/static/products-services/equity-derivatives-corporate-actions-adjustments)).
+- **Unclaimed dividends become <abbr title="Investor Education and Protection Fund">IEPF</abbr> property after seven consecutive years** and the underlying shares move to the IEPF Authority by corporate action; the route back is e-Form **IEPF-5** with nodal-officer verification in **15 days**.
+
+## Conceptual overview
+
+Every corporate action is a state change at the issuer that has to be projected onto millions of beneficial-owner accounts on an agreed date. The projection runs through three different pipes depending on what is being distributed. Cash goes issuer-to-holder, using the depository only as a list source. Securities go issuer-to-depository-to-holder, with the depository crediting accounts on the effective date. And *elective* events — rights, buybacks, delisting tenders, open offers — go through the exchange, because the client has to make a decision and that decision has to be collected, matched and settled like a trade.
+
+For the broker this produces an awkward split. It is the client's interface for elective events and must run an acquisition-window order book, a tender confirmation flow and a settlement path that resembles equity settlement without being it. For non-elective events it is a bystander whose only job is to display the right position at the right time. For cash events it is not in the chain at all — which is why "my dividend has not come" is the commonest corporate-action ticket a broker cannot resolve.
+
+## 1. Regulatory framework
+
+- **SEBI (LODR) Regulations, 2015**, Regulations 28(1) and 42(1) — in-principle approval and record-date intimation, the issuer-side timeline every corporate action hangs on.
+- **CIR/CFD/PoD/2024/122** (16 September 2024) `[not yet in index]` — T+2 trading of bonus shares where T is the record date, with credit directly into the permanent ISIN, exempting bonus from the temporary-ISIN requirement in CIR/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>/DP/21/2012 and CIR/MRD/DP/24/2012. Applies to bonus issues announced on or after 1 October 2024.
+- **SEBI/HO/CFD/DIL2/CIR/P/2020/13** (22 January 2020) `[not yet in index]` — dematerialised rights entitlements and the streamlined rights-issue procedure; advance notice for the record date reduced from 7 days to 3 working days.
+- **SEBI (Buy-back of Securities) Regulations, 2018**, as amended by **[SEBI/LAD-<abbr title="Non-Resident Ordinary (Rupee) account">NRO</abbr>/GN/2026/306](/broking-kyc/reference/circulars/sebi-other/#sebilad-nrogn2026306)** (1 July 2026, effective 1 August 2026) — reopens the exchange route for open-market buybacks below 15% of paid-up capital and free reserves, with prescribed opening and closing timelines.
+- **[HO/49/14/13(11)2026-CFD-POD1/I/16864/2026](/broking-kyc/reference/circulars/sebi-other/#ho491413112026-cfd-pod1i168642026)** (21 July 2026) — operationalises ISIN-level freezing of promoter and promoter-group holdings under Regulation 24(i)(ea) of the Buy-back Regulations, while permitting tender-offer participation and the invocation of pre-existing encumbrances.
+- **SEBI (Delisting of Equity Shares) Regulations, 2021** — reverse book building, the 90% threshold, the counter-offer mechanism and the post-delisting exit window. The September 2024 amendment added a fixed-price alternative to reverse book building. `[AI inference — verify before acting]`
+- **Companies Act, 2013**, sections 124 and 125, with the **Investor Education and Protection Fund Authority (Accounting, Audit, Transfer and Refund) Rules, 2016** as amended in 2017 — transfer of shares with seven consecutive years of unclaimed dividend to the IEPF Authority, and the IEPF-5 refund route.
+- **[CDSL/OPS/DP/CAIPO/2026/578](/broking-kyc/reference/circulars/cdsl/#cdslopsdpcaipo2026578)** (24 August 2026) — creates security type 41, Rights Entitlement Preference Shares, with harmonised value `REPRF`; DPs must make the corresponding back-office change.
+
+## 2. Date vocabulary under T+1
+
+| Term | What it means | Who fixes it |
+| --- | --- | --- |
+| Board approval and intimation | Issuer decides, then notifies the record date under Regulation 42(1) | Issuer |
+| Exchange notification | Exchange accepts the record date and publishes the ratio and, for bonus, the deemed allotment date | Exchange |
+| **Last cum date** | The final trading day on which a buyer acquires the benefit | Exchange, derived from the record date |
+| **Ex-date** | The first trading day on which the security trades without the benefit | Exchange |
+| **Record date** | The date whose end-of-day beneficial-owner list fixes entitlement | Issuer |
+| Deemed allotment date | For bonus, the working day after the record date | Issuer, on exchange record |
+| Effective date / first trading date | The depository credits securities; the exchange makes them tradeable | Issuer via the depository, then exchange |
+
+Under a T+1 cycle the ex-date and the record date coincide for cash-market purposes, so the last cum date is the trading day immediately before the record date: a client buying on the ex-date does not receive the benefit, and a client selling on the ex-date still does. `[AI inference — verify before acting]`
+
+<Aside type="caution" title="Positions look wrong between record date and credit">
+Between the record date and the depository credit, the client's holding is legally entitled to the benefit but the benefit is not yet in the account, and the market price has already adjusted downward on the ex-date. A holdings screen that shows only the pre-corporate-action quantity against a post-corporate-action price manufactures an apparent overnight loss of exactly the corporate-action ratio. Surfacing a pending-corporate-action row for the interval is the fix, and for bonus the interval is now only two trading days.
+</Aside>
+
+## 3. Cash corporate actions
+
+The depository provides the issuer or registrar with the beneficial-owner list and holdings as on the record or book-closure date. The registrar computes entitlement and pays directly — to the bank account registered in the demat account, which is why the nine-digit MICR bank code captured at account opening exists in the first place. The depository is **not** involved in the distribution of cash benefits and cannot resolve a dividend complaint; discrepancies go to the issuer or registrar. Only discrepancies in *non-cash* entitlement can be escalated to the depository.
+
+Dividend is taxed in the shareholder's hands as income from other sources, with withholding at 10% for residents above Rs.10,000 a year per company and 20% for non-residents before treaty relief. See [Tax reporting](./tax-reporting/). A stale bank mandate in the demat account is the commonest cause of a genuinely missing dividend, and the fix is a bank-detail modification at the DP — see [Lifecycle: Modifications](/broking-kyc/lifecycle/modifications/).
+
+## 4. Non-cash corporate actions
+
+| Action | Depository mechanic | Allotment file needed | Client action |
+| --- | --- | --- | --- |
+| Bonus | Automatic; credit on the deemed allotment date into the existing permanent ISIN | No | None |
+| Stock split / consolidation | Automatic; balance restated on the effective date | No | None |
+| Merger / amalgamation | Automatic; old ISIN extinguished, new ISIN credited in ratio | No | None |
+| Demerger | Automatic; resulting-company ISIN credited in ratio | No | None; cost basis must be apportioned for tax |
+| Rights issue | Voluntary; RE credited, then allotment against application | Yes | Apply, sell the RE, or let it lapse |
+| Buyback acceptance | Voluntary; accepted quantity debited, unaccepted quantity returned | Yes | Tender in the acquisition window |
+
+**Bonus, post-October 2024.** The issuer applies for in-principle approval within 5 working days of the board meeting, fixes the record date (T) and takes the deemed allotment date (T+1) on record, submits documents to the depositories by **12:00 on T+1**, uploads distinctive-number ranges to the depository database, and the shares become tradeable on **T+2**. Because credit goes into the permanent ISIN, the client's existing holding simply grows; there is no separate temporary-ISIN line to reconcile.
+
+**Demerger and cost apportionment.** The depository credits the resulting company's shares, but the *cost* of the original holding must be split between the demerged and resulting entities in the ratio of net book value certified by the company. Neither depository nor broker performs that split, so a capital-gains report shows the resulting-company shares at unknown cost until the client supplies the apportionment.
+
+## 5. Rights entitlement trading
+
+Since the January 2020 framework, a rights issue produces a tradeable instrument. On the record date the depository credits **rights entitlements** to eligible holders in a **separate ISIN**. During the RE trading window — which closes before the issue closes — the RE can be sold on the exchange like any other security, or bought by someone who was not a holder on the record date. At the end of the issue period the registrar files the allotment, the applied REs are extinguished and the new shares are credited.
+
+Three outcomes, one of which is a pure loss:
+
+| Client choice | Mechanics | Outcome |
+| --- | --- | --- |
+| Apply | Pay the issue price against the RE through the issuer's <abbr title="Applications Supported by Blocked Amount">ASBA</abbr>-based application | New shares credited on allotment |
+| Renounce on-market | Sell the RE in its own ISIN during the RE trading window | Sale proceeds; the buyer applies |
+| Renounce off-market | Off-market transfer of the RE to a specific person | Consideration settled outside the exchange |
+| Do nothing | RE lapses at the end of the issue period | **Total loss of the RE value** |
+
+The rights form is mailed by the issuer or registrar directly; neither the depository nor the DP mails it. A holder of *physical* shares can elect to receive the rights allotment in demat form by telling the registrar, but **cannot** receive a bonus allotment in demat form. CDSL added a security type for rights entitlements on preference shares in August 2026 under [CDSL/OPS/DP/CAIPO/2026/578](/broking-kyc/reference/circulars/cdsl/#cdslopsdpcaipo2026578).
+
+## 6. Buyback through the exchange window
+
+A tender-offer buyback is run as a separate acquisition window on the exchange. The broker's client tenders shares as a bid; the registrar computes acceptance against the entitlement ratio, including the reserved portion for small shareholders; accepted shares are settled and the unaccepted balance returns to the client's demat account.
+
+| Field | Type | Length | Mandatory | Source system | Destination system(s) | Notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| `symbol` | alphanumeric | 12 | Yes | Exchange master | Acquisition-window order book | Buyback-specific series, distinct from the cash series |
+| `isin` | alphanumeric | 12 | Yes | Exchange master | Order book, registrar | Must match the tendered holding |
+| `client_code` | alphanumeric | 10 | Yes | Broker <abbr title="Unique Client Code">UCC</abbr> master | Order book, registrar | The tendering client's UCC |
+| `dp_id_client_id` | numeric | 16 | Yes | Broker demat master | Registrar, depository | Where the unaccepted balance returns |
+| `quantity` | integer | 12 | Yes | Client input | Order book, registrar | Tendered quantity, subject to available free balance |
+| `price` | decimal | 15,2 | Yes | Exchange master | Order book | Fixed buyback price for a tender offer |
+| `shareholder_category` | code | 2 | Yes | Computed from holding | Registrar | Small shareholder or general, drives the reserved-portion entitlement |
+| `settlement_number` | alphanumeric | 12 | Yes | Clearing corporation | Settlement | Buyback-specific settlement |
+
+Field names follow the general shape of exchange acquisition-window specifications rather than a single published file layout. `[industry practice — unverified]`
+
+Two 2026 changes matter operationally. **Promoter-group holdings are frozen at ISIN level** for the duration of a buyback under the July 2026 framework, with tender participation expressly permitted and pre-existing encumbrances still invocable — so a promoter client sees a freeze marker that is not an error. And the **open-market exchange route reopened on 1 August 2026** for buybacks below 15% of paid-up capital and free reserves, after being phased out from 1 April 2025, following the restoration of capital-gains treatment from 1 April 2026. In an open-market buyback the client simply sells into the market; in a tender offer the client bids into the window.
+
+## 7. Delisting
+
+A voluntary delisting runs a **reverse book building** process: the acquirer announces a floor price, public shareholders bid quantities at prices at or above it through the exchange's book-building platform, and the discovered price is the price at which the acquirer's shareholding reaches **90%** of total equity. The acquirer may accept the discovered price or make a **counter-offer** at a lower price, which succeeds if enough shareholders accept. The September 2024 amendment added a **fixed-price** alternative for frequently traded shares, at a premium over the floor price. `[AI inference — verify before acting]`
+
+Shareholders who do not tender are not extinguished: the acquirer must keep an **exit window** open after delisting at the same exit price. From the broker's side the mechanics are the acquisition-window flow above, with the same field set.
+
+## 8. IEPF
+
+Where dividend on a shareholding has remained unclaimed for **seven consecutive years**, the shares are transferred to the IEPF Authority's account by corporate action. The client sees a plain debit in the demat account narrated as a transfer to the IEPF Authority, with no counterparty they recognise.
+
+The route back is e-Form **IEPF-5** on the IEPF Authority portal. The claimant files the form online, submits a printed copy with supporting documents to the company, and the company's nodal officer verifies the claim and files a verification report with the Authority within **15 days**; the refund is then released electronically to the claimant's account. The claim is made to the company first and the Authority second, which is the opposite of what most claimants assume.
+
+## 9. F&O contract adjustments
+
+The governing principle is that the value of a market participant's position must remain the same across the cum and ex dates, preserving in-the-money, at-the-money and out-of-the-money status. Adjustments are carried out after the close of trading on the **last cum date** and applied to all open positions.
+
+| Corporate action | Adjustment factor | Applied to |
+| --- | --- | --- |
+| Bonus, ratio A:B | `(A+B)/B` | Strike divided, futures base price divided, market lot multiplied, position multiplied |
+| Split or consolidation, ratio A:B | `A/B` | Same directions as bonus |
+| Rights, ratio A:B at issue price S, cum close P | `(P-E)/P` where `E = ((P-S) x A) / (A+B)` | Strike multiplied, lot divided, futures price multiplied, position multiplied |
+| Ordinary dividend, below 2% of market value | None | — |
+| Extraordinary dividend, at or above 2% of market value | Total dividend amount deducted | Deducted from every strike price; futures base price is the mark-to-market settlement price less the dividend |
+| Merger | No adjustment | No fresh contracts introduced after the record-date announcement; unexpired contracts compulsorily settled at the last cum-date closing price, and outstanding good-till-cancelled or good-till-date orders cancelled |
+
+Rounding is handled by computing position value before and after, rounding strike and lot, and adjusting so that no open position is force-closed. The 2% test uses the closing price on the day before the dividend announcement, or the same day's close where the announcement is after market hours; where shareholders change the rate at the annual general meeting, the post-meeting rate and the price on the day before that meeting apply.
+
+## 10. Alternatives
+
+| Option A | Option B | When to pick which | Who uses what |
+| --- | --- | --- | --- |
+| Tender into a buyback acquisition window | Sell in the open market during the buyback period | Tender when the buyback price exceeds the market price and the acceptance ratio is favourable; sell when acceptance is likely to be thin | Small shareholders benefit from the reserved portion and usually tender |
+| Apply against a rights entitlement | Sell the RE in the RE trading window | Apply when the issue price is meaningfully below the expected ex-rights price and the client wants the exposure; sell when the client does not want to fund it | Non-participating holders must sell, since doing nothing is a total loss |
+| Let the F&O contract be adjusted | Square off before the last cum date | Adjustment is value-neutral in principle but changes lot size and strike, which breaks strategy legs and stop levels | Systematic and multi-leg traders often square off |
+
+## Practical notes
+
+- **[gotcha]** "My dividend has not come" is not a broker-resolvable ticket. The broker is not in the payment chain; the registrar is. The only broker-side check is whether the bank details registered in the *demat* account are current, which is a different record from the payout bank account in the trading account.
+- **[gotcha]** The bonus interval is now two trading days, not the fortnight it used to be, so a holdings screen that lags the corporate action by a settlement cycle is far more visible than before. Check the pending-corporate-action display against the T+2 rule in CIR/CFD/PoD/2024/122.
+- **[gotcha]** A rights entitlement that is neither applied for nor sold lapses worthless at the end of the issue period. Brokers that notify only once, at credit, leave clients holding a decaying asset; the useful notification is a second one two days before the RE trading window closes. `[industry practice — unverified]`
+- **[gotcha]** Involuntary corporate-action credits such as bonus and split **do not** count as transactions when assessing whether a demat account is dormant, while voluntary ones such as a rights subscription do (CDSL DP Operating Instructions Clause 6.5.5.3). A client who has only received bonus shares for a year is still dormant for delivery-instruction verification purposes.
+- **[risk trade-off]** Running the acquisition-window order book on the same <abbr title="Risk Management System">RMS</abbr> path as cash equity is simpler but wrong: a tender bid must validate against the free demat balance and the shareholder category, not against margin. Firms that shortcut this discover it on the first oversubscribed buyback.
+
+## Cross-references
+
+- [Funds & Tax: Ledger and statements](./ledger-and-statements/) — why a dividend usually produces no ledger line at all.
+- [Funds & Tax: Tax reporting](./tax-reporting/) — buyback taxation, dividend withholding and demerger cost basis.
+- [Funds & Tax: Demat servicing](./demat-servicing/) — off-market renunciation of rights entitlements and freeze markers.
+- [Deep Dive: IPO and <abbr title="Offer for Sale (through stock exchange)">OFS</abbr>, broker side](/broking-kyc/deep-dives/specialty/ipo-ofs-broker-side/) — the ASBA and acquisition-window plumbing that rights and buyback offers reuse.
+- [Deep Dive: Surveillance norms, <abbr title="Graded Surveillance Measure">GSM</abbr> and <abbr title="Additional Surveillance Measure">ASM</abbr>](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/) — price-band interaction around corporate-action dates.
+- [Deep Dive: <abbr title="Trade-date Plus N settlement">T+0</abbr> and T+1 settlement](/broking-kyc/deep-dives/settlement/t0-t1-settlement/) — the settlement cycle that fixes the last cum date.
+- [Lifecycle: Modifications](/broking-kyc/lifecycle/modifications/) — updating the bank mandate in the demat account so dividends land.
+- [Lifecycle: Transmission](/broking-kyc/lifecycle/transmission/) — inherited holdings and IEPF-adjacent unclaimed balances.
+- [Lifecycle: Voluntary closure](/broking-kyc/lifecycle/closure/) — unclaimed balances and the IEPF path on exit.
+- [Vendors: CDSL](/broking-kyc/vendors/depositories/cdsl/) and [NSDL](/broking-kyc/vendors/depositories/nsdl/) — depository corporate-action modules.
+- [Circulars — SEBI other](/broking-kyc/reference/circulars/sebi-other/) and [Circulars — CDSL](/broking-kyc/reference/circulars/cdsl/) — the instruments cited above.
+
+## Verified through
+
+2026-09-11
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

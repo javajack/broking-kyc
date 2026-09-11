@@ -1,0 +1,188 @@
+---
+title: "Funds & Tax: Tax reporting"
+description: Tax profit-and-loss and capital-gains reports a broker produces, LTCG and STCG rates after the 2024 to 2026 Finance Acts, grandfathering and FIFO, F&O as business income, NRI withholding, and the SFT and AIS reporting split between depositories, AMCs and brokers.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** A broker is not a tax adviser, yet it holds the trade-level data a client's return depends on and is *not* the party that reports that data to the tax administration. The page separates three routinely confused things: how the income is classified and taxed, what the broker produces for the client, and who files what with the Income-tax Department. Sections are cited under both the Income-tax Act, 1961 and the Income-tax Act, 2025, because the 2025 Act took effect on 1 April 2026 and both numberings are in live use.
+
+## TL;DR
+
+- **Two regimes of section numbers are current.** The Income-tax Act, 2025 came into force on **1 April 2026**. Rates carried over largely unchanged; the numbering did not, and 2026 statements and software routinely mix the two. `[AI inference — verify before acting]`
+- **Listed-equity rates have been stable since 23 July 2024.** Short-term capital gains on <abbr title="Securities Transaction Tax">STT</abbr>-paid listed equity and equity-oriented units: **20%**. Long-term: **12.5%** on gains above **Rs.1,25,000** a year, with a **12-month** holding-period test. The Finance (No. 2) Act, 2024 set these for transfers on or after 23 July 2024; Budget 2026 left them unchanged.
+- **Grandfathering still applies.** For equity shares and equity-oriented units acquired **before 1 February 2018**, cost of acquisition is the higher of actual cost and the lower of the **31 January 2018** fair market value and the full value of consideration.
+- **Intraday equity is speculative business income; F&O is non-speculative business income** — the distinction that drives turnover, audit thresholds, set-off and carry-forward.
+- **Buyback taxation flipped twice in eighteen months.** Tender proceeds were deemed dividend from 1 October 2024 to 31 March 2026; from **1 April 2026** they are capital gains again with cost of acquisition allowed, which is why <abbr title="Securities and Exchange Board of India">SEBI</abbr> could reopen the exchange route under **[SEBI/<abbr title="Legal Affairs Department — Northern Regional Office (SEBI)">LAD-NRO</abbr>/GN/2026/306](/broking-kyc/reference/circulars/sebi-other/#sebilad-nrogn2026306)** from 1 August 2026.
+- **The depository reports your capital gains, not your broker.** Depositories file **<abbr title="Statement of Financial Transactions">SFT</abbr>-2517** (capital gains on transfer of listed securities and mutual-fund units) under section 508(1) read with rule 237(6), half-yearly; the format and procedure were notified by **DGIT(S) Notification No. 1 of 2026 dated 10 September 2026**. `[AI inference — verify before acting]`
+- **STT rose on 1 April 2026** under the Finance Act 2026: option sale **0.15%** of premium (from 0.10%), exercised option **0.15%** of intrinsic value (from 0.125%), futures sale **0.05%** (from 0.02%), per the [<abbr title="National Stock Exchange of India">NSE</abbr> STT computation page](https://www.nseindia.in/static/products-services/equity-derivatives-securities-transaction-tax).
+
+## Conceptual overview
+
+The broker's role in a client's tax position is narrow and often misunderstood. It computes and collects statutory levies at the point of trade — securities transaction tax, stamp duty, goods and services tax on its own services — and withholds tax only where the law makes it the deductor, which for a resident equity client is essentially never. It then hands the client *convenience reports*: a tax profit-and-loss report, a capital-gains report, and for some client types a withholding certificate. None is a return, none is authoritative against the Income-tax Department, and none is reconciled against the client's other brokers.
+
+The authoritative feed runs on a different path. Depositories report capital gains on listed securities and units; AMCs and mutual-fund registrars report folio transactions; companies report dividends; banks report interest. All of it lands in the taxpayer's Annual Information Statement, which the taxpayer must reconcile. The broker appears there only indirectly — through the depository holding the client's beneficial-owner account, and through any withholding it actually performed.
+
+The gap between those two paths is where nearly all client friction lives, and reconciling it is the client's obligation while explaining it is the broker's.
+
+## 1. Regulatory framework
+
+- **Income-tax Act, 1961** — governs transactions up to **31 March 2026**: section 111A (<abbr title="Short-term capital gains">STCG</abbr> on STT-paid listed equity), 112A (<abbr title="Long-term capital gains">LTCG</abbr> on the same, with the Rs.1,25,000 exemption and 31 January 2018 grandfathering), 112 (LTCG on other assets), 115AD (foreign portfolio investors), 43(5) (speculative transactions and the derivatives exclusion), 72, 73 and 74 (carry-forward), 44AB (audit), 44AD (presumptive), 194 and 195 (withholding), and 285BA with rule 114E (statements of financial transactions).
+- **Income-tax Act, 2025** — in force from **1 April 2026**. Capital-gains rate provisions sit in the 196 to 203 range, **section 196** carrying the eligible short-term rate and **section 198** the eligible long-term rate with the Rs.1,25,000 threshold; presumptive taxation is consolidated into **section 58**; non-resident withholding is **section 393(2)**; statements of financial transactions are **section 508**. `[AI inference — verify before acting]`
+- **Income-tax Rules, 2026** — **rule 237** replaces rule 114E for statements of financial transactions. `[AI inference — verify before acting]`
+- **Finance (No. 2) Act, 2024** — from 23 July 2024: STCG on STT-paid listed equity 15% to 20%, LTCG 10% to 12.5%, the section 112A exemption Rs.1,00,000 to Rs.1,25,000, holding periods simplified to 12 months for listed securities and 24 months for other assets, and deemed-dividend treatment of buyback proceeds from 1 October 2024.
+- **Finance Act, 2025** — resident dividend withholding threshold under section 194 raised from Rs.5,000 to Rs.10,000 a year per company.
+- **Finance Act, 2026** — derivative STT rates raised from 1 April 2026; capital-gains treatment of buyback consideration restored.
+- **CBDT Circular No. 768 dated 24 June 1998** `[not yet in index]` — first-in-first-out is the basis for identifying dematerialised securities transferred out of a demat account.
+- **DGIT(S) Notification No. 1 of 2026 dated 10 September 2026** `[not yet in index]` — format, data structure and submission procedure for SFT-2517 (depository transactions).
+
+## 2. Head of income by activity
+
+| Activity | Head of income | Provision (1961 / 2025) | Key consequence |
+| --- | --- | --- | --- |
+| Delivery equity, held as investment | Capital gains | 111A and 112A / 196 and 198 | Concessional rates; STT not deductible from the gain |
+| Intraday equity (squared off same day, no delivery) | **Speculative** business income | 43(5) / equivalent | Loss set off only against speculative income; carry-forward **4** years |
+| Equity and index F&O on a recognised exchange | **Non-speculative** business income | proviso (d) to 43(5) / equivalent | Loss set off against any business income; carry-forward **8** years |
+| Debt mutual funds acquired on or after 1 April 2023 | Deemed short-term capital gains | 50AA / equivalent | Slab rate irrespective of holding period |
+| Dividend | Income from other sources | 56 / equivalent | Slab rate; withholding at 10% above Rs.10,000 for residents |
+| Buyback consideration, from 1 April 2026 | Capital gains | Income-tax Act, 2025 as amended by Finance Act 2026 | Cost of acquisition allowed against the consideration |
+| Buyback consideration, 1 October 2024 to 31 March 2026 | Deemed dividend | 2(22)(f) | Full consideration taxed; cost claimable as a capital loss |
+
+<Aside type="caution" title="Classification is the client's, and it is sticky">
+Whether delivery equity is a capital asset or stock-in-trade is the client's characterisation, not the broker's, and a client who has consistently treated delivery as investment cannot re-characterise a bad year as business to access set-off. Brokers who label a report "Tax P&L" and present capital gains and business income in a single netted total invite exactly that error. Present the two heads separately, with intraday and F&O separated from each other, and carry a line saying the classification is the client's to make.
+</Aside>
+
+## 3. Capital gains mechanics
+
+| Item | Listed equity / equity-oriented units, STT paid | Unlisted shares | Debt and other listed securities |
+| --- | --- | --- | --- |
+| Long-term threshold | More than 12 months | More than 24 months | More than 12 months |
+| Short-term rate | 20% | Slab | Slab |
+| Long-term rate | 12.5% above Rs.1,25,000 a year | 12.5% without indexation | 12.5% without indexation |
+| STT treatment | Not deductible in computing the gain | Not applicable | Not applicable |
+| Grandfathering | Yes, for acquisitions before 1 February 2018 | No | No |
+| Identification of shares sold | FIFO per demat account | FIFO / specific identification | FIFO per demat account |
+
+**Grandfathering arithmetic.** For a share acquired before 1 February 2018 the deemed cost is the higher of actual cost and the lower of the 31 January 2018 fair market value and the sale consideration — so gains accrued up to 31 January 2018 are untaxed, and a sale below the 31 January 2018 value cannot manufacture an artificial loss.
+
+**FIFO is per demat account, not per broker.** The same scrip in two demat accounts has two independent FIFO queues. Transferring holdings between the client's own accounts resets nothing legally, but the *broker's* report for the receiving account will show the transfer-in date unless the client supplies the original cost — the commonest cause of an overstated short-term gain.
+
+## 4. Section mapping across the two Acts
+
+| Subject | Income-tax Act, 1961 | Income-tax Act, 2025 |
+| --- | --- | --- |
+| STCG on STT-paid listed equity | 111A | 196 |
+| LTCG on STT-paid listed equity and equity-oriented units | 112A | 198 |
+| Presumptive business income | 44AD, 44ADA, 44AE | 58 |
+| Withholding on payments to non-residents | 195 | 393(2) |
+| Withholding on dividend to residents | 194 | 393(1) |
+| Statement of financial transactions | 285BA with rule 114E | 508 with rule 237 |
+| Forms: SFT, non-resident withholding return, nil-withholding declaration | 61A, 27Q, 15G and 15H | 165, 144, 121 |
+
+The mapping is drawn from secondary commentary, not a CBDT correspondence table; confirm the operative section before using it in a client communication. `[AI inference — verify before acting]`
+
+## 5. F&O and intraday as business income
+
+Once derivatives income is business income, three obligations follow that a capital-gains client never meets.
+
+**Turnover.** For derivatives, turnover is conventionally the sum of absolute profits and losses on settled contracts plus premium received on sale of options plus any difference on exercise or assignment — the ICAI Guidance Note on Tax Audit position, not notional contract value. `[industry practice — unverified]`
+
+**Audit.** Section 44AB bites at turnover above **Rs.1 crore**, raised to **Rs.10 crore** where at least 95% of receipts and 95% of payments are non-cash, the normal case for an exchange-traded book. Declaring profits below the presumptive rate while having taxable income, or opting out after opting in, forces audit regardless of turnover.
+
+**Presumptive taxation.** Section 44AD (section 58 from 1 April 2026) lets an eligible business with turnover up to **Rs.2 crore** — **Rs.3 crore** where cash receipts stay within 5% — declare **8%** of turnover as income, or **6%** where receipts are digital. Opting out within five assessment years disqualifies the assessee for the next five and triggers audit.
+
+**Set-off and carry-forward.**
+
+| Loss type | Set off in the same year against | Carry-forward | Set off in later years against |
+| --- | --- | --- | --- |
+| Speculative business loss (intraday equity) | Speculative income only | 4 years | Speculative income only |
+| Non-speculative business loss (F&O) | Any income except salary | 8 years | Business income only |
+| Short-term capital loss | STCG and LTCG | 8 years | STCG and LTCG |
+| Long-term capital loss | LTCG only | 8 years | LTCG only |
+
+Carry-forward in every case requires the return to be filed by the due date.
+
+## 6. Non-resident clients
+
+A non-resident's Indian securities income is withheld at source, which makes the payer — not the client — the compliance point. For dividends that is the company or its registrar; for capital gains it depends on the client category and the custody arrangement.
+
+| Payment | Rate before surcharge and cess | Provision (1961 / 2025) | Notes |
+| --- | --- | --- | --- |
+| Dividend to a non-resident individual or foreign company | 20% | 195 / 393(2) | Reducible under a double-taxation avoidance agreement on a tax-residency certificate plus Form 10F |
+| Dividend to a resident | 10% above Rs.10,000 a year per company | 194 / 393(1) | Threshold raised by the Finance Act 2025 |
+| Any other sum chargeable, including capital gains, to a non-resident | Rate applicable to the income | 195 / 393(2) | **No threshold** — withholding applies from the first rupee |
+| <abbr title="Foreign Portfolio Investor">FPI</abbr> capital gains and dividend | 20% STCG, 12.5% LTCG on listed equity; 20% dividend | 115AD, 196D / equivalent | Custodian-operated withholding; see the FPI material in the account-variants section |
+
+Two mechanics matter operationally. A lower or nil withholding certificate shifts the rate for that payee only and must be with the deductor *before* payment. And the quarterly non-resident withholding return — Form 27Q under the 1961 Act, Form 144 under the 2025 Act — carries payee-level detail including tax-residency country, so residency evidence must be collected before the quarter closes.
+
+## 7. What the broker actually produces
+
+| Field | Type | Length | Mandatory | Source system | Destination system(s) | Notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| `pan` | alphanumeric | 10 | Yes | <abbr title="Know Your Customer (process).">KYC</abbr> master | Client report, withholding return | Report is keyed on <abbr title="Permanent Account Number">PAN</abbr>, not on <abbr title="Unique Client Code">UCC</abbr> |
+| `isin` | alphanumeric | 12 | Yes | Back office | Client report | Survives scrip renames and corporate actions |
+| `buy_date` | date | 8 | Yes | Back office | Client report | Acquisition date; blank for unknown transfer-in lots |
+| `buy_rate` | decimal | 15,4 | Yes | Back office | Client report | Excludes STT; brokerage included only if the client elects |
+| `sell_date` / `sell_rate` | date / decimal | 8 / 15,4 | Yes | Back office | Client report | Transfer date and realised rate |
+| `fmv_31jan2018` | decimal | 15,4 | Conditional | Market data feed | Client report | Mandatory where `buy_date` precedes 1 February 2018 |
+| `grandfathered_cost` | decimal | 15,2 | Conditional | Computed | Client report | Higher of cost, and lower of FMV and consideration |
+| `gain_type` / `realised_gain` | code / decimal | 4 / 15,2 | Yes | Computed | Client report | STCG, LTCG, SPEC or NSPEC, with the signed amount |
+| `stt_paid` | decimal | 15,2 | Yes | Back office | Client report | Disclosed but **not** deducted in the capital-gains computation |
+| `turnover_for_44ab` | decimal | 15,2 | Conditional | Computed | Client report | Derivatives only; state the basis used |
+
+A well-built report also carries an explicit "lots with unknown cost" section — the transfer-in and corporate-action lots the broker could not price — because that list is what the client must complete before filing.
+
+## 8. Who reports what to the Income-tax Department
+
+| Reporting entity | Statement | What is reported | Cadence |
+| --- | --- | --- | --- |
+| Depositories (<abbr title="Central Depository Services (India) Limited">CDSL</abbr>, <abbr title="National Securities Depository Limited">NSDL</abbr>) | **SFT-2517** — depository transactions | Capital gains on transfer of listed securities and units, with ISIN, quantity, consideration, cost, 31 January 2018 fair market value, acquisition and transfer dates | Half-yearly: period to 30 September due 31 October; period to 31 March due 30 April |
+| AMCs and mutual-fund registrars | SFT for mutual-fund transactions | Purchases and redemptions of units | Annual |
+| Companies and their registrars | SFT for dividend | Dividend paid, per payee | Annual |
+| Stock brokers | **No capital-gains SFT obligation** | Brokers file withholding returns where they are deductors, and respond to notices; they do not file the capital-gains statement | As applicable |
+
+All of it aggregates into the taxpayer's **Annual Information Statement** on the compliance portal, with the condensed **Taxpayer Information Summary** above it and the withholding record in Form 26AS. The client reconciles; the broker explains.
+
+<Aside type="note" title="Why the AIS gain never matches the broker report">
+The depository computes gains on the whole beneficial-owner account — off-market receipts, gifts, transmissions and corporate-action lots included — and prices lots from its own data. The broker computes gains only on the trades it executed. A client with one demat account, one broker and no off-market activity should see the two agree; every other client will not. Point at the mismatch categories, not the arithmetic.
+</Aside>
+
+## 9. Alternatives
+
+| Option A — broker tax report | Option B — independent computation from <abbr title="Consolidated Account Statement">CAS</abbr> plus contract notes | When to pick which | Who uses what |
+| --- | --- | --- | --- |
+| Free, instant, trade-level accurate for that broker | Complete across brokers and demat accounts, includes off-market and gifted lots | A for a single-broker investing client; B once there is a second broker, an off-market transfer or inherited stock | Most retail clients use A; anyone with a transmission or gift history needs B |
+| Broker's FIFO and cost conventions | Client's own conventions, defensible on record | B where brokerage-in-cost or unknown-lot treatment moves the figure | Clients near the Rs.1,25,000 threshold |
+| No audit or presumptive analysis | Supports the 44AB and 44AD decision | B for any derivatives book of size | Active derivatives traders |
+
+## Practical notes
+
+- **[gotcha]** The Rs.1,25,000 long-term exemption is per **person per financial year**, not per broker and not per scrip. A client with three brokers gets three reports each applying the full exemption, and the sum overstates the exemption threefold.
+- **[gotcha]** Securities transaction tax is disclosed on the contract note but is **not** deductible in computing a capital gain, while it *is* an allowable expense where the activity is business income — which is why the two heads must never share a computation path.
+- **[gotcha]** Transfer-in lots are the largest source of wrong broker-generated gains: for holdings received by off-market transfer, closure-with-transfer, gift or transmission, the acquisition date and cost must come from the client, because the broker sees only the credit date.
+- **[risk trade-off]** A single "Tax P&L" number is what clients ask for and what produces mis-filed returns; the defensible design refuses to net across heads and says on its face that classification is the client's decision.
+- **[gotcha]** Non-resident clients with a double-taxation agreement claim need the tax-residency certificate and Form 10F on record **before** the payment, not at assessment. A certificate produced afterwards does not undo a 20% withholding; it becomes a refund claim. See [Lifecycle: <abbr title="Non-Resident Indian">NRI</abbr> conversion](/broking-kyc/lifecycle/nri-conversion/) and the [NRI deep dive](/broking-kyc/appendix/nri-deep-dive/).
+- **[cost optimization]** Harvesting to sit just under the long-term exemption and re-acquiring is legal and common, but each round trip pays the 2026 STT rates plus brokerage and stamp duty and resets the FIFO queue; the break-even is narrower than clients assume.
+
+## Cross-references
+
+- [Funds & Tax: Ledger and statements](./ledger-and-statements/) — the source documents the tax report is built from.
+- [Funds & Tax: Corporate actions](./corporate-actions/) — events that change cost basis and head of income.
+- [Funds & Tax: Demat servicing](./demat-servicing/) — off-market transfers and gifts that break cost basis.
+- [Funds & Tax: Brokerage and charges](./brokerage-and-charges/) — the STT, stamp-duty and GST lines.
+- [Deep Dive: <abbr title="Electronic Contract Note.">ECN</abbr> and investor-servicing artefacts](/broking-kyc/deep-dives/member-compliance/ecn-investor-servicing/) — contract note cum tax invoice and annual statement.
+- [Field Atlas — Computed ECN tax fields](/broking-kyc/reference/field-atlas/sections/computed-ecn-tax/) — per-trade statutory-charge fields.
+- [Field Atlas — Regulatory reports destination](/broking-kyc/reference/field-atlas/destinations/regulatory-reports/) — reporting obligations mapped field by field.
+- [Lifecycle: NRI conversion](/broking-kyc/lifecycle/nri-conversion/) — residency change and withholding.
+- [Appendix: NRI deep dive](/broking-kyc/appendix/nri-deep-dive/) — repatriation, <abbr title="Portfolio Investment Scheme (RBI / NRI)">PIS</abbr> and residency documentation.
+- [Lifecycle: Transmission](/broking-kyc/lifecycle/transmission/) — inherited lots and their cost basis.
+- [Deep Dive: Mutual fund platforms](/broking-kyc/deep-dives/specialty/mutual-fund-platforms/) — demat versus statement-of-account reporting paths.
+- [Circulars — SEBI other](/broking-kyc/reference/circulars/sebi-other/) — the buyback amendment regulations.
+
+## Verified through
+
+2026-09-11
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

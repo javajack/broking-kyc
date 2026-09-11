@@ -1,0 +1,174 @@
+---
+title: "Funds & Tax: Ledger and statements"
+description: Client-facing ledger anatomy, bills, funds and holding statements, the depository transaction statement, the Consolidated Account Statement from CDSL and NSDL, and how to reconcile all of them against each other.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** A client sees five or six documents that all claim to describe the same money and the same shares, and they rarely tie up on first reading. The page starts with the artefact map, teaches the ledger line by line, walks outward to the documents the broker does *not* issue, and ends with the reconciliation order an operations desk follows. Broker-side format and retention rules live in the [<abbr title="Electronic Contract Note.">ECN</abbr> and investor-servicing deep dive](/broking-kyc/deep-dives/member-compliance/ecn-investor-servicing/); this is the client-facing and reconciliation view.
+
+## TL;DR
+
+- **The ledger is the broker's book of the client, not the market's.** It is a running debit-credit account maintained under the books-and-records obligations consolidated in the [Master Circular for Stock Brokers — <abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590). Securities appear in it only as money, never as quantities.
+- **Four broker-issued artefacts, two depository-issued.** Broker: contract note cum tax invoice, daily margin statement, funds-and-securities ledger, periodic statement of accounts. Depository: the <abbr title="Depository Participant">DP</abbr> transaction / holding statement and the Consolidated Account Statement.
+- **<abbr title="Consolidated Account Statement">CAS</abbr> timelines were rationalised in February 2025.** Under SEBI/HO/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>/PoD1/CIR/P/2025/16 (14 February 2025, effective 14 May 2025) `[not yet in index]` AMCs and MF-RTAs send common-<abbr title="Permanent Account Number">PAN</abbr> data by the **5th** day from month end; depositories dispatch monthly e-CAS by the **12th** and physical CAS by the **15th**. Half-yearly data lands by **8 April / 8 October**, e-CAS by the **18th**, physical by the **21st**. See [Circulars — SEBI other](/broking-kyc/reference/circulars/sebi-other/).
+- **CAS consolidates on PAN, and only one depository sends it** — the one holding the **earlier-opened** demat account ([<abbr title="Central Depository Services (India) Limited">CDSL</abbr> CAS FAQ](https://www.cdslindia.com/CAS/FAQ.html)).
+- **The DP statement is mandated separately from CAS.** Chapter 16 of the [CDSL DP Operating Instructions, March 2026 edition](https://www.cdslindia.com/downloads/DP/currentDPs/DP-Operating-Instructions-Chapters-as-on-March-31-2026.pdf) requires a statement at each month end where there was even one transaction, with annual or half-yearly holding statements otherwise, under Regulation 60 of the SEBI (Depositories and Participants) Regulations, 2018.
+- **The quarterly statement of accounts is a running-account artefact, not an accounting one** — see [Payout and running account](./payout-running-account/).
+
+## Conceptual overview
+
+A retail client's money and securities sit in four custodies at once. Un-utilised cash sits in the broker's upstreamed client nodal bank account chain, reported to the clearing corporation daily (see [client funds upstreaming](/broking-kyc/deep-dives/settlement/client-funds-upstreaming/)). Margin collateral sits pledged at a depository in favour of the broker's client-securities-margin account. Delivered shares sit in the client's own beneficial-owner account. And the *claim* the client has on the broker — the net of everything bought, sold, charged, funded and paid out — exists only in the broker's ledger.
+
+That asymmetry is why this document set exists. The ledger is the broker's arithmetic; the depository statement is the depository's; the CAS is the depository's plus the mutual-fund registrars', keyed on PAN rather than on the broker relationship. None is a superset of the others: a client who sold shares yesterday sees the securities debit in the DP statement on the pay-in date and the money credit in the ledger on the pay-out date, and a client who bought a mutual fund in statement-of-account mode sees it in CAS but never in the DP statement at all. Every dispute reduces to one of four questions: is a trade missing, is a charge wrong, is a corporate-action credit late, or is the client reading the wrong document.
+
+## 1. Regulatory framework
+
+- **[SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (April 2025, Master Circular for Stock Brokers, successor to [SEBI/HO/MIRSD/POD-1/P/CIR/2024/118](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir2024118)) — books of account, client ledger, contract-note and margin-statement issuance, running-account settlement.
+- **SEBI/HO/MRD/PoD1/CIR/P/2025/16** (14 February 2025) `[not yet in index]` — revises Paras 1.24.5 and 1.24.12 of Chapter 1 of the Master Circular for Depositories dated 3 December 2024 to set CAS data-supply and dispatch timelines.
+- **CIR/MRD/DP/31/2014** (12 November 2014) `[not yet in index]` — the founding CAS mandate; first CAS issued March 2015 for February 2015 transactions.
+- **MRD/DoP/Dep/Cir-27/2004** (16 August 2004) `[not yet in index]` — permits digitally signed electronic statements under the Information Technology Act, 2000, as deemed compliance with Regulation 43 of the 2018 Regulations.
+- **SEBI (Depositories and Participants) Regulations, 2018**, Regulations 60 and 66(1)(c) — statutory hook for CDSL DP Operating Instructions Chapter 16.
+- **[<abbr title="National Stock Exchange of India">NSE</abbr>/INSP/61999](/broking-kyc/reference/circulars/nse/#nseinsp61999)** (13 May 2024) — contract-note format; the tax-invoice half reconciles to the charge lines in the ledger.
+- **[SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2025/1](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-pod1pcir20251)** (6 January 2025) — refund for clients who have not traded in the last 30 days, forcing a ledger movement outside the quarterly cycle.
+
+## 2. The artefact set at a glance
+
+| Artefact | Issued by | Trigger | Cadence | Default channel |
+| --- | --- | --- | --- | --- |
+| Contract note cum tax invoice | Broker | Any trade on the day | Per trading day with activity, within 24 hours | Email plus <abbr title="Short Message Service.">SMS</abbr> link |
+| Daily margin statement | Broker | Open position or collateral | Every trading day | Email |
+| Funds and securities ledger | Broker | Continuous | On demand | Portal / app |
+| Statement of accounts | Broker | Running-account settlement | Quarterly, or monthly if elected | Email |
+| Annual global / tax statement | Broker | Financial-year close | Once a year | Email / portal |
+| DP transaction statement | Depository Participant | Any demat debit or credit | Monthly where a transaction occurred | e-statement, physical on opt-out |
+| DP holding statement | Depository Participant | Nil-transaction account | Annual (nil balance) or half-yearly (credit balance) | Email |
+| Consolidated Account Statement | Depository | Any demat or MF-folio transaction | Monthly, else half-yearly | e-CAS, physical on opt-out |
+
+<Aside type="note" title="The ledger is not a statement">
+The running ledger and the periodic *statement of accounts* are different artefacts with different purposes. The ledger is a continuous accounting record the broker must maintain and make available; the statement of accounts is a periodic communication tied to the running-account settlement obligation and carries prescribed content including the retained amount and the basis of retention. A client asking for "my statement" almost always wants the ledger.
+</Aside>
+
+## 3. Reading a ledger
+
+A client funds ledger is a running account in the broker's books where a **credit** increases what the broker owes the client and a **debit** reduces it. Because the client is a creditor of the broker, the convention feels inverted to anyone used to a bank passbook: a purchase of shares is a debit, and a pay-out to the client's bank is also a debit.
+
+### 3.1 Column set
+
+| Field | Type | Length | Mandatory | Source system | Destination system(s) | Notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| `voucher_date` | date | 8 | Yes | Back office | Portal, statement of accounts | For trade entries equals trade date |
+| `settlement_date` | date | 8 | No | Back office | Portal | Pay-in / pay-out date; blank for house vouchers |
+| `voucher_no` | alphanumeric | 20 | Yes | Back office | Portal, audit trail | Unique per branch per financial year |
+| `voucher_type` | code | 4 | Yes | Back office | Portal | Journal, receipt, payment, contra, bill |
+| `segment` | code | 4 | Yes | Back office | Portal | <abbr title="Clearing Member">CM</abbr>, FO, CD, COM, MF, DP |
+| `narration` | text | 200 | Yes | Back office | Portal, statement | Must name the scrip or charge head |
+| `reference` | alphanumeric | 30 | No | <abbr title="Order Management System">OMS</abbr> / back office | Portal | Contract-note number, bank UTR, pledge reference |
+| `debit_amount` | decimal | 15,2 | Conditional | Back office | Portal, statement | Exactly one of debit / credit populated |
+| `credit_amount` | decimal | 15,2 | Conditional | Back office | Portal, statement | — |
+| `running_balance` | decimal | 15,2 | Yes | Back office | Portal | Negative means the client owes the broker |
+| `balance_marker` | code | 2 | Yes | Back office | Portal | Dr or Cr against the running balance |
+
+### 3.2 What each line means
+
+| Ledger line | What happened | Where to verify |
+| --- | --- | --- |
+| Bill for purchase, debit | Net obligation for the day's buys in a segment, inclusive of brokerage and statutory charges | Contract note for that trade date |
+| Bill for sale, credit | Net receivable after charges | Contract note for that trade date |
+| Receipt, credit | Funds received from the client's own bank account | Bank statement; see [Payin rails](./payin-rails/) |
+| Payment, debit | Pay-out to the registered bank account | See [Payout and running account](./payout-running-account/) |
+| Delayed payment charge, debit | Interest on a debit balance carried past the pay-in obligation | See [Delayed payment charges](./delayed-payment-charges/) |
+| DP charge, debit | Per-debit-instruction charge on a sale, plus annual maintenance charge | DP tariff sheet and DP transaction statement |
+| Margin funding interest, debit | Interest on the funded portion of an <abbr title="Margin Trading Facility">MTF</abbr> position | [MTF deep dive](/broking-kyc/deep-dives/settlement/mtf-operational/) |
+| Dividend, credit | Only where the broker received it for the client — directly credited dividends produce **no** ledger line | Bank statement; see [Corporate actions](./corporate-actions/) |
+| Auction / close-out, debit | Short-delivery consequence | [Short delivery and auction](/broking-kyc/deep-dives/trading-day/short-delivery-auction/) |
+
+## 4. Funds statement versus holding statement
+
+The **funds statement** is the money-only view of the ledger and answers "how much can I withdraw". The withdrawable figure is not the ledger credit balance — it is that balance less margin blocked against open positions, less unsettled obligations, less the retained amount under the running-account framework. Both numbers are correct and both must be shown.
+
+The **holding statement** exists in two inconsistent flavours a support agent must keep apart. The **broker's holding view** is a back-office position construction: shares owned, pledged for margin, bought today but not yet delivered, sold today but not yet debited. The **DP holding statement** is the depository's custody record: free, pledged, locked-in and frozen balances, and nothing about T-day trades.
+
+<Aside type="caution" title="Freeze status is visible on the statement">
+Where a beneficial-owner account or a specific ISIN balance is frozen, the freeze status is displayed in the depository's <abbr title="Beneficial Owner">BO</abbr>-ISIN inquiry screens *and* on the transaction / holding statement, per Clause 13.5.4 of the CDSL DP Operating Instructions. Point a client whose sale was rejected at the statement's freeze marker before opening a trade-rejection investigation. Freeze can be set by the beneficial owner, by the DP under a statutory order or lien, or by the depository — including the <abbr title="KYC Registration Agency">KRA</abbr>-validation freezes circulated under [CDSL/OPS/DP/POLCY/2026/562](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolcy2026562) and [<abbr title="National Securities Depository Limited">NSDL</abbr>/POLICY/2026/0119](/broking-kyc/reference/circulars/nsdl/#nsdlpolicy20260119).
+</Aside>
+
+## 5. Depository statement of accounts
+
+Chapter 16 of the CDSL DP Operating Instructions sets the DP-side obligation, and the mechanics matter because the DP is usually the broker itself.
+
+The beneficial owner elects a frequency at account opening from daily, weekly, fortnightly or monthly; whatever the election, the DP must send a statement at least once at each month end where there was **even a single transaction**. Accounts with zero balance and nil transactions for a year get at least one annual holding statement by email; accounts with a credit balance but no transactions get a half-yearly one. The client may always elect physical form in writing (Annexure 16.1 consent format), and a withdrawal of email consent obliges physical dispatch from then on. The **main DP**, not a branch, must print and dispatch physical statements and retain proof of dispatch. Annexure 16.2 is the depository-generated file format, and every field specified there must appear in what the DP sends.
+
+Two carve-outs: where the **depository itself** sends the transaction statement, CAS and holding statement directly, the DP is relieved of the duty (Clause 16.7.3, reading CIR/MRD/DP/31/2014 Clauses 13–15 with the Rights and Obligations document); and banking clients holding government securities receive a weekly holding statement as on every **Friday**, detailing each day's holdings, to support daily Statutory Liquidity Ratio computation.
+
+## 6. Consolidated Account Statement
+
+CAS is the one artefact keyed to the *investor* rather than the relationship. It merges demat transactions and holdings across **both** depositories with mutual-fund units held in statement-of-account form at the MF registrars.
+
+| CAS type | Data from AMCs / MF-RTAs | e-CAS dispatch | Physical CAS dispatch |
+| --- | --- | --- | --- |
+| Monthly (any transaction in any demat account or MF folio) | Within 5 days from month end | Within 12 days from month end | Within 15 days from month end |
+| Half-yearly (no transaction anywhere) | On or before 8 April and 8 October | On or before 18 April and 18 October | On or before 21 April and 21 October |
+
+Before the February 2025 revision the data window was three days and the dispatch window ten days from month end for all CAS.
+
+| Question | Answer |
+| --- | --- |
+| Basis of consolidation | PAN; for joint holdings, PAN of the **first** holder plus the pattern of holding |
+| Which depository sends it | The one holding the **earlier-opened** demat account; changeable on request via the DP of the issuing depository |
+| Opting out | Permitted by informing any DP, which records it in the depository system |
+| Included | All demat transactions across both depositories, plus MF purchases, redemptions, switches, dividend accruals, SIP / SWP / STP entries, bonus and merger events as supplied by the MF-RTAs |
+| Excluded | MF units held **only** in demat form — the DP transaction statement covers those |
+| e-CAS password and duplicates | PAN of the sole or first holder in capitals; duplicates downloadable from the depository's CAS tab |
+
+PANs with MF folios but no demat account receive their CAS from the <abbr title="Asset Management Company (mutual funds context) / Annual Maintenance Charges (depository context).">AMC</abbr> or MF-RTA, not from a depository.
+
+## 7. Reconciliation order
+
+1. **Establish the as-of date and the document.** A CAS dated the 12th reflects the *previous* month end.
+2. **Segment the ledger** to one segment and one exchange; cross-segment netting in a consolidated view is the commonest source of apparent error.
+3. **Tie the bill to the contract note** for that date and segment. If they agree, it is a charge dispute and the tax-invoice half carries the break-up.
+4. **Tie receipts and payments to bank references**, and securities movements to the DP statement — a missing purchase credit is a pay-out question, since the credit arrives from the clearing corporation, not the broker pool (see [direct payout to demat](/broking-kyc/deep-dives/settlement/direct-payout-to-demat/)).
+5. **Check corporate-action timing, then freeze, pledge and lock-in markers** before concluding a balance is missing, and tie the quarter's closing balance to the next statement of accounts.
+
+## 8. Alternatives
+
+| Option A — broker ledger and app holdings | Option B — DP statement / CAS | When to pick which | Who uses what |
+| --- | --- | --- | --- |
+| Real-time, includes T-day trades and money | End-of-day custody truth, no money, no T-day trades | Ledger for "what do I owe / what can I withdraw"; DP statement for "what do I own" | Traders and support desks live in the ledger; auditors, transmission and closure ops live in the DP statement |
+| Broker-generated, disputable against the broker | Depository-generated, independent of the broker | Use the depository artefact whenever the dispute is *with* the broker | Investor-grievance cases |
+| No mutual funds in statement-of-account form | CAS includes them | CAS for a whole-portfolio view | Tax filing and net-worth statements |
+
+## Practical notes
+
+- **[gotcha]** A client holding demat accounts at both depositories receives CAS from only one — the depository of the **earlier-opened** account, not the larger holding and not the one linked to the current broker. Tickets titled "CAS is missing my other demat" are almost always this.
+- **[gotcha]** Mutual-fund units bought in demat mode never appear as MF folio rows in CAS; they appear as ISIN balances in the demat portion, so a client comparing CAS against an AMC statement finds the same investment described two ways.
+- **[industry practice]** Most retail ledgers default the segment filter to "all", producing a consolidated running balance that matches nothing the client was ever sent. Defaulting to a single segment, or showing per-segment closing balances above the consolidated one, removes a measurable share of support volume. `[industry practice — unverified]`
+- **[cost optimization]** DP transaction charges are levied per debit instruction, not per sale order, so selling the same ISIN in five tranches within one settlement generally incurs one debit while splitting sells across settlement dates pays per date. `[industry practice — unverified]`
+- **[gotcha]** Annual maintenance charges must **not** be levied on accounts in "to be closed" status holding only illiquid, suspended or delisted securities; CDSL circulates the DP-wise lists in its billing folder, most recently under [CDSL/OPS/DP/POLCY/2026/611](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolcy2026611) (3 September 2026). Wrongly levied, the charge appears as a DP debit in the client ledger and becomes a recurring grievance head.
+- **[industry practice]** Basic Services Demat Account eligibility is recomputed quarterly by the depository from holding value and cross-depository first-holder checks — CDSL circulated the June 2026 cohort under [CDSL/OPS/DP/POLCY/2026/433](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolcy2026433). <abbr title="Basic Services Demat Account">BSDA</abbr> status changes the maintenance-charge line without any client action, which surprises clients.
+
+## Cross-references
+
+- [Deep Dive: ECN and investor-servicing artefacts](/broking-kyc/deep-dives/member-compliance/ecn-investor-servicing/) — format, signature and retention rules for the broker-issued artefacts.
+- [Funds & Tax: Payout and running account](./payout-running-account/) — the cycle behind the statement of accounts and the retention disclosure.
+- [Funds & Tax: Corporate actions](./corporate-actions/) — clocks the ledger does not control.
+- [Funds & Tax: Demat servicing](./demat-servicing/) — freeze markers, DIS mechanics, closure statements.
+- [Funds & Tax: Tax reporting](./tax-reporting/) — how the ledger feeds the tax P&L and capital-gains reports.
+- [Deep Dive: Direct pay-out to client demat](/broking-kyc/deep-dives/settlement/direct-payout-to-demat/) — why a purchase credit arrives from the clearing corporation.
+- [Deep Dive: Client funds upstreaming](/broking-kyc/deep-dives/settlement/client-funds-upstreaming/) — where the ledger credit balance physically sits.
+- [Deep Dive: <abbr title="Trade-date Plus N settlement">T+0</abbr> and <abbr title="Trade-date Plus N settlement">T+1</abbr> settlement](/broking-kyc/deep-dives/settlement/t0-t1-settlement/) — trade date versus settlement date.
+- [Lifecycle: Voluntary closure](/broking-kyc/lifecycle/closure/) — the quarter-to-date and final statements a closing client receives.
+- [Field Atlas — Section AC (running-account settlement)](/broking-kyc/reference/field-atlas/sections/ac-running-account-settlement/) — settlement and retention field destinations.
+- [Field Atlas — Computed ECN tax fields](/broking-kyc/reference/field-atlas/sections/computed-ecn-tax/) — the charge heads that become ledger debits.
+- [Integration <abbr title="Directed Acyclic Graph.">DAG</abbr> — recurring cycles](/broking-kyc/operations/integration-dag/recurring-cycles/) — statement generation in the batch graph.
+- [Broker process narrative](/broking-kyc/broker-process/narrative/) — the end-of-day sequence that writes the day's vouchers.
+- [Circulars — CDSL](/broking-kyc/reference/circulars/cdsl/) and [Circulars — NSDL](/broking-kyc/reference/circulars/nsdl/) — depository instruments cited above.
+
+## Verified through
+
+2026-09-11
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

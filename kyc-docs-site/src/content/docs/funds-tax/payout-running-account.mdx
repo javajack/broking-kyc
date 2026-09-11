@@ -1,0 +1,161 @@
+---
+title: "Funds & Tax: Payout and Running-Account Settlement"
+description: How client money comes back out — the 24-hour default, the running-account authorisation, the exchange settlement calendar, the 225 per cent retention ceiling, and the actual-payment requirement.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** three different client events are routinely confused — ordinary settlement after a payout, a voluntary withdrawal request, and mandatory periodic settlement under a running-account authority. They have different triggers, different deadlines and different arithmetic. The page separates them first, then works through the authorisation, the calendar, the retention computation, and the evidence a broker has to produce, because that is the order in which a settlement run actually executes.
+
+## TL;DR
+
+- **The default is settlement within twenty-four hours of the payout.** Paragraph 23.1.1 of the Master Circular for Stock Brokers (<abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/90, 17 June 2025 — `[not yet in index]`; supersedes the [August 2024 master](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir2024118)) applies unless the client specifically authorises a running account.
+- **The running-account authorisation must be signed by the client, dated, and revocable at any time,** and may not be signed by an authorised person or a power-of-attorney holder. The client chooses monthly or quarterly settlement, on dates the exchanges stipulate jointly in an annual calendar (paragraphs 23.1.1(a)–(d) and 48.1).
+- **Retention is capped at outstanding T and T-1 fund pay-in obligation plus 225 per cent of total margin liability across segments and exchanges,** with margin liability excluding mark-to-market and pay-in obligation (paragraph 48.2). Table 12 of the master circular works three scenarios; <abbr title="National Stock Exchange of India">NSE</abbr>'s operational FAQ adds a 50 per cent cash-margin floor that can produce a different answer.
+- **Settlement counts only on actual payment into the client's bank account.** Journal entries do not settle a running account, and are permitted only for levy or reversal of charges (paragraph 48.3). Where a cheque or demand draft is used after an electronic-payment failure, the realisation date is the settlement date (paragraph 48.5).
+- **A credit-balance client with no transaction for 30 calendar days gets the entire credit returned on the next monthly date,** irrespective of the frequency they chose, per [SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2025/1](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-pod1pcir20251) (6 January 2025) and paragraph 48.4.
+
+## Conceptual overview
+
+A broker holding a client's money is holding someone else's property. Everything in the running-account framework follows from that: the money goes back quickly by default, staying only with the client's written permission, only up to an amount justified by real obligations, and only until the next prescribed date. The framework is not a payment SLA — it is a custody discipline with a payment mechanism attached.
+
+Three events therefore have to be kept apart. *Ordinary settlement* is what happens after a market payout when no running-account authority exists: the funds go back within twenty-four hours. A *voluntary withdrawal* is a client request against an available credit balance: the broker transfers within one working day if the funds are with it, and within three working days if they are with the clearing member or clearing corporation (paragraph 23.1.1(i)). *Periodic running-account settlement* is the mandatory sweep on an exchange-stipulated monthly or quarterly date for clients who have given a running-account authority. A client with a valid authority still has a right to withdraw on request — the calendar is a floor on how often money goes back, not a restriction on when the client may ask.
+
+The retention computation is where most of the operational difficulty sits. A broker may keep some money back on a settlement date if the client has open positions, but only an amount explainable from the pay-in obligation and margin liability of that specific client, across all segments and all exchanges, frozen as at end of day. The ceiling is not a target: a broker that retains the maximum every quarter without being able to reconstruct the obligation behind it has a documentation problem regardless of whether the arithmetic was right. The upstream side of this — where the money physically sits, the Up Streaming Client Nodal Bank Account, and the three permitted asset classes — is covered in the [client funds and upstreaming deep-dive](/broking-kyc/deep-dives/settlement/client-funds-upstreaming/); this page stays with the client-facing settlement event.
+
+## 1. Regulatory framework
+
+- **SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90** (17 June 2025) — Master Circular for Stock Brokers. Paragraph 23.1 carries the running-account authorisation conditions (a) to (k); paragraph 48 carries the settlement mechanics, the retention formula and Table 12, the actual-payment rule, the 30-day inactive-credit rule, the physical-instrument realisation rule, the discontinuation of administrative-convenience retention, the authorised-person prohibition, the intimation requirements, and the exchange monitoring mandate. `[not yet in index]`
+- **[SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2023/197](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-pod1pcir2023197)** (28 December 2023) — settlement of running account of client funds lying with the trading member; moved scheduling from a fixed rule to exchange-stipulated dates published in an annual calendar.
+- **[SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2025/1](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-pod1pcir20251)** (6 January 2025) — ease-of-doing-business measure for clients who have not traded in the last 30 days. Replaces the earlier three-working-day return trigger with return of the entire credit balance on the upcoming monthly settlement date, with a reversion rule if the client trades before that date.
+- **NSE/INSP/72413** (20 January 2026) — annual calendar for settlement of the running account of client funds for FY 2026-27, Annexure A. `[not yet in index]`
+- **NSE FAQs for Actual Settlement of Funds and Securities** (undated exchange guidance) — the operational retention worksheet, including the 50 per cent cash-margin component and the note that running-account settlement of *securities* was discontinued.
+- **[SEBI/HO/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>/MRD-PoD-2/P/CIR/2024/153](/broking-kyc/reference/circulars/sebi-other/#sebihomrdmrd-pod-2pcir2024153)** (11 November 2024) — relevant negatively: money blocked at the client's own bank under the <abbr title="Unified Payments Interface">UPI</abbr>-block or qualifying 3-in-1 route is not a balance held by the broker, and therefore never enters the settlement population.
+- **HO/38/11/(9)2026-MIRSD-POD/I/15382/2026** (3 July 2026) — handling of clients' unpaid securities, replacing master-circular paragraph 46 with direct client payout and auto-pledge to <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr> and a payment window capped at five trading days. Relevant to this page only as a boundary: it governs *securities* the client has not paid for, not the funds running account.
+
+## 2. Who is in scope, and who is not
+
+| Client / balance type | Periodic settlement applies? | Basis |
+| --- | --- | --- |
+| Resident individual with a running-account authority | Yes, on the chosen monthly or quarterly date | Paragraph 23.1.1(c) |
+| Client with no running-account authority | No — settle within 24 hours of payout | Paragraph 23.1.1 opening |
+| Credit-balance client, no transaction for 30 calendar days | Entire credit returned on the next monthly date, whatever frequency was chosen | Paragraph 48.4 |
+| Institutional client settling through a custodian | No — existing practice continues | Paragraph 23.1.1(k) |
+| Client availing margin trading facility | Periodic settlement may not be necessary for that arrangement | Paragraph 23.1.1(h)(i) |
+| Collateral held as bank guarantee or fixed-deposit receipt | Periodic settlement may not be necessary | Paragraph 23.1.1(h)(ii) |
+| Funds blocked at the client's bank under UPI block or 3-in-1 | Not a broker-held balance at all | SEBI/HO/MRD/MRD-PoD-2/P/CIR/2024/153 |
+
+The two "may not be necessary" exceptions are product-scoped, not client-scoped. A client who uses margin trading facility does not thereby exempt an unrelated free cash balance from settlement. Keep the product balance and its agreement separately identifiable so the exception can be evidenced. `[AI inference — verify before acting]`
+
+## 3. The authorisation
+
+Paragraph 23.1.1 sets out the conditions. The authorisation must be signed by the client only — not by an authorised person and not by a power-of-attorney holder. It must be dated and must contain a clause stating that the client may revoke it at any time, and the broker must repeat in every periodic statement of accounts that the authorisation continues until revoked. There are no inter-client adjustments for the purpose of settling a running account (paragraph 23.1.1(j)), and the authorised person is not permitted to accept client funds or securities at all (paragraph 48.7).
+
+Two derived points matter for screen design. First, the client's frequency choice is a first-class, changeable preference and should be visible next to the last completed settlement date and the next prescribed date. Second, revocation has to be as easy as granting — a revoked authority reverts the client to the twenty-four-hour default, which is a materially different operational posture and should be surfaced rather than buried.
+
+## 4. The calendar
+
+Dates are stipulated jointly by the exchanges and published annually. They are not derivable from a rule of thumb. The FY 2026-27 calendar published in NSE/INSP/72413 Annexure A illustrates the point:
+
+| Cycle | FY 2026-27 dates |
+| --- | --- |
+| Quarterly | 17 and/or 18 April; 3 and/or 4 July; 16 and/or 17 October; 1 and/or 2 January 2027 |
+| Monthly (additional to the quarterly dates) | 15/16 May; 5/6 June; 7/8 August; 4/5 September; 6/7 November; 4/5 December; 5/6 February; 5/6 March |
+
+<Aside type="caution" title="Do not derive settlement dates arithmetically">
+The FY 2026-27 quarterly dates fall on 17/18 April, 3/4 July, 16/17 October and 1/2 January — none of which is reliably the first Friday. Any scheduler that derives settlement dates arithmetically will drift from the published calendar, and the exchanges monitor timeliness under paragraph 48.10. Read the calendar circular each financial year, and check for modifications issued after it: no amendment to the 20 January 2026 publication was verified during research, which is not the same as confirming none exists.
+</Aside>
+
+## 5. Computing permissible retention
+
+Where a client has an outstanding trade position on the settlement date, paragraph 48.2 permits retention of two components: the entire fund pay-in obligation outstanding at end of day for T and T-1, and margin liability as at the settlement date across all segments plus additional margin up to 125 per cent of total margin liability — which the circular then states as a combined ceiling of 225 per cent of total margin liability across segments and exchanges. Margin liability for this purpose excludes mark-to-market and pay-in obligation, so those amounts must not be counted twice.
+
+Table 12 of the master circular works three scenarios. Reproduced with the circular's own column labels:
+
+| Scenario | A: fund pay-in obligation T and T-1 | B: <abbr title="End Of Day">EOD</abbr> / peak margin requirement | C = 225% of B | D: securities pledged / repledged | E: client fund balance | F = E − [(C − D) + A] retained |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | 1,10,000 | 1,00,000 | 2,25,000 | 2,00,000 | 3,00,000 | 1,65,000 |
+| 2 | 50,000 | 20,000 | 45,000 | 15,000 | 50,000 | 0 |
+| 3 | 1,50,000 | 1,00,000 | 2,25,000 | 2,80,000 | 1,80,000 | 30,000 |
+
+The circular footnotes scenario 3: excess securities of ₹55,000 (2,80,000 minus 2,25,000) need not be unpledged. That is the point most often missed — a funds settlement does not oblige the broker to release surplus pledged securities.
+
+NSE's operational FAQ presents the same computation with an explicit cash-margin component: with `A` as pay-in obligation, `B` as end-of-day margin, `E` as eligible collateral after haircut and `G` as the client funds balance, it sets the cash component `C = 0.5B`, the remaining requirement `D = 2.25B − C`, extra cash `F = max(D − E, 0)`, maximum retention `H = A + C + F`, and the refund as `max(G − H, 0)`. On the FAQ's own worked example — `A` ₹1,10,000, `B` ₹1,00,000, collateral ₹2,00,000, funds ₹3,00,000 — maximum retention is ₹1,60,000 and the refund ₹1,40,000, against ₹1,65,000 retained under Table 12 scenario 1.
+
+<Aside type="danger" title="The two published computations can disagree">
+Table 12 and the NSE FAQ worksheet produce different retained amounts on the same inputs (₹1,65,000 against ₹1,60,000 on the worked example above) because the FAQ imposes a 50 per cent cash-margin floor that Table 12 does not express. Do not implement one and describe it as the other. Use the exchange's operational guidance for the exchange's monitoring process, keep both computations in the settlement audit record, and resolve which instruction governs with the relevant exchange before automating a calculator.
+</Aside>
+
+Three further constraints apply when reviewing an unusual balance. A debit with a sister concern cannot be offset against this broker's client funds. Another client's money cannot be substituted (paragraph 23.1.1(j)). And retention of any amount for administrative or operational difficulty in settling active clients' accounts has been discontinued outright (paragraph 48.6).
+
+## 6. Payment, evidence and disputes
+
+| Step | Requirement | Source |
+| --- | --- | --- |
+| Payment | Actual payment into the client's bank account; journal entries do not settle, and are permitted only for levy or reversal of charges | Paragraph 48.3 |
+| Physical instrument fallback | Where a cheque or demand draft is issued after an electronic-payment failure, the realisation date in the client's bank account is the settlement date | Paragraph 48.5 |
+| Intimation | <abbr title="Short Message Service.">SMS</abbr> to the registered mobile and email, including transaction number and date for electronic transfer, or instrument number and date for a physical instrument | Paragraphs 23.1.1(f), 48.8 |
+| Statements | Retention statement sent with the statement of running accounts within five working days | Paragraphs 23.1.1(f), 48.8 |
+| Dispute window | Client raises any dispute on the statement of running account within thirty working days of its date | Paragraphs 23.1.1(g), 48.9 |
+| Requested transfer | Within one working day if funds are with the broker; within three working days if with the clearing member or clearing corporation | Paragraph 23.1.1(i) |
+| Post-settlement funds | Funds received from clients whose running account has been settled remain in the Up Streaming Client Nodal Bank Account and may not be used to settle another client's running account | Paragraphs 23.1.1(e), 48.1.3 |
+| Exchange monitoring | Exchanges operate an online system to verify timely settlement and that excess client funds are not retained | Paragraph 48.10 |
+
+A bank rejection is an unresolved obligation, not a completed settlement. Corrected bank details must come through the controlled modification trail rather than being typed into the payout file, and the client's ledger, the bank response and the delivery evidence for the intimation should all be retained against the same settlement run so that a later reversal does not erase the original trail.
+
+### Field-level model — payout instruction and retention statement
+
+Logical model. Bank-file labels are provider-specific and are not prescribed by the circulars cited here. `[AI inference — verify before acting]`
+
+| name | type | length | mandatory | source-system | destination-system(s) | notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| Client code | identifier | `[unknown — verify]` | Yes | Client master | Payout queue | Consolidates the same client across segments and exchanges |
+| Settlement preference | enumeration | `[unknown — verify]` | Running account | Signed authorisation | Scheduler | Monthly or quarterly; client-chosen |
+| Authorisation date and revocation flag | date, boolean | `[unknown — verify]` | Running account | Signed authorisation | Scheduler, audit | Revocation reverts the client to the 24-hour default |
+| Request timestamp | timestamp | `[unknown — verify]` | Voluntary withdrawal | Client channel | Back office | Drives the one or three working-day clock |
+| Destination account and <abbr title="Indian Financial System Code.">IFSC</abbr> | strings | IFSC 11 | Yes | Verified bank master | Bank | Only the client's own verified account |
+| Fund pay-in obligation T and T-1 | decimal INR | `[unknown — verify]` | Where retention applies | Clearing reports | Retention statement | Column A |
+| EOD margin requirement | decimal INR | `[unknown — verify]` | Where positions exist | Margin reports | Retention statement | Column B; excludes <abbr title="Mark-to-Market">MTM</abbr> and pay-in |
+| Securities pledged / repledged value | decimal INR | `[unknown — verify]` | Where collateral exists | Collateral records | Retention statement | After applicable haircut |
+| Client fund balance | decimal INR | `[unknown — verify]` | Yes | Client ledger | Retention statement | Column E |
+| Maximum retainable amount | decimal INR | `[unknown — verify]` | Yes | Retention calculation | Retention statement, payout | Record which computation was used |
+| Payment amount | decimal INR | `[unknown — verify]` | Yes | Retention calculation | Bank, ledger | Never negative |
+| Transaction number and date | identifier, date | `[unknown — verify]` | Completed electronic payout | Bank | SMS, email, audit | Required content of the intimation |
+| Instrument number and realisation date | identifier, date | `[unknown — verify]` | Physical fallback | Bank | Audit | Realisation date is the settlement date |
+
+## 7. Alternatives
+
+| Option A | Option B | When to pick which | Who uses what |
+| --- | --- | --- | --- |
+| No running-account authority (24-hour settlement) | Running-account authority | No authority suits occasional investors who want money back immediately; an authority suits clients holding positions and trading regularly | Most active traders give an authority; buy-and-hold investors often do not |
+| Monthly settlement | Quarterly settlement | Monthly reduces balances held and simplifies the inactive-credit rule; quarterly reduces payout runs and client-side reconciliation | Client preference; the 30-day inactive rule pulls quarterly clients into a monthly run anyway |
+| Electronic payout | Physical instrument fallback | Electronic always; physical only after an electronic failure | Electronic dominates; physical realisation risk makes it a last resort |
+| Retain to the ceiling | Retain only the evidenced requirement | Retaining less reduces inspection exposure and client disputes; retaining more preserves margin headroom into the next session | Practice varies; the ceiling is a limit, not an entitlement |
+
+## Practical notes
+
+- **[gotcha]** The January 2025 amendment displaced the older "return within three working days" trigger for inactive credit balances. Any internal document or page still citing that trigger is out of date.
+- **[gotcha]** A funds top-up is not a transaction for the purpose of the 30-day inactive test; a trade is. Paragraph 48.4 keys off transacting, and reverts the client to their chosen frequency only if they trade after the 30 days but before the upcoming monthly date.
+- **[gotcha]** Excess pledged securities need not be unpledged because a funds settlement is due — the Table 12 footnote says so explicitly.
+- **[industry practice]** Brokers publish their own settlement-day communications and often run the payout in a single overnight batch, which means a client asking on the morning of a settlement date may see the request acknowledged before the money moves. Distinguish request receipt from completed payment in the acknowledgement.
+- **[risk trade-off]** Freezing the computation inputs at a reproducible cut-off costs storage but is the only way to explain last quarter's retained amount against this morning's margin screen. `[AI inference — verify before acting]`
+- **[industry practice — unverified]** Clients whose bank accounts are frozen or under restriction create a settlement that cannot complete electronically. Confirm the current exchange handling of such cases rather than defaulting to indefinite retention.
+
+## Cross-references
+
+- [Deep Dive: Client Funds and Upstreaming](/broking-kyc/deep-dives/settlement/client-funds-upstreaming/) — the nodal-account architecture the retained and returned money moves through, including running-account settlement day.
+- [Section AC: Running Account Settlement — Data Flow](/broking-kyc/reference/field-atlas/sections/ac-running-account-settlement/) — the field-level destinations for the authorisation and settlement-preference data captured at onboarding.
+- [Funds & Tax: Pay-in Rails](./payin-rails/) — the inbound leg, including why a bank-side block never enters the settlement population.
+- [Funds & Tax: Delayed Payment Charges](./delayed-payment-charges/) — the netting rule that applies before a debit can be charged, which uses the same consolidated same-client balance as the retention computation.
+- [Deep Dive: <abbr title="Electronic Contract Note.">ECN</abbr> and Investor Servicing](/broking-kyc/deep-dives/member-compliance/ecn-investor-servicing/) — the statement and contract-note apparatus that carries the retention statement to the client.
+- [Deep Dive: <abbr title="Margin Trading Facility">MTF</abbr> Operational Walkthrough](/broking-kyc/deep-dives/settlement/mtf-operational/) — the margin-trading arrangement referenced in the paragraph 23.1.1(h)(i) exception.
+- [Deep Dive: <abbr title="Trade-date Plus N settlement">T+0</abbr> / <abbr title="Trade-date Plus N settlement">T+1</abbr> Settlement](/broking-kyc/deep-dives/settlement/t0-t1-settlement/) — the payout timing that starts the twenty-four-hour default clock.
+- [Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/) — where the running-account obligation sits among the broker's recurring compliance rows.
+
+## Verified through
+
+2026-09-11
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

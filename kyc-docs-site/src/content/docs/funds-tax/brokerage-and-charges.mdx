@@ -1,0 +1,188 @@
+---
+title: "Funds & Tax: Brokerage and Charges"
+description: The full cost stack on a trade — brokerage and its cap, plan models, exchange charges after the true-to-label mandate, SEBI turnover fee, STT, stamp duty, GST, DP charges, and the tariff sheet.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** the amount a client pays on a trade is built from one negotiable component and seven that are not. The page separates them on exactly that line — brokerage and broker-set fees first, then each pass-through levy with its own rate-setting instrument, then the disclosure obligations that tie the whole stack back to a document the client accepted — because a tariff dispute is almost always a dispute about which of those two categories a line item belongs to.
+
+## TL;DR
+
+- **Brokerage is the only genuinely negotiable component, and it is capped by exchange rules, not by <abbr title="Securities and Exchange Board of India">SEBI</abbr> directly.** Clause 17 of the Rights and Obligations document annexed to the Master Circular for Stock Brokers (SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/90, 17 June 2025 — `[not yet in index]`) states that the broker "shall not charge brokerage more than the maximum brokerage permissible as per the rules, regulations and bye-laws of the relevant stock exchanges and/or rules and regulations of SEBI".
+- **Exchange, clearing-corporation and depository charges have been true-to-label since 1 October 2024.** [SEBI/HO/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>/TPD-1/P/CIR/2024/92](/broking-kyc/reference/circulars/sebi-other/#sebihomrdtpd-1pcir202492) (1 July 2024) requires that the amount a member recovers from an end client be the amount the market infrastructure institution actually receives, and that the charge structure be "uniform and equal for all its members instead of slab-wise".
+- **<abbr title="Securities Transaction Tax">STT</abbr> on derivatives rose on 1 April 2026** under the Finance Act 2026: sale of futures from 0.02 per cent to 0.05 per cent, sale of options from 0.10 per cent to 0.15 per cent of premium, and options on exercise from 0.125 per cent to 0.15 per cent. Cash-segment rates were unchanged.
+- **Stamp duty has been uniform and centrally collected since 1 July 2020** — 0.015 per cent on delivery transfers, 0.003 per cent on non-delivery, buyer-side only, collected by clearing corporations and depositories on behalf of the states under the amended Indian Stamp Act framework referenced at [<abbr title="National Stock Exchange of India">NSE</abbr>/INSP/61999](/broking-kyc/reference/circulars/nse/#nseinsp61999).
+- **A tariff sheet is mandatory at account opening.** Paragraph 21.2.1 of the master circular requires the broker to give the client "a tariff sheet specifying various charges, including brokerage, payable by the client to avoid any disputes at a later date", and paragraph 23.4.3 requires the applicable brokerage rate to appear in the mandatory policies-and-procedures document.
+
+## Conceptual overview
+
+The price a retail client pays to execute a trade in India is a stack of eight or so components levied by five different parties. Only the first is set by the broker in a competitive market. The rest are set by an exchange, a clearing corporation, a depository, SEBI, the central government, or a state government, and reach the client because the broker is obliged to collect and remit them. SEBI's own data-format annexure to the broker master circular (Annexure-24, used for the profitability studies) names the taxonomy the regulator works with: brokerage plus clearing fee, exchange fee, stamp duty, SEBI turnover fee, STT, and GST. A client-facing tariff that does not resolve to those buckets is hard to reconcile against a contract note.
+
+The most consequential recent change to this stack was structural, not a rate. Before October 2024, exchanges charged members on volume-based slabs while members billed end clients daily at the headline rate, so a high-volume broker collected more from clients than it paid the exchange and kept the difference. [SEBI/HO/MRD/TPD-1/P/CIR/2024/92](/broking-kyc/reference/circulars/sebi-other/#sebihomrdtpd-1pcir202492) ended that: market infrastructure institutions were directed to redesign their charge structures so that what the client pays is what the institution receives, to make those structures uniform across members irrespective of size, and to give "due consideration to the existing per unit charges realized by MIIs so that the end clients are benefitted with the reduction of charges". Exchanges published revised flat rates effective 1 October 2024, and a revenue line several brokers had relied on disappeared.
+
+## 1. Regulatory framework
+
+- **SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90** (17 June 2025) — Master Circular for Stock Brokers. Paragraph 21.2.1 requires the tariff sheet at account opening; 21.1.6 the Most Important Terms and Conditions; 23.4.3 the applicable brokerage rate in the mandatory policies-and-procedures document; 23.6 a free copy of every executed document within seven days. Clause 17 of the annexed Rights and Obligations document carries the brokerage ceiling by reference to exchange rules; Annexure-24 sets out the charge taxonomy. `[not yet in index]`
+- **[SEBI/HO/MRD/TPD-1/P/CIR/2024/92](/broking-kyc/reference/circulars/sebi-other/#sebihomrdtpd-1pcir202492)** (1 July 2024, effective 1 October 2024) — "Charges levied by Market Infrastructure Institutions – True to Label". Clause 5(a) states the true-to-label principle; 5(b) requires a uniform and equal charge structure rather than one dependent on member volume or activity; 5(c) requires the new structure to consider existing per-unit charges so end clients benefit from a reduction. Clause 6 directs redesign, bye-law amendment, member notification and implementation reporting; clause 7 sets the effective date.
+- **[SEBI/<abbr title="Legal Affairs Department — Northern Regional Office (SEBI)">LAD-NRO</abbr>/GN/2026/291](/broking-kyc/reference/circulars/sebi-other/#sebilad-nrogn2026291)** (7 January 2026) — SEBI (Stock Brokers) Regulations, 2026, replacing the 1992 regulations. Registration and turnover fees sit in its schedules; read them there rather than from the 1992 Schedule <abbr title="—">III</abbr> references that persist in older internal documents.
+- **[NSE/INSP/61999](/broking-kyc/reference/circulars/nse/#nseinsp61999)** — the contract-note and levy reference used across this site for centralised stamp-duty collection since 1 July 2020 and for the revised contract-note format carrying the computed levies.
+- **Finance Act 2026** (presidential assent 30 March 2026) — revised STT rates for futures and options from 1 April 2026. The table below is drawn from broker and exchange restatements; verify against the Act's schedule before implementing. `[AI inference — verify before acting]`
+- **Indian Stamp Act 1899, Schedule I, as amended with effect from 1 July 2020**, read with the Indian Stamp (Collection of Stamp-Duty through Stock Exchanges, Clearing Corporations and Depositories) Rules 2019.
+
+## 2. The charge stack
+
+| Component | Levied by | Side | Rate basis | Negotiable? |
+| --- | --- | --- | --- | --- |
+| Brokerage | Broker | Both | Percentage of turnover, flat per executed order, or a subscription | Yes, up to the exchange ceiling |
+| Exchange transaction charge | Stock exchange | Both | Per lakh of turnover, or per crore of option premium | No — uniform since 1 October 2024 |
+| Clearing charge | Clearing corporation | Both | Per unit, where levied separately | No |
+| SEBI turnover fee | SEBI | Both | Percentage of turnover | No |
+| Securities Transaction Tax | Central government | Varies by transaction | Percentage of turnover or premium | No |
+| Stamp duty | State governments, collected centrally | Buyer only | Percentage of turnover | No |
+| GST | Central and state governments | Both | 18 per cent on the taxable services in the stack | No |
+| Depository participant charge | Depository and <abbr title="Depository Participant">DP</abbr> | Sell side, per debit | Flat per debit instruction | Partly — the DP's own component is broker-set |
+| Investor protection fund charge | Exchange | Both | Small per-turnover levy | No |
+
+Everything in the "No" column is a pass-through. The broker's only lawful margin on those lines, since 1 October 2024, is zero.
+
+## 3. Brokerage and plan models
+
+The ceiling is set by the rules, bye-laws and regulations of the exchange on which the trade is executed, and clause 17 of the Rights and Obligations document binds the broker to it. The figure conventionally cited is **2.5 per cent of the contract price, exclusive of statutory levies** `[industry practice — unverified]` — the exchange regulation stating it could not be fetched during research, so treat the number as the market's settled understanding and read the applicable exchange regulation before relying on it. In practice the ceiling is irrelevant to retail pricing: competitive rates are two to three orders of magnitude below it.
+
+| Plan model | How it prices | Typical positioning | Trade-off for the client |
+| --- | --- | --- | --- |
+| Percentage of turnover | A basis-point rate on traded value, often with a per-order minimum | Full-service and bank-led brokers | Predictable as a proportion; expensive on large tickets |
+| Flat per executed order | A fixed rupee amount per order regardless of size, commonly with delivery free | Discount brokers | Very cheap on large orders; the per-order floor dominates small ones |
+| Zero-brokerage delivery | No brokerage on delivery equity; intraday and derivatives priced flat | Discount brokers competing on headline | Statutory levies still apply, so "zero brokerage" is not "zero cost" |
+| Subscription or plan fee | A periodic fee replaces or reduces per-trade brokerage | Active-trader plans | Only rational above a break-even volume the client must compute |
+| Tiered by volume | Rate falls as monthly turnover rises | Institutional and HNI desks | Requires the client to trust the tier calculation |
+
+Two constraints apply whatever the model. The rate must be in the mandatory policies-and-procedures document (paragraph 23.4.3) and on the tariff sheet (paragraph 21.2.1), and the brokerage must be shown separately on the contract note. The master circular's own list of common inspection observations includes brokerage not being shown separately on contract notes, and charges other than brokerage and statutory charges being levied without the client's specific agreement or beyond the prescribed limits.
+
+<Aside type="caution" title="A plan change is a tariff change">
+Moving a client between plans changes a term of an accepted document. The tariff version in force on the trade date is the one that governs, so the back office needs the effective-dated plan history, not just the current plan. Retro-applying a new plan to executed trades — in either direction — produces bills the client cannot reconcile against the contract notes already issued.
+</Aside>
+
+## 4. Exchange transaction charges after true-to-label
+
+The rates below are the flat structures published by the two equity exchanges at the 1 October 2024 revision, restated from exchange announcements and broker charge pages rather than from a directly fetched exchange circular. Treat them as the shape of the post-mandate structure and confirm the current values against the exchange's live charge schedule before using them in a calculator. `[AI inference — verify before acting]`
+
+| Exchange and segment | Rate as published at the 1 October 2024 revision |
+| --- | --- |
+| NSE capital market (equity cash) | ₹2.97 per lakh of traded value |
+| NSE equity futures | ₹1.73 per lakh of traded value |
+| NSE equity options | ₹35.03 per lakh of premium value |
+| NSE currency futures | ₹0.35 per lakh of traded value |
+| NSE currency options and interest-rate options | ₹31.10 per lakh of premium value |
+| <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> equity cash (groups A, B and other non-exclusive scrips) | ₹3.75 per lakh of traded value |
+| BSE Sensex and Bankex options | ₹3,250 per crore of premium turnover |
+| BSE Sensex 50 options and stock options | ₹500 per crore of premium turnover |
+| BSE index and stock futures | Nil |
+
+The structural points survive any rate revision. Charges are uniform across members regardless of size. Option charges are levied on premium, not on notional, which is why an options tariff quoted "per lakh" is not comparable to a futures tariff quoted the same way. And the amount billed to the client must equal the amount the exchange receives — a broker cannot round the recovery up.
+
+## 5. SEBI turnover fee
+
+SEBI levies a turnover fee on brokers, collected through the exchanges and passed through to clients as a distinct contract-note line. The commonly applied rates are **0.0001 per cent, or ₹10 per crore, on non-debt securities** and **0.000025 per cent, or ₹2.5 per crore, on debt securities**, across cash, equity derivatives, currency derivatives, commodity derivatives and the newer segments. `[industry practice — unverified]` The authoritative rate schedule is the fee schedule to the SEBI (Stock Brokers) Regulations, 2026; confirm against that instrument rather than against a broker tariff page.
+
+Since the exchanges' notices on the point, the fee itself carries **18 per cent GST**, debited to members along with the fee. Brokers therefore show two lines — SEBI turnover fee, and GST computed on it — rather than a single grossed-up figure. The broker's own remittance to SEBI is half-yearly, for the half-years ending 30 September and 31 March; that obligation sits in the [compliance blueprint](/broking-kyc/operations/compliance-blueprint/) as a recurring reporting row.
+
+## 6. Securities Transaction Tax
+
+STT is a central levy on the transaction itself, computed by the clearing corporation and reflected on the contract note. The rates below reflect the Finance Act 2026 changes effective for transactions on or after **1 April 2026**.
+
+| Taxable securities transaction | Rate before 1 April 2026 | Rate from 1 April 2026 | Payable by |
+| --- | --- | --- | --- |
+| Purchase of equity shares, delivery | 0.1 per cent | 0.1 per cent | Purchaser |
+| Sale of equity shares, delivery | 0.1 per cent | 0.1 per cent | Seller |
+| Sale of equity shares, non-delivery (intraday) | 0.025 per cent | 0.025 per cent | Seller |
+| Sale of units of an equity-oriented fund, delivery | 0.001 per cent | 0.001 per cent | Seller |
+| Sale of futures in securities | 0.02 per cent | 0.05 per cent | Seller |
+| Sale of options in securities, on premium | 0.10 per cent | 0.15 per cent | Seller |
+| Sale of options in securities, where the option is exercised | 0.125 per cent | 0.15 per cent | Purchaser |
+
+Futures are valued at the traded price; options at the premium, except on exercise where the intrinsic settlement value applies. Commodity derivatives attract Commodities Transaction Tax on a separate schedule rather than STT, and securities lending and borrowing legs do not attract STT because the transaction is a loan rather than a sale — see the [<abbr title="Securities Lending and Borrowing Mechanism">SLBM</abbr> deep-dive](/broking-kyc/deep-dives/settlement/slbm/).
+
+<Aside type="danger" title="The April 2026 STT change is large in relative terms">
+The futures rate went up 150 per cent and the options premium rate 50 per cent in a single step. Any cost calculator, break-even model, tariff comparison page or client-facing "charges" screen written before April 2026 understates derivatives cost materially. Audit hard-coded STT constants specifically — they are the most commonly embedded numbers in a broking stack, and the cash-segment rates that did not change make the error easy to miss in spot checks.
+</Aside>
+
+## 7. Stamp duty
+
+Since 1 July 2020 stamp duty on securities transactions has been uniform nationally, levied on the buyer only, and collected centrally by clearing corporations and depositories, which remit to the states. The state-by-state patchwork and the seller-side levy that preceded it are gone.
+
+| Instrument | Rate | Levied on |
+| --- | --- | --- |
+| Transfer of securities other than debentures, delivery basis | 0.015 per cent | Buyer |
+| Transfer of securities other than debentures, non-delivery basis | 0.003 per cent | Buyer |
+| Futures, equity and commodity | 0.002 per cent | Buyer |
+| Options, equity and commodity | 0.003 per cent | Buyer |
+| Currency and interest-rate derivatives | 0.0001 per cent | Buyer |
+| Government securities | Nil | — |
+| Repo on corporate bonds | 0.00001 per cent | Buyer |
+
+These are the Schedule I rates as amended with effect from 1 July 2020, restated from published analyses of the amendment rather than from a fetched copy of the schedule. `[AI inference — verify before acting]` Note that off-market transfers and pledge invocations in the depository system are stamped separately — <abbr title="Central Depository Services (India) Limited">CDSL</abbr> introduced an "Overdue – Insufficient Stamp Duty" transaction status for exactly that case, and has since moved from a monthly to a daily stamp-duty utilisation report.
+
+## 8. GST and depository charges
+
+GST at **18 per cent** applies to the taxable services in the stack — brokerage, exchange transaction charges, clearing charges, the SEBI turnover fee, depository participant charges, and broker-set fees such as a payment-gateway charge. It does not apply to STT or stamp duty, which are themselves taxes. Certain interest and delayed-payment amounts follow a different treatment, discussed in [delayed payment charges](./delayed-payment-charges/).
+
+Depository participant charges are levied per debit instruction on the sell side — a flat rupee amount per ISIN per debit rather than a percentage, so they are regressive against small sell orders. The amount has two layers: the depository's charge to the participant, and the participant's markup. Only the second is broker-set, and true-to-label applies to the first. Published per-debit amounts vary and are not established by any source verified for this page. `[industry practice — unverified]`
+
+### Field-level model — tariff sheet and contract-note charge block
+
+Contract-note field names follow the existing [contract-notes destination](/broking-kyc/reference/field-atlas/destinations/contract-notes/) mapping.
+
+| name | type | length | mandatory | source-system | destination-system(s) | notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| Plan code and effective date | identifier, date | `[unknown — verify]` | Yes | Tariff master | Back office, contract notes | Effective-dated; the trade-date version governs |
+| Brokerage rate or flat amount | decimal | `[unknown — verify]` | Yes | Tariff master | Back office | Must not exceed the exchange ceiling |
+| Brokerage | decimal INR | NUMBER(15,2) | Yes | Back office | Contract note, ledger | Shown separately on the contract note |
+| Exchange transaction charge | decimal INR | NUMBER(15,2) | Yes | Exchange charge schedule | Contract note | True-to-label; recovery equals remittance |
+| Clearing charge | decimal INR | NUMBER(15,2) | Where levied | Clearing corporation | Contract note | May be combined with brokerage in SEBI's Annexure-24 taxonomy |
+| SEBIFee | decimal INR | NUMBER(15,2) | Yes | Back office | Contract note, half-yearly return | Turnover fee; GST computed on it separately |
+| STT | decimal INR | NUMBER(15,2) | Yes | Clearing corporation computation | Contract note | Rates per Finance Act; revised 1 April 2026 |
+| StampDuty | decimal INR | NUMBER(15,2) | Buy side | Clearing corporation or depository | Contract note, monthly state remittance | Centralised collection since 1 July 2020 |
+| GST | decimal INR | NUMBER(15,2) | Yes | Back office | Contract note | 18 per cent on the taxable components only |
+| IPFT charge | decimal INR | NUMBER(15,2) | Where levied | Exchange | Contract note | Small per-turnover exchange levy |
+| DP charge per debit | decimal INR | `[unknown — verify]` | Sell side | DP tariff | Ledger, DP bill | Flat per debit instruction; depository component is pass-through |
+| NetAmount | decimal INR | NUMBER(18,2) | Yes | Back office | Contract note, ledger | Gross value adjusted for every charge above, rounded to paise |
+
+## 9. Alternatives
+
+| Option A | Option B | When to pick which | Who uses what |
+| --- | --- | --- | --- |
+| Percentage brokerage | Flat per-order brokerage | Percentage suits small average tickets; flat suits large tickets and frequent orders | Full-service and bank-led brokers percentage; discount brokers flat |
+| Per-trade brokerage | Subscription plan | Subscription only above a published break-even volume | Active traders; most retail clients never reach break-even |
+| Absorb the payment-gateway fee | Pass it through | Absorbing reduces funding friction; passing through keeps unit economics clean | Practice varies; the choice belongs on the tariff sheet either way |
+
+## Practical notes
+
+- **[gotcha]** "Zero brokerage" never means zero cost. STT, stamp duty, exchange charges, the SEBI turnover fee and GST all still apply, and on a small delivery trade they can exceed what a flat-fee broker would have charged.
+- **[gotcha]** Option charges are quoted on premium and futures charges on notional. Comparing the two directly produces conclusions wrong by orders of magnitude.
+- **[gotcha]** Since 1 October 2024 the broker cannot round exchange-charge recovery up to a convenient figure. Recovery must equal remittance.
+- **[industry practice]** Brokers publish a charges page and calculator alongside the mandatory tariff sheet. The tariff sheet governs; a marketing calculator that disagrees with it is a dispute waiting to happen.
+- **[cost optimization]** For a delivery investor the dominant costs are STT and stamp duty, both untouchable; after April 2026 STT dominates derivatives cost further still. Brokerage optimisation matters most to small-ticket, high-frequency flow — exactly where a per-order floor bites.
+- **[risk trade-off]** A simple tariff is easier to disclose and reconcile; a segmented tariff captures more margin. The cost of the second is the effective-dated plan history every bill must be reproducible from.
+- **[industry practice — unverified]** Where two brokers' "same" plan produce different bills, the cause is usually the per-order minimum, the DP charge markup, or a payment-gateway fee — not brokerage.
+
+## Cross-references
+
+- [Deep Dive: <abbr title="Electronic Contract Note.">ECN</abbr> and Investor Servicing](/broking-kyc/deep-dives/member-compliance/ecn-investor-servicing/) — the contract note that carries every line in this stack, field by field.
+- [Contract Notes — Destination Mapping](/broking-kyc/reference/field-atlas/destinations/contract-notes/) — the field names and data types used in the table above.
+- [Computed / Derived — ecn-tax — Data Flow](/broking-kyc/reference/field-atlas/sections/computed-ecn-tax/) — where the computed levy fields originate and travel.
+- [Funds & Tax: Delayed Payment Charges](./delayed-payment-charges/) — the non-statutory charge that sits alongside this stack and follows a different tax treatment.
+- [Funds & Tax: Pay-in Rails](./payin-rails/) — where the payment-gateway fee referenced above is incurred.
+- [Cost Analysis](/broking-kyc/reference/cost-analysis/) — the other side of the economics: what an onboarding costs the broker in vendor fees.
+- [Deep Dive: Segment Rules Comparison](/broking-kyc/deep-dives/foundational/segment-rules-comparison/) — segment-by-segment differences in which levies apply.
+- [Compliance Blueprint](/broking-kyc/operations/compliance-blueprint/) — the half-yearly SEBI turnover fee and monthly stamp-duty remittance obligations as recurring compliance rows.
+- [Finance / CFO persona path](/broking-kyc/personas/finance-cfo/) — the reading order for someone who owns this cost stack commercially.
+
+## Verified through
+
+2026-09-11
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*
