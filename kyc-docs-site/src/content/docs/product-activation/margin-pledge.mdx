@@ -1,0 +1,149 @@
+---
+title: "Product Activation: Margin Pledge"
+description: The client side of pledging holdings for margin — creating and releasing a pledge, the depository OTP, how post-haircut collateral value is displayed, the re-pledge chain, and automated invocation after October 2025.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Pledging is the one collateral mechanism a retail client operates directly, and almost every complaint about it traces to a gap between what the client saw and what the margin engine used. The page therefore moves from the legal shape of the instrument, to the client's own screens and the depository authentication that sits outside the broker's app, to the number the client actually cares about — post-haircut collateral — and only then to release and invocation. Depository file formats, tags and the broker-side pledge chain are covered on the vendor pages.
+
+## TL;DR
+
+- **Pledge, not transfer, is the only lawful way to take client securities as margin.** [<abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/DOP/CIR/P/2020/28](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddopcirp202028) (25 Feb 2020) requires margin collateral to be taken by margin pledge under the Depositories Act, prohibits title transfer into the broker's own demat account, and states that holding a power of attorney is not equivalent to collecting margin (clauses 2 to 4).
+- **The client authenticates the pledge at the depository, not at the broker.** Annexure A clause 4 of that circular requires the client's acceptance "by way of One Time Password (<abbr title="One-Time Password">OTP</abbr>) confirmation on mobile number/registered e-mail id of the client or other verifiable mechanism" — which is why the flow leaves the broker's app.
+- **The value that matters is post-haircut.** The clearing corporation assigns collateral value after an applicable haircut, published monthly rather than fixed in the circular, and the 50 per cent cash-equivalent requirement operates at the clearing-member level, not per client.
+- **Clients can see their own collateral independently.** [SEBI/HO/MRD2_DCAP/CIR/2021/0598](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2_dcapcir20210598) (20 Jul 2021) requires a web portal showing client-wise disaggregated cash and non-cash collateral.
+- **Invocation is now largely automated.** SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/82 (3 Jun 2025) `[not yet in index]` introduced pledge release for early pay-in, invocation for early pay-in, and invocation cum redemption; implementation moved from 5 September 2025 to 10 October 2025.
+- **February 2026 brought a notice obligation.** A SEBI circular dated 5 February 2026 aligned pledge invocation with the pawnor-notice principle of the Indian Contract Act, and [<abbr title="Central Depository Services (India) Limited">CDSL</abbr>/OPS/<abbr title="Depository Participant">DP</abbr>/SETT/2026/180](/broking-kyc/reference/circulars/cdsl/#cdslopsdpsett2026180) (13 Mar 2026) implemented it from 6 April 2026 with a signed client undertaking and intimation to both pledgor and pledgee on invocation.
+
+## Conceptual overview
+
+A client with a portfolio and an appetite for derivatives has a problem: margin has to be paid in cash or in acceptable collateral, and the portfolio is neither until something is done to it. Pledging is that something. The client keeps ownership and keeps the securities in their own demat account; what changes is that a charge is created in favour of the broker, the broker re-pledges to its clearing member, and the clearing member re-pledges to the clearing corporation. The clearing corporation values the pledged stock after a haircut and that value counts towards the client's margin.
+
+The reason this machinery exists in exactly this shape is a scandal-driven reform. Before 2020, brokers routinely took client securities into their own demat accounts as "collateral", which made client assets indistinguishable from broker assets and made misuse both possible and hard to detect. The February 2020 circular closed the route: title transfer for margin purposes is prohibited, the only permitted mechanism is a pledge that leaves ownership with the client and leaves a visible trail in the client's own account, and a power of attorney does not substitute for it. Everything a client experiences today — the separate authentication step, the pledge appearing in their holdings statement, the separately tagged broker account — is a direct consequence.
+
+For the client, then, pledging is a deliberate act with a deliberate friction. That friction is the control. The design question is not how to remove it but how to make its result legible: which securities are pledged, what they are worth after haircut, how much of the margin requirement that covers, what happens if the market moves, and how to get the securities back. A pledge flow that succeeds technically and leaves the client unable to answer those five questions has failed.
+
+## 1. Regulatory framework
+
+- **[SEBI/HO/MIRSD/DOP/CIR/P/2020/28](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddopcirp202028)** (25 Feb 2020) — the founding circular. Clause 2 requires client securities collateral to be accepted only by way of margin pledge under section 12 of the Depositories Act read with regulation 79 of the SEBI (Depositories and Participants) Regulations, 2018. Clauses 3 and 4 treat off-market transfer as a change of ownership and prohibit title transfer to the broker's own account, and state expressly that holding a power of attorney is not equivalent to margin collection. Clause 5 requires depositories to provide a distinct "margin pledge" type and requires the broker to open a separately tagged client securities margin pledge account. Clauses 6 to 8 set out the client-to-broker, broker-to-clearing-member, clearing-member-to-clearing-corporation chain with the full trail visible in the pledgor's demat account. Clause 10 permits pledge of securities the clearing corporation does not approve, at the broker's own risk, without onward re-pledge. Clause 11 requires margin-funded stock to be held through pledge in a separate margin-funding account. Annexure A carries the initiation, release and invocation mechanics, including the OTP requirement; Annexure B carries the clearing-member-level aggregation and the minimum 50 per cent cash and cash-equivalent condition.
+- **[SEBI/HO/MRD2_DCAP/CIR/2021/0598](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2_dcapcir20210598)** (20 Jul 2021) — segregation and monitoring of collateral at client level. Clause 6 confirms that the clearing corporation assigns securities-collateral value on the basis of the applicable haircut; clause 18 places the 50 per cent cash-equivalent requirement at clearing-member level rather than mandatorily at each client; clauses 5 and 17 require the web portal on which a client can see their own disaggregated collateral.
+- **[CDSL/OPS/DP/POLCY/2020/309](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolcy2020309)** and the companion communiqués [CDSL/OPS/DP/POLCY/2020/326](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolcy2020326) and [CDSL/OPS/DP/POLCY/2020/338](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolcy2020338) — CDSL's operating instructions for margin pledge and re-pledge, including the client authentication sequence and the treatment of an unauthenticated instruction at the end of the execution date.
+- **[<abbr title="National Securities Depository Limited">NSDL</abbr>/POLICY/2020/0077](/broking-kyc/reference/circulars/nsdl/#nsdlpolicy20200077)** and **[NSDL/POLICY/2025/0084](/broking-kyc/reference/circulars/nsdl/#nsdlpolicy20250084)** — NSDL's operational guidelines on margin pledge and re-pledge, with [NSDL/POLICY/2025/0119](/broking-kyc/reference/circulars/nsdl/#nsdlpolicy20250119) covering download-file changes and [NSDL/POLICY/2025/0135](/broking-kyc/reference/circulars/nsdl/#nsdlpolicy20250135) covering auto-pledge movement for margin-funding and unpaid-securities accounts.
+- **SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/82** (3 Jun 2025) `[not yet in index]` — introduces pledge release for early pay-in, invocation for early pay-in, and invocation cum redemption for untraded mutual-fund units; original commencement 5 September 2025 with depository operating guidelines due by 1 July 2025. Extended to 10 October 2025 by SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/118 (18 Aug 2025) `[not yet in index]`. `[AI inference — verify before acting]` on the extension circular's number, which was corroborated from a secondary summary.
+- **SEBI circular dated 5 February 2026 on creation and invocation of pledge of securities through the depository system** `[not yet in index]` — aligns invocation with the pawnor-notice requirement of sections 176 and 177 of the Indian Contract Act, 1872, amending the depositories master circular; implementation on or before 6 April 2026. Operationalised by **[CDSL/OPS/DP/SETT/2026/180](/broking-kyc/reference/circulars/cdsl/#cdslopsdpsett2026180)** (13 Mar 2026), which requires a signed client undertaking for pledge creation and invocation and requires the depository to intimate both pledgor and pledgee on invocation, recording the pledgee as beneficial owner under regulation 79(8).
+- **[CDSL/OPS/DP/POLCY/2026/615](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolcy2026615)** (7 Sep 2026) — changes the DP89 report so that invocation and pledge-release-for-early-pay-in transactions awaiting obligation matching show as "under process" rather than "failed", effective 18 September 2026 at end of day. Client-facing relevance: a status a broker's operations team previously read as a failure is now correctly read as pending.
+
+## 2. Eligibility and preconditions
+
+| Precondition | Why it exists | Where it is checked |
+| --- | --- | --- |
+| Holdings free of other encumbrance | A pledged or locked-in quantity cannot be pledged again | Depository free-balance check at instruction creation |
+| Security is on the acceptable-collateral list | Only clearing-corporation-approved securities can be re-pledged onward for margin benefit | Broker's collateral master, refreshed from the clearing corporation's list |
+| Client has a purpose for margin | Pledging with no derivatives or margin-product activation produces collateral the client cannot use | Segment activation state |
+| Demat contact details current | The OTP goes to the mobile number and email on the demat record, not the trading record | Demat account master |
+| Broker has the tagged pledge account | Clause 5 requires the separately tagged client securities margin pledge account, in each depository the broker serves | Broker's depository setup |
+
+The second row causes the most client confusion. A client can pledge a security the clearing corporation does not approve — clause 10 permits it — but the broker cannot re-pledge it onward, so the margin benefit depends entirely on the broker's own risk appetite and may be nil. The interface should distinguish "cannot be pledged" from "can be pledged, no margin benefit", because those are different answers.
+
+## 3. Creating a pledge — the client flow
+
+1. **Select holdings.** The client picks securities and quantities from free holdings. The screen should show, per line, the current price, the haircut that will apply, and the resulting collateral value — not just the market value, which is the number clients anchor on and the number that is wrong.
+2. **Confirm the pledgee and purpose.** The pledge is in favour of the broker for the client's margin obligation. Naming the pledgee explicitly matters: this is the step that distinguishes a margin pledge from a loan-against-securities pledge in favour of a lender, which is a different product with a different pledgee.
+3. **Submit the instruction.** The broker's system creates the pledge request at the depository against the client's account.
+4. **Authenticate at the depository.** The client is taken to the depository's own page and confirms with an OTP sent to the mobile number and email registered on the demat account. This step is deliberately outside the broker's application and cannot be performed by the broker on the client's behalf.
+5. **Wait for the pledge to be recorded and valued.** Once authenticated, the pledge is recorded, the broker re-pledges onward, and the collateral appears in the margin computation at the next valuation point rather than instantly.
+
+<Aside type="caution" title="An unauthenticated pledge request does not survive the day">
+A pledge instruction the client never confirms is cancelled at the end of the execution date rather than carried forward. Clients who start a pledge in the evening, abandon it, and expect margin the next morning are a recurring support pattern. Show a live countdown on the pending instruction, and make the "authenticate now" link re-openable from the holdings screen rather than only from the original email or <abbr title="Short Message Service.">SMS</abbr>. Reported OTP validity differs across broker documentation, so do not publish a specific number of minutes without checking your own DP's current operating instructions. `[AI inference — verify before acting]`
+</Aside>
+
+### 3.1 Field-level view of the pledge instruction
+
+| name | type | length | mandatory | source-system | destination-system(s) | notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| pledgor_bo_id | string | 16 | yes | Demat account master | Depository | The client's own account; ownership does not change |
+| pledgee_account | string | 16 | yes | Broker depository setup | Depository | The separately tagged client securities margin pledge account required by clause 5 |
+| isin | string | 12 | yes | Holdings | Depository, collateral master | Must be a free, unencumbered holding |
+| pledge_quantity | decimal | varies | yes | Client input | Depository, risk system | Cannot exceed free balance |
+| pledge_purpose | code | 2 | yes | Pledge screen | Depository | Margin pledge versus margin-funding pledge versus other pledge types |
+| pledge_sequence_number | string | varies | system | Depository | Broker back office, reports | The identifier every later release or invocation quotes |
+| client_authentication_status | code | varies | system | Depository | Client status screen | Pending, confirmed, or cancelled at end of execution date |
+| haircut_percentage | decimal | 5,2 | system | Clearing-corporation collateral list | Risk system, client collateral screen | Refreshed on the clearing corporation's cycle, not fixed by circular |
+| post_haircut_value | decimal | 15,2 | system | Risk system | Margin computation, client screen | The number that actually counts as collateral |
+| collateral_type | code | 2 | system | Collateral master | Risk system, client-collateral reporting | Drives the cash and cash-equivalent composition at clearing-member level |
+
+Field names follow the naming recorded in [Section X of the field atlas](/broking-kyc/reference/field-atlas/sections/x-margin-pledge/); depository tag names and file layouts are on the [CDSL <abbr title="Margin Trading Facility">MTF</abbr> and pledge primer](/broking-kyc/vendors/depositories/cdsl-mtf-pledge/).
+
+## 4. The number the client sees
+
+Three values coexist for the same pledged holding, and a client-facing screen that shows only one of them will generate tickets.
+
+**Market value** is what the portfolio screen shows. It is not collateral.
+
+**Post-haircut value** is market value reduced by the haircut the clearing corporation applies to that security. This is the amount that counts towards margin. Haircut rates come from the clearing corporation's periodically published list rather than from any circular, so the same pledge can be worth different amounts in different months without anything the client did.
+
+**Usable margin** is post-haircut value as constrained by composition rules. The requirement that at least half of collateral be cash or cash equivalent operates at the clearing-member level rather than per client, so a client's own pledged securities are not individually capped at 50 per cent — but a broker may nonetheless impose a client-level cash-equivalent ratio as its own risk policy, and if it does, that policy is the binding constraint the client experiences. `[industry practice — unverified]`
+
+The client is also entitled to check independently. The July 2021 collateral-segregation circular requires a web portal showing client-wise, disaggregated cash and non-cash collateral, which means a client who disputes a broker's number has an authoritative second source. Product teams should treat that as a reason to make their own display reconcile, and support teams should know the portal exists rather than being surprised by it.
+
+<Aside type="tip" title="Show the haircut before the client commits">
+The single highest-value change to a pledge screen is putting the haircut and the resulting collateral value on the selection step rather than the confirmation step. Clients choose what to pledge on the basis of what it will be worth; showing that only after they have committed converts a good decision into a complaint. Where the haircut is unavailable for a security, say so explicitly instead of defaulting to zero.
+</Aside>
+
+## 5. Release, re-pledge and invocation
+
+**Release** — unpledging — is initiated by the client to the DP, or by the broker after its own risk checks, under Annexure A clauses 7 and 8. The founding circular does not impose an OTP on release, which is consistent with its logic: authentication protects the creation of an encumbrance, not its removal. Timing to free holdings is a DP and settlement-cycle matter rather than a circular-prescribed turnaround. `[AI inference — verify before acting]`
+
+**Re-pledge** is the onward chain and is not a client action at all. The client pledges to the broker; the broker re-pledges to the clearing member; the clearing member re-pledges to the clearing corporation. The client sees the trail in their own demat statement, which is the point — the visibility is the safeguard.
+
+**Invocation** is what happens when the client's obligation is not met and the pledgee takes the securities. Until 2025 this was a comparatively manual sequence. The June 2025 circular introduced three automated functions, in force from 10 October 2025:
+
+| Function | What it does | Why it matters to the client |
+| --- | --- | --- |
+| Pledge release for early pay-in | When a client sells pledged securities, releases the pledge and sets an early-pay-in block in the client's demat account in one instruction, without a separate physical or electronic instruction and without <abbr title="Demat Debit and Pledge Instruction">DDPI</abbr> or <abbr title="Power of Attorney">POA</abbr> | Selling pledged stock no longer requires the client to unpledge first and hope the timing works |
+| Invocation for early pay-in | On invocation of margin-pledged securities other than untraded mutual-fund units, blocks them for early pay-in directly in the client's demat account, with the trail retained in the broker's pledge account | Fewer failed settlements and fewer manual steps in a square-off |
+| Invocation cum redemption | For invoked mutual-fund units not traded on exchange, moves units to the broker's pledge account and redeems them there | Closes the gap for units that cannot be sold on an exchange |
+
+The February 2026 change layered a client-protection requirement on top: invocation now carries the pawnor-notice logic of the Indian Contract Act, a signed client undertaking is taken for pledge creation and invocation, and the depository intimates both pledgor and pledgee when an invocation happens. In interface terms that is a notification the client must actually receive, and an undertaking that must be captured at activation rather than improvised at invocation.
+
+## 6. Alternatives
+
+| Client objective | Option A | Option B | When to pick which | Who uses what |
+| --- | --- | --- | --- | --- |
+| Margin for derivatives without selling holdings | Margin pledge | Add cash | Pledge when the client wants to stay invested; cash when the requirement is short-lived and the haircut makes pledging inefficient | Most derivatives clients pledge; short-term traders fund in cash |
+| Leverage to buy more equity | Margin trading facility | Margin pledge plus own funds | Margin trading facility is a loan with interest and a mandatory pledge of the bought stock; pledging existing holdings creates no borrowing | See [MTF activation](./mtf-activation/) |
+| Cash without selling | Loan against securities, pledged to a lender | Margin pledge | These are different pledgees and different products; a margin pledge does not produce cash | Lender-led product versus broker-led collateral |
+| Cover a short delivery | Securities lending and borrowing | Pledge | Pledging does not deliver stock; borrowing does | See [<abbr title="Securities Lending and Borrowing Mechanism">SLBM</abbr> enrolment](./slbm-enrolment/) |
+| Avoid the authentication step entirely | Not available | — | The OTP confirmation is a regulatory requirement, not a broker feature | — |
+
+## Practical notes
+
+- **[gotcha]** The OTP goes to the contact details on the demat account, which may differ from those on the trading account for legacy clients. Reconcile them before promoting pledging, or the first pledge attempt fails for reasons the client cannot diagnose.
+- **[gotcha]** Collateral appears in margin at a valuation point, not at authentication. A client who pledges mid-session and expects immediate buying power has been mis-set by the interface, not by the depository. Say when the collateral will count.
+- **[risk trade-off]** Accepting pledges of securities the clearing corporation does not approve is permitted and gives the broker a wider apparent offering, but the broker cannot re-pledge them onward and carries the risk alone. Most brokers restrict the pledgeable list well inside the permitted universe. `[industry practice — unverified]`
+- **[industry practice]** Brokers that show the haircut per security in the holdings list, before any pledge action, report fewer disputes about collateral value than brokers that show it only in the margin report. `[industry practice — unverified]`
+- **[gotcha]** Do not conflate a margin pledge with the automatic pledge that arises on unpaid securities. Under the July 2026 unpaid-securities framework, securities a client has not paid for are paid out to the client's demat account and auto-pledged to the broker's unpaid-securities pledgee account with its own payment window — a different pledge, a different account, and a different consequence. See the [MTF operational deep dive](/broking-kyc/deep-dives/settlement/mtf-operational/).
+- **[cost optimization]** Pledging is not free of friction cost even where the broker charges nothing: every pledge and release is a depository transaction, and clients who pledge and unpledge repeatedly around expiry accumulate charges and operational risk. A stable core pledge with cash for the variable part is usually cheaper. `[industry practice — unverified]`
+- **[AI inference — verify before acting]** OTP validity duration, unpledge turnaround, and the exact number of the August 2025 extension circular were not confirmable from primary documents in this pass. Verify against your DP's current operating instructions and the SEBI circular listing.
+
+## Cross-references
+
+- [CDSL MTF and pledge primer](/broking-kyc/vendors/depositories/cdsl-mtf-pledge/) — pledge types, tag-based file formats, the invocation file and the pledge cost structure
+- [MTF operational deep dive](/broking-kyc/deep-dives/settlement/mtf-operational/) — the margin-funding pledge, its separate account and the unpaid-securities interaction
+- [DDPI versus eDIS and <abbr title="Transaction PIN">TPIN</abbr>](./ddpi-edis-tpin/) — the authority whose pledge purpose flag makes repeat pledging frictionless
+- [<abbr title="Risk Management System">RMS</abbr> and <abbr title="Standard Portfolio Analysis of Risk">SPAN</abbr> methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/) — how post-haircut collateral enters the margin computation
+- [Field atlas — Section X, margin pledge and collateral](/broking-kyc/reference/field-atlas/sections/x-margin-pledge/) — every collateral field and its destination systems
+- [NSDL overview](/broking-kyc/vendors/depositories/nsdl/) — the NSDL-side pledge instruction route
+- [Client funds upstreaming](/broking-kyc/deep-dives/settlement/client-funds-upstreaming/) — the funds counterpart of the client-asset segregation logic
+- [SLBM enrolment](./slbm-enrolment/) — the alternative when the client needs stock rather than margin
+- [Compliance blueprint](/broking-kyc/operations/compliance-blueprint/) — the margin and settlement obligation rows this framework drives
+- [Circulars — CDSL](/broking-kyc/reference/circulars/cdsl/) — the pledge operating instructions and their 2026 revisions
+
+## Verified through
+
+2026-09-11
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

@@ -1,0 +1,142 @@
+---
+title: "Product Activation: Advanced Order Types"
+description: Which order constructs live at the exchange and which live only inside the broker — GTT, bracket and cover, basket, AMO, disclosed quantity, iceberg, validity types, spread orders, and what the 2026 auction sessions changed.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** almost every retail "advanced order" is one of two very different things — an attribute the exchange order book understands, or a rule held in the broker's own system that emits an ordinary order when it fires. The distinction decides what happens during an outage, what margin is blocked and when, and what the client can complain about to whom. The page therefore sorts constructs by where they live before describing any of them, then covers what the August–September 2026 auction-session changes did to the permitted set.
+
+## TL;DR
+
+- The exchange order book accepts a small set: limit, market, stop-loss (limit and market), immediate-or-cancel validity, disclosed quantity, and — in derivatives — spread and multi-leg orders. **<abbr title="National Stock Exchange of India">NSE</abbr>/CD/57262** (23 June 2023), clause 1.1, lists the currency-derivatives set as regular lot, stop loss, immediate or cancel, and spread. `[not yet in index]`
+- Good-till-cancelled and good-till-date validity do not exist in NSE's live segments. The only NSE documentation still describing them covers the Limited Physical Market, which was itself discontinued with effect from 1 April 2019 per **NSE/CMTR/40599** (29 March 2019). `[not yet in index]`
+- <abbr title="Good Till Triggered">GTT</abbr>, bracket, cover, basket, and after-market orders are **broker-side constructs**. No exchange circular defines them; no exchange guarantees them. A triggered GTT becomes an ordinary limit order at the moment of firing, and nothing before that point exists at the exchange.
+- Disclosed quantity has a floor: the disclosed portion must be at least 10 percent of order quantity, set by the exchange (**NSE/CD/57262** clause 1.8, on **NSE/CD/12855** dated 6 August 2009). That text is the currency-derivatives circular; the same 10 percent convention is applied in the cash and F&O segments **[industry practice — unverified]**. `[not yet in index]`
+- <abbr title="Securities and Exchange Board of India">SEBI</abbr>'s [Closing Auction Session circular](/broking-kyc/reference/circulars/sebi-other/) `HO/47/11/11(3)2025-MRD-POD2/I/2765/2026` (16 January 2026) permits only limit and market orders in <abbr title="Consolidated Account Statement">CAS</abbr>, bars stop-loss orders, and requires full-quantity disclosure — CAS live from 3 August 2026, the revised pre-open from 7 September 2026.
+- "Iceberg" means two different things. SEBI uses it for an order that does not disclose full quantity; brokers use it for client-side order slicing. [NSE/CMTR/73362](/broking-kyc/reference/circulars/nse/#nsecmtr73362) (18 March 2026) translates SEBI's prohibition into "disclosed quantity orders shall not be allowed", and <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> calls the same thing a revealed-quantity order.
+
+## Conceptual overview
+
+An order type is a contract about behaviour. When the behaviour is implemented in the exchange's matching engine, it survives the broker's own failures: a resting stop-loss order sits in the exchange book and triggers on the exchange's own last-traded-price feed. When the behaviour is implemented in the broker's system, it inherits every one of the broker's failure modes — a trigger that should have fired during a broker outage simply does not fire, and there is no exchange record of an order that was never sent.
+
+Retail platforms present both kinds in one list, usually sorted by marketing value rather than by architecture. That is where client expectations break. A client who believes a year-long trigger is "resting at NSE" is wrong in a way that matters on the day it does not fire. Equally, a client who believes a bracket order is a single instrument is wrong about what happens if one leg is rejected: the construct is a set of ordinary orders held together by broker logic.
+
+The activation question for this family is therefore not "do you want advanced orders" but "does the client understand which layer is making the promise". That framing also determines the disclosure the broker owes: for exchange-native attributes, the exchange's own rules govern; for broker-side constructs, the broker's terms are the only source of the client's rights, because there is no regulator-prescribed specification of a GTT or a bracket order to fall back on.
+
+## 1. Where each construct lives
+
+| Construct | Lives at | What the client is actually getting | Primary reference |
+| --- | --- | --- | --- |
+| Limit, market | Exchange | Price instruction understood by the matching engine | NSE/CD/57262 clause 1.1 |
+| Stop-loss limit, stop-loss market | Exchange | Trigger held in the exchange order book | NSE/CD/57262 clause 1.1 |
+| Immediate-or-cancel validity | Exchange | Fill now or cancel; no resting order | NSE/CD/57262 clause 1.1 |
+| Disclosed quantity | Exchange | Part of a large order shown in the book, minimum 10 percent | NSE/CD/57262 clause 1.8 |
+| Spread / multi-leg (2-leg, 3-leg) | Exchange | Combination order matched in a separate spread book, IOC in nature | NSE/CD/57262 clauses 1.9 and 3.2 |
+| Good-till-cancelled / good-till-date | Not in live NSE segments | Nothing; no current segment accepts it | NSE/CMTR/40599 (discontinuation of the only segment that documented it) |
+| GTT / trigger orders valid for months | Broker | A rule in the broker's database that emits an ordinary order when hit | No exchange or SEBI specification found |
+| Bracket and cover orders | Broker | A bundle of ordinary entry, stop-loss, and target orders with broker logic between them | No exchange order type; withdrawn commercially after the peak-margin framework |
+| Basket order | Broker | Sequential submission of several ordinary orders in one click | Exchange supports same-underlying multi-leg, not cross-scrip baskets |
+| After-market order | Broker | A queued instruction released into the exchange's own order-entry window | No exchange circular defines <abbr title="After Market Order">AMO</abbr> |
+| Iceberg (slicing) | Broker | Automatic re-submission of successive slices | `[industry practice — unverified]` — no exchange circular located |
+
+<Aside type="caution" title="The word 'iceberg' is used for two different things">
+In SEBI's Closing Auction Session circular and in the revised pre-open rules, "iceberg order" means an order that does **not** disclose its full quantity — what NSE calls a disclosed-quantity order and BSE calls a revealed-quantity order. In retail platforms, "iceberg" usually means broker-side slicing of a large order into successive child orders. The two are unrelated, and a help page that maps SEBI's prohibition onto the broker product (or the reverse) will mislead. NSE/CMTR/73362 clause 4 resolves it for the auction sessions by rendering SEBI's phrase as "disclosed quantity orders shall not be allowed".
+</Aside>
+
+## 2. Exchange-native attributes, with their limits
+
+Beyond the order types themselves, the exchange layer imposes controls that a client experiences as rejections and that the broker cannot waive:
+
+| Control | What it does | Reference |
+| --- | --- | --- |
+| Quantity freeze | Orders above a contract-level freeze quantity are rejected by the exchange | NSE/CD/57262 clause 1.5 |
+| Operating price ranges / price bands | Orders outside the band are rejected; a trade-annulment policy governs exceptions | NSE/CD/57262 clause 1.7; **NSE/CD/30269** (17 July 2015) |
+| Limit price protection on market orders | Recalibrated band applied to market orders; algo market orders were pre-emptively rejected until the 2026 auction change | **NSE/FAOP/67775** (30 April 2025) clause 1.15(E); **NSE/CMTR/68802** (30 June 2025) |
+| User and branch order value limits | The exchange requires the **member** to set definite UOVL and BOVL values; users or branches without a limit may be unable to trade | NSE/CD/57262 clause 3.5; **NSE/MSD/46944** (8 January 2021) |
+| Self-trade prevention | Matching of a member's own opposite orders is prevented | NSE/CD/57262 clause 3.7; **NSE/CD/40134** (5 February 2019) |
+| Fair-usage charge on multi-leg orders | Tiered charge per 2-leg / 3-leg order based on execution efficiency | NSE/CD/57262 clause 3.2; **NSE/CD/32602** (17 June 2016), **NSE/MSD/44765** (24 June 2020) |
+
+The order-value point is the one most often mis-explained to clients. There is no single exchange-wide rupee ceiling per order that the broker is passing on; the exchange requires the broker to configure limits, and the number the client meets is the broker's. All circular IDs in this table are `[not yet in index]`.
+
+## 3. What the 2026 auction sessions changed
+
+SEBI's circular `HO/47/11/11(3)2025-MRD-POD2/I/2765/2026` (16 January 2026) introduced a Closing Auction Session in the equity cash segment and rewrote the pre-open session. For order types, the operative clauses are narrow and strict:
+
+- Clause 4.5.1 — only limit and market orders in CAS.
+- Clause 4.5.2 — iceberg orders not allowed; orders must be disclosed in full quantity.
+- Clause 4.5.3 — stop-loss orders not allowed.
+- Clause 4.8.1 — unexecuted continuous-session limit orders carry into CAS **except** stop-loss orders, iceberg (undisclosed-quantity) orders, and orders outside the CAS price band.
+- Clause 4.2 — CAS runs 15:15 to 15:35, with order entry 15:20 to 15:25 (limit and market), 15:25 to 15:30 limit-only with a random close between 15:28 and 15:30, and matching 15:30 to 15:35. Equity derivatives continue to 15:40; the cash post-close session runs 15:50 to 16:00.
+- Clause 4.4.1 — CAS price band of plus or minus 3 percent from a reference price computed as the volume-weighted average price of trades between 15:00 and 15:15.
+- Clause 5, rewriting the stock-exchange master circular — pre-open runs 09:00 to 09:15: order entry 09:00 to 09:05 (limit and market), 09:05 to 09:10 limit-only with no modification or cancellation of market orders and a random close between 09:08 and 09:10, matching 09:10 to 09:12, transition 09:12 to 09:15. Full-quantity disclosure and no stop-loss orders apply here too.
+- Clause 6 — CAS effective 3 August 2026; the pre-open changes effective 7 September 2026.
+
+[NSE/CMTR/73362](/broking-kyc/reference/circulars/nse/#nsecmtr73362) (18 March 2026) is the operational guideline: only limit and market orders, no disclosed-quantity orders, no stop-loss orders, and algo market orders now permitted in these sessions without the earlier penalty treatment. BSE Notice **20260610-41** (10 June 2026) mirrors the session structure and uses "revealed quantity order" for the same restriction. `[not yet in index]`
+
+The client-facing consequence is that three familiar order behaviours silently stop working in two windows of the trading day. A platform that accepts a stop-loss order at 15:22 and has it rejected by the exchange has produced a confusing failure; one that greys the option out for the duration of CAS has not. The session mechanics themselves are covered in [pre-open and closing auction](/broking-kyc/deep-dives/foundational/pre-open-closing-auction/).
+
+## 4. Broker-side constructs, one by one
+
+**GTT and long-dated triggers.** No exchange order book holds a multi-day retail trigger, and no SEBI or exchange communication naming GTT was located — the construct exists entirely in broker terms. Practical consequences that belong on the client's screen: no margin is blocked until the trigger fires, so a portfolio of triggers can exceed available funds and fail at firing; the trigger is evaluated by the broker's own price feed; and a broker outage at the trigger moment means no order. Retail implementations commonly cap validity at about a year and offer a one-cancels-the-other variant. **[industry practice — unverified]**
+
+**Bracket and cover orders.** These were always broker bundles of exchange-native orders, not exchange types — which is why no circular rescinds them. What ended them commercially was margin: SEBI's [peak-margin framework](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2dcapcirp2020127) `SEBI/HO/MRD2/DCAP/CIR/P/2020/127` (20 July 2020) phased upfront margin verification from 25 percent to 50, 75, and 100 percent of the peak margin obligation in three-month steps from 1 December 2020, operationalised at NSE by [NSE/INSP/46485](/broking-kyc/reference/circulars/nse/#nseinsp46485) (27 November 2020). Once intraday leverage was equalised, the reduced-margin rationale for a mandatory-stop-loss product disappeared. No exchange circular naming bracket or cover orders was found; their withdrawal is documented only in broker communications. `[industry practice — unverified]`
+
+**Basket orders.** The exchange supports multi-leg orders on the *same underlying* (2-leg and 3-leg, IOC in nature, in a separate spread book). A cross-scrip basket is broker-side sequential submission. That matters for option strategies, where the margin benefit depends on leg order and on the risk system recognising the completed combination: a partially filled basket is an unhedged position with a different margin profile than the strategy the client intended. Retail platforms typically cap a basket at around twenty orders and insert deliberate millisecond gaps so margin recomputation keeps up. **[industry practice — unverified]**
+
+**After-market orders.** Order entry happens only inside exchange-defined windows, so an AMO is a broker-held instruction released into the pre-open or the continuous session. Two client-visible effects: the margin check that passed at capture is re-run at release and can fail, and the revised pre-open timings from 7 September 2026 change *when* the release happens and which order attributes survive it.
+
+**Limited-validity orders.** Some platforms offer cancellation after a client-set interval — minutes to a couple of hours — which is a broker timer wrapped around an ordinary day order, not an exchange validity type. **[industry practice — unverified]**
+
+## 5. Field-level view of an order-type permission record
+
+Broker-side constructs need their own entitlement and audit state; they are not covered by the exchange's order attributes.
+
+| name | type | length | mandatory | source-system | destination-system(s) | notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| `client_code` | string | 10 | yes | Client master | <abbr title="Order Management System">OMS</abbr>, <abbr title="Risk Management System">RMS</abbr> | Existing <abbr title="Unique Client Code">UCC</abbr> |
+| `segment` | enumeration | 3 | yes | UCC registration | OMS | The segment must already be active; an order type never activates a segment |
+| `order_type_permitted` | enumeration | — | yes | Product entitlement | OMS pre-trade check | Distinguish exchange attributes from broker constructs in the same table |
+| `construct_owner` | enumeration | 1 | yes | Static config | Client disclosure, support view | E=exchange-resident, B=broker-side; drives the disclosure text shown |
+| `trigger_reference_price_source` | string | `[unknown — verify]` | conditional | Market-data service | Trigger engine, audit | Which feed evaluated a broker-side trigger; needed to answer "why did it not fire" |
+| `trigger_created_at` / `trigger_expires_at` | timestamp | — | conditional | Trigger store | Client view | Validity of a broker-side trigger; no exchange record exists for this period |
+| `margin_blocked_at_creation` | char | 1 | conditional | RMS | Client view | Usually N for triggers — state it, because clients assume otherwise |
+| `child_order_ids` | array | — | conditional | OMS | Audit, contract note reconciliation | For bundles and baskets: the ordinary orders the construct actually emitted |
+| `algo_tag` | string | `[unknown — verify]` | conditional | OMS | Exchange order message, audit trail | Where the construct is automated, the algo identification travels with the order |
+
+Field names here are a documentation model, not an exchange-prescribed schema. **[AI inference — verify before acting]**
+
+## 6. Alternatives
+
+| Option A | Option B | When to pick which | Who uses what |
+| --- | --- | --- | --- |
+| Exchange stop-loss order | Broker-side trigger (GTT-style) | The exchange order survives broker outage but rests only for the day; the broker trigger persists for months with no exchange protection | Intraday risk control against multi-week entry levels |
+| Disclosed quantity | Broker-side slicing | Disclosed quantity is one exchange order with a 10 percent floor; slicing is many orders with broker-set reveal size | Institutional-style single large order against retail working of size |
+| Exchange multi-leg spread order | Broker basket of separate legs | The spread order matches as a combination in its own book; the basket can fill partially | Same-underlying strategies against cross-scrip execution |
+| Market order | Limit order at a protected price | Market orders in the auction sessions are permitted only in defined windows and are subject to limit price protection | Speed against price certainty |
+
+## Practical notes
+
+- **[gotcha]** Good-till-cancelled and good-till-date still appear in NSE's own live segment documentation — inside the description of the Limited Physical Market, which the same page records as discontinued from 1 April 2019 under NSE/CMTR/40599. Stale exchange web content is a recurring source of wrong client help text.
+- **[gotcha]** Two windows a day now reject stop-loss orders and undisclosed quantity entirely (CAS since 3 August 2026 and pre-open since 7 September 2026). Order-entry screens that are not session-aware will generate exchange rejections rather than clean validation messages.
+- **[risk trade-off]** Broker-side triggers convert well and carry real tail risk: no margin block until firing, no exchange record before it, and complete dependence on the broker's uptime and price feed at the decisive moment. The mitigation is disclosure plus a pre-fire funds check, not a longer validity period.
+- **[industry practice — unverified]** Trigger, slicing, and basket products differ substantially between brokers in caps, permitted segments, and price types — several exclude commodity contracts. Anything a page states about limits must be sourced to that broker's own terms and dated.
+- **[AI inference — verify before acting]** No SEBI or exchange text was found requiring brokers to label which order constructs are broker-side rather than exchange-resident. Treat that as an unresolved question rather than a settled absence, and disclose it anyway.
+
+## Cross-references
+
+- [OMS internals — order-type matrix](/broking-kyc/deep-dives/trading-day/oms-internals/) — the broker-side order-type matrix by segment, pre-trade risk hot path, and where rejections originate.
+- [Pre-open and closing auction](/broking-kyc/deep-dives/foundational/pre-open-closing-auction/) — session mechanics for the windows in which these restrictions apply.
+- [Retail algo framework](/broking-kyc/deep-dives/trading-day/retail-algo-framework/) — when an automated construct becomes an algo order requiring tagging and exchange approval.
+- [Segment rules comparison](/broking-kyc/deep-dives/foundational/segment-rules-comparison/) — per-segment trading hours, lot sizes, and freeze conventions that order types operate within.
+- [API and algo access](./api-algo-access/) — the entitlement route for programmatic order submission.
+- [Screen 6: Trading Preferences](/broking-kyc/journey/06-trading-preferences/) — the segment activation these order types presuppose.
+- [Product activation overview](./) — the selector across all activation routes.
+
+## Verified through
+
+2026-09-11
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

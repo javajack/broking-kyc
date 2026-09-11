@@ -1,0 +1,167 @@
+---
+title: "Product Activation: DDPI vs eDIS / TPIN"
+description: How a client authorises securities debits from their demat account — DDPI activation, the per-transaction eDIS TPIN plus OTP route, revocation, and what each choice costs on a sale day.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** A client selling shares must authorise the debit from their demat account, and there are exactly two live ways to do it. The page therefore starts with the authority itself (what <abbr title="Demat Debit and Pledge Instruction">DDPI</abbr> covers and what it does not), then the client's choice, then the two per-transaction flows side by side, then activation and revocation screens, then the failure case that makes the choice matter. Depository file formats and <abbr title="Depository Participant">DP</abbr>-side plumbing live on the vendor pages and are only summarised here.
+
+## TL;DR
+
+- **DDPI is a narrow, voluntary standing authority.** [<abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/DoP/P/CIR/2022/44](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddoppcir202244) (4 Apr 2022) replaced the open-ended power of attorney with a Demat Debit and Pledge Instruction covering exactly two purposes — settlement delivery and pledge/re-pledge for margin (clause 3). The October 2022 amendment added exchange-platform mutual-fund transactions and tendering in open offers, giving the four purpose flags carried in depository records today ([Section O of the field atlas](/broking-kyc/reference/field-atlas/sections/o-ddpi/)).
+- **It cannot be made a condition of opening an account.** Clause 6 of the same circular inserts into the rights-and-obligations document that the broker "shall not directly/indirectly compel the clients to execute PoA or DDPI or deny services to the client if the client refuses to execute PoA or DDPI". Clause 4 preserves physical delivery instruction slips and eDIS as alternatives.
+- **The alternative is eDIS.** At <abbr title="Central Depository Services (India) Limited">CDSL</abbr> the client authorises each sale with a six-digit <abbr title="Transaction PIN">TPIN</abbr> plus an <abbr title="One-Time Password">OTP</abbr> on the depository's own page; at <abbr title="National Securities Depository Limited">NSDL</abbr> the equivalent is an e-DIS / SPEED-e authorisation. Operating instructions sit in [CDSL/OPS/DP/POLCY/2022/194](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolcy2022194) and [NSDL/POLICY/2022/115](/broking-kyc/reference/circulars/nsdl/#nsdlpolicy2022115).
+- **Missing the eDIS window is the whole risk.** An unauthorised sale becomes a short delivery, goes to the close-out or auction process, and the loss lands on the client through the broker's short-delivery policy — see the [short-delivery and auction deep dive](/broking-kyc/deep-dives/trading-day/short-delivery-auction/).
+- **Revocation is a client right the broker must actively enable.** Clause 8 requires exchanges and depositories to ensure the broker has enabled clients to revoke or cancel the DDPI; the same clause confines DDPI-driven transfers to the trading member's pool account. The circular sets no processing turnaround, so any published timeline is broker or DP policy.
+- **Not every debit needs either.** Securities already pledged for margin, and securities delivered under early pay-in or direct payout arrangements, follow the pledge and settlement rails rather than a DDPI or eDIS authorisation.
+
+## Conceptual overview
+
+Two things happen when a client sells shares. The trade is matched on the exchange, and — separately — the shares must leave the client's demat account and reach the clearing corporation in time for pay-in. The second step is a depository instruction, and a depository will only act on an instruction that carries the account holder's authority. Historically brokers solved this by taking a power of attorney at account opening, which gave them standing authority far wider than settlement required. SEBI closed that gap in April 2022 by prescribing a purpose-limited instrument, the Demat Debit and Pledge Instruction, and by requiring that clients who decline it still be able to trade.
+
+So the client faces a genuine choice, and it is a choice about where friction sits rather than about what is permitted. DDPI front-loads the friction: one signed and stamped authority at onboarding, after which sales settle without the client touching anything. eDIS distributes the friction: nothing to sign up front, but every sale needs a TPIN and an OTP inside the broker's cut-off window on the trade day. For a client who sells twice a year, eDIS is reasonable. For a client who trades weekly, or who uses margin pledge, or who runs any automated strategy, the per-transaction route becomes a reliability problem rather than an inconvenience.
+
+Operationally the distinction shows up as a single flag on the depository record, which is why the two routes are best documented together. The flag drives whether the broker's settlement batch can generate a debit instruction on its own, whether the client gets an authorisation prompt, whether a margin pledge can be created without a second authentication, and — in the failure case — whether the position turns into a short delivery. Everything downstream of that flag, from the contract-note indicator to the depository <abbr title="Short Message Service.">SMS</abbr> the client receives on pay-in, follows from it.
+
+## 1. Regulatory framework
+
+- **[SEBI/HO/MIRSD/DoP/P/CIR/2022/44](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddoppcir202244)** (4 Apr 2022) — creates DDPI as a separate document in the prescribed Annexure-A format for two purposes (clause 3), preserves physical DIS and eDIS as alternatives (clause 4), indexes DDPI as a voluntary document requiring explicit client consent and adequate stamping and permitting digital signature (clause 5), bars any compulsion or denial of service on refusal (clause 6), confines DDPI transfers to the trading member's pool account and requires a revocation facility (clause 8), and takes effect from 1 July 2022 (clause 14).
+- **SEBI/HO/MIRSD/DoP/P/CIR/2022/91** (30 Jun 2022) `[not yet in index]` — extends the DDPI effective date to 1 September 2022.
+- **SEBI/HO/MIRSD-PoD1/P/CIR/2022/137** (6 Oct 2022) `[not yet in index]` — adds the third and fourth purposes, mutual-fund transactions executed on exchange order-entry platforms and tendering shares in open offers through exchange platforms, effective 18 November 2022. Powers of attorney executed before 1 September 2022 remain valid until revoked; from 18 November 2022 no fresh <abbr title="Power of Attorney">POA</abbr> is accepted for these purposes. See [Circulars — SEBI MIRSD](/broking-kyc/reference/circulars/sebi-mirsd/).
+- **[SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** — Master Circular for Stock Brokers; consolidates the client-authorisation and running-account provisions that the DDPI chapter sits inside.
+- **[CDSL/OPS/DP/POLCY/2022/194](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolcy2022194)** and **[CDSL/OPS/DP/SYSTM/2023/43](/broking-kyc/reference/circulars/cdsl/#cdslopsdpsystm202343)** — CDSL operating instructions and system implementation: the purpose flags, the DDPI master identifier a DP links to each account, and the scope code.
+- **[NSDL/POLICY/2022/115](/broking-kyc/reference/circulars/nsdl/#nsdlpolicy2022115)**, **[NSDL/POLICY/2024/0086](/broking-kyc/reference/circulars/nsdl/#nsdlpolicy20240086)** and **[NSDL/POLICY/2024/0114](/broking-kyc/reference/circulars/nsdl/#nsdlpolicy20240114)** — NSDL operational guidelines for DDPI, and the registration / de-registration and enhancement instructions that moved DDPI capture into the unified file format.
+- **[NSDL/POLICY/2026/0095](/broking-kyc/reference/circulars/nsdl/#nsdlpolicy20260095)** (30 Jun 2026) — amends the delivery-instruction-slip forms 15, 16, 36 and 37, expressly including the versions used by a POA or DDPI holder, and provides for off-market transfers to a Retail Direct Gilt account. Relevant because it is a reminder that the DDPI holder's instruction forms are themselves regulated artefacts, not broker stationery.
+
+## 2. What DDPI authorises — and what it does not
+
+| Purpose | Covered by DDPI | Client action still needed |
+| --- | --- | --- |
+| Delivery of sold securities for exchange settlement | Yes | None |
+| Pledge / re-pledge of securities for the client's margin obligation | Yes | Depository confirmation on the pledge request, per the pledge rules |
+| Mutual-fund transactions on exchange order-entry platforms | Yes, post Oct 2022 amendment | None |
+| Tendering securities in open offers, buybacks and delisting offers routed through the exchange | Yes, post Oct 2022 amendment | None |
+| Off-market transfer, gift transfer, inter-depository transfer | No | Delivery instruction slip or eDIS, per transaction |
+| Transfer to a third party's demat account | No | Not permissible under DDPI at all |
+| Adding or changing a nominee | No | Client's own nomination instruction |
+| Closing the demat account | No | Client's own closure request |
+
+The last four rows are the point of the instrument. A DDPI holder cannot move securities anywhere other than the settlement and pledge rails, cannot touch nomination, and cannot act on the account in the client's stead for anything else. That narrowness is what allows the authority to be standing rather than per-transaction.
+
+One further restriction is easy to miss and worth building an assertion around: clause 8 confines securities transferred under DDPI to the trading member's pool account. A DDPI-driven debit that lands anywhere else — a broker's own beneficiary account, a third party — is outside the authority, not merely unusual. The destination account is therefore a control, not a configuration.
+
+<Aside type="caution" title="A refusal to sign DDPI cannot gate anything">
+DDPI is voluntary under [SEBI/HO/MIRSD/DoP/P/CIR/2022/44](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddoppcir202244). The onboarding flow must let the client decline and continue, and the declined state must be a working state — the client still gets a demat account, still gets trading rights, and sells through eDIS. Pre-ticking the DDPI consent, or presenting it on the same screen as a mandatory declaration, is the most common design failure here. Keep it on its own step with an explicit decline path, and keep the decline reversible later.
+</Aside>
+
+## 3. The two per-transaction flows
+
+### 3.1 With DDPI active
+
+The client sells. The broker's settlement batch builds the pay-in obligation for the relevant settlement, generates the debit instruction against the client's account under the DDPI authority, and the securities move to the clearing corporation before the securities pay-in deadline. The client's only touchpoint is the depository's SMS and email confirming the debit. Nothing can be missed, because nothing is asked.
+
+### 3.2 Without DDPI — the eDIS route
+
+At CDSL the client is taken to the depository's own authorisation page, enters a six-digit TPIN and then an OTP sent to the mobile number and email registered on the demat account, and confirms the specific quantity of the specific ISIN being sold. The authorisation is scoped to that sale, which is the reason it is safe and also the reason it is fragile. At NSDL the same function is served through the e-DIS / SPEED-e authorisation route; the client experience differs, but the principle is the same — an authentication event per instruction.
+
+Three properties of the eDIS route drive almost all the operational trouble:
+
+1. **It is quantity-and-ISIN specific.** An authorisation for 100 shares does not cover a sale of 150. Clients who add to a sale after authorising must authorise again.
+2. **It is time-bound to the broker's cut-off, not to the market close.** Brokers set an internal cut-off on the trade day so that the settlement batch can still build a clean pay-in file. The cut-off is a broker policy parameter and varies. `[industry practice — unverified]`
+3. **The TPIN is the client's own secret held at the depository.** The broker cannot reset it, cannot see it, and cannot authorise on the client's behalf. A forgotten TPIN is a depository self-service regeneration flow, not a broker support ticket.
+
+<Aside type="danger" title="The failure case is a short delivery, and it is expensive">
+If the client neither has DDPI nor completes the eDIS authorisation in time, the shares do not reach pay-in. The obligation goes into the close-out or auction process described in the [short-delivery and auction deep dive](/broking-kyc/deep-dives/trading-day/short-delivery-auction/). The client keeps the sale proceeds only net of the close-out outcome, which in a rising stock can be materially worse than the sale price, and the broker recovers the difference under its short-delivery policy. This single scenario is why brokers push DDPI at onboarding — and why the push must still be an offer rather than a condition.
+</Aside>
+
+## 4. Activation — the client-facing flow
+
+| Step | What the client does | What the system does | Typical elapsed time |
+| --- | --- | --- | --- |
+| 1 | Opens the DDPI step in onboarding, or the demat-authority screen later | Renders the SEBI-format authority with the four purposes named individually | — |
+| 2 | Reads and accepts, or declines | Records the decision and the exact version of the text accepted | — |
+| 3 | Signs — Aadhaar-based eSign for the online path, wet signature for the physical path | Generates the executed document; attaches stamp duty | Minutes online |
+| 4 | Nothing | DP creates or reuses its DDPI master identifier and links the client's account, then uploads the authority record to the depository | Same day for the online path |
+| 5 | Sees the status change from pending to active | Depository sets the authority flag on the beneficial-owner record; back office sets its own flag | Around one working day at CDSL; longer on the physical NSDL path |
+
+Stamp duty is a state subject, so the amount the client pays differs by state of residence; brokers typically collect a flat charge with GST and handle the e-stamping. Exact rates and the DP-side file mechanics are tabulated on the [CDSL DDPI deep dive](/broking-kyc/vendors/depositories/cdsl-ddpi/).
+
+<Aside type="note" title="Mind the pending window">
+Between eSign and depository activation the client is neither one thing nor the other. A sale placed in that window still needs eDIS. The activation screen should say so explicitly and route the client into the eDIS flow rather than letting them assume the authority is live. Treating "signed" as "active" is the most common client-facing bug in this journey.
+</Aside>
+
+### 4.1 Field-level view of the activation record
+
+| name | type | length | mandatory | source-system | destination-system(s) | notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| ddpi_opted | flag | 1 | yes | Client consent screen | Back office, CDSL <abbr title="Beneficial Owner">BO</abbr> record, NSDL BO record, contract notes | Y / N; N is a valid and permanent state, service cannot be refused |
+| ddpi_bo_id | string | 16 | conditional | Demat account master | Back office, depository | Same identifier as the client's demat account; one authority per account |
+| ddpi_dp_id | string | 8 | conditional | DP master | Depository | The DP under which the authority is registered |
+| ddpi_for_settlement | flag | 1 | conditional | Consent screen | Back office, depository | Purpose 1 — exchange deliveries and settlement obligations |
+| ddpi_for_pledge | flag | 1 | conditional | Consent screen | Back office, depository, client-collateral reporting | Purpose 2 — pledge and re-pledge for the client's margin |
+| ddpi_for_mutual_fund | flag | 1 | conditional | Consent screen | Back office, depository | Purpose 3 — exchange-platform mutual-fund transactions |
+| ddpi_for_tendering | flag | 1 | conditional | Consent screen | Back office, depository | Purpose 4 — tendering in open offers and buybacks via the exchange |
+| ddpi_scope | code | 2 | conditional | Consent screen | Depository | All-transaction versus specific scope code on the authority record |
+| ddpi_authorization_date | date | 8 | conditional | Executed document | Depository, back office | Date the authority was executed, not the date it was uploaded |
+| ddpi_deregistration_date | date | 8 | conditional | Revocation request | Depository, back office | Empty while active; set on revocation |
+| stamp_duty_reference | string | varies | conditional | e-stamping provider | Document store | Evidence that duty was paid in the correct state |
+| consent_text_version | string | varies | yes | Document store | Evidence record | Preserve the text actually shown, not the current template |
+
+Field names follow the depository-facing naming recorded in [Section O of the field atlas](/broking-kyc/reference/field-atlas/sections/o-ddpi/); lengths are the depository record lengths, and the last two rows are the broker-side evidence fields any audit will ask for. `[industry practice — unverified]` for the stamp-duty and consent-version rows, which are not depository-prescribed.
+
+## 5. Revocation and modification
+
+Revocation is unconditional. The client does not have to give a reason, and the effect is immediate once the depository record is updated: the authority flag goes to the "neither DDPI nor POA" value and every subsequent debit needs per-transaction authorisation. The circular does not prescribe a processing turnaround, so the one-working-day figure most brokers publish is a service commitment rather than a regulatory one. `[industry practice — unverified]` Two design obligations follow.
+
+First, the revocation control must be findable. Clause 8's requirement that exchanges and depositories ensure brokers have enabled revocation is a live inspection item, and "available on written request to the branch" does not satisfy it for a digital-only broker. Put it in the demat-account section of the app next to the authority's status.
+
+Second, revocation must not silently break the client. A client who revokes DDPI and then sells the next morning will meet the eDIS flow for the first time, possibly without a TPIN. The revocation confirmation screen is the right place to explain the TPIN prerequisite and to link the depository's TPIN generation page.
+
+Modification, in practice, is not a modification. Because the purposes are captured as flags on a single executed authority, narrowing or widening the scope means revoking and executing afresh — with fresh stamp duty. A client who wants settlement authority but not tendering authority should be told that up front rather than discovering it as a re-signing cycle.
+
+Broker-initiated deactivation happens in three situations that the client-facing status screen should be able to explain: closure of the trading or demat account, cancellation of the DP's registration, and a regulatory or court order. None of these is a substitute for the client's own revocation right.
+
+## 6. Alternatives
+
+| | DDPI | eDIS / TPIN per transaction | Physical delivery instruction slip | Legacy power of attorney |
+| --- | --- | --- | --- | --- |
+| What it is | Purpose-limited standing authority | Per-instruction authentication at the depository | Paper instruction submitted to the DP | Open-ended authority, discontinued for new clients |
+| Up-front effort | Sign once, stamp duty, around a day to activate | None | None | Not available |
+| Effort per sale | None | TPIN plus OTP inside the broker's cut-off | Slip delivered to the DP ahead of pay-in | None |
+| Off-market and gift transfers | Not covered | Covered | Covered | Was covered |
+| Main failure mode | Client forgets the authority exists | Missed window becomes a short delivery | Physical logistics miss the pay-in | Scope far wider than needed |
+| When to pick it | Any client who trades more than occasionally, uses margin pledge, or wants unattended settlement | Low-frequency sellers, clients unwilling to give standing authority | One-off non-settlement transfers | Only as an inherited state to be honoured until revoked |
+| Who uses what | Most active clients at most brokers `[industry practice — unverified]` | Clients who decline standing authority | Rare, mostly non-settlement cases | Pre-2022 clients who have never revoked |
+
+Existing power-of-attorney clients are a fourth population rather than a fifth option. Their POA remains valid until they revoke it, and the system must carry both states side by side; force-migration is neither required nor appropriate. The migration nudge belongs in servicing journeys, not in a blocking screen — see [account modifications](/broking-kyc/lifecycle/modifications/).
+
+## Practical notes
+
+- **[gotcha]** The four purpose flags are technically independent but commercially all-or-nothing at most brokers, because the signed template names all four. If your product intends genuinely selective scope, the template and the e-stamping flow have to support it before the UI offers it.
+- **[gotcha]** TPIN problems concentrate on the first sale after a long gap. The client has the demat account, has never sold, and has no TPIN. Detect the "no prior eDIS authorisation on this account" condition and surface TPIN generation before the sale rather than after it.
+- **[risk trade-off]** Some brokers set a conservative internal eDIS cut-off well before the depository's own deadline to protect the pay-in file. It reduces short deliveries and annoys clients who sell late in the session. Whichever cut-off you choose, publish it on the order-confirmation screen for non-DDPI clients. `[industry practice — unverified]`
+- **[industry practice]** Brokers that activate DDPI during onboarding report materially higher take-up of margin pledge and of margin-funded products, because the per-pledge authentication friction disappears. That is a real effect and also a reason to be scrupulous about the voluntariness of the consent.
+- **[gotcha]** Do not treat the depository's "debit authorised" SMS as a broker communication. It originates from the depository against the beneficial-owner record, which means the mobile number and email on the demat account must be the client's own and current. A stale demat contact detail produces a client who never sees the confirmation and a broker who cannot explain why.
+- **[AI inference — verify before acting]** Exact eDIS cut-off times, TPIN regeneration turnaround and the NSDL versus CDSL differences in client experience vary by DP configuration. Verify against your own DP's current operating instructions before publishing a time to clients.
+
+## Cross-references
+
+- [CDSL DDPI deep dive](/broking-kyc/vendors/depositories/cdsl-ddpi/) — depository-side purpose flags, the master authority identifier, file formats and processing timelines
+- [CDSL <abbr title="Margin Trading Facility">MTF</abbr> and pledge primer](/broking-kyc/vendors/depositories/cdsl-mtf-pledge/) — where the pledge purpose flag is actually consumed
+- [NSDL overview](/broking-kyc/vendors/depositories/nsdl/) — the NSDL-side authority registration and instruction routes
+- [Margin pledge activation](./margin-pledge/) — the client-facing pledge flow that the pledge purpose flag feeds
+- [Field atlas — Section O, DDPI](/broking-kyc/reference/field-atlas/sections/o-ddpi/) — every DDPI field and its destination systems
+- [Short delivery and auction](/broking-kyc/deep-dives/trading-day/short-delivery-auction/) — what an unauthorised sale turns into
+- [Direct payout to demat](/broking-kyc/deep-dives/settlement/direct-payout-to-demat/) — the buy-side counterpart, where securities arrive without any client instruction
+- [Review and eSign](/broking-kyc/journey/09-review-esign/) — where the DDPI authority is signed during onboarding
+- [Account modifications](/broking-kyc/lifecycle/modifications/) — revocation and re-execution as servicing events
+- [Circulars — SEBI MIRSD](/broking-kyc/reference/circulars/sebi-mirsd/) — the DDPI framework and its amendments
+
+## Verified through
+
+2026-09-11
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

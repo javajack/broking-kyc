@@ -1,0 +1,174 @@
+---
+title: "Product Activation: Commodity Derivatives"
+description: Client-facing commodity segment activation — MCX and NCDEX registration, the mandatory client-category declaration, options on goods versus options on futures, physical-delivery obligations, and the September 2026 client position limits.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** commodity activation looks like F&O activation and is not. It carries an extra mandatory field with no equity equivalent (the client category), an exchange whose session runs into the night, contracts that end in physical goods rather than cash, and a separate trading-preference format for commodity-only members. The page follows that order: what is different, what the client declares, what happens near expiry, and what the September 2026 limits changed.
+
+## TL;DR
+
+- Financial evidence is required on the same basis as equity derivatives — clause 23.3 of the [Master Circular for Stock Brokers](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590) covers any client who opts to deal in "the derivative segment", with no separate commodity threshold and no prescribed minimum income.
+- The segment-level rulebook is the [Master Circular for Commodity Derivatives Segment](/broking-kyc/reference/circulars/sebi-other/#sebihomrdmrd-pod-1pcir2024168) `SEBI/HO/MRD/MRD-PoD-1/P/CIR/2024/168` (3 December 2024), which supersedes the August 2023 master.
+- A commodity <abbr title="Unique Client Code">UCC</abbr> record carries a **mandatory client category** — hedger, speculator, arbitrageur, farmer, value-chain participant, domestic financial institution, foreign, or other (`CLIENT_CATEGORY_COM` per [<abbr title="Multi Commodity Exchange of India">MCX</abbr>/TECH/394/2023](/broking-kyc/reference/circulars/mcx/#mcxtech3942023)). It drives position limits and prints on the contract note; there is no equity analogue.
+- Clause 21.7 of the stock-broker master circular exempts members registered **exclusively** with commodity derivatives exchanges from the standardised trading-preference format; they use the erstwhile Forward Markets Commission format **<abbr title="Forward Markets Commission">FMC</abbr>/COMPL/IV/<abbr title="KYC Registration Agency">KRA</abbr>-05/11/14** dated 26 February 2015. `[not yet in index]`
+- Client position limits were revised with immediate effect by <abbr title="Securities and Exchange Board of India">SEBI</abbr>'s circular `HO/47/16/13(5)2026-MRD-POD1/ I/20735/2026` dated 9 September 2026 — 2 percent of deliverable supply for broad commodities, 1 percent for narrow, 0.5 percent for sensitive, with newly reclassified broad commodities retaining 1 percent for one year, and penalties capped at Rs 2 lakh for breaches above 2 percent and Rs 10,000 for breaches up to 2 percent. Forwarded to members as [MCX/S&I/513/2026](/broking-kyc/reference/circulars/mcx/#mcxsi5132026).
+- Physical settlement is the default for many contracts, and the obligations near expiry are the client's, not the broker's: delivery intentions, delivery-period margin, a commodity repository account to receive goods, and penalties measured as a percentage of settlement price plus replacement cost.
+
+## Conceptual overview
+
+A commodity derivative that settles by delivery is a contract to move a physical thing. That single fact generates every difference between this page and [F&O activation](./fno-activation/): the client must be classifiable by their relationship to the underlying goods, must have somewhere to receive electronic commodity holdings, must express delivery intentions within exchange windows, and must fund a delivery-period margin that is far larger than the normal initial margin. None of this is visible in an activation flow modelled on equity derivatives.
+
+The second structural difference is the venue. MCX is the primary commodity derivatives exchange, with <abbr title="National Commodity & Derivatives Exchange Limited">NCDEX</abbr> dominant in agricultural contracts and commodity segments also operated by <abbr title="National Stock Exchange of India">NSE</abbr> and <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr>. The commodity session extends into the evening to track international reference markets, which changes the operational shape of margin calls and square-offs for a retail client. For the per-segment comparison — session timings, settlement types, margin components, lot sizes — see [segment rules comparison](/broking-kyc/deep-dives/foundational/segment-rules-comparison/).
+
+The third is that the commodity segment's client-facing plumbing is being rebuilt. MCX prescribed new UCC file formats (version 1.1) and a UCC-API (version 1.0) in [MCX/S&I/453/2026](/broking-kyc/reference/circulars/mcx/#mcxsi4532026) dated 6 August 2026, replacing screen-based creation with file and API creation, adding an irreversible Closed status and nomination fields; the 7 September 2026 implementation date was then deferred until further communication by [MCX/S&I/504/2026](/broking-kyc/reference/circulars/mcx/#mcxsi5042026) dated 4 September 2026. Any commodity activation integration built today should be able to emit both the current and the pending format.
+
+## 1. Regulatory framework
+
+- **[SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>/MRD-PoD-1/P/CIR/2024/168](/broking-kyc/reference/circulars/sebi-other/#sebihomrdmrd-pod-1pcir2024168)** (3 December 2024) — Master Circular for Commodity Derivatives Segment; the consolidated source for product design, client and member position limits, delivery and staggered delivery, and hedge policy. Supersedes `SEBI/HO/MRD/MRD-PoD-1/P/CIR/2023/136`.
+- **[Master Circular for Stock Brokers](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — clause 23.3 (documentary evidence of financial details for derivatives clients), clause 21.5 to 21.8 (trading preferences, all-active-exchange registration, negative-consent opt-out, five-year record retention), clause 21.7 (commodity-exclusive members use the FMC format).
+- **[MCX/TECH/394/2023](/broking-kyc/reference/circulars/mcx/#mcxtech3942023)** — the UCC file specification behind commodity client registration, including the mandatory client-category field.
+- **[MCX/S&I/453/2026](/broking-kyc/reference/circulars/mcx/#mcxsi4532026)** (6 August 2026) and **[MCX/S&I/504/2026](/broking-kyc/reference/circulars/mcx/#mcxsi5042026)** (4 September 2026) — new UCC file formats version 1.1 and UCC-API version 1.0, and the deferral of their 7 September 2026 implementation.
+- **SEBI `HO/47/16/13(5)2026-MRD-POD1/ I/20735/2026`** (9 September 2026) and **[MCX/S&I/513/2026](/broking-kyc/reference/circulars/mcx/#mcxsi5132026)** (9 September 2026) — revised client position limits, revised broad-commodity classification, and capped penalties, effective immediately.
+- **SEBI `HO/47/16/13(4)2026-MRD-POD1/I/14266/2026`** (19 June 2026) — early pay-in of certified goods against relevant derivatives contracts, with margin exemptions determined by the clearing corporation's risk perception and mark-to-market margins still collectible; implementation from 21 September 2026. See the [SEBI other-departments index](/broking-kyc/reference/circulars/sebi-other/).
+- **[SEBI/HO/MRD/MRD-PoD-1/P/CIR/2024/57](/broking-kyc/reference/circulars/sebi-other/#sebihomrdmrd-pod-1pcir202457)** (May 2024) — staggered delivery period modification, reducing the staggered window ahead of expiry.
+- **[<abbr title="Multi Commodity Exchange Clearing Corporation Limited">MCXCCL</abbr>/RISK/184/2025](/broking-kyc/reference/circulars/clearing-corps/#mcxcclrisk1842025)** (4 September 2025, effective 1 October 2025) — margin framework by volatility category, including the additional 2 percent lean-period margin on agri contracts expiring in the lean period.
+- **[MCX/TRD/040/2026](/broking-kyc/reference/circulars/mcx/#mcxtrd0402026)** (27 January 2026) — revision in delivery and settlement procedure; the trigger for re-reading tender-period and delivery-intention workflows.
+
+## 2. Eligibility and pre-conditions
+
+| Pre-condition | Source of truth | What refuses it | Client-visible consequence |
+| --- | --- | --- | --- |
+| Documentary evidence of financial details | Broker review queue | Clause 23.3 plus the broker's risk policy | Same evidence options as [F&O activation](./fno-activation/) |
+| Trading-preference signature for the commodity segment | Annexure-8 Para C, or the FMC format for commodity-only members | Clause 21.4, 21.7 | A signature against the segment, not a tick box |
+| Client category declared | Client declaration, verified against evidence for non-speculator categories | MCX UCC validation | Determines the applicable position limit |
+| Commodity UCC registered and active on the exchange | MCX / NSE / BSE UCC response | UCC file or API rejection | Orders rejected until the exchange confirms |
+| Residential status permitted | Client master | <abbr title="Foreign Exchange Management Act 1999">FEMA</abbr> and SEBI framework for the segment | Non-resident participation is restricted; see below |
+| Ability to receive electronic commodity holdings, if delivery is possible | Commodity repository account | No repository account | A long position carried into delivery cannot be received |
+
+On non-residents: the site's [segment rules comparison](/broking-kyc/deep-dives/foundational/segment-rules-comparison/) records commodity derivatives as not available to <abbr title="Non-Resident Indian">NRI</abbr> clients, with existing positions to be closed before conversion. Treat the precise current position — including any conditional route for eligible foreign entities — as **[AI inference — verify before acting]**; it could not be closed out against a primary SEBI document within this page's research window, and it is the single most consequential eligibility question for a non-resident commodity applicant.
+
+## 3. The client category — the field with no equity equivalent
+
+| Code | Category | Who it is | Why it matters |
+| --- | --- | --- | --- |
+| HE | Hedger | A participant with exposure to the physical commodity | Eligible to apply for limits beyond the normal client position limit |
+| SP | Speculator | A participant taking a price view | Bound by the standard client position limit |
+| AR | Arbitrageur | A participant trading price differences | Standard limits; different surveillance profile |
+| Farmer | Farmer or farmer producer organisation | Primary producer | Category-specific treatment in exchange policy |
+| VCP | Value-chain participant | Processor, trader, exporter in the commodity's chain | Typically eligible for hedge treatment on evidence |
+| DFI | Domestic financial institution | Institutional participant | Institutional limits |
+| Foreign | Foreign participant | Eligible foreign entity or similar | Category-specific eligibility rules |
+| Other | Everything else | — | Default; avoid using it as a placeholder |
+
+The category is mandatory in the MCX UCC record (`CLIENT_CATEGORY_COM`), flows into the broker's risk system where hedger status carries a higher position limit, and prints on the MCX contract note as `ClientCategory` alongside delivery and tender-period margin where applicable — see [contract notes destination](/broking-kyc/reference/field-atlas/destinations/contract-notes/).
+
+Hedge treatment is not self-certifying. A client claiming hedger or value-chain status to obtain limits beyond the normal client limit applies to the exchange with evidence of physical-market exposure, and the exchange grants a limit for a defined period. The exact form name, the evidence set, the approving authority, and the validity period vary by exchange and commodity and must be taken from the relevant exchange's current hedge policy. **[AI inference — verify before acting]** — no single primary hedge-application specification was verified for this page; do not publish a form name you have not fetched.
+
+<Aside type="caution" title="A wrong category is not a cosmetic error">
+The category is the input to the position limit the exchange enforces against the client's <abbr title="Permanent Account Number">PAN</abbr>. Defaulting every retail applicant to speculator is defensible; defaulting an actual hedger to speculator caps them below their commercial need, and recording a speculator as a hedger to obtain headroom is a misrepresentation to the exchange. Make the field an explicit question with evidence requirements attached to the non-default answers, not a dropdown pre-filled for convenience.
+</Aside>
+
+## 4. Field-level view of commodity registration
+
+| name | type | length | mandatory | source-system | destination-system(s) | notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| `L-exchange_mcx` | char | 1 | yes | Trading preferences | MCX UCC `EXCH_MCX`, back office `mcx_flag` | Y triggers MCX UCC registration |
+| `L-segment_commodity` | char | 1 | yes | Trading preferences | MCX UCC `MCX_COM_FLAG`, NSE UCC `NSE_COM_FLAG`, BSE UCC `BSE_COM_FLAG`, <abbr title="Risk Management System">RMS</abbr> `seg_com_active` | Per-exchange; income proof required |
+| `U-mcx_client_category` | char | 2 | yes | Client declaration plus evidence | MCX UCC `CLIENT_CATEGORY_COM`, back office `mcx_client_cat`, RMS `mcx_category`, contract note `ClientCategory` | HE / SP / AR / Farmer / VCP / DFI / Foreign / Other |
+| `A-residential_status` | char | 2 | yes | Client master | MCX UCC `RES_STATUS` | Drives the Foreign category and eligibility |
+| `F-income_proof_type` | char | 2 | yes | Evidence upload | UCC, review queue | Required for commodity as for F&O |
+| `L-trading_experience_commodity_years` | number | 2 | conditional | Client declaration | NSE UCC `COM_EXP_YRS` | Required where the NSE commodity segment is opted |
+| `U-mcx_ucc_status` | char | 2 | yes | MCX UCC response | Entitlement service | The state that decides whether orders are accepted |
+| `U-mcx_error_account` | string | `[unknown — verify]` | yes at member level | Member setup | MCX UCC | An MCX-specific operational account requirement, not a client field |
+| Delivery-intention preference | enumeration | `[unknown — verify]` | conditional | Client instruction near expiry | Exchange delivery system | Location preference and intention to give or take delivery; see section 6 |
+
+Identifiers follow the [Field Atlas MCX UCC destination](/broking-kyc/reference/field-atlas/destinations/mcx-ucc/) and [Section U](/broking-kyc/reference/field-atlas/sections/u-exchange-registration/). The delivery-intention row is a documentation model. **[AI inference — verify before acting]**
+
+## 5. Options on goods versus options on commodity futures
+
+Two different option products exist in the commodity segment, and the difference is exactly what the holder ends up with.
+
+- **Options on commodity futures** devolve into a futures position on exercise. The client's post-expiry obligation is a futures position, which then follows that contract's own settlement route.
+- **Options in goods** devolve toward the goods. NCDEX's product note for Options in Goods on Wheat states that on expiry, the net exercised or assigned open position across all option series and types is **clubbed with the open position in the corresponding futures contract**, and the resulting long and short positions are marked for delivery. Buyers and sellers give a location preference through the clearing corporation's web system; if a seller gives none, the allocation goes to the base location. Delivery is allocated to buyers holding open long positions by a random allocation methodology so that all buyers have an equal chance irrespective of position size.
+
+The wheat note is a dated, contract-specific document (unit of trading 10 metric tonnes, unit of delivery 10 MT, quantity variation of plus or minus 5 percent permitted), so treat it as an illustration of the mechanism rather than a current universal specification; the live contract list and specifications must come from the exchange. What generalises is the client-facing consequence: an option that devolves toward goods can put a retail client into a delivery obligation they did not model, and the product note also makes clear that compliance with food-safety, warehousing, and tax law on the underlying goods rests with the market participant, not the exchange.
+
+Position-limit treatment differs too: the wheat note states that position limits for options in goods are clubbed with options on commodity futures on the same underlying goods, while remaining separate from futures position limits.
+
+## 6. Physical delivery — what the client actually has to do
+
+Delivery logic is part of the contract specification, not a broker setting. NCDEX's member compliance guide on delivery logic distinguishes two families:
+
+| Delivery logic | How positions end | Client's obligation | Failure consequence |
+| --- | --- | --- | --- |
+| Compulsory with staggered delivery | Open positions at expiry settle by physical delivery | Give location preference; sellers who do not are allocated to the basis delivery centre | Delivery default penalties apply |
+| Intention matching | Delivery only where buyer and seller intentions match on quantity and location; everything else is cash settled | Sellers give intention to the extent of the open position — at least 5 trading days before expiry for agri commodities, 3 trading days for non-agri, with a 3-working-day acceptance window | Unmatched or unnotified positions are cash settled |
+
+Three penalty and lock-in rules are worth putting in front of a client before the tender period, not after:
+
+- **Delivery default by a seller who gave intention**: 4 percent of settlement price plus replacement cost for agri futures, 3 percent plus replacement cost for non-agri, with the guide apportioning 1.75 percent of settlement price to the clearing corporation's settlement guarantee fund, 0.25 percent retained for administrative expenses, and the balance plus replacement cost paid to the buyer entitled to receive delivery.
+- **Squaring off after giving intention** is not permitted in intention-matching contracts; the guide records a penalty of 3 percent of the final settlement price on any position squared off after the request, besides further exchange action. In compulsory staggered-delivery contracts, by contrast, positions can be squared off during the intention-marking period.
+- **Buyer defaults are not permitted at all.** The amount due from a buyer is recovered as a pay-in shortage with prescribed charges, and the exchange may sell the goods on the buyer's account, with any balance still owed by the buyer.
+
+Those figures are from a dated exchange compliance guide (referencing clearing circular `NCDEX/CLEARING-010/2021` and its NCCL counterpart dated 24 March 2021) and from the commodity's own product note; confirm current values against the exchange's settlement calendar and the contract specification before relying on them. Delivery-period margins are additionally material — the margin framework applies a higher delivery-period margin during the tender window, which for some contracts is expressed as the higher of a percentage-plus-VaR formula or a flat percentage. See [RMS and <abbr title="Standard Portfolio Analysis of Risk">SPAN</abbr> methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/) for how those components reach the client's margin requirement.
+
+<Aside type="danger" title="The tender period is the activation flow's real deadline">
+A retail client who activated the commodity segment to trade price moves can be holding a compulsory-delivery contract days before expiry with no repository account, no warehouse arrangement, and no intention filed. The broker-side answer is a pre-tender position review and a hard cut-off for retail categories; the client-side answer is disclosure at activation that some contracts end in goods and which ones. Neither is optional if the segment is offered to retail at all.
+</Aside>
+
+## 7. Client position limits after 9 September 2026
+
+SEBI's 9 September 2026 circular, forwarded as MCX/S&I/513/2026, changed both the limit and the penalty:
+
+| Commodity classification | Client position limit | Notes |
+| --- | --- | --- |
+| Broad | 2 percent of deliverable supply | Classification itself was revised by the same circular |
+| Narrow | 1 percent of deliverable supply | — |
+| Sensitive | 0.5 percent of deliverable supply | Tightest category |
+| Newly reclassified as broad | 1 percent for one year | Transition, then the broad limit applies |
+
+Penalties for breach are capped at Rs 2 lakh where the breach exceeds 2 percent and Rs 10,000 where it is up to 2 percent, with next-day position reduction and repeat-violation consequences retained. For a retail client these ceilings are remote, but two client-facing points follow: limits are computed against deliverable supply, so they move as the exchange revises supply estimates and classifications; and the limit binds at PAN level across the client's accounts, so a client trading the same commodity through more than one broker aggregates.
+
+## 8. Inactive accounts and re-activation
+
+Commodity accounts have their own inactivity treatment — MCX issued **[MCX/INSP/716/2024](/broking-kyc/reference/circulars/mcx/#mcxinsp7162024)** on guidelines for inactive client accounts, and <abbr title="Know Your Customer (process).">KYC</abbr>-driven trading restrictions can arrive independently of dormancy: **[MCX/S&I/464/2026](/broking-kyc/reference/circulars/mcx/#mcxsi4642026)** (13 August 2026) prohibited trading and position square-up from 31 August 2026 for a specified cohort whose KYC remained on hold after a July upload, leaving existing positions to expire naturally, with members required to monitor open positions and subsequently compliant PANs permitted to trade on the next day based on KRA information received by the exchange.
+
+The re-activation path therefore has an extra step relative to equity: besides re-KYC and fresh financial evidence (see [dormancy and reactivation](/broking-kyc/lifecycle/dormancy-reactivation/)), the client category must be re-confirmed, because a hedger's commercial circumstances may have changed while the account was idle, and any hedge limit previously granted will have expired.
+
+## 9. Alternatives
+
+| Option A | Option B | When to pick which | Who uses what |
+| --- | --- | --- | --- |
+| Cash-settled commodity contract | Compulsory-delivery contract | Cash settlement removes the delivery obligation entirely; delivery contracts suit participants who want or hold the goods | Retail price views against physical-market participants |
+| Speculator category | Hedger or value-chain category with exchange-approved limits | Hedge treatment only where physical exposure can be evidenced to the exchange | Retail against commercial participants |
+| Options in goods | Options on commodity futures | Devolution toward goods against devolution into a futures position | Delivery-capable participants against financial participants |
+| MCX commodity segment | Commodity segment of an equity exchange | Liquidity and contract availability differ by commodity | Follow the contract, not the exchange brand |
+
+## Practical notes
+
+- **[gotcha]** Clause 21.7 means a commodity-exclusive member cannot reuse the standardised trading-preference block at all; it uses the FMC-era format. Multi-segment brokers routinely miss this when they template one account-opening form for every entity in the group.
+- **[gotcha]** The MCX UCC interface is mid-migration: version 1.1 files and the UCC-API were prescribed on 6 August 2026 and deferred on 4 September 2026 with the revised date "communicated separately". Build for both, and watch for the follow-up circular rather than assuming the old format is permanent.
+- **[gotcha]** Delivery figures published in exchange compliance guides carry the date of that guide. The 4 percent and 3 percent default penalties and the intention windows cited here come from a 2021-dated NCDEX guide; a 2026 activation disclosure must be checked against the current settlement calendar and contract specification.
+- **[industry practice — unverified]** Many brokers restrict retail clients to cash-settled commodity contracts, or force closure of delivery-eligible positions before the tender period begins. That is a broker policy layered on top of the exchange rules, and it should be stated as such.
+- **[AI inference — verify before acting]** Two items on this page need primary-source closure before publication in a compliance-facing context: the current position on non-resident participation in commodity derivatives, and the exchange-specific hedge-limit application form and evidence set.
+
+## Cross-references
+
+- [Segment rules comparison — commodity derivatives](/broking-kyc/deep-dives/foundational/segment-rules-comparison/) — session timings, settlement types, margin components, and lot sizes per commodity.
+- [F&O activation](./fno-activation/) — the financial-evidence options and disclosure obligations shared with this segment.
+- [MCX vendor page](/broking-kyc/vendors/exchanges/mcx/) — the exchange interfaces a commodity activation integration touches.
+- [Field Atlas — MCX UCC destination](/broking-kyc/reference/field-atlas/destinations/mcx-ucc/) — every field the MCX UCC record consumes.
+- [RMS and SPAN methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/) — how delivery-period, tender-period, and lean-period margins reach the client.
+- [Lifecycle: Dormancy and reactivation](/broking-kyc/lifecycle/dormancy-reactivation/) — the return path this page's section 8 extends.
+- [Exchange registration](/broking-kyc/operations/exchange-registration/) — UCC upload and response handling.
+- [Product activation overview](./) — the selector across all activation routes.
+
+## Verified through
+
+2026-09-11
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

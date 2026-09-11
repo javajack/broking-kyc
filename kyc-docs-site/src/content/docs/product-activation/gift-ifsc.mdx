@@ -1,0 +1,143 @@
+---
+title: "Product Activation: GIFT IFSC Access"
+description: Routing a resident Indian client to an IFSC broker-dealer — the separate business unit versus subsidiary question, LRS remittance rules and the fifteen-day idle-funds condition, TCS, KYC, available products and the grievance route.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Everything a client needs to understand about GIFT <abbr title="Indian Financial System Code.">IFSC</abbr> follows from one fact: they are dealing with a differently regulated entity in a differently regulated jurisdiction, funded by a remittance out of India. The page therefore establishes the entity and the money path before touching products, because a client who does not grasp those two things cannot meaningfully consent to anything that follows. Grievance and protection differences come last, deliberately, because they are the part most often left out of a sales flow.
+
+## TL;DR
+
+- **The regulator changes.** An IFSC broker-dealer is registered with the International Financial Services Centres Authority under the **<abbr title="International Financial Services Centres Authority">IFSCA</abbr> (Capital Market Intermediaries) Regulations, 2025**, which replaced the 2021 regulations; "broker dealer" is defined in regulation 2(1)(g) and net worth is set by the recognised stock exchange rather than by a fixed IFSCA figure.
+- **The structure has changed too.** <abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/61 (2 May 2025) `[not yet in index]` facilitates a SEBI-registered broker undertaking securities-market activities in GIFT IFSC through a separate business unit of the same legal entity, removing the earlier requirement for a distinct subsidiary with a no-objection certificate. `[AI inference — verify before acting]` on clause-level detail.
+- **Funding is a Liberalised Remittance Scheme transaction.** The annual ceiling is USD 250,000 per financial year per resident individual under the <abbr title="Reserve Bank of India">RBI</abbr> Master Direction on <abbr title="Liberalised Remittance Scheme">LRS</abbr>, and the money sits in a non-interest-bearing foreign-currency account in the IFSC.
+- **The fifteen-day rule is the one clients break.** Under RBI/2020-21/99, A.P. (DIR Series) Circular No. 11 (16 Feb 2021), funds lying idle in the IFSC account beyond fifteen days must be repatriated to the resident's domestic rupee account.
+- **The permitted purpose widened in 2024.** RBI/2024-25/49, A.P. (DIR Series) Circular No. 15 (10 Jul 2024), paragraph 3, extends LRS remittances to IFSC to all permissible LRS purposes — any IFSCA-regulated financial service or product within the IFSC, and any current or capital account transaction in a foreign jurisdiction routed through an IFSC foreign-currency account.
+- **Tax collection at source applies to investment remittances** under section 206C(1G) at 20 per cent above the applicable threshold, which is reported as having moved from ₹7 lakh to ₹10 lakh. `[AI inference — verify before acting]`
+- **Investor protection does not travel.** SEBI's complaint-redressal system and the exchange investor protection fund do not cover IFSC activity; IFSCA is the regulator for grievances, inspection and enforcement.
+- **<abbr title="Know Your Customer (process).">KYC</abbr> portability improved in August 2026.** [HO/38/15/(7)2026-MIRSD-POD/I/19255/2026](/broking-kyc/reference/circulars/sebi-mirsd/) (20 Aug 2026) specifies IFSCA under regulation 16A(1) of the <abbr title="KYC Registration Agency">KRA</abbr> Regulations, letting IFSCA-regulated entities access KYC registration agency records for client KYC.
+
+## Conceptual overview
+
+GIFT IFSC is, legally, offshore. It sits inside India geographically and outside India's domestic financial regulation functionally: a separate regulator, a foreign currency as the unit of account, its own exchanges, and its own rulebook. When a domestic broker offers "global investing through our IFSC arm", the client is being introduced to a different counterparty operating under a different regime, funded by a remittance that leaves the domestic system. Every subsequent difference — the products, the tax, the protection, the complaint route — derives from that.
+
+Two things about this have changed recently enough that older documentation is misleading. The first is structural. Brokers used to need a distinct legal entity in the IFSC, typically a subsidiary, with the associated capital, governance and no-objection requirements. Since May 2025 a SEBI-registered broker can instead operate in GIFT IFSC as a separate business unit of the same legal entity. For the client this is a subtle but real difference — the name on the contract may be the same as their domestic broker's — and it makes the disclosure obligation heavier rather than lighter, because the client can no longer infer a different regime from a different name.
+
+The second is the money path. The February 2021 circular that first allowed resident individuals to remit to an IFSC was narrow: investment in IFSC securities, excluding securities issued by entities resident in India outside the IFSC, held in a non-interest-bearing foreign-currency account, with idle funds to be brought back within fifteen days. The July 2024 circular widened the permitted purpose to the full LRS list, including using an IFSC account as a conduit for transactions in other foreign jurisdictions. That turned the IFSC account from a single-purpose investment wrapper into something closer to a general offshore account for a resident individual — which is precisely why the client-facing explanation has to be specific about what the client is actually doing with it.
+
+## 1. Regulatory framework
+
+- **IFSCA (Capital Market Intermediaries) Regulations, 2025** (document dated 17 Apr 2025) `[not yet in index]` — repeals and replaces the 2021 regulations as amended. Regulation 2(1)(g) defines a broker dealer as an entity buying or selling securities and permitted financial products for its own account or for customers, including a trading member of a recognised stock exchange, registered as a broker dealer with IFSCA. Schedule I, serial 1, sets net worth as specified by the recognised stock exchange rather than at a fixed figure. Regulation 26(2) governs dealing in securities of foreign jurisdictions.
+- **SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/61** (2 May 2025) `[not yet in index]` — facilitation for SEBI-registered stock brokers to undertake securities-market activities in GIFT IFSC through a separate business unit, in place of the earlier separate-legal-entity and no-objection route. See [Circulars — SEBI MIRSD](/broking-kyc/reference/circulars/sebi-mirsd/).
+- **IFSCA press release, 22 February 2021** `[not yet in index]` — permits banking units in the IFSC to open accounts for resident individuals, irrespective of net worth, to invest in foreign securities, excluding securities issued by entities resident in India outside the IFSC, under the LRS.
+- **RBI/2020-21/99, A.P. (DIR Series) Circular No. 11** (16 Feb 2021) `[not yet in index]` — the original LRS-to-IFSC permission: investment in IFSC securities within the stated exclusion, a non-interest-bearing foreign-currency account in the IFSC, and repatriation of funds idle beyond fifteen days to the resident's domestic rupee account. RBI's own pages resisted automated retrieval in this research pass, so clause wording should be confirmed at source. `[AI inference — verify before acting]`
+- **RBI/2024-25/49, A.P. (DIR Series) Circular No. 15** (10 Jul 2024) `[not yet in index]` — paragraph 2 recites the earlier scope; paragraph 3 extends LRS remittances to IFSC to all permissible LRS purposes, covering any IFSCA-regulated financial service or product within the IFSC and any current or capital account transaction in a foreign jurisdiction through an IFSC foreign-currency account; paragraph 4 directs that the LRS Master Direction be updated. Issued under sections 10(4) and 11(1) of <abbr title="Foreign Exchange Management Act 1999">FEMA</abbr>. See [Circulars — RBI](/broking-kyc/reference/circulars/rbi/).
+- **Master Direction — Liberalised Remittance Scheme, RBI/FED/2017-18/3, FED Master Direction No. 7/2015-16** `[not yet in index]` — the USD 250,000 per financial year ceiling and the scheme's permitted and prohibited purposes. Paragraph references were not confirmed from the primary document in this pass. `[AI inference — verify before acting]`
+- **Section 206C(1G) of the Income-tax Act**, as amended by the Finance Act 2023 with effect from 1 October 2023 `[not yet in index]` — 20 per cent tax collection at source on LRS remittances above the applicable threshold for purposes other than education and medical treatment, which includes investment. The current threshold is reported as ₹10 lakh rather than the earlier ₹7 lakh. `[AI inference — verify before acting]`
+- **[HO/38/15/(7)2026-MIRSD-POD/I/19255/2026](/broking-kyc/reference/circulars/sebi-mirsd/)** (20 Aug 2026), enabling sharing of information by KYC registration agencies with entities regulated by the International Financial Services Centres Authority — specifies IFSCA under regulation 16A(1) so that its regulated entities can access KRA systems for client KYC (clause 2), subject to the KRA Regulations, the securities-market KYC master circular, and the specified data-security guidelines for <abbr title="Foreign Portfolio Investor">FPI</abbr> clients (clauses 3 to 5), with immediate effect (clause 6).
+- **IFSCA circular on complaint handling and grievance redressal by regulated entities in the IFSC** (reported as 453/IFSCA/GRM/2023-24, 2 Dec 2024) `[not yet in index]` — acknowledgement, resolution and appeal timelines within the IFSC regime. Circular number and clause detail were not verified from the primary document. `[AI inference — verify before acting]`
+- **[HO/17/11/(2)2026-DDHS-POD1/I/18769/2026](/broking-kyc/reference/circulars/sebi-other/)** (14 Aug 2026) — permits online bond platform providers to offer IFSCA-regulated products with separate presentation and disclosures and with grievance redressal lying with the issuer (clause 3.1); relevant as a second, narrower domestic channel to IFSC-regulated instruments. See [bonds, G-Secs and <abbr title="National Pension System">NPS</abbr>](./bonds-gsec-nps/).
+
+## 2. What the client is actually signing up to
+
+| Dimension | Domestic broking account | IFSC broker-dealer account |
+| --- | --- | --- |
+| Regulator | SEBI, with the exchange as first-line supervisor | IFSCA, with the IFSC exchange as first-line supervisor |
+| Entity | The SEBI-registered broker | A separate business unit of the same broker, or a distinct IFSC entity |
+| Currency | Indian rupee | Foreign currency, typically US dollar |
+| Funding | Domestic bank transfer from the client's own verified account | LRS remittance to a non-interest-bearing foreign-currency account in the IFSC |
+| Annual limit on funding | None beyond the client's own means | USD 250,000 per financial year across all LRS purposes |
+| Idle funds | May remain in the trading account subject to running-account settlement | Must be repatriated if idle beyond fifteen days |
+| Tax at the point of funding | None | Tax collection at source on the remittance above the threshold |
+| Investor protection fund | Exchange investor protection fund applies | Does not apply |
+| Complaint escalation | Broker, exchange, then SEBI's complaint-redressal system and online dispute resolution | Broker dealer, then the IFSC grievance route, then IFSCA |
+| KYC | KRA and <abbr title="Central KYC (records registry)">CKYC</abbr> records | IFSC entity's own KYC, now able to draw on KRA records |
+
+<Aside type="danger" title="Investor protection does not cross the boundary">
+The exchange investor protection fund and SEBI's complaint-redressal and online-dispute-resolution machinery do not cover IFSC activity, regardless of whether the IFSC arm is a subsidiary or a separate business unit of the same legal entity. A client who has used the domestic broker for years will assume otherwise unless told plainly, and the assumption is most dangerous precisely in the separate-business-unit structure, where the entity name is familiar. State the absence of cover and name the IFSCA grievance route in the activation flow, not only in a terms document.
+</Aside>
+
+## 3. The money path, step by step
+
+1. **Client is onboarded by the IFSC entity.** This is a separate client relationship with its own account-opening, its own agreement and its own risk disclosures. Since August 2026 the IFSC entity can pull the client's KYC record from a KYC registration agency rather than rebuilding it, which shortens the flow without merging the two relationships.
+2. **A foreign-currency account is opened in the IFSC.** It is non-interest-bearing by design. The account is the client's, not the broker's.
+3. **LRS remittance.** The client's domestic authorised dealer bank processes the outward remittance against the client's LRS headroom for the financial year, applying tax collection at source where the threshold is crossed. The client's declaration of purpose at this step is the compliance artefact that matters later.
+4. **Funds arrive and are deployed.** The client trades permitted products on the IFSC exchange or through the broker dealer.
+5. **Idle funds are watched.** Money that sits in the account without being deployed beyond fifteen days must go back to the client's domestic rupee account. This is a condition on the remittance, not a broker service level, and the consequence of ignoring it is a FEMA compliance question rather than a fee.
+6. **Repatriation.** Proceeds come back through the same authorised-dealer route. The tax position on gains is the client's own and is not settled by the tax collected at source at remittance, which is creditable rather than final.
+
+### 3.1 Field-level view of the activation and remittance record
+
+| name | type | length | mandatory | source-system | destination-system(s) | notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| domestic_client_code | string | varies | conditional | Domestic broker client master | Referral record only | Never merge the two client identities; the IFSC relationship is separate |
+| ifsc_client_id | string | varies | yes | IFSC entity onboarding | IFSC trading platform | Issued by the IFSC entity under its own registration |
+| entity_structure | code | varies | yes | Product configuration | Client disclosure | Separate business unit versus distinct IFSC entity; drives the wording of the disclosure |
+| kra_kyc_reference | string | varies | conditional | KYC registration agency | IFSC entity KYC record | Available to IFSCA-regulated entities since the August 2026 circular |
+| fc_account_number | string | varies | yes | IFSC banking unit | Remittance instruction, statements | Non-interest-bearing foreign-currency account in the client's name |
+| lrs_purpose_code | code | varies | yes | Client declaration | Authorised dealer bank, FEMA reporting | The declared LRS purpose; investment is a permissible purpose post the July 2024 circular |
+| lrs_utilised_fy | decimal | 15,2 | yes | Authorised dealer bank | Headroom check | Cumulative across all LRS purposes in the financial year, not just this one |
+| remittance_amount_usd | decimal | 15,2 | yes | Client instruction | Authorised dealer bank | Against the USD 250,000 annual ceiling |
+| tcs_amount | decimal | 15,2 | system | Authorised dealer bank | Client's tax record | Creditable against the client's tax liability, not a final tax |
+| idle_since_date | date | 8 | system | IFSC account statement | Fifteen-day monitoring, client alert | The trigger for the repatriation condition |
+| repatriation_reference | string | varies | conditional | Authorised dealer bank | FEMA evidence | Evidence that the fifteen-day condition was met |
+
+Field names are the semantic labels an integration layer typically carries; the authorised dealer bank's LRS forms and the IFSC entity's own onboarding specification are authoritative. `[AI inference — verify before acting]`
+
+<Aside type="caution" title="The LRS ceiling is shared, and the client's other spending counts">
+USD 250,000 is a per-individual, per-financial-year limit across every LRS purpose — foreign travel, education, gifts, property, and investment. A client who has funded a child's tuition abroad has less headroom for an IFSC account than the raw limit suggests, and the authorised dealer bank, not the broker, holds the authoritative running total. Never present the ceiling as available investment capacity; present it as a limit the client must check with their bank.
+</Aside>
+
+## 4. Products, and what could not be verified
+
+The IFSC exchanges have offered resident Indian investors access to unsponsored depository receipts on large US-listed stocks, alongside index and commodity derivatives and other permitted products. Whether a specific facility is currently open to residents, in what form, and under which broker's arrangement, changes with IFSCA and exchange notifications, and none of it was confirmable from a primary source in this research pass. `[AI inference — verify before acting]`
+
+What can be said structurally, and is safe to put in front of a client:
+
+- The permitted universe is defined by IFSCA and the IFSC exchange, not by the domestic broker's product team.
+- Securities issued by entities resident in India outside the IFSC were excluded from the original LRS-to-IFSC permission — so "Indian stocks through the IFSC" is the wrong mental model.
+- Since July 2024 the IFSC foreign-currency account can also be a route to transactions in other foreign jurisdictions under the general LRS purposes, which is a materially different proposition from trading on the IFSC exchange and should be presented separately.
+
+Given the pace of change, a product page that hard-codes a product list will be wrong within a quarter. Drive the list from a configuration the compliance team owns, and date-stamp it on the client-facing screen.
+
+## 5. Alternatives
+
+| Client objective | Option A | Option B | When to pick which |
+| --- | --- | --- | --- |
+| Exposure to US equities | IFSC broker-dealer route under LRS | Domestic mutual fund or exchange-traded fund with international exposure | IFSC route for direct holdings and control, accepting LRS, TCS and the separate regime; domestic fund route for simplicity and no LRS usage |
+| Offshore account for multiple purposes | IFSC foreign-currency account under the widened July 2024 purposes | An overseas bank account under LRS | IFSC for proximity, Indian-jurisdiction dispute resolution and IFSCA supervision; overseas bank where the client needs local presence |
+| IFSC-regulated debt products | An IFSC broker-dealer relationship | An online bond platform provider offering IFSCA-regulated products post the Aug 2026 modification | Broker-dealer route for breadth; the domestic platform route for a curated shelf with issuer-level grievance redressal |
+| Avoid LRS entirely | Domestic products only | — | Where the client's objective can be met onshore, the compliance overhead is not worth incurring |
+| Non-resident client | Not this page | The non-resident routes | LRS applies to resident individuals; a non-resident client's access is a different framework — see the [<abbr title="Non-Resident Indian">NRI</abbr> deep dive](/broking-kyc/appendix/nri-deep-dive/) |
+
+## Practical notes
+
+- **[gotcha]** Referral is not onboarding. A domestic app that collects an IFSC client's details and shows an IFSC portfolio has not made the two relationships one, and it must not present them as one account. Label the entity on every screen where the client sees an IFSC holding.
+- **[gotcha]** The fifteen-day idle-funds condition has no client-facing home in most designs, so nobody watches it. Instrument it: a dated balance, an alert at day ten, and a repatriation path the client can act on without contacting support.
+- **[risk trade-off]** The separate-business-unit structure is cheaper and faster for the broker and more confusing for the client, because the name and often the brand are identical. If you take that route, spend the savings on disclosure clarity.
+- **[industry practice]** Tax collection at source at the remittance stage is the most common source of client surprise in this journey, because the client budgets the investment amount and not the remittance amount. Show the gross remittance including TCS before the client confirms. `[industry practice — unverified]`
+- **[gotcha]** The authorised dealer bank, not the broker, owns the LRS headroom figure. A broker that displays a computed headroom will eventually display a wrong one. Show the limit and point to the bank.
+- **[cost optimization]** For a client whose only objective is broad international equity exposure, a domestic fund route avoids LRS usage, TCS, the fifteen-day condition and a second client relationship. Recommending the IFSC route by default is expensive for the client and creates servicing load for the broker.
+- **[AI inference — verify before acting]** The 2025 separate-business-unit circular, the current TCS threshold, the LRS Master Direction paragraph references, the IFSCA grievance circular number and the current product availability for residents were all corroborated only from secondary sources or not at all in this research pass. None should be quoted to a client without a primary check.
+
+## Cross-references
+
+- [NRI deep dive](/broking-kyc/appendix/nri-deep-dive/) — the adjacent cross-border framework, for clients who are not resident
+- [NRI conversion](/broking-kyc/lifecycle/nri-conversion/) — what happens to a resident's accounts, including any IFSC relationship, on a change of residential status
+- [Declarations gate](/broking-kyc/journey/08-declarations-gate/) — where residency, tax-residency and <abbr title="Foreign Account Tax Compliance Act (US)">FATCA</abbr> declarations are captured
+- [Field atlas — Section J, FATCA and <abbr title="Common Reporting Standard">CRS</abbr>](/broking-kyc/reference/field-atlas/sections/j-fatca-crs/) — the tax-residency fields a cross-border relationship depends on
+- [KRA integration](/broking-kyc/vendors/kra/) — the KYC records IFSCA-regulated entities can now access
+- [Investor protection fund](/broking-kyc/deep-dives/foundational/ipf/) — the domestic protection that does not extend to the IFSC
+- [<abbr title="SEBI Complaints Redress System">SCORES</abbr> procedure](/broking-kyc/deep-dives/compliance-audit/scores-procedure/) — the domestic grievance route, for contrast with the IFSCA route
+- [Bonds, G-Secs and NPS](./bonds-gsec-nps/) — the domestic bond platform channel to IFSCA-regulated products
+- [Circulars — RBI](/broking-kyc/reference/circulars/rbi/) — the LRS and IFSC remittance authorities
+- [Circulars — SEBI MIRSD](/broking-kyc/reference/circulars/sebi-mirsd/) — the separate-business-unit facilitation and the KRA-access circular
+
+## Verified through
+
+2026-09-11
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

@@ -1,0 +1,159 @@
+---
+title: "Product Activation: Equity F&O"
+description: Client-facing F&O segment activation — the financial-evidence options SEBI actually accepts, the risk-disclosure acknowledgements, segment addition at exchange UCC, and what the 2024–2026 index-derivatives measures changed for a retail client.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** activating F&O is the only routine onboarding step where a broker must collect *suitability* evidence rather than identity evidence. The page therefore starts with what <abbr title="Securities and Exchange Board of India">SEBI</abbr> actually requires (and what it conspicuously does not), then the disclosures that must reach the client, then the exchange-side registration, and only then the 2024–2026 measures that changed what a newly activated client can afford to trade. Re-activation after dormancy is last, because it re-runs the same checks against a stale record.
+
+## TL;DR
+
+- The only SEBI requirement is documentary: clause 23.3 of the [Master Circular for Stock Brokers](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590) (17 June 2025) — "the stock broker shall have documentary evidence of financial details provided by the clients who opt to deal in the derivative segment. In respect of other clients, the stock broker shall obtain the documents in accordance with its risk management system."
+- **SEBI prescribes no minimum income and no minimum net worth for F&O.** The illustrative document list is in the account-opening form checklist; any rupee threshold a client is told about is the broker's own risk policy.
+- There is no separate derivatives risk-disclosure document. Annexure-10 is a single "Risk Disclosure Document for Capital Market and Derivatives Segments", whose section 2 carries the derivatives-specific features; the extra derivatives-specific artefact is the financial-details evidence, not a second <abbr title="Risk Disclosure Document">RDD</abbr>.
+- The F&O loss statistics at Annexure-23 must be shown on login as a pop-up the client acknowledges, "covering at least 50 percent area of the screen" (clause 49.2.2), and Qualified Stock Brokers must retain client profit-and-loss data for at least five years (clause 49.3).
+- Activation is a per-exchange registration, not a switch: the segment flag goes to <abbr title="National Stock Exchange of India">NSE</abbr> and <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> <abbr title="Unique Client Code">UCC</abbr>, and under the standardised trading-preference format a client opting into F&O is registered on every active exchange for that segment unless they give written negative consent (clauses 21.5 to 21.8).
+- Since **[SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>/TPD-1/P/CIR/2024/132](/broking-kyc/reference/circulars/sebi-other/#sebihomrdtpdpcir2024132)** (1 October 2024) an index derivatives contract must be worth at least Rs 15 lakh at introduction, weekly expiries exist on one benchmark index per exchange, and option premium is collected upfront — a newly activated retail client meets a materially larger minimum ticket than before.
+
+## Conceptual overview
+
+Every other gate in onboarding asks "is this person who they say they are". F&O activation asks something else: can this person absorb the loss profile of a leveraged, time-decaying instrument. SEBI's answer to that question is deliberately procedural — collect and retain documentary evidence of the financial details the client has declared — rather than substantive. There is no prescribed income floor. That design choice pushes the suitability judgement onto the broker's risk-management policy and, increasingly, onto product-level measures such as minimum contract size.
+
+The second thing to understand is that F&O activation has two independent halves. One is the broker's internal decision, evidenced by the financial-details documents and recorded as a segment flag in the back office and risk system. The other is registration at the exchange, where the segment flag travels with the client's UCC record and is what actually permits an order to be accepted. A client can be "approved" internally and still have orders rejected because the exchange registration has not been confirmed — and the reverse, an exchange flag live while the broker's risk system still blocks the segment, is equally possible. Keep both states visible.
+
+The third is that the product itself moved under the client's feet between November 2024 and December 2025. Contract sizes tripled, weekly expiries were rationalised to one benchmark index per exchange, expiry days were standardised to Tuesday or Thursday, and open-interest limits moved to a delta-based future-equivalent measure with rupee ceilings at <abbr title="Permanent Account Number">PAN</abbr> level. None of that changes the activation *procedure*, but all of it changes what the newly activated client can actually do with a small account — which is precisely what an activation screen should be honest about.
+
+## 1. Regulatory framework
+
+- **[Master Circular for Stock Brokers](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — clause 21 (mandatory account-opening documents and the standardised trading-preference format), clause 23.3 (financial evidence for derivatives clients), clause 23.4 (Policies and Procedures), clause 49 with Annexure-23 (F&O risk disclosures) and Annexure-24 (<abbr title="Qualified Stock Broker">QSB</abbr> profit-and-loss data format). Circular ID as printed on the document: `SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90`.
+- **<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/SE/Cir-19/2009** (3 December 2009 as cited throughout the master circular) — "Dealings between a Client and a Stock Broker", the origin of the documentary-evidence requirement now at clause 23.3. `[not yet in index]`
+- **CIR/MIRSD/16/2011** (22 August 2011) — rationalised the account-opening document set that clause 21 consolidates: <abbr title="Know Your Customer (process).">KYC</abbr> form, additional-information document (Annexure-8), Rights and Obligations (Annexure-9), Uniform RDD (Annexure-10), Guidance Note (Annexure-11). `[not yet in index]`
+- **[SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/95](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-pod-1pcir202395)** (21 June 2023) — trading preferences by clients: the standardised format at Para C of Annexure-8, registration on all active exchanges for opted segments, and the negative-consent opt-out with five-year record retention.
+- **SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/73** (19 May 2023) — the F&O risk-disclosure mandate now at clause 49. `[not yet in index]`
+- **SEBI/HO/MRD/TPD-1/P/CIR/2024/132** (1 October 2024) — the six index-derivatives measures at paragraphs 5.1 to 5.6 with the phasing table at paragraph 7. The identifier printed in the PDF carries `TPD-1`; SEBI's own landing page for the same document shows `SEBI/HO/MRD/TPD/P/CIR/2024/132`, which is how the [circulars index](/broking-kyc/reference/circulars/sebi-other/#sebihomrdtpdpcir2024132) records it.
+- **SEBI/HO/MRD/MRD-TPD-1/P/CIR/2025/76** (26 May 2025) — final settlement day for equity derivatives: clause 3.1 limits every exchange's expiries to Tuesday or Thursday, clause 3.2 allows one weekly benchmark index options contract per exchange, clause 3.3 sets a minimum one-month tenor for all other contracts expiring on the last Tuesday or Thursday of the month, clause 3.4 requires prior SEBI approval to change the chosen day. `[not yet in index]`
+- **SEBI/HO/MRD/TPD-1/P/CIR/2025/79** (29 May 2025) — delta-based Future Equivalent open interest (paragraph 5.1), index options limits of Rs 1,500 crore net and Rs 10,000 crore gross at PAN level (paragraph 5.5.1.1), index futures limits by participant category (paragraph 5.5.2), the 1 July to 5 December 2025 glide path with normal implementation from 6 December 2025 (paragraph 5.5.4), and the full phasing table at paragraph 6. `[not yet in index]`
+
+## 2. Financial evidence — the options SEBI accepts
+
+The illustrative list appears in the instructions and checklist to the account-opening form as "Additional documents in case of trading in derivatives segments":
+
+| Evidence option | What it proves | Verification method | Practical notes |
+| --- | --- | --- | --- |
+| ITR acknowledgement | Declared annual income | Match PAN and assessment year; check acknowledgement number | Most common salaried and self-employed route |
+| Annual accounts | Business income and balance sheet | Match entity name to the client; check audit status | Non-individual and proprietor clients |
+| Salary slip or Form 16 | Salaried income | Match employer name, PAN, and period | Slip staleness is the usual rejection reason |
+| Net worth certificate | Net worth as at a date | Chartered-accountant attestation; **the form requires the net worth to be not older than 1 year** | The only explicit freshness rule on the form |
+| Demat account holding statement | Ownership of securities | Match the holder name and the statement date | Useful where income is lumpy |
+| Bank account statement for the last 6 months | Cash flow | Match name and account number to the client's mapped bank | The six-month period is stated on the form itself |
+| Any other document substantiating ownership of assets | Asset ownership | Document-specific | Deliberately open-ended |
+| Self-declaration with relevant supporting documents | Client's own statement, supported | Check that supporting documents exist and are consistent | Not a standalone substitute for support |
+
+Section D of the additional-information document already captures a gross annual income *range* — below Rs 1 lakh, Rs 1 to 5 lakh, Rs 5 to 10 lakh, Rs 10 to 25 lakh, above Rs 25 lakh — or a net worth as at a date. The evidence above substantiates that declaration; it does not replace it.
+
+<Aside type="caution" title="Do not present a broker threshold as a SEBI rule">
+There is no minimum income or net worth for F&O anywhere in the master circular, and no prescribed periodic refresh cycle for the evidence beyond the "net worth not older than 1 year" requirement on the form itself. A broker may reasonably require a higher income band, a fresher document, or an annual refresh — all of that is clause 23.3's "risk management system" acting, and the rejection message should say so. Telling a client that "SEBI requires Rs 5 lakh income" is a mis-statement that will not survive a grievance. **[AI inference — verify before acting]** on any exchange-level refresh periodicity: none was locatable in a primary exchange document.
+</Aside>
+
+## 3. Disclosures the client must actually see
+
+| Artefact | Where it comes from | When | Acknowledgement |
+| --- | --- | --- | --- |
+| Rights and Obligations of stock broker and client | Annexure-9 | Account opening | Signature on the account-opening form (clause 21.4) |
+| Risk Disclosure Document for Capital Market **and Derivatives** Segments | Annexure-10 | Account opening; re-serve on segment addition | Declaration on the form confirms the client has read the RDD |
+| Guidance Note on do's and don'ts | Annexure-11 | Account opening | Broker undertakes on the form that the client was made aware of it |
+| Policies and Procedures — exposure limits, brokerage rate, delayed-payment charges, right to close positions | Clause 23.4 | Account opening | Declaration on the form |
+| Most Important Terms and Conditions | **SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/180** (13 November 2023) `[not yet in index]` | Onboarding, refreshed on change | Separate client acknowledgement (clause 21.4) |
+| F&O risk disclosures (the loss statistics) | Annexure-23 | **Every login**, as a pop-up | Client must acknowledge before proceeding (clause 49.2.1) |
+
+Annexure-23 is prescribed text, not a paraphrase. It states that 9 out of 10 individual traders in the equity F&O segment incurred net losses; that loss makers registered an average net trading loss close to Rs 50,000; that loss makers spent an additional 28 percent of net trading losses on transaction costs; and that those making net trading profits spent between 15 and 50 percent of those profits on transaction costs — sourced to SEBI's study dated 25 January 2023 on individual-trader profit and loss in equity F&O for FY 2021-22. Clause 49.2.2 requires it to cover at least 50 percent of the screen area.
+
+Note the shape of this obligation: it is not an activation-time consent at all. It recurs at every login for every client, and the acknowledgement is a condition of proceeding. Treating it as a one-time activation checkbox is the most common implementation error on this page.
+
+## 4. Segment addition at exchange UCC
+
+Activation is a modification to the client's exchange registration. Under clauses 21.5 and 21.6 the trading-preference format is standardised at Para C of Annexure-8 and the broker registers the client on all active exchanges for the segments opted into; clause 21.8 requires any opt-out to be a separate written negative consent retained for at least five years. Clause 21.7 exempts members registered exclusively with commodity derivatives exchanges, who use the erstwhile Forward Markets Commission format **<abbr title="Forward Markets Commission">FMC</abbr>/COMPL/IV/<abbr title="KYC Registration Agency">KRA</abbr>-05/11/14** dated 26 February 2015. `[not yet in index]`
+
+| name | type | length | mandatory | source-system | destination-system(s) | notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| `L-segment_equity_fno` | char | 1 | yes | Trading preferences (Annexure-8 Para C) | back-office `seg_fno_flag`, <abbr title="Risk Management System">RMS</abbr> `seg_fno_active` | Client signature against the segment box, not a tick (clause 21.4) |
+| `NSE_FNO_FLAG` | char | 1 | yes | Broker UCC upload | NSE UCC | Y activates F&O on NSE; income-proof check at UCC level (NSE/<abbr title="Investor Service Centre.">ISC</abbr>/61817) |
+| `BSE_FNO_FLAG` | char | 1 | yes | Broker UCC upload | BSE UCC | Y activates F&O on BSE; income proof tagged (BSE/20240223-42) |
+| `NSE_FNO_ACTIVATED` | char | 1 | yes | NSE UCC response | Entitlement service, RMS | Y on approval; the only state that means orders will be accepted |
+| `F-gross_annual_income_range` | char | 2 | yes | Section D of Annexure-8 | KRA, UCC `INCOME_RANGE`, back office | Codes per the exchange master; drives the broker's own suitability rules |
+| `F-income_proof_type` | char | 2 | yes | Evidence upload | UCC `INC_PROOF_TYPE`, review queue | Required for F&O and commodity activation only |
+| `F-income_proof_financial_year` | string | 9 | conditional | Evidence document | UCC `INC_PROOF_FY` | Format YYYY-YYYY; a period, not an upload date |
+| `F-net_worth` and `F-net_worth_date` | decimal / date | 15,2 / — | conditional | Net worth certificate | UCC `NET_WORTH`, `NW_DATE` | The date must be less than one year old at submission |
+| `L-trading_experience_fno_years` | number | 2 | conditional | Client declaration | UCC `FNO_EXP_YRS` | Required where F&O is opted; 0 to 50 |
+
+Field identifiers follow the [Field Atlas Section L](/broking-kyc/reference/field-atlas/sections/l-trading-preferences/) and [Section F](/broking-kyc/reference/field-atlas/sections/f-financial-profile/) naming, with destination names as documented for [NSE UCC](/broking-kyc/reference/field-atlas/destinations/nse-ucc/).
+
+## 5. What the 2024 measures changed for the client
+
+| Measure (paragraph) | Effective | What the client experiences |
+| --- | --- | --- |
+| Upfront collection of option premium from buyers (5.1) | 1 February 2025 | Net option premium payable is part of the upfront margin requirement; no intraday premium credit |
+| Removal of calendar-spread treatment on expiry day (5.2) | 1 February 2025 | An expiry-day spread against a later expiry attracts full margin on the expiring leg |
+| Intraday monitoring of position limits (5.3) | 1 April 2025 | At least four random intraday snapshots; a breach visible only mid-day now counts |
+| Minimum contract size of Rs 15 lakh, lot sized to keep value within Rs 15 to 20 lakh at review (5.4) | New contracts after 20 November 2024 | The smallest tradeable index derivative ticket roughly tripled against the earlier Rs 5 to 10 lakh band |
+| Weekly index derivatives rationalised to one benchmark index per exchange (5.5) | 20 November 2024 | Weekly expiries on other indices disappeared |
+| Additional 2 percent extreme loss margin on short options on expiry day (5.6) | 20 November 2024 | Higher margin for expiry-day option writing |
+
+<Aside type="note" title="Contract size is now the de-facto suitability test">
+SEBI said as much: paragraph 5.4.2 describes the recalibration of minimum contract size as ensuring "an inbuilt suitability and appropriateness criteria for participants is maintained as intended". With no income floor in the rules, the Rs 15 lakh minimum contract value does more suitability work at the margin than the documentary evidence does — which is worth saying plainly to a client whose account cannot support one lot.
+</Aside>
+
+## 6. The 2025 follow-ups an activation screen should reflect
+
+- **Expiry day.** Every exchange's equity derivatives expire on either Tuesday or Thursday (clause 3.1 of the May 2025 circular), one weekly benchmark index options contract per exchange (3.2), everything else on a minimum one-month tenor expiring on the last Tuesday or Thursday of the month (3.3). Which exchange took which day, and the date from which contracts followed it, was settled through subsequent exchange-level implementation rather than in the circular itself. **[industry practice — unverified]** — the commonly cited outcome is NSE on Tuesday and BSE on Thursday for contracts expiring on or after 1 September 2025, but the implementing exchange circular identifiers could not be verified from a primary source.
+- **Position limits.** Index options limits are measured on delta-based Future Equivalent open interest at PAN level: Rs 1,500 crore net end-of-day and Rs 10,000 crore gross, with neither gross long nor gross short exceeding the gross ceiling (paragraph 5.5.1.1). Index futures limits are category-based (paragraph 5.5.2). The glide path ran from 1 July to 5 December 2025 with a next-day cure mechanism, and normal implementation began 6 December 2025 (paragraph 5.5.4). These are far above a retail account's reach, but they are the reason position data is now reported on a future-equivalent basis — and the reason a family-office or high-net-worth client aggregated at PAN level can hit a limit they never see in a single account.
+- **Single-stock and market-wide limits.** The phasing table at paragraph 6 sequences the market-wide position limit definition and single-stock position-creation rules from 1 October 2025, intraday market-wide monitoring from 3 November 2025, non-benchmark index eligibility from 3 November 2025, and pre-open session changes from 6 December 2025. A further easing of the combined single-stock F&O limit toward a percentage of the market-wide limit was reported for December 2025; **[industry practice — unverified]** — the circular identifier could not be confirmed, so treat the number as pending verification.
+
+For the client-facing surface, the operative content is not the rupee ceilings but the derived facts: what one lot now costs, that the premium must be in the account before the order, that expiry-day margins are higher, and which weekday the position expires on.
+
+## 7. Re-activation after dormancy
+
+A client returning after a long absence is not re-activating a switch; they are re-running clause 23.3 against a stale file. Typical broker practice disables derivatives segments first on dormancy, keeping the cash segment alive — see [dormancy and reactivation](/broking-kyc/lifecycle/dormancy-reactivation/) for the full two-phase walkthrough. The F&O-specific parts of the return path are:
+
+1. **Re-KYC where the record is stale**, which is a prerequisite to, not a part of, segment re-activation.
+2. **Fresh financial evidence.** The old evidence documents a period that may be several years old. The net-worth freshness rule on the form and the broker's own policy both bite here.
+3. **Exchange UCC state.** The client's UCC may be flagged inactive at exchange level after a period without trades; the segment flag cannot be trusted until the exchange confirms the current state.
+4. **Disclosures re-served.** The Annexure-23 login acknowledgement resumes automatically; the RDD and <abbr title="Most Important Terms and Conditions">MITC</abbr> should be re-served if the versions changed while the client was away.
+5. **Product change briefing.** A client dormant since early 2024 returns to a market with triple the minimum contract size, one weekly index, standardised expiry weekdays, and upfront premium collection. Re-activation is the natural point to say so. **[AI inference — verify before acting]**
+
+## 8. Alternatives
+
+| Option A | Option B | When to pick which | Who uses what |
+| --- | --- | --- | --- |
+| Reuse the income range already held at the KRA | Collect fresh documentary evidence | Reuse only where the held range meets the broker's policy and the record is current; clause 23.3 still requires documentary evidence for derivatives clients | Fast path for recently KYC-verified clients |
+| Account-aggregator consented fetch of bank or ITR data | Manual document upload | The consented fetch gives a machine-readable, tamper-evident record; upload works where the client has no aggregator-linked account | Digital-first onboarding against assisted journeys |
+| Net worth certificate | ITR or salary evidence | Net worth suits lumpy or asset-heavy clients; income evidence suits salaried ones | Both are on the same illustrative list |
+| Activate F&O | Stay in cash and use the cash segment's own products | Where the account cannot support one index lot at the Rs 15 lakh minimum contract value, activation adds disclosure burden without adding capability | Small accounts |
+
+## Practical notes
+
+- **[gotcha]** The Annexure-23 loss disclosure is a per-login obligation covering at least half the screen, not an activation consent. Implementations that show it once at activation fail clause 49.2 while believing they comply.
+- **[gotcha]** There is one combined RDD for capital market and derivatives segments (Annexure-10). Client communication that promises a "separate F&O risk disclosure document" is describing something that does not exist in the SEBI document set; the derivatives-specific artefact is the financial-details evidence.
+- **[gotcha]** The Oct 2024 circular exists under two identifiers — `TPD-1` in the PDF header, `TPD` on SEBI's landing page metadata. Pick one, cite it verbatim, and note the variant; do not invent a third.
+- **[industry practice — unverified]** Brokers commonly re-verify derivatives income evidence annually even though no SEBI periodicity was locatable. If your policy does that, disclose it as policy at activation so the later request is not a surprise.
+- **[risk trade-off]** Straight-through activation off a KRA-held income range converts far better than an upload step, and it weakens the evidence file precisely where clause 23.3 is most likely to be tested. The defensible middle is straight-through where the held record is fresh and above the broker's own band, evidence collection otherwise.
+
+## Cross-references
+
+- [Screen 6: Trading Preferences](/broking-kyc/journey/06-trading-preferences/) — where the segment choice and income verification first appear in onboarding.
+- [Segment rules comparison](/broking-kyc/deep-dives/foundational/segment-rules-comparison/) — F&O trading hours, settlement, margin framework, lot sizes, and cross-segment add/drop mechanics.
+- [<abbr title="Order Management System">OMS</abbr> internals — pre-trade segment activation check](/broking-kyc/deep-dives/trading-day/oms-internals/) — what the order path does with the segment flag.
+- [Lifecycle: Dormancy and reactivation](/broking-kyc/lifecycle/dormancy-reactivation/) — the two-phase dormancy walkthrough this page's section 7 plugs into.
+- [Lifecycle: Modifications](/broking-kyc/lifecycle/modifications/) — segment add and drop as a modification, and its propagation order.
+- [Field Atlas — Section F (Financial Profile)](/broking-kyc/reference/field-atlas/sections/f-financial-profile/) — every destination that consumes income and net-worth fields.
+- [Exchange registration](/broking-kyc/operations/exchange-registration/) — the UCC upload and response handling behind segment addition.
+- [Product activation overview](./) — the selector across all activation routes.
+
+## Verified through
+
+2026-09-11
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

@@ -1,0 +1,170 @@
+---
+title: "Product Activation: Margin Trading Facility (MTF)"
+description: Client-facing MTF activation — the exchange-framed Rights and Obligations document, interest and charge disclosure, pledge-acceptance journey, liquidation disclosures, and how a client exits the facility.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** the broker-side mechanics of <abbr title="Margin Trading Facility">MTF</abbr> — funding flow, <abbr title="Client Securities Margin Funded Account">CSMFA</abbr> pledge files, UNPAIDMTF reporting, invocation — are already covered in the [MTF operational deep dive](/broking-kyc/deep-dives/settlement/mtf-operational/). This page covers only what the client touches: what they sign, what must be disclosed to them before they can borrow, the acceptance journey after the trade, and what the broker is permitted to do when the client does not pay. It follows the order in which a client meets each obligation.
+
+## TL;DR
+
+- MTF is the only route by which a <abbr title="Securities and Exchange Board of India">SEBI</abbr>-registered broker may fund a client's cash-market purchase; the framework sits in clause 39 of the [Master Circular for Stock Brokers](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590) dated 17 June 2025, consolidating **CIR/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>/<abbr title="Depository Participant">DP</abbr>/54/2017** (13 June 2017) and **CIR/MRD/DP/86/2017** (1 August 2017).
+- Only Group I securities and Group I equity ETF units are fundable (clause 39.1), at VaR plus 3 times <abbr title="Extreme Loss Margin">ELM</abbr> for F&O-segment Group I stocks and VaR plus 5 times ELM for the rest (clause 39.2.1, Table 10).
+- The client does not sign a broker-drafted loan contract. Clause 39.8.1 requires the **stock exchange** to frame a Rights and Obligations document for MTF; it is mandatory and binding, and clause 39.8.2 lets the broker add only *more stringent* terms, never dilute one.
+- Liquidation is not open-ended. Clause 39.3.1 requires the broker to list the situations in which securities may be liquidated *in the Rights and Obligations document*, and clause 39.3.2 forbids using client securities in any other situation.
+- Investor Protection Fund cover does not extend to MTF losses (clause 39.10.3), while grievance and arbitration routes do (clause 39.10.2) — a distinction most activation screens fail to state.
+- The interest rate itself is not prescribed by SEBI. What *is* prescribed is that the rate and period of delayed-payment charges appear in the mandatory Policies and Procedures document (clause 23.4.4) in font size not less than 11 (clause 23.5), with a copy to the client within seven days (clause 23.6).
+
+## Conceptual overview
+
+A client who wants Rs 10 lakh of a stock and holds Rs 2.5 lakh has three structurally different options at an Indian broker: buy less, pledge existing holdings to raise margin for a derivatives position, or borrow the difference from the broker under MTF. Only the third one creates a debt. That is the single idea a client-facing activation flow has to land, because the three are often presented in the same app as adjacent "increase your buying power" tiles.
+
+MTF is a secured credit product with a regulated perimeter. SEBI defines who may offer it (corporate brokers with net worth of at least Rs 3 crore, clause 39.4.1, with exchange permission under clause 39.10.4), what may be funded (clause 39.1), the client's margin (clause 39.2.1), the broker's aggregate ceiling (indebtedness capped at five times net worth, clause 39.6.1; single-client exposure capped at ten percent of the broker's maximum allowable exposure, clause 39.6.3(a)), and what happens on default (clause 39.3). It does not define the interest rate, a minimum ledger balance, or the broker's own scrip list — those are commercial policy, and the screen should say so rather than implying a statutory basis.
+
+Activation is therefore three separate acts a client experiences as one: accepting the exchange's Rights and Obligations document for MTF, acknowledging the broker's commercial terms, and — after the first funded trade settles — accepting a depository pledge over the securities just bought. Each has its own evidence trail and its own reversal path.
+
+## 1. Regulatory framework
+
+- **[Master Circular for Stock Brokers](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — clause 39 is the consolidated MTF framework: eligibility (39.1), margin (39.2), liquidation (39.3), broker eligibility (39.4), source of funds (39.5), leverage and exposure limits (39.6), disclosure to the exchange (39.7 with Annexure-15), Rights and Obligations (39.8), records (39.9), other conditions (39.10). Circular ID as printed on the document: `SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90`, superseding the master circular dated 9 August 2024.
+- **CIR/MRD/DP/54/2017** (13 June 2017) and **CIR/MRD/DP/86/2017** (1 August 2017) — the comprehensive MTF review and its clarification, both consolidated into clause 39; origin of the Rights and Obligations requirement and the indebtedness cap. `[not yet in index]`
+- **SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/MRD/MRD-PoD-3/P/CIR/2022/166** (30 November 2022) — brought units of Group I equity ETFs into both the fundable and the collateral universe (footnoted at clause 39.1). `[not yet in index]`
+- **SEBI/HO/MRD/MRD-PoD-2/P/CIR/2024/118** (11 September 2024) — the conditions now at clause 39.2.3: collateral and funded stocks must be separately identifiable with no commingling, both marked to market daily, and cash collateral passed to the clearing corporation may be treated as maintenance margin only to the extent of securities received against it, pledged as funded stock, with VaR plus 5 times ELM applied irrespective of F&O availability. `[not yet in index]`
+- **[SEBI/HO/MRD/MRD-PoD-2/P/CIR/2024/137](/broking-kyc/reference/circulars/sebi-other/#sebihomrdmrd-pod-2pcir2024137)** (10 October 2024) — direct pay-out of securities to the client demat account, which is why the funded stock now arrives in the client's own demat with a pledge already marked rather than transiting a broker pool.
+- **SEBI/HO/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/82** (3 June 2025) — automated pledge release and invocation (PR-EP, IV-EP, IV-RD), removing most manual unpledge steps when a funded holding is sold. `[not yet in index]`
+- **[<abbr title="Central Depository Services (India) Limited">CDSL</abbr>/OPS/DP/POLCY/2020/309](/broking-kyc/reference/circulars/cdsl/)** (16 July 2020) — the authentication sequence the client sees: clause 2(e) sets <abbr title="One-Time Password">OTP</abbr> validity at 15 minutes, clause 2(f) cancels an unauthenticated instruction at end of execution date. `[not yet in index]`
+
+<Aside type="caution" title="Two different documents, two different authors">
+The Rights and Obligations document for MTF is framed by the **exchange** (clause 39.8.1) and is binding on broker and client alike. The Policies and Procedures document covering interest rate, delayed-payment charges, and the circumstances in which positions are closed is framed by the **broker** (clause 23.4). A single scrollable "I agree" that fuses the two makes it impossible to show later which text the client accepted — and clause 39.8.2 means any broker clause that dilutes the exchange text is void regardless of what the client clicked.
+</Aside>
+
+## 2. What the client signs, and in what order
+
+| Document | Framed by | When it is presented | Regulatory anchor | Reversible by client |
+| --- | --- | --- | --- | --- |
+| Rights and Obligations for MTF | Stock exchange | Before the first MTF order is accepted | Clause 39.8.1 / 39.8.2 | No — withdrawal means exiting the facility |
+| Policies and Procedures (exposure limits, brokerage rate, delayed-payment charges, right to close positions) | Broker | At account opening; re-served on MTF activation | Clause 23.4.2 to 23.4.7 | No — it governs the whole account |
+| Tariff or interest sheet | Broker | With the activation consent | Clause 21.2.1 (tariff sheet) and 23.4.3 | Not applicable; changes require intimation |
+| Most Important Terms and Conditions acknowledgement | Broker, per SEBI format | At onboarding, refreshed on material change | **SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/180** (13 November 2023) `[not yet in index]` | No |
+| Depository pledge acceptance for the funded stock | Depository, initiated by broker | After each funded purchase settles | CDSL/<abbr title="National Securities Depository Limited">NSDL</abbr> margin-pledge framework | Instruction lapses if not authenticated |
+| Demat Debit and Pledge Instruction (optional) | Broker, per SEBI format | Only if the client chooses the standing route | **[SEBI/HO/MIRSD/DoP/P/CIR/2022/44](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddoppcir202244)** (4 April 2022) | Yes — revocable; see [<abbr title="Demat Debit and Pledge Instruction">DDPI</abbr> vs eDIS and <abbr title="Transaction PIN">TPIN</abbr>](./ddpi-edis-tpin/) |
+
+Two sequencing rules follow. A client who declines DDPI must still be able to activate MTF — the per-transaction depository authentication route remains, and the April 2022 circular makes DDPI voluntary. And pledge acceptance is not part of activation at all; it recurs after every funded trade, which is why activation-time copy saying "you have authorised the pledge" is wrong for the non-DDPI client.
+
+## 3. Eligibility and pre-conditions the screen must actually check
+
+| Pre-condition | Source of truth | Anchor | Failure behaviour |
+| --- | --- | --- | --- |
+| Broker holds exchange permission for MTF | Exchange member record | Clause 39.10.4 | Facility not offered; not a client-side rejection |
+| Client has a demat account capable of receiving a pledge | Depository | Direct pay-out regime | Block activation; a funded stock cannot be left unpledged |
+| Scrip is Group I (or a Group I equity ETF) and on the broker's own list | Exchange Group I classification plus broker policy | Clause 39.1 | Order-time rejection; state which of the two rules refused |
+| Initial margin available in permitted form | Broker margin ledger | Clause 39.2.1 and 39.2.2 | Order-time rejection with the shortfall amount |
+
+Clause 39.2.2 restricts initial margin to cash, cash equivalents, or Group I equity shares and Group I equity ETF units with applicable haircut. Clause 39.2.5 lets the exchange or broker demand more than the prescribed margin on a risk assessment — a client seeing a higher requirement than the published table is not seeing an error.
+
+## 4. The activation journey, step by step
+
+1. **Selection.** Show the legal shape in one line — a loan from the broker secured by the securities bought — before any interest number, and validate that the broker offers MTF on the exchange the client trades on.
+2. **Eligibility read-back.** Read cash-segment, demat, and pledge-capability status from their own systems rather than asking the client to restate them. A stale or unanswered status stays pending; it is not a rejection.
+3. **Disclosure.** Present the exchange Rights and Obligations document and the broker's interest and charge schedule as separately acknowledged items, each with a version identifier. Record which version the client saw, not just that a click occurred.
+4. **Consent capture.** Capture the acknowledgement with timestamp and channel. Clause 23.6 gives the client a copy of executed documents within seven days and clause 23.7 requires them to be visible behind client-specific credentials — so the consent artefact must be retrievable, not merely logged.
+5. **Enablement.** Set the MTF flag in the back office and risk system, with the effective timestamp returned by the enabling system. A client whose flag is on can still be refused at order time for margin or scrip reasons; keep those states distinct so support can tell a client *which* gate stopped them.
+6. **First funded trade and pledge acceptance.** After settlement the depository pledge instruction reaches the client, who authenticates it unless a DDPI already stands. An instruction not authenticated by the end of the execution date is cancelled under CDSL/OPS/DP/POLCY/2020/309 clause 2(f), and the position then follows the broker's square-off policy rather than staying quietly funded.
+7. **Ongoing statements.** Interest accrues on the funded amount and appears in the ledger; position, margin, and funded quantity stay visible per clause 23.7.
+
+## 5. Field-level view
+
+The activation record and the daily exchange disclosure are different data sets with different owners. Annexure-15 to the master circular prescribes the second; the first is an internal model. **[AI inference — verify before acting]** for the internal field names.
+
+| name | type | length | mandatory | source-system | destination-system(s) | notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| `client_code` | string | 10 | yes | Client master | Back office, exchange Annexure-15 | The existing <abbr title="Unique Client Code">UCC</abbr>; MTF never creates a second client identity |
+| `mtf_enabled_flag` | char | 1 | yes | Activation service | Back office, <abbr title="Risk Management System">RMS</abbr> | Y/N; an app feature flag is not a substitute for the risk-system state |
+| `ro_document_version` | string | `[unknown — verify]` | yes | Document store | Evidence record | Version of the exchange Rights and Obligations text actually served |
+| `consent_timestamp` | timestamp | — | yes | Consent service | Evidence record, audit | Server time with channel and IP; not the client's device clock |
+| `interest_rate_disclosed` | decimal | 5,2 | yes | Tariff master | Evidence record, ledger | Rate in force when consent was captured; keep historical versions |
+| `collateral_or_funded_flag` | char | 1 | yes | Depository pledge record | Back office, Annexure-15 "Name of Stock" column | Collateral and funded stock must not be commingled (clause 39.2.3(a)) |
+| `amount_financed` | decimal | 15,2 | yes | Back office | Annexure-15 | Reported in INR lakhs per the Annexure |
+| `source_of_funds` | enumeration | — | yes | Treasury | Annexure-15 | Own net worth or borrowed, with lender name and amount if borrowed (clause 39.5.1) |
+
+<Aside type="note" title="The reporting deadline appears twice, differently">
+Clause 39.7.1 requires the MTF disclosure to reach the exchange "on or before 6:00 PM on <abbr title="Trade-date Plus N settlement">T+1</abbr> day". The note at the foot of Annexure-15 to the same master circular says "on or before 12 noon on the following trading day". Build to the earlier of the two and confirm the operative cut-off with your exchange before go-live. **[AI inference — verify before acting]**
+</Aside>
+
+## 6. Interest, charges, and what must be on the screen
+
+SEBI does not set an MTF interest rate. It sets where the number must live:
+
+- Clause 23.4.3 — applicable brokerage rate in the mandatory Policies and Procedures document.
+- Clause 23.4.4 — imposition of penalty or delayed-payment charges by either party, **specifying the rate and the period**, with the caveat that it must not amount to funding in contravention of applicable law.
+- Clause 23.6 — a free copy of every executed document to the client within seven days, against acknowledgement.
+- Clause 21.2.1 — a tariff sheet specifying charges, given at onboarding "to avoid any disputes at a later date".
+
+Prevailing retail MTF rates sit in the low-to-high teens per annum, computed daily on the funded amount. **[industry practice — unverified]** The worked computation, day-count convention, and debit cadence are in the [MTF operational deep dive](/broking-kyc/deep-dives/settlement/mtf-operational/); the activation screen owes the client something narrower — the rate in force *today*, the charge heads additional to interest (pledge creation and release, square-off, brokerage and statutory levies on the underlying trade), and the fact that interest accrues on calendar days including settlement holidays.
+
+## 7. Pledge acceptance, briefly
+
+The pledge over the funded stock is created against the broker's client securities margin funded account and reaches the client as a depository-generated acceptance request. Under the DDPI route there is no per-trade client action; without it the client authenticates each instruction with the depository OTP, valid for 15 minutes under CDSL/OPS/DP/POLCY/2020/309 clause 2(e), with the instruction cancelled at the end of the execution date under clause 2(f). File formats, account types, and the automated invocation variants sit in the [CDSL MTF and pledge primer](/broking-kyc/vendors/depositories/cdsl-mtf-pledge/) and the [MTF operational deep dive](/broking-kyc/deep-dives/settlement/mtf-operational/).
+
+Three points matter on the client-facing surface. The acceptance link arrives from the depository, not the broker, so its sender and branding differ from every other message in the journey — a standing source of "is this phishing" contacts. **[industry practice — unverified]** Any OTP validity quoted in broker help content must match the depository's own page: the site's earlier MTF deep dive states 20 minutes where the fetched CDSL communique states 15. And a partially accepted pledge is a partially unfunded position — a risk state, not a cosmetic one.
+
+## 8. Liquidation and square-off — what the client is entitled to know
+
+This is the clause pair to read before writing any square-off copy:
+
+- **Clause 39.3.1** — the broker shall list out the situations and conditions in which the securities may be liquidated, **and such situations shall be included in the Rights and Obligations document**. Liquidation follows a failed margin call or a breach of the conditions in the circular or that document.
+- **Clause 39.3.2** — the broker shall not liquidate or use the client's securities in any manner in any situation other than those at 39.3.1.
+
+Alongside it, clause 23.4.5 permits a policy of selling client securities or closing positions without notice on non-payment of dues, expressly **limited to the extent of the settlement or margin obligation**. A disclosure reading "we may square off any position at any time" is wider than either clause supports.
+
+Two further consequences are frequently missed. Clause 39.10.3 keeps the settlement guarantee fund and investor protection fund available for exchange transactions done through MTF, **but excludes losses suffered in connection with the facility itself from <abbr title="Investor Protection Fund">IPF</abbr> cover** — see [Investor Protection Fund](/broking-kyc/deep-dives/foundational/ipf/). Clause 39.10.2 gives MTF disputes the same treatment as normal trades, so [<abbr title="Investor Grievance Redressal Committee">IGRC</abbr>](/broking-kyc/deep-dives/compliance-audit/igrc/) and [online dispute resolution](/broking-kyc/deep-dives/compliance-audit/odr/) are open to an MTF client — worth stating in the same breath as the IPF exclusion.
+
+<Aside type="danger" title="Leverage is symmetric; the square-off is not">
+With 25 percent client margin, a 10 percent adverse move erodes 40 percent of the client's margin. The broker's close-out is sized to protect the broker's exposure, not to cap the client's loss: once the position is closed, any residual shortfall stays a client debt recoverable like any other. An activation flow that presents MTF as increased buying power without this sentence has under-disclosed the product.
+</Aside>
+
+## 9. Turning it off
+
+Deactivation is three requests clients tend to make as one:
+
+| Client intent | What actually has to happen | What it does **not** do |
+| --- | --- | --- |
+| Stop taking new funded positions | Broker disables the MTF flag in the risk system | Does not repay the existing funded amount or release the pledge |
+| Release a specific funded holding | Repay the funded amount attributable to it; pledge released or, on a sale, released against the delivery obligation | Does not close the facility |
+| Close the facility | Square off or fully repay every funded position, then withdraw consent | Does not reverse interest already accrued and debited |
+
+A client who has exited MTF but retains a margin pledge over other holdings still has a live pledge — a different depository transaction in a different account. See [margin pledge](./margin-pledge/) and [modifications](/broking-kyc/lifecycle/modifications/).
+
+## 10. Alternatives
+
+| Option A | Option B | When to pick which | Who uses what |
+| --- | --- | --- | --- |
+| MTF funded purchase | Buy a smaller quantity with own funds | MTF only when the client accepts an interest cost and a square-off risk on a position they intend to hold for days to weeks | Retail clients with a directional view and insufficient cash |
+| MTF | Margin pledge of existing holdings | Pledge raises margin for derivatives or cash exposure without creating a purchase-funding debt; MTF funds a specific purchase | Pledge is the derivatives-collateral route; MTF is the cash-purchase credit route |
+| MTF | Intraday product with square-off before close | Intraday leverage carries no overnight funding and no pledge, but forces exit the same day | Day traders versus positional buyers |
+| MTF on an F&O-eligible Group I stock | MTF on a non-F&O Group I stock or equity ETF | The margin differs — VaR plus 3 times ELM against VaR plus 5 times ELM (clause 39.2.1) | Same client, different scrip; the screen should show which bucket applies |
+
+## Practical notes
+
+- **[gotcha]** The deadline for the daily MTF disclosure to the exchange is stated twice in the same master circular with different values (clause 39.7.1 says 6:00 PM on T+1; the Annexure-15 note says 12 noon the following trading day). Whichever your exchange enforces, do not let the two live in different runbooks.
+- **[gotcha]** "MTF agreement" is a misnomer that survives in a lot of client communication. The binding instrument is the exchange's Rights and Obligations document for MTF (clause 39.8.1); a broker addendum can only be stricter (clause 39.8.2). Naming it correctly matters the first time a client disputes a square-off.
+- **[risk trade-off]** Making DDPI a soft prerequisite removes per-trade OTP friction and acceptance risk, but DDPI is voluntary under SEBI/HO/MIRSD/DoP/P/CIR/2022/44. Keep the non-DDPI path functional and the two consent records separate.
+- **[AI inference — verify before acting]** Keep three states distinct in the data model — consent captured, facility enabled, order permissible. Conflating them produces the support pattern where a client with an "MTF enabled" badge cannot place an MTF order and nobody can say which gate refused.
+
+## Cross-references
+
+- [MTF operational walkthrough](/broking-kyc/deep-dives/settlement/mtf-operational/) — broker-side funding flow, UNPAIDMTF file, invocation mechanics, interest computation.
+- [CDSL MTF and pledge primer](/broking-kyc/vendors/depositories/cdsl-mtf-pledge/) — depository file formats and account types behind the acceptance screen.
+- [Screen 6: Trading Preferences](/broking-kyc/journey/06-trading-preferences/) — where segment choice is captured during onboarding, upstream of any product activation.
+- [Direct pay-out to demat](/broking-kyc/deep-dives/settlement/direct-payout-to-demat/) — why the funded stock now lands in the client's demat with the pledge already marked.
+- [Investor Protection Fund](/broking-kyc/deep-dives/foundational/ipf/) — what the IPF covers, against which clause 39.10.3 excludes MTF losses.
+- [Lifecycle: Modifications](/broking-kyc/lifecycle/modifications/) — how an activation or deactivation flag change propagates downstream.
+- [Product activation overview](./) — the selector across all activation routes.
+
+## Verified through
+
+2026-09-11
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

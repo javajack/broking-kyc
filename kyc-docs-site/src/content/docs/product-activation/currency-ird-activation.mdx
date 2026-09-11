@@ -1,0 +1,148 @@
+---
+title: "Product Activation: Currency and Interest Rate Derivatives"
+description: Client-facing activation for the currency derivatives and interest-rate derivatives segments — the RBI contracted-exposure rule, the USD 100 million no-underlying limit, hedger declarations, and position limits by client type.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** currency derivatives are the only retail segment where the *purpose* of the trade is regulated, not merely its risk. <abbr title="Reserve Bank of India">RBI</abbr>'s foreign-exchange framework decides what a position is for; <abbr title="Securities and Exchange Board of India">SEBI</abbr>'s broker rules decide what evidence the broker holds; the exchange decides the limits. The page takes them in that order, then covers interest-rate derivatives, which share the activation plumbing but almost none of the retail reality.
+
+## TL;DR
+
+- Exchange-traded currency derivatives involving INR are offered "to users for the purpose of **hedging contracted exposure**" — paragraph 3.3 of **A. P. (DIR Series) Circular No. 13** (`RBI/2023-24/108`, 5 January 2024). `[not yet in index]`
+- A user may take positions, long or short, **without having to establish the existence of underlying exposure, up to a single limit of USD 100 million equivalent across all currency pairs involving INR** (paragraph 3.4(i)(a)). Not establishing exposure is not the same as not having it.
+- The same circular requires users to be informed that they "must ensure the existence of a valid underlying contracted exposure which has not been hedged using any other derivative contract and should be in a position to establish the same, if required" (note to paragraph 2.4(i)).
+- The circular prescribes **no declaration by the user to a stock broker or trading member**. The client-facing declarations brokers now collect are an industry response to the rule, not a form specified by RBI. **[industry practice — unverified]**
+- Permitted pairs are USD-INR, EUR-INR, GBP-INR, JPY-INR, EUR-USD, GBP-USD and USD-JPY, as futures and European-style call and put options (paragraph 3.2).
+- Financial-evidence collection is the same as for any derivatives segment: clause 23.3 of the [Master Circular for Stock Brokers](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590) applies to every client who opts to deal in "the derivative segment", which includes currency and interest-rate derivatives.
+
+## Conceptual overview
+
+Two different regulators shape this segment and they ask different questions. SEBI asks whether the broker holds documentary evidence of the client's financial details before enabling a derivatives segment. RBI asks what the position is *for*: exchange-traded currency derivatives involving the rupee exist, in the framework's own words, for hedging contracted exposure. The January 2024 directions kept a long-standing practical accommodation — positions up to USD 100 million equivalent may be taken without *establishing* underlying exposure — while restating, unambiguously, that a valid contracted exposure must exist and must be capable of being established on demand.
+
+That combination is the source of nearly all client confusion in this segment. For years the segment was traded by retail participants as a cheap, liquid directional market, on the strength of the no-documentation allowance. The 2024 restatement did not change the limit; it changed the emphasis, and the market's reading of it. An activation flow that quotes the USD 100 million figure without the sentence that follows it has told the client the less important half.
+
+Interest-rate derivatives sit in the same activation plumbing — the same trading-preference block, the same financial-evidence rule, a segment flag on the same <abbr title="Unique Client Code">UCC</abbr> record — and almost nowhere else. Exchange-traded interest-rate futures on government securities are predominantly an institutional market: banks, primary dealers, insurers, and mutual funds managing duration. Retail activation requests are rare, and a broker that offers the segment should be clear that thin retail participation is itself a risk characteristic.
+
+## 1. Regulatory framework
+
+- **A. P. (DIR Series) Circular No. 13**, `RBI/2023-24/108` (5 January 2024), "Risk Management and Inter-Bank Dealings – Hedging of foreign exchange risk" — paragraph 3.2 (products and permitted currency pairs), paragraph 3.3 (purpose: hedging contracted exposure), paragraph 3.4(i)(a) (the USD 100 million no-underlying limit for INR pairs), the note to paragraph 2.4(i) (the user's obligation to ensure a valid unhedged contracted exposure exists), paragraph 3 (directions effective 5 April 2024, replacing the existing Part A Section I directions), paragraph 2.4(ix) (existing contracts may continue to expiry) and Annex-<abbr title="—">II</abbr> (eleven repealed notifications, including the currency futures and exchange-traded currency options directions of 2008 to 2020). `[not yet in index]`
+- **Implementation date.** The circular text sets 5 April 2024. RBI subsequently deferred the effective date to 3 May 2024. **[industry practice — unverified]** — the deferral was announced separately from the circular and could not be closed out against a primary RBI document within this page's research window.
+- **[Master Circular for Stock Brokers](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — clause 23.3 (documentary evidence of financial details for clients dealing in the derivative segment), clause 21.4 to 21.8 (trading preferences: a signature against each segment, registration on all active exchanges, negative-consent opt-out retained five years).
+- **[SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD-1/P/CIR/2023/95](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-pod-1pcir202395)** (21 June 2023) — the standardised trading-preference format in which the currency box sits.
+- **[SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/109](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir2025109)** (29 July 2025, in force 1 September 2025) — operational efficiency in monitoring <abbr title="Non-Resident Indian">NRI</abbr> position limits in exchange-traded derivatives contracts: exchange-level aggregation and <abbr title="Permanent Account Number">PAN</abbr>-based linkage. Relevant because non-resident position monitoring is aggregated, not per-account.
+- **<abbr title="National Stock Exchange of India">NSE</abbr>/CD/57262** (23 June 2023) — the consolidated currency-derivatives circular that carries the segment's order types (clause 1.1: regular lot, stop loss, immediate or cancel, spread), quantity freeze (1.5), operating price ranges (1.7), the 10 percent minimum disclosed quantity (1.8), day spread order functionality (1.9), multi-leg order charges (3.2), and the requirement that members set user and branch order-value limits (3.5). `[not yet in index]`
+
+<Aside type="caution" title="The USD 100 million line is a documentation waiver, not a permission to speculate">
+Paragraph 3.4(i)(a) removes the requirement to *establish* underlying exposure up to USD 100 million equivalent across INR pairs. The note to paragraph 2.4(i) keeps the requirement to *have* a valid contracted exposure, unhedged elsewhere, and to be able to evidence it if asked. Client-facing copy that states the first without the second is incomplete in the direction that matters, because the obligation it omits is the client's own.
+</Aside>
+
+## 2. What the client declares, and to whom
+
+The January 2024 circular imposes its information obligation on Authorised Dealers, and contains no prescribed declaration from a user to a stock broker or trading member. In practice brokers and exchanges built client-facing declarations and acknowledgements after the restatement, because the broker is the only party in the retail chain positioned to surface the obligation at order time. That means the declaration text, its timing, and its retention period are broker or exchange design decisions rather than an RBI form, and they should be documented as such. **[industry practice — unverified]**
+
+A defensible client-facing design has three elements:
+
+1. **An activation-time acknowledgement** that INR-pair contracts are for hedging contracted exposure, that positions up to USD 100 million equivalent may be taken without establishing that exposure, and that the client must be able to establish it if required.
+2. **A position-level disclosure** rather than a one-time click: the obligation is continuous and attaches to the exposure, not to the account.
+3. **A record of the text and version acknowledged**, retained with the activation evidence — the same discipline applied to every other consent on this site's [activation selector](./).
+
+## 3. Eligibility and pre-conditions
+
+| Pre-condition | Source of truth | Anchor | Notes |
+| --- | --- | --- | --- |
+| Documentary evidence of financial details | Broker review queue | Clause 23.3 of the stock-broker master circular | Same evidence options as [F&O activation](./fno-activation/); no separate currency threshold |
+| Trading-preference signature against the currency segment | Annexure-8 Para C | Clause 21.4 | A signature, not a tick |
+| Client is a "user" permitted to transact under the RBI framework | Client master and residency | A. P. (DIR Series) Circular No. 13, paragraphs 3.2 and 3.3 | Persons resident in India and persons resident outside India are both contemplated at paragraph 3.2 for the listed products |
+| Exposure acknowledgement captured | Consent service | Broker design on the RBI obligation | Continuous obligation, not a one-time click |
+| Exchange UCC currency-segment flag confirmed | NSE / <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> UCC response | `NSE_CD_FLAG` to `NSE_CD_ACTIVATED` | Orders are accepted on the activated state, not the requested one |
+| Non-resident aggregation understood | Exchange monitoring | SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/109 | NRI derivative positions are aggregated at PAN level across accounts |
+
+## 4. Field-level view
+
+| name | type | length | mandatory | source-system | destination-system(s) | notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| `L-segment_currency` | char | 1 | yes | Trading preferences | NSE UCC `NSE_CD_FLAG`, BSE UCC `BSE_CD_FLAG`, back office `seg_cd_flag`, <abbr title="Risk Management System">RMS</abbr> `seg_cd_active` | Y activates currency derivatives on that exchange |
+| `U-nse_cd_activated` | char | 1 | yes | NSE UCC response | Entitlement service, RMS | Y on approval; the state the order path must read |
+| `F-income_proof_type` | char | 2 | yes | Evidence upload | UCC `INC_PROOF_TYPE`, review queue | Clause 23.3 applies to the currency and IRD segments as derivatives segments |
+| `A-residential_status` | char | 2 | yes | Client master | UCC `RES_STATUS` | Drives client category and non-resident monitoring |
+| `exposure_acknowledgement_version` | string | `[unknown — verify]` | yes | Document store | Evidence record | Version of the contracted-exposure text the client acknowledged |
+| `exposure_acknowledgement_timestamp` | timestamp | — | yes | Consent service | Evidence record, audit | Server time and channel |
+| `ird_segment_flag` | char | 1 | conditional | Trading preferences | Exchange UCC, RMS | Interest-rate derivatives where the exchange operates a separate segment flag |
+
+The last three rows are a documentation model rather than an exchange-prescribed schema. **[AI inference — verify before acting]** Field identifiers otherwise follow the [Field Atlas Section L](/broking-kyc/reference/field-atlas/sections/l-trading-preferences/) and the [NSE UCC destination](/broking-kyc/reference/field-atlas/destinations/nse-ucc/).
+
+## 5. Position limits by client type
+
+Currency-derivatives position limits are set per currency pair and differ by participant category — client, trading member, and foreign portfolio investor categories — with the exchange monitoring against the aggregate at PAN level. Three structural points survive any revision of the numbers:
+
+- **Limits are per pair, not per portfolio.** A client trading several INR pairs meets a separate ceiling in each.
+- **Limits aggregate across accounts at the same PAN.** For non-residents this is explicit: SEBI's July 2025 circular on monitoring NRI position limits in exchange-traded derivatives specifies exchange-level aggregation with PAN-based linkage.
+- **The RBI USD 100 million figure is a different thing from the exchange position limit.** One is the documentation waiver across INR pairs under the foreign-exchange framework; the other is the exchange's own per-pair cap. A client can be inside one and outside the other.
+
+The current numeric limits per pair and per participant category are published by the exchanges in their consolidated currency-derivatives circulars and position-limit pages. They could not be re-verified from a primary exchange document within this page's research window — exchange archive fetches failed — so this page deliberately states no figures. **[AI inference — verify before acting]**: take the numbers from the exchange's current consolidated circular before quoting them in client-facing material, and date the quotation.
+
+<Aside type="note" title="Two ceilings, two regulators, one client">
+The client experiences a single "can I place this order" answer, but it is computed from at least three independent constraints: the exchange's per-pair position limit, the RBI framework's contracted-exposure requirement (with its USD 100 million documentation waiver), and the broker's own margin and risk limits. When an order is refused, say which of the three refused it. Merging them into "limit exceeded" produces a support conversation nobody can resolve.
+</Aside>
+
+## 6. Interest-rate derivatives
+
+Exchange-traded interest-rate derivatives in India are principally futures on government securities, cash-settled, trading on a session comparable to the currency segment and predominantly used by institutions managing interest-rate risk — see [segment rules comparison](/broking-kyc/deep-dives/foundational/segment-rules-comparison/) for the segment's trading hours, settlement cycle, margin framework, contract size, and quarterly expiry convention as documented there.
+
+For activation purposes, three things matter:
+
+1. **The same evidence rule applies.** Clause 23.3 does not distinguish between derivative segments; a client opting into interest-rate derivatives needs documentary evidence of financial details on the same basis as an F&O client.
+2. **Liquidity is the risk.** Thin retail participation means wider spreads and a real chance of being unable to exit at a modelled price. An activation screen that treats IRD as "another derivatives toggle" understates this.
+3. **Hedger framing is institutional.** Where a client is genuinely hedging a rupee interest-rate exposure, that is an institutional treasury activity governed by RBI's rupee interest-rate derivatives framework alongside the exchange rules; a retail activation flow is not the place to assert eligibility conclusions for it. **[AI inference — verify before acting]** on the current directions, their version, and any client-classification requirement.
+
+## 7. Segment-specific order mechanics worth surfacing at activation
+
+The currency segment's consolidated circular documents attributes that differ from equity and that a newly activated client will meet immediately:
+
+| Attribute | Currency derivatives | Reference |
+| --- | --- | --- |
+| Order types | Regular lot, stop loss, immediate or cancel, spread | NSE/CD/57262 clause 1.1 |
+| Disclosed quantity | Minimum 10 percent of order quantity | NSE/CD/57262 clause 1.8 |
+| Quantity freeze | Contract-level; orders above it are rejected by the exchange | NSE/CD/57262 clause 1.5 |
+| Price bands | Tenor-dependent bands on futures, delta-based beyond a minimum band on options | NSE/CD/57262 clause 1.7 |
+| Spread and multi-leg orders | Day spread order book; 2-leg and 3-leg combination orders, immediate-or-cancel in nature, with a tiered fair-usage charge by execution efficiency | NSE/CD/57262 clauses 1.9 and 3.2 |
+| Order-value limits | The member must set user and branch order-value limits; without them the user may be unable to trade | NSE/CD/57262 clause 3.5 |
+
+All `[not yet in index]`. See [advanced order types](./advanced-order-types/) for which of these are exchange-resident and which are broker constructs.
+
+## 8. Alternatives
+
+| Option A | Option B | When to pick which | Who uses what |
+| --- | --- | --- | --- |
+| Exchange-traded currency derivative | OTC forward with an Authorised Dealer bank | ETCD is standardised, exchange-cleared and accessible through a broker; the OTC forward is tailored to the exposure and documented with the bank | Small and mid-sized exposures against bespoke commercial hedges |
+| Position within the USD 100 million no-underlying allowance | Position with exposure documented up front | The allowance removes documentation at entry, not the obligation to have the exposure | Every INR-pair user |
+| Currency derivatives | Interest-rate derivatives | Different risk entirely — exchange rate against rupee interest rates | Importers and exporters against duration managers |
+| Cross-currency pair (EUR-USD, GBP-USD, USD-JPY) | INR pair | Cross-currency pairs are not INR pairs and sit differently in the framework's purpose test | Read paragraph 3.2 and 3.3 together before assuming parity |
+
+## Practical notes
+
+- **[gotcha]** The USD 100 million allowance is frequently paraphrased as "no underlying exposure needed". The circular's own language is narrower: no requirement to *establish* it. The obligation to have a valid, unhedged contracted exposure and to be able to evidence it survives the waiver.
+- **[gotcha]** The circular's stated effective date is 5 April 2024 and existing contracts booked under the earlier directions could run to expiry (paragraph 2.4(ix)). Any date later than that quoted in broker material — including the widely cited deferral — should be traced to the RBI communication that announced it before being published.
+- **[gotcha]** Annex-II repealed eleven earlier notifications, including the currency futures and exchange-traded currency options directions. Internal policy documents that still cite the 2008 or 2010 directions are citing repealed text.
+- **[industry practice — unverified]** Exposure declarations collected at activation are a broker or exchange construct. Two brokers can legitimately implement very different text; neither is "the RBI declaration", and neither should be described that way to a client.
+- **[AI inference — verify before acting]** This page publishes no per-pair position-limit figures on purpose. Fetch them from the exchange's current consolidated circular, date them, and re-check after any RBI or SEBI amendment; the same applies to the current rupee interest-rate derivatives directions.
+
+## Cross-references
+
+- [Segment rules comparison — currency and interest rate derivatives](/broking-kyc/deep-dives/foundational/segment-rules-comparison/) — trading hours, settlement, margin, lot sizes and expiry conventions for both segments.
+- [F&O activation](./fno-activation/) — the financial-evidence options and disclosure obligations shared across derivative segments.
+- [Advanced order types](./advanced-order-types/) — which of the segment's order attributes live at the exchange.
+- [Screen 6: Trading Preferences](/broking-kyc/journey/06-trading-preferences/) — where the currency toggle first appears in onboarding.
+- [Field Atlas — Section L (Trading Preferences)](/broking-kyc/reference/field-atlas/sections/l-trading-preferences/) — every destination that consumes the segment flags.
+- [Lifecycle: NRI conversion](/broking-kyc/lifecycle/nri-conversion/) — segment restrictions applied when a client's residential status changes.
+- [Exchange registration](/broking-kyc/operations/exchange-registration/) — UCC upload and response handling behind segment addition.
+- [Product activation overview](./) — the selector across all activation routes.
+
+## Verified through
+
+2026-09-11
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

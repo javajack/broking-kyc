@@ -1,0 +1,170 @@
+---
+title: "Product Activation: IPO Application via ASBA and UPI"
+description: The client side of applying in a public issue — choosing between UPI, bank-ASBA and a 3-in-1 account, the mandate-acceptance cut-off, SME lot rules, the T+3 activity schedule, allotment, unblocking and delay compensation.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** A client applying in an <abbr title="Initial Public Offering">IPO</abbr> makes exactly one consequential choice — which payment route to use — and then lives inside a fixed clock. The page therefore settles the route choice first, then walks the clock as the client experiences it from bid to listing, then handles the two categories where the rules differ materially (non-institutional sub-categories and SME issues), then the money coming back. The broker-side issue master, sponsor-bank empanelment and reconciliation are covered in the IPO and <abbr title="Offer for Sale (through stock exchange)">OFS</abbr> deep dive.
+
+## TL;DR
+
+- **<abbr title="Unified Payments Interface">UPI</abbr> is compulsory for individual bids up to ₹5 lakh.** [<abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Corporate Finance Department (within SEBI)">CFD</abbr>/DIL2/CIR/P/2022/45](/broking-kyc/reference/circulars/sebi-other/#sebihocfddil2cirp202245) (5 Apr 2022) requires all individual bidders in issues opening on or after 1 May 2022 with application size up to ₹5 lakh to use the UPI mechanism when applying through a non-bank intermediary.
+- **The mandate must be accepted by 5 pm on the issue closing day.** The T+3 activity schedule issued under [SEBI/HO/CFD/TPD1/CIR/P/2023/140](/broking-kyc/reference/circulars/sebi-other/#sebihocfdtpd1cirp2023140) (9 Aug 2023) fixes UPI mandate acceptance at T day 5 pm, alongside retail bid closure at 5 pm and non-retail closure at 4 pm.
+- **Listing is on T+3.** Voluntary for issues opening on or after 1 September 2023 and mandatory for issues opening on or after 1 December 2023; unblocking of non-allotted UPI applications completes before 4 pm on <abbr title="Trade-date Plus N settlement">T+2</abbr>.
+- **Retail is still ₹2 lakh, and the non-institutional split is not 2 to 5.** A retail individual investor bids up to ₹2,00,000. Within the non-institutional portion, one-third is reserved for application sizes above ₹2 lakh and up to ₹10 lakh and two-thirds for sizes above ₹10 lakh — a common misstatement worth correcting in product copy.
+- **Delayed unblocking is compensated.** Unblocking for non-allotted, partially allotted, cancelled or withdrawn applications must complete within two working days of the issue closing date; beyond that the self-certified syndicate bank, or the post-issue lead manager from the date a grievance is received, pays ₹100 per day or 15 per cent per annum, whichever is higher.
+- **SME issues no longer have a retail category in the old sense.** The minimum application is two lots and above ₹2 lakh, which sits above the ₹2 lakh retail definition; non-institutional allotment in SME issues moved from proportionate to draw of lots.
+- **There is no official "UPI 2.0" or "UPI 3.0" for IPOs.** The phases are Phase I, Phase <abbr title="—">II</abbr> and the T+3 phase; the marketing labels do not correspond to SEBI instruments. `[industry practice — unverified]`
+
+## Conceptual overview
+
+An IPO application is not an order. Nothing is bought at the moment the client submits it; what happens instead is that a bid is registered on the exchange's bidding platform and an equivalent amount of money is blocked — not debited — in the client's own bank account. If shares are allotted, the blocked amount is debited to the extent of the allotment and the rest is released. If nothing is allotted, the whole block is released. The client's money never leaves their bank account before allotment, and the broker never holds it. That is the entire architecture of Applications Supported by Blocked Amount, and it is why the client-facing failure modes are all about blocking and unblocking rather than about execution.
+
+UPI entered this architecture as a way to make the block instruction reach the client's bank without paper. The client supplies a UPI handle with their bid; the exchange routes a mandate request through the sponsor bank to the client's bank; the client's UPI application shows a mandate notification; the client approves it and the funds are blocked. Every one of those hops can fail, and because the client sees only the last one, a mandate that never arrives feels like a broker failure even when the break is elsewhere. The design implication is that the bid status and the mandate status are two different things that must be shown separately.
+
+The clock is the other half of the story. Since the move to T+3 listing, the entire post-close sequence — third-party checks, basis of allotment, exchange approval, fund transfer, unblocking, corporate action, listing application — is compressed into roughly two days, with named cut-offs at each step. That compression is good for the client, who gets liquidity three days after the issue closes instead of six, and unforgiving for anyone whose mandate was not accepted in time. There is no grace period on the 5 pm mandate deadline.
+
+## 1. Regulatory framework
+
+- **SEBI/HO/CFD/DIL2/CIR/P/2018/138** (1 Nov 2018) `[not yet in index]` — introduces the UPI mechanism in <abbr title="Applications Supported by Blocked Amount">ASBA</abbr> for retail applications through intermediaries, the "Phase I" arrangement. See [Circulars — SEBI other](/broking-kyc/reference/circulars/sebi-other/).
+- **SEBI/HO/CFD/DIL2/CIR/P/2019/50** (3 Apr 2019), **SEBI/HO/CFD/DIL2/CIR/P/2019/76** (28 Jun 2019), **SEBI/HO/CFD/DIL2/CIR/P/2019/85** (26 Jul 2019) and **SEBI/HO/CFD/DCR2/CIR/P/2019/133** (8 Nov 2019) `[not yet in index]` — the Phase II sequence, which ended the physical movement of application forms from non-bank intermediaries to self-certified syndicate banks and extended the phase.
+- **[SEBI/HO/CFD/DIL2/CIR/P/2022/45](/broking-kyc/reference/circulars/sebi-other/#sebihocfddil2cirp202245)** (5 Apr 2022) — raises the UPI application ceiling, requiring all individual bidders in issues opening on or after 1 May 2022 with application sizes up to ₹5 lakh to use the UPI mechanism.
+- **[SEBI/HO/CFD/TPD1/CIR/P/2023/140](/broking-kyc/reference/circulars/sebi-other/#sebihocfdtpd1cirp2023140)** (9 Aug 2023) — reduces the listing timeline from T+6 to T+3 and carries the activity schedule reproduced in Section 3; voluntary for issues opening on or after 1 September 2023, mandatory from 1 December 2023.
+- **[SEBI/HO/CFD/DIL2/CIR/P/2021/2480/1/M](/broking-kyc/reference/circulars/sebi-other/#sebihocfddil2cirp202124801m)** (16 Mar 2021) — streamlines the IPO-with-UPI process and establishes the investor-grievance and compensation framework, effective for issues opening on or after 1 May 2021; amended by SEBI/HO/CFD/DIL1/CIR/P/2021/47 (31 Mar 2021), SEBI/HO/CFD/DIL2/P/CIR/2021/570 (2 Jun 2021), SEBI/HO/CFD/DIL2/CIR/P/2022/51 (20 Apr 2022), SEBI/HO/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD_RTAMB/P/CIR/2022/76 (30 May 2022) and the August 2023 circular above `[not yet in index]` for the amending circulars.
+- **SEBI/HO/CFD/DIL2/P/CIR/2022/75** (30 May 2022) `[not yet in index]` — requires ASBA applications in all categories, for issues opening on or after 1 September 2022, to be processed only after the money has actually been blocked in the investor's bank account.
+- **Master Circular for SEBI (Issue of Capital and Disclosure Requirements) Regulations, 2018** — the consolidated position, most recently reissued on 9 February 2026 consolidating circulars up to 31 December 2025, succeeding [SEBI/HO/CFD/PoD-2/P/CIR/2023/00094](/broking-kyc/reference/circulars/sebi-other/#sebihocfdpod-2pcir202300094) (21 Jun 2023) and the November 2024 version. The February 2026 reissue is a consolidation and introduced no new UPI or timeline change `[not yet in index]`.
+- **[<abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> 20220803-40](/broking-kyc/reference/circulars/bse/#20220803-40)** (3 Aug 2022) and the corresponding <abbr title="National Stock Exchange of India">NSE</abbr> circular — processing of ASBA applications in public issues, including the sponsor bank's blocking requests and the 5 pm confirmation cut-off on the issue closing date.
+- **[NSE/CMTR/63747](/broking-kyc/reference/circulars/nse/#nsecmtr63747)** — modification of the pre-open call-auction duration for IPO and relisted scrips, which is what the client actually meets on listing morning.
+- **[<abbr title="National Payments Corporation of India">NPCI</abbr>/UPI/OC-128A/2026-27](/broking-kyc/reference/circulars/npci/#npciupioc-128a2026-27)** (3 Jul 2026, in force 15 Jul 2026) — extends deemed-debit treatment to additional response codes and, for IPO, Retail Direct Scheme and secondary-market block mandates, permits a specified handling of excluded codes where the amount conforms to the mandate; requires members to reconcile mandate and transaction files, unblock expired mandates and prevent duplicate or out-of-validity execution.
+
+## 2. The route choice
+
+| | UPI mechanism through a broker | Bank-ASBA with a self-certified syndicate bank | 3-in-1 account |
+| --- | --- | --- | --- |
+| Who can use it | Individual bidders; compulsory up to ₹5 lakh when applying through a non-bank intermediary | Any category, including bids above the UPI ceiling | Clients of a bank-led broker where trading, demat and bank accounts are linked |
+| Where the bid is entered | Broker's app or website | Bank's net banking or mobile app, or a physical form at the bank | Broker's platform, with the linked bank account debited-and-blocked internally |
+| How the block happens | Mandate request routed via sponsor bank to the client's bank, approved in the UPI app | The bank blocks directly, no mandate | The same bank blocks in its own account, no mandate |
+| Client cut-off on the closing day | Bid by 5 pm for retail, mandate accepted by 5 pm | Up to 4 pm for net banking, mobile or syndicate UPI-ASBA; 1 pm for physical forms at the bank | Up to 5 pm |
+| Main failure mode | Mandate not delivered or not approved in time | Bank-side blocking failure or branch cut-off | Rarely fails; limited to that bank's customers |
+| Bids above ₹5 lakh | Not available | Available | Available |
+
+Three clarifications matter for product copy. First, physical ASBA forms were not abolished — what Phase II ended was the physical movement of forms from non-bank intermediaries to banks. A retail investor can still submit a physical form directly to a self-certified syndicate bank. Second, the 3-in-1 route is not a separate regulatory category; it is bank-ASBA where the same institution happens to hold all three accounts, which is why it has the fewest moving parts. Third, above ₹5 lakh an individual cannot use the UPI route at all, so a high-value non-institutional applicant has to be pushed to a bank route rather than allowed to attempt a mandate that will be rejected.
+
+<Aside type="caution" title="Bid status and mandate status are different states">
+The most damaging simplification in an IPO interface is a single "application status". A bid can be accepted on the exchange platform while the mandate is still pending, rejected by the client's bank, or never delivered. Model them as two fields, show both, and give the client a way to re-trigger the mandate. A client staring at "submitted" at 4:55 pm on the closing day, with an unapproved mandate sitting in a UPI app they have not opened, is a design failure with a hard deadline attached.
+</Aside>
+
+## 3. The clock, as the client experiences it
+
+T is the issue closing date. The activity schedule issued under the August 2023 circular fixes the following times; the rows a client can act on are marked.
+
+| When | What happens | Client action? |
+| --- | --- | --- |
+| Issue open to T, 5 pm | Bidding, bid modification and depository validation | Yes |
+| T, 5 pm | UPI mandate acceptance deadline | Yes — the hard one |
+| T, 5 pm | Retail and reserved-category bid closure | Yes |
+| T, 4 pm | Qualified-institutional and non-institutional closure | Yes |
+| T, 4 pm | Bank-ASBA via net banking, mobile or syndicate UPI-ASBA closes | Yes |
+| T, 1 pm / 12 pm | Physical form cut-offs at the bank and at the syndicate | Yes |
+| T, before 7:30 pm and 9:30 pm | Final certificates from self-certified syndicate banks, and from sponsor banks for UPI | No |
+| <abbr title="Trade-date Plus N settlement">T+1</abbr>, before 9:30 am / 1 pm | Third-party checks completed for UPI and non-UPI applications | No |
+| T+1, before 6 pm | Rejections finalised and basis of allotment settled | No |
+| T+1, before 9 pm | Basis of allotment approved by the exchange | No |
+| T+2, by 9:30 am | Fund transfer instruction files initiated | No |
+| T+2, before 2 pm | Fund transfer completed for bank and online ASBA | No |
+| T+2, before 4 pm | Unblocking completed for UPI applications via the sponsor bank | No |
+| T+2, before 2 pm to 6 pm | Corporate action — shares credited to demat | No |
+| T+2, before 7:30 pm | Listing application filed with the exchanges | No |
+| T+2, before 9 pm / T+3 | Allotment advertisement on website, then in newspapers | No |
+| T+3 | Trading starts | Yes |
+
+Two things follow for interface design. Everything the client can influence happens on or before T at 5 pm, which means every reminder, nudge and escalation belongs in that window and nowhere else. And the allotment result becomes knowable late on T+1, not on T+2 — which is why "check allotment status" traffic spikes before the broker's own data has refreshed, and why linking to the registrar's status page is more honest than showing a stale internal state.
+
+### 3.1 Field-level view of the bid record
+
+| name | type | length | mandatory | source-system | destination-system(s) | notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| pan | string | 10 | yes | Client master | Exchange bidding platform, registrar | The duplicate-application key; one <abbr title="Permanent Account Number">PAN</abbr>, one application per category |
+| dp_id_client_id | string | 16 | yes | Demat account master | Exchange platform, depository | Where allotted shares are credited; must be active |
+| bid_quantity | integer | varies | yes | Client input | Exchange platform | In multiples of the lot size |
+| bid_price | decimal | varies | conditional | Client input | Exchange platform | Omitted where the cut-off option is used |
+| cut_off_flag | flag | 1 | conditional | Client input | Exchange platform | Available to retail, employees and retail shareholders in a reservation portion; prohibited for institutional and non-institutional bidders |
+| investor_category | code | varies | yes | Bid screen | Exchange platform, registrar | Retail, non-institutional by sub-category, employee, shareholder reservation |
+| upi_handle | string | varies | conditional | Client input | Sponsor bank, client's bank | UPI route only; validated against the accepted-handle list |
+| application_number | string | varies | system | Exchange platform | Client statement, registrar, support | The reference every later query needs |
+| mandate_status | code | varies | system | Sponsor bank | Client status screen | Pending, accepted, rejected, expired — distinct from bid status |
+| blocked_amount | decimal | 15,2 | system | Client's bank | Client status screen | Blocked, not debited; equals bid value at the bid price or cap price |
+| allotted_quantity | integer | varies | system | Registrar | Depository credit, client statement | Zero is a valid and common outcome |
+| unblock_timestamp | datetime | varies | system | Sponsor bank or syndicate bank | Client statement, grievance evidence | The clock that the compensation framework runs against |
+
+Field names are the semantic labels a broker's integration layer typically carries; the exchange bidding-platform and registrar file specifications are authoritative. `[AI inference — verify before acting]`
+
+## 4. Categories, sub-categories and the cut-off price
+
+A **retail individual investor** is one who bids for a value of not more than ₹2,00,000. That number has not moved, notwithstanding the ₹5 lakh UPI ceiling — the two are different things, and conflating them is the second most common error in IPO product copy after the mandate-status problem.
+
+The **non-institutional portion** is sub-categorised, and not as it is often described. One-third of the non-institutional portion is reserved for applications of more than ₹2 lakh and up to ₹10 lakh; two-thirds for applications of more than ₹10 lakh. Allotment within each sub-category is by draw of lots at the minimum bid lot rather than proportionate. A client with ₹6 lakh to deploy is therefore in the smaller reservation with a better statistical chance per rupee than they would have at ₹12 lakh — a genuinely useful thing for an interface to surface, and one almost none do.
+
+The **cut-off price** option lets a bidder agree to the price discovered at the end of book building instead of naming one. It is available to retail individual investors, employees, and retail individual shareholders in a shareholder reservation portion, and is prohibited for qualified institutional buyers and non-institutional investors. For a retail client it is almost always the right default, because a bid below the discovered price is simply not allotted.
+
+## 5. SME issues
+
+SME issues used to be the retail-friendly corner of the primary market. They are not any more, and the change is structural rather than cosmetic. The minimum application size is now **two lots per application, valued above ₹2 lakh**. Because the ICDR definition of a retail individual investor caps that category at ₹2 lakh, an SME application above ₹2 lakh cannot be a retail application at all — SEBI's own framework review noted this and proposed replacing the term "retail individual investors" with "individual investors who apply for minimum application size" in the SME context.
+
+Two consequences for a client-facing product. The minimum cheque for an SME issue is above ₹2 lakh, which puts it outside most retail clients' intent and outside the UPI-compulsory band's assumptions. And non-institutional allotment in SME issues moved from proportionate to draw of lots, matching the main board, so a larger application no longer produces a proportionally larger allotment.
+
+<Aside type="note" title="Dates and numbers in the SME framework are partly secondary-sourced">
+The two-lot, above-₹2-lakh minimum and the shift to draw of lots are stated in SEBI's SME framework review memorandum. The gazette notification number and date for the corresponding ICDR amendment, the SEBI board-meeting date, and the exchange implementation circular numbers were corroborated only from secondary compilations in this research pass. `[AI inference — verify before acting]` before quoting an effective date to an issuer or a client.
+</Aside>
+
+## 6. Allotment, refunds and unblocking
+
+For a UPI applicant, "refund" is the wrong mental model and the wrong word to use in the interface. Nothing was paid, so nothing is refunded. What happens is that the block is released — in full for a non-allotment, partially for a partial allotment — and the debit that does occur is only to the extent of shares actually allotted. Unblocking for UPI applications completes before 4 pm on T+2 under the activity schedule.
+
+The outer limit is two working days from the issue closing date, and it is enforced with money. Where unblocking is delayed beyond two working days — for non-allotted or partially allotted bids, and for cancelled, withdrawn or deleted applications — or where the bank blocked a multiple of the application amount, or blocked more than the bid amount, the investor is compensated at **₹100 per day or 15 per cent per annum, whichever is higher**. The payer is the self-certified syndicate bank responsible for the failure, or the post-issue lead manager running from the date the investor's grievance is received until the amount is unblocked.
+
+A second, older mechanism sits alongside this one and is easy to confuse with it: an opportunity-loss-based compensation formula for bid-entry failures by self-certified syndicate banks, originating in January and February 2018 circulars and consolidated in the ICDR master circular. It addresses a different failure — a bid that never reached the platform — and is calculated differently. Support scripts should distinguish them, because a client claiming compensation needs the right one.
+
+## 7. Alternatives
+
+| Client situation | Option A | Option B | When to pick which |
+| --- | --- | --- | --- |
+| Retail bid up to ₹2 lakh | UPI through the broker | Bank-ASBA | UPI for speed and a familiar approval gesture; bank-ASBA where the client's bank's UPI mandate flow is unreliable |
+| Individual bid between ₹2 lakh and ₹5 lakh | UPI through the broker | Bank-ASBA | Either; the applicant is in the smaller non-institutional sub-category regardless of route |
+| Individual bid above ₹5 lakh | Bank-ASBA or 3-in-1 | Not UPI | The UPI route is closed above the ceiling; attempting it wastes the window |
+| Client wants certainty of allotment price | Cut-off price bid | Named price bid | Cut-off for retail almost always; a named price only where the client genuinely will not pay above it |
+| Client wants exposure without the application lottery | Buy on listing | Apply | Applying is free optionality with an opportunity cost on blocked funds; buying on listing pays the listing premium but is certain |
+| Debt public issue | Same ASBA plumbing | — | See [bonds, G-Secs and <abbr title="National Pension System">NPS</abbr>](./bonds-gsec-nps/) for the debt shelf around it |
+
+## Practical notes
+
+- **[gotcha]** The 5 pm mandate deadline on the closing day admits no exception. Build reminders at T minus one day, on the morning of T, and at least twice during the afternoon, and make the last one a push notification rather than an email.
+- **[gotcha]** UPI handle validation is not cosmetic. Only handles on the accepted list work for mandate-based blocking, and the list changes. Validate at bid entry against the current list and explain a rejection in terms of the handle, not as a generic error.
+- **[gotcha]** One PAN, one application per category. Family members applying from a single device, or a client applying through two brokers, produce rejections at the third-party check stage on T+1 with no remedy. Warn at bid time.
+- **[risk trade-off]** Blocked funds are unavailable for trading for the duration. A client who blocks a large amount on the closing day and then meets a margin call has created a problem the broker will be asked to solve. Show the blocked amount in the funds summary, not only in the IPO section.
+- **[industry practice]** Brokers that deep-link to the registrar's allotment-status page rather than mirroring allotment data internally report fewer disputes, because the registrar is the source of truth and refreshes first. `[industry practice — unverified]`
+- **[gotcha]** "Refund" is the wrong word for a UPI applicant and produces tickets asking where the money went. Use "unblocked" in every client-facing string, and show the unblock timestamp, because that timestamp is the evidence a compensation claim rests on.
+- **[cost optimization]** The compensation framework is a liability for whoever caused the delay, not for the client to chase silently. Capturing the unblock timestamp per application, automatically, turns a manual grievance investigation into a query.
+- **[AI inference — verify before acting]** There is no SEBI instrument called "UPI 2.0" or "UPI 3.0" for public issues; the official sequence is Phase I, Phase II and the T+3 phase. The NPCI circular raising the per-transaction UPI limit for IPOs to ₹5 lakh was not verified against NPCI's own document in this pass.
+
+## Cross-references
+
+- [IPO and OFS, broker side](/broking-kyc/deep-dives/specialty/ipo-ofs-broker-side/) — issue-master setup, sponsor-bank empanelment, the ten-step broker flow, OFS, rights issues, buybacks and reconciliation
+- [Payment mandates](/broking-kyc/vendors/payment-mandates/) — UPI mandate and block mechanics shared with the secondary-market block facility
+- [Pre-open and closing auction](/broking-kyc/deep-dives/foundational/pre-open-closing-auction/) — the listing-day call auction the client meets on T+3
+- [Bank account capture](/broking-kyc/journey/05-bank-account/) — the funding account and third-party-funds prohibition that underpin ASBA
+- [Field atlas — Section H, demat account](/broking-kyc/reference/field-atlas/sections/h-demat-account/) — the demat identifiers the bid record carries
+- [Surveillance norms, <abbr title="Graded Surveillance Measure">GSM</abbr> and <abbr title="Additional Surveillance Measure">ASM</abbr>](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/) — listing-day surveillance measures on newly listed scrips
+- [Bonds, G-Secs and NPS](./bonds-gsec-nps/) — public issues of debt securities using the same ASBA rails
+- [Investor grievance redressal](/broking-kyc/deep-dives/compliance-audit/igrc/) — where an unresolved unblocking complaint goes
+- [Circulars — SEBI other](/broking-kyc/reference/circulars/sebi-other/) — the ICDR and public-issue authorities
+- [Circulars — NPCI](/broking-kyc/reference/circulars/npci/) — mandate and deemed-debit handling for IPO blocks
+
+## Verified through
+
+2026-09-11
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

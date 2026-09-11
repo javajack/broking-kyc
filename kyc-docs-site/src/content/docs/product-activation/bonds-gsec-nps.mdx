@@ -1,0 +1,151 @@
+---
+title: "Product Activation: Bonds, G-Secs and NPS"
+description: Activating the non-equity shelf for a retail client — RFQ and listed bonds, NSE goBID and BSE Direct, RBI Retail Direct, SGB in the secondary market, and NPS through a broker acting as Point of Presence.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** These products look like one shelf in the app and are four different regulatory animals underneath — an exchange segment, a primary-auction aggregation facility, a direct-with-<abbr title="Reserve Bank of India">RBI</abbr> account, and a pension product under a different regulator entirely. The page is ordered by who holds the account, because that single question determines what the broker can activate, what it can only refer, and where the client's grievance goes.
+
+## TL;DR
+
+- **Listed bonds trade in the exchange debt segment, and that segment needs its own registration.** A broker's equity membership does not carry into debt; the client-side effect is that a broker may show bonds but route the order through the Request-for-Quote platform as an eligible trading member on the client's behalf.
+- **Face-value reduction is what made bonds retail at all.** <abbr title="Securities and Exchange Board of India">SEBI</abbr> cut the minimum face value of privately placed listed debt from ₹10 lakh to ₹1 lakh in October 2022 and to ₹10,000 in July 2024, subject to a merchant-banker appointment and plain-vanilla structure.
+- **Online Bond Platform Providers must be registered brokers in the debt segment.** The November 2022 framework built that in; the August 2026 modification widened the shelf to <abbr title="International Financial Services Centres Authority">IFSCA</abbr>-regulated products and specified tax-saving bonds with separate presentation and disclaimers.
+- **Government securities reach retail two ways, and only one of them is the broker's.** <abbr title="National Stock Exchange of India">NSE</abbr> goBID and <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> Direct front the RBI non-competitive bidding facility, where roughly 5 per cent of a notified auction amount is reserved for retail bids of ₹10,000 to ₹2 crore and the securities land in the client's demat account. RBI Retail Direct is the other way — a Retail Direct Gilt account opened directly with RBI, with no broker in the chain.
+- **The two G-Sec worlds are now plumbed together.** [<abbr title="Central Depository Services (India) Limited">CDSL</abbr>/OPS/CA/GENRL/<abbr title="Sovereign Gold Bond">SGB</abbr>/2025/743](/broking-kyc/reference/circulars/cdsl/#cdslopscagenrlsgb2025743) introduced a transaction type for transfers of government securities between demat and Retail Direct Gilt accounts, and [<abbr title="National Securities Depository Limited">NSDL</abbr>/POLICY/2026/0095](/broking-kyc/reference/circulars/nsdl/#nsdlpolicy20260095) (30 Jun 2026) amended the delivery-instruction forms to carry the twelve-digit RDG account number.
+- **<abbr title="National Pension System">NPS</abbr> is not a securities product.** It sits under <abbr title="Pension Fund Regulatory and Development Authority">PFRDA</abbr>, reaches the client through a Point of Presence registration the broker must hold separately, and its charges are prescribed by PFRDA rather than negotiated.
+
+## Conceptual overview
+
+A retail client who opens a broking account expects to see equity, and increasingly expects to see everything else too — corporate bonds, treasury bills, government bonds, gold bonds, a pension account. From the client's side that is one list. From the broker's side it is four distinct activations with four different answers to the question "whose books is the client's holding in?"
+
+For listed debt, the answer is the same as equity: the client's demat account, cleared by the same clearing corporation, in a segment of the same exchange. For primary-market government securities bought through goBID or BSE Direct, the holding is still in the client's demat account, but allotment happens in an RBI auction where the broker's platform is an aggregation front end rather than a counterparty. For Retail Direct, the answer changes entirely: the holding sits in an RDG account with RBI, the broker is not a party, and the only thing the broker can do is move securities between the demat account and the RDG account once both exist. For NPS, the answer is a Permanent Retirement Account Number with a central recordkeeping agency, and the broker is a distribution intermediary under a different statute.
+
+Getting this hierarchy right is not pedantry. It determines who the client complains to when something goes wrong, whether the broker's investor-protection and grievance machinery applies, what the broker may charge, and whether a "buy" button in the app is an order, a bid, a referral, or a contribution. The commonest product failure on this shelf is presenting all four as the same gesture.
+
+## 1. Regulatory framework
+
+- **SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Investment Management Department (within SEBI)">IMD</abbr>/DF3/CIR/P/2020/130** (22 Jul 2020) `[not yet in index]` — introduces the Request-for-Quote platform for corporate bonds and commercial paper and requires mutual funds to route a minimum share of secondary trades through it; the origin of <abbr title="Request for Quote">RFQ</abbr> as a market structure. See [Circulars — SEBI other](/broking-kyc/reference/circulars/sebi-other/).
+- **SEBI/HO/DDHS/DDHS_Div1/P/CIR/2022/142** (19 Oct 2022) `[not yet in index]` — consolidates the RFQ platform framework across listed non-convertible securities, securitised debt instruments, municipal debt securities and commercial paper, including trade execution and settlement.
+- **SEBI/HO/DDHS/P/CIR/2022/00144** (28 Oct 2022) `[not yet in index]` — reduces the face value of privately placed listed debt securities from ₹10 lakh to ₹1 lakh for issuances from 1 January 2023. `[AI inference — verify before acting]` on the exact circular number, which was corroborated from secondary compilations rather than the SEBI document itself.
+- **SEBI circular dated 3 July 2024 on further reduction of face value to ₹10,000** `[not yet in index]` — conditional on the issuer appointing at least one merchant banker and the instrument being plain-vanilla interest-bearing. The circular number could not be verified from a primary source in this pass. `[AI inference — verify before acting]`
+- **SEBI/HO/DDHS/DDHS-RACPOD1/P/CIR/2022/154** (14 Nov 2022) `[not yet in index]` — the Online Bond Platform Provider framework: an OBPP must be registered as a stock broker in the debt segment of a recognised exchange, and its product shelf is confined to listed and public-issue debt securities.
+- **[HO/17/11/(2)2026-DDHS-POD1/I/18769/2026](/broking-kyc/reference/circulars/sebi-other/)** (14 Aug 2026) — modifies the OBPP framework in the Non-Convertible Securities Master Circular: permits OBPPs to offer IFSCA-regulated products and specified tax-saving bonds subject to separate presentation, regulatory disclosures and a grievance route that lies with the issuer, and replaces the company-secretary requirement with a compliance officer under the Stock Brokers Regulations, 2026 holding the prescribed certification (clauses 3.1, 3.2 and 5).
+- **RBI's non-competitive bidding facility in the auction of government securities** — the scheme document reserving a share of each notified amount for non-competitive retail bids, with a per-bid floor and ceiling, allotted at the auction's weighted-average price. NSE goBID and BSE Direct are front ends to this facility, not separate schemes. See [Circulars — RBI](/broking-kyc/reference/circulars/rbi/).
+- **RBI Retail Direct Scheme** (launched 12 Nov 2021) — establishes the Retail Direct Gilt account held directly with RBI for dated government securities, treasury bills, state development loans and sovereign gold bonds, in primary auctions and on the secondary NDS-OM platform, with no fee to the investor and no intermediary.
+- **[CDSL/OPS/CA/GENRL/SGB/2025/743](/broking-kyc/reference/circulars/cdsl/#cdslopscagenrlsgb2025743)** — introduces the transaction type for transfers of government securities between demat and RDG accounts.
+- **[NSDL/POLICY/2026/0095](/broking-kyc/reference/circulars/nsdl/#nsdlpolicy20260095)** (30 Jun 2026) — amends government-securities Rule 12.11.1 and delivery-instruction forms 15, 16, 36 and 37, including the <abbr title="Demat Debit and Pledge Instruction">DDPI</abbr>-holder versions, to provide for off-market transfers to an RDG account using the twelve-digit RDG account number.
+- **[NSDL/POLICY/2025/0128](/broking-kyc/reference/circulars/nsdl/#nsdlpolicy20250128)** — premature-redemption calendar for sovereign gold bonds, the operational artefact a client's early-exit request has to align with.
+- **PFRDA (Point of Presence) Regulations, 2018**, as amended, and the PFRDA Point of Presence master circular **PFRDA/Master Circular/2025/01/PoP-01** (14 Jan 2025) `[not yet in index]` — registration eligibility and the prescribed charge structure for a PoP.
+
+## 2. What the broker activates, and for whom
+
+| Product | Whose account holds it | What the broker must have | What the client must do | Who handles a grievance |
+| --- | --- | --- | --- | --- |
+| Listed corporate bonds, NCDs, on-exchange debt | Client demat | Debt-segment registration; RFQ access as an eligible trading member | Nothing beyond the existing account, in most broker designs | Broker, then exchange, then SEBI |
+| Public issues of NCDs | Client demat | The same <abbr title="Applications Supported by Blocked Amount">ASBA</abbr> plumbing as an equity public issue | Apply through the public-issue flow | Broker and registrar |
+| Treasury bills and dated G-Secs, primary | Client demat | goBID or BSE Direct access | One-time registration on the facility, then bid | Exchange facility, then SEBI |
+| G-Secs, T-Bills, SDLs, SGBs via Retail Direct | RDG account with RBI | Nothing — the broker is not in the chain | Register directly on the RBI portal | RBI, through the scheme's own grievance route |
+| SGB in the secondary market | Client demat | Ordinary cash-segment access | Place an order like any listed security | Broker, then exchange |
+| NPS Tier I and Tier <abbr title="—">II</abbr> | PRAN with a central recordkeeping agency | PFRDA Point of Presence registration | Complete PRAN registration and contribute | PFRDA and the CRA, not SEBI |
+
+<Aside type="caution" title="Do not let one button imply one product">
+The four rows above differ in who holds the asset and who answers a complaint. A single "Invest" tile that leads to a Retail Direct redirect, an NPS contribution and a bond order without changing its language is a mis-selling risk rather than a convenience. Label the destination entity on the screen before the client commits: the exchange facility, RBI, the pension recordkeeper, or the broker itself.
+</Aside>
+
+## 3. Listed bonds and the RFQ route
+
+Retail participation in listed debt has two practical shapes. The first is an order on the exchange's ordinary debt order book, which behaves like an equity order and settles into the demat account. The second — and the one that carries most of the volume in non-convertible securities — is the Request-for-Quote platform, where a participant seeks quotes and executes a negotiated trade that then clears through the clearing corporation. Retail and non-institutional clients are not direct participants on RFQ; they reach it through an eligible trading member who registers and executes on their behalf. `[industry practice — unverified]` on the exact minimum quantity a given broker will accept, which is a broker and platform parameter rather than a regulatory floor.
+
+The economics that made this shelf viable for retail are the two face-value reductions. A privately placed listed bond with a ₹10 lakh minimum is an institutional instrument; at ₹10,000 it is a retail one. That is why the OBPP framework and the face-value reductions are best read together: the first created a regulated distribution channel, the second created something small enough to distribute.
+
+The August 2026 OBPP modification is worth flagging to product teams because it changes what may legitimately appear next to a bond. IFSCA-regulated products and specified tax-saving bonds are now permissible on an OBPP, but only with separate presentation, explicit regulatory disclosures, and the clear statement that grievance redressal for those instruments does not lie with SEBI. In interface terms that is a separate tab with its own disclaimer, not another row in the same list.
+
+## 4. Government securities: the two doors
+
+### 4.1 Through the broker — goBID and BSE Direct
+
+These are exchange-operated front ends to RBI's non-competitive bidding facility. The client registers once, sees the auctions on offer, places a bid in rupee terms rather than in yield, funds it from the bank account linked to the demat account, and receives allotment at the auction's weighted-average price with any excess refunded. A share of the notified amount — around 5 per cent — is set aside for the aggregate of non-competitive bids, and each bid must sit between a ₹10,000 floor and a ₹2 crore ceiling. Securities credit to the client's demat account, which means the holding appears in the same statement as equity and can be pledged, transferred or sold like any other demat security.
+
+| name | type | length | mandatory | source-system | destination-system(s) | notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| pan | string | 10 | yes | Client master | Exchange retail-bidding facility | Identity key for the bid; must match the demat account holder |
+| dp_id_client_id | string | 16 | yes | Demat account master | Exchange facility, depository | Where allotted securities are credited |
+| bank_account_and_ifsc | string | varies | yes | Bank verification record | Exchange facility | Funding and refund account; third-party funding is not permissible |
+| security_identifier | string | varies | yes | Auction calendar | Exchange facility | The specific T-Bill or dated security on offer |
+| bid_amount | decimal | varies | yes | Client input | Exchange facility | In rupees, not yield; subject to the scheme floor and ceiling |
+| bid_reference | string | varies | system | Exchange facility | Client statement, support tools | The reference support needs to trace an allotment or refund |
+| allotment_quantity | decimal | varies | system | Auction result | Depository credit, client statement | Allotted at weighted-average price, not at a bid price |
+| refund_amount | decimal | varies | system | Auction result | Bank account | Unallotted portion returned to the funding account |
+
+Field names are the semantic labels a broker's integration layer typically carries; the exchange facilities publish their own file and screen specifications, which should be treated as authoritative. `[AI inference — verify before acting]`
+
+### 4.2 Around the broker — RBI Retail Direct
+
+Retail Direct is the case where the honest client-facing answer is "not here". A resident individual — and, per later scheme expansions, certain non-residents — registers on the RBI portal, completes the portal's own <abbr title="Know Your Customer (process).">KYC</abbr> and bank verification, and receives an RDG account held with RBI. There is no fee, no broker, and no demat account involved in the holding. The client can buy in primary auctions and can transact on the secondary NDS-OM platform, including its odd-lot segment, which is the only retail-accessible route to secondary G-Sec liquidity in small size.
+
+What did change for brokers is portability. Once a client holds government securities in both places, movement between them is now a defined depository transaction rather than an operational impossibility: CDSL introduced a dedicated transaction type for demat-to-RDG and RDG-to-demat transfers as an own-account transfer with no change of ownership, and NSDL amended the delivery-instruction forms — including the DDPI-holder versions — to carry the twelve-digit RDG account number. The client-facing consequence is that a broker can now legitimately offer help with consolidating a G-Sec position, which it could not before.
+
+<Aside type="note" title="Opening an RDG account activates nothing at the broker">
+An RDG account is not a broker product and does not switch on the broker's debt segment, and a broker's debt-segment activation does not give the client an RDG account. Support scripts should keep these separate, because a client who says "I already have Retail Direct" is telling you nothing about what they can do inside your app.
+</Aside>
+
+## 5. Sovereign gold bonds after the issuance window
+
+Fresh SGB tranches have not been issued since the 2023-24 series, and the government's post-Budget position has been that the scheme is not being continued for fresh subscription. That has no formal notification behind it, so treat it as a reported policy stance rather than a rule. `[AI inference — verify before acting]`
+
+For a client, then, SGB is now a secondary-market and redemption story. Existing bonds are listed and can be bought or sold on exchange through an ordinary cash-segment order, with the well-known caveat that volumes are thin and traded prices frequently sit at a discount to the prevailing gold price — which is an execution risk the order screen should not hide. Premature redemption is available from the fifth year onwards and only on interest-payment dates, against a calendar the depositories circulate; the NSDL premature-redemption calendar circulars are the operational artefact to check a client's window against.
+
+Tax treatment diverges sharply by exit route, and this is the part clients get wrong. Redemption at maturity by an individual carries the capital-gains exemption that made SGB attractive. A sale in the secondary market does not — it is an ordinary capital-gains event under the post-July-2024 rate structure, without indexation. `[AI inference — verify before acting]` on the precise statutory clauses; the position was corroborated from secondary sources rather than from the Act itself.
+
+## 6. NPS through a Point of Presence
+
+A broker distributing NPS is doing so as a PFRDA-registered Point of Presence, under the PFRDA (Point of Presence) Regulations, 2018. Eligibility runs through the general company category rather than a broker-specific carve-out, so a broking company applies as a company. `[AI inference — verify before acting]` on whether any broker-specific clause exists in the current Regulations.
+
+Client-side mechanics are simple and unlike everything else on this page. The client gets a PRAN from one of the central recordkeeping agencies — Protean, KFin and CAMS operate the three — and holds a Tier I pension account, optionally with a Tier II voluntary account that can only exist alongside Tier I. Minimum contributions are small: ₹500 to open Tier I and ₹1,000 a year to keep it from freezing, ₹1,000 to open Tier II with smaller subsequent contributions. `[AI inference — verify before acting]` on the exact Tier II subsequent-contribution floor, which is reported inconsistently.
+
+Charges are the part a broker cannot design. PFRDA prescribes them, and the structure has been in transition: the pre-2026 master-circular structure paired a registration charge in a ₹200 to ₹400 band with a contribution-based charge subject to a floor and a cap, while a 2026 overhaul effective 1 October 2026 replaces that with a per-PRAN onboarding charge — lower for fully digital onboarding — plus an annual asset-based charge adjusted through NAV, and exempts subscribers onboarded and contributing through the fully online routes from PoP charges altogether. Circular numbering for the 2026 overhaul is reported inconsistently across secondary compilations, so the numbers should be taken from PFRDA's own active-circulars listing before being quoted to a client. `[AI inference — verify before acting]`
+
+The scheme architecture also moved in 2025: the multiple-scheme framework for non-government subscribers, effective 1 October 2025, lets one PRAN hold allocations across schemes and pension funds, and a balanced life-cycle option was added inside the auto-choice category. A broker's NPS screen that still presents a single-scheme choice is behind the framework.
+
+## 7. Alternatives
+
+| Client objective | Option A | Option B | When to pick which |
+| --- | --- | --- | --- |
+| Fixed-income yield, small ticket | Listed bond or NCD through the broker's debt shelf | Debt mutual fund on the exchange platform | Bond for a known maturity and coupon and no expense ratio; fund for diversification and daily liquidity |
+| Sovereign credit exposure | goBID or BSE Direct primary bid, held in demat | RBI Retail Direct | Broker route to keep everything in one statement and to pledge the holding; Retail Direct for zero fees, secondary odd-lot access and a direct-with-RBI relationship |
+| Gold exposure | SGB in the secondary market | Gold ETF | SGB for the coupon and maturity-redemption tax treatment, accepting thin liquidity; ETF for tight spreads and continuous liquidity |
+| Long-horizon retirement saving | NPS through the broker as PoP | Fully online NPS, direct | Broker route when the client wants assisted onboarding; direct online route to avoid PoP charges under the 2026 structure |
+| Tax-saving bonds | Specified bonds through an OBPP shelf, post the Aug 2026 modification | Direct with the issuer | Platform route for convenience, provided the client understands grievance redressal lies with the issuer |
+
+## Practical notes
+
+- **[gotcha]** Debt-segment registration is an exchange membership matter, not a client setting. A client screen that offers bonds before the membership is live produces rejected orders with unhelpful error codes. Gate the shelf on the segment's actual status from [exchange registration](/broking-kyc/operations/exchange-registration/), not on a product flag.
+- **[gotcha]** Non-competitive bids are not orders. There is no price to choose, no modification after the window, and the allotment price is the auction's weighted average. Copying the equity order screen for a G-Sec bid creates client expectations the facility cannot meet.
+- **[risk trade-off]** Presenting Retail Direct inside the app is good for the client and bad for the broker's perceived ownership of the relationship. Brokers that link out honestly tend to get fewer grievance escalations they cannot act on. `[industry practice — unverified]`
+- **[cost optimization]** Under the 2026 PFRDA structure, a subscriber who onboards and contributes through the fully online routes bears no PoP charge. A PoP-led NPS proposition therefore has to be justified by assistance and servicing rather than by access.
+- **[gotcha]** SGB premature redemption is calendar-bound. A client request received outside the window is not "processing", it is waiting for the next half-yearly date. Say so in the status rather than leaving a request open-ended.
+- **[industry practice]** Most retail bond shelves are curated to a short list of liquid, high-rated issues even though the universe is far larger. That curation is a broker policy decision, and clients should be told it is one. `[industry practice — unverified]`
+- **[AI inference — verify before acting]** Several circular numbers in Section 1 were corroborated only from secondary compilations because the primary pages did not yield document text in this research pass. Fetch the SEBI, RBI and PFRDA documents directly before quoting a clause reference.
+
+## Cross-references
+
+- [Mutual fund platforms](/broking-kyc/deep-dives/specialty/mutual-fund-platforms/) — the adjacent non-equity shelf and its exchange order-entry platforms
+- [Segment rules comparison](/broking-kyc/deep-dives/foundational/segment-rules-comparison/) — how segment-level rules differ once a client moves beyond cash equity
+- [Exchange registration](/broking-kyc/operations/exchange-registration/) — how a segment actually becomes available to a broker's clients
+- [Trading preferences](/broking-kyc/journey/06-trading-preferences/) — where segment choices are captured during onboarding
+- [NSDL overview](/broking-kyc/vendors/depositories/nsdl/) — the depository side of government-security and delivery-instruction handling
+- [Field atlas — Section H, demat account](/broking-kyc/reference/field-atlas/sections/h-demat-account/) — the demat identifiers every product on this page writes to
+- [Circulars — RBI](/broking-kyc/reference/circulars/rbi/) — Retail Direct and the non-competitive bidding facility
+- [Circulars — SEBI other](/broking-kyc/reference/circulars/sebi-other/) — RFQ, face-value and OBPP authorities
+- [<abbr title="Initial Public Offering">IPO</abbr> and ASBA via <abbr title="Unified Payments Interface">UPI</abbr>](./ipo-asba-upi/) — the same ASBA plumbing serves public issues of NCDs
+- [GIFT <abbr title="Indian Financial System Code.">IFSC</abbr> access](./gift-ifsc/) — the IFSCA-regulated products the 2026 OBPP modification permits
+
+## Verified through
+
+2026-09-11
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*

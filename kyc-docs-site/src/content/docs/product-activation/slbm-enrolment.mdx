@@ -1,0 +1,150 @@
+---
+title: "Product Activation: SLBM Enrolment"
+description: Getting a client into securities lending and borrowing — who may lend or borrow, the enrolment path, contract tenure and series, margins on each leg, corporate-action foreclosure, and the client-level position limit.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Securities lending is the one exchange product where the client's economic role — lender or borrower — changes almost everything about the obligations they take on. The page therefore separates the two roles from the start, then walks enrolment, then the contract terms a client actually has to understand before quoting a fee, then margins, then the two ways a contract can end early. The clearing-corporation mechanics, settlement types and file formats are covered in the <abbr title="Securities Lending and Borrowing Mechanism">SLBM</abbr> deep dive and summarised here only where a client feels them.
+
+## TL;DR
+
+- **Both retail and institutional investors may participate.** <abbr title="Securities and Exchange Board of India">SEBI</abbr>'s scheme, originating in <abbr title="Market Regulation Department (SEBI)">MRD</abbr>/DoP/SE/Dep/Cir-14/2007 (20 Dec 2007) and operationalised from 21 April 2008, covers all investor categories; the live operating rules are in the clearing corporation's consolidated scheme circulars, [<abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr>/CMPT/61810](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt61810) and [NCL/CMPT/67763](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt67763).
+- **Retail clients do not need a separate clearing-corporation code.** Institutional clients need a custodial-participant code alongside their unique client code, mapped by the custodian and effective the next trading day; a retail client transacts under the existing client code through their trading member.
+- **Tenure is up to twelve months, in fixed monthly series.** Reverse-leg settlement dates are fixed — the first Thursday of the relevant month — and there are two series per month: the regular series, which is foreclosed on most corporate actions, and a non-foreclosing series.
+- **Margins fall almost entirely on the borrower.** On the first leg the lender pays mark-to-market plus a fixed percentage of the lending price, or nothing at all if the lender gives early pay-in; on the reverse leg the lender pays nothing and the borrower pays value-at-risk margin, extreme loss margin, mark-to-market and a fixed 100 per cent of the lending price.
+- **Corporate actions usually end the contract rather than pass through.** Dividends are passed from borrower to lender through the clearing corporation and stock splits are quantity-adjusted; for almost everything else the regular-series contract is foreclosed on the ex-date or record date with the lending fee refunded pro rata to the borrower.
+- **The client-level cap is 1 per cent of the market-wide position limit** for the security, where that limit for lending purposes is 10 per cent of free-float capital.
+- **Lending is not a transfer for the lender's capital-gains purposes** under CBDT Circular No. 2/2008 (22 Feb 2008), and securities transaction tax is not levied on the lending and borrowing legs.
+
+## Conceptual overview
+
+Securities lending answers a question the cash market cannot: how does someone who needs a specific share for a specific period get hold of it without buying it? The typical borrower is covering a short position, arbitraging a price difference between segments, or fixing a delivery shortfall. The typical lender is a long-term holder with idle stock who is willing to part with possession — not ownership — for a fee. The exchange platform matches the two, and the clearing corporation stands between them so that neither has to assess the other's credit.
+
+Mechanically, every contract has two legs. In the first leg the lender delivers the securities and receives the lending fee; in the reverse leg the borrower returns the securities and the lender gets them back. The two legs are separate settlements with separate obligations, which is the single most important thing for a client to grasp, because the risk profile of the two roles is asymmetric. A lender's worst case is that the stock does not come back on the reverse-leg date, which the clearing corporation's auction process addresses. A borrower's worst case is that they must return a stock that has moved sharply against them, which is why the borrower carries almost the entire margin burden.
+
+For the broker, SLBM is a low-volume, high-explanation product. Enrolment is light — for a retail client it is essentially a consent and a segment activation — but the questions that follow are dense: why the fee is quoted per share, why a corporate action cancelled the contract, why the stock has not come back yet, why the borrower's margin went up overnight. A product team that treats SLBM as a checkbox will hand all of that to support.
+
+## 1. Regulatory framework
+
+- **MRD/DoP/SE/Dep/Cir-14/2007** (20 Dec 2007) `[not yet in index]` — the originating SEBI framework for securities lending and borrowing, operationalised from 21 April 2008; its Annexure 2 remains the reference for the eligibility architecture the clearing corporations implement. See [Circulars — SEBI other](/broking-kyc/reference/circulars/sebi-other/).
+- **MRD/DoP/SE/Cir-05/2008** (19 Mar 2008) `[not yet in index]` — implementation guidance on the scheme.
+- **[NCL/CMPT/61810](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt61810)** — the clearing corporation's consolidated circular for the securities lending and borrowing scheme, cited throughout the clearing corporation's own scheme documentation for registration, contract specifications, file formats and penalties. Part C(1) prescribes the participant agreement and Part C(3) the depository settlement account and undertaking.
+- **[NCL/CMPT/67763](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt67763)** (30 Apr 2025) — the succeeding consolidated scheme circular for the following financial year. A separately numbered consolidation for the current financial year was not located in this research pass. `[AI inference — verify before acting]`
+- **Monthly settlement-calendar circulars**, such as [NCL/CMPT/71222](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt71222) — the operational artefact that fixes each month's first-leg and reverse-leg dates. A client's contract dates come from these, not from a generic rule.
+- **MRD/DoP/SE/Cir-07/2005** `[not yet in index]` — the Group I classification referenced in the eligibility test for securities outside the derivatives segment.
+- **CBDT Circular No. 2/2008** (22 Feb 2008) `[not yet in index]` — clarifies that a lending transaction under the scheme is not a transfer under section 2(47) of the Income-tax Act in the lender's hands.
+
+## 2. Who may participate, and what each role needs
+
+| | Lender | Borrower |
+| --- | --- | --- |
+| Typical motive | Fee income on idle long-term holdings | Cover a short position, arbitrage, or fix a delivery shortfall |
+| Securities needed at the start | Yes, in demat, free of encumbrance | No |
+| First-leg margin | Mark-to-market plus a fixed percentage of lending price; nil on early pay-in | A fixed percentage of the lending fee |
+| Reverse-leg margin | Nil | Value-at-risk plus extreme loss margin, plus mark-to-market, plus 100 per cent of lending price |
+| Main risk | Securities not returned on the reverse-leg date | Having to buy back a stock that has moved against them |
+| Corporate-action exposure | Loses ongoing exposure when the regular-series contract forecloses | Gets the lending fee refunded pro rata on foreclosure |
+| What ends the position | Reverse-leg settlement, early recall, or foreclosure | Reverse-leg settlement, early repay, or foreclosure |
+
+Institutional clients — foreign investors, mutual funds, banks, insurers, pension funds and development financial institutions — need a custodial-participant code in addition to their unique client code; the custodian maps the code and it becomes effective the next trading day. Retail clients transact under their existing client code through their trading member, without a separate clearing-corporation registration. `[AI inference — verify before acting]` on the retail position, which follows from the scheme documentation's silence rather than from an explicit clause.
+
+One depository detail catches brokers out. For settlement of the cash segment and of securities lending, the clearing corporation's existing <abbr title="National Securities Depository Limited">NSDL</abbr> pool account serves both; on the <abbr title="Central Depository Services (India) Limited">CDSL</abbr> side a separate account for the lending scheme has to be opened. A broker that has never enabled the product will discover this at the first trade rather than at enrolment, which is the wrong time.
+
+<Aside type="caution" title="Enrolment is thin; the disclosure should not be">
+For a retail client, activating securities lending is little more than a consent, a segment flag and — for a lender — a confirmation that the holdings will leave their account for the contract period. That lightness is misleading. A lender who does not understand that most corporate actions will foreclose the contract, or a borrower who does not understand that the reverse-leg margin includes 100 per cent of the lending price, has not been onboarded, merely enabled. Put the role-specific consequences in the activation flow, not in the terms document.
+</Aside>
+
+## 3. Contract terms a client has to understand
+
+**Tenure and series.** Contracts run up to twelve months, arranged as twelve fixed monthly tenures with reverse-leg settlement on the first Thursday of the relevant month. Each month offers two series: a regular series, which is mandatorily foreclosed on a general or extraordinary general meeting and on most corporate actions other than dividend and split, and a non-foreclosing series for clients who want the position to survive those events.
+
+**Fee quoting.** The lending fee is market-determined and quoted per share, not as an annualised rate. A client comparing "2 rupees" against "8 per cent" is comparing incomparable things, and the interface should do the annualisation for them rather than leaving it as an exercise.
+
+**Rollover.** A contract can be rolled over more than once, subject to the total duration including rollovers not exceeding twelve months from the original contract date. The rollover contract's last trading day falls a few working days before the near-month expiry, so a client intending to roll has a narrower window than the contract's own dates suggest.
+
+**Early exit.** Both sides have one. A lender can recall, and a borrower can repay, only after the first leg has settled and only up to three working days before the reverse-leg settlement date. A borrower repaying early must have transferred the securities to the clearing corporation's repayment account first. The fee for an early recall or repay is itself market-determined and quoted per share for the balance tenure the party is giving up.
+
+**Corporate actions.** Dividends are passed from the borrower to the lender through the clearing corporation's debit and credit mechanism. A stock split produces a proportionate quantity adjustment at the reverse leg. For everything else — bonus, merger, open offer and the rest — the regular-series contract is foreclosed on the ex-date or record date and the lending fee is refunded to the borrower pro rata. The practical effect is that a lender does not receive most corporate-action benefits through the contract; the contract simply ends and the securities come back.
+
+### 3.1 Field-level view of the enrolment and contract record
+
+| name | type | length | mandatory | source-system | destination-system(s) | notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| client_code | string | varies | yes | Client master | Exchange lending platform | The existing unique client code; retail clients need no separate registration |
+| cp_code | string | varies | conditional | Custodian | Clearing corporation | Institutional clients only; mapped by the custodian, effective next trading day |
+| role | code | 1 | yes | Activation screen | Order routing, risk system | Lender or borrower; drives the entire margin profile |
+| slb_consent_version | string | varies | yes | Document store | Evidence record | The role-specific disclosure actually accepted |
+| depository_settlement_account | string | 16 | yes | Broker depository setup | Clearing corporation | Separate account required on the CDSL side for this scheme |
+| isin | string | 12 | yes | Eligible-securities master | Platform, risk system | Must be on the scheme's eligible list, refreshed by the clearing corporation |
+| series_code | code | varies | yes | Contract master | Platform | Regular monthly series versus non-foreclosing series |
+| tenure_month | code | varies | yes | Contract master | Platform | Fixed monthly tenure; reverse leg on the first Thursday |
+| lending_fee_per_share | decimal | varies | yes | Client order | Platform, back office | Market-determined, quoted per share, not annualised |
+| quantity | decimal | varies | yes | Client order | Platform, depository | Lender needs free holdings for the full quantity |
+| first_leg_settlement_date | date | 8 | system | Settlement calendar | Client statement | Taken from the monthly calendar circular |
+| reverse_leg_settlement_date | date | 8 | system | Settlement calendar | Client statement, risk system | The date the borrower's obligation crystallises |
+| early_pay_in_flag | flag | 1 | conditional | Depository | Risk system | Lender's first-leg margin is nil where early pay-in is given |
+| foreclosure_reason | code | varies | system | Corporate-action feed | Client statement | Populated when a corporate action ends a regular-series contract |
+
+Field names are the semantic labels a broker's integration layer typically carries; the clearing corporation's file formats in the consolidated scheme circular are authoritative. `[AI inference — verify before acting]`
+
+## 4. Margins and collateral
+
+The asymmetry is the whole story, so it is worth stating twice.
+
+On the **first leg**, the lender posts mark-to-market margin plus a fixed percentage of the lending price — stated in the scheme as 25 per cent or as the clearing corporation otherwise specifies — and posts nothing at all where the lender has given early pay-in of the securities. The borrower posts a fixed percentage of the lending fee, stated as 100 per cent or as otherwise specified. That is a small number, because the borrower has not yet received anything.
+
+On the **reverse leg**, the lender posts nothing. The borrower posts value-at-risk margin and extreme loss margin at cash-market rates, plus mark-to-market margin, plus a fixed 100 per cent of the lending price computed on the previous day's closing price — all collected upfront against the participant's or custodian's collateral. A borrower who does not model this will experience the reverse-leg margin as a surprise call, because it is structurally larger than anything on the first leg.
+
+Acceptable collateral for these obligations is the standard set: cash, bank guarantees, fixed-deposit receipts, government securities and treasury bills, equity shares and exchange-traded fund or mutual-fund units pledged to the clearing corporation. Guarantees and deposits issued by the member itself or by an associate bank are not accepted, which is a conflict-of-interest rule rather than a credit rule.
+
+<Aside type="danger" title="A lender is exposed to non-return, not to nothing">
+"Lending is risk-free because the clearing corporation guarantees it" is a dangerous simplification to put in front of a client. The clearing corporation's reverse-leg auction process exists precisely because return can fail, and the outcome of an auction in an illiquid stock is not always the lender's ideal. Lenders should also understand that during the contract the securities are out of their account: they cannot be sold, cannot be pledged for margin, and are unavailable for anything else. Explain unavailability as the primary cost, ahead of counterparty risk.
+</Aside>
+
+## 5. Eligibility of the security, and the limits that bind
+
+A security is eligible if it is in the derivatives segment, or is a qualifying index exchange-traded fund — traded on at least 80 per cent of trading days over six months with impact cost at or below 1 per cent — or is a Group I security with a market-wide position limit of at least ₹100 crore and six-month average monthly cash-segment turnover of at least ₹100 crore.
+
+Position limits then operate in a cascade. For lending purposes the market-wide position limit is 10 per cent of free-float capital in share terms. A participant is capped at 10 per cent of that market-wide limit, an institutional investor likewise, and a **client at 1 per cent of the market-wide limit**. The client-level cap is the one that actually bites for a large retail lender in a small stock, and it is not a number the client can discover from the order screen unless the broker puts it there.
+
+## 6. Alternatives
+
+| Client objective | Option A | Option B | When to pick which | Who uses what |
+| --- | --- | --- | --- | --- |
+| Earn on idle long-term holdings | Lend through the scheme | Pledge for margin and trade | Lending earns a fee and gives up availability; pledging keeps the stock in the account but earns nothing directly | Long-only holders versus derivatives traders |
+| Cover a short delivery | Borrow through the scheme | Let it go to auction or close-out | Borrowing is cheaper and more certain where the stock is available; auction is the default and the outcome is not chosen | See [short delivery and auction](/broking-kyc/deep-dives/trading-day/short-delivery-auction/) |
+| Take a bearish view beyond the intraday session | Borrow and sell | Futures or options | Borrowing when the exposure must be in the cash stock; derivatives for leverage and simpler mechanics | Arbitrageurs versus directional traders |
+| Leverage a long position | Margin trading facility | Not SLBM | Lending and borrowing is not a funding product; see [<abbr title="Margin Trading Facility">MTF</abbr> activation](./mtf-activation/) | — |
+| Keep a position through a corporate action | Non-foreclosing series | Regular series | Non-foreclosing where the event is known and the exposure must survive it | Informed lenders and borrowers |
+
+## Practical notes
+
+- **[gotcha]** Contract dates come from the monthly settlement-calendar circular, not from a rule a client can infer. Show the actual first-leg and reverse-leg dates on the order screen, and re-show them on a settlement-holiday revision.
+- **[gotcha]** Quoting the fee per share is a constant source of client error. Display the annualised equivalent alongside the per-share fee, and label which one the order is placed in.
+- **[risk trade-off]** The regular series is more liquid; the non-foreclosing series survives corporate actions. Clients who want both usually discover they cannot have both. Say which series they are trading before they quote a fee.
+- **[industry practice]** Retail participation in lending is thin at most brokers, which means the product carries a disproportionate support load per trade and a real risk of stale documentation. Brokers that surface it only to clients who already hold eligible stock report better outcomes than brokers that market it broadly. `[industry practice — unverified]`
+- **[gotcha]** A lender's holdings leave their demat account for the contract period. Any margin the client was getting from those holdings through a pledge disappears at the same moment, which can create an unrelated margin shortfall. Model the collateral impact before confirming a lend.
+- **[cost optimization]** Early pay-in of securities removes the lender's first-leg margin entirely. For a lender who is going to deliver anyway, this is free money left on the table if the flow does not offer it.
+- **[AI inference — verify before acting]** The taxation of lending-fee income in the lender's hands, and the eligibility of non-resident clients to participate, were not established from primary sources in this pass. Both need a specific answer before the product is offered to those populations.
+
+## Cross-references
+
+- [SLBM deep dive](/broking-kyc/deep-dives/settlement/slbm/) — settlement types, the reverse-leg auction, file formats and the clearing-corporation-side mechanics
+- [Short delivery and auction](/broking-kyc/deep-dives/trading-day/short-delivery-auction/) — the process borrowing is most often used to avoid
+- [<abbr title="Trade-date Plus N settlement">T+0</abbr> and <abbr title="Trade-date Plus N settlement">T+1</abbr> settlement](/broking-kyc/deep-dives/settlement/t0-t1-settlement/) — the settlement cycle the lending legs sit alongside
+- [<abbr title="Risk Management System">RMS</abbr> and <abbr title="Standard Portfolio Analysis of Risk">SPAN</abbr> methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/) — how the reverse-leg margin is computed and collected
+- [Margin pledge activation](./margin-pledge/) — the competing use for the same holdings
+- [Segment rules comparison](/broking-kyc/deep-dives/foundational/segment-rules-comparison/) — where the lending segment sits against the others
+- [Trading preferences](/broking-kyc/journey/06-trading-preferences/) — where segment activation is captured at onboarding
+- [<abbr title="Non-Resident Indian">NRI</abbr> deep dive](/broking-kyc/appendix/nri-deep-dive/) — the population whose eligibility for this scheme needs a specific answer
+- [Compliance blueprint](/broking-kyc/operations/compliance-blueprint/) — the obligation rows the scheme adds
+- [Circulars — clearing corporations](/broking-kyc/reference/circulars/clearing-corps/) — the consolidated scheme circulars and monthly settlement calendars
+
+## Verified through
+
+2026-09-11
+
+---
+
+*AI-generated and not legal, financial, or compliance advice. See the project [README](https://github.com/javajack/broking-kyc) for full disclaimer.*
