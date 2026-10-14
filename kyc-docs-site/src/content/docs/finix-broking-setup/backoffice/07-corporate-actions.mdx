@@ -1,0 +1,213 @@
+---
+title: "Back office 7: corporate actions"
+description: Processing corporate actions across cash and derivatives — the event taxonomy and what each one changes, record and ex dates, entitlement computation on held, pledged, unpaid and in-transit positions, derivatives contract adjustments, the effect on resting broker-held intent, client communication, and the reconciliation that catches an entitlement error before the client does.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Corporate actions are a small share of daily volume and a large share of client complaints, because an entitlement error is visible, personal and hard to undo. The complexity is not in the arithmetic but in the edge positions: securities that are pledged, unpaid, in transit between settlement and demat, or held against a derivatives position. So the page gives the event taxonomy briefly, then spends its length on the position states that complicate entitlement, then on the derivatives side where contracts themselves are adjusted, then on the resting-intent problem that catches broker-held orders.
+
+## TL;DR
+
+- **Entitlement follows beneficial ownership on the record date**, which is why pledged securities still entitle the client — the pledge moved an encumbrance, not ownership.
+- **The hard cases are the edge positions**: pledged, CUSPA-pledged, in transit between settlement and demat, bought but not yet settled, sold but not yet delivered, held as collateral, and positions in a derivatives contract on the underlying.
+- **Derivatives contracts are adjusted, not merely repriced.** Lot sizes, strike prices and positions change on an adjustment, and an adjustment can accelerate an expiry.
+- **Resting broker-held intent must be reviewed at every corporate action.** A Good Till Triggered instruction whose trigger was set against an unadjusted price is no longer the instruction the client gave. Finix cancels and notifies rather than adjusting silently.
+- **Collateral valuation changes.** A corporate action can change a security's price, its eligibility, or its haircut, and the risk engine must revalue rather than carry forward.
+- **Communication beats correction.** Telling a client what to expect before the ex date prevents most of the queries that otherwise arrive after it.
+- **Reconcile entitlements against the depository and the registrar**, not against the firm's own expectation.
+
+## Conceptual overview
+
+A corporate action is an event in which a company does something to its own securities, and everyone holding them has to be brought along. For a broker the task is narrow but unforgiving: determine who held what on the record date, compute what they are entitled to, make sure they receive it, and adjust everything downstream that referenced the old state. The narrowness is deceptive because "who held what" has many more answers than it appears to. A client who bought on the ex date does not hold on the record date. A client whose securities are pledged still holds them. A client whose securities sit in the CUSPA pledge still holds them. A client who sold but has not yet delivered holds them for settlement purposes but not economically.
+
+The derivatives side adds a different kind of complexity. In the cash segment a corporate action changes the quantity or the value of what someone holds. In derivatives it changes the contract: strike prices, lot sizes and positions are adjusted so that the economic position is preserved across the event. That adjustment is computed by the exchange and clearing corporation and must be ingested, not derived, and it can have consequences beyond arithmetic — an adjustment can accelerate an expiry, which changes a client's position horizon without the client doing anything.
+
+The third issue, and the one most often missed in implementation, is resting intent. A client's Good Till Triggered instruction, a Stock SIP schedule, or a queued after-market order was created with reference to a price that a corporate action has just made meaningless. A ten-for-one split turns a trigger at ₹1,000 into something that will fire immediately. The options are to adjust silently, to cancel and notify, or to do nothing — and doing nothing is indefensible. Finix cancels and notifies, on the reasoning that an adjusted instruction is an instruction the client did not give.
+
+## 1. Framework
+
+- **Exchange and clearing corporation corporate action circulars** — the authoritative source for ex dates, adjustment factors, derivatives contract adjustments and any acceleration of expiry. `[not yet in index]`
+- **Depository corporate action processing** — CDSL and NSDL process entitlements for dematerialised holdings; see the [CDSL](/broking-kyc/reference/circulars/cdsl/) and [NSDL](/broking-kyc/reference/circulars/nsdl/) circulars indexes.
+- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — client servicing and records obligations.
+- **[SEBI/HO/MIRSD/DOP/CIR/P/2020/28](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddopcirp202028)** (25 February 2020) — the pledge regime, under which beneficial ownership remains with the client.
+- **[Client unpaid securities, HO/38/11/(9)2026-MIRSD-POD/I/15382/2026](/broking-kyc/reference/circulars/sebi-mirsd/#ho381192026-mirsd-podi153822026)** (3 July 2026) — CUSPA-pledged securities, which likewise remain the client's.
+- **Derivatives contract adjustment** — exchange and clearing corporation adjustment notices; an adjustment can accelerate an expiry.
+
+## 2. Event taxonomy
+
+| Event | Changes | Cash segment | Derivatives |
+|---|---|---|---|
+| Dividend | Cash to holders | Entitlement on record date | Usually a price adjustment; large dividends may trigger a contract adjustment |
+| Bonus issue | Additional shares | Quantity increases | Lot size and position adjusted |
+| Stock split | Face value and quantity | Quantity increases, price falls | Adjusted |
+| Consolidation or reverse split | Quantity decreases | Quantity falls, price rises | Adjusted |
+| Rights issue | Entitlement to subscribe | Entitlement and a separate tradeable right | Adjusted |
+| Buy-back | Tender opportunity | Client action required | — |
+| Merger or demerger | Securities replaced or supplemented | Complex entitlement | Contracts adjusted or terminated |
+| Scheme of arrangement | Varies | Varies | Varies |
+| Name or ISIN change | Identity | Master change | Master change |
+| Face value change | Per-share value | Quantity and price | Adjusted |
+| Delisting | Tradability | Securities cease to trade | Contracts settled or terminated |
+| Suspension | Tradability | Temporary | Trading halted |
+| Open offer | Tender opportunity | Client action required | — |
+| Interest or redemption on debt | Cash | Entitlement | — |
+
+## 3. Position states and entitlement
+
+The arithmetic is simple; identifying the population is not.
+
+| Position state | Entitled on the record date? | Note |
+|---|---|---|
+| Held free in the client's demat | **Yes** | The simple case |
+| **Pledged to the member or up the chain** | **Yes** | Pledge moves an encumbrance, not ownership; beneficial ownership stays with the client |
+| **CUSPA-pledged** | **Yes** | Same reasoning; the securities are the client's |
+| Bought, settled, in demat before the record date | Yes | — |
+| Bought on or after the ex date | **No** | A frequent source of client queries |
+| Bought before the ex date, not yet settled | Depends on the settlement and record-date relationship | Must be computed against the actual dates, not assumed |
+| Sold before the ex date, not yet delivered | Depends on the same relationship | Must be computed |
+| Sold on or after the ex date | Yes, if held on the record date | — |
+| Held in a pool or transit account | **Investigate** — should be rare under direct pay-out | Any entitlement sitting in a firm account must reach the client |
+| Held against a short delivery | Per the auction and close-out outcome | Complex; follow the clearing corporation's treatment |
+| Derivatives position in the underlying | No cash entitlement; **the contract is adjusted** | Different mechanism entirely |
+
+<Aside type="caution" title="Pledged securities are still the client's">
+The most common entitlement error in a broking operation is omitting pledged positions from the entitlement computation, because they are not in the client's free balance. Under the pledge regime beneficial ownership stays with the client and the pledge chain is visible in the pledgor's own demat account — the securities are theirs, encumbered. The same applies to CUSPA-pledged securities. Compute entitlement from total beneficial holding, not from free balance, and reconcile the total against the depository.
+</Aside>
+
+## 4. Processing sequence
+
+| Step | Action | Timing |
+|---|---|---|
+| 1 | Ingest the corporate action announcement from the exchange | On announcement |
+| 2 | Record ex date, record date, adjustment factor and derivatives treatment | On announcement |
+| 3 | **Notify clients holding the security** of what to expect | Before the ex date |
+| 4 | Review resting broker-held intent on the security | Before the ex date |
+| 5 | Review collateral eligibility and valuation effects | Before the ex date |
+| 6 | Determine holdings as at the record date, including pledged and CUSPA positions | On the record date |
+| 7 | Compute entitlements | After the record date |
+| 8 | **Reconcile against the depository and registrar** | On receipt of entitlement data |
+| 9 | Post entitlements to client ledgers and holdings | On receipt |
+| 10 | Apply derivatives contract adjustments from the exchange | Per the adjustment notice |
+| 11 | Revalue collateral | On the ex date and after |
+| 12 | Communicate outcomes to clients | On completion |
+| 13 | Handle exceptions and disputes | As they arise |
+| 14 | Record everything | Throughout |
+
+## 5. Derivatives adjustments
+
+| Element | Detail |
+|---|---|
+| Who computes | The exchange and clearing corporation publish the adjustment |
+| What changes | Strike prices, lot sizes, and positions, so that the economic position is preserved |
+| **Ingestion, not derivation** | Apply the published adjustment; do not compute your own and reconcile later |
+| Position adjustment | Client positions restated; the client's screen must reflect it |
+| Margin effect | The adjusted position has a new margin requirement; recompute |
+| **Expiry acceleration** | An adjustment can accelerate an expiry, changing the client's horizon without any client action |
+| Resting orders | Orders in the adjusted contract may be cancelled by the exchange; handle the cancellations and tell the client |
+| Physical settlement | An acceleration changes the delivery timetable; see [exercise, assignment and physical settlement](/broking-kyc/trading-risk/exercise-assignment-physical/) |
+| Communication | Clients holding the contract must be told what changed and what it means |
+
+## 6. Resting broker-held intent
+
+| Instrument of intent | Problem | Finix behaviour |
+|---|---|---|
+| **Good Till Triggered** | The trigger was set against an unadjusted price; a split or bonus makes it fire immediately or never | **Cancel and notify** |
+| Stock SIP | The instalment quantity or value assumption changes | Review; continue with the adjusted basis where it is unambiguous, notify either way |
+| After-market order queue | An order queued overnight across an ex date | **Cancel and notify** where the security is affected |
+| Commodity good-till-date and good-till-cancelled orders | Resting at the exchange across the event | Review; the exchange may cancel; handle the cancellation and tell the client |
+| Basket definitions | A saved basket referencing changed quantities | Flag to the client |
+| Alerts and triggers set by clients | Price references invalidated | Notify |
+
+The reasoning for cancel-and-notify rather than silent adjustment: an adjusted instruction is an instruction the client did not give, and if it executes the client will reasonably say so. Cancelling and telling them puts the decision back where it belongs, at the cost of a notification.
+
+## 7. Collateral effects
+
+| Effect | Action |
+|---|---|
+| Price change on the ex date | Revalue; do not carry the pre-ex price forward |
+| Quantity change | Update the pledged quantity records and reconcile |
+| **Eligibility change** | A security can leave the acceptable-collateral list around a corporate action; exclude rather than assume |
+| Haircut change | Apply the current published haircut |
+| Pledge continuity | Verify the pledge survives the event in the depository's records |
+| Cross-margin eligibility | A corporate action can remove an instrument from a cross-margin computation without any client action |
+| Communication | Clients whose capacity changes materially should be told before the margin call |
+
+## 8. Reconciliation
+
+| Check | Against | Frequency |
+|---|---|---|
+| Holdings as at the record date | Depository | Per event |
+| Entitlements computed | Depository and registrar data | Per event |
+| Entitlements posted | Client ledgers and holdings | Per event |
+| Pledged and CUSPA positions included | Total beneficial holding | Per event |
+| Derivatives positions after adjustment | Exchange and clearing corporation | Per event |
+| Collateral revaluation | Risk engine | Per event |
+| Any entitlement sitting in a firm account | Firm accounts | **Per event — must be zero or explained** |
+| Client queries post-event | Trend | Monthly |
+
+The seventh row is the control that catches the quiet failure: an entitlement that arrived but was never passed to the client sits somewhere, and the only way to find it is to look for it.
+
+## 9. Client communication
+
+| Stage | Message |
+|---|---|
+| On announcement | What the event is, the key dates, and what it means for a holder |
+| Before the ex date | A reminder, with the effect on holdings and on any resting instruction |
+| Resting instruction cancelled | Explicit, with the reason and an invitation to re-place |
+| After the record date | What the client was entitled to |
+| On receipt | What has been credited |
+| Derivatives adjustment | What changed in the contract and in their position, in plain terms |
+| Expiry acceleration | **Prominent**; the client's horizon has changed |
+| Action required — rights, buy-back, open offer | The action, the deadline and how to take it |
+
+## 10. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.bo.ca.source` | Exchange and clearing corporation announcements | Exchange-set | Missed or wrong events |
+| `finix.bo.ca.entitlement_basis` | **Total beneficial holding**, including pledged and CUSPA | Regulatory in substance | Omitted entitlements |
+| `finix.bo.ca.derivatives_adjustment` | **Ingested from the exchange**, not derived | Exchange-set | Divergent positions |
+| `finix.bo.ca.gtt_action` | **Cancel and notify** | Discretionary, disclosed | Executing an instruction the client did not give |
+| `finix.bo.ca.amo_action` | Cancel and notify for affected securities | Discretionary | Same |
+| `finix.bo.ca.sip_action` | Review and notify | Discretionary | Client surprise |
+| `finix.bo.ca.collateral_revaluation` | On the ex date | Discretionary, strongly recommended | Stale collateral values |
+| `finix.bo.ca.collateral_eligibility_recheck` | On the event | Exchange-set | Recognising ineligible collateral |
+| `finix.bo.ca.client_notice_lead` | Before the ex date | Discretionary | Avoidable queries |
+| `finix.bo.ca.firm_account_entitlement_alarm` | Alarm on any | Discretionary, strongly recommended | Client entitlements stranded |
+| `finix.bo.ca.expiry_acceleration_notice` | Prominent, immediate | Discretionary | Clients unaware their horizon changed |
+| `finix.bo.ca.reconciliation_required` | Against depository and registrar | Discretionary, strongly recommended | Entitlement errors reaching clients |
+
+## 11. Exception paths
+
+| Situation | Response |
+|---|---|
+| Entitlement not received from the depository or registrar | Escalate; the client's entitlement does not depend on the firm receiving it promptly |
+| Entitlement received but not identifiable to a client | Investigate immediately; an unallocated entitlement is a client's property sitting in a firm account |
+| Pledged positions omitted from the computation | Correct and post; investigate the computation basis |
+| Client claims an entitlement they did not receive | Produce the record-date holding, the computation and the posting; correct if wrong |
+| Derivatives adjustment produces an unexpected position | The exchange's adjustment governs; investigate the ingestion |
+| **Expiry accelerated by an adjustment** | Immediate, prominent client communication; review positions for delivery consequences |
+| Resting instruction executed against an unadjusted trigger | A defect; quantify, inform the client, and assess remediation |
+| Collateral eligibility lost around an event | Exclude; recompute; communicate before the margin call |
+| A client acts on an outdated understanding of the event | The pre-ex communication is the preventive control; review its content |
+| Event announced with very short notice | Prioritise the client communication and the resting-intent review over the entitlement computation, which can follow |
+
+## Practical notes
+
+- **Compute entitlement from total beneficial holding.** Free balance is the wrong basis and it is the most common error.
+- **Ingest derivatives adjustments; do not derive them.** The exchange's numbers are the ones everyone else will use.
+- **Cancel and notify on resting intent.** A silently adjusted trigger is an instruction the client did not give.
+- **Alarm on any entitlement sitting in a firm account.** It should be zero and it is a client-property issue when it is not.
+- **Communicate before the ex date.** Most corporate-action queries are preventable with one message.
+- **Treat expiry acceleration as a prominent communication.** It changes the client's position horizon without their action.
+- **Revalue collateral on the ex date.** Carrying the pre-ex price forward overstates capacity.
+
+## Where this connects
+
+- [Ledger and accounting](/broking-kyc/finix-broking-setup/backoffice/04-ledger-accounting/) — where entitlements post
+- [Collateral and pledge](/broking-kyc/finix-broking-setup/rms/05-collateral-pledge/) — revaluation and eligibility
+- [CUSPA and unpaid securities](/broking-kyc/finix-broking-setup/backoffice/06-cuspa-unpaid-securities/) — CUSPA positions still entitle the client
+- [Order types catalogue](/broking-kyc/finix-broking-setup/oms/04-order-types-catalogue/) — the resting-intent types affected
+- [Exercise, assignment and physical settlement](/broking-kyc/trading-risk/exercise-assignment-physical/) — expiry acceleration and delivery
+- [Statements and retention](/broking-kyc/finix-broking-setup/backoffice/08-statements-retention/) — how entitlements appear to clients

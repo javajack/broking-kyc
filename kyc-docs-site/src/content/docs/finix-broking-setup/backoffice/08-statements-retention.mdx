@@ -1,0 +1,198 @@
+---
+title: "Back office 8: statements and retention"
+description: The client-servicing artefact set on its clock — daily margin statement, quarterly statement of accounts, annual statements, holding statements, tax artefacts and the investor charter — with dispatch channels and evidence, plus the eight-year records floor under the 2026 regulations, what it covers beyond documents, and how retrieval is proved.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Statements and retention look like two topics and are one: everything the firm sends a client is also a record it must keep and be able to produce years later. So the page runs the artefact set first with its clock and its channel, then treats retention as a single regime covering far more than documents — configuration history, order logs, communications, consent artefacts and screening results all sit on the same floor — and ends with retrieval, because a record that cannot be produced is a record the firm does not have.
+
+## TL;DR
+
+- **Record retention has a statutory floor of not less than eight years** under regulation 16 of the [SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/), up from the commonly understood five.
+- **The floor covers more than documents.** Order and trade logs, risk decision records, configuration history, communications and their delivery evidence, consent artefacts, screening results and audit trails all fall within books and records.
+- **Each artefact has its own clock and channel.** Daily margin statement, quarterly statement of accounts, annual statements, holding statements, tax artefacts and the investor charter each have a prescribed or policy frequency and a prescribed channel.
+- **Dispatch evidence is part of the obligation.** Record the attempt, the outcome, the bounce and the retry — despatch alone is not delivery.
+- **A wrong statement is worse than a late one.** The statement is derived from the ledger, and if the ledger is not closed, the statement waits.
+- **Retrieval must be tested.** Producing a contract note from year seven on demand is the only proof that the retention regime works, and it is cheap to test annually.
+- **Investor awareness messages are now a display obligation** following the 1 October 2026 circular — mandatory on website landing pages from 1 November 2026, with applications displaying messages and risk disclosures on alternate days.
+
+## Conceptual overview
+
+Statements are the client's window into the ledger, and they fail in two characteristic ways. The first is being wrong, which happens when they are generated from an unclosed ledger or on a rounding rule that differs from the contract note's. The second is being unexplainable, which happens when the statement is technically correct but presents the information in a form from which the client cannot reconstruct their own activity. Both are avoidable, and the second is the more common and the more corrosive, because a client who cannot reconcile their own statement stops trusting all the numbers.
+
+Retention is the less visible half and the one that gets under-built. The intuitive model is that retention is about documents — contract notes, statements, agreements — and about storage cost. The 2026 regulations' eight-year floor applies to books and records, which in a modern broking stack means the order log, the risk decision record, the configuration history, the communication record and the screening results as much as the signed documents. Those are high-volume, machine-generated records whose retention is an architectural decision rather than a filing one, and deciding it late is expensive.
+
+The third point is retrieval. Retention is only meaningful if a specific record can be produced on demand, which is a different capability from storing it. An archive that holds eight years of data in a format nobody can query, or on media nobody has tested, satisfies the letter and fails the purpose. The practical test is simple and worth running annually: pick a client and a date from six or seven years ago, and produce their contract note, their ledger balance at that instant, the configuration in force, and the risk decision on one of their orders. A firm that can do this in an afternoon is in good shape; one that cannot has a retention problem it does not yet know about.
+
+## 1. Framework
+
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — **regulation 16, records maintained for a minimum period of eight years**; regulation 10(e), investor complaints redressed within 21 calendar days; regulation 18(6), continuous SCORES and ODR enrolment. `[not yet in index]`
+- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — the books-and-records framework and client-servicing artefacts.
+- **[NSE/INSP/61999](/broking-kyc/reference/circulars/nse/#nseinsp61999)** and **[NSE/INSP/63859](/broking-kyc/reference/circulars/nse/#nseinsp63859)** — electronic contract note format and FAQ; **[NSE/INSP/52604](/broking-kyc/reference/circulars/nse/#nseinsp52604)** — dispatch using DLT-approved templates.
+- **Investor awareness messages** — SEBI circular of **1 October 2026** under section 11(1) of the SEBI Act: messages plus existing risk disclosures on websites from 5 October, app display voluntary; from **1 November 2026** mandatory on website landing pages, with applications displaying messages and risk disclosures on **alternate days**. Supplements the risk-disclosure circular of 19 May 2023. `[not yet in index]`
+- **Investor charter** — publication and periodic disclosure obligations.
+- **Digital Personal Data Protection Act, 2023** — retention interacts with data-minimisation obligations; the statutory retention requirement governs where they conflict, but the interaction must be reasoned and recorded.
+- Depth on artefact formats: **[ECN and investor servicing](/broking-kyc/deep-dives/member-compliance/ecn-investor-servicing/)**.
+
+## 2. The artefact set
+
+| Artefact | Frequency | Source | Channel | Note |
+|---|---|---|---|---|
+| **Electronic contract note** | Each trading day with activity | Reconciled trades | Email plus SMS link, DLT templates | Within 24 hours of execution, digitally signed; see [contract notes](/broking-kyc/finix-broking-setup/backoffice/03-contract-notes/) |
+| **Daily margin statement** | Daily | Margin computation | Email | The client's view of requirement and collection |
+| **Quarterly statement of accounts** | Quarterly | Ledger and holdings | Email | Funds and securities |
+| **Annual statement** | Annually | Ledger | Email | Consolidated |
+| **Holding statement** | Daily or per policy | Depository and back office | Email or portal | Positions |
+| Tax artefacts | Annually and per period | Ledger and statutory data | Email | Including the annual profit and loss statement and tax certificates where applicable |
+| Running account settlement statement | Per cycle | Ledger | Email | The computation and the transfer |
+| Depository transaction and holding statements | Per depository schedule | Depository | Per depository | A depository-participant obligation, separate from broking |
+| **Investor charter** | Published and periodically disclosed | Compliance | Website and client communication | — |
+| **Monthly complaint disclosure** | Monthly | Complaint records | Website | Required disclosure |
+| **Investor awareness messages** | Continuous display | SEBI-supplied content | Website landing pages and apps | **Mandatory on websites from 1 November 2026; apps on alternate days** |
+| Risk disclosures | Continuous display | Prescribed | Website and apps | Supplemented by the awareness messages |
+| Most Important Terms and Conditions | At onboarding and on change | Prescribed | Client communication | See [client protection frameworks](/broking-kyc/trading-risk/client-protection-frameworks/) |
+
+<Aside type="note" title="The investor awareness display is configuration with history">
+The 1 October 2026 circular makes SEBI-supplied messages a display obligation, with an alternate-day rule in applications and a requirement to keep the displayed version current as SEBI modifies the messages. That makes the displayed content a configuration item with a version history, not a static banner: the firm must be able to say which message was displayed on which date, on which surface. Build it with the same versioning as any other configuration, and put the refresh on the compliance calendar.
+</Aside>
+
+## 3. Generation and dispatch
+
+| Control | Requirement |
+|---|---|
+| **Ledger closed before generation** | A statement from an unclosed ledger is a wrong statement |
+| Single rounding rule | Shared with the contract note and the ledger |
+| Completeness | Every client who should receive one does; the count is asserted |
+| Pre-send assertion | Totals tie to the ledger before dispatch |
+| Reproducibility | A statement reproducible later from the same data |
+| Delivery evidence | Attempt, outcome, bounce, retry — all recorded |
+| Bounce handling | Hard bounces routed to a servicing process to update contact details |
+| Unreachable clients | A defined path, including restriction where the client cannot be served |
+| Portal availability | A convenience, not a substitute for dispatch where dispatch is prescribed |
+| Language and clarity | A client must be able to reconstruct their own activity from the statement |
+
+## 4. The retention regime
+
+Regulation 16 sets a floor of not less than eight years. Applied across the stack:
+
+| Record class | Examples | Volume | Retention design |
+|---|---|---|---|
+| **Client documents** | Agreements, KYC artefacts, consent records, DDPI, nominations | Low | Document store, indexed by client |
+| **Signed artefacts** | Contract notes, eSigned documents with their signature evidence | Medium | With signature and verification evidence |
+| **Statements** | Every artefact in section 2, as despatched | Medium | As generated, with dispatch evidence |
+| **Communications** | Emails, SMS, their templates and delivery outcomes | High | Content and metadata |
+| **Order and trade records** | Every order, modification, cancellation, rejection, fill, with timestamps | **Very high** | Append-only log store |
+| **Risk decision records** | Every release and rejection with its full input set | **Very high** | As above |
+| **Configuration history** | Every value, version, approver and effective period | Medium | Append-only configuration store |
+| **Identifier register** | Allocation, reporting, entitlements, withdrawal | Low | Versioned register |
+| **Screening results** | With the list version used | Medium | With version evidence |
+| **Surveillance alerts and dispositions** | Alert, investigation, decision, reasoning | Medium | Case store |
+| **Reconciliation outputs** | Differences, causes, resolutions | High | As generated |
+| **Exchange and depository files** | Raw files as received | **Very high** | Archive, with the parsed result |
+| **Regulatory filings** | Submissions and acknowledgements | Low | With acknowledgements |
+| **Audit and access logs** | Who did what, when | **Very high** | Tamper-evident log store |
+
+| Property | Requirement |
+|---|---|
+| Immutability | Append-only for logs and decision records; no edit path |
+| **Replication** | Surviving the loss of the primary site |
+| Point-in-time query | Balances, configuration and entitlements answerable as at a past instant |
+| Indexing | By client, by date, by instrument, by order — the dimensions questions arrive in |
+| **Retrieval tested** | Annually, with a real production-shaped request |
+| Format durability | Readable without the original application where feasible |
+| Media and platform migration | Planned, because eight years outlives most storage platforms |
+| Deletion | Only after the floor and after any longer obligation; deletion is a controlled, evidenced process |
+| Data protection interaction | Retention obligations and minimisation obligations reasoned and recorded together |
+| Vendor records | Vendors holding records on the firm's behalf must retain for the same period, including after termination — see [vendor contracts](/broking-kyc/finix-broking-setup/setup/09-vendor-onboarding-contracts/) |
+
+## 5. Retrieval
+
+| Capability | Test |
+|---|---|
+| A specific contract note | Produce one for a named client and date from six or seven years ago |
+| A ledger balance at an instant | Produce a client's balance as at a past timestamp |
+| Configuration in force | What was a named key's value for a named scope at a past timestamp |
+| A risk decision | Why a specific historical order was released or rejected, with its inputs |
+| The communications sent to a client | All of them, over a period, with delivery outcomes |
+| A screening result with its list version | For a named client at a past date |
+| The identifier register as at a date | Who held which identifier |
+| An exchange file as received | The raw file, not the parsed result |
+
+| Control | Detail |
+|---|---|
+| **Annual retrieval drill** | A realistic, production-shaped request, timed and evidenced |
+| Named owner | Who runs a retrieval when an inspection asks |
+| Service level | How long a retrieval should take, agreed internally |
+| Evidence package | The standard set produced for an inspection or an arbitration |
+| Failure | A failed retrieval drill is a high-severity finding with a dated remediation |
+
+## 6. Complaints and the clock
+
+| Element | Detail |
+|---|---|
+| **Clock** | **21 calendar days** from receipt, under regulation 10(e) |
+| Calendar, not working, days | The commonest implementation defect |
+| Receipt | The clock starts on receipt, through any channel |
+| Channels | All channels feed one register — email, phone, branch, portal, SCORES, ODR |
+| **SCORES and ODR** | Continuous enrolment under regulation 18(6); see [SCORES procedure](/broking-kyc/deep-dives/compliance-audit/scores-procedure/) and [ODR](/broking-kyc/deep-dives/compliance-audit/odr/) |
+| Monthly disclosure | Complaint data disclosed as required |
+| Record | The complaint, the investigation, the response and the delivery, retained on the floor |
+| Trend analysis | Clustering by cause, by branch, by individual — a surveillance input; see [intraday surveillance](/broking-kyc/finix-broking-setup/rms/07-intraday-surveillance/) |
+
+## 7. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.bo.stmt.requires_ledger_close` | True | Discretionary, strongly recommended | Wrong statements |
+| `finix.bo.stmt.rounding_rule` | One rule, shared | Discretionary, strongly recommended | Client distrust |
+| `finix.bo.stmt.completeness_assertion` | Required | Discretionary | Clients missed |
+| `finix.bo.stmt.frequency.<artefact>` | Per prescribed or policy frequency | Regulatory | Servicing breach |
+| `finix.bo.stmt.channel.<artefact>` | Per prescribed channel | Regulatory | Non-conforming dispatch |
+| `finix.bo.stmt.delivery_evidence` | Recorded per attempt | Regulatory in substance | Unprovable dispatch |
+| `finix.bo.stmt.hard_bounce_action` | Servicing process; restrict if unresolvable | Discretionary | Clients who cannot be served |
+| `finix.cmp.retention.books_years` | **8** | **Regulatory** | Short of the statutory floor |
+| `finix.cmp.retention.scope` | All classes in section 4 | Regulatory | Partial retention |
+| `finix.cmp.retention.immutable_classes` | Logs and decision records | Regulatory in substance | Destroyed audit trail |
+| `finix.cmp.retention.replication` | Survives primary-site loss | Discretionary, strongly recommended | Records lost with the site |
+| `finix.cmp.retention.retrieval_drill_frequency` | Annual | Discretionary, strongly recommended | Untested retention |
+| `finix.cmp.retention.deletion_controlled` | Approved, evidenced | Regulatory in substance | Premature destruction |
+| `finix.cmp.complaint.clock_days` | **21 calendar days** | Regulatory | Statutory breach |
+| `finix.cmp.complaint.clock_basis` | **Calendar** | Regulatory | The commonest defect |
+| `finix.cmp.awareness_messages.display` | Website landing pages; apps on alternate days from 1 November 2026 | Regulatory | Display obligation unmet |
+| `finix.cmp.awareness_messages.version_history` | Retained | Regulatory in substance | Cannot show what was displayed when |
+
+## 8. Exception paths
+
+| Situation | Response |
+|---|---|
+| Ledger not closed at statement time | **Delay the statement.** A wrong statement is worse than a late one |
+| Statement totals do not tie to the ledger | Block the run; investigate |
+| A client's contact details fail persistently | Servicing process; restrict the account where the client cannot be served, per policy |
+| A retrieval drill fails | High-severity finding with a dated remediation; retention that cannot retrieve is not retention |
+| A record is found to have been deleted before the floor | Severity one; investigate; assess the disclosure obligation |
+| A vendor cannot produce records for a past period | Contractual breach; the firm's obligation is unaffected |
+| Complaint clock implemented in working days | Defect; recompute affected complaints; correct immediately |
+| Investor awareness message not refreshed after SEBI modifies it | Compliance calendar failure; refresh and record |
+| Storage platform end-of-life within the retention period | Planned migration, with verification that migrated records are retrievable |
+| Data-protection request conflicts with retention | Reason it, record it; the statutory retention obligation governs, and the reasoning is the evidence |
+
+## Practical notes
+
+- **Run the retrieval drill annually and keep the evidence.** It is the only proof the regime works.
+- **Implement the complaint clock in calendar days with a timezone.** Working-day arithmetic is the single most common defect here.
+- **Share one rounding rule across contract note, ledger and statement.** Small discrepancies cost disproportionate trust.
+- **Plan for platform migration inside eight years.** The retention period outlives most storage generations.
+- **Treat the awareness-message content as versioned configuration.** You will be asked what was displayed on a date.
+- **Push retention obligations into vendor contracts, including post-termination.** Standard vendor retention is shorter than eight years.
+- **Make the statement reconstructible by the client.** A statement the client cannot tie to their own activity generates queries no amount of accuracy prevents.
+
+## Where this connects
+
+- [Contract notes](/broking-kyc/finix-broking-setup/backoffice/03-contract-notes/) — the artefact with the tightest clock
+- [Ledger and accounting](/broking-kyc/finix-broking-setup/backoffice/04-ledger-accounting/) — the source
+- [Regulatory reporting](/broking-kyc/finix-broking-setup/backoffice/09-regulatory-reporting/) — the other output of the same data
+- [Compliance configuration baseline](/broking-kyc/finix-broking-setup/compliance/01-compliance-config-baseline/) — retention and the complaint clock as configured obligations
+- [Inspection readiness](/broking-kyc/finix-broking-setup/compliance/03-inspection-readiness/) — where retrieval is exercised for real
+- [ECN and investor servicing](/broking-kyc/deep-dives/member-compliance/ecn-investor-servicing/) — artefact formats in depth
+- [SCORES procedure](/broking-kyc/deep-dives/compliance-audit/scores-procedure/) and [ODR](/broking-kyc/deep-dives/compliance-audit/odr/) — complaint escalation

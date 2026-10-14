@@ -1,0 +1,221 @@
+---
+title: "Back office 1: architecture"
+description: The SecMark back office as deployed at Finix — modules in scope, the daily pipeline with its blocking dependencies and deadlines, the masters it depends on, the depository-participant record separation, the reconciliation framework, batch design, and what happens when a stage fails.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** A back office is a dependency graph with deadlines attached, so the useful description is not a module list but a sequence with blocking relationships. The page gives the modules briefly, then the pipeline in order with what each stage blocks, then the masters that everything depends on, then the reconciliation framework that is the plane's actual control, and finally the failure behaviour — because in a pipeline with deadlines, the question "what do we do when stage four fails at 18:40" is the one that matters.
+
+## TL;DR
+
+- **Six SecMark modules in scope at Finix**: the back office itself, the middleware for lifecycle and reconciliation, the Partner Portal for sub-broker and branch accounting, SmartReco for bank, gateway and depository reconciliation, AML Sutra for transaction monitoring and suspicious transaction reporting, and ComplianceSutra for the compliance calendar and evidence.
+- **The pipeline blocks forward, not backward.** A trade-file failure stops everything; a statement failure stops only statements. Knowing which is which is the difference between a measured response and a panic.
+- **Three masters underpin everything** — client, instrument and the firm's own chart of accounts — and a defect in any of them produces errors that look like processing failures and are not.
+- **Depository-participant records must remain separable** even though the platform covers both broking and depository participation, because a depository inspection asks for depository records.
+- **Reconciliation is the plane's control, and it is multi-way.** Trades reconcile three ways, collateral three ways, bank two ways against the gateway and the ledger, holdings two ways against the depository.
+- **Batch design must be restartable and idempotent.** Operators re-run jobs under deadline pressure, and a job that double-posts on a re-run converts a delay into a corruption.
+- **Commodity hours overlap equity end-of-day.** The equity pipeline runs while MCX is still trading, which means two operating modes in the same building at the same time and a separate commodity close afterwards.
+
+## Conceptual overview
+
+The back office is where a broking firm's claims become its records. Up to the moment a trade executes, everything is intention and estimate — an order, a risk number, a provisional position. Afterwards, the firm owes a client a legal confirmation of what traded, owes the clearing corporation a settlement obligation, owes the exchange a margin report, and owes itself a ledger that balances. All of those derive from one input, the exchange's trade file, and all of them have deadlines. That is why the plane is a pipeline rather than a set of services: the dependency order is real and the deadlines are externally set.
+
+The second structural fact is that the back office is the only place in the stack where correctness beats speed unconditionally. In the order path, a slow decision is a failure. Here, a fast wrong contract note is far worse than a slow right one, because the contract note is a legal document that the client will rely on and the firm cannot easily unsend. This inverts several design instincts: fail the run rather than produce partial output, block on an unexplained difference rather than proceed with a note, and prefer a late filing within the window to a filing that is wrong.
+
+The third fact is that reconciliation is not a quality check bolted onto the pipeline — it is the pipeline's control. Every stage has an independent counterparty record: the exchange's trade file against the order management system's feed, the clearing corporation's obligation against the firm's computation, the depository's holdings against the firm's record, the bank's statement against the ledger. Where those agree, the firm's records are evidenced. Where they do not, the firm has discovered something, and the only wrong response is to proceed as though it had not.
+
+## 1. Modules in scope
+
+| Module | Role at Finix | Explicitly not used for |
+|---|---|---|
+| **Back office** | Ledger of record, trade processing, contract notes, obligations, statements, depository-participant records, regulatory reports | Intraday risk decisions |
+| **Middleware and API suite** | Order and trade lifecycle events, channel orchestration, reconciliation feeds | **Risk checks in the order path** — see the [vendor map decision](/broking-kyc/finix-broking-setup/stack/vendor-map/#31-real-time-risk-checks-saral-rms-or-secmark-middleware) |
+| **Partner Portal** | Sub-broker and branch network management, commission tracking, partner compliance across broking hierarchies | Client-facing servicing |
+| **SmartReco** | Bank, payment-gateway and depository reconciliation | Trade-to-obligation reconciliation, which is intrinsic to the back office |
+| **AML Sutra** | Transaction monitoring, suspicious transaction reporting in FINnet 2.0 format | Onboarding screening, which is C-Safe |
+| **ComplianceSutra** | Compliance calendar, obligations, evidence, audit workflow across governance, risk, compliance, audit, project and task | Operational processing |
+| C-Safe | Screening against more than fifty global and domestic lists including politically exposed persons | — |
+
+## 2. The daily pipeline
+
+| # | Stage | Input | Deadline character | Blocks if it fails |
+|---|---|---|---|---|
+| P1 | Masters refresh — instrument, client, charges | Exchange files, client master | Before processing | **Everything** |
+| P2 | **Trade file import** | Exchange trade files per segment | Post-session | Everything downstream |
+| P3 | **Trade reconciliation** — three-way | Exchange file, OMS feed, back office | Before P4 | Contract notes, obligations, ledger |
+| P4 | Charge computation | Trades plus the charge master | Before P5 | Contract notes, ledger |
+| P5 | **Contract note generation** | Reconciled trades plus charges | **Within 24 hours of execution** | A regulatory deadline |
+| P6 | Contract note dispatch and evidence | Generated notes | Same | Delivery evidence |
+| P7 | **Ledger posting** | Trades, charges, obligations | Before P9 and pay-out | Statements, reporting, pay-out authorisation |
+| P8 | **Obligation processing** | Clearing corporation obligation files | Per settlement | Settlement |
+| P9 | Settlement instruction preparation | Obligations, holdings, positions | Deadline-bound | Settlement |
+| P10 | **CUSPA processing** | Pay-out, ledger, margin obligations | Same day as pay-out, daily thereafter | A statutory clock |
+| P11 | Collateral and balance extract to RMS | Ledger, pledges | Before next-day open | **Next day's trading** |
+| P12 | Margin reporting extract | Margin collected and peak | Within the reporting cut-off | A penalised deadline |
+| P13 | Corporate action processing | Corporate action files | Per record date | Entitlements |
+| P14 | Statements | Ledger, holdings | Per prescribed frequency | A servicing obligation |
+| P15 | Bank and gateway reconciliation | Bank statements, gateway files | Daily | Money-plane integrity |
+| P16 | Depository reconciliation | Depository files | Daily | Collateral and settlement integrity |
+| P17 | Partner and commission processing | Reconciled trades | Periodic | Partner statements |
+| P18 | Regulatory report generation | Various | Per calendar | Filings |
+| P19 | Firm general ledger extract | Ledger | Per close | Statutory accounts |
+| P20 | **Commodity close** | MCX session end at 23:30 | After the equity pipeline | Commodity records |
+
+<Aside type="caution" title="P3 is the chokepoint, and the deadline after it does not move">
+The single most consequential dependency in the plane is that contract notes cannot be produced until trades reconcile, and contract notes have a 24-hour deadline. A one-trade difference stops the run. That is correct — a contract note is a legal confirmation and issuing one on an unreconciled file is worse than issuing it late — but it means reconciliation exception handling must be fast, staffed and practised, not a next-morning activity. Design the process so a difference is surfaced within minutes of import, not at the end of a batch.
+</Aside>
+
+## 3. The three masters
+
+| Master | Source | Refresh | Failure symptom |
+|---|---|---|---|
+| **Instrument** | Exchange, daily | Pre-open, current day asserted | Trades that will not map; charges computed on the wrong basis; corporate actions missed |
+| **Client** | Onboarding, maintained through the lifecycle | On change, reconciled daily across onboarding, OMS and back office | Trades for a client the back office does not know; statements to the wrong address; reporting gaps |
+| **Charges** | The firm's own schedule plus statutory rates | On change, with effective dates | Wrong contract notes, wrong ledger, client complaints and refunds |
+
+| Control | Requirement |
+|---|---|
+| Effective dating | Charges and client attributes are effective-dated, so a past trade computes on the rate that applied then |
+| Daily reconciliation | Client master across onboarding, OMS and back office; a client in one and not another blocks trading |
+| Assertion before processing | Current-day instrument master asserted before P2 |
+| Change control | Charge master changes under maker-checker, with a client-communication path where applicable |
+| Point-in-time | What was this client's brokerage rate on 14 August — answerable |
+
+## 4. Depository-participant record separation
+
+| Requirement | Detail |
+|---|---|
+| Separable records | Depository-participant records must be producible independently for a depository inspection |
+| Separate compliance officer | A named depository-participant compliance officer, not an assumed extension of the broking role |
+| Separate charges | Depository charges, their collection and the applicable account treatment |
+| Separate grievance handling | Depository complaints distinct from broking complaints |
+| Separate reporting | Depository reporting on its own calendar |
+| Shared platform, separate outputs | SecMark covers both; the architecture must not force a mixed report |
+
+## 5. Reconciliation framework
+
+| # | Reconciliation | Sources | Frequency | On difference |
+|---|---|---|---|---|
+| X1 | **Trades** | Exchange trade file, Saral OMS feed, back office | Daily, post-session | **Block contract notes**; investigate every difference |
+| X2 | **Obligations** | Clearing corporation files, back office computation | Per settlement | Escalate; settlement is at risk |
+| X3 | **Holdings** | Depository, back office | Daily | Do not recognise disputed quantities as collateral |
+| X4 | **Pledges** | Depository, back office, Saral RMS | Daily | Block exposure increase for affected clients |
+| X5 | **Bank** | Bank statement, ledger, gateway | Daily | Age the exception; unattributed client money is reportable if it persists |
+| X6 | **Gateway** | Razorpay settlement files, bank credits, ledger | Daily | Age the exception |
+| X7 | **Margin** | Firm's computation, clearing corporation files and snapshots | Daily | Risk incident; potential short collection |
+| X8 | **Client master** | Onboarding, OMS, back office | Daily | Block trading for mismatched clients |
+| X9 | **Ledger control accounts** | Client ledgers, firm general ledger | Per close | Resolve before close |
+| X10 | **Charges** | Computed charges, statutory rates, contract notes | Daily sample, monthly full | Correct and refund where overcharged |
+| X11 | **Partner commissions** | Reconciled trades, partner statements | Periodic | Hold the partner statement |
+| X12 | **CUSPA pledges** | Pay-outs, pledge instructions, depository confirmations | Daily | Stop further exposure; a statutory clock is running |
+
+| Metric | Why |
+|---|---|
+| **Age of the oldest open exception per reconciliation** | The metric that matters; count alone hides a backlog |
+| Exceptions created and cleared daily | Whether the function is keeping pace |
+| Exceptions by cause | Where the systemic problem is |
+| Recurring exceptions | A process defect, not a daily task |
+
+## 6. Batch design
+
+| Property | Requirement | Why |
+|---|---|---|
+| **Idempotent** | Re-running a stage must not double-post | Operators re-run under pressure |
+| **Restartable** | A failed stage resumes rather than restarting the pipeline | Deadlines |
+| Checkpointed | Progress recorded, so a restart knows where it was | Same |
+| Deterministic ordering | Same input, same output, every time | Reproducibility and testing |
+| Partial-failure visible | A stage that processed 980 of 1,000 reports that, loudly | Silent partial success is the worst outcome |
+| Validated input | Counts, totals and hashes asserted before processing | Garbage in is garbage posted |
+| Dry-run capable | A run that reports what it would do | Essential for exception investigation |
+| Audited | Who ran what, when, with what parameters and what result | Inspection and diagnosis |
+| Observable | Per-stage duration and record counts trended | Degradation is visible before it is a failure |
+
+## 7. Failure behaviour by stage
+
+| Stage fails | Immediate action | Downstream |
+|---|---|---|
+| P1 masters | **Stop.** Do not process on a stale master | Everything |
+| P2 trade import | Escalate to the exchange; retrieve again; **never synthesise trades from the OMS feed** | Everything |
+| P3 reconciliation difference | Investigate; do not proceed to contract notes | Contract notes, obligations |
+| P4 charges | Fix and re-run; charges are effective-dated so a re-run is safe | Contract notes |
+| P5 contract notes | **Escalate immediately**; a missed deadline is a reportable breach, not a delay to absorb quietly | Regulatory |
+| P6 dispatch | Generation deadline is absolute; dispatch may queue with evidence of attempts | Delivery evidence |
+| P7 ledger | Stop; a wrong ledger propagates into statements, reporting and pay-outs | Most things |
+| P8 obligations | **Escalate to the clearing corporation**; settlement cannot be estimated | Settlement |
+| P9 settlement instructions | Escalate; short delivery has a defined and expensive consequence path | Settlement |
+| P10 CUSPA | **Stop further exposure for affected clients**; a statutory clock is running | Statutory |
+| P11 extract to RMS | **Next day's open is blocked** — this is a begin-of-day gate | Trading |
+| P12 margin reporting | Within the window, re-run; **do not file a file that failed validation** | Penalty |
+| P13 corporate actions | Escalate; entitlement errors are visible to clients and hard to unwind | Client |
+| P14 statements | Delay rather than send wrong; a wrong statement is worse than a late one | Servicing |
+| P15, P16 reconciliation | Run anyway; the exceptions are the output | Integrity |
+| P17 partner | Hold the statement | Partner |
+| P18 reporting | Per the calendar's escalation | Filing |
+| P20 commodity close | Separate escalation path, in the evening | Commodity records |
+
+## 8. Timing and the commodity overlap
+
+| Window | What runs | Consideration |
+|---|---|---|
+| Post equity close | P2 to P9 for equity segments | The main pipeline |
+| Concurrently, to 23:30 | MCX trading continues | Risk, dealing and support still live |
+| 19:30 on tender days | Commodity delivery intentions through MCXCCL eClear | A hard evening deadline |
+| After 23:30 | P20 commodity close | A second, later pipeline |
+| Overnight | P11, P13, P15 to P19 | The window is narrow |
+| Pre-open | P1 for the next day | The gate |
+
+| Design consequence | Detail |
+|---|---|
+| Two operating modes concurrently | Equity end-of-day while commodity trades; separate handovers |
+| Narrow maintenance window | Between the commodity close and the next begin-of-day |
+| Separate commodity checklist | The commodity close is not an appendix to the equity one |
+| Daylight saving | The commodity close moves twice a year; batch schedules must follow |
+| Staffing | A late shift with the authority to escalate, not just to observe |
+
+## 9. Configuration touchpoints
+
+Full list at the [back office configuration reference](/broking-kyc/finix-broking-setup/backoffice/10-backoffice-config-reference/).
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.bo.master.assert_current_day` | True, hard gate | Exchange-set | Processing on a stale master |
+| `finix.bo.trade.source_of_truth` | Exchange trade file | Regulatory in substance | Records that the exchange does not confirm |
+| `finix.bo.recon.block_contract_notes_on_diff` | True | Regulatory in substance | A note on an unreconciled trade |
+| `finix.bo.batch.idempotent` | Enforced | Discretionary, strongly recommended | Double posting on re-run |
+| `finix.bo.batch.partial_success_action` | Fail loudly | Discretionary | Silent partial processing |
+| `finix.bo.dp.records_separable` | True | Regulatory | Mixed records in a depository inspection |
+| `finix.bo.recon.exception_age_alarm.<type>` | Tight | Discretionary | Silent backlog |
+| `finix.bo.extract.rms_blocking` | True | Discretionary, strongly recommended | Trading on stale balances |
+
+## 10. Exception paths
+
+| Situation | Response |
+|---|---|
+| Exchange trade file late | Escalate to the exchange; recompute the internal timeline against the contract-note deadline; inform compliance early if the deadline is at risk |
+| Trade file re-published with corrections | Re-ingest idempotently; re-reconcile; if contract notes were already issued, follow the correction process and tell the clients |
+| Unexplained trade difference | Block contract notes; escalate; the exchange file governs |
+| A client in the OMS but not the back office | Block trading for that client; fix the master; investigate the onboarding path |
+| Pipeline stage fails near a deadline | Escalate to compliance at the point the deadline becomes at risk, not after it passes |
+| Batch re-run double-posts | Severity one; the idempotency property has failed; quantify and reverse |
+| Commodity close cannot complete | Evening escalation path; the next begin-of-day depends on it |
+| Operator runs a job out of sequence | The pipeline should prevent it; if it happened, treat as a control failure |
+| An exception category's oldest item is ageing | This is the signal; escalate before it becomes a reportable condition |
+
+## Practical notes
+
+- **Make reconciliation differences visible within minutes of import.** The 24-hour contract-note clock does not care when you noticed.
+- **Never synthesise trades from the order feed.** It is the fastest way out of a late-file situation and it produces records the exchange does not confirm.
+- **Test the re-run path deliberately.** Idempotency is claimed far more often than it is verified.
+- **Keep depository records separable from day one.** Retro-fitting separation is an archaeology project.
+- **Track exception age, not count.** A hundred one-day-old exceptions is a busy day; one ninety-day-old exception is a finding.
+- **Write a separate commodity close checklist.** It runs later, with fewer people, and it is where tired mistakes happen.
+- **Escalate deadline risk early.** Compliance can act on a deadline that is going to be missed; it can only record one that already was.
+
+## Where this connects
+
+- [Trade import and reconciliation](/broking-kyc/finix-broking-setup/backoffice/02-trade-import-reconciliation/) — the first stage in detail
+- [EOD runbook](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/) — this pipeline as an operated sequence
+- [Integration contract matrix](/broking-kyc/finix-broking-setup/stack/integration-contract-matrix/#6-record-path) — the interfaces each stage uses
+- [RMS architecture](/broking-kyc/finix-broking-setup/rms/01-rms-architecture/) — the consumer of P11
+- [Back office and RMS](/broking-kyc/appendix/back-office-rms/) — the vendor-neutral treatment

@@ -1,0 +1,242 @@
+---
+title: "Back office 5: settlement obligations"
+description: Turning the clearing corporation's obligation files into funds and securities that move on time — the obligation file set and its timetable, client-level allocation, funds and securities pay-in, early pay-in, direct pay-out to client demat, short delivery and auction, physical settlement of stock derivatives, commodity delivery, and the deadline chain that runs backwards from the bank's cut-off.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Settlement is the stage where a failure costs real money the same day, so the page is organised around the deadlines rather than around the data. It starts with the files and when they arrive, then the obligations they produce, then each movement — funds in, securities in, securities out, funds out — with its own deadline chain. Short delivery, physical settlement and commodity delivery get separate treatment because each has a different consequence path, and the page ends with the backwards-from-the-bank-cut-off scheduling rule that is the single most useful operational habit in the plane.
+
+## TL;DR
+
+- **The clearing corporation publishes the obligations; the firm allocates them to clients.** The daily obligation report gives the cumulative net buy and sell position for a trading day; the final obligation report gives the net securities and funds to be delivered or received and is downloaded on T+1.
+- **The operative deadline is the bank's cut-off, not the exchange's.** Count backwards: clearing corporation deadline, minus the bank's cut-off, minus the firm's maker-checker step, equals the internal deadline that belongs in the runbook.
+- **Early pay-in of securities earns a margin benefit** and is worth operationalising deliberately rather than treating as an occasional optimisation.
+- **Direct pay-out sends securities to the client's demat account** rather than through a broker pool, which removes a step and a risk.
+- **Short delivery has a defined and expensive consequence path** — auction and close-out — and the right response is prevention: know before the deadline which clients are short.
+- **Physically settled stock derivatives build delivery margins across the expiry week**, and commodity delivery runs on a tender process with a 19:30 cut-off on tender days through MCXCCL eClear.
+- **A missing obligation file is an incident, not an absence.** Obligations cannot be estimated, and proceeding on a computed guess is how a settlement failure becomes a default.
+
+## Conceptual overview
+
+Settlement is the moment the broking business stops being informational. Up to this point everything is a record: trades, ledgers, margins. At settlement, securities actually move between demat accounts and money actually moves between bank accounts, on a timetable set by someone else, with a consequence path for failure that is defined in advance and is not negotiable. This changes the character of the operation. Elsewhere in the stack an error can be corrected tomorrow; here, a missed pay-in produces a short delivery, an auction, a close-out price and a cost that is allocated to a client who will dispute it.
+
+The second property is that settlement is a chain of externally imposed deadlines with internal steps between them, and the firm controls only the internal steps. The clearing corporation sets a pay-in deadline. The firm's bank sets an earlier cut-off for the channel the firm uses. The firm's own maker-checker adds time. The firm's funding decision needs a treasury input that needs a view of the obligation that needs the obligation file. Every one of those is a dependency, and the useful discipline is to compute the chain backwards and publish the earliest internal deadline rather than the latest external one.
+
+The third property is that prevention is far cheaper than cure in this stage specifically. A short delivery costs an auction price plus a penalty plus a client dispute; knowing at 15:45 that a client is short costs a phone call. A funds shortfall at the bank's cut-off costs an escalation and possibly a default; knowing at 11:00 that the day's obligation will exceed available funds costs a treasury decision. The design priority is therefore early visibility: the firm should know its settlement position long before the deadline, not when the instruction fails.
+
+## 1. Framework
+
+- **Clearing corporation rules, bye-laws and settlement schedules** — NSE Clearing, Indian Clearing Corporation and MCX Clearing Corporation publish the settlement calendar, obligation file formats, deadlines and consequence paths. `[not yet in index]`
+- **NSE Clearing report set** — reports downloaded in comma-separated format to the member's Reports folder on the Extranet, covering trades, obligations, deliveries, auctions, corporate actions, settlements and shortages. The **daily obligation report** provides the daily cumulative net buy and sell position for a trading day; the **final obligation report** provides the net obligation for securities and funds to be delivered or received and is downloaded on **T+1**. The **bank summary report** gives transactions in the member's clearing account at the clearing bank; the **daily funds statement** gives the break-up of debits and credits in the clearing bank account. `[not yet in index]`
+- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025).
+- **T+1 settlement** — see [T+0 and T+1 settlement](/broking-kyc/deep-dives/settlement/t0-t1-settlement/).
+- **Direct pay-out to client demat** — see [direct pay-out to demat](/broking-kyc/deep-dives/settlement/direct-payout-to-demat/).
+- **Short delivery and auction** — see [short delivery and auction](/broking-kyc/deep-dives/trading-day/short-delivery-auction/).
+- **Physical settlement of stock derivatives** — delivery margins staged across the last sessions of expiry week. See [exercise, assignment and physical settlement](/broking-kyc/trading-risk/exercise-assignment-physical/).
+- **Commodity delivery** — staggered delivery tender period over the last three trading days including expiry, with an 8.34 percent incremental margin; delivery intention by buyer or seller on any tender day until **19:30** through MCXCCL eClear; sellers exempt from margins other than mark-to-market where goods are tendered as early pay-in with documentary evidence.
+
+## 2. The file set and its timetable
+
+| File | What it gives | When | If missing |
+|---|---|---|---|
+| Daily obligation report | Daily cumulative net buy and sell position for the trading day | Post-session | Cannot compute the day's position; escalate |
+| **Final obligation report** | Net securities and funds to be delivered or received | **T+1** | **Settlement cannot proceed on an estimate; escalate immediately** |
+| Delivery statements | Securities to deliver and receive | Per settlement | Escalate |
+| Bank summary report | Transactions in the clearing account at the clearing bank | Daily | Reconciliation blocked |
+| Daily funds statement | Break-up of debits and credits in the clearing bank account | Daily | Reconciliation blocked |
+| Shortage and auction reports | Short deliveries and auction outcomes | Per settlement | Cannot allocate auction costs |
+| Corporate action reports | Entitlement effects on settlement | Per event | Entitlement errors |
+| Margin and collateral statements | Requirement and collateral position | Daily and intraday | Risk and reporting blocked |
+| Settlement calendar | Dates and deadlines | Published, amendable | Wrong deadline assumptions |
+
+| Control | Detail |
+|---|---|
+| **Expected-file checklist** | Every file expected, per exchange, segment and settlement, asserted |
+| Missing file | An incident with an escalation path, not an absence to be worked around |
+| Version handling | A re-published file is a new version with a computed difference |
+| Retention | Files retained on the eight-year floor |
+
+## 3. Client-level allocation
+
+| Step | Detail |
+|---|---|
+| 1. Load the obligation | Per the final obligation report |
+| 2. Compute client-level obligations | From reconciled trades, netted per the applicable rules |
+| 3. **Reconcile** | The sum of client obligations against the clearing corporation's member-level obligation; a difference blocks settlement preparation |
+| 4. Identify funds shortfalls | Clients who owe and have not paid |
+| 5. Identify securities shortfalls | Clients who must deliver and do not hold |
+| 6. Identify early pay-in candidates | Clients holding the securities they must deliver |
+| 7. Apply CUSPA where securities are paid out against an unpaid obligation | See [CUSPA](/broking-kyc/finix-broking-setup/backoffice/06-cuspa-unpaid-securities/) |
+| 8. Produce the funding requirement | For treasury |
+
+<Aside type="caution" title="Know your shortfalls before the deadline, not at it">
+Steps 4 and 5 are the prevention step, and their value depends entirely on when they run. A securities shortfall identified at 15:45 on the settlement day can still be fixed by a client transfer or by buying in. The same shortfall identified when the pay-in instruction is rejected cannot. Run the shortfall identification as early as the obligation data allows, publish it to the people who can act on it, and treat it as an operational deliverable rather than a by-product of the settlement run.
+</Aside>
+
+## 4. Funds pay-in
+
+| Step | Owner | Timing |
+|---|---|---|
+| Obligation known | Operations | On the final obligation report |
+| Client-level funding position computed | Operations | Immediately after |
+| Treasury funding decision | Treasury | Well before the bank cut-off |
+| Instruction prepared | Treasury, maker | Before the internal deadline |
+| Instruction approved | Treasury, checker | Before the internal deadline |
+| **Instruction sent** | Treasury | **Before the bank's cut-off** |
+| Bank debit confirmed | Treasury | Monitored |
+| Clearing corporation recognition confirmed | Operations | **Assert; do not assume** |
+| Reconciliation | Operations | Against the bank summary and daily funds statement |
+
+| The deadline chain | Example structure |
+|---|---|
+| Clearing corporation pay-in deadline | Published |
+| **minus** the bank's channel cut-off | Earlier, per bank and per channel, documented in writing |
+| **minus** the firm's maker-checker time | Measured, not assumed |
+| **minus** a contingency buffer | For a failed first attempt |
+| **= the internal deadline in the runbook** | This is the number operations works to |
+
+## 5. Securities pay-in and early pay-in
+
+| Mechanism | Detail |
+|---|---|
+| Ordinary pay-in | Delivery instruction to the depository before the deadline |
+| **Early pay-in** | Securities delivered ahead of the deadline, earning a margin benefit |
+| Why it matters | The margin benefit is real and recurring; treating early pay-in as an occasional optimisation leaves capital on the table |
+| Identification | Clients holding the securities they must deliver, identified from the holdings and obligation data |
+| Authority | The client's authority for the delivery must exist — see [eSign, DDPI and pledge setup](/broking-kyc/finix-broking-setup/onboarding/06-esign-ddpi-pledge-setup/) |
+| Confirmation | Early pay-in must be **recognised** for the margin benefit; assert the recognition rather than assuming it |
+| Commodity analogue | Sellers tendering goods as early pay-in with documentary evidence are exempt from margins other than mark-to-market |
+
+## 6. Securities and funds pay-out
+
+| Mechanism | Detail |
+|---|---|
+| **Direct pay-out to client demat** | Securities move from the clearing corporation to the client's demat account rather than through a broker pool account |
+| Benefit | Fewer hops, less operational risk, and the client sees the securities where they expect |
+| Unpaid obligations | Where the client has not paid, the securities are still paid out to their demat and the **CUSPA auto-pledge** is created at pay-out |
+| Funds pay-out | Received into the clearing account, then to the downstreaming client nodal account for client disbursement **the same day** |
+| Client disbursement | From the downstreaming account only; see [bank account architecture](/broking-kyc/finix-broking-setup/setup/06-bank-account-architecture/) |
+| Reconciliation | Pay-out received against pay-out disbursed, daily |
+
+## 7. Short delivery and auction
+
+| Stage | Detail |
+|---|---|
+| Prevention | Identify securities shortfalls early; client transfer, or buy-in |
+| Shortfall occurs | Reported in the shortage report |
+| Auction | The clearing corporation conducts an auction to obtain the securities |
+| Close-out | Where the auction does not succeed, a close-out at the prescribed basis |
+| Cost | The auction or close-out price difference plus applicable charges |
+| **Allocation** | To the client who failed to deliver, per the disclosed policy and the agreement |
+| Communication | The client is told what happened, the cost, and why |
+| Recurrence | A client with repeated short deliveries is a risk and conduct matter, not just a cost |
+| Record | The full chain retained |
+
+Depth at [short delivery and auction](/broking-kyc/deep-dives/trading-day/short-delivery-auction/).
+
+## 8. Physical settlement of stock derivatives
+
+| Element | Detail |
+|---|---|
+| Scope | Single-stock futures and options settle by delivery of shares |
+| Direction | A long future and an exercised long call receive; a short future, an assigned short call and an exercised long put deliver |
+| **Delivery margins** | Build across the last sessions of expiry week rather than appearing on expiry day |
+| Netting | Derivatives delivery obligations net against cash-segment obligations for the same clearing member, trading member and unique client code |
+| Taxes | Securities transaction tax and stamp duty remain segment-wise |
+| Client communication | Must begin well before expiry week; a client unaware that their option position will result in a delivery obligation is a predictable complaint |
+| Failed square-off | A residual position that could not be exited remains in the delivery queue |
+| Corporate actions | Can accelerate an expiry and change the obligation |
+
+Depth at [exercise, assignment and physical settlement](/broking-kyc/trading-risk/exercise-assignment-physical/).
+
+## 9. Commodity delivery
+
+| Element | Detail |
+|---|---|
+| Tender period | The last three trading days including expiry, for staggered delivery contracts |
+| Margin ladder | An **8.34 percent incremental margin** across those days |
+| Delivery period margin | The higher of 3 percent plus five-day 99 percent value-at-risk of spot price volatility, or **25 percent** |
+| Intention | By buyer or seller, on any tender day, **until 19:30**, through MCXCCL eClear |
+| Seller early pay-in | Goods tendered as early pay-in with documentary evidence exempt the seller from margins other than mark-to-market |
+| Warehouse | Documentation, quality and location all matter; this is a physical-goods operation |
+| Staffing | A present, authorised person on every tender day — not an on-call arrangement |
+| Client communication | Begins several sessions before the tender period, because the margin step change is large |
+
+Depth at [MCX commodity](/broking-kyc/finix-broking-setup/exchanges/04-mcx-commodity/).
+
+## 10. Controls and metrics
+
+| Control | Detail |
+|---|---|
+| Expected-file checklist per settlement | Asserted |
+| Client obligation sum against member obligation | Must tie before preparation |
+| Shortfall identification time | As early as the data allows |
+| Internal deadline, not the external one | Published in the runbook |
+| Instruction acknowledgement | Asserted, not assumed |
+| Clearing corporation recognition | Asserted |
+| Early pay-in benefit realised | Measured; an unrecognised early pay-in is wasted effort |
+| Short delivery count and cost | Trended, by client |
+| Settlement reconciliation | Daily, against the bank summary and daily funds statement |
+
+| Metric | Behaviour |
+|---|---|
+| Time from final obligation to client allocation complete | Minutes to a small number of hours |
+| Shortfalls identified before the actionable window closes | Should be all of them |
+| Instructions sent before the internal deadline | Should be all of them |
+| Short deliveries per month | Trending to zero; a stable rate is a process defect |
+| Early pay-in coverage | The share of eligible deliveries made early |
+
+## 11. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.bo.settle.expected_files.<exchange>.<segment>` | Explicit | Exchange-set | A missing file unnoticed |
+| `finix.bo.settle.obligation_tie_out_required` | True | Discretionary, strongly recommended | Settling on an unreconciled obligation |
+| `finix.bo.settle.internal_deadline.<bank>.<channel>` | Computed backwards from the bank cut-off | Discretionary, strongly recommended | Missed pay-in |
+| `finix.bo.settle.bank_cutoff.<bank>.<channel>` | Per bank, in writing | Exchange and bank set | Wrong deadline assumption |
+| `finix.bo.settle.shortfall_identification_time` | As early as data allows | Discretionary | Preventable short deliveries |
+| `finix.bo.settle.early_payin_enabled` | True, with automated candidate identification | Discretionary | Margin benefit forgone |
+| `finix.bo.settle.early_payin_recognition_assert` | True | Discretionary | Benefit assumed but not received |
+| `finix.bo.settle.direct_payout` | Enabled | Exchange-set | Unnecessary pool-account risk |
+| `finix.bo.settle.payout_same_day_to_dscnb` | True | Regulatory | Pay-out funded from a pool |
+| `finix.bo.settle.short_delivery_cost_allocation` | Per agreement and disclosed policy | Regulatory in substance | Unauthorised client charge |
+| `finix.bo.settle.physical_delivery_notice_days` | Well before expiry week | Discretionary | Client surprise |
+| `finix.bo.settle.commodity_tender_cutoff` | 19:30 on tender days | Exchange-set | Missed delivery intention |
+| `finix.bo.settle.commodity_notice_days` | Several sessions before the tender period | Discretionary | Margin step-change surprise |
+
+## 12. Exception paths
+
+| Situation | Response |
+|---|---|
+| Final obligation file not received | **Escalate immediately.** Obligations cannot be estimated |
+| Client obligation sum does not tie to the member obligation | Block preparation; investigate; the clearing corporation governs |
+| Funds shortfall against the obligation | Treasury decision well before the cut-off: own funds, facility, or recovery from clients; escalate early |
+| Bank channel fails before the cut-off | Alternate channel, alternate bank, escalate to the clearing corporation; document every attempt |
+| Securities shortfall identified late | Buy-in if time permits; otherwise prepare for the auction path and inform the client |
+| Early pay-in not recognised | Investigate same day; the margin benefit was assumed in the day's computation |
+| Short delivery occurs | Follow the auction and close-out path; allocate per policy; communicate; record |
+| Client disputes a close-out cost | Produce the obligation, the shortfall, the auction or close-out outcome, and the policy clause |
+| Physical delivery obligation the client cannot meet | Escalate; the consequence path is defined and expensive; communicate immediately |
+| Commodity tender deadline approaching with no cover | Escalate before 19:30, not at it |
+| Settlement recognised by the firm but not by the clearing corporation | The clearing corporation governs; escalate and resolve before the deadline passes |
+
+## Practical notes
+
+- **Put the internal deadline in the runbook, not the exchange's.** Everyone knows the exchange time; almost nobody has written down the bank cut-off minus maker-checker.
+- **Identify shortfalls as early as the data allows and publish them.** It is the single highest-value habit in this stage.
+- **Operationalise early pay-in.** The benefit is recurring and the identification is automatable.
+- **Assert recognition, never assume it.** An instruction sent is not an obligation met.
+- **Communicate physical delivery well before expiry week.** The client-side surprise is predictable and preventable.
+- **Staff commodity tender days properly.** A 19:30 deadline needs a present, authorised person.
+- **Trend short deliveries by client.** A recurring short deliverer is a credit and conduct matter.
+
+## Where this connects
+
+- [Trade import and reconciliation](/broking-kyc/finix-broking-setup/backoffice/02-trade-import-reconciliation/) — the input
+- [CUSPA and unpaid securities](/broking-kyc/finix-broking-setup/backoffice/06-cuspa-unpaid-securities/) — what happens at pay-out when the client has not paid
+- [Treasury and exchange funding](/broking-kyc/finix-broking-setup/money/05-treasury-exchange-funding/) — funding the pay-in
+- [Settlement day operations](/broking-kyc/finix-broking-setup/daily-ops/06-settlement-day-ops/) — this plane as an operated sequence
+- [T+0 and T+1 settlement](/broking-kyc/deep-dives/settlement/t0-t1-settlement/) — the cycle
+- [Short delivery and auction](/broking-kyc/deep-dives/trading-day/short-delivery-auction/) — the consequence path
+- [Exercise, assignment and physical settlement](/broking-kyc/trading-risk/exercise-assignment-physical/) — stock derivatives delivery

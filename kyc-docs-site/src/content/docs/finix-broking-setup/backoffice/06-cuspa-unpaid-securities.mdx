@@ -1,0 +1,235 @@
+---
+title: "Back office 6: CUSPA and unpaid securities"
+description: The Client Unpaid Securities Pledgee Account regime introduced on 3 July 2026 — auto-pledge at pay-out without client instruction, the daily maximum-pledge-value recomputation, the five-trading-day payment window, the 6 PM extension request on day five, depository auto-release on day six, invocation and liquidation under the client's own code, and what the firm must build to operate it.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** This regime is new, dated, and almost entirely composed of same-day and next-day obligations, which makes it unusually easy to implement in a way that looks right and fails on day six. So the page is built as a timeline — what must happen at pay-out, what must happen every day afterwards, what must happen by 6 PM on the fifth trading day, and what the depositories do on the sixth whether or not the firm has acted. Each step names the system that performs it and the evidence it produces, because the whole regime is a sequence of dated instructions whose absence is visible to the depository.
+
+## TL;DR
+
+- **The circular is [HO/38/11/(9)2026-MIRSD-POD/I/15382/2026](/broking-kyc/reference/circulars/sebi-mirsd/#ho381192026-mirsd-podi153822026)**, dated **3 July 2026**, amending paragraph 46 of the Master Circular for Stock Brokers of 17 June 2025.
+- **Trading members must establish a dedicated Client Unpaid Securities Pledgee Account** to hold auto-pledged unpaid securities.
+- **The pledge is created at pay-out, without client instruction**, in favour of the CUSPA, marked with the reason "unpaid", and the client is notified by email or SMS explaining the outstanding funds obligation and the member's right to sell the pledged securities on non-payment.
+- **The maximum pledge value is recomputed daily** from the client's ledger balance and margin obligations, and **excess pledged securities are released on or before the next trading day**.
+- **The payment window is capped at five trading days from pay-out.** Beyond it the member invokes, blocks the securities in the client's demat, the depository verifies the block against client-level obligations, and the securities are **sold under the client's own unique client code**, with surplus credited to the client's ledger.
+- **An extension must be requested by 6 PM on the fifth trading day**, where liquidation is blocked by a lower circuit with only sellers, a suspension or trading halt, or another cause recognised by the market infrastructure institutions. The pledge may continue for up to **one additional calendar week**, renewable with fresh client communication.
+- **On the sixth trading day the depositories auto-release the pledge** if it has been neither invoked nor released — which means a firm that misses the window loses its security and still has the exposure.
+- **CUSPA securities may not be further pledged or transferred to banks or non-banking financial companies**, may count for margin collection reporting, and **must not support client trading exposure**.
+
+## Conceptual overview
+
+The problem this regime solves is old. A client buys securities, the securities are paid out on settlement, and the client has not paid for them. Under direct pay-out the securities go straight to the client's demat account, so the broker has delivered an asset against an unpaid obligation and has no hold over it. Various arrangements existed to manage that, with varying rigour and varying transparency. The 2026 framework standardises it: a dedicated pledgee account, an automatic pledge created at the moment of pay-out, a capped window, a defined liquidation mechanism and an automatic release if the member does nothing.
+
+What makes it operationally distinctive is that almost every obligation in it is dated and short. The pledge is created at pay-out, not later. The maximum value is recomputed daily and excess is released by the next trading day. The window is five trading days. The extension request is due by 6 PM on day five. The depositories act on day six. None of these is a target; each is a deadline whose breach is visible in the depository's own records. A firm that implements the auto-pledge and treats the rest as a monthly process will discover on day six that its pledges have evaporated.
+
+The third observation is that the regime is protective in both directions. It gives the member a real security interest in securities it has delivered but not been paid for, which is a genuine improvement on what came before. It also constrains the member: the securities may not be used as a funding source, they may not support the client's own further trading, and the member cannot sit on the pledge indefinitely. Designing to the constraints as carefully as to the entitlement is what keeps the arrangement defensible.
+
+## 1. The framework
+
+| Attribute | Value |
+|---|---|
+| Circular | **HO/38/11/(9)2026-MIRSD-POD/I/15382/2026** |
+| Date | **3 July 2026** |
+| Issued by | SEBI, Markets Intermediaries Regulation and Supervision Department |
+| Amends | **Paragraph 46** of the [Master Circular for Stock Brokers](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590) dated 17 June 2025 |
+| Account created | **Client Unpaid Securities Pledgee Account (CUSPA)**, dedicated, per trading member |
+| Effective, paragraphs 46.1 to 46.11 | **Three months from the issue of stock exchange operational guidelines** |
+| Effective, paragraphs 46.12 to 46.14 — the extension provisions | **Six months from 3 July 2026** |
+| Exchange operational guidelines | To be issued **within 30 days**, that is by early August 2026 |
+
+<Aside type="caution" title="The exchange operational guidelines are the operative document for mechanics">
+The circular sets the obligations; the exchange operational guidelines set the mechanics — instruction formats, the extension request channel, the reporting, and the depository interaction. Paragraphs 46.1 to 46.11 commence three months after those guidelines are issued, which makes the guideline date the one to track. Obtain them, read them against this page, and treat any difference as the guidelines governing.
+</Aside>
+
+## 2. The timeline
+
+| Day | What must happen | System | Evidence |
+|---|---|---|---|
+| **T, pay-out date** | Securities credited to the client's demat account | Depository | Pay-out record |
+| **T, pay-out date** | **Auto-pledge created in favour of the CUSPA, without client instruction, reason "unpaid"** | SecMark instruction to the depository | Pledge confirmation |
+| **T, pay-out date** | **Client notified** by email or SMS, explaining the outstanding funds obligation and the member's right to sell the pledged securities on non-payment | SecMark, with dispatch evidence | Notice and delivery record |
+| **T+1 to T+4** | Client clears the funds obligation within the member's policy window | — | Ledger |
+| **Daily, T onward** | **Maximum pledge value recomputed** from the client's ledger balance and margin obligations | SecMark, from the ledger | Computation record |
+| **Daily, T onward** | **Excess pledged securities released on or before the next trading day** | SecMark instruction to the depository | Release confirmation |
+| **T+5, the fifth trading day** | The payment window ends — the maximum is five trading days from pay-out | — | — |
+| **T+5, by 18:00** | **Extension request, where applicable conditions persist** | Per exchange guidelines | Request record |
+| **T+5 onward** | Invocation where the client has not paid | SecMark instruction | Invocation record |
+| **T+6, the sixth trading day** | **Depositories auto-release** the pledge if it has been neither invoked nor released | Depository | Release record |
+
+## 3. Invocation and liquidation
+
+| Step | Detail |
+|---|---|
+| 1. Reasonable notice | The member invokes the pledge and gives the client reasonable notice |
+| 2. Block | Securities are blocked in the client's demat account |
+| 3. **Depository verification** | The depositories verify block details against client-level obligations |
+| 4. **Sale under the client's own unique client code** | The securities are sold using the client's UCC, not the member's |
+| 5. Settlement | The sale settles in the ordinary way |
+| 6. **Surplus to the client** | Surplus funds after settlement are credited to the client's ledger |
+| 7. Shortfall | Where the sale does not cover the obligation, the residual debit remains the client's |
+| 8. Record | The entire chain retained |
+
+The sale under the client's own code is the detail most likely to be implemented wrongly, and it matters: it keeps the transaction in the client's name, keeps the tax and reporting consequences with the client, and makes the surplus obviously theirs.
+
+## 4. Constraints on CUSPA securities
+
+| Constraint | Detail |
+|---|---|
+| **No further pledge or transfer** | CUSPA-pledged securities **cannot be further pledged or transferred to banks or non-banking financial companies for fund-raising** |
+| **No client trading exposure** | They may count for margin collection reporting, but **no client trading exposure is permitted against them** |
+| Dedicated account | A standardised CUSPA per trading member, not a general-purpose pledgee account |
+| Reason marking | The pledge is marked with the reason "unpaid" |
+| Daily sizing | The pledge may be no larger than the daily computed maximum |
+| Release obligation | Excess released on or before the next trading day |
+| Time limit | Five trading days, extendable only through the prescribed process |
+
+<Aside type="note" title="Two configuration flags that must be set correctly">
+`finix.rms.collateral.cuspa_supports_exposure` must be **false** — the risk engine must not treat CUSPA-pledged securities as capacity. And the margin reporting extract must include them where they legitimately count for margin collection reporting. These two are easy to get backwards: a firm that counts them as capacity has given the client trading power against securities they have not paid for; a firm that excludes them from reporting has understated its collection.
+</Aside>
+
+## 5. What changed from the earlier framework
+
+| Aspect | Earlier | Now |
+|---|---|---|
+| Pledge account | No dedicated account | **Standardised CUSPA per trading member** |
+| Payment window | Unstandardised | **Capped at five trading days from pay-out** |
+| Unresolved pledge | Not clearly defined | **Auto-released by the depositories on day six** |
+| Extensions | No formal process | **Structured request by 6 PM on day five; up to one additional calendar week, renewable** |
+| Bank and non-banking financial company transfer | Not addressed | **Expressly prohibited** |
+| Margin reporting | Not addressed | **May be counted for margin collection reporting; no client trading exposure permitted** |
+| Daily sizing | Not specified | **Daily recomputation with next-trading-day release of excess** |
+
+## 6. The extension process
+
+| Element | Detail |
+|---|---|
+| When | By **6 PM on the fifth trading day** |
+| Why | Where unpaid securities cannot be liquidated within five trading days because of: a security in a **lower circuit with only sellers**; a **suspension or trading halt**, whether for surveillance or another cause; or another circumstance recognised by the market infrastructure institutions |
+| Duration | The pledge may continue for **up to one additional calendar week** |
+| Renewal | Further extensions of similar length may be sought where the conditions persist |
+| Client communication | **Each extension requires fresh client communication** |
+| Channel | Per the exchange operational guidelines |
+| Record | The request, its basis, the outcome, and the client communication |
+
+The 6 PM cut-off is a hard operational deadline on a specific day, which means it needs an owner, a calendar entry per affected position, and an alert well in advance. A firm that discovers at 6:30 PM that it needed an extension has lost the option.
+
+## 7. What the firm must build
+
+| Capability | Detail | Owner |
+|---|---|---|
+| **CUSPA account** | Opened with each depository, per the prescribed structure | Operations |
+| **Unpaid-securities policy** | Drafted, approved, disclosed; must state the member's window, which may be shorter than five trading days but not longer | Compliance |
+| **Pay-out-time detection** | Identify, at pay-out, every client position paid out against an unpaid obligation | Back office |
+| **Auto-pledge instruction** | Created at pay-out, without client instruction, with the correct reason marking | Back office to depository |
+| **Client notification** | Email or SMS at pay-out, with the obligation and the member's rights, with delivery evidence | Back office |
+| **Daily recomputation** | Maximum pledge value from ledger balance and margin obligations | Back office |
+| **Daily release of excess** | Instruction on or before the next trading day | Back office to depository |
+| **Day-five tracking** | Per position, with an alert in advance of 6 PM | Operations |
+| **Extension workflow** | Request, basis, approval, submission, client communication | Operations and compliance |
+| **Invocation workflow** | Notice, block, depository verification, sale under the client's UCC, surplus credit | Operations |
+| **Risk-engine exclusion** | CUSPA securities must not create trading capacity | Risk |
+| **Margin reporting inclusion** | Where they count for margin collection reporting | Risk and operations |
+| **Reconciliation** | Pay-outs against pledges created; pledges against the daily maximum; releases against instructions | Operations |
+| **Reporting** | Positions in CUSPA, by age, with the day-five and day-six horizon visible | Operations |
+
+## 8. Reconciliation and monitoring
+
+| Check | Frequency | On difference |
+|---|---|---|
+| Pay-outs against an unpaid obligation versus pledges created | **Daily, same day as pay-out** | A missing pledge is unsecured exposure; stop further exposure for that client and escalate |
+| Pledge quantity versus the daily computed maximum | Daily | Release excess; an oversized pledge is a client-rights issue |
+| Excess released by the next trading day | Daily | A late release is a breach of the daily obligation |
+| Positions approaching day five | **Daily, with a forward view** | Act before the 6 PM cut-off |
+| Positions at day six without invocation or release | Daily | **The depository will auto-release** — the firm loses its security and keeps the exposure |
+| Invoked positions through to sale and surplus credit | Per event | Complete the chain |
+| CUSPA securities appearing as risk capacity | Daily | Configuration defect; severity one |
+| CUSPA securities in margin reporting | Daily | Verify the treatment is correct in both directions |
+
+| Metric | Why |
+|---|---|
+| Positions in CUSPA, by age | The forward view of the clock |
+| Pledges created versus required, same day | The core control |
+| Excess releases made on time | The daily obligation |
+| Extensions requested and granted | Both an operational and a credit signal |
+| Day-six auto-releases | **Should be zero.** Any is a process failure |
+| Invocations and their outcomes | Client impact |
+
+## 9. Client communication
+
+| Event | Message | Timing |
+|---|---|---|
+| Pay-out with an unpaid obligation | The outstanding funds obligation, the pledge created, and the member's right to sell the pledged securities on non-payment | **At pay-out** |
+| Daily reminder within the window | Amount outstanding, days remaining, consequence | Daily or per policy |
+| Approaching the window end | Explicit: the date, the amount, what will happen | Before day five |
+| Extension granted | That the pledge continues, why, and for how long | **On each extension** |
+| Invocation | Reasonable notice before selling | Before the sale |
+| Sale completed | What was sold, at what price, the obligation cleared, and the surplus credited or the residual debit | After the sale |
+
+| Principle | Detail |
+|---|---|
+| The pay-out notice is mandatory | Email or SMS, with the specific content |
+| Delivery evidence | Recorded, as for any regulatory communication |
+| Plain language | The client has securities in their demat that they cannot freely sell; say so plainly |
+| Separate from margin calls | This is a different process with a different clock; do not merge the messages |
+
+## 10. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.bo.cuspa.enabled` | True | Regulatory | Unsecured unpaid positions |
+| `finix.bo.cuspa.autopledge_at_payout` | True, same day | Regulatory | No security over delivered securities |
+| `finix.bo.cuspa.pledge_reason` | "unpaid" | Regulatory | Mis-marked pledge |
+| `finix.bo.cuspa.notice_at_payout` | Email and SMS, with the prescribed content | Regulatory | Notice obligation unmet |
+| `finix.bo.cuspa.daily_max_recompute` | Daily, from ledger balance and margin obligations | Regulatory | Oversized pledge |
+| `finix.bo.cuspa.excess_release_by` | **Next trading day** | Regulatory | Client securities over-encumbered |
+| `finix.bo.cuspa.payment_window_days` | **Maximum 5 trading days**; the firm's policy may be shorter | Regulatory cap | Breach if longer |
+| `finix.bo.cuspa.extension_cutoff` | **18:00 on the fifth trading day** | Regulatory | Extension option lost |
+| `finix.bo.cuspa.extension_reasons` | Lower circuit sellers-only; suspension or halt; other MII-recognised cause | Regulatory | Invalid extension request |
+| `finix.bo.cuspa.extension_duration` | Up to one additional calendar week, renewable | Regulatory | Over-long pledge |
+| `finix.bo.cuspa.extension_requires_fresh_communication` | True | Regulatory | Client not informed |
+| `finix.bo.cuspa.sale_under_client_ucc` | **True** | Regulatory | Sale in the wrong name |
+| `finix.bo.cuspa.surplus_to_client_ledger` | True | Regulatory | Client surplus withheld |
+| `finix.bo.cuspa.no_further_pledge_or_transfer` | **Enforced** | Regulatory | Prohibited fund-raising against client securities |
+| `finix.rms.collateral.cuspa_supports_exposure` | **False** | Regulatory | Trading capacity against unpaid securities |
+| `finix.bo.cuspa.margin_reporting_treatment` | Included where it legitimately counts | Regulatory | Understated collection |
+| `finix.bo.cuspa.day5_alert_lead` | Well before 18:00 | Discretionary, strongly recommended | Missed extension cut-off |
+| `finix.bo.cuspa.day6_autorelease_alarm` | Alarm on any | Discretionary, strongly recommended | Silent loss of security |
+
+## 11. Exception paths
+
+| Situation | Response |
+|---|---|
+| Auto-pledge instruction fails at pay-out | **Stop further exposure for that client**; escalate same day; the five-day clock is already running on an unsecured position |
+| Client notification fails to deliver | Retry on the alternate channel; record; the obligation is to notify |
+| Daily recomputation not run | Severity one: the pledge may be oversized, which is a client-rights issue, or undersized, which is unsecured exposure |
+| Excess not released by the next trading day | Breach of the daily obligation; release immediately; record |
+| Security in a lower circuit with only sellers at day five | **Extension request by 6 PM**, citing the condition; fresh client communication |
+| Suspension or halt at day five | As above |
+| Extension cut-off missed | The option is lost; invoke if possible, or accept the day-six auto-release and pursue the debit; record as a process failure |
+| Day-six auto-release occurs | The firm has lost its security and retains the exposure; escalate; this should never happen |
+| Invocation sale does not cover the obligation | Residual debit remains the client's; follow the debit process |
+| Surplus not credited to the client | Correct immediately; this is the client's money |
+| CUSPA securities found supporting trading capacity | Severity one configuration defect; quantify the exposure window |
+| Client pays during the window | Release the pledge promptly; confirm to the client |
+
+## Practical notes
+
+- **Track the exchange operational guidelines, because they set the mechanics and the commencement date** for paragraphs 46.1 to 46.11.
+- **Put a calendar alert on day five per position, well before 18:00.** The extension option is time-boxed and losing it is expensive.
+- **Make day-six auto-releases an alarm with a target of zero.** Each one means the firm gave up a security interest by inaction.
+- **Verify both directions of the margin-reporting treatment.** Counted where it should be, excluded from capacity where it must be.
+- **Keep the pay-out notice separate from margin-call messaging.** Different process, different clock, different consequence.
+- **Reconcile pledges created against pay-outs the same day.** A missing pledge is unsecured exposure on a running clock.
+- **Set the firm's own window shorter than five trading days if the policy supports it.** The cap is a maximum, not a target.
+
+## Where this connects
+
+- [Settlement obligations](/broking-kyc/finix-broking-setup/backoffice/05-settlement-obligations/) — where pay-out happens
+- [Ledger and accounting](/broking-kyc/finix-broking-setup/backoffice/04-ledger-accounting/) — the balance that drives the daily recomputation
+- [Collateral and pledge](/broking-kyc/finix-broking-setup/rms/05-collateral-pledge/) — why CUSPA securities are not capacity
+- [Depository participation](/broking-kyc/finix-broking-setup/setup/05-depository-participant/) — the instruction path
+- [Margin reporting and penalties](/broking-kyc/finix-broking-setup/rms/08-margin-reporting-penalties/) — the reporting treatment
+- [Square-off engine](/broking-kyc/finix-broking-setup/rms/06-squareoff-engine/) — the separate margin process this must not be confused with
+- [Circulars index](/broking-kyc/reference/circulars/sebi-mirsd/#ho381192026-mirsd-podi153822026) — the source circular

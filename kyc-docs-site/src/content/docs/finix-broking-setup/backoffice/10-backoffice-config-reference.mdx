@@ -1,0 +1,230 @@
+---
+title: "Back office 10: configuration reference"
+description: Every back-office tunable in one table — masters and batch behaviour, trade import and reconciliation, contract notes, the ledger, settlement, CUSPA, corporate actions, statements and retention, and regulatory reporting — each with its Finix default, classification, and the failure mode if it is wrong.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page exists:** The back office is where regulatory deadlines turn into configured values — a retention period, a contract-note window, a payment window, a reporting cut-off. Several of them are statutory caps or floors with no discretion, and mixing those with the firm's own choices in one undifferentiated settings file is how a floor gets treated as a preference. This page separates them.
+
+## TL;DR
+
+- **Four values in this plane are statutory and absolute**: the eight-year retention floor, the 24-hour contract-note window, the five-trading-day CUSPA cap, and the prohibition on cash.
+- **Three gates block the pipeline by design**: current-day masters, reconciled trades before contract notes, and a closed ledger before statements. Each is a deliberate refusal to proceed on bad inputs.
+- **Deadlines are configured as internal targets, not external limits.** The runbook works to the internal number; the external one is recorded for reference.
+- **Batch idempotency is configuration, not a hope.** Operators re-run under pressure, and a non-idempotent re-run converts a delay into a corruption.
+- **The two directions of the CUSPA treatment must both be right**: excluded from risk capacity, included in margin collection reporting where it legitimately counts.
+
+## 1. Classification
+
+**R** regulatory · **E** exchange, clearing corporation or depository set · **D** discretionary. The *Blocks* column names what the firm refuses to do when the value's condition is not met.
+
+## 2. Masters and batch
+
+| Key | Finix default | Class | Blocks | Failure mode |
+|---|---|---|---|---|
+| `finix.bo.master.assert_current_day` | True, hard gate | E | **All processing** | Processing on a stale master |
+| `finix.bo.master.client_recon_daily` | Onboarding, OMS, back office | D | Trading for mismatched clients | Trades for an unknown client |
+| `finix.bo.master.charge_effective_dating` | Enforced | D | — | Prior-day re-runs computing wrongly |
+| `finix.bo.master.charge_change_maker_checker` | Required | D | — | Unapproved client charges |
+| `finix.bo.batch.idempotent` | Enforced | D | — | Double posting on re-run |
+| `finix.bo.batch.restartable` | Enforced | D | — | Full re-runs under deadline pressure |
+| `finix.bo.batch.partial_success_action` | **Fail loudly** | D | Downstream stages | Silent partial processing |
+| `finix.bo.batch.dry_run_available` | True | D | — | Blind exception investigation |
+| `finix.bo.batch.audit_log` | Who, what, when, parameters, result | R in substance | — | Unexplainable processing |
+| `finix.bo.dp.records_separable` | True | R | — | Mixed records in a depository inspection |
+
+## 3. Trade import and reconciliation
+
+| Key | Finix default | Class | Blocks | Failure mode |
+|---|---|---|---|---|
+| `finix.bo.trade.source_of_truth` | **Exchange trade file** | R in substance | — | Records the exchange does not confirm |
+| `finix.bo.trade.expected_files.<x>.<seg>` | Explicit list | E | Processing | A missing file unnoticed |
+| `finix.bo.trade.count_assertion` | Required | D | Downstream stages | A partial import processed |
+| `finix.bo.trade.value_assertion` | Required where available | D | Downstream stages | Same |
+| `finix.bo.trade.idempotent_load` | Enforced | D | — | Double posting |
+| `finix.bo.trade.file_version_diff` | Computed on re-publication | D | — | Corrections missed |
+| `finix.bo.recon.three_way` | Enforced | D | — | Intraday view errors invisible |
+| `finix.bo.recon.block_contract_notes_on_diff` | **True** | R in substance | **Contract notes** | A note on an unreconciled trade |
+| `finix.bo.recon.escalate_immediately` | D2 unconfirmed trade, D8 unknown client, D16 segregation | D | — | Serious matters queued |
+| `finix.bo.recon.difference_report_latency` | Minutes | D | — | The contract-note clock consumed by batch latency |
+| `finix.bo.trade.unallocated_action` | **Block the pipeline** | R in substance | Everything downstream | An unidentified obligation |
+| `finix.bo.trade.prop_client_segregation` | Hard | **R** | — | Statutory segregation breach |
+| `finix.bo.trade.raw_file_retention_years` | 8 | **R** | — | Short of the statutory floor |
+
+## 4. Contract notes
+
+| Key | Finix default | Class | Blocks | Failure mode |
+|---|---|---|---|---|
+| `finix.bo.cn.format` | Annexure A or B, one of them | E | — | Non-conforming notes |
+| `finix.bo.cn.deadline_hours` | **24 from execution** | **R** | — | Missed statutory deadline |
+| `finix.bo.cn.internal_target` | Materially earlier | D | — | No room to recover |
+| `finix.bo.cn.requires_reconciled_trades` | True | R in substance | Generation | A note on an unreconciled trade |
+| `finix.bo.cn.signing_cert` | Current, expiry monitored | **R** | Generation | Pipeline outage or unsigned notes |
+| `finix.bo.cn.unsigned_dispatch` | **Blocked** | **R** | Dispatch | Invalid notes issued |
+| `finix.bo.cn.channels` | Email plus SMS link | E | — | Non-conforming dispatch |
+| `finix.bo.cn.dlt_templates` | Registered and current | E | SMS dispatch | Dispatch failure |
+| `finix.bo.cn.dispatch_retry_policy` | Bounded, evidenced | D | — | Silent non-delivery |
+| `finix.bo.cn.hard_bounce_action` | Servicing; restrict if unresolvable | D | — | Clients who cannot be served |
+| `finix.bo.cn.rounding_rule` | One rule, shared with the ledger | D | — | Persistent small discrepancies |
+| `finix.bo.cn.correction_indicator` | Explicit, referencing the original | D | — | Client confusion |
+| `finix.bo.cn.retention_years` | 8 | **R** | — | Short of the floor |
+
+## 5. Ledger
+
+| Key | Finix default | Class | Blocks | Failure mode |
+|---|---|---|---|---|
+| `finix.bo.ledger.cash_head` | **Absent** | **R** | — | Cash receipt, prohibited by regulation 20(d) |
+| `finix.bo.ledger.inter_client_posting` | **Impossible by construction** | **R** | — | Statutory segregation breach |
+| `finix.bo.ledger.prop_separation` | Hard | **R** | — | Segregation breach |
+| `finix.bo.ledger.credit_on` | **Confirmed good funds** | R in substance | Capacity and pay-out | Credit against reversible money |
+| `finix.bo.ledger.sale_proceeds_availability` | Per disclosed policy, consistent across systems | D, disclosed | — | Three answers to one question |
+| `finix.bo.ledger.brokerage_withdrawal` | On computation of amounts actually due | **R** | — | Own funds taken early from the client pool |
+| `finix.bo.ledger.rounding_rule` | One rule, shared | D | — | Client distrust |
+| `finix.bo.ledger.no_deletions` | Reversals only | R in substance | — | Audit trail destroyed |
+| `finix.bo.ledger.point_in_time_query` | Supported | R in substance | — | Disputes unanswerable |
+| `finix.bo.ledger.debit_age_buckets` | Defined | D | — | Ageing invisible |
+| `finix.bo.ledger.interest_on_debit` | Only per agreement and policy | R in substance | — | Unauthorised charge |
+| `finix.bo.ledger.runacc_cycle` | Per applicable frequency and client preference | **R** | — | Missed settlement |
+| `finix.bo.ledger.control_account_recon` | Per close | D | Close | Books diverging |
+| `finix.bo.ledger.retention_years` | 8 | **R** | — | Short of the floor |
+
+## 6. Settlement
+
+| Key | Finix default | Class | Blocks | Failure mode |
+|---|---|---|---|---|
+| `finix.bo.settle.expected_files.<x>.<seg>` | Explicit | E | Preparation | A missing file unnoticed |
+| `finix.bo.settle.obligation_tie_out_required` | True | D | Preparation | Settling on an unreconciled obligation |
+| `finix.bo.settle.bank_cutoff.<bank>.<channel>` | Per bank, in writing | E and bank set | — | Wrong deadline assumption |
+| `finix.bo.settle.internal_deadline.<bank>.<channel>` | **Bank cut-off minus maker-checker minus buffer** | D | — | Missed pay-in |
+| `finix.bo.settle.shortfall_identification_time` | As early as data allows | D | — | Preventable short deliveries |
+| `finix.bo.settle.early_payin_enabled` | True, with automated candidate identification | D | — | Margin benefit forgone |
+| `finix.bo.settle.early_payin_recognition_assert` | True | D | — | Benefit assumed but not received |
+| `finix.bo.settle.direct_payout` | Enabled | E | — | Unnecessary pool-account risk |
+| `finix.bo.settle.payout_same_day_to_dscnb` | True | **R** | Client pay-out | Pay-out funded from a pool |
+| `finix.bo.settle.short_delivery_cost_allocation` | Per agreement and disclosed policy | R in substance | — | Unauthorised client charge |
+| `finix.bo.settle.physical_delivery_notice_days` | Well before expiry week | D | — | Client surprise |
+| `finix.bo.settle.commodity_tender_cutoff` | **19:30 on tender days** | E | — | Missed delivery intention |
+| `finix.bo.settle.commodity_notice_days` | Several sessions ahead | D | — | Margin step-change surprise |
+
+## 7. CUSPA
+
+| Key | Finix default | Class | Blocks | Failure mode |
+|---|---|---|---|---|
+| `finix.bo.cuspa.enabled` | True | **R** | — | Unsecured unpaid positions |
+| `finix.bo.cuspa.autopledge_at_payout` | True, same day | **R** | Further exposure if it fails | No security over delivered securities |
+| `finix.bo.cuspa.pledge_reason` | "unpaid" | **R** | — | Mis-marked pledge |
+| `finix.bo.cuspa.notice_at_payout` | Email and SMS, prescribed content | **R** | — | Notice obligation unmet |
+| `finix.bo.cuspa.daily_max_recompute` | Daily, from ledger and margin obligations | **R** | — | Oversized or undersized pledge |
+| `finix.bo.cuspa.excess_release_by` | **Next trading day** | **R** | — | Client securities over-encumbered |
+| `finix.bo.cuspa.payment_window_days` | **Maximum 5 trading days** | **R cap** | — | Breach if longer |
+| `finix.bo.cuspa.extension_cutoff` | **18:00 on the fifth trading day** | **R** | — | Extension option lost |
+| `finix.bo.cuspa.extension_reasons` | Lower circuit sellers-only; suspension or halt; other MII-recognised cause | **R** | — | Invalid request |
+| `finix.bo.cuspa.extension_duration` | Up to one additional calendar week, renewable | **R** | — | Over-long pledge |
+| `finix.bo.cuspa.extension_requires_fresh_communication` | True | **R** | — | Client not informed |
+| `finix.bo.cuspa.sale_under_client_ucc` | **True** | **R** | — | Sale in the wrong name |
+| `finix.bo.cuspa.surplus_to_client_ledger` | True | **R** | — | Client surplus withheld |
+| `finix.bo.cuspa.no_further_pledge_or_transfer` | **Enforced** | **R** | — | Prohibited fund-raising against client securities |
+| `finix.rms.collateral.cuspa_supports_exposure` | **False** | **R** | — | Trading capacity against unpaid securities |
+| `finix.bo.cuspa.margin_reporting_treatment` | Included where it legitimately counts | **R** | — | Understated collection |
+| `finix.bo.cuspa.day5_alert_lead` | Well before 18:00 | D | — | Missed extension cut-off |
+| `finix.bo.cuspa.day6_autorelease_alarm` | Alarm on any; target zero | D | — | Silent loss of security |
+
+## 8. Corporate actions
+
+| Key | Finix default | Class | Blocks | Failure mode |
+|---|---|---|---|---|
+| `finix.bo.ca.source` | Exchange and clearing corporation announcements | E | — | Missed or wrong events |
+| `finix.bo.ca.entitlement_basis` | **Total beneficial holding**, including pledged and CUSPA | R in substance | — | Omitted entitlements |
+| `finix.bo.ca.derivatives_adjustment` | **Ingested, not derived** | E | — | Divergent positions |
+| `finix.bo.ca.gtt_action` | **Cancel and notify** | D, disclosed | — | An instruction the client did not give |
+| `finix.bo.ca.amo_action` | Cancel and notify | D | — | Same |
+| `finix.bo.ca.sip_action` | Review and notify | D | — | Client surprise |
+| `finix.bo.ca.collateral_revaluation` | On the ex date | D | — | Stale collateral values |
+| `finix.bo.ca.collateral_eligibility_recheck` | On the event | E | — | Recognising ineligible collateral |
+| `finix.bo.ca.client_notice_lead` | Before the ex date | D | — | Avoidable queries |
+| `finix.bo.ca.firm_account_entitlement_alarm` | Alarm on any; target zero | D | — | Client entitlements stranded |
+| `finix.bo.ca.expiry_acceleration_notice` | Prominent, immediate | D | — | Clients unaware their horizon changed |
+
+## 9. Statements and retention
+
+| Key | Finix default | Class | Blocks | Failure mode |
+|---|---|---|---|---|
+| `finix.bo.stmt.requires_ledger_close` | True | D | **Statements** | Wrong statements |
+| `finix.bo.stmt.rounding_rule` | One rule, shared | D | — | Client distrust |
+| `finix.bo.stmt.completeness_assertion` | Required | D | Dispatch | Clients missed |
+| `finix.bo.stmt.frequency.<artefact>` | Per prescribed or policy frequency | **R** | — | Servicing breach |
+| `finix.bo.stmt.channel.<artefact>` | Per prescribed channel | **R** | — | Non-conforming dispatch |
+| `finix.bo.stmt.delivery_evidence` | Per attempt | R in substance | — | Unprovable dispatch |
+| `finix.bo.stmt.hard_bounce_action` | Servicing; restrict if unresolvable | D | — | Clients who cannot be served |
+| `finix.cmp.retention.books_years` | **8** | **R** | — | Short of the statutory floor |
+| `finix.cmp.retention.scope` | All record classes, not only documents | **R** | — | Partial retention |
+| `finix.cmp.retention.immutable_classes` | Logs and decision records | R in substance | — | Destroyed audit trail |
+| `finix.cmp.retention.replication` | Survives primary-site loss | D | — | Records lost with the site |
+| `finix.cmp.retention.retrieval_drill_frequency` | Annual | D | — | Untested retention |
+| `finix.cmp.retention.deletion_controlled` | Approved and evidenced | R in substance | — | Premature destruction |
+| `finix.cmp.complaint.clock_days` | **21** | **R** | — | Statutory breach |
+| `finix.cmp.complaint.clock_basis` | **Calendar** | **R** | — | The commonest defect |
+| `finix.cmp.awareness_messages.display` | Websites; apps on alternate days from 1 November 2026 | **R** | — | Display obligation unmet |
+| `finix.cmp.awareness_messages.version_history` | Retained | R in substance | — | Cannot show what was displayed when |
+
+## 10. Regulatory reporting
+
+| Key | Finix default | Class | Blocks | Failure mode |
+|---|---|---|---|---|
+| `finix.bo.rpt.inventory_source` | ComplianceSutra, with owners | R in substance | — | An unowned obligation |
+| `finix.bo.rpt.internal_target_days.<report>` | Materially before the deadline | D | — | No room to recover |
+| `finix.bo.rpt.requires_source_close` | True | D | Extraction | Reporting on unreconciled data |
+| `finix.bo.rpt.validation_mandatory` | True | D | Submission | Malformed filings |
+| `finix.bo.rpt.on_validation_failure` | **Escalate; do not submit** | D | Submission | False or incorrect reporting |
+| `finix.bo.rpt.format_version_recorded` | With every filing | R in substance | — | Historical filings unexplainable |
+| `finix.bo.rpt.ack_required` | True, per filing | R in substance | — | Unnoticed non-submission |
+| `finix.bo.rpt.ack_missing_action` | Incident with escalation | D | — | Treated as non-submission |
+| `finix.bo.rpt.independent_comparison` | Where a source exists | D | — | Wrong but well-formed filings |
+| `finix.bo.rpt.str_format` | FINnet 2.0 | **R** | — | Rejected filings |
+| `finix.bo.rpt.str_decision_owner` | Principal officer | **R** | — | Decision by the wrong person |
+| `finix.bo.rpt.str_no_report_recorded` | True | R in substance | — | No evidence the question was considered |
+| `finix.bo.rpt.tipping_off_controls` | Enforced | **R** | — | Offence |
+| `finix.bo.rpt.retention_years` | 8 | **R** | — | Short of the floor |
+
+## 11. The absolute values
+
+<Aside type="caution" title="No discretion below or beyond these">
+**`finix.cmp.retention.books_years` = 8** — a floor, not a target. **`finix.bo.cn.deadline_hours` = 24** from execution — a ceiling. **`finix.bo.cuspa.payment_window_days` = 5 trading days** — a cap; a shorter firm policy is permitted, a longer one is a breach. **`finix.cmp.complaint.clock_days` = 21 calendar days** — a ceiling, and calendar days. **`finix.bo.ledger.cash_head` = absent** — a prohibition, not a limit. Each of these appears in a regulation or circular with no discretion attached, and treating any of them as a tunable is the error this table exists to prevent.
+</Aside>
+
+## 12. The pipeline gates
+
+| Gate | Condition | Blocks |
+|---|---|---|
+| Masters current | `master.assert_current_day` | All processing |
+| Trades reconciled | `recon.block_contract_notes_on_diff` | Contract notes, and therefore the 24-hour clock |
+| Ledger closed | `stmt.requires_ledger_close` | Statements |
+| Obligations tied out | `settle.obligation_tie_out_required` | Settlement preparation |
+| Source data closed | `rpt.requires_source_close` | Report extraction |
+| Validation passed | `rpt.validation_mandatory` | Submission |
+| Trades allocated | `trade.unallocated_action` | Everything downstream |
+| CUSPA pledge created | `cuspa.autopledge_at_payout` | Further exposure for that client |
+| Balance extract to risk | `finix.bo.extract.rms_blocking` | **Next day's open** |
+
+## 13. Review cadence
+
+| Set | Frequency | Owner |
+|---|---|---|
+| Masters and batch behaviour | Quarterly, and after any incident | Operations and technology |
+| Trade import and reconciliation | Quarterly; difference trends monthly | Operations |
+| Contract note format and charges | On every relevant circular; charge master on change | Compliance and finance |
+| Ledger rules | Quarterly, and on any policy change | Finance and compliance |
+| Settlement deadlines | **On any bank or clearing corporation change**, and quarterly | Treasury and operations |
+| CUSPA | **On the exchange operational guidelines**, and quarterly | Operations and compliance |
+| Corporate actions | Annually, and after any entitlement error | Operations |
+| Statements and retention | Annually; retrieval drill annually | Compliance and technology |
+| Regulatory reporting | On every format circular; inventory monthly | Compliance |
+
+## Where this connects
+
+- [Environments and configuration baseline](/broking-kyc/finix-broking-setup/stack/environments-config-baseline/) — the convention and change control
+- [OMS configuration reference](/broking-kyc/finix-broking-setup/oms/10-oms-config-reference/) and [RMS configuration reference](/broking-kyc/finix-broking-setup/rms/09-rms-config-reference/) — the other planes
+- [Compliance configuration baseline](/broking-kyc/finix-broking-setup/compliance/01-compliance-config-baseline/) — the obligation-to-configuration map
+- [EOD runbook](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/) — where the gates are applied
+- [Admin workflow](/broking-kyc/operations/admin-workflow/) — maker-checker

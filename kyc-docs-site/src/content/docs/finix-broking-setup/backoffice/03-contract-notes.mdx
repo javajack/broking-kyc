@@ -1,0 +1,212 @@
+---
+title: "Back office 3: contract notes"
+description: Generating and dispatching the electronic contract note within 24 hours of execution — the two prescribed format options, digital signing under the Information Technology Act, the charge computation that must be right the first time, DLT-approved dispatch templates, delivery evidence, bounce handling, corrections, and the retention obligation.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** A contract note is the only document in the daily pipeline that is simultaneously a legal confirmation, a tax invoice, a client-service artefact and a regulatory deliverable with a hard deadline. Each of those imposes a different requirement, and the common failures come from satisfying three and missing the fourth. So the page separates them: content and format first, then signing, then the charge computation that has to be right because a wrong note is corrected rather than amended, then dispatch and its evidence, then corrections and retention.
+
+## TL;DR
+
+- **Dispatch within 24 hours of trade execution**, digitally signed under the Information Technology Act, 2000 with the broker's digital signature certificate.
+- **Two prescribed format options** under the NSE format circular: **Annexure A**, a combined contract note cum tax invoice, or **Annexure B**, a separate contract note and tax invoice. Pick one, configure it, and do not mix.
+- **Dispatch is by email with an SMS link, using DLT-approved templates**, and both channels are preserved as evidence of dispatch.
+- **The charge computation must be right the first time.** Brokerage, securities transaction tax, exchange transaction charges, SEBI turnover fees, stamp duty by state, goods and services tax and depository charges all appear on the note, and an error is corrected with a fresh note rather than quietly adjusted.
+- **Delivery evidence is the obligation, not just despatch.** Record the attempt, the outcome and the bounce, and have a defined path for a client whose email persistently fails.
+- **Generation is the deadline; dispatch may queue.** If delivery infrastructure fails, generation must still complete on time and delivery is retried with the attempts evidenced.
+- **Retention is on the eight-year floor** under regulation 16 of the 2026 regulations, and it covers the note, the signature, the dispatch evidence and the underlying computation.
+
+## Conceptual overview
+
+A contract note settles what happened. Once it is issued and the client has it, the trade's terms are confirmed in a form both sides can rely on, which is why issuing one on an unreconciled trade is a worse failure than issuing one late. It is also a tax invoice, which is why the charge computation is not a presentation detail — goods and services tax, securities transaction tax and stamp duty all have statutory bases and statutory consequences, and a note that misstates them creates a tax problem as well as a client one.
+
+The second thing to understand is that the deadline runs from execution. That means the firm's own internal processing time — file retrieval, reconciliation, charge computation, generation, signing, dispatch — all comes out of a budget that started before the back office had anything to work with. The practical consequence is that every upstream delay is a contract-note risk, and the firm should know at any moment how much of the budget remains. Making that number visible to the operations team during the evening run is a simple change with a large effect on behaviour.
+
+The third point concerns corrections. A contract note that was wrong is not edited; a corrected note is issued, and the client receives two documents describing the same trades. That is operationally awkward and it is also the right outcome, because the original was relied upon and the record must show both what was said and what replaced it. Designing for corrections — a clear correction indicator, a reference to the original, a client communication that explains rather than merely resends — turns an embarrassing event into a handled one.
+
+## 1. Framework
+
+- **[NSE/INSP/61999](/broking-kyc/reference/circulars/nse/#nseinsp61999)** (13 May 2024 revision) — the electronic contract note format, with **Annexure A** a contract note cum tax invoice as a single combined document and **Annexure B** a separate contract note plus tax invoice. Supplemented by the FAQ at **[NSE/INSP/63859](/broking-kyc/reference/circulars/nse/#nseinsp63859)**.
+- **[NSE/INSP/52604](/broking-kyc/reference/circulars/nse/#nseinsp52604)** (June 2022) — dispatch by email and SMS link using DLT-approved templates.
+- **Information Technology Act, 2000** — the basis on which the note is digitally signed with the broker's digital signature certificate.
+- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — contract-note obligations within the books-and-records framework.
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — regulation 16, records retained for not less than eight years. `[not yet in index]`
+- **Statutory charge bases** — securities transaction tax, stamp duty under the state-wise regime, goods and services tax, exchange transaction charges and SEBI turnover fees.
+- Depth on format and columns: **[ECN and investor servicing](/broking-kyc/deep-dives/member-compliance/ecn-investor-servicing/)**; field-level detail: **[contract note fields](/broking-kyc/reference/field-atlas/destinations/contract-notes/)**.
+
+## 2. Format choice
+
+| Option | Structure | Consideration |
+|---|---|---|
+| **Annexure A** | Contract note cum tax invoice — one combined document | Fewer documents for the client; the invoice elements must satisfy tax requirements within a single artefact |
+| **Annexure B** | Separate contract note and tax invoice | Cleaner separation of the trade confirmation from the invoice; two documents to generate, sign, dispatch and retain |
+
+| Rule | Detail |
+|---|---|
+| Choose one and configure it | Mixing formats across clients or days creates reconciliation and support problems |
+| Changing format is a project | Templates, signing, dispatch, retention and client communication all change |
+| Column conformance | Per the prescribed columns in the applicable annexure; see the [ECN deep dive](/broking-kyc/deep-dives/member-compliance/ecn-investor-servicing/) |
+| Per-exchange and per-segment | Trades across exchanges and segments on one day; the format must handle the combination as prescribed |
+
+## 3. Content and computation
+
+| Element | Source | Common error |
+|---|---|---|
+| Client identity and unique client code | Client master | A stale address on a client who moved |
+| Trade details — instrument, quantity, price, side, time, trade identifier | Reconciled trade file | Aggregation of fills presented in a way the client cannot tie to their own view |
+| Order details where prescribed | Order records | Missing linkage between order and trade |
+| **Brokerage** | Charge master, effective-dated | A rate change applied to prior-day trades |
+| **Securities transaction tax** | Statutory rate by instrument and transaction type | Delivery versus intraday basis confusion |
+| **Exchange transaction charges** | Exchange schedule | Stale schedule after a circular |
+| **SEBI turnover fees** | Statutory | Rate change missed |
+| **Stamp duty** | State-wise regime | Wrong state; the basis is prescribed and uniform in the current regime but the computation must follow it |
+| **Goods and services tax** | Statutory rate on the taxable components | Applied to the wrong base |
+| Depository charges where applicable | Depository schedule | Charged on the wrong leg |
+| Net amount | Computed | Rounding inconsistency with the ledger |
+| Settlement details | Settlement calendar | Wrong settlement reference |
+
+| Control | Requirement |
+|---|---|
+| Effective dating | Every rate effective-dated, so a re-run of a prior day computes correctly |
+| Independent recomputation | A sample recomputed independently daily, and fully monthly |
+| Rounding rule | One rounding rule across contract note, ledger and statement; divergence here produces persistent one-rupee queries |
+| Ledger tie-out | The note's net amount must equal the ledger posting, exactly |
+| Change control | Charge master changes under maker-checker with a client-communication path |
+
+<Aside type="caution" title="Rounding is a real source of client distrust">
+A contract note, a ledger entry and a statement that disagree by a rupee because they round at different points is a small defect with a disproportionate effect: it is the kind of thing a client notices, reports, and then stops trusting the rest of the numbers. Define one rounding rule, apply it at one place, and tie the note to the ledger exactly rather than approximately.
+</Aside>
+
+## 4. Signing
+
+| Element | Detail |
+|---|---|
+| Basis | Digitally signed under the Information Technology Act, 2000 |
+| Certificate | The broker's digital signature certificate |
+| **Expiry** | A certificate expiry is a scheduled outage of the contract-note pipeline; monitor at 60, 30 and 7 days |
+| Key custody | In the managed secret store, access logged and attributable |
+| Signing verification | Every signed note verified before dispatch; an unsigned or wrongly signed note must not go out |
+| Re-signing | A corrected note is signed afresh |
+| Evidence | The signature and its verification retained with the note |
+| Failure behaviour | **Stop and escalate**; dispatching unsigned notes is not an acceptable degradation |
+
+## 5. Dispatch
+
+| Channel | Detail |
+|---|---|
+| Email | The note or a link to it |
+| SMS | A link, using **DLT-approved templates** |
+| Both preserved | As evidence of dispatch |
+| Template management | DLT templates registered and current; a template change is a controlled change |
+| Client preference | Where the client has a recorded preference consistent with the prescribed channels |
+| Portal availability | The note also available in the client's own area, which is a convenience and not a substitute for dispatch |
+
+| Evidence | Requirement |
+|---|---|
+| Despatch timestamp | Per note, per channel |
+| Delivery outcome | Delivered, bounced, deferred |
+| Bounce classification | Hard bounce versus soft bounce |
+| Retry policy | Defined, bounded, evidenced |
+| Persistent failure path | A defined process for a client whose contact details do not work — including updating details and, where necessary, restricting the account until servicing is possible |
+| Retention | Dispatch evidence on the eight-year floor |
+
+## 6. Generation versus dispatch
+
+| Stage | Deadline | Behaviour on failure |
+|---|---|---|
+| **Generation** | Within the prescribed window from execution | **Absolute.** Escalate to compliance when it is at risk, not after it is missed |
+| Signing | Immediately after generation | Stop; do not dispatch unsigned |
+| **Dispatch** | Promptly after signing | May queue, with retries and evidence of attempts |
+
+This split matters operationally. If the email provider fails at 20:00, the correct response is to complete generation and signing on time, queue the dispatch, and evidence the attempts — not to treat the whole stage as blocked. If generation itself cannot complete, that is a different severity and a different escalation.
+
+## 7. Corrections
+
+| Step | Action |
+|---|---|
+| 1. Detect | From a reconciliation difference, a charge-master error, an exchange trade modification, or a client query |
+| 2. Assess scope | One client, a group, or everyone; one day or several |
+| 3. **Do not edit** | A corrected note is issued; the original remains in the record |
+| 4. Generate the corrected note | With a clear correction indicator and a reference to the original |
+| 5. Sign and dispatch | As for an original |
+| 6. **Communicate** | Explain what changed and why — a corrected note arriving without explanation generates more queries than the error did |
+| 7. Adjust the ledger | Where the correction changes amounts |
+| 8. Record | The original, the correction, the cause and the client communication |
+| 9. Escalate | To compliance, with a cause classification |
+| 10. Trend | Corrections by cause; a recurring cause is a process defect |
+
+## 8. Controls and metrics
+
+| Control | Detail |
+|---|---|
+| Pre-generation gate | Trade reconciliation complete; **no notes on an unreconciled file** |
+| Completeness | Every client with trading activity receives a note; the count ties to the trade file's distinct clients |
+| Ledger tie-out | Note totals equal ledger postings |
+| Independent charge recomputation | Daily sample, monthly full |
+| Signature verification | Every note |
+| Dispatch evidence | Every note, every channel |
+| Deadline tracking | Time remaining, visible during the run |
+| Correction tracking | By cause, trended |
+
+| Metric | Behaviour |
+|---|---|
+| Notes generated versus clients with activity | Must match exactly |
+| Time from execution to generation complete | Trended against the deadline |
+| Dispatch success rate by channel | Trended |
+| Hard bounces outstanding | Aged; a client who cannot be reached is a servicing problem |
+| Corrections per month by cause | Trending to zero |
+| Client queries about charges | A proxy for computation and presentation quality |
+
+## 9. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.bo.cn.format` | One of Annexure A or B, configured | Exchange-set | Non-conforming notes |
+| `finix.bo.cn.deadline_hours` | 24 from execution | Regulatory | Missed deadline |
+| `finix.bo.cn.internal_target` | Materially earlier | Discretionary | No room to recover |
+| `finix.bo.cn.requires_reconciled_trades` | True | Regulatory in substance | A note on an unreconciled trade |
+| `finix.bo.cn.signing_cert` | Current, monitored for expiry | Regulatory | Pipeline outage, or unsigned notes |
+| `finix.bo.cn.unsigned_dispatch` | **Blocked** | Regulatory | Invalid notes issued |
+| `finix.bo.cn.channels` | Email plus SMS link | Exchange-set | Non-conforming dispatch |
+| `finix.bo.cn.dlt_templates` | Registered and current | Exchange-set | Dispatch failure |
+| `finix.bo.cn.dispatch_retry_policy` | Bounded, evidenced | Discretionary | Silent non-delivery |
+| `finix.bo.cn.hard_bounce_action` | Update details; restrict if unresolvable | Discretionary | Clients who cannot be served |
+| `finix.bo.cn.rounding_rule` | One rule, shared with the ledger | Discretionary, strongly recommended | Persistent small discrepancies |
+| `finix.bo.cn.charge_master_effective_dating` | Enforced | Discretionary, strongly recommended | Prior-day re-runs computing wrongly |
+| `finix.bo.cn.correction_indicator` | Explicit, with a reference to the original | Discretionary | Client confusion |
+| `finix.bo.cn.retention_years` | 8 | Regulatory | Short of the statutory floor |
+
+## 10. Exception paths
+
+| Situation | Response |
+|---|---|
+| Trade reconciliation incomplete near the deadline | Escalate to compliance; do not generate on an unreconciled file |
+| Signing certificate expired | Pipeline stop; emergency certificate process; escalate — this is foreseeable and should never happen |
+| Email provider failure | Complete generation and signing on time; queue dispatch; evidence the attempts |
+| DLT template rejected | Dispatch failure on the SMS channel; fix the template; evidence the email channel meanwhile |
+| Charge computed wrongly, discovered next day | Corrected notes; ledger adjustment; client communication; refund where overcharged |
+| Exchange modifies a trade after notes issued | Corrected notes; explicit client communication; compliance escalation |
+| A client's email hard-bounces repeatedly | Servicing process to update details; restrict the account where the client cannot be reached, per policy |
+| Note count does not match clients with activity | Block the run; a missing client is a missing legal document |
+| Generation deadline missed | **Report it.** A missed regulatory deadline is a breach to be recorded and reported, not absorbed |
+| Client disputes a charge | Produce the computation, the effective-dated rate and the ledger entry |
+
+## Practical notes
+
+- **Put the remaining time on the operations screen.** Teams behave differently when the clock is visible.
+- **Tie the note to the ledger exactly.** Approximate agreement produces a permanent stream of one-rupee queries.
+- **Monitor the signing certificate like a production dependency.** Its expiry is a complete pipeline stop and it is entirely predictable.
+- **Split generation from dispatch in the runbook.** They have different deadlines and different failure responses.
+- **Explain corrections.** A corrected note without a note explaining it generates more work than the error.
+- **Recompute a charge sample independently every day.** It is the cheapest detector of a charge-master defect.
+- **Treat an unreachable client as a servicing problem, not a dispatch statistic.** The obligation is to serve them.
+
+## Where this connects
+
+- [Trade import and reconciliation](/broking-kyc/finix-broking-setup/backoffice/02-trade-import-reconciliation/) — the gate before this stage
+- [Ledger and accounting](/broking-kyc/finix-broking-setup/backoffice/04-ledger-accounting/) — where the amounts post
+- [Statements and retention](/broking-kyc/finix-broking-setup/backoffice/08-statements-retention/) — the wider artefact set
+- [ECN and investor servicing](/broking-kyc/deep-dives/member-compliance/ecn-investor-servicing/) — format and column detail
+- [Contract note fields](/broking-kyc/reference/field-atlas/destinations/contract-notes/) — field-level reference
+- [EOD runbook](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/) — this stage as an operated step

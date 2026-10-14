@@ -1,0 +1,216 @@
+---
+title: "Back office 4: the ledger and accounting"
+description: The client ledger as the single record of what each client owes or is owed — the account structure, posting rules and their timing, running account settlement, debit balance handling, the separation of client ledgers from the firm's own books, control-account reconciliation, and the rules that keep one client's balance from ever touching another's.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** The ledger is the one artefact in the stack that a client, an auditor, an arbitrator and an inspector all read, and each reads it for a different thing. So the page starts from what it must be able to say, then the account structure that lets it say it, then the posting rules and — critically — their timing, because most ledger disputes are about when something was recognised rather than whether. Running account settlement and debit handling follow because they are the two client-facing processes the ledger drives, and the page ends with the reconciliation that proves the whole thing.
+
+## TL;DR
+
+- **The client ledger is the ledger of record.** Risk views, statements and screens are derived; the ledger is what is shown and defended.
+- **Segregation is now statutory.** Regulation 18(2)(c) of the [2026 regulations](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/) requires client money to be segregated from the broker's own account **and from any other client's account** — which means client-level attribution of every balance, not a pooled client position.
+- **Cash from clients is prohibited outright** under regulation 20(d). There should be no cash receipt mode and no cash ledger head; a prohibition that depends on staff remembering will eventually be breached.
+- **Timing is where disputes live.** When a receipt becomes clear funds, when a sale becomes available, when brokerage is debited, when a penalty is passed on — each has a rule, and the rule must be the same in the ledger, the statement and the risk engine.
+- **Brokerage is withdrawn by computation, not by sweep.** Amounts due to the firm leave the client pool only after they have been computed and are actually due.
+- **Running account settlement returns client funds on a cycle**, and a correctly implemented running account reduces retained client cash — which also reduces the variable net worth requirement.
+- **Client ledgers are not the firm's books.** The firm's own general ledger is separate, fed by control accounts, and reconciled.
+
+## Conceptual overview
+
+A client ledger answers one question continuously: as of this instant, what does this client owe the firm or what does the firm owe this client? Every other client-facing number — available margin, withdrawable balance, the statement, the pay-out authorisation — is a view over that answer. The discipline that makes it reliable is that every economic event produces exactly one set of postings, at a defined moment, under a rule that is written down. Where that discipline slips, the symptoms are familiar: a client's app shows one balance and their statement another, a pay-out is authorised against money that is not clear, or a brokerage debit appears that the client cannot tie to a trade.
+
+The segregation requirement reshapes the design. Historically, client money could be managed as a pool with client-level accounting over it. Regulation 18(2)(c) requires segregation from other clients as well as from the firm, which pushes attribution down to the client level in substance rather than only in the ledger's presentation. Practically this means the firm must be able to say, for any moment, how much of the balance in the client nodal accounts belongs to each client, and must never let one client's shortfall be financed by another's surplus. That is an accounting constraint and a treasury constraint at the same time.
+
+The third idea is that timing rules are a client-facing policy, not an implementation detail. When a payment becomes usable, how long a sale takes to become withdrawable, when a debit becomes an ageing debit — these determine what clients can do and when, they belong in the disclosed policy, and they must be identical across the ledger, the risk engine and the statement. Firms that implement them separately in three places end up with three answers and a support queue.
+
+## 1. Framework
+
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — regulation 18(2)(c) strict segregation of client money and securities from the broker's own account and from any other client's account; regulation 20(d) prohibition on accepting cash from clients; regulation 16 records retained for not less than eight years. `[not yet in index]`
+- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — client funds, running account settlement, permitted uses, books and records.
+- **Upstreaming framework** — the USCNB and DSCNB account structure, end-of-day upstreaming of clients' clear credit balances in cash, lien on fixed deposit receipts, or pledge of mutual fund overnight scheme units. See [bank account architecture](/broking-kyc/finix-broking-setup/setup/06-bank-account-architecture/) and [client funds upstreaming](/broking-kyc/deep-dives/settlement/client-funds-upstreaming/). `[not yet in index]`
+- **Running account settlement** — see [running account settlement fields](/broking-kyc/reference/field-atlas/sections/ac-running-account-settlement/).
+- **[Client unpaid securities, HO/38/11/(9)2026-MIRSD-POD/I/15382/2026](/broking-kyc/reference/circulars/sebi-mirsd/#ho381192026-mirsd-podi153822026)** (3 July 2026) — the CUSPA regime, whose daily maximum pledge value is computed from the client ledger balance and margin obligations.
+- **Companies Act, 2013 and applicable accounting standards** — for the firm's own books.
+
+## 2. Account structure
+
+| Level | Content |
+|---|---|
+| **Client** | One ledger per client, per segment where the firm maintains segment-wise ledgers, with a consolidated view |
+| Heads within a client ledger | Trade settlement, brokerage, statutory charges, depository charges, interest or delayed payment charges where applicable, penalties passed on, pay-in, pay-out, collateral-related entries, corporate action receipts |
+| **Proprietary** | Entirely separate from client ledgers; segregation is hard |
+| Control accounts | Client payable, client receivable, settlement, charges, statutory dues — the bridge to the firm's own books |
+| **Firm general ledger** | Separate system; the firm's revenue, costs, assets and liabilities |
+
+| Rule | Detail |
+|---|---|
+| One client, one ledger identity | The client code is the key everywhere |
+| No cash head | Regulation 20(d); the head should not exist |
+| No inter-client postings | A posting that moves value between client ledgers is a defect by construction |
+| Proprietary strictly separate | Including in any aggregation or report |
+| Segment-wise where required | With a defensible consolidation rule |
+| Effective-dated attributes | Rates and client attributes effective-dated for correct re-runs |
+
+<Aside type="caution" title="Make inter-client postings structurally impossible">
+The clearest way to satisfy the "and from any other client's account" limb of regulation 18(2)(c) is to make a posting that debits one client and credits another impossible to express — not forbidden by policy, but absent from the posting model. Any legitimate movement between clients is really two transactions with the firm or an external party in between, and modelling it that way both satisfies the rule and produces a clearer audit trail.
+</Aside>
+
+## 3. Posting rules and timing
+
+| Event | Posting | Timing | Where the rule must also appear |
+|---|---|---|---|
+| **Trade executed** | Trade value and charges to the client | On reconciled trades, with the trade date | Contract note, statement |
+| **Brokerage and charges** | Debit to the client | With the trade, effective-dated rates | Contract note |
+| **Pay-in received** | Credit to the client | **On confirmed good funds**, not on authorisation | Risk engine, client view |
+| Gateway settlement | Bank-side entry reconciled to the client credit | On settlement with the UTR | Bank reconciliation |
+| **Sale proceeds** | Available per the settlement cycle and the disclosed policy | Per the policy, consistently | Risk engine, statement, pay-out |
+| **Pay-out** | Debit to the client | On instruction, reversed if the payout fails | Payout engine |
+| Settlement obligation | Per the obligation file | On obligation | Settlement |
+| **Penalty passed on** | Debit, only where the agreement and policy allow | With the cause classification | Statement, itemised |
+| Interest or delayed payment charges | Per the disclosed policy | Per the policy | Statement |
+| Depository charges | Debit | Per the depository billing cycle | Statement |
+| Corporate action receipt | Credit | On receipt | Statement |
+| **Running account settlement** | Transfer to the client | Per the cycle | Client communication |
+| Upstreaming | No client ledger effect; it is a treasury movement of client funds | End of day | Treasury records |
+| Reversal | Explicit reversing entry, never a deletion | On the event | Audit trail |
+
+| Principle | Detail |
+|---|---|
+| **No deletions** | Corrections are reversing entries with a reason |
+| Single rounding rule | Shared with the contract note and the statement |
+| Value date and posting date distinct | Both recorded; disputes are usually about one of them |
+| Idempotent posting | A re-run must not double-post |
+| Point-in-time balance | What was this client's balance at 14:30 on a past date — answerable |
+
+## 4. Clear funds and availability
+
+| State | Meaning | Usable for margin? | Withdrawable? |
+|---|---|---|---|
+| Initiated | The client has started a payment | No | No |
+| Authorised | The payment is authorised at the gateway | **No** | No |
+| **Confirmed good funds** | Settled and reconciled to the bank | **Yes** | Per the policy |
+| Sale proceeds, unsettled | Sold but not yet settled | Per the margin rules | No |
+| Sale proceeds, settled | Settled | Yes | Yes |
+| Collateral value | Recognised pledged securities | Yes, as collateral | No — it is not cash |
+| Unpaid securities | Under the CUSPA regime | **May count for margin collection reporting, but must not support new trading exposure** | No |
+
+The row that causes the most trouble is "authorised". A client who has completed a payment on their phone sees it as done, and the firm cannot safely give capacity against it until the money is confirmed. The resolution is not to relax the rule but to make the state visible: show the client that the payment is received and pending confirmation, with an expected time, rather than showing nothing.
+
+## 5. Running account settlement
+
+| Element | Detail |
+|---|---|
+| Purpose | Return client funds rather than retaining them indefinitely |
+| Cycle | Per the applicable frequency and the client's preference where permitted |
+| Computation | The retainable amount per the applicable rules, with the balance returned |
+| Communication | A statement of the settlement, explaining the computation |
+| Exceptions | Clients with open positions and margin obligations retain what is required |
+| **Capital effect** | Money returned is not retained, and retained client cash drives NSE's variable net worth requirement — see [entity and capital structure](/broking-kyc/finix-broking-setup/setup/01-entity-capital-structure/#44-variable-net-worth) |
+| Evidence | The computation, the transfer and the communication retained |
+| Failure | A missed settlement cycle is a client-facing and regulatory issue, not an operational slip |
+
+## 6. Debit balances
+
+| Stage | Action |
+|---|---|
+| Debit arises | Posted; client informed |
+| Within the policy window | Client funds it |
+| Ageing | Tracked by age bucket, per client and in aggregate |
+| **Policy escalation** | Per the disclosed policy: communication, restriction, then recovery action |
+| Unpaid securities | The CUSPA path applies to the securities, with its own statutory clock; see [CUSPA](/broking-kyc/finix-broking-setup/backoffice/06-cuspa-unpaid-securities/) |
+| Interest or delayed payment charges | Only where the agreement and policy provide, computed transparently |
+| Write-off | A controlled, approved process; a written-off debit is still a recoverable claim |
+| Reporting | Aged debits reported to risk and to management; large or growing debits are a credit signal |
+
+| Control | Detail |
+|---|---|
+| Ageing is the metric | Not the balance — a stable total hiding ageing items is worse than a lumpy one |
+| No new exposure against an aged debit | Enforced in the [check ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/) |
+| Separation from unpaid securities | The CUSPA process is statutory and separate; do not conflate the two |
+| Communication evidence | Every demand recorded, with delivery |
+
+## 7. Client ledgers versus the firm's books
+
+| Boundary | Detail |
+|---|---|
+| Client ledgers | What each client owes or is owed; not the firm's income statement |
+| Control accounts | The bridge: client payable, client receivable, settlement, charges collected, statutory dues |
+| Firm general ledger | Revenue recognition, costs, assets, liabilities, tax |
+| **Reconciliation** | Control accounts reconciled between the back office and the general ledger at each close |
+| Revenue recognition | Brokerage earned, not brokerage debited; the distinction matters at period ends |
+| Statutory dues | Securities transaction tax, goods and services tax, stamp duty collected and remitted — a liability, not revenue |
+| Penalties | Firm-borne penalties are a cost; client-borne penalties are a recovery, and the cause classification determines which |
+| Segregation evidence | The firm must be able to demonstrate that client money was never used for its own purposes |
+
+## 8. Reconciliation
+
+| # | Reconciliation | Sources | Frequency |
+|---|---|---|---|
+| L1 | Client ledger total against client nodal bank balances plus upstreamed amounts | Ledger, bank, clearing corporation | Daily |
+| L2 | Control accounts between back office and general ledger | Both | Per close |
+| L3 | Contract note totals against ledger postings | Both | Daily |
+| L4 | Statutory dues collected against remitted | Ledger, filings | Per period |
+| L5 | Settlement obligations against ledger postings | Clearing corporation, ledger | Per settlement |
+| L6 | Pay-outs against bank debits | Ledger, bank, payout records | Daily |
+| L7 | Pay-ins against bank credits and gateway settlements | Ledger, bank, gateway | Daily |
+| L8 | Depository charges billed against collected | Depository, ledger | Per cycle |
+| L9 | Aged debits against the risk engine's view | Ledger, risk | Daily |
+| L10 | Running account settlements computed against executed | Ledger, bank | Per cycle |
+
+L1 is the one that proves segregation: the sum of what clients are owed must be matched by client money held in the designated accounts and upstreamed, with no shortfall. A persistent gap in either direction is a serious finding.
+
+## 9. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.bo.ledger.cash_head` | **Absent** | Regulatory | Cash receipt, prohibited by regulation 20(d) |
+| `finix.bo.ledger.inter_client_posting` | **Impossible by construction** | Regulatory | Segregation breach |
+| `finix.bo.ledger.prop_separation` | Hard | Regulatory | Segregation breach |
+| `finix.bo.ledger.credit_on` | Confirmed good funds | Regulatory in substance | Capacity against reversible money |
+| `finix.bo.ledger.sale_proceeds_availability` | Per disclosed policy, consistent across systems | Discretionary, disclosed | Three answers to one question |
+| `finix.bo.ledger.brokerage_withdrawal` | On computation of amounts actually due | Regulatory | Own funds taken from the client pool early |
+| `finix.bo.ledger.rounding_rule` | One rule, shared | Discretionary, strongly recommended | Persistent discrepancies |
+| `finix.bo.ledger.no_deletions` | Enforced; reversals only | Regulatory in substance | Audit trail destroyed |
+| `finix.bo.ledger.point_in_time_query` | Supported | Regulatory in substance | Disputes unanswerable |
+| `finix.bo.ledger.debit_age_buckets` | Defined | Discretionary | Ageing invisible |
+| `finix.bo.ledger.interest_on_debit` | Only per agreement and policy | Regulatory in substance | Unauthorised charge |
+| `finix.bo.ledger.runacc_cycle` | Per applicable frequency and client preference | Regulatory | Missed settlement |
+| `finix.bo.ledger.control_account_recon` | Per close | Discretionary, strongly recommended | Books diverging |
+| `finix.bo.ledger.retention_years` | 8 | Regulatory | Short of the statutory floor |
+
+## 10. Exception paths
+
+| Situation | Response |
+|---|---|
+| L1 reconciliation shows a shortfall in client funds | **Severity one.** Fund immediately from own resources, investigate, and assess the disclosure obligation |
+| A posting is found that moved value between clients | Severity one; reverse, investigate the path, report |
+| Cash receipt recorded | Reverse; investigate how it was possible; regulation 20(d) is absolute |
+| Capacity granted against an authorised but unconfirmed payment | Quantify the window; reverse the capacity; fix the gate |
+| Contract note and ledger disagree | Block statements; reconcile; the two must tie exactly |
+| Running account settlement missed | Execute immediately; communicate; record as a breach |
+| Aged debit beyond policy | Follow the disclosed escalation; do not extend new exposure |
+| Statutory dues collected exceed remitted | Investigate immediately; this is a liability and a tax exposure |
+| Client disputes a brokerage debit | Produce the effective-dated rate, the trade, the contract note and the posting |
+| General ledger and control accounts diverge at close | Resolve before close; a close on unreconciled control accounts is not a close |
+
+## Practical notes
+
+- **Make inter-client postings unrepresentable.** The strongest control is the one that cannot be bypassed because it does not exist.
+- **Show clients the pending state of a payment.** It removes the pressure to grant capacity early.
+- **Use one rounding rule across contract note, ledger and statement.** It is a five-minute decision that prevents years of queries.
+- **Reconcile L1 daily and treat any shortfall as severity one.** It is the proof of segregation.
+- **Track debit ageing, not debit balance.** The total hides the problem.
+- **Keep revenue recognition separate from the client debit.** Brokerage debited is not brokerage earned at a period end.
+- **Make the ledger point-in-time queryable.** Almost every dispute is about a past instant.
+
+## Where this connects
+
+- [Contract notes](/broking-kyc/finix-broking-setup/backoffice/03-contract-notes/) — what must tie to the ledger
+- [Settlement obligations](/broking-kyc/finix-broking-setup/backoffice/05-settlement-obligations/) — the obligation postings
+- [CUSPA and unpaid securities](/broking-kyc/finix-broking-setup/backoffice/06-cuspa-unpaid-securities/) — the ledger drives the daily pledge computation
+- [Bank account architecture](/broking-kyc/finix-broking-setup/setup/06-bank-account-architecture/) — where the money sits
+- [Bank reconciliation](/broking-kyc/finix-broking-setup/money/04-bank-recon/) — L6 and L7 in detail
+- [Statements and retention](/broking-kyc/finix-broking-setup/backoffice/08-statements-retention/) — what clients see
+- [Client funds upstreaming](/broking-kyc/deep-dives/settlement/client-funds-upstreaming/) — the end-of-day movement

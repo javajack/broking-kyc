@@ -1,0 +1,205 @@
+---
+title: "Back office 2: trade import and reconciliation"
+description: Importing the exchange trade files per exchange and segment, the three-way reconciliation against the order management system's feed, the difference taxonomy with a cause and an action for each, trade modification and cancellation handling, allocation to clients, and the controls that keep a one-trade difference from becoming a missed contract-note deadline.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Trade import is a small stage with an outsized consequence: it is the gate on the whole record pipeline, and the deadline immediately after it does not move. So the page covers import mechanics briefly, then spends most of its length on the difference taxonomy — because every minute spent diagnosing a difference is a minute off the contract-note clock, and a classified difference with a known action is diagnosed in seconds rather than hours.
+
+## TL;DR
+
+- **The exchange trade file is the source of truth.** The order management system's real-time feed is fast and useful; the file is authoritative. Where they differ, the file governs and the difference is investigated — never reconciled away.
+- **Reconcile three ways**: exchange file, Saral OMS trade feed, back-office import. Two-way reconciliation between the file and the back office tells you the import worked; it does not tell you whether the firm's real-time view of its own trading was right.
+- **A difference blocks contract notes.** This is correct and it is also the plane's tightest coupling, so difference handling must be fast, staffed and rehearsed.
+- **Every difference has a cause class**, and a classified difference resolves in minutes. The taxonomy in section 4 is the operational heart of this page.
+- **Trade modification and cancellation by the exchange are rare and consequential.** They change positions, obligations and — if the client has already been told — a communication the firm has to correct.
+- **Allocation to clients must be complete and attributable.** Every trade maps to a unique client code; an unallocated trade is not a data problem, it is an unidentified obligation.
+- **Counts, then values, then hashes.** A file that imported successfully with 980 of 1,000 trades returns success. Assert the count.
+
+## Conceptual overview
+
+There are two records of every trade and they are produced by different mechanisms for different purposes. The order management system learns about a trade from the exchange's real-time confirmation on the trading session, in milliseconds, so that risk and positions are current. The back office learns about it from the exchange's end-of-session trade file, which is the exchange's own considered record, published after the session and occasionally corrected. The first is for decisions; the second is for records. Keeping both and reconciling them is not redundancy — it satisfies two requirements that one mechanism cannot satisfy simultaneously, because a real-time feed cannot be authoritative and an end-of-day file cannot be timely.
+
+The reconciliation between them is therefore doing something more interesting than checking that the import worked. It is testing whether the firm's intraday view of its own trading — the view on which it made risk decisions, computed margin, and possibly squared clients off — matched what actually happened. A difference found here is retrospective evidence about the quality of the session's decisions, which is why it is investigated rather than adjusted. A firm that routinely "corrects the back office to the exchange file" and moves on has stopped using the control for what it is for.
+
+The third consideration is time pressure. The contract-note deadline runs from execution, not from import, so every delay in import and reconciliation eats the same budget. This creates a predictable failure pattern: a difference appears, investigation starts, the clock runs, and somebody suggests proceeding without resolving it. The structural defence is to make differences visible immediately rather than at the end of a batch, to have a classified taxonomy so that diagnosis is lookup rather than research, and to escalate deadline risk to compliance early — because a deadline that will be missed is a different conversation from one that already was.
+
+## 1. Framework
+
+- **Exchange and clearing corporation trade file specifications** — per exchange and segment, published and versioned. NSE Clearing downloads reports in comma-separated format to the member's Reports folder on the Extranet, covering trades, obligations, deliveries, auctions, corporate actions, settlements and shortages. `[not yet in index]`
+- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — books and records, contract-note and client-allocation obligations.
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — regulation 16 record retention of not less than eight years. `[not yet in index]`
+- **Client code modification norms** — exchange-capped and monitored; see [modification and cancellation](/broking-kyc/finix-broking-setup/oms/08-modify-cancel-rules/#7-modifying-another-persons-order).
+- **[ECN and investor servicing](/broking-kyc/deep-dives/member-compliance/ecn-investor-servicing/)** — the contract-note deadline this stage feeds.
+
+## 2. Import
+
+| Step | Detail |
+|---|---|
+| Retrieval | From the exchange or clearing corporation extranet, per exchange and segment; the member's Reports folder on the NSE Clearing Extranet, and the equivalent channels at BSE and MCX |
+| Expected-file checklist | A list of every file expected for the day, per exchange and segment, asserted; **a missing file is an incident, not an absence** |
+| Format validation | Against the current published specification, with the version recorded |
+| **Count assertion** | Record count against the file header or an independent source |
+| Value assertion | Total traded value against the exchange's own summary where available |
+| Duplicate detection | File-level and trade-level, keyed on the exchange trade identifier |
+| Idempotent load | A re-run must not double-post |
+| Versioning | A re-published or corrected file is loaded as a new version, with the difference computed |
+| Storage | Raw file retained on the eight-year floor, alongside the parsed result |
+
+<Aside type="caution" title="Assert the count, not the exit code">
+A file that parses cleanly and contains 980 of 1,000 trades produces a successful import. Every downstream stage then operates on an incomplete trade set: contract notes are missing trades, obligations are understated, the ledger does not balance against the clearing corporation, and the difference surfaces as a settlement problem. The control is an explicit record-count assertion against an independent source, applied before any downstream stage runs. It is one line of logic and it prevents the most expensive silent failure in the plane.
+</Aside>
+
+## 3. The three-way reconciliation
+
+| Source | What it is | Role |
+|---|---|---|
+| **A. Exchange trade file** | The exchange's own record, published post-session | **Authoritative** |
+| **B. Saral OMS trade feed** | Real-time trade confirmations received during the session | The firm's intraday view |
+| **C. Back-office import** | The parsed and loaded result | The record being built |
+
+| Dimension reconciled | Granularity |
+|---|---|
+| Trade count | Per exchange, per segment, per instrument |
+| Trade value | Per exchange, per segment |
+| Quantity | Per instrument |
+| Price | Per trade |
+| Side | Per trade |
+| Client allocation | Per trade |
+| Trade identifier | Per trade — the join key |
+| Timestamp | Per trade |
+
+| Comparison | Meaning |
+|---|---|
+| A = B = C | Clean; proceed |
+| A = C, A ≠ B | The import is right and **the intraday view was wrong** — investigate what the session's risk decisions were based on |
+| A = B, A ≠ C | Import defect; re-run and investigate |
+| B = C, A ≠ B | Both internal records differ from the exchange; **serious** — the exchange governs |
+| All three differ | Investigate from the exchange file outward |
+
+The second row is the one with the most information in it and the one most often skipped. If the firm's intraday feed missed trades, then positions, margin utilisation and possibly square-off decisions during the session were computed on an incomplete book. That is a risk finding, not a back-office one, and it should go to the head of risk the same evening.
+
+## 4. Difference taxonomy
+
+| # | Difference | Likely cause | Action | Blocks contract notes? |
+|---|---|---|---|---|
+| D1 | Trade in A, not in B | Real-time feed gap, session break, sequence gap | Investigate the session; check for a sequence gap; report to risk | No, once loaded from A |
+| D2 | Trade in B, not in A | A trade the exchange does not confirm — **very serious** | Escalate immediately; the firm may have acted on a trade that did not occur | **Yes** |
+| D3 | Trade in A, not in C | Import incomplete | Re-run import; assert counts | **Yes** |
+| D4 | Quantity differs | Partial-fill aggregation difference | Reconcile fills to trades; the file governs | **Yes** |
+| D5 | Price differs | Rounding, or an aggregation of fills at different prices | Check the aggregation rule; the file governs | **Yes** |
+| D6 | Client allocation differs | A client code modification during or after the session | Verify the modification was authorised and within limits; see [client code modification](/broking-kyc/finix-broking-setup/oms/08-modify-cancel-rules/#7-modifying-another-persons-order) | **Yes** |
+| D7 | Unallocated trade | Client code missing or invalid | **Must be resolved** — an unallocated trade is an unidentified obligation | **Yes** |
+| D8 | Trade for an unknown client | Client master gap, or a trade that is not the firm's | Escalate; if the client is genuinely unknown, this is a serious matter | **Yes** |
+| D9 | Instrument not in the master | Stale instrument master, or a new instrument | Refresh the master; if it persists, escalate | **Yes** |
+| D10 | Duplicate trade identifier | File re-published, or a load defect | Deduplicate on the exchange identifier; verify idempotency | No, once resolved |
+| D11 | Trade modified by the exchange | Exchange trade modification | Apply; adjust position, obligation and ledger; if the client was told, correct it | **Yes** |
+| D12 | Trade cancelled by the exchange | Exchange trade cancellation | As above, with a client communication | **Yes** |
+| D13 | Timestamp differs materially | Clock issue | Investigate time synchronisation; timestamps are evidence | No, but escalate |
+| D14 | Total value differs, trades match | Charge or aggregation difference | Recompute; usually a charge-master issue | **Yes** |
+| D15 | Segment or exchange mis-assigned | Mapping defect | Fix mapping; re-run | **Yes** |
+| D16 | Proprietary trade allocated to a client, or vice versa | **Segregation failure** | Escalate to compliance immediately | **Yes** |
+
+<Aside type="note" title="D2 and D16 are escalations, not exceptions">
+A trade the firm believes happened and the exchange does not confirm (D2) means either the firm's record is wrong or it received someone else's message — both serious. A proprietary trade allocated to a client, or a client trade allocated to proprietary (D16), is a breach of the segregation that regulation 18(2)(c) makes statutory. Neither belongs in an exception queue to be worked through in the morning; both go to compliance and the head of risk the same evening.
+</Aside>
+
+## 5. Allocation to clients
+
+| Requirement | Detail |
+|---|---|
+| Completeness | Every trade allocated to a unique client code or to the proprietary account |
+| Uniqueness | One client code per trade |
+| Validity | The client code exists, is active, and is registered on that exchange and segment |
+| Authority | Allocation follows the order's client code; a post-trade change is a client code modification with its own controls |
+| **Segregation** | Proprietary and client trades strictly separated; see regulation 18(2)(c) |
+| Custodial participant trades | Where applicable, routed to the custodian's process rather than ordinary client allocation |
+| Timing | Before contract notes and before obligation computation |
+| Evidence | The allocation and any change to it retained on the eight-year floor |
+
+## 6. Trade modification and cancellation by the exchange
+
+| Step | Action |
+|---|---|
+| 1. Detect | From the trade file version comparison, or an explicit exchange message |
+| 2. Classify | Modification of attributes, or cancellation |
+| 3. Assess | What has already been produced on the basis of the original: contract note, obligation, margin report, client communication |
+| 4. Adjust | Position, ledger, obligation, margin computation |
+| 5. **Communicate** | If the client has been told, correct it explicitly and promptly — this is high-sensitivity |
+| 6. Re-issue | Where a contract note was issued, follow the correction process |
+| 7. Record | Full audit trail of the original, the change, and everything re-derived |
+| 8. Escalate | To compliance; exchange trade changes are rare enough to warrant visibility |
+
+## 7. Controls and metrics
+
+| Control | Detail |
+|---|---|
+| Expected-file checklist | Asserted; a missing file is an incident |
+| Count and value assertions | Before any downstream stage |
+| Three-way difference report | Produced automatically, within minutes of import |
+| Difference classification | Against the taxonomy, with the class recorded |
+| Escalation rules | D2, D8, D16 escalate immediately regardless of value |
+| Deadline tracking | Time remaining on the contract-note clock, visible |
+| Resolution record | Every difference closed with a cause and an action |
+| Trend | Differences by class over time; a rising class is a systemic defect |
+
+| Metric | Target behaviour |
+|---|---|
+| Time from file availability to import complete | Minutes |
+| Time from import to difference report | Minutes |
+| Differences per day by class | Trending to zero; a stable non-zero count is a defect, not a norm |
+| Time to resolve a difference | Trended, with the longest tracked |
+| Contract-note clock remaining at reconciliation completion | Monitored; a shrinking margin is an early warning |
+
+## 8. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.bo.trade.source_of_truth` | Exchange trade file | Regulatory in substance | Records the exchange does not confirm |
+| `finix.bo.trade.expected_files.<exchange>.<segment>` | Explicit list | Exchange-set | A missing file unnoticed |
+| `finix.bo.trade.count_assertion` | Required | Discretionary, strongly recommended | Partial import processed |
+| `finix.bo.trade.value_assertion` | Required where available | Discretionary | Same |
+| `finix.bo.trade.idempotent_load` | Enforced | Discretionary, strongly recommended | Double posting on re-run |
+| `finix.bo.trade.file_version_diff` | Computed on re-publication | Discretionary | Corrections missed |
+| `finix.bo.recon.three_way` | Enforced | Discretionary, strongly recommended | Intraday view errors invisible |
+| `finix.bo.recon.block_contract_notes_on_diff` | True | Regulatory in substance | A note on an unreconciled trade |
+| `finix.bo.recon.escalate_immediately` | D2, D8, D16 | Discretionary, strongly recommended | Serious matters queued |
+| `finix.bo.recon.difference_report_latency` | Minutes | Discretionary | Clock consumed by batch latency |
+| `finix.bo.trade.unallocated_action` | **Block the pipeline** | Regulatory in substance | An unidentified obligation |
+| `finix.bo.trade.prop_client_segregation` | Hard | Regulatory | Segregation breach |
+| `finix.bo.trade.raw_file_retention_years` | 8 | Regulatory | Short of the statutory floor |
+
+## 9. Exception paths
+
+| Situation | Response |
+|---|---|
+| Trade file not published on time | Escalate to the exchange; recompute the deadline position; inform compliance if the contract-note clock is at risk |
+| File published then corrected | Load the new version; compute the difference; assess what was produced on the old version |
+| Count assertion fails | Do not proceed; retrieve again; escalate if the file is genuinely short |
+| D2 — a trade the exchange does not confirm | Immediate escalation; do not issue a contract note for it |
+| D7 — unallocated trade | Block; resolve the allocation; an unallocated trade cannot be settled or reported |
+| D16 — proprietary and client conflated | Immediate escalation to compliance; this is a statutory segregation breach |
+| Exchange cancels a trade already confirmed to a client | Correct promptly and explicitly; prepared communication template; escalate |
+| Differences persist after investigation | The exchange file governs; load it, record the unexplained difference, and escalate as a systemic issue |
+| Contract-note deadline at risk | Escalate to compliance **before** it passes; a known breach reported is handled differently from one discovered later |
+| Client code modification count elevated for the day | Review before closing the reconciliation; it is both an error signal and a conduct signal |
+
+## Practical notes
+
+- **Produce the difference report within minutes, not at the end of a batch.** The clock is running from execution.
+- **Classify differences with a stored class.** Diagnosis becomes a lookup and the trend becomes visible.
+- **Send D1 differences to risk, not just to operations.** They mean the session's risk view was incomplete.
+- **Keep the raw files.** They are the evidence, and re-deriving a dispute from a parsed table is unconvincing.
+- **Never proceed on an unexplained difference.** The contract note is a legal document.
+- **Escalate deadline risk early and in writing.** Compliance can act before; it can only record after.
+- **Watch the trend, not just the day.** A stable low difference count is a defect that someone has normalised.
+
+## Where this connects
+
+- [Back office architecture](/broking-kyc/finix-broking-setup/backoffice/01-backoffice-architecture/) — where this stage sits
+- [Contract notes](/broking-kyc/finix-broking-setup/backoffice/03-contract-notes/) — what this unblocks
+- [Settlement obligations](/broking-kyc/finix-broking-setup/backoffice/05-settlement-obligations/) — the other consumer
+- [Order return path](/broking-kyc/finix-broking-setup/oms/07-order-return-path/) — where the real-time feed comes from
+- [File formats and downloads](/broking-kyc/finix-broking-setup/exchanges/08-file-formats-downloads/) — the file reference
+- [EOD runbook](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/) — this stage as an operated step

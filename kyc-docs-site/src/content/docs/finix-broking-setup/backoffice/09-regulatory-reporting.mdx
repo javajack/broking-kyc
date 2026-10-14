@@ -1,0 +1,211 @@
+---
+title: "Back office 9: regulatory reporting"
+description: The filing machinery from the back office — the report inventory by recipient and frequency, the generation and validation pipeline, format-currency management as circulars change, submission and acknowledgement tracking, correction handling, the FINnet 2.0 suspicious transaction path, and the controls that stop a late or wrong filing.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Regulatory reporting fails in three ways — late, malformed, or wrong — and each has a different cause and a different control. So the page separates them: the inventory and calendar address lateness, the validation pipeline and format-currency management address malformation, and the source-data controls address wrongness. The acknowledgement and correction sections come last because they are what turns a submission into a completed obligation, and most reporting registers stop at "submitted".
+
+## TL;DR
+
+- **A report is not filed until it is acknowledged.** Track acknowledgements per filing; absence of one is an incident, because non-submission is treated far more harshly than late submission.
+- **Format currency is a vendor obligation worth contracting for.** Report formats change by circular, and the single most valuable clause in a back-office contract is the vendor's obligation to keep every regulatory format current within a stated lead time.
+- **A wrong file filed on time is worse than a correct file filed late within the window.** False or incorrect reporting is a separate disciplinary matter, not merely a penalty.
+- **Margin reporting carries its own regime** — a five-working-day cut-off, a penalty grid, and non-reporting treated as 100 percent short reporting. See [margin reporting and penalties](/broking-kyc/finix-broking-setup/rms/08-margin-reporting-penalties/).
+- **Suspicious transaction reports go through AML Sutra in FINnet 2.0 format**, filed by the principal officer, within the prescribed timeline, with no tipping off.
+- **The calendar is the control.** ComplianceSutra holds the obligation, the owner, the deadline, the evidence and the acknowledgement; an obligation without an owner is the failure mode the calendar exists to prevent.
+- **Validation runs before submission and comparison runs after.** Pre-submission validation catches malformation; post-submission comparison against the consequence — a penalty advice, a query — catches wrongness.
+
+## Conceptual overview
+
+Regulatory reporting is the point where the firm's internal records become statements to a regulator, and the change in status matters. Internally, a number that is slightly off is an error to be corrected. In a filing it is a representation, and a representation that is wrong is treated differently from one that is late. That asymmetry should drive the operating posture: within the filing window, correctness beats speed unconditionally, and a run that fails validation is not submitted.
+
+The second characteristic is that the formats are not stable. Exchanges, depositories, SEBI and FIU-IND all change formats by circular, sometimes with short notice, and a firm with a dozen recurring filings is managing a dozen independent format lifecycles. This is work that scales badly and is almost entirely outsourceable to the back-office vendor — which is why the contract clause matters more than the internal process. A vendor obliged to keep formats current within a stated lead time converts a recurring compliance risk into a supplier obligation.
+
+The third characteristic is that reporting is derived, so its quality is determined upstream. A margin report is only as good as the collateral recognition and the ledger; a client-level allocation report is only as good as the pledge reconciliation. This means that reporting controls which test only the file — schema, totals, counts — catch malformation but not wrongness. Catching wrongness requires reconciliation against an independent source, which is why the daily comparison against clearing corporation data belongs in the reporting control set and not only in the risk one.
+
+## 1. Framework
+
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — Chapter III general obligations; Chapter V inspection; regulation 16 retention of not less than eight years, applying to filings and acknowledgements. `[not yet in index]`
+- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — the consolidated reporting obligations.
+- **Margin reporting** — client-wise margin collected at end of day and peak margin during the day, with a **five-working-day cut-off**; the penalty grid at paragraph 40.3.1 and the 20 percent alternative at 40.3.2; non-reporting treated as 100 percent short reporting; false or incorrect reporting a separate disciplinary offence under CIR/HO/MIRSD/DOP/CIR/P/2019/88 (1 August 2019). `[not yet in index]`
+- **[SEBI/HO/MRD2_DCAP/CIR/2021/0598](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2_dcapcir20210598)** (20 July 2021) — client-level collateral allocation and valuation reporting, with formats at Annexure 3.
+- **Prevention of Money Laundering Act, 2002 and the SEBI anti-money-laundering framework** — suspicious transaction reports and other prescribed reports to FIU-IND in **FINnet 2.0** format, filed by the principal officer. See the [FIU-IND circulars index](/broking-kyc/reference/circulars/fiu-ind/).
+- **Exchange compliance reporting** — through the member portals; on NSE, ENIT at `enit.nseindia.com/MemberPortal/`, with compliance submissions under ENIT-COMPLIANCE-NEW → Compliance → Status Report. `[not yet in index]`
+- **Depository reporting** — participant obligations on the depositories' own calendars.
+- **Tax reporting** — securities transaction tax, goods and services tax, stamp duty, tax deducted at source and the annual information obligations.
+
+## 2. Report inventory
+
+Indicative; the live inventory is held in ComplianceSutra with owners and deadlines, and must be rebuilt from current circulars.
+
+| Recipient | Report | Frequency | Source | Owner |
+|---|---|---|---|---|
+| **Clearing corporation** | Client-wise margin collected, end of day and peak | Daily, **cut-off T+5 working days** | Risk and back office | Risk |
+| Clearing corporation | Client-level collateral allocation and valuation | Daily | Back office | Operations |
+| Clearing corporation | Settlement-related submissions | Per settlement | Back office | Operations |
+| **Exchange** | Compliance submissions through the member portal | Periodic | Compliance | Compliance |
+| Exchange | Terminal and identifier reporting | On change, **before use** | Technology and compliance | Compliance |
+| Exchange | Algorithm registration and changes | On change | Technology and compliance | Compliance |
+| Exchange | Internal audit and system audit reports | Per cycle | Compliance | Compliance |
+| Exchange | Net worth certificate | Per cycle | Finance | Finance |
+| Exchange | Client code modification data | Per cycle | Operations | Operations |
+| Exchange | Investor complaint data | Monthly | Compliance | Compliance |
+| **SEBI** | Registration-related and event-driven filings | On event | Compliance | Compliance |
+| SEBI | SCORES complaint handling | Continuous | Compliance | Compliance |
+| **FIU-IND** | Suspicious transaction reports, **FINnet 2.0 format** | On suspicion, within the prescribed timeline | AML Sutra | **Principal officer** |
+| FIU-IND | Other prescribed reports | Per the framework | AML Sutra | Principal officer |
+| **Depository** | Participant reporting | Per depository calendar | Back office, DP records | DP compliance officer |
+| **KRA and CKYCRR** | KYC record upload and update | Per onboarding and lifecycle | Onboarding | Operations |
+| **Tax authorities** | Securities transaction tax, goods and services tax, stamp duty, tax deducted at source, annual information | Per statutory calendar | Finance | Finance |
+| Internal | Board and risk committee packs | Periodic | Compliance and risk | Compliance |
+
+## 3. The generation pipeline
+
+| # | Stage | Control |
+|---|---|---|
+| G1 | Source data closed | Ledger, trades, collateral and margin reconciled before extraction |
+| G2 | Extract | Deterministic, re-runnable, parameterised by period |
+| G3 | Transform to the prescribed format | **Format version recorded with the file** |
+| G4 | **Validate** | Schema, mandatory fields, totals, record counts, cross-field consistency |
+| G5 | **Compare** | Against the prior period and against an independent source where one exists |
+| G6 | Review | A human looks at the summary before submission for material filings |
+| G7 | Approve | Maker-checker, with the approver named |
+| G8 | Submit | Through the prescribed channel |
+| G9 | **Acknowledge** | Captured and stored; **absence is an incident** |
+| G10 | Record | File, format version, validation output, approval, submission and acknowledgement, retained on the eight-year floor |
+| G11 | Post-submission comparison | Against the consequence — a penalty advice, a query, a return file |
+
+<Aside type="caution" title="G4 failing near a deadline is not a reason to skip G4">
+The predictable failure is that validation fails late in the evening before a cut-off and somebody proposes submitting anyway. Within the filing window, a correct file submitted a day later is a much better outcome than an incorrect file submitted on time, because false or incorrect reporting is a separate disciplinary matter rather than a penalty. Make the escalation path explicit: validation failure goes to compliance, who decide, and the default decision is not to submit.
+</Aside>
+
+## 4. Format currency
+
+| Mechanism | Detail |
+|---|---|
+| **Vendor obligation** | SecMark contractually obliged to keep every regulatory report format current as circulars change, within a stated lead time — the single most valuable clause in the back-office contract |
+| Circular monitoring | Every issuer's circular feed monitored, with format-affecting circulars routed to the reporting owner |
+| Format register | Current format version per report, with its circular reference and effective date |
+| Change testing | A format change tested against production-shaped data before the effective date |
+| Parallel run | Where feasible, old and new formats produced and compared for one period |
+| Effective dating | The format version used recorded with every filing, so a historical filing is explicable |
+| Fallback | What to do if the vendor is late: a manual or interim path, agreed in advance |
+
+## 5. Submission and acknowledgement
+
+| Control | Detail |
+|---|---|
+| Channel per report | Recorded; several of these are portal submissions with their own credentials and availability |
+| Credentials | In the managed secret store; portal access is a critical dependency at deadline time |
+| **Acknowledgement capture** | Per filing, stored with the file |
+| **Missing acknowledgement** | An incident with an escalation path; non-submission is treated as 100 percent short reporting in the margin case and as non-compliance generally |
+| Submission register | Obligation, period, due date, submitted date, acknowledgement, approver |
+| Deadline tracking | Forward view with alerts, not a backward-looking report |
+| Portal outage near a deadline | Escalate to the recipient; document attempts; keep evidence |
+
+## 6. Corrections
+
+| Step | Action |
+|---|---|
+| 1. Detect | From post-submission comparison, a recipient query, or an internal reconciliation |
+| 2. Assess | What was wrong, for which period, and what consequence followed |
+| 3. Within the window | Resubmit the corrected file |
+| 4. After the window | A correction with a record; this is a late or incorrect filing and should be recorded as such |
+| 5. Root cause | Source data, transformation, format, or process |
+| 6. Remediate | Fix the cause, not the file |
+| 7. Record | Original, correction, cause, remediation |
+| 8. Escalate | To compliance; trend corrections by cause |
+
+## 7. The suspicious transaction path
+
+| Element | Detail |
+|---|---|
+| Source | Surveillance and transaction monitoring in AML Sutra; see [intraday surveillance](/broking-kyc/finix-broking-setup/rms/07-intraday-surveillance/) |
+| Decision | By the **principal officer**, on the basis of suspicion, not certainty |
+| Format | **FINnet 2.0** |
+| Timeline | Within the prescribed period from the formation of suspicion |
+| **No tipping off** | The client must not be alerted; this is an offence |
+| Independence | The decision sits with the principal officer, outside commercial influence |
+| Record | The alert, the investigation, the reasoning, the decision — **including a decision not to report** — retained |
+| Confidentiality | Restricted access; the report and its existence are confidential |
+| Board reporting | Aggregate, in the periodic pack; individual reports handled confidentially |
+
+A decision not to report is as important to record as a decision to report. It is the evidence that the question was considered.
+
+## 8. Controls and metrics
+
+| Control | Detail |
+|---|---|
+| Calendar completeness | Every obligation in ComplianceSutra with an owner and a deadline |
+| **Obligation without an owner** | The failure the calendar exists to prevent; alarm on any |
+| Forward deadline view | Alerts in advance, not a report afterwards |
+| Pre-submission validation | Mandatory; failure escalates rather than overrides |
+| Acknowledgement tracking | Per filing |
+| Independent-source comparison | Where available, especially for margin |
+| Correction trend | By cause |
+| Format register currency | Reviewed on every relevant circular |
+
+| Metric | Behaviour |
+|---|---|
+| Filings submitted by the internal target | Should be all |
+| Filings acknowledged | Should be all |
+| Validation failures | Trended; a rising rate is a source-data or format problem |
+| Corrections per period by cause | Trending to zero |
+| Obligations without an owner | **Zero** |
+| Time between a format circular and implementation | Within the vendor's contracted lead time |
+
+## 9. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.bo.rpt.inventory_source` | ComplianceSutra, with owners | Regulatory in substance | An unowned obligation |
+| `finix.bo.rpt.internal_target_days.<report>` | Materially before the deadline | Discretionary | No room to recover |
+| `finix.bo.rpt.requires_source_close` | True | Discretionary, strongly recommended | Reporting on unreconciled data |
+| `finix.bo.rpt.validation_mandatory` | True | Discretionary, strongly recommended | Malformed filings |
+| `finix.bo.rpt.on_validation_failure` | **Escalate to compliance; do not submit** | Discretionary, strongly recommended | False or incorrect reporting |
+| `finix.bo.rpt.format_version_recorded` | With every filing | Regulatory in substance | Historical filings unexplainable |
+| `finix.bo.rpt.ack_required` | True, per filing | Regulatory in substance | Unnoticed non-submission |
+| `finix.bo.rpt.ack_missing_action` | Incident with escalation | Discretionary, strongly recommended | Treated as non-submission by the recipient |
+| `finix.bo.rpt.independent_comparison` | Where a source exists | Discretionary | Wrong but well-formed filings |
+| `finix.bo.rpt.retention_years` | 8 | Regulatory | Short of the statutory floor |
+| `finix.bo.rpt.str_format` | FINnet 2.0 | Regulatory | Rejected filings |
+| `finix.bo.rpt.str_decision_owner` | Principal officer | Regulatory | Decision taken by the wrong person |
+| `finix.bo.rpt.str_no_report_recorded` | True | Regulatory in substance | No evidence the question was considered |
+| `finix.bo.rpt.tipping_off_controls` | Enforced | Regulatory | Offence |
+
+## 10. Exception paths
+
+| Situation | Response |
+|---|---|
+| Validation fails near a deadline | Escalate to compliance; the default is not to submit within the window |
+| Source data not reconciled at report time | Do not extract; a reconciled late file beats an unreconciled timely one |
+| Format changed by circular with short notice | Invoke the vendor obligation; prepare an interim manual path if the lead time cannot be met |
+| Portal unavailable at the deadline | Document attempts; escalate to the recipient; retain the evidence |
+| Acknowledgement not received | Treat as potentially unsubmitted; chase; escalate |
+| Penalty or query indicates a wrong filing | Investigate the source data, not just the file; correct and remediate |
+| An obligation is discovered with no owner | Assign immediately; investigate how it was missed; this is a calendar failure |
+| Suspicious transaction identified | Principal officer decides and files within the timeline; no tipping off; record the chain |
+| A decision not to file a suspicious transaction report | Record the reasoning; it is evidence that the question was considered |
+| Correction needed after the window | Record as a late or incorrect filing, report internally, and fix the cause |
+
+## Practical notes
+
+- **Contract for format currency.** It converts a dozen independent lifecycles into one supplier obligation.
+- **Track acknowledgements, not submissions.** The register that stops at "submitted" is the register that misses a non-submission.
+- **Make "do not submit on validation failure" the written default.** The pressure at 23:00 runs the other way.
+- **Compare against an independent source where one exists.** Schema validation proves the file is well-formed, not that it is true.
+- **Alarm on any obligation without an owner.** It is the cheapest possible control on the most common failure.
+- **Record decisions not to file a suspicious transaction report.** The absence of a record looks like the absence of consideration.
+- **Keep an interim manual path for every critical filing.** Vendors are late occasionally; deadlines are not flexible.
+
+## Where this connects
+
+- [Margin reporting and penalties](/broking-kyc/finix-broking-setup/rms/08-margin-reporting-penalties/) — the filing with its own penalty regime
+- [Statements and retention](/broking-kyc/finix-broking-setup/backoffice/08-statements-retention/) — the retention floor these filings sit on
+- [Intraday surveillance](/broking-kyc/finix-broking-setup/rms/07-intraday-surveillance/) — the source of suspicious transaction reports
+- [Compliance reporting pipeline](/broking-kyc/finix-broking-setup/compliance/02-reporting-pipeline/) — the compliance-plane view of the same machinery
+- [Compliance configuration baseline](/broking-kyc/finix-broking-setup/compliance/01-compliance-config-baseline/) — the obligation register
+- [Vendor onboarding and contracts](/broking-kyc/finix-broking-setup/setup/09-vendor-onboarding-contracts/) — the format-currency clause
+- [Inspection readiness](/broking-kyc/finix-broking-setup/compliance/03-inspection-readiness/) — where filings are examined
