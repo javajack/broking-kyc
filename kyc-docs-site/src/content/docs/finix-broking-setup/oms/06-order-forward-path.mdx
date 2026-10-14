@@ -36,7 +36,7 @@ The third idea is preconditions. Most discussion of an order path concerns what 
 | 2 | **Authentication and entitlement** | Directory, identifier register, certification register | Expired session, lapsed certification, identifier not enabled for routing, dealer acting outside client scope | Cheap, deterministic, and gates everything |
 | 3 | **Static validation** | Instrument master of the current day | Unknown instrument, suspended instrument, segment not enabled, quantity not a lot multiple, price not a tick multiple | Static data; the largest share of malformed orders |
 | 4 | **Order-type legality** | The [support matrix](/broking-kyc/finix-broking-setup/oms/04-order-types-catalogue/#9-support-matrix) and certification record | Unsupported type, illegal attribute combination, all-or-none or minimum fill populated, market-priced multileg, discontinued stop-loss market | Prevents exchange rejections the client cannot interpret |
-| 5 | **Client-state checks** | Client master | Inactive or closed account, voluntary or regulatory freeze, segment not activated for the client, missing DDPI where required for the action, unresolved screening hit | Client status is current-day state, cheap to read |
+| 5 | **Client-state checks** | Client master | Inactive or closed account, voluntary or regulatory freeze, segment not activated for the client, missing <abbr title="Demat Debit and Pledge Instruction">DDPI</abbr> where required for the action, unresolved screening hit | Client status is current-day state, cheap to read |
 | 6 | **Scrip and product restrictions** | Ban-period list, surveillance measure lists, broker block list | Fresh derivatives positions in a banned underlying, orders breaching a surveillance restriction, instruments the broker has blocked | Instrument-level restrictions before any client computation |
 | 7 | **Price reasonability** | Market data, operating price range, broker collar | Price outside the band, outside the broker collar, market order while the feed is stale | Needs current price; cheap once available |
 | 8 | **Quantity and value limits** | Limit configuration | Order quantity or value above the per-order, per-scrip, per-client, per-branch or per-segment ceiling | Bounded arithmetic before margin computation |
@@ -149,7 +149,7 @@ See [margin engine](/broking-kyc/finix-broking-setup/rms/02-margin-engine/) and 
 | `QUEUED_AMO` | Accepted into the after-market queue | `RECEIVED` at release, or `CANCELLED` |
 | `PENDING_TRIGGER` | Broker-held Good Till Triggered instruction | `RECEIVED` on fire, or `CANCELLED`, `EXPIRED` |
 
-The `UNKNOWN` state is the one that distinguishes a defensible implementation. It must exist, it must be visible to the client, and it must not resolve by assumption. See [OMS architecture](/broking-kyc/finix-broking-setup/oms/01-oms-architecture/#4-session-management-and-recovery).
+The `UNKNOWN` state is the one that distinguishes a defensible implementation. It must exist, it must be visible to the client, and it must not resolve by assumption. See [<abbr title="Order Management System">OMS</abbr> architecture](/broking-kyc/finix-broking-setup/oms/01-oms-architecture/#4-session-management-and-recovery).
 
 ## 4. Write points
 
@@ -169,7 +169,7 @@ The path refuses to process orders, in the stated scope, unless all of these hol
 
 | Precondition | Scope of refusal if unmet | Verified at |
 |---|---|---|
-| Instrument master is current-day | Everything | BOD gate |
+| Instrument master is current-day | Everything | <abbr title="Beginning Of Day">BOD</abbr> gate |
 | Risk parameter file applied and current | The affected segment | BOD and on each publication |
 | Ban-period list applied and current-day | Fresh derivatives positions in the affected underlyings | BOD gate |
 | Surveillance measure lists applied | The affected instruments | BOD gate |

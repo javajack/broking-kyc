@@ -9,13 +9,13 @@ import { Aside } from '@astrojs/starlight/components';
 
 ## TL;DR
 
-- **Six SecMark modules in scope at Finix**: the back office itself, the middleware for lifecycle and reconciliation, the Partner Portal for sub-broker and branch accounting, SmartReco for bank, gateway and depository reconciliation, AML Sutra for transaction monitoring and suspicious transaction reporting, and ComplianceSutra for the compliance calendar and evidence.
+- **Six SecMark modules in scope at Finix**: the back office itself, the middleware for lifecycle and reconciliation, the Partner Portal for sub-broker and branch accounting, SmartReco for bank, gateway and depository reconciliation, <abbr title="Anti-Money Laundering">AML</abbr> Sutra for transaction monitoring and suspicious transaction reporting, and ComplianceSutra for the compliance calendar and evidence.
 - **The pipeline blocks forward, not backward.** A trade-file failure stops everything; a statement failure stops only statements. Knowing which is which is the difference between a measured response and a panic.
 - **Three masters underpin everything** — client, instrument and the firm's own chart of accounts — and a defect in any of them produces errors that look like processing failures and are not.
 - **Depository-participant records must remain separable** even though the platform covers both broking and depository participation, because a depository inspection asks for depository records.
 - **Reconciliation is the plane's control, and it is multi-way.** Trades reconcile three ways, collateral three ways, bank two ways against the gateway and the ledger, holdings two ways against the depository.
 - **Batch design must be restartable and idempotent.** Operators re-run jobs under deadline pressure, and a job that double-posts on a re-run converts a delay into a corruption.
-- **Commodity hours overlap equity end-of-day.** The equity pipeline runs while MCX is still trading, which means two operating modes in the same building at the same time and a separate commodity close afterwards.
+- **Commodity hours overlap equity end-of-day.** The equity pipeline runs while <abbr title="Multi Commodity Exchange of India">MCX</abbr> is still trading, which means two operating modes in the same building at the same time and a separate commodity close afterwards.
 
 ## Conceptual overview
 
@@ -43,15 +43,15 @@ The third fact is that reconciliation is not a quality check bolted onto the pip
 |---|---|---|---|---|
 | P1 | Masters refresh — instrument, client, charges | Exchange files, client master | Before processing | **Everything** |
 | P2 | **Trade file import** | Exchange trade files per segment | Post-session | Everything downstream |
-| P3 | **Trade reconciliation** — three-way | Exchange file, OMS feed, back office | Before P4 | Contract notes, obligations, ledger |
+| P3 | **Trade reconciliation** — three-way | Exchange file, <abbr title="Order Management System">OMS</abbr> feed, back office | Before P4 | Contract notes, obligations, ledger |
 | P4 | Charge computation | Trades plus the charge master | Before P5 | Contract notes, ledger |
 | P5 | **Contract note generation** | Reconciled trades plus charges | **Within 24 hours of execution** | A regulatory deadline |
 | P6 | Contract note dispatch and evidence | Generated notes | Same | Delivery evidence |
 | P7 | **Ledger posting** | Trades, charges, obligations | Before P9 and pay-out | Statements, reporting, pay-out authorisation |
 | P8 | **Obligation processing** | Clearing corporation obligation files | Per settlement | Settlement |
 | P9 | Settlement instruction preparation | Obligations, holdings, positions | Deadline-bound | Settlement |
-| P10 | **CUSPA processing** | Pay-out, ledger, margin obligations | Same day as pay-out, daily thereafter | A statutory clock |
-| P11 | Collateral and balance extract to RMS | Ledger, pledges | Before next-day open | **Next day's trading** |
+| P10 | **<abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr> processing** | Pay-out, ledger, margin obligations | Same day as pay-out, daily thereafter | A statutory clock |
+| P11 | Collateral and balance extract to <abbr title="Risk Management System">RMS</abbr> | Ledger, pledges | Before next-day open | **Next day's trading** |
 | P12 | Margin reporting extract | Margin collected and peak | Within the reporting cut-off | A penalised deadline |
 | P13 | Corporate action processing | Corporate action files | Per record date | Entitlements |
 | P14 | Statements | Ledger, holdings | Per prescribed frequency | A servicing obligation |
@@ -160,7 +160,7 @@ The single most consequential dependency in the plane is that contract notes can
 |---|---|---|
 | Post equity close | P2 to P9 for equity segments | The main pipeline |
 | Concurrently, to 23:30 | MCX trading continues | Risk, dealing and support still live |
-| 19:30 on tender days | Commodity delivery intentions through MCXCCL eClear | A hard evening deadline |
+| 19:30 on tender days | Commodity delivery intentions through <abbr title="Multi Commodity Exchange Clearing Corporation Limited">MCXCCL</abbr> eClear | A hard evening deadline |
 | After 23:30 | P20 commodity close | A second, later pipeline |
 | Overnight | P11, P13, P15 to P19 | The window is narrow |
 | Pre-open | P1 for the next day | The gate |
@@ -215,7 +215,7 @@ Full list at the [back office configuration reference](/broking-kyc/finix-brokin
 ## Where this connects
 
 - [Trade import and reconciliation](/broking-kyc/finix-broking-setup/backoffice/02-trade-import-reconciliation/) — the first stage in detail
-- [EOD runbook](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/) — this pipeline as an operated sequence
+- [<abbr title="End Of Day">EOD</abbr> runbook](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/) — this pipeline as an operated sequence
 - [Integration contract matrix](/broking-kyc/finix-broking-setup/stack/integration-contract-matrix/#6-record-path) — the interfaces each stage uses
 - [RMS architecture](/broking-kyc/finix-broking-setup/rms/01-rms-architecture/) — the consumer of P11
 - [Back office and RMS](/broking-kyc/appendix/back-office-rms/) — the vendor-neutral treatment

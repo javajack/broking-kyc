@@ -9,13 +9,13 @@ import { Aside } from '@astrojs/starlight/components';
 
 ## TL;DR
 
-- **Registration is per exchange and per segment**, not per client. A client is not "registered"; they are registered at NSE for cash and derivatives, at BSE for cash, at MCX for commodities, and each is a separate state.
+- **Registration is per exchange and per segment**, not per client. A client is not "registered"; they are registered at <abbr title="National Stock Exchange of India">NSE</abbr> for cash and derivatives, at <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> for cash, at <abbr title="Multi Commodity Exchange of India">MCX</abbr> for commodities, and each is a separate state.
 - **Partial batch acceptance is the characteristic failure.** A client accepted on one exchange and rejected on another must be enabled only where accepted, and the firm must know which is which without guessing.
 - **Enablement is gated on the registration state**, enforced at check C2 of the [ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/). A client tradeable in a segment where they are not registered is a control failure, not a user-experience problem.
-- **Attribute matching drives acceptance.** Name, PAN, date of birth and the other matched attributes must agree with the authoritative sources; see [six-attribute matching](/broking-kyc/operations/six-attribute-matching/).
+- **Attribute matching drives acceptance.** Name, <abbr title="Permanent Account Number">PAN</abbr>, date of birth and the other matched attributes must agree with the authoritative sources; see [six-attribute matching](/broking-kyc/operations/six-attribute-matching/).
 - **Modifications propagate.** A change of name, address, bank or status flows to every exchange where the client is registered, and completion must be tracked per exchange rather than assumed.
 - **Reconcile daily against each exchange's record.** The firm's enablement state and the exchange's registration state must agree; a difference in either direction is a finding.
-- **Demat and UCC are different gates.** A client can be registered and still unable to settle a delivery trade because their demat account is not active.
+- **Demat and <abbr title="Unique Client Code">UCC</abbr> are different gates.** A client can be registered and still unable to settle a delivery trade because their demat account is not active.
 
 ## Conceptual overview
 
@@ -28,9 +28,9 @@ The third point is that registration is not a one-time event. Clients change nam
 ## 1. Framework
 
 - **Exchange unique client code registration requirements** — per exchange, with the submission mechanics, formats and validation rules published by each. See [exchange registration](/broking-kyc/operations/exchange-registration/). `[not yet in index]`
-- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — client registration and records obligations.
+- **[Master Circular for Stock Brokers <abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — client registration and records obligations.
 - **Attribute matching** — the matched-attribute framework that drives acceptance; see [six-attribute matching](/broking-kyc/operations/six-attribute-matching/).
-- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — Chapter III general obligations; regulation 16 retention. `[not yet in index]`
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — Chapter <abbr title="—">III</abbr> general obligations; regulation 16 retention. `[not yet in index]`
 - **Client code modification norms** — exchange-capped and monitored; see [modification and cancellation](/broking-kyc/finix-broking-setup/oms/08-modify-cancel-rules/#7-modifying-another-persons-order).
 - Field-level reference: [exchange registration fields](/broking-kyc/reference/field-atlas/sections/u-exchange-registration/) and the per-exchange destinations for [NSE](/broking-kyc/reference/field-atlas/destinations/nse-ucc/), [BSE](/broking-kyc/reference/field-atlas/destinations/bse-ucc/) and [MCX](/broking-kyc/reference/field-atlas/destinations/mcx-ucc/).
 
@@ -38,7 +38,7 @@ The third point is that registration is not a one-time event. Clients change nam
 
 Per client, a state per cell.
 
-| | NSE CM | NSE F&O | NSE CD | BSE CM | BSE EQD | MCX COM |
+| | NSE <abbr title="Clearing Member">CM</abbr> | NSE F&O | NSE CD | BSE CM | BSE EQD | MCX COM |
 |---|---|---|---|---|---|---|
 | Submitted | | | | | | |
 | Accepted | | | | | | |
@@ -63,7 +63,7 @@ A client told their account is open, who can trade equities and is rejected on t
 
 | Step | Detail |
 |---|---|
-| 1. Trigger | Client approved and KYC complete; see [CVL KRA](/broking-kyc/finix-broking-setup/onboarding/02-kra-cvl-integration/) |
+| 1. Trigger | Client approved and <abbr title="Know Your Customer (process).">KYC</abbr> complete; see [CVL <abbr title="KYC Registration Agency">KRA</abbr>](/broking-kyc/finix-broking-setup/onboarding/02-kra-cvl-integration/) |
 | 2. Prepare | Per exchange and per segment, in the published format |
 | 3. **Pre-validate** | Against each exchange's published rules, locally, so rejections are rare |
 | 4. Submit | Through the exchange's member portal or file channel |
@@ -145,7 +145,7 @@ A client told their account is open, who can trade equities and is rejected on t
 | Related gate | Where |
 |---|---|
 | KRA status | [CVL KRA integration](/broking-kyc/finix-broking-setup/onboarding/02-kra-cvl-integration/#3-status-and-the-trading-gate) |
-| Screening | [PEP and sanctions screening](/broking-kyc/finix-broking-setup/onboarding/04-pep-sanctions-screening/) |
+| Screening | [<abbr title="Politically Exposed Person">PEP</abbr> and sanctions screening](/broking-kyc/finix-broking-setup/onboarding/04-pep-sanctions-screening/) |
 | Demat active | [Depository participation](/broking-kyc/finix-broking-setup/setup/05-depository-participant/) |
 | Client master reconciled | [Back office architecture](/broking-kyc/finix-broking-setup/backoffice/01-backoffice-architecture/#3-the-three-masters) |
 

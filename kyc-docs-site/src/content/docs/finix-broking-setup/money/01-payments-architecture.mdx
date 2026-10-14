@@ -31,13 +31,13 @@ The third point concerns the boundary between money and risk. A payment becoming
 | | **Collection — Razorpay** | **Disbursement — RazorpayX** |
 |---|---|---|
 | Purpose | Client pays the firm | Firm pays the client |
-| Products | Payment gateway; **Smart Collect** virtual accounts for automated reconciliation of bank-transfer collections | **Payouts** over UPI, IMPS, NEFT and RTGS to accounts at all Indian banks |
+| Products | Payment gateway; **Smart Collect** virtual accounts for automated reconciliation of bank-transfer collections | **Payouts** over <abbr title="Unified Payments Interface">UPI</abbr>, <abbr title="Immediate Payment Service">IMPS</abbr>, <abbr title="National Electronic Funds Transfer">NEFT</abbr> and <abbr title="Real Time Gross Settlement">RTGS</abbr> to accounts at all Indian banks |
 | Object model | Payment, order, settlement | **Contact → fund account → payout** |
 | Initiation | Client action | Firm action, by API or dashboard; bulk addition and queueing available |
 | Idempotency key | Payment identifier | **The firm's own reference on the payout** |
 | Events | Payment state changes; `settlement.processed` after funds transfer to the business bank account | Payout state changes, with **webhook callback on every state change** |
 | Reconciliation key | **UTR**, used to reconcile settlement funds against the bank statement | Payout reference and bank UTR |
-| Destination account | **USCNB — the upstreaming client nodal account** | Sourced from **DSCNB — the downstreaming client nodal account** |
+| Destination account | **<abbr title="Upstreaming Client Nodal Bank Account">USCNB</abbr> — the upstreaming client nodal account** | Sourced from **<abbr title="Downstreaming Client Nodal Bank Account">DSCNB</abbr> — the downstreaming client nodal account** |
 | Characteristic risk | Money arrived but not attributed; third-party payer | Duplicate payout; reversal after apparent success |
 | Degraded behaviour | Queue and reconcile; never credit on a client's screenshot | **Stop on ambiguity**; never retry without the idempotency reference |
 
@@ -51,7 +51,7 @@ The shared-abstraction instinct produces a service whose retry policy is safe fo
 
 | Account | Prescribed name | Role in this plane |
 |---|---|---|
-| **A1 USCNB** | "Name of the SB/CM – USCNB account" | **Every client pay-in lands here**, including gateway settlements |
+| **A1 USCNB** | "Name of the SB/<abbr title="Clearing Member">CM</abbr> – USCNB account" | **Every client pay-in lands here**, including gateway settlements |
 | **A2 DSCNB** | "Name of the SB/CM – DSCNB account" | **Every client pay-out leaves from here**, funded same day from the clearing corporation or clearing member |
 | A3 Clearing | Per the designated clearing bank | Settlement with the clearing corporation; margin funding |
 | A5 Own operating | Conventional | The firm's revenue, after brokerage is computed and due |
@@ -110,7 +110,7 @@ Full map and the permitted-movement matrix at [bank account architecture](/broki
 | Payer attribution data | Razorpay supplies; **the firm enforces** | Razorpay does not know the third-party rule |
 | Settlement destination | **The firm configures** | A default is not a decision |
 | Client credit decision | **SecMark ledger** | Not the gateway |
-| Capacity grant | **Saral RMS**, on confirmed funds | Not the payment system |
+| Capacity grant | **Saral <abbr title="Risk Management System">RMS</abbr>**, on confirmed funds | Not the payment system |
 | Pay-out authorisation | **SecMark**, against clear balance | Not RazorpayX |
 | Pay-out execution | RazorpayX | — |
 | Bank reconciliation | **SmartReco**, firm-owned | Not the gateway dashboard |

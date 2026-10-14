@@ -147,7 +147,7 @@ SEBI turnover fees for the listed segments carry 18% GST (since July 18, 2022). 
 - **impact_areas:** file-format
 - **primary_url:** https://www.bseindia.com/downloads/UploadDocs/Notices/20260529-13/20260529-13.pdf
 
-Updates notice 20260515-36 on mandatory ETI API changes: an Algo ID field in order and quote mass-cancellation messages, a new error code for debarred clients and revised Location ID identification (first paragraph). Simulation testing starts May 26, 2026 (June 3 for Equity), and the same v1.6.14 changes extend to EGR (bullets). The changes go live June 29, 2026 in the derivatives and EGR segments and July 6, 2026 in Equity; vendors and in-house developers must update their applications (go-live bullets and closing paragraph).
+Updates notice 20260515-36 on mandatory <abbr title="Enhanced Trading Interface">ETI</abbr> API changes: an Algo ID field in order and quote mass-cancellation messages, a new error code for debarred clients and revised Location ID identification (first paragraph). Simulation testing starts May 26, 2026 (June 3 for Equity), and the same v1.6.14 changes extend to EGR (bullets). The changes go live June 29, 2026 in the derivatives and EGR segments and July 6, 2026 in Equity; vendors and in-house developers must update their applications (go-live bullets and closing paragraph).
 
 ### 20260520-33
 
@@ -590,7 +590,7 @@ Implements SEBI KYC validation guidelines: Aadhaar via UIDAI, mobile/email via <
 - **impact_areas:** upstreaming, client-funds
 - **primary_url:** https://www.bseindia.com/markets/MarketInfo/DispNewNoticesCirculars.aspx?page=20230812-1
 
-BSE disseminates FAQ on the SEBI upstreaming framework that requires brokers/clearing members to upstream client funds to clearing corporations daily in approved forms (cash, lien on FDR, pledged MFOS units). All members must read and comply with the annexed FAQ.
+BSE disseminates FAQ on the SEBI upstreaming framework that requires brokers/clearing members to upstream client funds to clearing corporations daily in approved forms (cash, lien on FDR, pledged <abbr title="Mutual Fund Overnight Scheme">MFOS</abbr> units). All members must read and comply with the annexed FAQ.
 
 ### 20230412-15
 

@@ -29,7 +29,7 @@ Sorted by `source_section`, then `field_id`.
 | A | A-father_spouse_name | Father/Spouse Name | FATHER_SPOUSE_NAME | VARCHAR(140) | one-time | formatted | CKYC validates against <abbr title="Officially Valid Document">OVD</abbr> where present; mandatory | CKYC/2025/16 |
 | A | A-father_spouse_prefix | Father/Spouse Prefix | FATHER_SPOUSE_PREFIX | VARCHAR(5) | one-time | [direct] | CKYC T1 mandatory | CKYC/2020/04 |
 | A | A-first_name | First Name | FIRST_NAME | VARCHAR(70) | one-time | formatted | CKYC validates against name on OVD; alpha+spaces only | CKYC/2025/16 |
-| A | A-full_name | Full Name | FULL_NAME | VARCHAR(200) | one-time | derived from Y | CKYCRR computes Name field internally; uploaded as concat | CKYC/2020/04 |
+| A | A-full_name | Full Name | FULL_NAME | VARCHAR(200) | one-time | derived from Y | <abbr title="Central KYC Records Registry">CKYCRR</abbr> computes Name field internally; uploaded as concat | CKYC/2020/04 |
 | A | A-gender | Gender | GENDER | CHAR(1) | one-time | [direct] | M/F/T per <abbr title="Central Registry of Securitisation Asset Reconstruction and Security Interest of India">CERSAI</abbr> template; mandatory | CKYC/2025/16 |
 | A | A-is_differently_abled | Differently Abled Status | DIFFERENTLY_ABLED_STATUS | CHAR(1) | one-time | [direct] | New field added per Supreme Court order; bulk file v1.3; effective 30-Sep-2025 | CKYC/2025/11 |
 | A | A-last_name | Last Name | LAST_NAME | VARCHAR(70) | one-time | formatted | Mandatory; concatenated for FULL_NAME on output | CKYC/2025/16 |

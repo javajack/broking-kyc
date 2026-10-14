@@ -5,16 +5,16 @@ description: Operating the KRA leg on the Finix stack — the lookup-first seque
 
 import { Aside } from '@astrojs/starlight/components';
 
-> **Why this page is structured this way:** The KRA integration itself is documented in depth in the [KRA reference](/broking-kyc/vendors/kra/), including the Digio API specification, the status codes and the field-level upload content. This page therefore covers only the operating layer: the sequence, the branches, the gates, and the reconciliation. The single most important thing in it is that a rejection on duplicate upload is a normal branch and not an error — getting that wrong produces retry loops, support tickets and, eventually, stale client records.
+> **Why this page is structured this way:** The <abbr title="KYC Registration Agency">KRA</abbr> integration itself is documented in depth in the [KRA reference](/broking-kyc/vendors/kra/), including the Digio API specification, the status codes and the field-level upload content. This page therefore covers only the operating layer: the sequence, the branches, the gates, and the reconciliation. The single most important thing in it is that a rejection on duplicate upload is a normal branch and not an error — getting that wrong produces retry loops, support tickets and, eventually, stale client records.
 
 ## TL;DR
 
-- **Look up first, always.** The first call in the flow determines whether the client needs fresh KYC or has existing records, and it is a query to one KRA that returns the record regardless of which KRA holds it, through the mandated interoperability framework.
+- **Look up first, always.** The first call in the flow determines whether the client needs fresh <abbr title="Know Your Customer (process).">KYC</abbr> or has existing records, and it is a query to one KRA that returns the record regardless of which KRA holds it, through the mandated interoperability framework.
 - **The KRA status is the trading gate.** Registered, Validated, On Hold, Rejected or Not Available. Trading is allowed at **Registered**; Validated is not required to begin.
 - **A duplicate upload for an already-compliant investor is rejected by design.** The correct response is to **download** the record, not to retry the upload. Treating this as an error produces loops and masks the real condition.
 - **The download is authoritative.** Details uploaded earlier may have been modified at verification, so the intermediary treats the download as final based on the updated date and uses it to update the back office.
 - **Upload within the prescribed window.** Intermediaries upload client KYC records to a KRA within the prescribed period of account opening; see the [KRA reference](/broking-kyc/vendors/kra/) for the current timeline.
-- **Dual upload applies.** Since the dual-upload mandate, client KYC data goes to **both** the KRA and CERSAI's CKYC registry; see [CKYCRR 2.0](/broking-kyc/finix-broking-setup/onboarding/03-ckyc-ckycrr2-integration/).
+- **Dual upload applies.** Since the dual-upload mandate, client KYC data goes to **both** the KRA and <abbr title="Central Registry of Securitisation Asset Reconstruction and Security Interest of India">CERSAI</abbr>'s <abbr title="Central KYC (records registry)">CKYC</abbr> registry; see [<abbr title="Central KYC Records Registry">CKYCRR</abbr> 2.0](/broking-kyc/finix-broking-setup/onboarding/03-ckyc-ckycrr2-integration/).
 - **Modifications propagate.** A change at one intermediary updates the investor's record at the holding KRA, and other intermediaries see it — which means the firm's own records must be refreshed, not assumed static.
 
 ## Conceptual overview
@@ -27,12 +27,12 @@ The third observation is about the rejection branch. When an intermediary upload
 
 ## 1. Framework
 
-- **KRA framework and interoperability** — five SEBI-registered KRAs with a mandated back-end interoperability framework; a query to one returns the record regardless of which holds it; the queried KRA fetches it from the holding KRA in the background. See the [KRA reference](/broking-kyc/vendors/kra/).
+- **KRA framework and interoperability** — five <abbr title="Securities and Exchange Board of India">SEBI</abbr>-registered KRAs with a mandated back-end interoperability framework; a query to one returns the record regardless of which holds it; the queried KRA fetches it from the holding KRA in the background. See the [KRA reference](/broking-kyc/vendors/kra/).
 - **Upload obligation** — intermediaries upload client KYC records to a KRA within the prescribed period of account opening.
 - **Duplicate handling** — an upload for an already-compliant investor is rejected by the KRA system and the intermediary must download the record instead.
 - **Download authority** — details uploaded earlier may have been modified at verification, so the intermediary treats the download as final based on the updated date and uses it to update the back office.
 - **Dual upload** — client KYC data to both the KRA and CERSAI's CKYC registry.
-- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025).
+- **[Master Circular for Stock Brokers SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025).
 - **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — regulation 16 retention of not less than eight years, applying to KYC records and the registry correspondence. `[not yet in index]`
 - **Access route at Finix** — through Digio's unified KRA interface, which abstracts the differences between the KRAs; CVL is the primary. CVL also provides an API directly on request, configured by the intermediary to push customer data and images and to check status, fetch and submit.
 
@@ -40,7 +40,7 @@ The third observation is about the rejection branch. When an intermediary upload
 
 | # | Step | Call | Outcome branches |
 |---|---|---|---|
-| 1 | **Lookup** | Status query by PAN | Record exists → fetch. No record → fresh KYC |
+| 1 | **Lookup** | Status query by <abbr title="Permanent Account Number">PAN</abbr> | Record exists → fetch. No record → fresh KYC |
 | 2a | **Fetch** | Download the existing record | Use it to prefill and to update the back office |
 | 2b | **Fresh KYC** | Capture and verify through [Digio](/broking-kyc/finix-broking-setup/onboarding/01-digio-integration/) | Proceed to upload |
 | 3 | Verify in-person or video, where required | Per the applicable requirement | — |
@@ -163,7 +163,7 @@ The last row is the one that catches the worst failure: a client trading without
 - [KRA reference](/broking-kyc/vendors/kra/) — the API specification, status codes and field-level upload content
 - [CKYC and CKYCRR 2.0](/broking-kyc/finix-broking-setup/onboarding/03-ckyc-ckycrr2-integration/) — the other half of the dual upload
 - [Digio integration](/broking-kyc/finix-broking-setup/onboarding/01-digio-integration/) — the access route
-- [UCC registration](/broking-kyc/finix-broking-setup/onboarding/05-ucc-registration-exchanges/) — the next gate
+- [<abbr title="Unique Client Code">UCC</abbr> registration](/broking-kyc/finix-broking-setup/onboarding/05-ucc-registration-exchanges/) — the next gate
 - [Re-KYC](/broking-kyc/lifecycle/re-kyc/) and [modifications](/broking-kyc/lifecycle/modifications/) — the lifecycle events
 - [KRA submission fields](/broking-kyc/reference/field-atlas/sections/s-kra-submission/) — field-level reference
 - [Pre-trade check ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/) — where the status gate is enforced

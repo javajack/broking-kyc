@@ -10,8 +10,8 @@ import { Aside } from '@astrojs/starlight/components';
 ## TL;DR
 
 - **Four independent dimensions**: the price instruction (market, limit, stop-loss variants), the time instruction (day, immediate-or-cancel, good-till-date, good-till-cancelled), the quantity instruction (full, disclosed, minimum fill, all-or-none) and the product or margin treatment the broker applies. A supported "order type" is a legal combination, not an item on a list.
-- **NSE's normal market segregates orders into books by attribute**: the Regular Lot book holds orders with none of all-or-none, minimum fill or stop-loss attached; the Special Terms book holds all-or-none and minimum fill orders, **which are not currently available on the system as per SEBI directives**; the Stop Loss book holds stop-loss orders until the trigger price is reached or surpassed, at which point the order is released into the Regular Lot book.
-- **Stop-loss market orders have been progressively withdrawn.** NSE discontinued SL-M for index and stock options from **27 September 2021** per circular NSE/FAOP/49677, following freak-trade incidents — notably 20 August 2021, when a Nifty call premium moved from about ₹80 to ₹800 in a second and swept resting SL-M orders. BSE discontinued stop-loss market orders from 9 October 2023 on the same reasoning.
+- **<abbr title="National Stock Exchange of India">NSE</abbr>'s normal market segregates orders into books by attribute**: the Regular Lot book holds orders with none of all-or-none, minimum fill or stop-loss attached; the Special Terms book holds all-or-none and minimum fill orders, **which are not currently available on the system as per <abbr title="Securities and Exchange Board of India">SEBI</abbr> directives**; the Stop Loss book holds stop-loss orders until the trigger price is reached or surpassed, at which point the order is released into the Regular Lot book.
+- **Stop-loss market orders have been progressively withdrawn.** NSE discontinued SL-M for index and stock options from **27 September 2021** per circular NSE/FAOP/49677, following freak-trade incidents — notably 20 August 2021, when a Nifty call premium moved from about ₹80 to ₹800 in a second and swept resting SL-M orders. <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> discontinued stop-loss market orders from 9 October 2023 on the same reasoning.
 - **Multileg orders with a market price condition for all contracts were discontinued**; such market orders are rejected by the exchange. Multileg orders with a limit price condition remain available for all contracts.
 - **Good-till-cancelled and good-till-date are commodity validities.** They are not available as exchange validities in the equity segments, where long-dated client intent is served by a broker-side Good Till Triggered facility instead.
 - **Bracket and cover orders are largely gone from the Indian market.** Brokers withdrew them from around March 2020 and more decisively after the July 2020 peak-margin framework removed the leverage that made them attractive, and because in volatile markets both legs can fire. Finix does not offer them at launch.
@@ -33,7 +33,7 @@ The third idea is the division between exchange-native and broker-synthetic. A b
 - **NSE Limit Price Protection** — introduced 31 October 2022 in the futures and options segment as a pre-trade risk control; an additional validation over and above the operating price range, based on both sides of a reference price. `[not yet in index]`
 - **NSE Non-NEAT Front End protocol documents, per segment** — spread order entry rules and structure, and the rules and structure of two-leg and three-leg order entry, including the discontinuation of multileg orders with a market price condition for all contracts. `[not yet in index]`
 - **Peak margin framework** — SEBI's intraday peak margin regime from July 2020, phased to August 2021, which removed the leverage underpinning bracket and cover order products. See [margin shortfall and peak margin](/broking-kyc/trading-risk/margin-shortfall-peak-margin/).
-- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025).
+- **[Master Circular for Stock Brokers SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025).
 - **Saral MoneyMaker published order features** — basket orders, Good Till Triggered, Stock SIP, single-leg open breakout orders, ratio-based hedging with equity, futures or synthetic instruments, and bulk file upload.
 
 ## 2. The four dimensions
@@ -67,7 +67,7 @@ The fourth is the one that causes client confusion, because it is presented alon
 | Behaviour | Buy or sell at a specified price or better |
 | Risk | Non-execution, or partial execution |
 | Resting | Rests in the Regular Lot book at its price with time priority |
-| Protection | Subject to the operating price range and, in derivatives, **Limit Price Protection** — an incoming limit order beyond the LPP range is automatically rejected by the exchange |
+| Protection | Subject to the operating price range and, in derivatives, **Limit Price Protection** — an incoming limit order beyond the <abbr title="Limit Price Protection">LPP</abbr> range is automatically rejected by the exchange |
 | Finix policy | The default and the recommended instruction for every client, in every segment |
 
 ### 3.3 Stop-loss limit
@@ -136,8 +136,8 @@ All-or-none and minimum fill exist in the book structure and in the protocol, bu
 | Odd lot | Quantities below the regular lot | Separate market |
 | Block and bulk deals | Large transactions with disclosure obligations | Separate windows and reporting; see [block and bulk deals](/broking-kyc/deep-dives/trading-day/block-bulk-deals/) |
 | Negotiated trade | Regular lot orders with a counterparty identifier | Day orders only |
-| Securities lending and borrowing | Lending and borrowing of securities | Its own protocol document and order structure; see [SLBM](/broking-kyc/deep-dives/settlement/slbm/) |
-| Commodity tender and delivery | Delivery intention in commodity derivatives | Through MCXCCL eClear until 19:30 on tender days; see [MCX commodity](/broking-kyc/finix-broking-setup/exchanges/04-mcx-commodity/) |
+| Securities lending and borrowing | Lending and borrowing of securities | Its own protocol document and order structure; see [<abbr title="Securities Lending and Borrowing Mechanism">SLBM</abbr>](/broking-kyc/deep-dives/settlement/slbm/) |
+| Commodity tender and delivery | Delivery intention in commodity derivatives | Through <abbr title="Multi Commodity Exchange Clearing Corporation Limited">MCXCCL</abbr> eClear until 19:30 on tender days; see [<abbr title="Multi Commodity Exchange of India">MCX</abbr> commodity](/broking-kyc/finix-broking-setup/exchanges/04-mcx-commodity/) |
 
 ## 7. Broker-synthetic order types
 
@@ -159,7 +159,7 @@ These exist in the broker's system. The exchange sees only the ordinary order th
 | **Square-off order** | The firm's own risk instruction | A normal order | Everything — this is the firm acting on the client's position; see [square-off engine](/broking-kyc/finix-broking-setup/rms/06-squareoff-engine/) | **Offered**, risk-identifier only |
 
 <Aside type="caution" title="Why Finix does not offer bracket and cover orders at launch">
-Both were withdrawn across the Indian market from around March 2020, and more decisively after the July 2020 peak-margin framework, for two reasons that both still hold. The regulatory reason is that these products existed largely to package leverage, and the peak-margin regime removed the leverage. The behavioural reason is sharper: in a volatile market both the target and the stop-loss leg can fire, leaving the client with an unintended opposite position, and the broker owns the resulting dispute. Offering them would require a leg-management design, a client-communication design and a dispute position — a substantial build for a product whose economic rationale has already gone. Re-evaluate deliberately if the market re-adopts them, rather than offering them because the OMS can.
+Both were withdrawn across the Indian market from around March 2020, and more decisively after the July 2020 peak-margin framework, for two reasons that both still hold. The regulatory reason is that these products existed largely to package leverage, and the peak-margin regime removed the leverage. The behavioural reason is sharper: in a volatile market both the target and the stop-loss leg can fire, leaving the client with an unintended opposite position, and the broker owns the resulting dispute. Offering them would require a leg-management design, a client-communication design and a dispute position — a substantial build for a product whose economic rationale has already gone. Re-evaluate deliberately if the market re-adopts them, rather than offering them because the <abbr title="Order Management System">OMS</abbr> can.
 </Aside>
 
 ### 7.1 The availability obligation on synthetic types
@@ -182,7 +182,7 @@ Not an exchange concept. It is the broker's margin and square-off policy, named 
 | Delivery | Intended to settle; cash segment | Full applicable margin, settled by pay-in | No |
 | Intraday | Intended to close within the session | Exchange-mandated margin under the peak-margin regime; **no leverage beyond the applicable requirement** | Yes, at a published time and on a published trigger |
 | Carry-forward derivatives | Positions held across sessions | Full span-based and exposure margin | Only on shortfall |
-| Margin funded | Funded by the broker under the applicable framework | Per the framework | Per the framework; see [MTF operational](/broking-kyc/deep-dives/settlement/mtf-operational/) |
+| Margin funded | Funded by the broker under the applicable framework | Per the framework | Per the framework; see [<abbr title="Margin Trading Facility">MTF</abbr> operational](/broking-kyc/deep-dives/settlement/mtf-operational/) |
 
 | Control | Requirement |
 |---|---|
@@ -195,7 +195,7 @@ Not an exchange concept. It is the broker's margin and square-off policy, named 
 
 `✔` enabled at Finix after certification · `◐` available but deferred · `✖` not available or not offered · `—` not applicable
 
-| Order type | NSE CM | NSE F&O | NSE CD | BSE CM | BSE EQD | MCX COM |
+| Order type | NSE <abbr title="Clearing Member">CM</abbr> | NSE F&O | NSE CD | BSE CM | BSE EQD | MCX COM |
 |---|---|---|---|---|---|---|
 | Limit | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
 | Market | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |

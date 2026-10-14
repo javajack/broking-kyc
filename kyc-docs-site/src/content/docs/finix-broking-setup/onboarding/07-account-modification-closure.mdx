@@ -9,9 +9,9 @@ import { Aside } from '@astrojs/starlight/components';
 
 ## TL;DR
 
-- **A modification is a propagation, not an update.** Name, address, bank, contact and status changes touch the client master, the KRA, CKYC, every exchange where the client is registered, the depository, the back office and the risk engine — each tracked to completion separately.
+- **A modification is a propagation, not an update.** Name, address, bank, contact and status changes touch the client master, the <abbr title="KYC Registration Agency">KRA</abbr>, <abbr title="Central KYC (records registry)">CKYC</abbr>, every exchange where the client is registered, the depository, the back office and the risk engine — each tracked to completion separately.
 - **The authoritative change usually happens at the registry.** A change entered locally and not propagated produces divergence that the registry will eventually overwrite; a change made at the registry by another intermediary arrives at the firm through a refresh.
-- **Four changes are sensitive** and need extra control: bank account, contact details, nomination and DDPI revocation. Each is a fraud vector, a client-rights matter, or both.
+- **Four changes are sensitive** and need extra control: bank account, contact details, nomination and <abbr title="Demat Debit and Pledge Instruction">DDPI</abbr> revocation. Each is a fraud vector, a client-rights matter, or both.
 - **A bank-account change followed by a withdrawal is reviewed before release**, and every change is notified to the **previously registered** contact details as well as the new ones.
 - **Dormancy and reactivation re-run parts of the plane**, including screening and, depending on the elapsed period, verification.
 - **Closure is a settlement exercise before it is a records exercise**: positions closed, obligations settled, securities transferred, balance returned, and only then the account closed — with records retained for the full period regardless.
@@ -21,18 +21,18 @@ import { Aside } from '@astrojs/starlight/components';
 
 Onboarding is a one-off and the client lifecycle is forever. Most of the operational cost of a client relationship after the first week is in keeping records consistent across systems that update at different speeds and sometimes without the firm's involvement. The defining characteristic is that nothing errors: a propagation that failed looks exactly like one that succeeded until something downstream depends on it — a contract note to an old address, a pay-out to a closed account, an exchange record that disagrees with the firm's.
 
-The second idea is that the direction of authority varies by field and is frequently misunderstood. KYC attributes are authoritative at the registry; a local edit is at best a request. Bank account details are authoritative with the firm and must be propagated to where they are held. Status — active, dormant, closed, frozen — is authoritative with the firm and must reach the exchanges and the depository. Getting the direction wrong produces either edits that are silently overwritten or local records that the registry never learns about.
+The second idea is that the direction of authority varies by field and is frequently misunderstood. <abbr title="Know Your Customer (process).">KYC</abbr> attributes are authoritative at the registry; a local edit is at best a request. Bank account details are authoritative with the firm and must be propagated to where they are held. Status — active, dormant, closed, frozen — is authoritative with the firm and must reach the exchanges and the depository. Getting the direction wrong produces either edits that are silently overwritten or local records that the registry never learns about.
 
 The third idea is that some changes are fraud vectors. Account takeover does not usually begin with a withdrawal; it begins with a contact-detail change so that notifications go elsewhere, followed by a bank-account change, followed by a withdrawal. Treating these as ordinary data updates removes the firm's only chance to intervene. The controls are cheap — notify the old details, impose a cooling period, review a withdrawal that follows a change — and they are the difference between an attempted fraud and a loss.
 
 ## 1. Framework
 
-- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — client records, modification and closure obligations.
-- **KRA and CKYC modification frameworks** — the registry paths for changes to KYC attributes; see [CVL KRA integration](/broking-kyc/finix-broking-setup/onboarding/02-kra-cvl-integration/) and [CKYCRR 2.0](/broking-kyc/finix-broking-setup/onboarding/03-ckyc-ckycrr2-integration/).
+- **[Master Circular for Stock Brokers <abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — client records, modification and closure obligations.
+- **KRA and CKYC modification frameworks** — the registry paths for changes to KYC attributes; see [CVL KRA integration](/broking-kyc/finix-broking-setup/onboarding/02-kra-cvl-integration/) and [<abbr title="Central KYC Records Registry">CKYCRR</abbr> 2.0](/broking-kyc/finix-broking-setup/onboarding/03-ckyc-ckycrr2-integration/).
 - **Exchange and depository modification requirements** — per exchange and per depository.
 - **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — regulation 16 retention of not less than eight years, which survives account closure. `[not yet in index]`
 - **Dormancy and reactivation framework**; **transmission framework**; **voluntary freeze facility** — see [client protection frameworks](/broking-kyc/trading-risk/client-protection-frameworks/).
-- Client-facing walkthroughs: [modifications](/broking-kyc/lifecycle/modifications/), [re-KYC](/broking-kyc/lifecycle/re-kyc/), [dormancy and reactivation](/broking-kyc/lifecycle/dormancy-reactivation/), [closure](/broking-kyc/lifecycle/closure/), [transmission](/broking-kyc/lifecycle/transmission/), [NRI conversion](/broking-kyc/lifecycle/nri-conversion/).
+- Client-facing walkthroughs: [modifications](/broking-kyc/lifecycle/modifications/), [re-KYC](/broking-kyc/lifecycle/re-kyc/), [dormancy and reactivation](/broking-kyc/lifecycle/dormancy-reactivation/), [closure](/broking-kyc/lifecycle/closure/), [transmission](/broking-kyc/lifecycle/transmission/), [<abbr title="Non-Resident Indian">NRI</abbr> conversion](/broking-kyc/lifecycle/nri-conversion/).
 
 ## 2. The propagation matrix
 
@@ -109,7 +109,7 @@ Closure is a settlement exercise before it is a records exercise.
 | 1 | Client requests closure | — |
 | 2 | **Open positions closed or transferred** | Yes |
 | 3 | **Settlement obligations completed** | Yes |
-| 4 | Unpaid securities resolved, including any CUSPA pledge released or invoked | Yes |
+| 4 | Unpaid securities resolved, including any <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr> pledge released or invoked | Yes |
 | 5 | Pledges released | Yes |
 | 6 | **Securities transferred** to the client's chosen destination | Yes |
 | 7 | **Funds returned** to the verified bank account | Yes |
@@ -154,7 +154,7 @@ Walkthrough at [transmission](/broking-kyc/lifecycle/transmission/).
 | Client master against KRA | Both | Daily for changed records; periodic full | **The registry governs** |
 | Client master against exchanges | Both | Daily | Propagate or investigate |
 | Client master against depository | Both | Daily | Propagate or investigate |
-| Client master across onboarding, OMS and back office | All three | **Daily** | A client in one and not another must not trade |
+| Client master across onboarding, <abbr title="Order Management System">OMS</abbr> and back office | All three | **Daily** | A client in one and not another must not trade |
 | Pending propagations by age | Change log | Daily | Escalate on ageing |
 | Closed clients still enabled anywhere | Status, enablement | Daily | **Severity one** |
 | Dormant clients with live capacity | Status, limits | Daily | Reduce to the global default |
@@ -209,8 +209,8 @@ Walkthrough at [transmission](/broking-kyc/lifecycle/transmission/).
 
 - [Modifications](/broking-kyc/lifecycle/modifications/), [re-KYC](/broking-kyc/lifecycle/re-kyc/), [dormancy and reactivation](/broking-kyc/lifecycle/dormancy-reactivation/), [closure](/broking-kyc/lifecycle/closure/), [transmission](/broking-kyc/lifecycle/transmission/), [NRI conversion](/broking-kyc/lifecycle/nri-conversion/) — the client-facing walkthroughs
 - [CVL KRA integration](/broking-kyc/finix-broking-setup/onboarding/02-kra-cvl-integration/) and [CKYCRR 2.0](/broking-kyc/finix-broking-setup/onboarding/03-ckyc-ckycrr2-integration/) — registry propagation
-- [UCC registration](/broking-kyc/finix-broking-setup/onboarding/05-ucc-registration-exchanges/) — exchange propagation
+- [<abbr title="Unique Client Code">UCC</abbr> registration](/broking-kyc/finix-broking-setup/onboarding/05-ucc-registration-exchanges/) — exchange propagation
 - [Pay-out engine](/broking-kyc/finix-broking-setup/money/03-payout-engine/) — the destination controls
-- [PEP and sanctions screening](/broking-kyc/finix-broking-setup/onboarding/04-pep-sanctions-screening/) — rescreening triggers
+- [<abbr title="Politically Exposed Person">PEP</abbr> and sanctions screening](/broking-kyc/finix-broking-setup/onboarding/04-pep-sanctions-screening/) — rescreening triggers
 - [Account lifecycle fields](/broking-kyc/reference/field-atlas/sections/y-account-lifecycle/) — field-level reference
 - [Admin workflow](/broking-kyc/operations/admin-workflow/) — maker-checker on sensitive changes

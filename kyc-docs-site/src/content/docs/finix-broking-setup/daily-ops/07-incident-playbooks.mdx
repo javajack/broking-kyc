@@ -11,7 +11,7 @@ import { Aside } from '@astrojs/starlight/components';
 
 - **The first two decisions are scope and command.** How wide does the stop go, and who is running this. Everything else follows.
 - **Scope the stop as narrowly as the failure allows.** One instrument, one segment, one exchange, one client, one identifier — rarely everything.
-- **Communicate early and specifically.** "The NSE derivatives segment is unavailable" is useful; "we are experiencing technical issues" is not, and clients can tell the difference.
+- **Communicate early and specifically.** "The <abbr title="National Stock Exchange of India">NSE</abbr> derivatives segment is unavailable" is useful; "we are experiencing technical issues" is not, and clients can tell the difference.
 - **Three incidents justify stopping all order entry**: no risk evaluation, no audit trail, and a confirmed bypass of the release point.
 - **The silent incidents are the dangerous ones** — stale market data, a stale collateral load, a quiet connection, an unapplied parameter file. They have no error and no symptom until the consequence arrives.
 - **Compliance is informed when a regulatory deadline is at risk**, not after it has passed.
@@ -311,8 +311,8 @@ Most incidents are scoped: one segment, one instrument, one client. Three are no
 ## Where this connects
 
 - [Continuous session operations](/broking-kyc/finix-broking-setup/daily-ops/03-continuous-session-ops/) — the board that detects these
-- [BOD runbook](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/) — the gates whose failure produces several of them
-- [EOD runbook](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/) — the record incidents
+- [<abbr title="Beginning Of Day">BOD</abbr> runbook](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/) — the gates whose failure produces several of them
+- [<abbr title="End Of Day">EOD</abbr> runbook](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/) — the record incidents
 - [Settlement day operations](/broking-kyc/finix-broking-setup/daily-ops/06-settlement-day-ops/) — the money incidents
 - [Integration contract matrix](/broking-kyc/finix-broking-setup/stack/integration-contract-matrix/) — the degraded behaviours these implement
 - [Square-off engine](/broking-kyc/finix-broking-setup/rms/06-squareoff-engine/) — P11 and P12

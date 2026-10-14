@@ -26,7 +26,7 @@ import { Aside } from '@astrojs/starlight/components';
 | Mid-session | Whether the value may change while a market is open |
 | Failure mode | What goes wrong if the value is wrong |
 
-Scope suffixes used below: `<exchange>` NSE, BSE, MCX · `<segment>` CM, FO, CD, COM · `<channel>` terminal, web, mobile, api, algo · `<class>` identifier class · `<algo>` algorithm identifier.
+Scope suffixes used below: `<exchange>` <abbr title="National Stock Exchange of India">NSE</abbr>, <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr>, <abbr title="Multi Commodity Exchange of India">MCX</abbr> · `<segment>` <abbr title="Clearing Member">CM</abbr>, FO, CD, COM · `<channel>` terminal, web, mobile, api, algo · `<class>` identifier class · `<algo>` algorithm identifier.
 
 ## 2. Architecture and the order path
 
@@ -46,9 +46,9 @@ Scope suffixes used below: `<exchange>` NSE, BSE, MCX · `<segment>` CM, FO, CD,
 
 | Key | Finix default | Class | Mid-session | Failure mode |
 |---|---|---|---|---|
-| `finix.oms.conn.nse.mode` | CTCL with NNF | E | No | Unsupported access model |
+| `finix.oms.conn.nse.mode` | <abbr title="Computer-to-Computer Link.">CTCL</abbr> with <abbr title="Non-NEAT Front End">NNF</abbr> | E | No | Unsupported access model |
 | `finix.oms.conn.nse.tap_enabled` | Per vendor architecture | D | No | An unplanned latency hop |
-| `finix.oms.conn.bse.instances` | **3 — one per segment** | E | No | A segment with no path, or orders to the wrong instance |
+| `finix.oms.conn.bse.sessions` | **One per segment** | E | No | A segment with no session, or orders on the wrong session |
 | `finix.oms.conn.mcx.mode` | Per current approved option | E | No | Unsupported connectivity |
 | `finix.oms.conn.<x>.<seg>.protocol_version` | Per current document | E | No | Malformed messages after an exchange upgrade |
 | `finix.oms.conn.heartbeat_miss_action` | Alert on a single miss | D | Yes | Late detection |
@@ -212,7 +212,7 @@ Six values on this page have a safe setting that conflicts with the instinct to 
 ## Where this connects
 
 - [Environments and configuration baseline](/broking-kyc/finix-broking-setup/stack/environments-config-baseline/) — the convention, the classification and the change-control model
-- [RMS configuration reference](/broking-kyc/finix-broking-setup/rms/09-rms-config-reference/) — the risk-side tunables
+- [<abbr title="Risk Management System">RMS</abbr> configuration reference](/broking-kyc/finix-broking-setup/rms/09-rms-config-reference/) — the risk-side tunables
 - [Back office configuration reference](/broking-kyc/finix-broking-setup/backoffice/10-backoffice-config-reference/) — the record-side tunables
 - [Compliance configuration baseline](/broking-kyc/finix-broking-setup/compliance/01-compliance-config-baseline/) — the obligation-to-configuration map
 - [Certification, mock trading and go-live](/broking-kyc/finix-broking-setup/setup/10-certification-mock-golive/) — the certification record the gate compares against

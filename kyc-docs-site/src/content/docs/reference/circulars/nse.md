@@ -621,7 +621,7 @@ Builds on SEBI Circular dated January 31, 2025 (forwarded via NSE/INSP/66456) to
 
 - **date_issued:** 2025-07-24
 - **issuer:** NSE
-- **title:** "Pre-Trade risk controls - Algo Market Order pre-emptive cancellation and NNF ID-Algo ID validations"
+- **title:** "Pre-Trade risk controls - Algo Market Order pre-emptive cancellation and <abbr title="Non-NEAT Front End">NNF</abbr> ID-Algo ID validations"
 - **applies_to:** broker
 - **in_force_date:** 2025-07-24
 - **status:** in-force
@@ -1481,7 +1481,7 @@ Operationalises identification and removal of inactive AP terminals (no trades w
 - **impact_areas:** upstreaming, client-funds
 - **primary_url:** https://archives.nseindia.com/content/circulars/INSP57959.pdf
 
-Updates FAQ on upstreaming framework based on member representations following initial June 2023 circulars (NSE/INSP/57250, /57382). Clarifies operational aspects of cash/FDR-lien/MFOS-pledge upstreaming, cut-off times, and reporting of reasons for collateral withdrawal (effective September 01, 2023).
+Updates FAQ on upstreaming framework based on member representations following initial June 2023 circulars (NSE/INSP/57250, /57382). Clarifies operational aspects of cash/FDR-lien/<abbr title="Mutual Fund Overnight Scheme">MFOS</abbr>-pledge upstreaming, cut-off times, and reporting of reasons for collateral withdrawal (effective September 01, 2023).
 
 ### NSE/INSP/57639
 

@@ -3,7 +3,7 @@ title: "Stack: overview"
 description: The Finix vendor stack as a system — the ten planes, the four architectural bands, the boundaries where responsibility transfers between products, and the three pages that pin down who does what, how configuration is named, and what every interface owes every other interface.
 ---
 
-> **Why this plane comes first:** Every later page assumes a particular division of labour — that the OMS and not the back office holds the order book, that the RMS and not the OMS holds the margin number, that the back office and not the RMS owns the ledger of record. Those assumptions are choices, several of them are contestable, and if you make different ones then half the configuration tables later in this manual move to a different system. So this plane states the choices explicitly, before anything depends on them.
+> **Why this plane comes first:** Every later page assumes a particular division of labour — that the <abbr title="Order Management System">OMS</abbr> and not the back office holds the order book, that the <abbr title="Risk Management System">RMS</abbr> and not the OMS holds the margin number, that the back office and not the RMS owns the ledger of record. Those assumptions are choices, several of them are contestable, and if you make different ones then half the configuration tables later in this manual move to a different system. So this plane states the choices explicitly, before anything depends on them.
 
 ## TL;DR
 
@@ -32,14 +32,14 @@ The bands matter because latency, reversibility and authority all change as you 
 |---|---|---|---|
 | [Stack](/broking-kyc/finix-broking-setup/stack/) | — | Boundaries, naming, interface contracts | Any runtime behaviour |
 | [Setting up](/broking-kyc/finix-broking-setup/setup/) | — | Registration, membership, capital, accounts, approvals | Anything that happens after go-live |
-| [Onboarding](/broking-kyc/finix-broking-setup/onboarding/) | Digio, CVL KRA, CERSAI, SecMark C-Safe | Client identity, consent, signature, screening, UCC | Trading limits, funds |
+| [Onboarding](/broking-kyc/finix-broking-setup/onboarding/) | Digio, CVL <abbr title="KYC Registration Agency">KRA</abbr>, <abbr title="Central Registry of Securitisation Asset Reconstruction and Security Interest of India">CERSAI</abbr>, SecMark C-Safe | Client identity, consent, signature, screening, <abbr title="Unique Client Code">UCC</abbr> | Trading limits, funds |
 | [OMS](/broking-kyc/finix-broking-setup/oms/) | Saral MoneyMaker | The order book, exchange sessions, order state | The margin number, the ledger |
 | [RMS](/broking-kyc/finix-broking-setup/rms/) | Saral MoneyMaker RMS | Limits, margin at order time, square-off decisions | Order routing, settlement |
 | [Back office](/broking-kyc/finix-broking-setup/backoffice/) | SecMark | Ledger of record, obligations, contract notes, reports | Intraday risk decisions |
 | [Money movement](/broking-kyc/finix-broking-setup/money/) | Razorpay, RazorpayX, banks | Collection, disbursement, bank reconciliation, treasury | Client credit decisions |
-| [Exchanges](/broking-kyc/finix-broking-setup/exchanges/) | NSE, BSE, MCX and their clearing corporations | Matching, bands, halts, obligations, penalties | Everything inside the broker |
+| [Exchanges](/broking-kyc/finix-broking-setup/exchanges/) | <abbr title="National Stock Exchange of India">NSE</abbr>, <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr>, <abbr title="Multi Commodity Exchange of India">MCX</abbr> and their clearing corporations | Matching, bands, halts, obligations, penalties | Everything inside the broker |
 | [Daily operations](/broking-kyc/finix-broking-setup/daily-ops/) | People, with system support | The sequence and its timing | Any single system |
-| [Compliance](/broking-kyc/finix-broking-setup/compliance/) | SecMark ComplianceSutra, AML Sutra | Evidence, filings, calendars, audit trail | Operational decisions |
+| [Compliance](/broking-kyc/finix-broking-setup/compliance/) | SecMark ComplianceSutra, <abbr title="Anti-Money Laundering">AML</abbr> Sutra | Evidence, filings, calendars, audit trail | Operational decisions |
 
 ## The three pages in this plane
 
@@ -49,4 +49,4 @@ The bands matter because latency, reversibility and authority all change as you 
 
 ## Where this connects
 
-The design choices here are the practical form of the principles in [design principles](/broking-kyc/architecture/design-principles/), and the interface inventory is a stack-specific view of the dependency ordering in [integration DAG](/broking-kyc/operations/integration-dag/). If you want the same systems described without vendor names, [back office and RMS](/broking-kyc/appendix/back-office-rms/) and [OMS internals](/broking-kyc/deep-dives/trading-day/oms-internals/) are the vendor-neutral treatments.
+The design choices here are the practical form of the principles in [design principles](/broking-kyc/architecture/design-principles/), and the interface inventory is a stack-specific view of the dependency ordering in [integration <abbr title="Directed Acyclic Graph.">DAG</abbr>](/broking-kyc/operations/integration-dag/). If you want the same systems described without vendor names, [back office and RMS](/broking-kyc/appendix/back-office-rms/) and [OMS internals](/broking-kyc/deep-dives/trading-day/oms-internals/) are the vendor-neutral treatments.

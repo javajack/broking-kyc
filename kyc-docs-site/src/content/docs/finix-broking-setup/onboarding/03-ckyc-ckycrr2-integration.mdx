@@ -5,18 +5,18 @@ description: The 2026 rebuild of the Central KYC Records Registry — real-time 
 
 import { Aside } from '@astrojs/starlight/components';
 
-> **Why this page is structured this way:** CKYCRR 2.0 is recent enough that most internal documentation still describes the system it replaced, and the differences are architectural rather than cosmetic — a batch-and-PDF model became a real-time API model with consent in the download path. So the page states what changed first, then the four API patterns a broker actually implements, then the consent flow because it introduces a client-facing dependency that did not previously exist, then the migration and the operating cycle.
+> **Why this page is structured this way:** <abbr title="Central KYC Records Registry">CKYCRR</abbr> 2.0 is recent enough that most internal documentation still describes the system it replaced, and the differences are architectural rather than cosmetic — a batch-and-PDF model became a real-time API model with consent in the download path. So the page states what changed first, then the four API patterns a broker actually implements, then the consent flow because it introduces a client-facing dependency that did not previously exist, then the migration and the operating cycle.
 
 ## TL;DR
 
-- **CKYCRR 2.0 went live on 1 August 2026**, phased, after a core platform targeted around the end of February 2026. The pilot and readiness window was **extended to 5 October 2026**, and reporting entities were told to treat that period as readiness and testing and to watch CERSAI communications for their production instruction.
+- **CKYCRR 2.0 went live on 1 August 2026**, phased, after a core platform targeted around the end of February 2026. The pilot and readiness window was **extended to 5 October 2026**, and reporting entities were told to treat that period as readiness and testing and to watch <abbr title="Central Registry of Securitisation Asset Reconstruction and Security Interest of India">CERSAI</abbr> communications for their production instruction.
 - **It replaces scheduled batch uploads with real-time API submission in structured JSON**, with instant validation that rejects incomplete or malformed submissions immediately rather than in a return file days later.
-- **The registry issues a fourteen-digit KYC Identifier Number**, permanent and portable, which travels with the customer across institutions and products.
-- **Search now includes mobile number** alongside PAN and Aadhaar in permitted form, which materially improves hit rates before fresh KYC is started.
-- **Download requires OTP-based consent**, with Aadhaar masking — which introduces a **client-facing dependency in the download path** that did not exist before, and a failure mode where the client is unreachable.
+- **The registry issues a fourteen-digit <abbr title="Know Your Customer (process).">KYC</abbr> Identifier Number**, permanent and portable, which travels with the customer across institutions and products.
+- **Search now includes mobile number** alongside <abbr title="Permanent Account Number">PAN</abbr> and Aadhaar in permitted form, which materially improves hit rates before fresh KYC is started.
+- **Download requires <abbr title="One-Time Password">OTP</abbr>-based consent**, with Aadhaar masking — which introduces a **client-facing dependency in the download path** that did not exist before, and a failure mode where the client is unreachable.
 - **De-duplication uses facial recognition**, with stricter document-quality standards.
 - **SFTP remains for bulk**, but the production onboarding path is the API.
-- **Dual upload still applies**: client KYC data goes to both the KRA and the CKYC registry.
+- **Dual upload still applies**: client KYC data goes to both the <abbr title="KYC Registration Agency">KRA</abbr> and the <abbr title="Central KYC (records registry)">CKYC</abbr> registry.
 
 ## Conceptual overview
 
@@ -30,10 +30,10 @@ The third consideration is that the registry's validation is now immediate and s
 
 - **CERSAI CKYCRR** — the Central KYC Records Registry; **CKYCRR 2.0** announced in the Union Budget 2025 and rebuilt around real-time API connectivity, instant validation, facial-recognition de-duplication, mandatory Aadhaar masking and stricter document-quality standards. `[not yet in index]`
 - **Rollout** — core platform targeted around end-February 2026; **live 1 August 2026**, phased across reporting entities; pilot and readiness testing **extended to 5 October 2026**, with reporting entities told to treat the period as readiness and to monitor CERSAI communications for production go-live instructions. A CKYCRR 2.0 API integration and reporting-entity onboarding guide dated 5 June 2026 is published on the official portal. `[not yet in index]`
-- **KIN** — a unique **fourteen-digit** KYC Identifier Number, permanent and portable across institutions, products and updates.
+- **<abbr title="KYC Identification Number">KIN</abbr>** — a unique **fourteen-digit** KYC Identifier Number, permanent and portable across institutions, products and updates.
 - **Prevention of Money Laundering Act, 2002 and the rules** — the statutory basis for the registry and for reporting-entity obligations. See the [CERSAI circulars index](/broking-kyc/reference/circulars/cersai/).
 - **Dual upload** — client KYC data to both the KRA and CKYC; see [CVL KRA integration](/broking-kyc/finix-broking-setup/onboarding/02-kra-cvl-integration/).
-- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — regulation 16 retention of not less than eight years, applying to KYC records and registry correspondence. `[not yet in index]`
+- **[<abbr title="Securities and Exchange Board of India">SEBI</abbr> (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — regulation 16 retention of not less than eight years, applying to KYC records and registry correspondence. `[not yet in index]`
 - **Access route at Finix** — through Digio's CKYC connectivity; see [Digio integration](/broking-kyc/finix-broking-setup/onboarding/01-digio-integration/).
 - Field-level reference: [CKYC submission fields](/broking-kyc/reference/field-atlas/sections/t-ckyc-submission/).
 
@@ -122,7 +122,7 @@ The last row is the structural one. Any process that previously assumed the firm
 |---|---|
 | Principle | Update periodicity varies by customer risk classification rather than a uniform cycle |
 | Consequence | The firm's re-KYC scheduling must be driven by the client's risk category, not a single global period |
-| Inputs | Risk classification from onboarding and from ongoing monitoring; see [PEP and sanctions screening](/broking-kyc/finix-broking-setup/onboarding/04-pep-sanctions-screening/) |
+| Inputs | Risk classification from onboarding and from ongoing monitoring; see [<abbr title="Politically Exposed Person">PEP</abbr> and sanctions screening](/broking-kyc/finix-broking-setup/onboarding/04-pep-sanctions-screening/) |
 | Reclassification | A client whose risk category changes has a changed update obligation |
 | Tracking | Per client: category, last update, next due |
 | Coordination | Must align with the KRA re-KYC cycle and the firm's own periodic review; see [re-KYC](/broking-kyc/lifecycle/re-kyc/) |

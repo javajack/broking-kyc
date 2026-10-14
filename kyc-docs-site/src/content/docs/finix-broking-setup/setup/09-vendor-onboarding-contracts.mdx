@@ -19,7 +19,7 @@ import { Aside } from '@astrojs/starlight/components';
 
 ## Conceptual overview
 
-Outsourcing in a regulated business is a transfer of execution, never a transfer of accountability. When a KYC vendor's verification fails, the firm has onboarded a client improperly. When a payment vendor settles into the wrong account, the firm has breached segregation. When a back-office vendor's run fails, the firm has missed a reporting deadline. In every case the regulator's counterparty is the broker. That asymmetry is the whole reason vendor contracting in this sector is different from ordinary procurement: the firm is buying not just a capability but a set of assurances it can stand behind in an inspection.
+Outsourcing in a regulated business is a transfer of execution, never a transfer of accountability. When a <abbr title="Know Your Customer (process).">KYC</abbr> vendor's verification fails, the firm has onboarded a client improperly. When a payment vendor settles into the wrong account, the firm has breached segregation. When a back-office vendor's run fails, the firm has missed a reporting deadline. In every case the regulator's counterparty is the broker. That asymmetry is the whole reason vendor contracting in this sector is different from ordinary procurement: the firm is buying not just a capability but a set of assurances it can stand behind in an inspection.
 
 The practical consequence is that the contract has to reach into the vendor's operation. The firm needs to know the vendor's controls are adequate, which means assessment rights at onboarding and audit rights thereafter. It needs breach notification fast enough to meet its own notification obligations, which means the vendor's timeline must be strictly shorter than the firm's. It needs the vendor to cooperate when a regulator or exchange asks a question that only the vendor can answer. And it needs the vendor to keep records for as long as the firm must — which, under regulation 16 of the [2026 regulations](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/), is a minimum of eight years, longer than most standard vendor retention terms.
 
@@ -27,12 +27,12 @@ The second structural issue is concentration. In this stack SecMark provides the
 
 ## 1. Regulatory framework
 
-- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — regulation 16 record retention of not less than eight years; regulation 18(5) cyber security and cyber resilience; Chapter IV fraud prevention, which includes systems the vendor operates; Chapter V inspection, which can reach records held by a vendor on the firm's behalf. `[not yet in index]`
+- **[<abbr title="Securities and Exchange Board of India">SEBI</abbr> (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — regulation 16 record retention of not less than eight years; regulation 18(5) cyber security and cyber resilience; Chapter IV fraud prevention, which includes systems the vendor operates; Chapter V inspection, which can reach records held by a vendor on the firm's behalf. `[not yet in index]`
 - **Outsourcing guidelines for intermediaries** — the principle that core activities may not be outsourced and that outsourcing does not dilute the intermediary's obligations, with due diligence, agreement, monitoring and contingency requirements. `[not yet in index]`
-- **Cybersecurity and Cyber Resilience Framework** — third-party and supply-chain obligations. See [CSCRF deep dive](/broking-kyc/deep-dives/compliance-audit/cscrf-deep-dive/).
-- **Digital Personal Data Protection Act, 2023 and its rules** — the firm as data fiduciary, the vendor as data processor, with consequent obligations. See [DPDP consent fields](/broking-kyc/reference/field-atlas/sections/aa-dpdp-consent/) and the [MeitY circulars index](/broking-kyc/reference/circulars/meity/).
+- **Cybersecurity and Cyber Resilience Framework** — third-party and supply-chain obligations. See [<abbr title="Cybersecurity and Cyber Resilience Framework">CSCRF</abbr> deep dive](/broking-kyc/deep-dives/compliance-audit/cscrf-deep-dive/).
+- **Digital Personal Data Protection Act, 2023 and its rules** — the firm as data fiduciary, the vendor as data processor, with consequent obligations. See [<abbr title="Digital Personal Data Protection Act 2023 (and Rules 2025)">DPDP</abbr> consent fields](/broking-kyc/reference/field-atlas/sections/aa-dpdp-consent/) and the [MeitY circulars index](/broking-kyc/reference/circulars/meity/).
 - **System audit framework** — which examines vendor management as a domain. See [system audit](/broking-kyc/deep-dives/compliance-audit/system-audit/).
-- **Payment and settlement regulation** — for the payment aggregator relationship, the applicable Reserve Bank framework and the settlement account requirements. See the [RBI circulars index](/broking-kyc/reference/circulars/rbi/).
+- **Payment and settlement regulation** — for the payment aggregator relationship, the applicable Reserve Bank framework and the settlement account requirements. See the [<abbr title="Reserve Bank of India">RBI</abbr> circulars index](/broking-kyc/reference/circulars/rbi/).
 
 ## 2. The clauses that close the accountability gap
 
@@ -128,7 +128,7 @@ An escrow arrangement that holds whatever the vendor deposited, unverified, is a
 |---|---|
 | Scope | Which front ends: Client Solo dealer terminal, Browser, Handy mobile, and whether Money Maker Challenge or Pharos modules are in scope |
 | Order types | **An explicit list of supported order types and attributes per exchange and segment**, because this is the basis for what the firm can offer; see [order types catalogue](/broking-kyc/finix-broking-setup/oms/04-order-types-catalogue/) |
-| Risk ownership | That Saral RMS is the single release-decision point, with a contractual statement of the timeout behaviour being reject |
+| Risk ownership | That Saral <abbr title="Risk Management System">RMS</abbr> is the single release-decision point, with a contractual statement of the timeout behaviour being reject |
 | Limit model | The limit hierarchy and resolution order, documented, since limits at identifier, client and scrip level are a published capability |
 | Margin computation | Which margin methodology is computed where, and the source and refresh of the risk parameter inputs |
 | Exchange protocol versions | Current versions supported per exchange and segment, and the upgrade commitment when an exchange changes a protocol |
@@ -142,14 +142,14 @@ An escrow arrangement that holds whatever the vendor deposited, unverified, is a
 
 | Item | What to pin down |
 |---|---|
-| Modules in scope | Back office, middleware, Partner Portal, SmartReco, C-Safe, AML Sutra, ComplianceSutra — each priced and scoped separately |
+| Modules in scope | Back office, middleware, Partner Portal, SmartReco, C-Safe, <abbr title="Anti-Money Laundering">AML</abbr> Sutra, ComplianceSutra — each priced and scoped separately |
 | Modules explicitly out of scope | e-KYC and the trading front ends, per the vendor map decisions, so the firm neither pays for nor inherits them |
 | Middleware boundary | That the middleware does **not** perform risk checks in the order path |
 | Regulatory format currency | **Obligation to keep every regulatory report format current** as circulars change, within a stated lead time — this is the single most valuable clause in the back-office contract |
 | Deadline-linked service levels | Trade import, contract notes, obligations, margin reporting, as in section 3 |
 | Screening lists | Which lists, their sources, refresh frequency, and **list version returned with every screening result** |
 | FINnet format | Obligation to maintain suspicious transaction report format compliance |
-| DP records separability | DP records separable and separately producible for a DP inspection |
+| <abbr title="Depository Participant">DP</abbr> records separability | DP records separable and separately producible for a DP inspection |
 | Data model documentation | Delivered, so the firm can build its own warehouse and reporting |
 | Concentration | Disclosure of the vendor's own dependencies, given how many planes it covers |
 | Escrow | Production build in escrow, verified |
@@ -158,12 +158,12 @@ An escrow arrangement that holds whatever the vendor deposited, unverified, is a
 
 | Item | What to pin down |
 |---|---|
-| Services in scope | DigiKYC components used, DigiSign signature types, eStamping including DDPI and nomination documents, eNACH and UPI AutoPay |
+| Services in scope | DigiKYC components used, DigiSign signature types, eStamping including <abbr title="Demat Debit and Pledge Instruction">DDPI</abbr> and nomination documents, eNACH and <abbr title="Unified Payments Interface">UPI</abbr> AutoPay |
 | Screening | Explicitly out of scope, per the vendor map |
 | Signature validity | Which signature types produce a legally valid signature, and the evidentiary package delivered with each |
 | **Artefact custody** | The signed document and its audit trail retrievable by the firm for the full retention period, and exportable — a signature the firm cannot produce in year seven is a problem |
 | Sandbox parity | Explicit statement of what differs, since sandbox eSign does not produce a valid signature |
-| Upstream dependencies | Behaviour and notification when DigiLocker, Aadhaar or PAN sources are unavailable |
+| Upstream dependencies | Behaviour and notification when DigiLocker, Aadhaar or <abbr title="Permanent Account Number">PAN</abbr> sources are unavailable |
 | Consent artefacts | Consent records captured, retained and exportable |
 | Per-transaction pricing | Unit pricing with volume protection, and clarity on charges for failed attempts |
 | Data protection | Processor obligations, localisation, deletion |
@@ -177,8 +177,8 @@ These are not ordinary commercial vendors — they are regulated infrastructure 
 |---|---|
 | Nature | Registry access under published operating instructions; terms are largely non-negotiable |
 | What to obtain | Current operating instructions, API specification, test environment and test records, charge schedule, support path |
-| KRA interoperability | Understand that a query to one KRA returns the record regardless of which holds it, and that a duplicate upload for an already-compliant investor is rejected and must be followed by a download |
-| CKYCRR 2.0 | Real-time API model live from 1 August 2026, phased, with the pilot and readiness window extended to 5 October 2026; **monitor CERSAI communications for the production instruction applicable to the firm's category** |
+| <abbr title="KYC Registration Agency">KRA</abbr> interoperability | Understand that a query to one KRA returns the record regardless of which holds it, and that a duplicate upload for an already-compliant investor is rejected and must be followed by a download |
+| <abbr title="Central KYC Records Registry">CKYCRR</abbr> 2.0 | Real-time API model live from 1 August 2026, phased, with the pilot and readiness window extended to 5 October 2026; **monitor <abbr title="Central Registry of Securitisation Asset Reconstruction and Security Interest of India">CERSAI</abbr> communications for the production instruction applicable to the firm's category** |
 | Change management | Registry-driven format and process changes; the firm absorbs them, so build for change |
 | Internal obligation | Because there is no negotiating leverage, the firm's protection is implementation quality: idempotent handling, retry, reconciliation and alerting |
 

@@ -217,7 +217,7 @@ The following vendor documentation portals and API references were consulted. Al
 - [BSE Master Circular (PDF)](https://www.bseindia.com/downloads1/Master_Circular_Inspection.pdf) — Stock broker inspection master circular
 - [BOLT Plus Connectivity Manual](https://www.bseindia.com/downloads1/BOLTPLUS_Connectivity_ManualV12.pdf)
 - [BOLT Plus IML API](https://www.bseindia.com/downloads1/BOLTPlus_IML_API_version_6.0.pdf)
-- [ETI API Manual](https://www.bseindia.com/downloads1/ETI_API_ManualV158.pdf)
+- [<abbr title="Enhanced Trading Interface">ETI</abbr> API Manual](https://www.bseindia.com/downloads1/ETI_API_ManualV158.pdf)
 
 ### MCX (Multi Commodity Exchange)
 
@@ -256,7 +256,7 @@ The following vendor documentation portals and API references were consulted. Al
 - [DigiLocker <abbr title="Consolidated Account Statement">CAS</abbr> Facility (PDF)](https://nsdl.co.in/downloadables/pdf/2025-0055-Policy-Facility_to_avail_Consolidated_Account_Statement_(CAS)_and_Statement_of_Holding_and_Transactions_from_DigiLocker_Platform.pdf)
 - [KYC Validation Circular (PDF)](https://nsdl.co.in/downloadables/pdf/2024-0071-Policy-SEBI_Circular_on_review_of_validation_of_KYC_records_by_KRAs_and_FAQs.pdf)
 - [FATCA/CRS Circular (PDF)](https://nsdl.co.in/downloadables/pdf/2024-0023-Policy-SEBI_Circular_on_Centralization_of_certifications_under_Foreign_Account_Tax_Compliance_Act_(FATCA)_and_Common_Reporting_Standard_(CRS)_at_KRAs.pdf)
-- [CKYC Upload Circular (PDF)](https://nsdl.co.in/downloadables/pdf/2024-0078-_Policy-SEBI_Circular_on_Uploading_of_KYC_information_by_KYC_Registration_Agencies_(KRAs)_to_Central_KYC_Records_Registry_(CKYCRR).pdf)
+- [CKYC Upload Circular (PDF)](https://nsdl.co.in/downloadables/pdf/2024-0078-_Policy-SEBI_Circular_on_Uploading_of_KYC_information_by_KYC_Registration_Agencies_(KRAs)_to_Central_KYC_Records_Registry_(<abbr title="Central KYC Records Registry">CKYCRR</abbr>).pdf)
 
 ---
 

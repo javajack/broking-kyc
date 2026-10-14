@@ -9,7 +9,7 @@ import { Aside } from '@astrojs/starlight/components';
 
 ## TL;DR
 
-- **Two concentration days a week now, not one.** NSE's weekly index expiry is **Tuesday** and BSE's is **Thursday**, following the standardisation effective 1 September 2025.
+- **Two concentration days a week now, not one.** <abbr title="National Stock Exchange of India">NSE</abbr>'s weekly index expiry is **Tuesday** and <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr>'s is **Thursday**, following the standardisation effective 1 September 2025.
 - **Delivery margins build across the last sessions of expiry week**, not on expiry day. The step change arrives before most clients are thinking about expiry.
 - **Client communication starts well before expiry week.** A client who discovers a physical-settlement obligation on expiry day has been failed by the communication, not by the market.
 - **A failed square-off is not an exit.** If illiquidity or a price band blocks the closing trade, the residual quantity stays in the delivery queue and becomes an obligation.
@@ -19,12 +19,12 @@ import { Aside } from '@astrojs/starlight/components';
 
 ## 1. Framework
 
-- **Expiry standardisation** — one weekly benchmark index contract per exchange; **NSE Tuesday, BSE Thursday**, effective 1 September 2025 following SEBI's circular of 26 May 2025. `[not yet in index]`
-- **Physical settlement of single-stock derivatives** — mandated by SEBI/HO/MRD/DOPI/CIR/P/2018/161 (31 December 2018), phased across the 2019 expiries. `[not yet in index]`
-- **Delivery margin staging** — staged across the last sessions of expiry week per NCL/CMPT/43262 (17 January 2020). `[not yet in index]`
+- **Expiry standardisation** — one weekly benchmark index contract per exchange; **NSE Tuesday, BSE Thursday**, effective 1 September 2025 following <abbr title="Securities and Exchange Board of India">SEBI</abbr>'s circular of 26 May 2025. `[not yet in index]`
+- **Physical settlement of single-stock derivatives** — mandated by SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>/DOPI/CIR/P/2018/161 (31 December 2018), phased across the 2019 expiries. `[not yet in index]`
+- **Delivery margin staging** — staged across the last sessions of expiry week per <abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr>/CMPT/43262 (17 January 2020). `[not yet in index]`
 - **[NCL/CMPT/55330](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt55330)** (20 January 2023) as updated by **[NCL/CMPT/56167](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt56167)** (28 March 2023) — netting of derivatives delivery obligations with cash-segment obligations for the same clearing member, trading member and unique client code.
 - **Expiry withdraws the cross-margin spread benefit on the expiring leg** — index contracts from 1 February 2025 under [SEBI/HO/MRD/TPD/P/CIR/2024/132](/broking-kyc/reference/circulars/sebi-other/#sebihomrdtpdpcir2024132); single stocks per the February 2026 instruction effective three months from issue.
-- **Commodity staggered delivery** — tender period over the last three trading days including expiry, with an **8.34 percent incremental margin**; delivery intention until **19:30** through MCXCCL eClear; delivery period margin at the higher of 3 percent plus five-day 99 percent value-at-risk of spot volatility, or 25 percent.
+- **Commodity staggered delivery** — tender period over the last three trading days including expiry, with an **8.34 percent incremental margin**; delivery intention until **19:30** through <abbr title="Multi Commodity Exchange Clearing Corporation Limited">MCXCCL</abbr> eClear; delivery period margin at the higher of 3 percent plus five-day 99 percent value-at-risk of spot volatility, or 25 percent.
 - Depth: [expiry day operations](/broking-kyc/trading-risk/expiry-day-operations/), [exercise, assignment and physical settlement](/broking-kyc/trading-risk/exercise-assignment-physical/).
 
 ## 2. The timeline
@@ -111,7 +111,7 @@ Physical settlement, the delivery-margin ladder and the commodity tender period 
 | **Netting** | Derivatives delivery obligations net against cash-segment obligations for the same clearing member, trading member and unique client code; **securities tax and stamp duty remain segment-wise** |
 | Delivery instructions | Through the depository, by the deadline |
 | Shortfall | The short-delivery path; see [settlement day operations](/broking-kyc/finix-broking-setup/daily-ops/06-settlement-day-ops/#6-short-delivery) |
-| Unpaid obligations | CUSPA applies at pay-out |
+| Unpaid obligations | <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr> applies at pay-out |
 | Client communication | What they must deliver or will receive, and by when |
 | Corporate actions | Can accelerate an expiry and change the obligation |
 
@@ -185,7 +185,7 @@ Physical settlement, the delivery-margin ladder and the commodity tender period 
 ## Where this connects
 
 - [NSE derivatives](/broking-kyc/finix-broking-setup/exchanges/02-nse-fno/) — expiry days, contract sizes and the delivery ladder
-- [MCX commodities](/broking-kyc/finix-broking-setup/exchanges/04-mcx-commodity/) — the tender period
+- [<abbr title="Multi Commodity Exchange of India">MCX</abbr> commodities](/broking-kyc/finix-broking-setup/exchanges/04-mcx-commodity/) — the tender period
 - [Expiry day operations](/broking-kyc/trading-risk/expiry-day-operations/) and [exercise, assignment and physical settlement](/broking-kyc/trading-risk/exercise-assignment-physical/) — depth
 - [Square-off engine](/broking-kyc/finix-broking-setup/rms/06-squareoff-engine/) — the decision points and failed exits
 - [Settlement obligations](/broking-kyc/finix-broking-setup/backoffice/05-settlement-obligations/) — physical and commodity delivery

@@ -5,14 +5,14 @@ description: The complete file inventory the daily runbooks assert against — w
 
 import { Aside } from '@astrojs/starlight/components';
 
-> **Why this page is structured this way:** A broking operation runs on files. Almost every step in the begin-of-day and end-of-day runbooks is "retrieve a file, assert it, apply it", and almost every silent failure in the stack is a file that did not arrive, arrived stale, or was applied without being asserted. So this page is an inventory organised by what consumes the file and what blocks without it, followed by the ingestion contract that every file needs regardless of source. It is the reference the [BOD](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/) and [EOD](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/) runbooks assert against.
+> **Why this page is structured this way:** A broking operation runs on files. Almost every step in the begin-of-day and end-of-day runbooks is "retrieve a file, assert it, apply it", and almost every silent failure in the stack is a file that did not arrive, arrived stale, or was applied without being asserted. So this page is an inventory organised by what consumes the file and what blocks without it, followed by the ingestion contract that every file needs regardless of source. It is the reference the [<abbr title="Beginning Of Day">BOD</abbr>](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/) and [<abbr title="End Of Day">EOD</abbr>](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/) runbooks assert against.
 
 ## TL;DR
 
 - **The expected-file checklist is the control.** A missing file is an incident, not an absence, and the only way to know it is missing is to have listed what was expected.
 - **Three exchanges and three clearing corporations means three checklists**, with different names, timings and channels.
-- **NSE Clearing delivers reports in comma-separated format to the member's Reports folder on the Extranet**, covering trades, obligations, deliveries, auctions, corporate actions, settlements and shortages.
-- **The daily obligation report gives the day's cumulative net position; the final obligation report gives the net securities and funds obligation and is downloaded on T+1.**
+- **<abbr title="National Stock Exchange of India">NSE</abbr> Clearing delivers reports in comma-separated format to the member's Reports folder on the Extranet**, covering trades, obligations, deliveries, auctions, corporate actions, settlements and shortages.
+- **The daily obligation report gives the day's cumulative net position; the final obligation report gives the net securities and funds obligation and is downloaded on <abbr title="Trade-date Plus N settlement">T+1</abbr>.**
 - **Assert the content, not the retrieval.** A file that downloaded successfully with eighty percent of the records returns success.
 - **Every file needs an ingestion contract**: expected arrival, staleness threshold, behaviour on staleness, version handling, idempotent re-load and a consumer list.
 - **Re-publication is normal.** Files get corrected, and a re-load must compute the difference rather than silently overwrite.
@@ -54,7 +54,7 @@ These block the open.
 
 | File | Source | When | Consumers | **Blocks if missing** |
 |---|---|---|---|---|
-| **Instrument master, lot and tick** | Exchange | Pre-open | OMS, RMS, back office | **The open, entirely** |
+| **Instrument master, lot and tick** | Exchange | Pre-open | <abbr title="Order Management System">OMS</abbr>, <abbr title="Risk Management System">RMS</abbr>, back office | **The open, entirely** |
 | **Ban-period list** | Exchange | Pre-open | RMS | **Fresh derivatives positions in all listed underlyings** |
 | **Surveillance measure lists** | Exchange | Pre-open, periodic | RMS, back office | Apply the most restrictive known treatment |
 | **Price bands** | Exchange | Pre-open, intraday | OMS, RMS | Reject outside the last-known band |
@@ -87,11 +87,11 @@ These block the record pipeline.
 
 | File | Source | When | Consumers | Blocks if missing |
 |---|---|---|---|---|
-| Holdings statement | CDSL / NSDL | Daily | Back office, RMS | Holdings reconciliation; disputed quantities not recognised as collateral |
+| Holdings statement | <abbr title="Central Depository Services (India) Limited">CDSL</abbr> / <abbr title="National Securities Depository Limited">NSDL</abbr> | Daily | Back office, RMS | Holdings reconciliation; disputed quantities not recognised as collateral |
 | Transaction statement | CDSL / NSDL | Daily | Back office | Reconciliation |
 | **Pledge position file** | CDSL / NSDL | Daily and on event | Back office, RMS | **Collateral recognition** |
 | Pledge instruction responses | CDSL / NSDL | On instruction | Back office | Pledge confirmation |
-| **CUSPA pledge confirmations** | CDSL / NSDL | At pay-out and daily | Back office | **The statutory clock; see [CUSPA](/broking-kyc/finix-broking-setup/backoffice/06-cuspa-unpaid-securities/)** |
+| **<abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr> pledge confirmations** | CDSL / NSDL | At pay-out and daily | Back office | **The statutory clock; see [CUSPA](/broking-kyc/finix-broking-setup/backoffice/06-cuspa-unpaid-securities/)** |
 | Corporate action entitlements | CDSL / NSDL | Per event | Back office | Entitlement posting |
 | Account opening and modification responses | CDSL / NSDL | On submission | Onboarding | Activation |
 | Charge files | CDSL / NSDL | Per cycle | Back office | Charge billing |
@@ -113,8 +113,8 @@ These block the record pipeline.
 |---|---|---|
 | **NSE Clearing** | Reports downloaded in **comma-separated format** to the member's **Reports folder on the Extranet** | Covering trades, obligations, deliveries, auctions, corporate actions, settlements and shortages |
 | NSE | Member portal and published downloads; **ENIT** at `enit.nseindia.com/MemberPortal/` for compliance submissions | ENIT-COMPLIANCE-NEW → Compliance → Status Report |
-| BSE and ICCL | BSE member portal and ICCL channels | A second set of names and timings |
-| MCX and MCXCCL | MCX member portal and MCXCCL channels, including **eClear** for delivery intentions | A third set |
+| <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> and <abbr title="Indian Clearing Corporation Limited">ICCL</abbr> | BSE member portal and ICCL channels | A second set of names and timings |
+| <abbr title="Multi Commodity Exchange of India">MCX</abbr> and <abbr title="Multi Commodity Exchange Clearing Corporation Limited">MCXCCL</abbr> | MCX member portal and MCXCCL channels, including **eClear** for delivery intentions | A third set |
 | CDSL and NSDL | Depository systems | Two depositories, two formats |
 | Banks | Host-to-host, API or portal | Per bank and channel |
 | Razorpay | Dashboard and API | Daily statements are the reconciliation backstop |

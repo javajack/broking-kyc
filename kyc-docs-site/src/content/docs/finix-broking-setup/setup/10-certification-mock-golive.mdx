@@ -15,7 +15,7 @@ import { Aside } from '@astrojs/starlight/components';
 - **The first settlement matters more than the first trade.** A trade that executes is immediately visible and easy to verify. A settlement failure surfaces days later, with a penalty, a short delivery, or a client whose securities did not arrive.
 - **Go live narrow and widen deliberately.** One exchange, one segment, internal accounts, then staff, then a small client cohort, then general availability — with a stated dwell time and exit criteria at each step.
 - **Have an abort criterion written down before the day.** The hardest decision in go-live is to stop, and it is much easier if the condition was agreed in advance by people who were not under pressure.
-- **BSE needs three certification tracks** because it requires a separate connection and a separate protocol instance per segment. Plan them as three projects.
+- **<abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> needs a certification track per segment** because it requires a separate <abbr title="Enhanced Trading Interface">ETI</abbr> session per segment. Plan them as three projects.
 
 ## Conceptual overview
 
@@ -28,17 +28,17 @@ The third idea is that go-live should be reversible for as long as possible. Eac
 ## 1. Regulatory framework
 
 - **Exchange certification and mock trading circulars** — each exchange publishes its certification requirements per segment and facility, its mock trading calendar, and the certification process. These are the operative documents and they are announced and amended by circular. `[not yet in index]`
-- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — registration conditions apply from registration, not from go-live, so the compliance obligations are already live before the first order. `[not yet in index]`
-- **Facility approval frameworks** — internet-based trading, securities trading through wireless technology, direct market access, algorithmic trading, smart order routing and application programming interface access, each with its own prerequisites. See [algo, API, DMA and SOR](/broking-kyc/finix-broking-setup/oms/09-algo-api-dma-sor/).
+- **[<abbr title="Securities and Exchange Board of India">SEBI</abbr> (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — registration conditions apply from registration, not from go-live, so the compliance obligations are already live before the first order. `[not yet in index]`
+- **Facility approval frameworks** — internet-based trading, securities trading through wireless technology, direct market access, algorithmic trading, smart order routing and application programming interface access, each with its own prerequisites. See [algo, API, DMA and <abbr title="Smart Order Routing">SOR</abbr>](/broking-kyc/finix-broking-setup/oms/09-algo-api-dma-sor/).
 - **System audit framework** — a pre-go-live audit, or an audit within a defined period of commencement, depending on the applicable requirement. See [system audit](/broking-kyc/deep-dives/compliance-audit/system-audit/).
 - **Business continuity and disaster recovery drill obligations** — begin once operational. See [BCP and DR drill](/broking-kyc/deep-dives/specialty/bcp-dr-drill/).
-- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025).
+- **[Master Circular for Stock Brokers SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025).
 
 ## 2. The certification matrix
 
 Each cell is a separate certification or a confirmation that the cell is not applicable.
 
-| Facility | NSE CM | NSE F&O | NSE CD | BSE CM | BSE EQD | BSE CDX | MCX COM |
+| Facility | <abbr title="National Stock Exchange of India">NSE</abbr> <abbr title="Clearing Member">CM</abbr> | NSE F&O | NSE CD | BSE CM | BSE EQD | BSE CDX | <abbr title="Multi Commodity Exchange of India">MCX</abbr> COM |
 |---|---|---|---|---|---|---|---|
 | Own front end, dealer terminal | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
 | Internet-based trading | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
@@ -47,11 +47,11 @@ Each cell is a separate certification or a confirmation that the cell is not app
 | Algorithmic trading | ✔ | ✔ | — at launch | ✔ | ✔ | — | ✔ |
 | Direct market access | Deferred | Deferred | — | Deferred | Deferred | — | — |
 | Smart order routing | Deferred | Deferred | — | Deferred | Deferred | — | — |
-| Separate protocol instance | Shared stack | Shared stack | Shared stack | **Own instance** | **Own instance** | **Own instance** | Per MCX |
+| Separate session per segment | Shared stack | Shared stack | Shared stack | **Own session** | **Own session** | **Own session** | Per MCX |
 
 | Planning consequence | Detail |
 |---|---|
-| BSE is three tracks | Separate connection and separate IML instance per segment |
+| BSE certification is per segment | A separate ETI session per segment, and success on one does not transfer |
 | Facilities are not free | Each facility certification is separate work and separate evidence |
 | Deferred is a decision | Direct market access and smart order routing deferred to a later phase, documented, not forgotten |
 | Algorithmic certification has a capital link | The algorithmic category sets base minimum capital at ₹50 lakh; see [entity and capital structure](/broking-kyc/finix-broking-setup/setup/01-entity-capital-structure/#5-base-minimum-capital--a-business-model-decision) |
@@ -110,27 +110,27 @@ Certification is the exchange's gate. These are the firm's, and nobody else will
 
 | Plane | Gate | Evidence |
 |---|---|---|
-| [Setup](/broking-kyc/finix-broking-setup/setup/) | Registration, membership, DP, bank accounts, deposits all in place | Certificates, account statements, receipts |
+| [Setup](/broking-kyc/finix-broking-setup/setup/) | Registration, membership, <abbr title="Depository Participant">DP</abbr>, bank accounts, deposits all in place | Certificates, account statements, receipts |
 | Setup | Net worth monitor running, with current certified figure | Monthly report |
 | Setup | All named roles filled; certification register complete and current | Register with expiry dates |
 | [Stack](/broking-kyc/finix-broking-setup/stack/) | Every interface in the contract matrix has an owner, a monitor and a tested degraded path | Interface register |
 | Stack | Configuration register populated, classified and approved | Register with approvals |
-| [Onboarding](/broking-kyc/finix-broking-setup/onboarding/) | Full journey completed end to end for a real client, including KRA, CKYC, screening, UCC and demat | A live activated account |
+| [Onboarding](/broking-kyc/finix-broking-setup/onboarding/) | Full journey completed end to end for a real client, including <abbr title="KYC Registration Agency">KRA</abbr>, <abbr title="Central KYC (records registry)">CKYC</abbr>, screening, <abbr title="Unique Client Code">UCC</abbr> and demat | A live activated account |
 | Onboarding | Screening list versions recorded; unresolved-hit block tested | Screening evidence |
-| [OMS](/broking-kyc/finix-broking-setup/oms/) | Certified order types match the enabled configuration exactly | Certification record versus configuration diff |
+| [<abbr title="Order Management System">OMS</abbr>](/broking-kyc/finix-broking-setup/oms/) | Certified order types match the enabled configuration exactly | Certification record versus configuration diff |
 | OMS | No path to the exchange bypasses the risk release point | Architectural proof plus test |
-| [RMS](/broking-kyc/finix-broking-setup/rms/) | Risk parameter ingestion, staleness behaviour and abort tested | Ingestion logs, forced-failure test |
+| [<abbr title="Risk Management System">RMS</abbr>](/broking-kyc/finix-broking-setup/rms/) | Risk parameter ingestion, staleness behaviour and abort tested | Ingestion logs, forced-failure test |
 | RMS | Square-off engine tested including the failure-to-square-off path | Test record |
 | RMS | Margin reporting file produced and format-validated | Sample file, validation output |
 | [Back office](/broking-kyc/finix-broking-setup/backoffice/) | Trade import, reconciliation with a seeded discrepancy, contract notes, obligations — full cycle | Cycle evidence |
-| Back office | CUSPA auto-pledge, recomputation, release and invocation tested | Depository test records |
+| Back office | <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr> auto-pledge, recomputation, release and invocation tested | Depository test records |
 | Back office | Every regulatory report generated once in the correct format | Sample set |
 | [Money](/broking-kyc/finix-broking-setup/money/) | Gateway settles to the client nodal account, verified with real money | Bank statement line |
 | Money | Pay-out run executed, including a reversal case | Payout records |
 | Money | Upstreaming computed and instructed once | Instruction and confirmation |
 | Money | Third-party payment block tested | Rejected test transaction |
 | [Exchanges](/broking-kyc/finix-broking-setup/exchanges/) | Every file in the [download reference](/broking-kyc/finix-broking-setup/exchanges/08-file-formats-downloads/) retrieved and parsed | Parse logs |
-| [Daily ops](/broking-kyc/finix-broking-setup/daily-ops/) | BOD and EOD runbooks executed by the actual staff, not the project team | Signed checklists |
+| [Daily ops](/broking-kyc/finix-broking-setup/daily-ops/) | <abbr title="Beginning Of Day">BOD</abbr> and <abbr title="End Of Day">EOD</abbr> runbooks executed by the actual staff, not the project team | Signed checklists |
 | Daily ops | One incident playbook rehearsed | Drill record |
 | [Compliance](/broking-kyc/finix-broking-setup/compliance/) | Policy set approved; compliance calendar populated with owners | Board minutes, calendar |
 | Compliance | Investor awareness messages configured per the October 2026 circular | Screenshot plus configuration record |

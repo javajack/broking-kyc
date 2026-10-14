@@ -5,7 +5,7 @@ description: The time, price and quantity conditions that combine with every ord
 
 import { Aside } from '@astrojs/starlight/components';
 
-> **Why this page is structured this way:** NSE classifies order conditions into three categories — time-related, price-related and quantity-related — and that classification is the right mental model because the three are independent and combine. Most order-entry defects are not wrong order types; they are illegal or unsupported *combinations*, or attributes populated where they should be absent. So the page takes each category in turn, states the behaviour and the exchange-specific availability, then gives the combination legality matrix, then treats the two exchange-side price controls that reject orders the broker's own checks would pass.
+> **Why this page is structured this way:** <abbr title="National Stock Exchange of India">NSE</abbr> classifies order conditions into three categories — time-related, price-related and quantity-related — and that classification is the right mental model because the three are independent and combine. Most order-entry defects are not wrong order types; they are illegal or unsupported *combinations*, or attributes populated where they should be absent. So the page takes each category in turn, states the behaviour and the exchange-specific availability, then gives the combination legality matrix, then treats the two exchange-side price controls that reject orders the broker's own checks would pass.
 
 ## TL;DR
 
@@ -13,7 +13,7 @@ import { Aside } from '@astrojs/starlight/components';
 - **Day and Immediate or Cancel are the universally available time conditions.** An IOC order must be executed immediately in full or in part, and any unexecuted portion is cancelled immediately.
 - **Good Till Date and Good Till Cancelled are commodity validities.** They are not exchange validities in the equity segments, where long-dated intent is served by the broker's Good Till Triggered facility instead — a different thing with different risk ownership.
 - **Disclosed quantity shows the market only part of the order.** An order of 1,000 with a disclosed quantity of 200 shows 200 at a time. Exchanges impose a minimum disclosed proportion; verify it per segment before enabling.
-- **All or None and Minimum Fill are not available on the system per SEBI directives**, despite existing in the Special Terms book structure and in the protocol. Validate them to absent rather than relying on defaults.
+- **All or None and Minimum Fill are not available on the system per <abbr title="Securities and Exchange Board of India">SEBI</abbr> directives**, despite existing in the Special Terms book structure and in the protocol. Validate them to absent rather than relying on defaults.
 - **Trigger price is a separate price from the limit price**, and the gap between them is the client's protection and the client's execution risk simultaneously. It is the most misunderstood attribute in retail trading.
 - **Two exchange-side price controls reject orders independently of the broker**: the operating price range, and **Limit Price Protection**, introduced on 31 October 2022 in the futures and options segment, which validates limit prices against a dynamic range on both sides of a reference price, over and above the operating range.
 - **After-market orders are a broker facility with a broker-defined window.** Equity and derivatives windows differ, and the release at the open is the broker's obligation.
@@ -24,16 +24,16 @@ The useful way to think about an order's attributes is as a set of constraints o
 
 The second thing to hold onto is that unavailable is not the same as nonexistent. All-or-none and minimum fill have a book, a protocol representation and a long history, and they are not available per SEBI directives. That combination — present in the wire format, absent in practice — is a specific implementation hazard, because a defect can populate the field and the resulting rejection will be obscure. The defensive design is to validate explicitly that these attributes are absent, so that a broker-side error message appears instead of an exchange-side one.
 
-The third is that price validation now happens twice on the exchange side, and the second layer is dynamic. The operating price range is the familiar band. Limit Price Protection, added to the derivatives segment in 2022, is a further validation based on a reference price with instrument-class-specific ranges that change through the day with market activity. An order can be inside the operating range and still be rejected by LPP. For a broker this means two things: the client-facing explanation of "why was my order rejected" needs both mechanisms in it, and any broker-side price collar should be understood as a third, independent layer rather than a substitute for either.
+The third is that price validation now happens twice on the exchange side, and the second layer is dynamic. The operating price range is the familiar band. Limit Price Protection, added to the derivatives segment in 2022, is a further validation based on a reference price with instrument-class-specific ranges that change through the day with market activity. An order can be inside the operating range and still be rejected by <abbr title="Limit Price Protection">LPP</abbr>. For a broker this means two things: the client-facing explanation of "why was my order rejected" needs both mechanisms in it, and any broker-side price collar should be understood as a third, independent layer rather than a substitute for either.
 
 ## 1. Regulatory and exchange framework
 
 - **NSE trading system documentation** — order conditions classified as time-related, price-related and quantity-related; the Regular Lot, Special Terms, Stop Loss and Negotiated Trade books; the statement that all-or-none and minimum fill are not currently available on the system as per SEBI directives. `[not yet in index]`
 - **NSE Limit Price Protection** — introduced 31 October 2022 in the futures and options segment to strengthen pre-trade risk controls against aberrant orders; an additional validation over and above the operating price range, based on both sides of a reference price; incoming limit orders beyond the range are automatically rejected. `[not yet in index]`
 - **NSE/FAOP/49677** — discontinuation of stop-loss market orders for index and stock options from 27 September 2021. `[not yet in index]`
-- **BSE notice** discontinuing stop-loss market orders from 9 October 2023. `[not yet in index]`
+- **<abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> notice** discontinuing stop-loss market orders from 9 October 2023. `[not yet in index]`
 - **Segment protocol documents** — the authoritative field-level definitions of every attribute, per exchange and segment. `[not yet in index]`
-- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025).
+- **[Master Circular for Stock Brokers SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025).
 
 ## 2. Time-related conditions
 
@@ -92,7 +92,7 @@ In the equity segments a long-dated client instruction is held by the broker, no
 | Modification | Modifiable or cancellable by the client before release |
 | Variants | Limit and market after-market orders |
 | Broker obligations | Release at the right time; correct handling of overnight corporate actions, band revisions and margin changes; clear communication if release fails |
-| Finix configuration | Windows configured per exchange and segment, published to clients, and asserted at BOD |
+| Finix configuration | Windows configured per exchange and segment, published to clients, and asserted at <abbr title="Beginning Of Day">BOD</abbr> |
 
 The precise window times are a broker policy within what the exchange permits, and they are published to clients — which makes them a disclosed, discretionary configuration item rather than a technical detail. See [BOD runbook](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/) for the release step and its verification.
 

@@ -29,7 +29,7 @@ import Diagram from '../../../../components/Diagram.astro';
 | **G3** | Ban-period list | Current-day date; membership diff reviewed | **Fresh derivatives positions in all listed underlyings** |
 | **G4** | Surveillance measure lists | Current-day; additions alerted | **Most restrictive known treatment on affected instruments** |
 | **G5** | Collateral and ledger load | **As-of timestamp is today's**; record count reconciles to the client master | **Do not open. Everything.** |
-| **G6** | Exchange sessions | Established per exchange and per BSE segment instance; sequence continuous; heartbeats healthy | **That exchange and segment** |
+| **G6** | Exchange sessions | Established per exchange and per <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> <abbr title="Enhanced Trading Interface">ETI</abbr> segment session; sequence continuous; heartbeats healthy | **That exchange and segment** |
 
 <Aside type="caution" title="G5 is the gate that prevents the most expensive silent failure">
 A collateral and balance load that runs successfully but carries yesterday's as-of timestamp gives every client the wrong limit, all day, in the permissive direction. Nothing errors. Orders are released. The problem appears at end of day as a margin shortfall across the book, by which time the trades exist. The assertion is not "did the load run" but "is the as-of timestamp today's, and does the record count reconcile to the client master". It takes seconds and it is the highest-value gate in the runbook.
@@ -53,13 +53,13 @@ Times are indicative for an ordinary trading day; the day-after-a-holiday varian
 | 08:15 | 10 | **Surveillance measure lists applied** — **G4** | Risk | Current-day; additions alerted | **Most restrictive treatment** |
 | 08:20 | 11 | Price bands loaded | Technology | Current | Reject outside last-known band |
 | 08:25 | 12 | Market-wide position limit data loaded | Risk | Current | Position-limit monitoring degraded; escalate |
-| 08:30 | 13 | **Collateral and ledger balance loaded into RMS** — **G5** | Operations and risk | **As-of is today's; count reconciles to the client master** | **Abort the open** |
+| 08:30 | 13 | **Collateral and ledger balance loaded into <abbr title="Risk Management System">RMS</abbr>** — **G5** | Operations and risk | **As-of is today's; count reconciles to the client master** | **Abort the open** |
 | 08:35 | 14 | Pledge positions reconciled — depository, back office, risk | Operations | Three-way clean, or exceptions identified | Block exposure increase for affected clients |
 | 08:40 | 15 | Limits resolved; **available exposure computed per client** | Risk | Every active client has a resolved limit | Investigate clients resolving to the global default |
 | 08:45 | 16 | **Firm-level utilisation baselined** | Risk | Firm ceilings loaded and current | Escalate |
-| 08:50 | 17 | **Exchange sessions established** — **G6** | Technology | Per exchange and per BSE segment instance; sequence continuous; heartbeats healthy | **Block that exchange and segment** |
+| 08:50 | 17 | **Exchange sessions established** — **G6** | Technology | Per exchange and per BSE ETI segment session; sequence continuous; heartbeats healthy | **Block that exchange and segment** |
 | 08:52 | 18 | Market data feeds verified | Technology | Per-instrument staleness within threshold once feeds start | Block price-dependent decisions in scope |
-| 08:55 | 19 | **Client master three-way reconciliation** — onboarding, OMS, back office | Operations | Clean, or mismatched clients identified and blocked | Block mismatched clients |
+| 08:55 | 19 | **Client master three-way reconciliation** — onboarding, <abbr title="Order Management System">OMS</abbr>, back office | Operations | Clean, or mismatched clients identified and blocked | Block mismatched clients |
 | 08:57 | 20 | Certification and identifier register checks | Compliance | No lapsed certificates on active identifiers; no unreported identifiers enabled | **Disable affected identifiers** |
 | 09:00 | 21 | **After-market queue released** | Technology | **Release verified**, with counts | **Incident**; clients informed |
 | 09:00 | 22 | **Go or no-go decision** | Named owner | All gates green, or exceptions explicitly accepted with scope | **No-go is the default on amber** |
@@ -93,7 +93,7 @@ Times are indicative for an ordinary trading day; the day-after-a-holiday varian
 
 | Item | Detail |
 |---|---|
-| MCX session opens at 09:00 | The same gates apply to the commodity segment |
+| <abbr title="Multi Commodity Exchange of India">MCX</abbr> session opens at 09:00 | The same gates apply to the commodity segment |
 | Commodity-specific files | Included in the expected-file checklist |
 | **Tender day** | If today is a tender day, the 19:30 eClear deadline has a named owner from the start of the day |
 | Daylight saving | On the changeover day, confirm the close time has been applied |
@@ -172,6 +172,6 @@ Times are indicative for an ordinary trading day; the day-after-a-holiday varian
 - [RMS architecture](/broking-kyc/finix-broking-setup/rms/01-rms-architecture/) — the input contracts behind the gates
 - [Sessions and calendars](/broking-kyc/finix-broking-setup/exchanges/06-sessions-calendars/) — the calendar confirmation
 - [Pre-open operations](/broking-kyc/finix-broking-setup/daily-ops/02-pre-open-ops/) — what follows
-- [EOD runbook](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/) — which produces the extract this depends on
+- [<abbr title="End Of Day">EOD</abbr> runbook](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/) — which produces the extract this depends on
 - [Incident playbooks](/broking-kyc/finix-broking-setup/daily-ops/07-incident-playbooks/) — when a gate fails
-- [Integration DAG](/broking-kyc/operations/integration-dag/bod/) — the vendor-neutral dependency view
+- [Integration <abbr title="Directed Acyclic Graph.">DAG</abbr>](/broking-kyc/operations/integration-dag/bod/) — the vendor-neutral dependency view

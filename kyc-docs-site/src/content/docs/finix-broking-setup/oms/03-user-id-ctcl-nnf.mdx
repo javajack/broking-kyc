@@ -9,9 +9,9 @@ import { Aside } from '@astrojs/starlight/components';
 
 ## TL;DR
 
-- **NSE: the trading member creates twelve-digit identifiers** for its users under the Non-NEAT Front End facility, and **must report the terminal details to the exchange before routing any order through such terminals**. Reporting is a precondition, not a follow-up.
+- **<abbr title="National Stock Exchange of India">NSE</abbr>: the trading member creates twelve-digit identifiers** for its users under the Non-NEAT Front End facility, and **must report the terminal details to the exchange before routing any order through such terminals**. Reporting is a precondition, not a follow-up.
 - **The Computer-to-Computer Link facility is what permits an own front end at all**, and it is available only to trading members of NSE. Access to the trading system is through various modes of connectivity, each with a unique user identifier.
-- **Administration goes through NSE-ENIT.** Applications for NEAT to CTCL conversion of user identifiers, and for non-NEAT user identifiers, are made through the ENIT interface per circular NSE/MSD/67755 dated 29 April 2025.
+- **Administration goes through NSE-ENIT.** Applications for NEAT to <abbr title="Computer-to-Computer Link.">CTCL</abbr> conversion of user identifiers, and for non-NEAT user identifiers, are made through the ENIT interface per circular NSE/MSD/67755 dated 29 April 2025.
 - **An identifier is not a login — it is an attribution.** It links an order to a person or a system, a location, and an entitlement. Sharing one destroys the attribution, which is the point of having it.
 - **The register must reconcile with the exchange and with the directory.** Three records of the same population: the firm's register, the exchange's declared terminals, and the identity directory. Any two disagreeing is a finding.
 - **Joiners, movers and leavers are the drift mechanism.** A dealer who leaves with their identifier still allocated and still reported is a live control gap that no system will report unless someone looks.
@@ -29,10 +29,10 @@ The hard part is not setting this up; it is keeping it true. Identifier populati
 
 - **NSE user identifier and CTCL identifier documentation** — the Computer-to-Computer Link facility, Non-NEAT Front End identifiers and the reporting obligation. `[not yet in index]`
 - **NSE/MSD/67755** (29 April 2025) — applications for NEAT to CTCL conversion of user identifiers and for non-NEAT user identifiers through NSE-ENIT. `[not yet in index]`
-- **BSE and MCX identifier schemes** — per each exchange's published scheme and member documentation. `[not yet in index]`
-- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — Chapter III general obligations and Chapter IV fraud prevention, both of which assume attributable activity; regulation 16 record retention of not less than eight years applies to the identifier register and its history. `[not yet in index]`
-- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025).
-- **Facility approval frameworks** — algorithmic trading, direct market access, application programming interface and smart order routing each constrain who and what may hold an identifier of the relevant class. See [algo, API, DMA and SOR](/broking-kyc/finix-broking-setup/oms/09-algo-api-dma-sor/).
+- **<abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> and <abbr title="Multi Commodity Exchange of India">MCX</abbr> identifier schemes** — per each exchange's published scheme and member documentation. `[not yet in index]`
+- **[<abbr title="Securities and Exchange Board of India">SEBI</abbr> (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — Chapter <abbr title="—">III</abbr> general obligations and Chapter IV fraud prevention, both of which assume attributable activity; regulation 16 record retention of not less than eight years applies to the identifier register and its history. `[not yet in index]`
+- **[Master Circular for Stock Brokers SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025).
+- **Facility approval frameworks** — algorithmic trading, direct market access, application programming interface and smart order routing each constrain who and what may hold an identifier of the relevant class. See [algo, API, DMA and <abbr title="Smart Order Routing">SOR</abbr>](/broking-kyc/finix-broking-setup/oms/09-algo-api-dma-sor/).
 - **Authorised person framework** — identifiers allocated to authorised persons carry the member's responsibility. See [authorised person framework](/broking-kyc/deep-dives/compliance-audit/ap-framework/).
 
 ## 2. The NSE scheme
@@ -41,14 +41,14 @@ The hard part is not setting this up; it is keeping it true. Identifier populati
 |---|---|
 | Facility | Computer-to-Computer Link, available only to NSE trading members, permitting use of the member's own front-end software |
 | Access | Through various modes of connectivity, each with a unique user identifier |
-| NNF identifiers | Trading members create **twelve-digit** identifiers for their users under the Non-NEAT Front End facility |
+| <abbr title="Non-NEAT Front End">NNF</abbr> identifiers | Trading members create **twelve-digit** identifiers for their users under the Non-NEAT Front End facility |
 | Conversion | Members may convert NEAT identifiers to NNF and enable them for NNF products |
 | **Reporting** | Terminal details must be reported to the exchange **before any order is routed** through such terminals |
 | Administration route | NSE-ENIT, per NSE/MSD/67755 dated 29 April 2025 |
 | Facilities | CTCL, internet-based trading, direct market access, wireless, algorithmic trading, smart order routing and application programming interface all operate against this identifier structure |
 
 <Aside type="caution" title="Before, not after">
-The obligation is to report before routing. A terminal brought into use on Monday and reported on Tuesday was in breach on Monday, and the breach is trivially demonstrable from the exchange's own data. Build the control as a hard gate: an identifier cannot be enabled for order routing in the OMS until the register records a confirmed exchange reporting reference. Make the gate technical, because a procedural rule will eventually lose to an urgent Monday morning.
+The obligation is to report before routing. A terminal brought into use on Monday and reported on Tuesday was in breach on Monday, and the breach is trivially demonstrable from the exchange's own data. Build the control as a hard gate: an identifier cannot be enabled for order routing in the <abbr title="Order Management System">OMS</abbr> until the register records a confirmed exchange reporting reference. Make the gate technical, because a procedural rule will eventually lose to an urgent Monday morning.
 </Aside>
 
 ## 3. Identifier classes at Finix
@@ -149,7 +149,7 @@ Every other drift source is untidy. A departed dealer with a live, reported iden
 | Exchanges and segments | Register, OMS | OMS, before release |
 | Order types permitted | Register, OMS | OMS static validation; must match the certification record |
 | Client scope | Register, OMS | OMS |
-| Order quantity and value ceiling | Register, RMS | [RMS check ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/) |
+| Order quantity and value ceiling | Register, <abbr title="Risk Management System">RMS</abbr> | [RMS check ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/) |
 | Rate limit | OMS | OMS, per identifier and per channel |
 | Square-off authority | Register | OMS, restricted to risk identifiers |
 | Modification and cancellation of others' orders | Register | OMS; should be rare and logged distinctly |

@@ -13,7 +13,7 @@ import { Aside } from '@astrojs/starlight/components';
 - **Format currency is a vendor obligation worth contracting for.** Report formats change by circular, and the single most valuable clause in a back-office contract is the vendor's obligation to keep every regulatory format current within a stated lead time.
 - **A wrong file filed on time is worse than a correct file filed late within the window.** False or incorrect reporting is a separate disciplinary matter, not merely a penalty.
 - **Margin reporting carries its own regime** — a five-working-day cut-off, a penalty grid, and non-reporting treated as 100 percent short reporting. See [margin reporting and penalties](/broking-kyc/finix-broking-setup/rms/08-margin-reporting-penalties/).
-- **Suspicious transaction reports go through AML Sutra in FINnet 2.0 format**, filed by the principal officer, within the prescribed timeline, with no tipping off.
+- **Suspicious transaction reports go through <abbr title="Anti-Money Laundering">AML</abbr> Sutra in FINnet 2.0 format**, filed by the principal officer, within the prescribed timeline, with no tipping off.
 - **The calendar is the control.** ComplianceSutra holds the obligation, the owner, the deadline, the evidence and the acknowledgement; an obligation without an owner is the failure mode the calendar exists to prevent.
 - **Validation runs before submission and comparison runs after.** Pre-submission validation catches malformation; post-submission comparison against the consequence — a penalty advice, a query — catches wrongness.
 
@@ -21,18 +21,18 @@ import { Aside } from '@astrojs/starlight/components';
 
 Regulatory reporting is the point where the firm's internal records become statements to a regulator, and the change in status matters. Internally, a number that is slightly off is an error to be corrected. In a filing it is a representation, and a representation that is wrong is treated differently from one that is late. That asymmetry should drive the operating posture: within the filing window, correctness beats speed unconditionally, and a run that fails validation is not submitted.
 
-The second characteristic is that the formats are not stable. Exchanges, depositories, SEBI and FIU-IND all change formats by circular, sometimes with short notice, and a firm with a dozen recurring filings is managing a dozen independent format lifecycles. This is work that scales badly and is almost entirely outsourceable to the back-office vendor — which is why the contract clause matters more than the internal process. A vendor obliged to keep formats current within a stated lead time converts a recurring compliance risk into a supplier obligation.
+The second characteristic is that the formats are not stable. Exchanges, depositories, <abbr title="Securities and Exchange Board of India">SEBI</abbr> and <abbr title="Financial Intelligence Unit — India">FIU-IND</abbr> all change formats by circular, sometimes with short notice, and a firm with a dozen recurring filings is managing a dozen independent format lifecycles. This is work that scales badly and is almost entirely outsourceable to the back-office vendor — which is why the contract clause matters more than the internal process. A vendor obliged to keep formats current within a stated lead time converts a recurring compliance risk into a supplier obligation.
 
 The third characteristic is that reporting is derived, so its quality is determined upstream. A margin report is only as good as the collateral recognition and the ledger; a client-level allocation report is only as good as the pledge reconciliation. This means that reporting controls which test only the file — schema, totals, counts — catch malformation but not wrongness. Catching wrongness requires reconciliation against an independent source, which is why the daily comparison against clearing corporation data belongs in the reporting control set and not only in the risk one.
 
 ## 1. Framework
 
-- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — Chapter III general obligations; Chapter V inspection; regulation 16 retention of not less than eight years, applying to filings and acknowledgements. `[not yet in index]`
-- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — the consolidated reporting obligations.
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — Chapter <abbr title="—">III</abbr> general obligations; Chapter V inspection; regulation 16 retention of not less than eight years, applying to filings and acknowledgements. `[not yet in index]`
+- **[Master Circular for Stock Brokers SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — the consolidated reporting obligations.
 - **Margin reporting** — client-wise margin collected at end of day and peak margin during the day, with a **five-working-day cut-off**; the penalty grid at paragraph 40.3.1 and the 20 percent alternative at 40.3.2; non-reporting treated as 100 percent short reporting; false or incorrect reporting a separate disciplinary offence under CIR/HO/MIRSD/DOP/CIR/P/2019/88 (1 August 2019). `[not yet in index]`
 - **[SEBI/HO/MRD2_DCAP/CIR/2021/0598](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2_dcapcir20210598)** (20 July 2021) — client-level collateral allocation and valuation reporting, with formats at Annexure 3.
-- **Prevention of Money Laundering Act, 2002 and the SEBI anti-money-laundering framework** — suspicious transaction reports and other prescribed reports to FIU-IND in **FINnet 2.0** format, filed by the principal officer. See the [FIU-IND circulars index](/broking-kyc/reference/circulars/fiu-ind/).
-- **Exchange compliance reporting** — through the member portals; on NSE, ENIT at `enit.nseindia.com/MemberPortal/`, with compliance submissions under ENIT-COMPLIANCE-NEW → Compliance → Status Report. `[not yet in index]`
+- **Prevention of Money Laundering Act, 2002 and the SEBI anti-money-laundering framework** — suspicious transaction reports and other prescribed reports to <abbr title="Financial Intelligence Unit">FIU</abbr>-IND in **FINnet 2.0** format, filed by the principal officer. See the [FIU-IND circulars index](/broking-kyc/reference/circulars/fiu-ind/).
+- **Exchange compliance reporting** — through the member portals; on <abbr title="National Stock Exchange of India">NSE</abbr>, ENIT at `enit.nseindia.com/MemberPortal/`, with compliance submissions under ENIT-COMPLIANCE-NEW → Compliance → Status Report. `[not yet in index]`
 - **Depository reporting** — participant obligations on the depositories' own calendars.
 - **Tax reporting** — securities transaction tax, goods and services tax, stamp duty, tax deducted at source and the annual information obligations.
 
@@ -53,11 +53,11 @@ Indicative; the live inventory is held in ComplianceSutra with owners and deadli
 | Exchange | Client code modification data | Per cycle | Operations | Operations |
 | Exchange | Investor complaint data | Monthly | Compliance | Compliance |
 | **SEBI** | Registration-related and event-driven filings | On event | Compliance | Compliance |
-| SEBI | SCORES complaint handling | Continuous | Compliance | Compliance |
+| SEBI | <abbr title="SEBI Complaints Redress System">SCORES</abbr> complaint handling | Continuous | Compliance | Compliance |
 | **FIU-IND** | Suspicious transaction reports, **FINnet 2.0 format** | On suspicion, within the prescribed timeline | AML Sutra | **Principal officer** |
 | FIU-IND | Other prescribed reports | Per the framework | AML Sutra | Principal officer |
-| **Depository** | Participant reporting | Per depository calendar | Back office, DP records | DP compliance officer |
-| **KRA and CKYCRR** | KYC record upload and update | Per onboarding and lifecycle | Onboarding | Operations |
+| **Depository** | Participant reporting | Per depository calendar | Back office, <abbr title="Depository Participant">DP</abbr> records | DP compliance officer |
+| **<abbr title="KYC Registration Agency">KRA</abbr> and <abbr title="Central KYC Records Registry">CKYCRR</abbr>** | <abbr title="Know Your Customer (process).">KYC</abbr> record upload and update | Per onboarding and lifecycle | Onboarding | Operations |
 | **Tax authorities** | Securities transaction tax, goods and services tax, stamp duty, tax deducted at source, annual information | Per statutory calendar | Finance | Finance |
 | Internal | Board and risk committee packs | Periodic | Compliance and risk | Compliance |
 

@@ -11,8 +11,8 @@ import Diagram from '../../../../components/Diagram.astro';
 ## TL;DR
 
 - **Four Saral front ends, one order path.** Money Maker Client Solo as the dealer terminal, Money Maker Browser for web, Money Maker Handy for mobile, and programmatic access — all converging on a single order acceptance and release path. Divergent paths are the failure mode this architecture exists to prevent.
-- **Exactly one release point.** Saral RMS makes the release decision for every order from every channel. If any channel can reach an exchange gateway without passing it, the control does not exist, whatever the policy says. This is an architectural property to be proved, not a configuration to be set.
-- **The OMS owns order state; the RMS owns the margin number; the back office owns the ledger.** None of the three may be duplicated. Everything else in the stack may be shadowed or cross-checked.
+- **Exactly one release point.** Saral <abbr title="Risk Management System">RMS</abbr> makes the release decision for every order from every channel. If any channel can reach an exchange gateway without passing it, the control does not exist, whatever the policy says. This is an architectural property to be proved, not a configuration to be set.
+- **The <abbr title="Order Management System">OMS</abbr> owns order state; the RMS owns the margin number; the back office owns the ledger.** None of the three may be duplicated. Everything else in the stack may be shadowed or cross-checked.
 - **Saral computes margin before release.** The published behaviour is that on order entry the system computes value-at-risk margin and extreme loss margin for the entered order and allows it to flow to the exchange within the available exposure limit, with limits controllable at identifier, client and scrip level and available exposure updated daily at the server.
 - **Risk evaluation timeout must reject, never release.** A timeout is the one failure where the safe default is counter-intuitive to an engineer optimising for availability, and it must be contractual as well as configured.
 - **The latency budget is a design input.** Decide the total, allocate it per hop, measure each hop separately, and alert on percentile degradation rather than on failure — degradation precedes failure and is the only useful warning.
@@ -32,15 +32,15 @@ The third idea is that the order path's job includes producing evidence. Every o
 
 | # | Component | Product | Responsibility | Does not do |
 |---|---|---|---|---|
-| C1 | Dealer terminal | Saral Money Maker Client Solo | Dealer order entry across NSE, BSE, MCX and NCDEX in one application; charting; exposure and net obligation views | Hold authoritative state |
+| C1 | Dealer terminal | Saral Money Maker Client Solo | Dealer order entry across <abbr title="National Stock Exchange of India">NSE</abbr>, <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr>, <abbr title="Multi Commodity Exchange of India">MCX</abbr> and <abbr title="National Commodity & Derivatives Exchange Limited">NCDEX</abbr> in one application; charting; exposure and net obligation views | Hold authoritative state |
 | C2 | Web front end | Saral Money Maker Browser | Client order entry, market analysis, order management and reporting | Hold authoritative state |
 | C3 | Mobile front end | Saral Money Maker Handy | Client order entry across exchanges and segments | Hold authoritative state |
 | C4 | Programmatic access | Saral API surface | Order entry for approved API and algorithmic clients | Bypass risk |
 | C5 | Algorithmic module | Saral Money Maker Challenge, with Auto Trader and the modelling module | Exchange-approved algorithm execution with risk-limiting safeguards | Operate without approval |
 | C6 | Order acceptance | Saral OMS | Validation, enrichment, order identifier assignment, sequencing | Decide release |
 | C7 | **Risk and release** | Saral RMS | **The single release decision**, margin computation at order time, limit enforcement at identifier, client and scrip level | Route orders |
-| C8 | Exchange gateway, NSE | Saral, over CTCL with Non-NEAT Front End, optionally via the Trading Access Point | Session management, protocol encoding, sequencing | Re-evaluate risk |
-| C9 | Exchange gateway, BSE | Saral, over BSE Open Message Bus, **one IML instance per segment** | As above, per segment | As above |
+| C8 | Exchange gateway, NSE | Saral, over <abbr title="Computer-to-Computer Link.">CTCL</abbr> with Non-NEAT Front End, optionally via the Trading Access Point | Session management, protocol encoding, sequencing | Re-evaluate risk |
+| C9 | Exchange gateway, BSE | Saral, over BSE Open Message Bus, **one <abbr title="Enhanced Trading Interface">ETI</abbr> session per segment** | As above, per segment | As above |
 | C10 | Exchange gateway, MCX | Saral, over the MCX member protocol | As above | As above |
 | C11 | Market data | Exchange multicast into Saral, with a separate store for non-trading use | Prices, depth, open interest, band revisions | Serve as a valuation record of history |
 | C12 | Order state store | Saral OMS | Authoritative order and position state for the session | Serve as the ledger |
@@ -104,7 +104,7 @@ Finix sets a total budget and allocates it, rather than measuring what happens a
 
 | Aspect | Design |
 |---|---|
-| Session establishment | Per exchange and, on BSE, per segment instance; at BOD, before the market opens |
+| Session establishment | Per exchange and, on BSE, per segment instance; at <abbr title="Beginning Of Day">BOD</abbr>, before the market opens |
 | Heartbeat | Per protocol requirement, monitored with an alert on miss |
 | Sequence tracking | Continuous; a gap is an incident, not a warning |
 | Reconnection | Automatic with bounded attempts, then human escalation |
@@ -168,7 +168,7 @@ The last row is the one that matters in a dispute. Being able to say "this order
 |---|---|
 | Instrument identity | Single instrument master, exchange-sourced, same version to every consumer on the same day |
 | Session independence | A failure in one exchange or segment must not affect another |
-| BSE per-segment instances | Three instances, monitored and failed over independently, with three runbooks |
+| BSE per-segment sessions | Established, monitored and recovered per segment, with segment-named runbooks |
 | Order routing | Explicit per order; no implicit cross-exchange routing without smart order routing approval |
 | Position aggregation | Per client across exchanges for risk, while obligations remain segment-wise |
 | Margin | Segment-specific regimes, aggregated only where cross-margin is actually recognised; see [collateral and cross-margin](/broking-kyc/trading-risk/collateral-cross-margin/) |
@@ -187,7 +187,7 @@ Full list at the [OMS configuration reference](/broking-kyc/finix-broking-setup/
 | `finix.oms.marketdata.staleness_ms.<segment>` | Per segment | Discretionary | Decisions on a stale price |
 | `finix.oms.marketdata.stale_action` | Block price-dependent decisions in scope | Discretionary | Silent wrong decisions |
 | `finix.oms.audit.write_failure_action` | Alert, stop entry if sustained | Regulatory in substance | Trading without a record |
-| `finix.oms.gateway.instance.<exchange>.<segment>` | Per exchange topology | Exchange-set | Orders to the wrong instance; BSE needs one per segment |
+| `finix.oms.gateway.instance.<exchange>.<segment>` | Per exchange topology | Exchange-set | Orders on the wrong session; BSE needs one per segment |
 | `finix.oms.order.max_rate.<channel>` | Per channel | Discretionary | One channel starving the gateway |
 
 ## 9. Exception paths

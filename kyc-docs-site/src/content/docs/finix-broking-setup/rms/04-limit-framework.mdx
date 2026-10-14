@@ -27,10 +27,10 @@ The third point concerns the peak-margin regime, which changed the nature of thi
 
 ## 1. Framework
 
-- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) and **[SEBI/HO/MIRSD/POD-1/P/CIR/2024/118](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir2024118)** (9 August 2024) — upfront margin obligations that bound the multiplier.
+- **[Master Circular for Stock Brokers <abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) and **[SEBI/HO/MIRSD/POD-1/P/CIR/2024/118](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir2024118)** (9 August 2024) — upfront margin obligations that bound the multiplier.
 - **[SEBI/HO/MRD2/DCAP/CIR/P/2020/127](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2dcapcirp2020127)** (20 July 2020) — the peak-margin framework and the intraday snapshot verification.
 - **Exchange position and open-interest limits** — client-level, member-level and market-wide limits, set and published by the exchanges. See [position limits and open interest](/broking-kyc/trading-risk/position-limits-oi/).
-- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — Chapter III general obligations; the risk management policy is a day-one artefact disclosed to clients. `[not yet in index]`
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — Chapter <abbr title="—">III</abbr> general obligations; the risk management policy is a day-one artefact disclosed to clients. `[not yet in index]`
 - **Saral published behaviour** — limits controllable at identifier, client and scrip level; available exposure limit updated daily at the server; on order entry the system computes value-at-risk and extreme loss margin and allows the order within the available exposure limit.
 
 ## 2. The hierarchy
@@ -49,8 +49,8 @@ Resolution is **most-specific-wins**, in this order. Every level may be absent e
 | 8 | Dealer identifier | One dealer | Head of risk | `…identifier.NNF…` |
 | 9 | Channel | Terminal, web, mobile, API, algorithmic | Head of risk | `…channel.api` |
 | 10 | Product | Delivery, intraday, carry-forward, funded | Risk committee | `…product.intraday` |
-| 11 | Segment | CM, FO, CD, COM | Risk committee | `…segment.fo` |
-| 12 | Exchange | NSE, BSE, MCX | Risk committee | `…exchange.mcx` |
+| 11 | Segment | <abbr title="Clearing Member">CM</abbr>, FO, CD, COM | Risk committee | `…segment.fo` |
+| 12 | Exchange | <abbr title="National Stock Exchange of India">NSE</abbr>, <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr>, <abbr title="Multi Commodity Exchange of India">MCX</abbr> | Risk committee | `…exchange.mcx` |
 | 13 | **Firm** | Aggregate | Risk committee and board | `…firm` |
 | 14 | **Global default** | Everything | Risk committee | `…` — **must exist** |
 

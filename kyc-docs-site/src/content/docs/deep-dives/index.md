@@ -38,7 +38,7 @@ The settlement layer — how <abbr title="Trade-date Plus N settlement">T+1</abb
 |---|---|
 | T+0 / T+1 settlement nuances | [t0-t1-settlement](./settlement/t0-t1-settlement/) |
 | Direct payout to demat (<abbr title="Trading Member">TM</abbr> <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr> / <abbr title="Clearing Member">CM</abbr> CUSPA / TM <abbr title="Client Securities Margin Funded Account">CSMFA</abbr>) | [direct-payout-to-demat](./settlement/direct-payout-to-demat/) |
-| Client funds upstreaming (MFOS / FDR / cash) | [client-funds-upstreaming](./settlement/client-funds-upstreaming/) |
+| Client funds upstreaming (<abbr title="Mutual Fund Overnight Scheme">MFOS</abbr> / FDR / cash) | [client-funds-upstreaming](./settlement/client-funds-upstreaming/) |
 | Payin default + Core <abbr title="Settlement Guarantee Fund">SGF</abbr> draw | [payin-default-core-sgf](./settlement/payin-default-core-sgf/) |
 | <abbr title="Securities Lending and Borrowing Mechanism">SLBM</abbr> (Securities Lending & Borrowing Mechanism) | [slbm](./settlement/slbm/) |
 | MTF operational walkthrough | [mtf-operational](./settlement/mtf-operational/) |

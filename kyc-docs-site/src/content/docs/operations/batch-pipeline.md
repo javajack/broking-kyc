@@ -97,7 +97,7 @@ BSE has a slightly different verification approach — it uses a strict 3-parame
 
 | Step | Action | Format | Input/Output | Status | SLA |
 |------|--------|--------|-------------|--------|-----|
-| 1 | Submit UCC | ETI/API (fixed-length, max 30K) | Client master data | SUBMITTED | Immediate |
+| 1 | Submit UCC | <abbr title="Enhanced Trading Interface">ETI</abbr>/API (fixed-length, max 30K) | Client master data | SUBMITTED | Immediate |
 | 2 | 3-parameter PAN verification | BSE via Protean | PAN + Name + DOB must all verify | VERIFIED | Same batch cycle |
 | 3 | UCC approved + segment activation | Segment activation batch (max 50K) | Segments live | ACTIVE | Same day |
 

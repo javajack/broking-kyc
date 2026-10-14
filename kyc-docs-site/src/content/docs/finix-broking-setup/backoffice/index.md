@@ -10,7 +10,7 @@ description: The record plane on SecMark — architecture and the daily pipeline
 - **The exchange trade file is authoritative, not the order management system's real-time feed.** The two are reconciled, and a difference blocks contract notes — which is correct, because a contract note is a legal confirmation of what traded.
 - **The deadlines do not move.** Contract notes are dispatched within **24 hours** of trade execution, digitally signed under the Information Technology Act, 2000. Settlement pay-in deadlines are same-day and bank cut-offs are earlier than exchange ones.
 - **The ledger of record is the single owner of client balances.** Intraday risk views are working numbers; the ledger is what a client, an auditor and an arbitrator are shown.
-- **CUSPA changed unpaid-securities handling in 2026**, with auto-pledge at pay-out, daily recomputation, a five-trading-day payment window, a 6 PM extension request on day five, and depository auto-release on day six. It is new enough to be missing from most internal documentation.
+- **<abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr> changed unpaid-securities handling in 2026**, with auto-pledge at pay-out, daily recomputation, a five-trading-day payment window, a 6 PM extension request on day five, and depository auto-release on day six. It is new enough to be missing from most internal documentation.
 - **Reconciliation is the control, and exception ageing is its metric.** Trades, obligations, holdings, pledges, bank and gateway all reconcile daily; a stable exception backlog is an accumulating liability, not a steady state.
 - **Record retention has a statutory floor of eight years** under regulation 16 of the 2026 regulations, and it covers configuration history, communications and audit logs, not just contract notes.
 - **SecMark covers broking and depository-participant records in one platform**, which is efficient — but the records must stay separable, because a depository inspection asks for depository records.
@@ -33,8 +33,8 @@ Architecture and the daily sequence are at [back office architecture](/broking-k
 
 ## Where this connects
 
-- [RMS](/broking-kyc/finix-broking-setup/rms/) — which consumes the collateral and balance this plane produces
+- [<abbr title="Risk Management System">RMS</abbr>](/broking-kyc/finix-broking-setup/rms/) — which consumes the collateral and balance this plane produces
 - [Money movement](/broking-kyc/finix-broking-setup/money/) — pay-in, pay-out and bank reconciliation
-- [EOD runbook](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/) — the sequence this plane runs in
-- [ECN and investor servicing](/broking-kyc/deep-dives/member-compliance/ecn-investor-servicing/) — artefact formats in depth
+- [<abbr title="End Of Day">EOD</abbr> runbook](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/) — the sequence this plane runs in
+- [<abbr title="Electronic Contract Note.">ECN</abbr> and investor servicing](/broking-kyc/deep-dives/member-compliance/ecn-investor-servicing/) — artefact formats in depth
 - [Back office and RMS](/broking-kyc/appendix/back-office-rms/) — the vendor-neutral treatment

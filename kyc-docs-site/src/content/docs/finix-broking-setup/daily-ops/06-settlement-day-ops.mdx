@@ -11,7 +11,7 @@ import { Aside } from '@astrojs/starlight/components';
 
 - **The operative deadline is the bank's cut-off**, which is earlier than the clearing corporation's, and the internal deadline is earlier still by the maker-checker time plus a buffer.
 - **Prevention beats cure by an enormous margin.** A securities shortfall identified at 15:45 can be fixed; the same shortfall identified when the instruction is rejected cannot.
-- **The final obligation report arrives on T+1**, so the settlement working window is tighter than the T+1 label suggests.
+- **The final obligation report arrives on <abbr title="Trade-date Plus N settlement">T+1</abbr>**, so the settlement working window is tighter than the T+1 label suggests.
 - **Client obligations must tie to the member obligation** before settlement preparation proceeds.
 - **Early pay-in earns a margin benefit** and the recognition must be asserted, not assumed.
 - **Pay-out received is moved to the downstreaming nodal account and disbursed to clients the same day.**
@@ -58,7 +58,7 @@ The published clearing corporation deadline is the number that appears in every 
 | 17 | **Clearing corporation recognition asserted** | Operations | **Recognised, not assumed** | **Escalate immediately** |
 | 18 | Securities pay-out received | Operations | Per the obligation | Investigate |
 | 19 | **Direct pay-out to client demat verified** | Operations | Securities where the client expects | Investigate |
-| 20 | **CUSPA auto-pledge for unpaid positions** | Operations | Pledges created match pay-outs against unpaid obligations | Stop further exposure; escalate |
+| 20 | **<abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr> auto-pledge for unpaid positions** | Operations | Pledges created match pay-outs against unpaid obligations | Stop further exposure; escalate |
 | 21 | Funds pay-out received into the clearing account | Treasury | Per the obligation | Investigate |
 | 22 | **Moved to the downstreaming nodal account, same day** | Treasury | A2 funded | **Client pay-outs cannot proceed** |
 | 23 | Client pay-outs disbursed from A2 | Treasury | Within the published cut-off | — |
@@ -135,7 +135,7 @@ Depth at [short delivery and auction](/broking-kyc/deep-dives/trading-day/short-
 |---|---|
 | Clearing route | Through a clearing member at launch; the clearing member's formats and timetable govern |
 | Delivery | Physical, with warehouse documentation and quality grades |
-| **Tender intention** | By **19:30** on tender days through MCXCCL eClear |
+| **Tender intention** | By **19:30** on tender days through <abbr title="Multi Commodity Exchange Clearing Corporation Limited">MCXCCL</abbr> eClear |
 | Seller early pay-in | Exempts all margins except mark-to-market, with documentary evidence |
 | Margin ladder | Delivery period margin and the 8.34 percent tender increment |
 | Timing | The commodity settlement work happens in the evening, alongside the equity pipeline |
@@ -190,5 +190,5 @@ Depth at [short delivery and auction](/broking-kyc/deep-dives/trading-day/short-
 - [Bank account architecture](/broking-kyc/finix-broking-setup/setup/06-bank-account-architecture/) — A2 and the same-day rule
 - [CUSPA](/broking-kyc/finix-broking-setup/backoffice/06-cuspa-unpaid-securities/) — the pay-out pledge
 - [Short delivery and auction](/broking-kyc/deep-dives/trading-day/short-delivery-auction/) — the consequence path
-- [EOD runbook](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/) — the pipeline this sits inside
+- [<abbr title="End Of Day">EOD</abbr> runbook](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/) — the pipeline this sits inside
 - [Incident playbooks](/broking-kyc/finix-broking-setup/daily-ops/07-incident-playbooks/) — when funding or instruction fails

@@ -5,7 +5,7 @@ description: The complete enumeration of every check an order passes before rele
 
 import { Aside } from '@astrojs/starlight/components';
 
-> **Why this page is structured this way:** The user-visible question "why was my order rejected" and the inspection question "show me your pre-trade controls" are the same question asked from two directions, and both are answered by one artefact: an ordered, sourced, complete list of checks. So this page is that list. It is grouped by the kind of question each check asks rather than by the system that performs it, because grouping by system hides the fact that a single logical control is sometimes split across the OMS and the RMS. Each check carries its source, because an inspector's first question about any control is whether it is mandated or chosen.
+> **Why this page is structured this way:** The user-visible question "why was my order rejected" and the inspection question "show me your pre-trade controls" are the same question asked from two directions, and both are answered by one artefact: an ordered, sourced, complete list of checks. So this page is that list. It is grouped by the kind of question each check asks rather than by the system that performs it, because grouping by system hides the fact that a single logical control is sometimes split across the <abbr title="Order Management System">OMS</abbr> and the <abbr title="Risk Management System">RMS</abbr>. Each check carries its source, because an inspector's first question about any control is whether it is mandated or chosen.
 
 ## TL;DR
 
@@ -29,16 +29,16 @@ The third idea concerns completeness. Most brokers implement most of these check
 
 | Code | Meaning | Evidence needed |
 |---|---|---|
-| **R** | Regulatory — mandated by regulation or SEBI circular | The instrument and paragraph |
+| **R** | Regulatory — mandated by regulation or <abbr title="Securities and Exchange Board of India">SEBI</abbr> circular | The instrument and paragraph |
 | **E** | Exchange — mandated by exchange or clearing corporation rules | The circular, plus a named refresh job |
 | **D** | Discretionary — the firm's own policy | A board or committee-approved policy and an approver |
 
 Key regulatory and exchange anchors used below:
 
-- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — Chapter III general obligations, Chapter IV fraud prevention and detection. `[not yet in index]`
-- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) and **[SEBI/HO/MIRSD/POD-1/P/CIR/2024/118](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir2024118)** (9 August 2024) — upfront margin at paragraph 40.1.2 and the surrounding obligations.
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — Chapter <abbr title="—">III</abbr> general obligations, Chapter IV fraud prevention and detection. `[not yet in index]`
+- **[Master Circular for Stock Brokers SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) and **[SEBI/HO/MIRSD/POD-1/P/CIR/2024/118](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir2024118)** (9 August 2024) — upfront margin at paragraph 40.1.2 and the surrounding obligations.
 - **[SEBI/HO/MRD2/DCAP/CIR/P/2020/127](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2dcapcirp2020127)** (20 July 2020) — peak margin.
-- **[SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/0000013](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir20250000013)** (4 February 2025) and the NSE implementation chain — algorithmic controls.
+- **[SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/0000013](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir20250000013)** (4 February 2025) and the <abbr title="National Stock Exchange of India">NSE</abbr> implementation chain — algorithmic controls.
 - **NSE Limit Price Protection** (31 October 2022) and exchange operating price ranges. `[not yet in index]`
 - Ban period, surveillance measure frameworks — see [surveillance norms](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/).
 
@@ -83,7 +83,7 @@ Key regulatory and exchange anchors used below:
 | C5 | Segment activated for this client | R | Client master | "This segment is not activated on your account." | No |
 | C6 | Derivatives suitability or income documentation where required | R | Client master | "Additional documentation is required to trade derivatives." | No |
 | C7 | Demat account active where the order creates a delivery obligation | D | Client master | "Your demat account is not yet active." | No |
-| C8 | DDPI or equivalent authority present where the action requires it | R | Client master | "An authorisation is required for this action." | No |
+| C8 | <abbr title="Demat Debit and Pledge Instruction">DDPI</abbr> or equivalent authority present where the action requires it | R | Client master | "An authorisation is required for this action." | No |
 | C9 | No unresolved screening alert blocking activity | R | [Screening](/broking-kyc/finix-broking-setup/onboarding/04-pep-sanctions-screening/) | Internal, with a compliance-approved message | **No** |
 | C10 | Employee, connected-person or restricted-list constraints | R | Restricted lists | Internal | **No** |
 
@@ -111,7 +111,7 @@ The D1 distinction is the one that gets implemented wrongly: a ban period restri
 |---|---|---|---|---|---|
 | E1 | Market data fresh for this instrument | D | Per-instrument staleness | "Live prices are unavailable for this security; please try again." | **No** |
 | E2 | Price within the exchange operating price range | E | Band, current | "The price is outside the exchange's permitted range (A to B)." | **No** |
-| E3 | Limit Price Protection awareness in derivatives | E | LPP range where available | "The exchange will reject prices far from the market; the allowed range is A to B." | No |
+| E3 | Limit Price Protection awareness in derivatives | E | <abbr title="Limit Price Protection">LPP</abbr> range where available | "The exchange will reject prices far from the market; the allowed range is A to B." | No |
 | E4 | Price within the broker collar | D | Collar configuration, price | "This price is far from the last traded price. Confirm, or adjust." | With approval |
 | E5 | Market order permitted — not blocked by stale data, policy or instrument | D | Configuration | "Market orders are not available for this security right now." | Yes |
 | E6 | Trigger-to-limit relationship sane | D | Price | "Your limit is on the wrong side of your trigger." | No |
@@ -139,7 +139,7 @@ The D1 distinction is the one that gets implemented wrongly: a ban period restri
 | G4 | Available = collateral plus clear cash, less utilised, less blocked, times the applicable multiplier | D for the multiplier; R for the structure | All of the above | — computes | Multiplier only |
 | G5 | **Requirement ≤ available** | R | G1 and G4 | "This trade requires ₹X; you have ₹Y available." | **No** |
 | G6 | Cash-equivalent composition respected where it binds | E | Collateral composition | Internal | **No** |
-| G7 | Unpaid-securities exposure not used to support new trading | R | CUSPA state | Internal | **No** |
+| G7 | Unpaid-securities exposure not used to support new trading | R | <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr> state | Internal | **No** |
 | G8 | Margin-funded position limits where applicable | R | Funding framework | Per framework | No |
 
 <Aside type="note" title="G5 is where the message quality is won or lost">
@@ -169,7 +169,7 @@ Each of these belongs somewhere, and putting it in the pre-trade path is a desig
 
 | Check | Where it belongs | Why not pre-trade |
 |---|---|---|
-| Know-your-customer completeness | Onboarding, before activation | An activated client is a client whose KYC is complete |
+| Know-your-customer completeness | Onboarding, before activation | An activated client is a client whose <abbr title="Know Your Customer (process).">KYC</abbr> is complete |
 | Periodic re-KYC due | Account lifecycle, with a status consequence | It changes client status; the ladder reads the status |
 | Contract note and statement delivery | Back office | Post-trade |
 | Settlement obligation computation | Back office | Post-trade |

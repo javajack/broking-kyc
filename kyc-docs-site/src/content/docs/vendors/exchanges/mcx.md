@@ -143,7 +143,7 @@ MCX provides three API types for CTCL connectivity:
 |----------|----------|----------|--------|-------|
 | **Non-<abbr title="Financial Information eXchange protocol">FIX</abbr> (Legacy)** | TCP/IP | C-struct binary (proprietary) | Legacy, being phased out | Original MCX API format |
 | **FIX v4.2** | TCP/IP | FIX tag-value text | Available | Standard FIX protocol |
-| **MCX ETI** (Primary) | TCP/IP | Flat binary encoding | **Primary, recommended** | FIX v5.0 SP2 semantics, proprietary session layer |
+| **MCX <abbr title="Enhanced Trading Interface">ETI</abbr>** (Primary) | TCP/IP | Flat binary encoding | **Primary, recommended** | FIX v5.0 SP2 semantics, proprietary session layer |
 
 ### 4.3 MCX ETI (Enhanced Trading Interface) - Primary API
 

@@ -5,13 +5,13 @@ description: Operating the NSE capital market segment — the three-part session
 
 import { Aside } from '@astrojs/starlight/components';
 
-> **Why this page is structured this way:** The NSE cash segment is where most brokers start, which means it is also where most assumptions are formed that later fail elsewhere. So the page is deliberately explicit about what is NSE-cash-specific rather than general: the auction phases, the order-book structure, the settlement regime, and the handful of behaviours — band revisions, freezes, trade-for-trade treatment, auction market participation — that an implementation must handle rather than assume away.
+> **Why this page is structured this way:** The <abbr title="National Stock Exchange of India">NSE</abbr> cash segment is where most brokers start, which means it is also where most assumptions are formed that later fail elsewhere. So the page is deliberately explicit about what is NSE-cash-specific rather than general: the auction phases, the order-book structure, the settlement regime, and the handful of behaviours — band revisions, freezes, trade-for-trade treatment, auction market participation — that an implementation must handle rather than assume away.
 
 ## TL;DR
 
 - **The day has three parts**: pre-open call auction 09:00 to 09:15, continuous trading 09:15 to 15:30, closing session 15:30 to 15:40. The pre-open itself has phases — order entry 09:00 to 09:08, matching and trade confirmation 09:08 to 09:12, and a buffer 09:12 to 09:15.
 - **After-market orders queued overnight are released into the pre-open at 09:00**, entering the order-entry queue rather than the continuous session.
-- **Settlement is T+1**, with an optional **T+0** regime extended to the top 500 scrips by SEBI/HO/MRD/MRD-PoD-2/P/CIR/2024/02 (10 December 2024).
+- **Settlement is <abbr title="Trade-date Plus N settlement">T+1</abbr>**, with an optional **<abbr title="Trade-date Plus N settlement">T+0</abbr>** regime extended to the top 500 scrips by <abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>/MRD-PoD-2/P/CIR/2024/02 (10 December 2024).
 - **Upfront value-at-risk plus extreme loss margin applies in the cash segment**, not only in derivatives — paragraph 40.1.2 of the [Master Circular](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir2024118).
 - **The normal market has four books**: Regular Lot, Special Terms, Stop Loss and Negotiated Trade, plus the odd-lot and auction markets. All-or-none and minimum fill, which define the Special Terms book, **are not available on the system per SEBI directives**.
 - **Negotiated trades are Day orders only**, and carry a counterparty identifier.
@@ -32,7 +32,7 @@ The third feature is that a scrip's treatment is not uniform. A security may be 
 - **Pre-open and closing session** — phases and eligibility; see [pre-open and closing auction](/broking-kyc/deep-dives/foundational/pre-open-closing-auction/) and **NSE/CMTR/63594** (17 September 2024) with its supersession trail. `[not yet in index]`
 - **SEBI/HO/MRD/MRD-PoD-3/P/CIR/2024/85** (20 June 2024) — call-auction changes for initial public offerings and relisted scrips, including indicative quantity and price disclosure. `[not yet in index]`
 - **SEBI/HO/MRD/MRD-PoD-2/P/CIR/2024/02** (10 December 2024) — optional T+0 settlement extended to the top 500 scrips. `[not yet in index]`
-- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/POD-1/P/CIR/2024/118](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir2024118)** (9 August 2024) — paragraph 40.1.2 upfront value-at-risk plus extreme loss margin in the cash segment.
+- **[Master Circular for Stock Brokers SEBI/HO/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/POD-1/P/CIR/2024/118](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir2024118)** (9 August 2024) — paragraph 40.1.2 upfront value-at-risk plus extreme loss margin in the cash segment.
 - **Settlement and clearing** — NSE Clearing rules, report set and schedules. `[not yet in index]`
 - Depth: [T+0 and T+1 settlement](/broking-kyc/deep-dives/settlement/t0-t1-settlement/), [segment rules comparison](/broking-kyc/deep-dives/foundational/segment-rules-comparison/).
 
@@ -74,7 +74,7 @@ Implementations commonly treat 09:00 to 09:15 as the session starting early. It 
 | Securities pay-in | Delivery instruction; **early pay-in earns a margin benefit** |
 | Pay-out | **Direct pay-out to the client's demat account** |
 | Short delivery | Auction, then close-out; see [short delivery and auction](/broking-kyc/deep-dives/trading-day/short-delivery-auction/) |
-| Unpaid securities | **CUSPA auto-pledge at pay-out**; see [CUSPA](/broking-kyc/finix-broking-setup/backoffice/06-cuspa-unpaid-securities/) |
+| Unpaid securities | **<abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr> auto-pledge at pay-out**; see [CUSPA](/broking-kyc/finix-broking-setup/backoffice/06-cuspa-unpaid-securities/) |
 
 ## 5. Margin
 
@@ -110,8 +110,8 @@ Detail at [margin engine](/broking-kyc/finix-broking-setup/rms/02-margin-engine/
 | **Auction market** | Settling short deliveries | **Operations, not a client order type** |
 | Odd lot | Below regular lot | Separate market |
 | Negotiated trades | Counterparty-identified | **Day orders only** |
-| Securities lending and borrowing | Lending and borrowing | Its own protocol; see [SLBM](/broking-kyc/deep-dives/settlement/slbm/) |
-| Public issues and offers | Applications | See [IPO and OFS broker side](/broking-kyc/deep-dives/specialty/ipo-ofs-broker-side/) |
+| Securities lending and borrowing | Lending and borrowing | Its own protocol; see [<abbr title="Securities Lending and Borrowing Mechanism">SLBM</abbr>](/broking-kyc/deep-dives/settlement/slbm/) |
+| Public issues and offers | Applications | See [<abbr title="Initial Public Offering">IPO</abbr> and <abbr title="Offer for Sale (through stock exchange)">OFS</abbr> broker side](/broking-kyc/deep-dives/specialty/ipo-ofs-broker-side/) |
 
 ## 8. Operational nuances
 
@@ -138,7 +138,7 @@ Full reference at [file formats and downloads](/broking-kyc/finix-broking-setup/
 
 | File | When | Consumer |
 |---|---|---|
-| Instrument master, lot and tick | Pre-open | OMS, RMS, back office |
+| Instrument master, lot and tick | Pre-open | <abbr title="Order Management System">OMS</abbr>, <abbr title="Risk Management System">RMS</abbr>, back office |
 | Price bands | Pre-open plus intraday revisions | OMS, RMS |
 | Surveillance measure lists | Pre-open and periodic | RMS |
 | Value-at-risk and extreme loss margin rates | Daily | RMS |

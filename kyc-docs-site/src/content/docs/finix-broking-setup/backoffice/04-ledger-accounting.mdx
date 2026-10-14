@@ -27,11 +27,11 @@ The third idea is that timing rules are a client-facing policy, not an implement
 
 ## 1. Framework
 
-- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — regulation 18(2)(c) strict segregation of client money and securities from the broker's own account and from any other client's account; regulation 20(d) prohibition on accepting cash from clients; regulation 16 records retained for not less than eight years. `[not yet in index]`
-- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — client funds, running account settlement, permitted uses, books and records.
-- **Upstreaming framework** — the USCNB and DSCNB account structure, end-of-day upstreaming of clients' clear credit balances in cash, lien on fixed deposit receipts, or pledge of mutual fund overnight scheme units. See [bank account architecture](/broking-kyc/finix-broking-setup/setup/06-bank-account-architecture/) and [client funds upstreaming](/broking-kyc/deep-dives/settlement/client-funds-upstreaming/). `[not yet in index]`
+- **[<abbr title="Securities and Exchange Board of India">SEBI</abbr> (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — regulation 18(2)(c) strict segregation of client money and securities from the broker's own account and from any other client's account; regulation 20(d) prohibition on accepting cash from clients; regulation 16 records retained for not less than eight years. `[not yet in index]`
+- **[Master Circular for Stock Brokers SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — client funds, running account settlement, permitted uses, books and records.
+- **Upstreaming framework** — the <abbr title="Upstreaming Client Nodal Bank Account">USCNB</abbr> and <abbr title="Downstreaming Client Nodal Bank Account">DSCNB</abbr> account structure, end-of-day upstreaming of clients' clear credit balances in cash, lien on fixed deposit receipts, or pledge of mutual fund overnight scheme units. See [bank account architecture](/broking-kyc/finix-broking-setup/setup/06-bank-account-architecture/) and [client funds upstreaming](/broking-kyc/deep-dives/settlement/client-funds-upstreaming/). `[not yet in index]`
 - **Running account settlement** — see [running account settlement fields](/broking-kyc/reference/field-atlas/sections/ac-running-account-settlement/).
-- **[Client unpaid securities, HO/38/11/(9)2026-MIRSD-POD/I/15382/2026](/broking-kyc/reference/circulars/sebi-mirsd/#ho381192026-mirsd-podi153822026)** (3 July 2026) — the CUSPA regime, whose daily maximum pledge value is computed from the client ledger balance and margin obligations.
+- **[Client unpaid securities, HO/38/11/(9)2026-MIRSD-POD/I/15382/2026](/broking-kyc/reference/circulars/sebi-mirsd/#ho381192026-mirsd-podi153822026)** (3 July 2026) — the <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr> regime, whose daily maximum pledge value is computed from the client ledger balance and margin obligations.
 - **Companies Act, 2013 and applicable accounting standards** — for the firm's own books.
 
 ## 2. Account structure
@@ -107,7 +107,7 @@ The row that causes the most trouble is "authorised". A client who has completed
 | Computation | The retainable amount per the applicable rules, with the balance returned |
 | Communication | A statement of the settlement, explaining the computation |
 | Exceptions | Clients with open positions and margin obligations retain what is required |
-| **Capital effect** | Money returned is not retained, and retained client cash drives NSE's variable net worth requirement — see [entity and capital structure](/broking-kyc/finix-broking-setup/setup/01-entity-capital-structure/#44-variable-net-worth) |
+| **Capital effect** | Money returned is not retained, and retained client cash drives <abbr title="National Stock Exchange of India">NSE</abbr>'s variable net worth requirement — see [entity and capital structure](/broking-kyc/finix-broking-setup/setup/01-entity-capital-structure/#44-variable-net-worth) |
 | Evidence | The computation, the transfer and the communication retained |
 | Failure | A missed settlement cycle is a client-facing and regulatory issue, not an operational slip |
 

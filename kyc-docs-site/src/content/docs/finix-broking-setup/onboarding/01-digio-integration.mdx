@@ -10,11 +10,11 @@ import Diagram from '../../../../components/Diagram.astro';
 
 ## TL;DR
 
-- **Digio supplies the primitives; Finix owns the journey.** DigiKYC for identity verification, DigiSign for signature, eStamping for stamp duty, and eNACH and UPI AutoPay for mandates. The screens, the sequence and the conversion are the broker's.
-- **DigiSign offers both digital and electronic signatures** — Aadhaar eSign with OTP, biometric, iris and face-match authentication; USB digital signature certificate; document signer certificate; and stylus-based electronic signature. They are not evidentially equivalent, and the choice must be deliberate per document.
-- **eStamping covers DDPI and nomination document preview with digital stamp duty payment**, which removes a physical bottleneck from the two most paperwork-heavy artefacts in onboarding.
+- **Digio supplies the primitives; Finix owns the journey.** DigiKYC for identity verification, DigiSign for signature, eStamping for stamp duty, and eNACH and <abbr title="Unified Payments Interface">UPI</abbr> AutoPay for mandates. The screens, the sequence and the conversion are the broker's.
+- **DigiSign offers both digital and electronic signatures** — Aadhaar eSign with <abbr title="One-Time Password">OTP</abbr>, biometric, iris and face-match authentication; USB digital signature certificate; document signer certificate; and stylus-based electronic signature. They are not evidentially equivalent, and the choice must be deliberate per document.
+- **eStamping covers <abbr title="Demat Debit and Pledge Instruction">DDPI</abbr> and nomination document preview with digital stamp duty payment**, which removes a physical bottleneck from the two most paperwork-heavy artefacts in onboarding.
 - **The dangerous state is a signature that exists at Digio and not with the broker.** The account looks incomplete and is legally complete. Reconcile retrieved artefacts daily.
-- **Sandbox is not production.** Sandbox eSign does not produce a legally valid signature, and sandbox identity flows are simulated — test with synthetic identities only, never with a real PAN.
+- **Sandbox is not production.** Sandbox eSign does not produce a legally valid signature, and sandbox identity flows are simulated — test with synthetic identities only, never with a real <abbr title="Permanent Account Number">PAN</abbr>.
 - **Every call needs a client-facing failure branch.** A vendor outage mid-journey must save state and let the client resume, not discard captured data.
 - **Screening is explicitly out of scope for Digio at Finix** — it belongs to SecMark C-Safe, so that onboarding screening and ongoing rescreening share one list version and one disposition queue.
 
@@ -30,12 +30,12 @@ The third idea is that an interrupted journey is the normal case, not the except
 
 | Component | Capability | Finix use |
 |---|---|---|
-| **DigiKYC** | Aadhaar and PAN verification, OCR, face sync and match, DigiLocker, offline Aadhaar, Video KYC, CKYC and KRA connectivity | **Primary verification layer** |
+| **DigiKYC** | Aadhaar and PAN verification, <abbr title="Optical Character Recognition.">OCR</abbr>, face sync and match, DigiLocker, offline Aadhaar, Video <abbr title="Know Your Customer (process).">KYC</abbr>, <abbr title="Central KYC (records registry)">CKYC</abbr> and <abbr title="KYC Registration Agency">KRA</abbr> connectivity | **Primary verification layer** |
 | **DigiSign** | Aadhaar eSign with OTP, biometric, iris and face-match authentication; USB digital signature certificate; document signer certificate; stylus-based electronic signature | **Signature layer** |
 | **eStamping** | Digital stamp duty payment, including **DDPI and nomination document preview** | **Stamping layer** |
-| **Mandates** | eNACH and NACH eMandate, UPI AutoPay recurring payments | Stock SIP and recurring collection |
+| **Mandates** | eNACH and <abbr title="National Automated Clearing House">NACH</abbr> eMandate, UPI AutoPay recurring payments | Stock SIP and recurring collection |
 | Document management | Template-based document and agreement management; API, SDK and dashboard initiation | Agreement generation |
-| AML and CFT screening | Available | **Not used** — screening is SecMark C-Safe; see the [vendor map decision](/broking-kyc/finix-broking-setup/stack/vendor-map/#33-screening-secmark-c-safe-or-digio-aml) |
+| <abbr title="Anti-Money Laundering">AML</abbr> and <abbr title="Combating the Financing of Terrorism">CFT</abbr> screening | Available | **Not used** — screening is SecMark C-Safe; see the [vendor map decision](/broking-kyc/finix-broking-setup/stack/vendor-map/#33-screening-secmark-c-safe-or-digio-aml) |
 
 <Diagram src="/diagrams/finix-06-onboarding-pipeline.svg" label="The Finix onboarding pipeline — broker-owned journey, vendor and registry layer, and the four gates before a client can trade" />
 
@@ -128,7 +128,7 @@ A real PAN sent to a test endpoint can create a real record somewhere, which is 
 |---|---|
 | Products | eNACH and NACH eMandate; UPI AutoPay |
 | Use at Finix | Stock SIP instalments and any recurring collection |
-| AutoPay format | Per the NPCI mandate format referenced in [NPCI/UPI/OC No. 217/2025-26](/broking-kyc/reference/circulars/npci/#npciupioc-no-2172025-26) |
+| AutoPay format | Per the <abbr title="National Payments Corporation of India">NPCI</abbr> mandate format referenced in [NPCI/UPI/OC No. 217/2025-26](/broking-kyc/reference/circulars/npci/#npciupioc-no-2172025-26) |
 | Reconciliation | Mandates created at the vendor against mandates recorded locally, daily |
 | Lifecycle | Creation, amendment, pause, cancellation — each a client-visible event |
 | Failure handling | A failed instalment is notified, retried per policy, and recorded; a silently skipped instalment is a complaint |
@@ -196,7 +196,7 @@ A real PAN sent to a test endpoint can create a real record somewhere, which is 
 
 - [User journey](/broking-kyc/journey/) — the screens these primitives serve
 - [Field atlas](/broking-kyc/reference/field-atlas/) — the fields captured
-- [CVL KRA integration](/broking-kyc/finix-broking-setup/onboarding/02-kra-cvl-integration/) and [CKYCRR 2.0](/broking-kyc/finix-broking-setup/onboarding/03-ckyc-ckycrr2-integration/) — the registry legs
+- [CVL KRA integration](/broking-kyc/finix-broking-setup/onboarding/02-kra-cvl-integration/) and [<abbr title="Central KYC Records Registry">CKYCRR</abbr> 2.0](/broking-kyc/finix-broking-setup/onboarding/03-ckyc-ckycrr2-integration/) — the registry legs
 - [eSign, DDPI and pledge setup](/broking-kyc/finix-broking-setup/onboarding/06-esign-ddpi-pledge-setup/) — the authority artefacts
 - [Integration contract matrix](/broking-kyc/finix-broking-setup/stack/integration-contract-matrix/#4-onboarding-path) — the interface contracts
 - [Vendor map](/broking-kyc/finix-broking-setup/stack/vendor-map/) — the scope decisions

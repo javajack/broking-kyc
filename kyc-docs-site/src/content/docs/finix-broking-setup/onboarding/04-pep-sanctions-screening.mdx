@@ -9,13 +9,13 @@ import { Aside } from '@astrojs/starlight/components';
 
 ## TL;DR
 
-- **SecMark C-Safe is the system of record for screening at Finix**, covering more than fifty global and domestic lists including SEBI, UNSC, OFAC and politically exposed persons. Digio's own screening is deliberately not enabled, so that onboarding and ongoing screening share one list version and one disposition queue.
+- **SecMark C-Safe is the system of record for screening at Finix**, covering more than fifty global and domestic lists including <abbr title="Securities and Exchange Board of India">SEBI</abbr>, UNSC, OFAC and politically exposed persons. Digio's own screening is deliberately not enabled, so that onboarding and ongoing screening share one list version and one disposition queue.
 - **Screening is not an onboarding event.** It re-runs when a list changes, when a client's attributes change, periodically for the whole book, and on specified triggers. A firm that screens only at onboarding has a control that decays from the day it is applied.
 - **The list version used must be recorded with every result.** Without it, a past screening result is unprovable, and "we screened them in 2026" is an assertion rather than evidence.
 - **An unresolved hit blocks activation.** Never auto-clear; the disposition is a human decision by compliance, recorded with its reasoning.
-- **Screening output feeds risk classification**, which under CKYCRR 2.0 drives the **risk-tiered update schedule** and, under the firm's own policy, the depth of due diligence.
+- **Screening output feeds risk classification**, which under <abbr title="Central KYC Records Registry">CKYCRR</abbr> 2.0 drives the **risk-tiered update schedule** and, under the firm's own policy, the depth of due diligence.
 - **Chapter IV of the [2026 regulations](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/) adds a mule-account detection duty at regulation 23(8)** that screening does not satisfy — it is behavioural and lives in [surveillance](/broking-kyc/finix-broking-setup/rms/07-intraday-surveillance/).
-- **AML Sutra carries transaction monitoring and suspicious transaction reporting in FINnet 2.0 format**, filed by the principal officer, with no tipping off.
+- **<abbr title="Anti-Money Laundering">AML</abbr> Sutra carries transaction monitoring and suspicious transaction reporting in FINnet 2.0 format**, filed by the principal officer, with no tipping off.
 
 ## Conceptual overview
 
@@ -27,13 +27,13 @@ The third idea is scope. Screening proves that a client is not on a list. It doe
 
 ## 1. Framework
 
-- **Prevention of Money Laundering Act, 2002, the rules, and the SEBI anti-money-laundering master circular** — the obligations to identify clients, screen against prescribed lists, classify risk, apply enhanced due diligence, monitor transactions and report. See the [FIU-IND circulars index](/broking-kyc/reference/circulars/fiu-ind/).
+- **Prevention of Money Laundering Act, 2002, the rules, and the SEBI anti-money-laundering master circular** — the obligations to identify clients, screen against prescribed lists, classify risk, apply enhanced due diligence, monitor transactions and report. See the [<abbr title="Financial Intelligence Unit — India">FIU-IND</abbr> circulars index](/broking-kyc/reference/circulars/fiu-ind/).
 - **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — Chapter IV fraud prevention and detection, with **regulation 23(8) mule-account detection** and **regulation 25 whistle-blower policy**. `[not yet in index]`
-- **[SEBI/HO/MIRSD/FATF/P/CIR/2023/0144](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdfatfpcir20230144)** — Financial Action Task Force related obligations.
+- **[SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/<abbr title="Financial Action Task Force">FATF</abbr>/P/CIR/2023/0144](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdfatfpcir20230144)** — Financial Action Task Force related obligations.
 - **United Nations Security Council sanctions lists** and the designated-persons framework; **domestic debarred and prohibited lists** published by SEBI and the exchanges.
 - **Politically exposed persons** — identification and the enhanced due diligence that follows.
 - **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025).
-- **Stack**: SecMark **C-Safe** for screening across more than fifty global and domestic lists including SEBI, UNSC, OFAC and PEP; **AML Sutra** for transaction monitoring and suspicious transaction reporting in **FINnet 2.0** format; **ComplianceSutra** for workflow and evidence.
+- **Stack**: SecMark **C-Safe** for screening across more than fifty global and domestic lists including SEBI, UNSC, OFAC and <abbr title="Politically Exposed Person">PEP</abbr>; **AML Sutra** for transaction monitoring and suspicious transaction reporting in **FINnet 2.0** format; **ComplianceSutra** for workflow and evidence.
 - Field-level reference: [PEP and AML fields](/broking-kyc/reference/field-atlas/sections/k-pep-aml/).
 
 ## 2. The list inventory
@@ -142,7 +142,7 @@ Screening at onboarding alone is a control that decays from day one.
 | [Intraday surveillance](/broking-kyc/finix-broking-setup/rms/07-intraday-surveillance/) | Transaction monitoring, and the **regulation 23(8) mule-account rules that screening does not cover** |
 | [Regulatory reporting](/broking-kyc/finix-broking-setup/backoffice/09-regulatory-reporting/) | Suspicious transaction reports in FINnet 2.0 by the principal officer |
 | [CKYCRR 2.0](/broking-kyc/finix-broking-setup/onboarding/03-ckyc-ckycrr2-integration/) | Risk category drives the update tier |
-| [Re-KYC](/broking-kyc/lifecycle/re-kyc/) | Periodicity and depth |
+| [Re-<abbr title="Know Your Customer (process).">KYC</abbr>](/broking-kyc/lifecycle/re-kyc/) | Periodicity and depth |
 | [Pay-in rails](/broking-kyc/finix-broking-setup/money/02-payin-rails/) | Third-party funding as a mule indicator |
 | [Compliance configuration baseline](/broking-kyc/finix-broking-setup/compliance/01-compliance-config-baseline/) | The obligation register |
 
@@ -212,5 +212,5 @@ Stating these boundaries explicitly is itself useful: an inspection that asks ho
 - [Pre-trade check ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/) — where the block is enforced
 - [Regulatory reporting](/broking-kyc/finix-broking-setup/backoffice/09-regulatory-reporting/) — the suspicious transaction path
 - [PEP and AML fields](/broking-kyc/reference/field-atlas/sections/k-pep-aml/) — field-level reference
-- [FIU-IND circulars index](/broking-kyc/reference/circulars/fiu-ind/) — the source documents
+- [<abbr title="Financial Intelligence Unit">FIU</abbr>-IND circulars index](/broking-kyc/reference/circulars/fiu-ind/) — the source documents
 - [SEBI registration under the 2026 regulations](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/#4-chapter-iv-in-implementation-terms) — Chapter IV

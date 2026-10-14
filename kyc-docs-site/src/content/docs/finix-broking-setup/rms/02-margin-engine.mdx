@@ -10,7 +10,7 @@ import { Aside } from '@astrojs/starlight/components';
 ## TL;DR
 
 - **Upfront means before the trade, in cash as well as derivatives.** Trading and clearing members must mandatorily collect upfront value-at-risk margin plus extreme loss margin from clients in the cash segment, per paragraph 40.1.2 of the [Master Circular](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir2024118).
-- **Margins other than upfront are now due by settlement day**, not T+2. SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/57 (28 April 2025) rewrote the collection window to align with the T+1 cycle, forwarded as NSE/INSP/67739 (29 April 2025). `[not yet in index]`
+- **Margins other than upfront are now due by settlement day**, not <abbr title="Trade-date Plus N settlement">T+2</abbr>. <abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/57 (28 April 2025) rewrote the collection window to align with the <abbr title="Trade-date Plus N settlement">T+1</abbr> cycle, forwarded as <abbr title="National Stock Exchange of India">NSE</abbr>/INSP/67739 (29 April 2025). `[not yet in index]`
 - **Derivatives upfront margin is span-based initial margin plus extreme loss margin**, with additional layers added contextually — delivery, tender, special, surveillance and event-driven.
 - **The clearing corporation computes the authoritative number**; the firm consumes the risk parameter file and computes per-client margin in real time from it. The firm's exposure is the gap between the two.
 - **Verification uses at least four random intraday snapshots** inside pre-defined windows — 11:00 to 11:30, 12:30 to 13:00, 13:30 to 14:00 and 14:30 to 15:00 — and the peak-margin requirement for the day is the maximum across them.
@@ -32,11 +32,11 @@ The third idea is that precision has a cost and the regulation offers an explici
 - **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — the consolidated current master circular.
 - **SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/57** (28 April 2025) — margins other than upfront due by settlement day rather than T+2, aligning collection with the T+1 cycle; rewrote paragraphs 39.1.2, 39.1.3 and 39.1.5. Forwarded as NSE/INSP/67739 (29 April 2025). `[not yet in index]`
 - **[SEBI/HO/MRD2/DCAP/CIR/P/2020/127](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2dcapcirp2020127)** (20 July 2020) — the peak-margin framework and the minimum four random client-wise snapshots per segment per day.
-- **[NCL/CMPT/45516](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt45516)** and **[NCL/CMPL/44977](/broking-kyc/reference/circulars/clearing-corps/#nclcmpl44977)** — the snapshot windows.
+- **[<abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr>/CMPT/45516](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt45516)** and **[NCL/CMPL/44977](/broking-kyc/reference/circulars/clearing-corps/#nclcmpl44977)** — the snapshot windows.
 - **CIR/DNPD/7/2011** (10 August 2011) — the penalty slabs still adopted by reference. `[not yet in index]`
 - **[SEBI/HO/MRD2_DCAP/CIR/2021/0598](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2_dcapcir20210598)** (20 July 2021) — segregation and monitoring of collateral at client level, including the cash-equivalent minimum at clearing-member level.
 - **[NCL/CMPT/62978](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt62978)** (18 July 2024) — cross-margin for offsetting positions with different expiry dates.
-- Full treatment: [RMS SPAN methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/) and [margin shortfall and peak margin](/broking-kyc/trading-risk/margin-shortfall-peak-margin/).
+- Full treatment: [<abbr title="Risk Management System">RMS</abbr> <abbr title="Standard Portfolio Analysis of Risk">SPAN</abbr> methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/) and [margin shortfall and peak margin](/broking-kyc/trading-risk/margin-shortfall-peak-margin/).
 
 ## 2. What is computed, per segment
 
@@ -52,7 +52,7 @@ The third idea is that precision has a cost and the regulation offers an explici
 | Mark-to-market and other non-upfront margins | **By settlement day**, aligned with the T+1 cycle, following the April 2025 revision |
 
 <Aside type="caution" title="The commodity delivery ladder catches firms out">
-Commodity delivery margins are large and they start early. The delivery period margin is the higher of 3 percent plus a five-day 99 percent value-at-risk of spot price volatility, or 25 percent — an order of magnitude above ordinary initial margin — and an incremental 8.34 percent applies across the last three trading days including expiry. A client holding a position into the tender period experiences a step change in requirement that they will not have anticipated unless told. Build the client communication to fire several sessions before the ladder starts, not when the margin call lands. See [MCX commodity](/broking-kyc/finix-broking-setup/exchanges/04-mcx-commodity/).
+Commodity delivery margins are large and they start early. The delivery period margin is the higher of 3 percent plus a five-day 99 percent value-at-risk of spot price volatility, or 25 percent — an order of magnitude above ordinary initial margin — and an incremental 8.34 percent applies across the last three trading days including expiry. A client holding a position into the tender period experiences a step change in requirement that they will not have anticipated unless told. Build the client communication to fire several sessions before the ladder starts, not when the margin call lands. See [<abbr title="Multi Commodity Exchange of India">MCX</abbr> commodity](/broking-kyc/finix-broking-setup/exchanges/04-mcx-commodity/).
 </Aside>
 
 ## 3. Ingestion contracts

@@ -11,7 +11,7 @@ import { Aside } from '@astrojs/starlight/components';
 
 - **Four columns answer almost every inspection question**: obligation, configuration that implements it, system that evidences it, person who owns it.
 - **Classification is the part that is easiest to get wrong and fastest to be noticed.** Regulatory values need a circular; exchange-set values need an ingestion job with a staleness behaviour; discretionary values need an approved policy and an approver.
-- **Five values are statutory absolutes** with no discretion: the eight-year retention floor, the 24-hour contract-note window, the five-trading-day CUSPA cap, the 21-calendar-day complaint clock, and the prohibition on cash from clients.
+- **Five values are statutory absolutes** with no discretion: the eight-year retention floor, the 24-hour contract-note window, the five-trading-day <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr> cap, the 21-calendar-day complaint clock, and the prohibition on cash from clients.
 - **Seven values must mirror the client-facing risk management policy** exactly, because operating outside a disclosed mandate is the finding an arbitrator reaches first.
 - **Eleven registers carry the evidence**, and each has an owner and a retention period.
 - **The daily assertions are the heartbeat**: segregation, upstreaming computed versus confirmed, the begin-of-day gates and the extract that unblocks tomorrow.
@@ -27,7 +27,7 @@ import { Aside } from '@astrojs/starlight/components';
 
 | Common misclassification | Reality |
 |---|---|
-| "SEBI allows 5x leverage" | The **multiplier is discretionary**, bounded by margin rules |
+| "<abbr title="Securities and Exchange Board of India">SEBI</abbr> allows 5x leverage" | The **multiplier is discretionary**, bounded by margin rules |
 | "We keep records for seven years" | **Eight years is a statutory floor** under regulation 16 |
 | "Complaint resolution in 21 working days" | **21 calendar days** under regulation 10(e) |
 | "We allow 50 percent cash because SEBI requires it" | The cash-equivalent minimum binds the **clearing member**, not each client |
@@ -47,13 +47,13 @@ An inspector asking "under what authority do you apply this limit" and receiving
 |---|---|---|---|---|
 | Client money segregated from own and from other clients | **Reg 18(2)(c)** | `finix.bo.ledger.inter_client_posting` = impossible; `finix.bo.ledger.prop_separation` = hard; account map | SecMark ledger; **daily segregation assertion** | Finance |
 | Cash from clients prohibited | **Reg 20(d)** | `finix.bo.ledger.cash_head` = absent; `finix.money.payin.cash_mode` = no code path | Ledger structure; payment configuration | Finance |
-| Collection into the prescribed nodal account | Upstreaming framework | `finix.money.payin.settlement_account` = A1 USCNB | Bank statement header; daily account assertion | Treasury |
+| Collection into the prescribed nodal account | Upstreaming framework | `finix.money.payin.settlement_account` = A1 <abbr title="Upstreaming Client Nodal Bank Account">USCNB</abbr> | Bank statement header; daily account assertion | Treasury |
 | Pay-out from the prescribed account, same-day funded | Upstreaming framework | `finix.money.payout.source_account` = A2; `same_day_funding_required` = true | Bank and payout records | Treasury |
 | End-of-day upstreaming in permitted forms | Upstreaming framework | `finix.money.upstream.schedule`, `forms_enabled` | **Computed-versus-confirmed assertion** | Treasury |
 | Third-party payments prohibited | Master circular | `finix.money.payin.third_party_block` = hard | Payer-attribution records | Treasury |
 | Client-level collateral allocation and reporting | **CIR/2021/0598** | `finix.rms.collateral.*` | Allocation files; three-way reconciliation | Operations |
 | Pledge, not transfer, for client collateral | **CIR/P/2020/28** | `finix.rms.collateral.recognise_on` = confirmed pledge | Depository records | Operations |
-| Unpaid securities under CUSPA | **HO/38/11/(9)2026-MIRSD-POD/I/15382/2026** | `finix.bo.cuspa.*` | Pledge confirmations; day-five and day-six tracking | Operations |
+| Unpaid securities under CUSPA | **<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/38/11/(9)2026-<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>-POD/I/15382/2026** | `finix.bo.cuspa.*` | Pledge confirmations; day-five and day-six tracking | Operations |
 
 ### 2.2 Risk and margin
 
@@ -62,7 +62,7 @@ An inspector asking "under what authority do you apply this limit" and receiving
 | Upfront margin collection | Master circular para 40.1.2 | `finix.rms.margin.basis` | Margin computation records | Risk |
 | Margin sufficient continuously | Peak-margin framework | Snapshot handling; `finix.rms.margin.mtm_frequency` | Snapshot reconciliation | Risk |
 | Margin reporting within the cut-off | Exchange | `finix.rms.report.margin_cutoff_days`, `internal_target_days` | Submissions and **acknowledgements** | Risk |
-| Pre-trade controls | Chapter III; exchange | The [check ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/) | Decision records with inputs | Risk |
+| Pre-trade controls | Chapter <abbr title="—">III</abbr>; exchange | The [check ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/) | Decision records with inputs | Risk |
 | No order reaches the market unevaluated | Architecture | `finix.oms.risk.timeout_action` = reject; single release point | Architectural proof plus a standing test | Technology and risk |
 | Position and open-interest limits | Exchange | `finix.rms.limits.oi_limit_source` | Monitoring records | Risk |
 | Ban-period restriction on fresh positions only | Exchange | `finix.exch.ban.fresh_only` = true | Rejection and acceptance records | Risk |
@@ -75,7 +75,7 @@ An inspector asking "under what authority do you apply this limit" and receiving
 | **Records retained not less than eight years** | **Reg 16** | `finix.cmp.retention.books_years` = 8; scope = all classes | Retention configuration; **annual retrieval drill** | Compliance and technology |
 | Contract notes within 24 hours, digitally signed | Exchange format circulars | `finix.bo.cn.deadline_hours` = 24; signing certificate | Generation and dispatch evidence | Operations |
 | **Complaints redressed within 21 calendar days** | **Reg 10(e)** | `finix.cmp.complaint.clock_days` = 21; `clock_basis` = calendar | Complaint register | Compliance |
-| Continuous SCORES and ODR enrolment | **Reg 18(6)** | Enrolment monitored | Enrolment status | Compliance |
+| Continuous <abbr title="SEBI Complaints Redress System">SCORES</abbr> and <abbr title="Online Dispute Resolution">ODR</abbr> enrolment | **Reg 18(6)** | Enrolment monitored | Enrolment status | Compliance |
 | Monthly complaint disclosure | Master circular | Publication job | Published page | Compliance |
 | Statements at prescribed frequency and channel | Master circular | `finix.bo.stmt.frequency`, `channel` | Dispatch evidence | Operations |
 | **Investor awareness messages displayed** | **1 Oct 2026 circular** | `finix.cmp.awareness_messages.display`, `version_history` | Screenshot plus version record | Compliance and product |
@@ -90,14 +90,14 @@ An inspector asking "under what authority do you apply this limit" and receiving
 | Escalation path | Chapter IV | Workflow configuration | Case records with timestamps | Compliance |
 | Board accountability | Chapter IV | Board pack frequency | **Minutes** | Compliance and board |
 | **Whistle-blower policy and confidential channel** | **Reg 25** | Channel configuration, access-restricted | Policy; case records; annual test | Board and compliance |
-| Screening against prescribed lists | AML framework | `finix.onb.screen.*`, **list version recorded** | Screening results with list versions | Compliance |
-| Suspicious transaction reporting | PMLA framework | `finix.bo.rpt.str_*` | Filings; **and decisions not to file** | Principal officer |
+| Screening against prescribed lists | <abbr title="Anti-Money Laundering">AML</abbr> framework | `finix.onb.screen.*`, **list version recorded** | Screening results with list versions | Compliance |
+| Suspicious transaction reporting | <abbr title="Prevention of Money Laundering Act 2002">PMLA</abbr> framework | `finix.bo.rpt.str_*` | Filings; **and decisions not to file** | Principal officer |
 
 ### 2.5 Governance and registration
 
 | Obligation | Source | Configuration | System and evidence | Owner |
 |---|---|---|---|---|
-| **Designated director resident ≥182 days per financial year** | Chapter II | Monitored as a compliance object | Residency tracking | Compliance |
+| **Designated director resident ≥182 days per financial year** | Chapter <abbr title="—">II</abbr> | Monitored as a compliance object | Residency tracking | Compliance |
 | Two years' securities experience | Chapter II | Documented at application | Evidence file | Compliance |
 | Net worth maintained | Chapter X | Monthly monitor with deductions | Computation; **half-yearly certificate** | Finance |
 | Fit and proper, continuing | Fit-and-proper criteria | Declarations and diligence | Register | Compliance |
@@ -162,7 +162,7 @@ Day-one artefacts, each approved, owned and reviewed.
 | Inspection readiness pack | Chapter V | Compliance |
 | Orderly wind-down outline | Reg 19, forward-looking | Board |
 | Running account settlement policy | Master circular | Operations |
-| Authorised person policy | AP framework | Compliance |
+| Authorised person policy | <abbr title="Authorized Person">AP</abbr> framework | Compliance |
 
 ## 6. The registers
 
@@ -187,7 +187,7 @@ Day-one artefacts, each approved, owned and reviewed.
 | **Daily** | **Segregation**: client ledger total equals client money held plus upstreamed | Finance | **Yes, severity one** |
 | **Daily** | **Upstreaming computed equals confirmed** | Treasury | **Yes** |
 | Daily | Begin-of-day gates G1 to G6 | Operations | Yes, scoped |
-| Daily | Extract to RMS produced with today's as-of | Operations | Yes |
+| Daily | Extract to <abbr title="Risk Management System">RMS</abbr> produced with today's as-of | Operations | Yes |
 | Daily | Trading enabled only where registered and status permits | Operations | Yes |
 | Daily | Certification valid on every active identifier | Compliance | Yes |
 | Daily | No client activated without a registry record | Operations | **Yes** |
@@ -226,7 +226,7 @@ Day-one artefacts, each approved, owned and reviewed.
 ## Where this connects
 
 - [SEBI registration under the 2026 regulations](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/) — the obligations behind most of this map
-- [OMS](/broking-kyc/finix-broking-setup/oms/10-oms-config-reference/), [RMS](/broking-kyc/finix-broking-setup/rms/09-rms-config-reference/) and [back office](/broking-kyc/finix-broking-setup/backoffice/10-backoffice-config-reference/) configuration references — the values themselves
+- [<abbr title="Order Management System">OMS</abbr>](/broking-kyc/finix-broking-setup/oms/10-oms-config-reference/), [RMS](/broking-kyc/finix-broking-setup/rms/09-rms-config-reference/) and [back office](/broking-kyc/finix-broking-setup/backoffice/10-backoffice-config-reference/) configuration references — the values themselves
 - [Environments and configuration baseline](/broking-kyc/finix-broking-setup/stack/environments-config-baseline/) — classification and change control
 - [Periodic calendar](/broking-kyc/finix-broking-setup/daily-ops/09-periodic-calendar/) — the operational calendar
 - [Inspection readiness](/broking-kyc/finix-broking-setup/compliance/03-inspection-readiness/) — where this map is produced

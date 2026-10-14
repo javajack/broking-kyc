@@ -10,7 +10,7 @@ import { Aside } from '@astrojs/starlight/components';
 ## TL;DR
 
 - **The exchange trade file is the source of truth.** The order management system's real-time feed is fast and useful; the file is authoritative. Where they differ, the file governs and the difference is investigated — never reconciled away.
-- **Reconcile three ways**: exchange file, Saral OMS trade feed, back-office import. Two-way reconciliation between the file and the back office tells you the import worked; it does not tell you whether the firm's real-time view of its own trading was right.
+- **Reconcile three ways**: exchange file, Saral <abbr title="Order Management System">OMS</abbr> trade feed, back-office import. Two-way reconciliation between the file and the back office tells you the import worked; it does not tell you whether the firm's real-time view of its own trading was right.
 - **A difference blocks contract notes.** This is correct and it is also the plane's tightest coupling, so difference handling must be fast, staffed and rehearsed.
 - **Every difference has a cause class**, and a classified difference resolves in minutes. The taxonomy in section 4 is the operational heart of this page.
 - **Trade modification and cancellation by the exchange are rare and consequential.** They change positions, obligations and — if the client has already been told — a communication the firm has to correct.
@@ -27,17 +27,17 @@ The third consideration is time pressure. The contract-note deadline runs from e
 
 ## 1. Framework
 
-- **Exchange and clearing corporation trade file specifications** — per exchange and segment, published and versioned. NSE Clearing downloads reports in comma-separated format to the member's Reports folder on the Extranet, covering trades, obligations, deliveries, auctions, corporate actions, settlements and shortages. `[not yet in index]`
-- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — books and records, contract-note and client-allocation obligations.
+- **Exchange and clearing corporation trade file specifications** — per exchange and segment, published and versioned. <abbr title="National Stock Exchange of India">NSE</abbr> Clearing downloads reports in comma-separated format to the member's Reports folder on the Extranet, covering trades, obligations, deliveries, auctions, corporate actions, settlements and shortages. `[not yet in index]`
+- **[Master Circular for Stock Brokers <abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — books and records, contract-note and client-allocation obligations.
 - **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — regulation 16 record retention of not less than eight years. `[not yet in index]`
 - **Client code modification norms** — exchange-capped and monitored; see [modification and cancellation](/broking-kyc/finix-broking-setup/oms/08-modify-cancel-rules/#7-modifying-another-persons-order).
-- **[ECN and investor servicing](/broking-kyc/deep-dives/member-compliance/ecn-investor-servicing/)** — the contract-note deadline this stage feeds.
+- **[<abbr title="Electronic Contract Note.">ECN</abbr> and investor servicing](/broking-kyc/deep-dives/member-compliance/ecn-investor-servicing/)** — the contract-note deadline this stage feeds.
 
 ## 2. Import
 
 | Step | Detail |
 |---|---|
-| Retrieval | From the exchange or clearing corporation extranet, per exchange and segment; the member's Reports folder on the NSE Clearing Extranet, and the equivalent channels at BSE and MCX |
+| Retrieval | From the exchange or clearing corporation extranet, per exchange and segment; the member's Reports folder on the NSE Clearing Extranet, and the equivalent channels at <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> and <abbr title="Multi Commodity Exchange of India">MCX</abbr> |
 | Expected-file checklist | A list of every file expected for the day, per exchange and segment, asserted; **a missing file is an incident, not an absence** |
 | Format validation | Against the current published specification, with the version recorded |
 | **Count assertion** | Record count against the file header or an independent source |
@@ -202,4 +202,4 @@ A trade the firm believes happened and the exchange does not confirm (D2) means 
 - [Settlement obligations](/broking-kyc/finix-broking-setup/backoffice/05-settlement-obligations/) — the other consumer
 - [Order return path](/broking-kyc/finix-broking-setup/oms/07-order-return-path/) — where the real-time feed comes from
 - [File formats and downloads](/broking-kyc/finix-broking-setup/exchanges/08-file-formats-downloads/) — the file reference
-- [EOD runbook](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/) — this stage as an operated step
+- [<abbr title="End Of Day">EOD</abbr> runbook](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/) — this stage as an operated step

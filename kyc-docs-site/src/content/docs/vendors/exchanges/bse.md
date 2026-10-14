@@ -100,7 +100,7 @@ Before diving into UCC registration, it helps to understand the trading system y
 
 | Mode | Protocol | Use Case | Latency | Notes |
 |------|----------|----------|---------|-------|
-| **ETI** (Enhanced Trading Interface) | TCP/IP, <abbr title="Financial Information eXchange protocol">FIX</abbr> V5.0 SP2 binary | High-frequency, low-latency DMA | Lowest (~microseconds) | Proprietary session layer |
+| **<abbr title="Enhanced Trading Interface">ETI</abbr>** (Enhanced Trading Interface) | TCP/IP, <abbr title="Financial Information eXchange protocol">FIX</abbr> V5.0 SP2 binary | High-frequency, low-latency DMA | Lowest (~microseconds) | Proprietary session layer |
 | **IML** (Intermediate Messaging Layer) | TCP/IP via `iml.ini` config | Standard broker connectivity | Low (~milliseconds) | Separate instance per segment |
 | **BOW** (BOLT Plus on Web) | HTTPS (browser) | Manual trading, small brokers | Higher | No software installation |
 | Leased Line | Dedicated circuit | Production primary | Fixed | BSE data center co-location |

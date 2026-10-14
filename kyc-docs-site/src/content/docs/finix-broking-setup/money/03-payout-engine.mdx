@@ -12,7 +12,7 @@ import { Aside } from '@astrojs/starlight/components';
 - **Pay-outs leave only from the Downstreaming Client Nodal Bank Account**, after funds are received from the clearing corporation or clearing member the **same day**.
 - **Authorise against clear, settled balance.** Not available margin, not unsettled sale proceeds, not an authorised but unconfirmed receipt.
 - **Idempotency is mandatory and is the firm's responsibility.** Every payout carries a firm-generated reference, and a retry without that reference creates a second payment.
-- **RazorpayX uses a contact → fund account → payout object model**, with webhook callbacks on every state change. Payouts go over UPI, IMPS, NEFT and RTGS to accounts at all Indian banks.
+- **RazorpayX uses a contact → fund account → payout object model**, with webhook callbacks on every state change. Payouts go over <abbr title="Unified Payments Interface">UPI</abbr>, <abbr title="Immediate Payment Service">IMPS</abbr>, <abbr title="National Electronic Funds Transfer">NEFT</abbr> and <abbr title="Real Time Gross Settlement">RTGS</abbr> to accounts at all Indian banks.
 - **Webhook ordering is not guaranteed.** A `processed` event can arrive before a `queued` event; terminal states must be accepted out of order and never regressed.
 - **A reversal can arrive after apparent success**, and must debit the client ledger again and be communicated.
 - **A bank-account change shortly before a large withdrawal is a classic fraud signature** and should trigger review before the payout, not after.
@@ -28,9 +28,9 @@ The third idea concerns the regulatory shape of the flow. Client pay-outs are ma
 
 ## 1. Framework
 
-- **Upstreaming and downstreaming framework** — payment to clients is made **only from the DSCNB account**, with the nomenclature "Name of the SB/CM – DSCNB account", **after receiving funds from the clearing corporation or clearing member the same day**. See [bank account architecture](/broking-kyc/finix-broking-setup/setup/06-bank-account-architecture/) and [client funds upstreaming](/broking-kyc/deep-dives/settlement/client-funds-upstreaming/). `[not yet in index]`
-- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — regulation 18(2)(c) segregation of client money from the firm's own and from other clients'. `[not yet in index]`
-- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — client funds, running account settlement and permitted uses.
+- **Upstreaming and downstreaming framework** — payment to clients is made **only from the <abbr title="Downstreaming Client Nodal Bank Account">DSCNB</abbr> account**, with the nomenclature "Name of the SB/<abbr title="Clearing Member">CM</abbr> – DSCNB account", **after receiving funds from the clearing corporation or clearing member the same day**. See [bank account architecture](/broking-kyc/finix-broking-setup/setup/06-bank-account-architecture/) and [client funds upstreaming](/broking-kyc/deep-dives/settlement/client-funds-upstreaming/). `[not yet in index]`
+- **[<abbr title="Securities and Exchange Board of India">SEBI</abbr> (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — regulation 18(2)(c) segregation of client money from the firm's own and from other clients'. `[not yet in index]`
+- **[Master Circular for Stock Brokers SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — client funds, running account settlement and permitted uses.
 - **Running account settlement** — the periodic return of client funds; see [running account settlement fields](/broking-kyc/reference/field-atlas/sections/ac-running-account-settlement/).
 - **RazorpayX Payouts** — contact, fund account and payout objects; UPI, IMPS, NEFT and RTGS to accounts at all Indian banks; dashboard and API initiation; bulk addition and queueing; webhook callback on every state change.
 
@@ -41,7 +41,7 @@ The third idea concerns the regulatory shape of the flow. Client pay-outs are ma
 | Client identity and status | Active, not frozen, not restricted |
 | **Clear settled balance** | Not available margin; not unsettled sale proceeds; not an authorised-but-unconfirmed receipt |
 | Open obligations | Margin requirements, settlement obligations and aged debits reduce what is withdrawable |
-| Unpaid securities | A client under the [CUSPA](/broking-kyc/finix-broking-setup/backoffice/06-cuspa-unpaid-securities/) regime has an outstanding obligation |
+| Unpaid securities | A client under the [<abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr>](/broking-kyc/finix-broking-setup/backoffice/06-cuspa-unpaid-securities/) regime has an outstanding obligation |
 | Policy limits | Any per-day or per-transaction limits the firm applies, disclosed |
 | **Destination verified** | The registered bank account, verified at onboarding or at change |
 | Bank-account change window | A recent change triggers review before release — see section 5 |

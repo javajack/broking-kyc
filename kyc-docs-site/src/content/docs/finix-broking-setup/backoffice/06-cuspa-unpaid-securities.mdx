@@ -9,9 +9,9 @@ import { Aside } from '@astrojs/starlight/components';
 
 ## TL;DR
 
-- **The circular is [HO/38/11/(9)2026-MIRSD-POD/I/15382/2026](/broking-kyc/reference/circulars/sebi-mirsd/#ho381192026-mirsd-podi153822026)**, dated **3 July 2026**, amending paragraph 46 of the Master Circular for Stock Brokers of 17 June 2025.
+- **The circular is [<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/38/11/(9)2026-<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>-POD/I/15382/2026](/broking-kyc/reference/circulars/sebi-mirsd/#ho381192026-mirsd-podi153822026)**, dated **3 July 2026**, amending paragraph 46 of the Master Circular for Stock Brokers of 17 June 2025.
 - **Trading members must establish a dedicated Client Unpaid Securities Pledgee Account** to hold auto-pledged unpaid securities.
-- **The pledge is created at pay-out, without client instruction**, in favour of the CUSPA, marked with the reason "unpaid", and the client is notified by email or SMS explaining the outstanding funds obligation and the member's right to sell the pledged securities on non-payment.
+- **The pledge is created at pay-out, without client instruction**, in favour of the <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr>, marked with the reason "unpaid", and the client is notified by email or <abbr title="Short Message Service.">SMS</abbr> explaining the outstanding funds obligation and the member's right to sell the pledged securities on non-payment.
 - **The maximum pledge value is recomputed daily** from the client's ledger balance and margin obligations, and **excess pledged securities are released on or before the next trading day**.
 - **The payment window is capped at five trading days from pay-out.** Beyond it the member invokes, blocks the securities in the client's demat, the depository verifies the block against client-level obligations, and the securities are **sold under the client's own unique client code**, with surplus credited to the client's ledger.
 - **An extension must be requested by 6 PM on the fifth trading day**, where liquidation is blocked by a lower circuit with only sellers, a suspension or trading halt, or another cause recognised by the market infrastructure institutions. The pledge may continue for up to **one additional calendar week**, renewable with fresh client communication.
@@ -32,7 +32,7 @@ The third observation is that the regime is protective in both directions. It gi
 |---|---|
 | Circular | **HO/38/11/(9)2026-MIRSD-POD/I/15382/2026** |
 | Date | **3 July 2026** |
-| Issued by | SEBI, Markets Intermediaries Regulation and Supervision Department |
+| Issued by | <abbr title="Securities and Exchange Board of India">SEBI</abbr>, Markets Intermediaries Regulation and Supervision Department |
 | Amends | **Paragraph 46** of the [Master Circular for Stock Brokers](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590) dated 17 June 2025 |
 | Account created | **Client Unpaid Securities Pledgee Account (CUSPA)**, dedicated, per trading member |
 | Effective, paragraphs 46.1 to 46.11 | **Three months from the issue of stock exchange operational guidelines** |
@@ -50,7 +50,7 @@ The circular sets the obligations; the exchange operational guidelines set the m
 | **T, pay-out date** | Securities credited to the client's demat account | Depository | Pay-out record |
 | **T, pay-out date** | **Auto-pledge created in favour of the CUSPA, without client instruction, reason "unpaid"** | SecMark instruction to the depository | Pledge confirmation |
 | **T, pay-out date** | **Client notified** by email or SMS, explaining the outstanding funds obligation and the member's right to sell the pledged securities on non-payment | SecMark, with dispatch evidence | Notice and delivery record |
-| **T+1 to T+4** | Client clears the funds obligation within the member's policy window | — | Ledger |
+| **<abbr title="Trade-date Plus N settlement">T+1</abbr> to T+4** | Client clears the funds obligation within the member's policy window | — | Ledger |
 | **Daily, T onward** | **Maximum pledge value recomputed** from the client's ledger balance and margin obligations | SecMark, from the ledger | Computation record |
 | **Daily, T onward** | **Excess pledged securities released on or before the next trading day** | SecMark instruction to the depository | Release confirmation |
 | **T+5, the fifth trading day** | The payment window ends — the maximum is five trading days from pay-out | — | — |
@@ -65,7 +65,7 @@ The circular sets the obligations; the exchange operational guidelines set the m
 | 1. Reasonable notice | The member invokes the pledge and gives the client reasonable notice |
 | 2. Block | Securities are blocked in the client's demat account |
 | 3. **Depository verification** | The depositories verify block details against client-level obligations |
-| 4. **Sale under the client's own unique client code** | The securities are sold using the client's UCC, not the member's |
+| 4. **Sale under the client's own unique client code** | The securities are sold using the client's <abbr title="Unique Client Code">UCC</abbr>, not the member's |
 | 5. Settlement | The sale settles in the ordinary way |
 | 6. **Surplus to the client** | Surplus funds after settlement are credited to the client's ledger |
 | 7. Shortfall | Where the sale does not cover the obligation, the residual debit remains the client's |
@@ -186,7 +186,7 @@ The 6 PM cut-off is a hard operational deadline on a specific day, which means i
 | `finix.bo.cuspa.excess_release_by` | **Next trading day** | Regulatory | Client securities over-encumbered |
 | `finix.bo.cuspa.payment_window_days` | **Maximum 5 trading days**; the firm's policy may be shorter | Regulatory cap | Breach if longer |
 | `finix.bo.cuspa.extension_cutoff` | **18:00 on the fifth trading day** | Regulatory | Extension option lost |
-| `finix.bo.cuspa.extension_reasons` | Lower circuit sellers-only; suspension or halt; other MII-recognised cause | Regulatory | Invalid extension request |
+| `finix.bo.cuspa.extension_reasons` | Lower circuit sellers-only; suspension or halt; other <abbr title="Market Infrastructure Institution">MII</abbr>-recognised cause | Regulatory | Invalid extension request |
 | `finix.bo.cuspa.extension_duration` | Up to one additional calendar week, renewable | Regulatory | Over-long pledge |
 | `finix.bo.cuspa.extension_requires_fresh_communication` | True | Regulatory | Client not informed |
 | `finix.bo.cuspa.sale_under_client_ucc` | **True** | Regulatory | Sale in the wrong name |

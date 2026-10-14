@@ -336,7 +336,7 @@ Updated AML/CFT Master Circular replacing the February 2023 master circular. Cov
 
 - **date_issued:** 2024-06-06
 - **issuer:** SEBI-MIRSD
-- **title:** "Uploading of KYC information by KYC Registration Agencies (KRAs) to Central KYC Records Registry (CKYCRR)"
+- **title:** "Uploading of KYC information by KYC Registration Agencies (KRAs) to Central KYC Records Registry (<abbr title="Central KYC Records Registry">CKYCRR</abbr>)"
 - **applies_to:** all-intermediaries
 - **in_force_date:** 2024-08-01
 - **status:** in-force
@@ -461,7 +461,7 @@ Consolidates the 31 July 2023 ODR circular and the 4 August 2023 amendment into 
 - **impact_areas:** upstreaming, client-funds, rms, settlement
 - **primary_url:** https://www.sebi.gov.in/legal/circulars/dec-2023/upstreaming-of-clients-funds-by-stock-brokers-sbs-clearing-members-cms-to-clearing-corporations-ccs-_80247.html
 
-Revised upstreaming framework following Industry Standards Forum representations. Operationalises Upstreaming Client Nodal Bank Account (USCNBA) and Downstreaming Client Nodal Bank Account (DSCNBA), allows MFOS pledge expansion, and lays out cash/FDR/MFOS upstreaming modalities while reaffirming the <abbr title="End Of Day">EOD</abbr> no-retention principle for client funds.
+Revised upstreaming framework following Industry Standards Forum representations. Operationalises Upstreaming Client Nodal Bank Account (USCNBA) and Downstreaming Client Nodal Bank Account (DSCNBA), allows <abbr title="Mutual Fund Overnight Scheme">MFOS</abbr> pledge expansion, and lays out cash/FDR/MFOS upstreaming modalities while reaffirming the <abbr title="End Of Day">EOD</abbr> no-retention principle for client funds.
 
 ### SEBI/HO/MIRSD/POD-1/P/CIR/2023/181
 

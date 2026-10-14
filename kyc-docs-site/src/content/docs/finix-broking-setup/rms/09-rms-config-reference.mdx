@@ -37,7 +37,7 @@ import { Aside } from '@astrojs/starlight/components';
 
 | Key | Finix default | Class | Mid-session | Failure mode |
 |---|---|---|---|---|
-| `finix.rms.margin.basis.<segment>` | Computed VaR plus ELM; span-based in derivatives | R | No | Wrong collection basis |
+| `finix.rms.margin.basis.<segment>` | Computed VaR plus <abbr title="Extreme Loss Margin">ELM</abbr>; span-based in derivatives | R | No | Wrong collection basis |
 | `finix.rms.margin.upfront_20pct_groups` | Empty; configurable per group | R option | No | Mixed bases in one report |
 | `finix.rms.margin.mtm_frequency` | Continuous, event-driven plus sweep | D | Yes | A book drifting from reality |
 | `finix.rms.margin.delivery_ladder_notice_days` | Several sessions ahead | D | Yes | Clients surprised by a step change |
@@ -191,7 +191,7 @@ Three of these — `warn_pct`, `trigger_pct` and `grace_minutes` — **must be i
 ## Where this connects
 
 - [Environments and configuration baseline](/broking-kyc/finix-broking-setup/stack/environments-config-baseline/) — the convention, classification and change control
-- [OMS configuration reference](/broking-kyc/finix-broking-setup/oms/10-oms-config-reference/) — the order-path tunables
+- [<abbr title="Order Management System">OMS</abbr> configuration reference](/broking-kyc/finix-broking-setup/oms/10-oms-config-reference/) — the order-path tunables
 - [Back office configuration reference](/broking-kyc/finix-broking-setup/backoffice/10-backoffice-config-reference/) — the record-side tunables
 - [Compliance configuration baseline](/broking-kyc/finix-broking-setup/compliance/01-compliance-config-baseline/) — the obligation-to-configuration map
 - [Square-off engine](/broking-kyc/finix-broking-setup/rms/06-squareoff-engine/) — the policy-mirror values in context

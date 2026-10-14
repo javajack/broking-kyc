@@ -14,7 +14,7 @@ import { Aside } from '@astrojs/starlight/components';
 - **One registration covers both roles** under regulation 3 of the 2026 regulations, so the paperwork is simpler than it used to be — but the net worth, deposits and operational obligations attached to the clearing role are unchanged.
 - **Clearing through someone else trades capital for dependency.** The clearing member sees the firm's entire position and collateral, sets its own risk limits on top of the clearing corporation's, can call for additional margin, and in the extreme can stop the firm trading. That is a commercial relationship with a kill switch in it.
 - **Self-clearing is an operational build, not just a capital commitment.** Collateral management, margin files, obligation processing, pay-in and pay-out instructions, delivery and auction handling, and a clearing bank relationship all become in-house functions with hard daily deadlines.
-- **NSE's ₹1 lakh interest-free security deposit to NSE Clearing is not required if a clearing or self-clearing member clears and settles only on a gross basis for both securities and funds with no settlement guarantee** — a narrow but real structural option.
+- **<abbr title="National Stock Exchange of India">NSE</abbr>'s ₹1 lakh interest-free security deposit to NSE Clearing is not required if a clearing or self-clearing member clears and settles only on a gross basis for both securities and funds with no settlement guarantee** — a narrow but real structural option.
 - **Finix adopts a hybrid**: self-clearing in equity and equity derivatives where the volume justifies the build, clearing through a clearing member in commodities at launch where delivery operations would otherwise be the longest pole. The hybrid is documented explicitly because it means two settlement operating models running side by side.
 
 ## Conceptual overview
@@ -27,12 +27,12 @@ The third consideration is time. Self-clearing adds a substantial workstream to 
 
 ## 1. Regulatory framework
 
-- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — regulation 3 single registration across stock broker and clearing member roles; Chapter X net worth and deposits for each tier. `[not yet in index]`
-- **Clearing corporation rules, bye-laws and regulations** — NSE Clearing, Indian Clearing Corporation for BSE, and MCX Clearing Corporation. These set the member obligations, margin regimes, settlement schedules, default procedures and report sets. `[not yet in index]`
-- **[Segregation and monitoring of collateral at client level, SEBI/HO/MRD2_DCAP/CIR/2021/0598](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2_dcapcir20210598)** (20 July 2021) — client-level collateral reporting, allocation and valuation, and the cash-equivalent minimum at clearing-member level in paragraph 18.
-- **[Margin obligations by way of pledge and re-pledge, SEBI/HO/MIRSD/DOP/CIR/P/2020/28](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddopcirp202028)** (25 February 2020) — the pledge chain from client to trading member to clearing member to clearing corporation.
+- **[<abbr title="Securities and Exchange Board of India">SEBI</abbr> (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — regulation 3 single registration across stock broker and clearing member roles; Chapter X net worth and deposits for each tier. `[not yet in index]`
+- **Clearing corporation rules, bye-laws and regulations** — NSE Clearing, Indian Clearing Corporation for <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr>, and <abbr title="Multi Commodity Exchange of India">MCX</abbr> Clearing Corporation. These set the member obligations, margin regimes, settlement schedules, default procedures and report sets. `[not yet in index]`
+- **[Segregation and monitoring of collateral at client level, SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/MRD2_DCAP/CIR/2021/0598](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2_dcapcir20210598)** (20 July 2021) — client-level collateral reporting, allocation and valuation, and the cash-equivalent minimum at clearing-member level in paragraph 18.
+- **[Margin obligations by way of pledge and re-pledge, SEBI/HO/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/DOP/CIR/P/2020/28](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddopcirp202028)** (25 February 2020) — the pledge chain from client to trading member to clearing member to clearing corporation.
 - **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025).
-- **Core settlement guarantee fund framework** — see [SGF and core SGF](/broking-kyc/deep-dives/foundational/sgf-core-sgf/) and [member default and recovery](/broking-kyc/deep-dives/foundational/member-default-recovery/).
+- **Core settlement guarantee fund framework** — see [<abbr title="Settlement Guarantee Fund">SGF</abbr> and core SGF](/broking-kyc/deep-dives/foundational/sgf-core-sgf/) and [member default and recovery](/broking-kyc/deep-dives/foundational/member-default-recovery/).
 
 ## 2. What the clearing function actually comprises
 
@@ -113,7 +113,7 @@ Not contemplated for Finix at launch.
 
 Score the decision on these axes rather than on cost alone.
 
-| Axis | Question | Favours clearing through a CM | Favours self-clearing |
+| Axis | Question | Favours clearing through a <abbr title="Clearing Member">CM</abbr> | Favours self-clearing |
 |---|---|---|---|
 | Capital | Is ₹5 crore of net worth available without starving working capital? | No | Yes |
 | Volume | Will clearing fees exceed the cost of the operation within the planning horizon? | Low volume | High volume |
@@ -143,7 +143,7 @@ Running two settlement operating models at once is the part that gets underestim
 |---|---|
 | Two file sets | Standard clearing corporation reports for equity; the clearing member's formats and timetable for commodities |
 | Two reconciliation processes | The back office must reconcile against two different authorities with different cut-offs |
-| Two margin truths in commodities | The clearing corporation's requirement and the clearing member's additional buffer, both of which must reach the RMS |
+| Two margin truths in commodities | The clearing corporation's requirement and the clearing member's additional buffer, both of which must reach the <abbr title="Risk Management System">RMS</abbr> |
 | Two collateral pools | Collateral posted to the clearing corporation directly, and collateral posted to the clearing member |
 | Client-level reporting in both | The client-level allocation and reporting obligation applies regardless of route |
 | Two default paths | Different procedures if a client defaults in equity versus commodities |

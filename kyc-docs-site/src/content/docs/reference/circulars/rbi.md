@@ -672,7 +672,7 @@ Mandates <abbr title="Legal Entity Identifier">LEI</abbr> for all <abbr title="R
 - **impact_areas:** onboarding, re-KYC, non-individual, reporting, file-format
 - **primary_url:** https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=12008&Mode=0
 
-Extends CKYCR coverage to Legal Entities, requiring REs to upload KYC for LE accounts opened on or after 01-Apr-2021. Customers with a CKYC identifier can authorise REs to fetch existing records via consent, removing duplicate document submission unless info has changed or EDD applies. Aligns RBI-side CKYC plumbing with SEBI KRA/CKYCRR pipelines used by brokers for non-individual onboarding.
+Extends CKYCR coverage to Legal Entities, requiring REs to upload KYC for LE accounts opened on or after 01-Apr-2021. Customers with a CKYC identifier can authorise REs to fetch existing records via consent, removing duplicate document submission unless info has changed or EDD applies. Aligns RBI-side CKYC plumbing with SEBI KRA/<abbr title="Central KYC Records Registry">CKYCRR</abbr> pipelines used by brokers for non-individual onboarding.
 
 ### RBI/2020-21/70
 

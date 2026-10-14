@@ -903,7 +903,7 @@ Full operational circular pursuant to SEBI/HO/MRD/TPD-1/P/CIR/2024/24 (April 23,
 - **impact_areas:** rms, settlement, file-format
 - **primary_url:** https://www.icclindia.com/Dynamicpages/DispNoticesNCirculars.aspx?page=20240710-11
 
-ICCL operationalisation of SEBI norms on collateral acceptance effective August 1, 2024. Eligible securities: equity shares with impact cost up to 0.1% for INR 1 Lakh orders and traded ≥ 99% of days over six months across BSE/NSE/<abbr title="Metropolitan Stock Exchange of India">MSEI</abbr>. Phased haircut on un-approved securities: 40% (or VaR, whichever higher) Aug; 60% Sep; 80% Oct; 100% Nov 2024. Mutual fund haircut: Overnight MFOS 5%; other schemes VaR based on 6σ with min 9% effective Aug 1, 2024. Members directed to replace unapproved collaterals promptly.
+ICCL operationalisation of SEBI norms on collateral acceptance effective August 1, 2024. Eligible securities: equity shares with impact cost up to 0.1% for INR 1 Lakh orders and traded ≥ 99% of days over six months across BSE/NSE/<abbr title="Metropolitan Stock Exchange of India">MSEI</abbr>. Phased haircut on un-approved securities: 40% (or VaR, whichever higher) Aug; 60% Sep; 80% Oct; 100% Nov 2024. Mutual fund haircut: Overnight <abbr title="Mutual Fund Overnight Scheme">MFOS</abbr> 5%; other schemes VaR based on 6σ with min 9% effective Aug 1, 2024. Members directed to replace unapproved collaterals promptly.
 
 ### ICCL 20240613-52
 

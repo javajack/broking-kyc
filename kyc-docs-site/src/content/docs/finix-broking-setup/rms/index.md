@@ -19,7 +19,7 @@ description: The risk plane on Saral MoneyMaker RMS — architecture and inputs,
 
 | # | Page | What it settles |
 |---|---|---|
-| 1 | [RMS architecture](/broking-kyc/finix-broking-setup/rms/01-rms-architecture/) | Components, inputs and their contracts, the decision record, failure behaviour |
+| 1 | [<abbr title="Risk Management System">RMS</abbr> architecture](/broking-kyc/finix-broking-setup/rms/01-rms-architecture/) | Components, inputs and their contracts, the decision record, failure behaviour |
 | 2 | [Margin engine](/broking-kyc/finix-broking-setup/rms/02-margin-engine/) | What is computed, from which file, how often, and how it is proved correct |
 | 3 | [Pre-trade check ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/) | Every check in order, with the regulatory, exchange and discretionary split |
 | 4 | [Limit framework](/broking-kyc/finix-broking-setup/rms/04-limit-framework/) | The hierarchy, resolution, authority, and intraday change rules |
@@ -31,8 +31,8 @@ description: The risk plane on Saral MoneyMaker RMS — architecture and inputs,
 
 ## Where this connects
 
-- [OMS](/broking-kyc/finix-broking-setup/oms/) — the path this plane gates
-- [RMS SPAN methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/) — the computation in depth
+- [<abbr title="Order Management System">OMS</abbr>](/broking-kyc/finix-broking-setup/oms/) — the path this plane gates
+- [RMS <abbr title="Standard Portfolio Analysis of Risk">SPAN</abbr> methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/) — the computation in depth
 - [Margin shortfall and peak margin](/broking-kyc/trading-risk/margin-shortfall-peak-margin/) — the member's collection and reporting obligation
 - [Collateral and cross-margin](/broking-kyc/trading-risk/collateral-cross-margin/) — eligibility, haircuts and offsets
 - [Order risk controls](/broking-kyc/trading-risk/order-risk-controls/) — the regulatory control set

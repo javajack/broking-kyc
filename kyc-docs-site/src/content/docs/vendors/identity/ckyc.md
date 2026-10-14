@@ -1162,7 +1162,7 @@ Total                       : Rs. 8-13
 | Document | Reference | Date |
 |----------|-----------|------|
 | SEBI KYC Master Circular | SEBI/HO/MIRSD/MIRSD-SEC-2/P/CIR/2023/168 | Oct 12, 2023 |
-| SEBI KRA Upload to CKYCRR | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/79 | Jun 6, 2024 |
+| SEBI KRA Upload to <abbr title="Central KYC Records Registry">CKYCRR</abbr> | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/79 | Jun 6, 2024 |
 | RBI Master Direction on KYC | RBI/2016-17/49 | Updated periodically |
 | PMLA Rules (UBO, CDD) | Prevention of Money Laundering Act, 2002 | Amended 2023 |
 

@@ -9,7 +9,7 @@ import { Aside } from '@astrojs/starlight/components';
 
 ## TL;DR
 
-- **One weekly index expiry per exchange, on a fixed day.** SEBI's circular of 26 May 2025 required exchanges to offer only one weekly benchmark index contract expiring on a **Tuesday or a Thursday**, with the choice to be submitted by 15 June 2025. From **1 September 2025, NSE's expiry day is Tuesday** and BSE's is Thursday. `[not yet in index]`
+- **One weekly index expiry per exchange, on a fixed day.** <abbr title="Securities and Exchange Board of India">SEBI</abbr>'s circular of 26 May 2025 required exchanges to offer only one weekly benchmark index contract expiring on a **Tuesday or a Thursday**, with the choice to be submitted by 15 June 2025. From **1 September 2025, <abbr title="National Stock Exchange of India">NSE</abbr>'s expiry day is Tuesday** and <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr>'s is Thursday. `[not yet in index]`
 - **Contract sizes rose in November 2024.** The minimum notional value of equity index derivatives contracts was raised to approximately **₹15 lakh**, implemented through revised lot sizes — Nifty 50 from 25 to 75, Bank Nifty from 15 to 30, Financial Services from 25 to 65, Midcap Select from 50 to 120.
 - **Limit Price Protection is a second price gate, introduced 31 October 2022**, over and above the operating price range, with **dynamic** ranges on both sides of a reference price. Published ranges: index and stock options with a reference price at or below ₹50, ±₹20 absolute, above ₹50, ±40 percent; index futures at or below ₹10,000, ±₹200 absolute, above ₹10,000, ±2 percent; stock futures at or below ₹50, ±₹1.50 absolute, above ₹50, ±3 percent.
 - **Stop-loss market orders were discontinued for index and stock options from 27 September 2021** per circular NSE/FAOP/49677, following freak-trade incidents.
@@ -28,11 +28,11 @@ Expiry days, lot sizes, Limit Price Protection ranges, ban-period thresholds and
 - **NSE Limit Price Protection** — introduced **31 October 2022** in the futures and options segment as an additional validation over and above the operating price range, based on both sides of a reference price, with dynamic ranges; incoming limit orders beyond the range are automatically rejected. `[not yet in index]`
 - **NSE/FAOP/49677** — discontinuation of stop-loss market orders for index and stock options with effect from **27 September 2021**. `[not yet in index]`
 - **Multileg orders** — those with a market price condition for all futures and option contracts discontinued; such market orders are rejected by the exchange. Limit-priced multileg orders remain available. Spread, two-leg and three-leg order entry rules and structures are defined in the segment protocol. `[not yet in index]`
-- **Physical settlement of single-stock derivatives** — mandated by SEBI/HO/MRD/DOPI/CIR/P/2018/161 (31 December 2018), phased across the April, July and October 2019 expiries. `[not yet in index]`
-- **Delivery margin staging** — NSE Clearing stages the computed delivery margin across the last sessions of expiry week per NCL/CMPT/43262 (17 January 2020). `[not yet in index]`
+- **Physical settlement of single-stock derivatives** — mandated by SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>/DOPI/CIR/P/2018/161 (31 December 2018), phased across the April, July and October 2019 expiries. `[not yet in index]`
+- **Delivery margin staging** — NSE Clearing stages the computed delivery margin across the last sessions of expiry week per <abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr>/CMPT/43262 (17 January 2020). `[not yet in index]`
 - **[NCL/CMPT/55330](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt55330)** (20 January 2023) as updated by **[NCL/CMPT/56167](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt56167)** (28 March 2023) — netting of derivatives delivery obligations against cash-segment obligations for the same clearing member, trading member and unique client code.
 - **[NCL/CMPT/62978](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt62978)** (18 July 2024) — cross-margin for offsetting positions with different expiry dates.
-- Depth: [exercise, assignment and physical settlement](/broking-kyc/trading-risk/exercise-assignment-physical/), [expiry day operations](/broking-kyc/trading-risk/expiry-day-operations/), [position limits and open interest](/broking-kyc/trading-risk/position-limits-oi/), [RMS SPAN methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/).
+- Depth: [exercise, assignment and physical settlement](/broking-kyc/trading-risk/exercise-assignment-physical/), [expiry day operations](/broking-kyc/trading-risk/expiry-day-operations/), [position limits and open interest](/broking-kyc/trading-risk/position-limits-oi/), [<abbr title="Risk Management System">RMS</abbr> <abbr title="Standard Portfolio Analysis of Risk">SPAN</abbr> methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/).
 
 ## 2. Contracts and expiry
 
@@ -96,7 +96,7 @@ Expiry days, lot sizes, Limit Price Protection ranges, ban-period thresholds and
 | Direction logic | Determining whether an order increases or reduces a position requires the current position, so this check sits after position evaluation |
 | Square-off | **Must still work in a banned underlying** — reduction is permitted |
 | Client message | Specific: "fresh positions are not permitted; you may reduce your existing position" |
-| Begin-of-day gate | The list must be current-day; see [BOD runbook](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/) |
+| Begin-of-day gate | The list must be current-day; see [<abbr title="Beginning Of Day">BOD</abbr> runbook](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/) |
 
 ## 5. Position and open-interest limits
 

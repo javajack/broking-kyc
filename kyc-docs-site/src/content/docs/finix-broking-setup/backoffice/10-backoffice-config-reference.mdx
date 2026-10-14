@@ -9,7 +9,7 @@ import { Aside } from '@astrojs/starlight/components';
 
 ## TL;DR
 
-- **Four values in this plane are statutory and absolute**: the eight-year retention floor, the 24-hour contract-note window, the five-trading-day CUSPA cap, and the prohibition on cash.
+- **Four values in this plane are statutory and absolute**: the eight-year retention floor, the 24-hour contract-note window, the five-trading-day <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr> cap, and the prohibition on cash.
 - **Three gates block the pipeline by design**: current-day masters, reconciled trades before contract notes, and a closed ledger before statements. Each is a deliberate refusal to proceed on bad inputs.
 - **Deadlines are configured as internal targets, not external limits.** The runbook works to the internal number; the external one is recorded for reference.
 - **Batch idempotency is configuration, not a hope.** Operators re-run under pressure, and a non-idempotent re-run converts a delay into a corruption.
@@ -24,7 +24,7 @@ import { Aside } from '@astrojs/starlight/components';
 | Key | Finix default | Class | Blocks | Failure mode |
 |---|---|---|---|---|
 | `finix.bo.master.assert_current_day` | True, hard gate | E | **All processing** | Processing on a stale master |
-| `finix.bo.master.client_recon_daily` | Onboarding, OMS, back office | D | Trading for mismatched clients | Trades for an unknown client |
+| `finix.bo.master.client_recon_daily` | Onboarding, <abbr title="Order Management System">OMS</abbr>, back office | D | Trading for mismatched clients | Trades for an unknown client |
 | `finix.bo.master.charge_effective_dating` | Enforced | D | — | Prior-day re-runs computing wrongly |
 | `finix.bo.master.charge_change_maker_checker` | Required | D | — | Unapproved client charges |
 | `finix.bo.batch.idempotent` | Enforced | D | — | Double posting on re-run |
@@ -62,7 +62,7 @@ import { Aside } from '@astrojs/starlight/components';
 | `finix.bo.cn.requires_reconciled_trades` | True | R in substance | Generation | A note on an unreconciled trade |
 | `finix.bo.cn.signing_cert` | Current, expiry monitored | **R** | Generation | Pipeline outage or unsigned notes |
 | `finix.bo.cn.unsigned_dispatch` | **Blocked** | **R** | Dispatch | Invalid notes issued |
-| `finix.bo.cn.channels` | Email plus SMS link | E | — | Non-conforming dispatch |
+| `finix.bo.cn.channels` | Email plus <abbr title="Short Message Service.">SMS</abbr> link | E | — | Non-conforming dispatch |
 | `finix.bo.cn.dlt_templates` | Registered and current | E | SMS dispatch | Dispatch failure |
 | `finix.bo.cn.dispatch_retry_policy` | Bounded, evidenced | D | — | Silent non-delivery |
 | `finix.bo.cn.hard_bounce_action` | Servicing; restrict if unresolvable | D | — | Clients who cannot be served |
@@ -119,7 +119,7 @@ import { Aside } from '@astrojs/starlight/components';
 | `finix.bo.cuspa.excess_release_by` | **Next trading day** | **R** | — | Client securities over-encumbered |
 | `finix.bo.cuspa.payment_window_days` | **Maximum 5 trading days** | **R cap** | — | Breach if longer |
 | `finix.bo.cuspa.extension_cutoff` | **18:00 on the fifth trading day** | **R** | — | Extension option lost |
-| `finix.bo.cuspa.extension_reasons` | Lower circuit sellers-only; suspension or halt; other MII-recognised cause | **R** | — | Invalid request |
+| `finix.bo.cuspa.extension_reasons` | Lower circuit sellers-only; suspension or halt; other <abbr title="Market Infrastructure Institution">MII</abbr>-recognised cause | **R** | — | Invalid request |
 | `finix.bo.cuspa.extension_duration` | Up to one additional calendar week, renewable | **R** | — | Over-long pledge |
 | `finix.bo.cuspa.extension_requires_fresh_communication` | True | **R** | — | Client not informed |
 | `finix.bo.cuspa.sale_under_client_ucc` | **True** | **R** | — | Sale in the wrong name |
@@ -224,7 +224,7 @@ import { Aside } from '@astrojs/starlight/components';
 ## Where this connects
 
 - [Environments and configuration baseline](/broking-kyc/finix-broking-setup/stack/environments-config-baseline/) — the convention and change control
-- [OMS configuration reference](/broking-kyc/finix-broking-setup/oms/10-oms-config-reference/) and [RMS configuration reference](/broking-kyc/finix-broking-setup/rms/09-rms-config-reference/) — the other planes
+- [OMS configuration reference](/broking-kyc/finix-broking-setup/oms/10-oms-config-reference/) and [<abbr title="Risk Management System">RMS</abbr> configuration reference](/broking-kyc/finix-broking-setup/rms/09-rms-config-reference/) — the other planes
 - [Compliance configuration baseline](/broking-kyc/finix-broking-setup/compliance/01-compliance-config-baseline/) — the obligation-to-configuration map
-- [EOD runbook](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/) — where the gates are applied
+- [<abbr title="End Of Day">EOD</abbr> runbook](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/) — where the gates are applied
 - [Admin workflow](/broking-kyc/operations/admin-workflow/) — maker-checker

@@ -10,7 +10,7 @@ description: Compliance as configured, owned and evidenced rather than as a poli
 - **The 2026 regulations moved compliance into the architecture.** Client-asset segregation, cyber resilience, an eight-year records floor, a 21-calendar-day complaint clock, a whistle-blower channel and a mule-account detection duty are statutory, which means they are system properties rather than policy statements.
 - **Every obligation maps to a configuration value, a system and an owner.** The [compliance configuration baseline](/broking-kyc/finix-broking-setup/compliance/01-compliance-config-baseline/) is that map, and it is the artefact an inspection is shown first.
 - **The classification matters more than the value.** A regulatory value needs a circular, an exchange-set value needs an ingestion job, a discretionary value needs an approved policy — and misclassifying any of them is itself a finding.
-- **Reporting spans more authorities than most firms track**: clearing corporations, exchanges, SEBI, FIU-IND, depositories, the registries and the tax authorities, each on its own calendar and format.
+- **Reporting spans more authorities than most firms track**: clearing corporations, exchanges, <abbr title="Securities and Exchange Board of India">SEBI</abbr>, <abbr title="Financial Intelligence Unit — India">FIU-IND</abbr>, depositories, the registries and the tax authorities, each on its own calendar and format.
 - **Evidence is produced as a by-product of doing things properly**, or it is reconstructed under pressure. The difference is visible to an inspector within minutes.
 - **An obligation without an owner is the failure the calendar exists to prevent**, and it should alarm.
 
@@ -30,4 +30,4 @@ description: Compliance as configured, owned and evidenced rather than as a poli
 - [Periodic calendar](/broking-kyc/finix-broking-setup/daily-ops/09-periodic-calendar/) — the operational calendar
 - [Audit and compliance](/broking-kyc/operations/audit-compliance/) — the vendor-neutral treatment
 - [Inspection types](/broking-kyc/deep-dives/compliance-audit/inspection-types/) — what inspections look like
-- [CSCRF deep dive](/broking-kyc/deep-dives/compliance-audit/cscrf-deep-dive/) — the cyber framework in depth
+- [<abbr title="Cybersecurity and Cyber Resilience Framework">CSCRF</abbr> deep dive](/broking-kyc/deep-dives/compliance-audit/cscrf-deep-dive/) — the cyber framework in depth

@@ -9,12 +9,12 @@ import { Aside } from '@astrojs/starlight/components';
 
 ## TL;DR
 
-- **The clearing corporation publishes the obligations; the firm allocates them to clients.** The daily obligation report gives the cumulative net buy and sell position for a trading day; the final obligation report gives the net securities and funds to be delivered or received and is downloaded on T+1.
+- **The clearing corporation publishes the obligations; the firm allocates them to clients.** The daily obligation report gives the cumulative net buy and sell position for a trading day; the final obligation report gives the net securities and funds to be delivered or received and is downloaded on <abbr title="Trade-date Plus N settlement">T+1</abbr>.
 - **The operative deadline is the bank's cut-off, not the exchange's.** Count backwards: clearing corporation deadline, minus the bank's cut-off, minus the firm's maker-checker step, equals the internal deadline that belongs in the runbook.
 - **Early pay-in of securities earns a margin benefit** and is worth operationalising deliberately rather than treating as an occasional optimisation.
 - **Direct pay-out sends securities to the client's demat account** rather than through a broker pool, which removes a step and a risk.
 - **Short delivery has a defined and expensive consequence path** — auction and close-out — and the right response is prevention: know before the deadline which clients are short.
-- **Physically settled stock derivatives build delivery margins across the expiry week**, and commodity delivery runs on a tender process with a 19:30 cut-off on tender days through MCXCCL eClear.
+- **Physically settled stock derivatives build delivery margins across the expiry week**, and commodity delivery runs on a tender process with a 19:30 cut-off on tender days through <abbr title="Multi Commodity Exchange Clearing Corporation Limited">MCXCCL</abbr> eClear.
 - **A missing obligation file is an incident, not an absence.** Obligations cannot be estimated, and proceeding on a computed guess is how a settlement failure becomes a default.
 
 ## Conceptual overview
@@ -27,10 +27,10 @@ The third property is that prevention is far cheaper than cure in this stage spe
 
 ## 1. Framework
 
-- **Clearing corporation rules, bye-laws and settlement schedules** — NSE Clearing, Indian Clearing Corporation and MCX Clearing Corporation publish the settlement calendar, obligation file formats, deadlines and consequence paths. `[not yet in index]`
+- **Clearing corporation rules, bye-laws and settlement schedules** — <abbr title="National Stock Exchange of India">NSE</abbr> Clearing, Indian Clearing Corporation and <abbr title="Multi Commodity Exchange of India">MCX</abbr> Clearing Corporation publish the settlement calendar, obligation file formats, deadlines and consequence paths. `[not yet in index]`
 - **NSE Clearing report set** — reports downloaded in comma-separated format to the member's Reports folder on the Extranet, covering trades, obligations, deliveries, auctions, corporate actions, settlements and shortages. The **daily obligation report** provides the daily cumulative net buy and sell position for a trading day; the **final obligation report** provides the net obligation for securities and funds to be delivered or received and is downloaded on **T+1**. The **bank summary report** gives transactions in the member's clearing account at the clearing bank; the **daily funds statement** gives the break-up of debits and credits in the clearing bank account. `[not yet in index]`
-- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025).
-- **T+1 settlement** — see [T+0 and T+1 settlement](/broking-kyc/deep-dives/settlement/t0-t1-settlement/).
+- **[Master Circular for Stock Brokers <abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025).
+- **T+1 settlement** — see [<abbr title="Trade-date Plus N settlement">T+0</abbr> and T+1 settlement](/broking-kyc/deep-dives/settlement/t0-t1-settlement/).
 - **Direct pay-out to client demat** — see [direct pay-out to demat](/broking-kyc/deep-dives/settlement/direct-payout-to-demat/).
 - **Short delivery and auction** — see [short delivery and auction](/broking-kyc/deep-dives/trading-day/short-delivery-auction/).
 - **Physical settlement of stock derivatives** — delivery margins staged across the last sessions of expiry week. See [exercise, assignment and physical settlement](/broking-kyc/trading-risk/exercise-assignment-physical/).
@@ -67,7 +67,7 @@ The third property is that prevention is far cheaper than cure in this stage spe
 | 4. Identify funds shortfalls | Clients who owe and have not paid |
 | 5. Identify securities shortfalls | Clients who must deliver and do not hold |
 | 6. Identify early pay-in candidates | Clients holding the securities they must deliver |
-| 7. Apply CUSPA where securities are paid out against an unpaid obligation | See [CUSPA](/broking-kyc/finix-broking-setup/backoffice/06-cuspa-unpaid-securities/) |
+| 7. Apply <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr> where securities are paid out against an unpaid obligation | See [CUSPA](/broking-kyc/finix-broking-setup/backoffice/06-cuspa-unpaid-securities/) |
 | 8. Produce the funding requirement | For treasury |
 
 <Aside type="caution" title="Know your shortfalls before the deadline, not at it">
@@ -104,7 +104,7 @@ Steps 4 and 5 are the prevention step, and their value depends entirely on when 
 | **Early pay-in** | Securities delivered ahead of the deadline, earning a margin benefit |
 | Why it matters | The margin benefit is real and recurring; treating early pay-in as an occasional optimisation leaves capital on the table |
 | Identification | Clients holding the securities they must deliver, identified from the holdings and obligation data |
-| Authority | The client's authority for the delivery must exist — see [eSign, DDPI and pledge setup](/broking-kyc/finix-broking-setup/onboarding/06-esign-ddpi-pledge-setup/) |
+| Authority | The client's authority for the delivery must exist — see [eSign, <abbr title="Demat Debit and Pledge Instruction">DDPI</abbr> and pledge setup](/broking-kyc/finix-broking-setup/onboarding/06-esign-ddpi-pledge-setup/) |
 | Confirmation | Early pay-in must be **recognised** for the margin benefit; assert the recognition rather than assuming it |
 | Commodity analogue | Sellers tendering goods as early pay-in with documentary evidence are exempt from margins other than mark-to-market |
 

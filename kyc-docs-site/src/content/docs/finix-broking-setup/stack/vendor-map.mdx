@@ -9,12 +9,12 @@ import { Aside } from '@astrojs/starlight/components';
 
 ## TL;DR
 
-- **Saral MoneyMaker is the order and risk layer.** Publicly: a multi-exchange dealer terminal for NSE, BSE, MCX and NCDEX with SPAN margining and a risk management system, plus browser and mobile clients, an algorithmic module with exchange-approved algorithm execution, and limit control at identifier, client and scrip level with margin computed before the order is allowed to flow to the exchange.
-- **SecMark is the record and compliance layer, and also offers middleware that overlaps the order layer.** Publicly: back office for broking, depository participants, institutional desks and proprietary trading; a middleware and API suite doing order orchestration, real-time risk checks, margin validation, trade lifecycle and reconciliation; a partner portal for sub-broker hierarchies; SmartReco for reconciliation; C-Safe for screening against more than fifty lists including PEP; AML Sutra for transaction monitoring and FINnet 2.0 reporting; and ComplianceSutra across six modules.
-- **That overlap is the single most important decision in this stack.** SecMark middleware and Saral RMS can both perform real-time risk checks and margin validation. [Only one may own the release decision](#3-overlaps-that-need-a-decision), and this manual gives it to Saral RMS.
-- **Digio is the identity, consent and signature layer** — Aadhaar and PAN verification, OCR, face match, DigiLocker, offline Aadhaar, Video KYC, CKYC and KRA connectivity, Aadhaar eSign and certificate-based signing, eStamping, DDPI and nomination document preview with digital stamp duty, and eNACH and UPI AutoPay mandates.
-- **CVL KRA is the primary KRA and is not an island.** Five KRAs are registered with SEBI and a mandated back-end interoperability framework makes them behave as one logical system: a query to any KRA returns the record whoever holds it, and a duplicate upload for an already-compliant investor is rejected rather than accepted.
-- **CERSAI CKYCRR is a different system with a different model, and it changed in 2026.** CKYCRR 2.0 went live on 1 August 2026 with real-time APIs, structured payloads, OTP-based consent for download and masked Aadhaar, replacing the batch-and-PDF model.
+- **Saral MoneyMaker is the order and risk layer.** Publicly: a multi-exchange dealer terminal for <abbr title="National Stock Exchange of India">NSE</abbr>, <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr>, <abbr title="Multi Commodity Exchange of India">MCX</abbr> and <abbr title="National Commodity & Derivatives Exchange Limited">NCDEX</abbr> with <abbr title="Standard Portfolio Analysis of Risk">SPAN</abbr> margining and a risk management system, plus browser and mobile clients, an algorithmic module with exchange-approved algorithm execution, and limit control at identifier, client and scrip level with margin computed before the order is allowed to flow to the exchange.
+- **SecMark is the record and compliance layer, and also offers middleware that overlaps the order layer.** Publicly: back office for broking, depository participants, institutional desks and proprietary trading; a middleware and API suite doing order orchestration, real-time risk checks, margin validation, trade lifecycle and reconciliation; a partner portal for sub-broker hierarchies; SmartReco for reconciliation; C-Safe for screening against more than fifty lists including <abbr title="Politically Exposed Person">PEP</abbr>; <abbr title="Anti-Money Laundering">AML</abbr> Sutra for transaction monitoring and FINnet 2.0 reporting; and ComplianceSutra across six modules.
+- **That overlap is the single most important decision in this stack.** SecMark middleware and Saral <abbr title="Risk Management System">RMS</abbr> can both perform real-time risk checks and margin validation. [Only one may own the release decision](#3-overlaps-that-need-a-decision), and this manual gives it to Saral RMS.
+- **Digio is the identity, consent and signature layer** — Aadhaar and <abbr title="Permanent Account Number">PAN</abbr> verification, <abbr title="Optical Character Recognition.">OCR</abbr>, face match, DigiLocker, offline Aadhaar, Video <abbr title="Know Your Customer (process).">KYC</abbr>, <abbr title="Central KYC (records registry)">CKYC</abbr> and <abbr title="KYC Registration Agency">KRA</abbr> connectivity, Aadhaar eSign and certificate-based signing, eStamping, <abbr title="Demat Debit and Pledge Instruction">DDPI</abbr> and nomination document preview with digital stamp duty, and eNACH and <abbr title="Unified Payments Interface">UPI</abbr> AutoPay mandates.
+- **CVL KRA is the primary KRA and is not an island.** Five KRAs are registered with <abbr title="Securities and Exchange Board of India">SEBI</abbr> and a mandated back-end interoperability framework makes them behave as one logical system: a query to any KRA returns the record whoever holds it, and a duplicate upload for an already-compliant investor is rejected rather than accepted.
+- **<abbr title="Central Registry of Securitisation Asset Reconstruction and Security Interest of India">CERSAI</abbr> <abbr title="Central KYC Records Registry">CKYCRR</abbr> is a different system with a different model, and it changed in 2026.** CKYCRR 2.0 went live on 1 August 2026 with real-time APIs, structured payloads, <abbr title="One-Time Password">OTP</abbr>-based consent for download and masked Aadhaar, replacing the batch-and-PDF model.
 - **Razorpay is two products, not one.** The payment gateway and Smart Collect sit on the collection side; RazorpayX Payouts sits on the disbursement side with a contact, fund-account and payout object model and webhooks on every state change. They have different reconciliation semantics and must not share a code path.
 - **Nothing in this stack clears, settles, custodies or lends.** Those stay with the clearing corporations, the depositories, the banks and — if the broker offers margin funding — the broker's own balance sheet.
 
@@ -43,7 +43,7 @@ The third thing is to be honest about gaps. The stack as specified has no treasu
 | Analytics | TradingView chart integration, option payoff charting, option chain and Greeks, technical indicators, pivot points | `[public]` |
 | Market data | Direct multicast referenced as a platform capability | `[public]` |
 | Back-office link | Back-office integration referenced as a platform capability | `[public]`, counterparty not specified |
-| IPO platform | Listed as an upcoming offering for end clients to apply for public issues | `[public]` |
+| <abbr title="Initial Public Offering">IPO</abbr> platform | Listed as an upcoming offering for end clients to apply for public issues | `[public]` |
 
 What this manual adds as `[reference implementation]`: the internal ordering of the pre-trade check ladder, the configuration key names, the square-off decision sequence, the specific limit hierarchy arithmetic, and the exchange-session state machine. Those are modelled on what the regulations require and what the product claims, not on product documentation.
 
@@ -56,10 +56,10 @@ What this manual adds as `[reference implementation]`: the internal ordering of 
 | Partner Portal | Sub-broker and branch network management, commission tracking, partner compliance, SEBI broking hierarchies with audit trail | `[public]` |
 | SmartReco | Reconciliation engine for high-volume record matching | `[public]` |
 | e-KYC | Real-time Aadhaar and PAN integration, AI-based face matching and liveness, document capture with OCR, customisable onboarding workflows, cloud and on-premises deployment | `[public]` |
-| Mobile and Web Trading | Charting, instrument search, market feeds, technical indicators, open APIs for integration with multiple OMS and RMS platforms | `[public]` |
+| Mobile and Web Trading | Charting, instrument search, market feeds, technical indicators, open APIs for integration with multiple <abbr title="Order Management System">OMS</abbr> and RMS platforms | `[public]` |
 | C-Safe | Client screening across more than fifty global and domestic lists including SEBI, UNSC, OFAC and PEP | `[public]` |
 | AML Sutra | Transaction monitoring and suspicious transaction reporting in FINnet 2.0 format | `[public]` |
-| ComplianceSutra | SEBI, RBI, MCA and income-tax compliance modules across six integrated modules: governance, risk, compliance, audit, project and task | `[public]` |
+| ComplianceSutra | SEBI, <abbr title="Reserve Bank of India">RBI</abbr>, MCA and income-tax compliance modules across six integrated modules: governance, risk, compliance, audit, project and task | `[public]` |
 | Corporate | Listed company; acquired the iBeats and Busiwin back-office products, adding more than seventy financial-market participants as clients | `[public]` |
 
 ### Digio
@@ -69,7 +69,7 @@ What this manual adds as `[reference implementation]`: the internal ordering of 
 | DigiKYC | Aadhaar and PAN verification, OCR, face sync and match, DigiLocker, offline Aadhaar, Video KYC, CKYC and KRA connectivity | `[public]` |
 | DigiSign | Aadhaar eSign with OTP, biometric, iris and face-match authentication; USB digital signature certificate signing; document signer certificate; stylus-based electronic signature | `[public]` |
 | eStamping | Digital stamp duty payment, including DDPI and nomination document preview | `[public]` |
-| Mandates | eNACH and NACH eMandate, UPI AutoPay recurring payments | `[public]` |
+| Mandates | eNACH and <abbr title="National Automated Clearing House">NACH</abbr> eMandate, UPI AutoPay recurring payments | `[public]` |
 | Screening | AML and counter-terrorist-financing screening | `[public]` |
 | Documents | Template-based document and agreement management; API, SDK and dashboard-initiated signature requests | `[public]` |
 
@@ -77,9 +77,9 @@ What this manual adds as `[reference implementation]`: the internal ordering of 
 
 | System | Operator | Public description | Evidence class |
 |---|---|---|---|
-| CVL KRA | CDSL Ventures Ltd | One of five SEBI-registered KRAs; provides an API on request that an intermediary configures to push customer data and images, and to check status, fetch details and submit details | `[public]` |
+| CVL KRA | <abbr title="Central Depository Services (India) Limited">CDSL</abbr> Ventures Ltd | One of five SEBI-registered KRAs; provides an API on request that an intermediary configures to push customer data and images, and to check status, fetch details and submit details | `[public]` |
 | KRA interoperability | All five KRAs | Back-end interoperability updates the investor's record at the respective KRA; a query to one KRA returns the record regardless of which KRA holds it; an upload for an already-compliant investor is rejected and the intermediary must download instead | `[public]` |
-| Other KRAs | NSDL Database Management, CAMS, Karvy, DotEx | The remaining four registered KRAs | `[public]` |
+| Other KRAs | <abbr title="National Securities Depository Limited">NSDL</abbr> Database Management, CAMS, Karvy, DotEx | The remaining four registered KRAs | `[public]` |
 | CKYCRR | CERSAI | Central KYC Records Registry; CKYCRR 2.0 live 1 August 2026, phased, with pilot and readiness testing extended to 5 October 2026; real-time API-first replacing batch and PDF, structured payloads, OTP-based consent, Aadhaar masking, de-duplication, risk-tiered update schedule, SFTP retained for bulk | `[public]` |
 
 ### Razorpay and RazorpayX
@@ -88,7 +88,7 @@ What this manual adds as `[reference implementation]`: the internal ordering of 
 |---|---|---|
 | Payment Gateway | Collection across UPI, cards, net banking and wallets | `[public]` |
 | Smart Collect | Virtual accounts for automated reconciliation of collections received by bank transfer | `[public]` |
-| RazorpayX Payouts | Disbursement over UPI, IMPS, NEFT and RTGS to accounts at all Indian banks; dashboard and API initiation; bulk addition and queueing; webhook callback on every state change | `[public]` |
+| RazorpayX Payouts | Disbursement over UPI, <abbr title="Immediate Payment Service">IMPS</abbr>, <abbr title="National Electronic Funds Transfer">NEFT</abbr> and <abbr title="Real Time Gross Settlement">RTGS</abbr> to accounts at all Indian banks; dashboard and API initiation; bulk addition and queueing; webhook callback on every state change | `[public]` |
 | Settlements | `settlement.processed` webhook fires after funds are transferred to the business bank account; the UTR is used to reconcile settlement funds against the bank statement | `[public]` |
 
 <Aside type="caution" title="A broker is not an ordinary merchant">
@@ -99,13 +99,13 @@ Everything a payment aggregator does is built for merchant collection, where mon
 
 One row per broking function. `●` means this manual assigns primary ownership here; `○` means the product can do it and is used in a supporting role; `—` means not used for this function even if the product offers it.
 
-| Function | Saral | SecMark | Digio | KRA / CKYC | Razorpay | Exchange / CC / DP |
+| Function | Saral | SecMark | Digio | KRA / CKYC | Razorpay | Exchange / <abbr title="Clearing Corporation (NCL, ICCL, MCXCCL — context-dependent).">CC</abbr> / <abbr title="Depository Participant">DP</abbr> |
 |---|---|---|---|---|---|---|
 | Client identity capture and verification | — | ○ | ● | ○ | — | — |
 | KYC record upload and fetch | — | ○ | ● | ● | — | — |
 | PEP, sanctions and debarred screening | — | ● | ○ | — | — | — |
 | Signature, DDPI, stamping | — | — | ● | — | — | — |
-| UCC registration with exchanges | — | ● | — | — | — | ● |
+| <abbr title="Unique Client Code">UCC</abbr> registration with exchanges | — | ● | — | — | — | ● |
 | Demat account opening | — | ○ | ○ | — | — | ● |
 | Order capture, dealer and client front ends | ● | ○ | — | — | — | — |
 | Order book and exchange session state | ● | — | — | — | — | ● |
@@ -119,7 +119,7 @@ One row per broking function. `●` means this manual assigns primary ownership 
 | Ledger of record | — | ● | — | — | — | — |
 | Contract notes | — | ● | — | — | — | — |
 | Settlement obligation processing | — | ● | — | — | — | ● |
-| Unpaid securities and CUSPA | — | ● | — | — | — | ● |
+| Unpaid securities and <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr> | — | ● | — | — | — | ● |
 | Corporate actions | — | ● | — | — | — | ● |
 | Client statements and holdings | — | ● | — | — | — | ● |
 | Margin reporting to exchange | ○ | ● | — | — | — | ● |
@@ -195,7 +195,7 @@ At launch, a single vendor across terminal, web and mobile means one order-entry
 | Gap | Why it matters | Finix position at launch |
 |---|---|---|
 | Treasury management | Deciding how much to place with which clearing corporation, in cash versus collateral, under an intraday margin regime, is a daily optimisation with real cost | Spreadsheet-driven with a documented decision rule; see [treasury and exchange funding](/broking-kyc/finix-broking-setup/money/05-treasury-exchange-funding/) |
-| Service desk and client communication | Complaint handling is on a 21-calendar-day statutory clock and SCORES and ODR enrolment is continuous | Ticketing tool plus ComplianceSutra for the regulatory clock and evidence |
+| Service desk and client communication | Complaint handling is on a 21-calendar-day statutory clock and <abbr title="SEBI Complaints Redress System">SCORES</abbr> and <abbr title="Online Dispute Resolution">ODR</abbr> enrolment is continuous | Ticketing tool plus ComplianceSutra for the regulatory clock and evidence |
 | Firm general ledger | Client ledgers are not the firm's books; statutory accounts, GST and tax are separate | Standard accounting package, fed from back office |
 | Data warehouse and reporting | Management information, regulatory analytics and surveillance all need history in one place | End-of-day extracts into a warehouse; explicitly not the back office's job |
 | Market data history | Reproducible valuation and surveillance | Own store from exchange end-of-day files |
@@ -220,7 +220,7 @@ Everything else in the stack may be duplicated, shadowed, cross-checked or recon
 - **Ask every vendor for the integration kit before signing, not after.** The kit tells you whether the published capability is an API, a file drop or a screen. That difference determines whether your integration is a week or a quarter, and it is not discoverable from marketing material.
 - **Write down the overlap decisions in the contract.** If SecMark middleware is not doing risk checks, the statement of work should say so, because otherwise you will pay for the module and inherit the obligation to test it.
 - **Version the list of lists.** C-Safe screening against "fifty-plus lists" is only meaningful if you know which fifty on the day a given client was screened. That version is evidence. See [PEP and sanctions screening](/broking-kyc/finix-broking-setup/onboarding/04-pep-sanctions-screening/).
-- **Treat the Pharos and Money Maker Challenge modules as approval-gated.** Anything that places orders without a human pressing a key is algorithmic trading, and it needs exchange approval before use. See [algo, API, DMA and SOR](/broking-kyc/finix-broking-setup/oms/09-algo-api-dma-sor/).
+- **Treat the Pharos and Money Maker Challenge modules as approval-gated.** Anything that places orders without a human pressing a key is algorithmic trading, and it needs exchange approval before use. See [algo, API, DMA and <abbr title="Smart Order Routing">SOR</abbr>](/broking-kyc/finix-broking-setup/oms/09-algo-api-dma-sor/).
 - **Keep one page in your own wiki that maps vendor module to regulatory obligation.** When an inspection asks which system evidences a given paragraph, you want to answer in one minute, not one day. [Compliance configuration baseline](/broking-kyc/finix-broking-setup/compliance/01-compliance-config-baseline/) is the template.
 
 ## Where this connects

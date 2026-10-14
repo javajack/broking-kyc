@@ -19,7 +19,7 @@ The same entries appear once below in alphabetical order. This grouping is a nav
 
 **Exchanges & depositories** — [NSE](#nse), [BSE](#bse), [MCX](#mcx), [NCDEX](#ncdex), [ICEX](#icex), [MSEI](#msei), [CDSL](#cdsl), [NSDL](#nsdl), [NCL (NSCCL)](#ncl-nsccl), [ICCL](#iccl), [MCXCCL](#mcxccl)
 
-**Identity, KYC & e-signing** — [PAN](#pan), [e-PAN](#e-pan), [Aadhaar (UID)](#aadhaar-uid), [CKYC](#ckyc), [KRA](#kra), [eKYC](#ekyc), [IPV](#ipv), [VIPV](#vipv), [OTP](#otp), [KIN](#kin), [OVD](#ovd), [DigiLocker](#digilocker), [eSign](#esign), [Aadhaar Offline XML (Paperless KYC)](#aadhaar-offline-xml-paperless-kyc), [e-KYC Setu](#e-kyc-setu)
+**Identity, KYC & e-signing** — [PAN](#pan), [e-PAN](#e-pan), [Aadhaar (UID)](#aadhaar-uid), [CKYC](#ckyc), [KRA](#kra), [eKYC](#ekyc), [IPV](#ipv), [VIPV](#vipv), [OTP](#otp), [KIN](#kin), [OVD](#ovd), [DigiLocker](#digilocker), [eSign](#esign), [Aadhaar Offline XML (Paperless KYC)](#aadhaar-offline-xml-paperless-kyc), [e-KYC Setu](#e-kyc-setu), [CKYCRR](#ckycrr)
 
 **Cross-border / tax / NRI** — [FATCA](#fatca), [CRS](#crs), [TIN](#tin), [GIIN](#giin), [NRI](#nri), [NRE](#nre), [NRO](#nro), [PIS](#pis), [RNOR](#rnor), [FEMA](#fema), [FCNR](#fcnr)
 
@@ -27,11 +27,11 @@ The same entries appear once below in alphabetical order. This grouping is a nav
 
 **Member / account types & roles** — [UCC](#ucc), [BO (Beneficial Owner)](#bo-beneficial-owner), [BO (Branch Office)](#bo-branch-office), [DP](#dp), [AP](#ap), [KMP](#kmp), [CM](#cm), [TM](#tm), [QSB](#qsb), [RA](#ra), [IA](#ia), [PMS](#pms)
 
-**Trading systems & FIX** — [OMS](#oms), [EMS](#ems), [RMS](#rms), [FIX](#fix), [SOR](#sor), [SPAN](#span), [ELM](#elm), [MTM](#mtm), [VAR margin](#var-margin)
+**Trading systems & FIX** — [OMS](#oms), [EMS](#ems), [RMS](#rms), [FIX](#fix), [SOR](#sor), [SPAN](#span), [ELM](#elm), [MTM](#mtm), [VAR margin](#var-margin), [CTCL](#ctcl), [NNF](#nnf), [TAP](#tap), [ETI](#eti)
 
-**Trading concepts** — [BOD](#bod), [EOD](#eod), [IST](#ist), [T+0, T+1, T+2](#t0-t1-t2), [MWPL](#mwpl), [ASBA](#asba), [IPO](#ipo), [OFS](#ofs), [MTF](#mtf), [SLBM](#slbm), [GSM](#gsm), [ASM](#asm), [ESM](#esm), [Peak margin](#peak-margin), [Running account settlement](#running-account-settlement), [Pre-open session](#pre-open-session), [Closing auction](#closing-auction), [Block deal vs Bulk deal](#block-deal-vs-bulk-deal), [Call auction](#call-auction), [Periodic call auction](#periodic-call-auction)
+**Trading concepts** — [BOD](#bod), [EOD](#eod), [IST](#ist), [T+0, T+1, T+2](#t0-t1-t2), [MWPL](#mwpl), [ASBA](#asba), [IPO](#ipo), [OFS](#ofs), [MTF](#mtf), [SLBM](#slbm), [GSM](#gsm), [ASM](#asm), [ESM](#esm), [Peak margin](#peak-margin), [Running account settlement](#running-account-settlement), [Pre-open session](#pre-open-session), [Closing auction](#closing-auction), [Block deal vs Bulk deal](#block-deal-vs-bulk-deal), [Call auction](#call-auction), [Periodic call auction](#periodic-call-auction), [LPP](#lpp)
 
-**Settlement & risk infrastructure** — [SGF](#sgf), [Core SGF](#core-sgf), [IPF](#ipf), [CCP](#ccp), [Upstreaming of client funds](#upstreaming-of-client-funds), [Direct payout to demat](#direct-payout-to-demat), [Pay-in and Pay-out](#pay-in-and-pay-out), [Auction settlement](#auction-settlement), [Short delivery](#short-delivery), [COD](#cod)
+**Settlement & risk infrastructure** — [SGF](#sgf), [Core SGF](#core-sgf), [IPF](#ipf), [CCP](#ccp), [Upstreaming of client funds](#upstreaming-of-client-funds), [Direct payout to demat](#direct-payout-to-demat), [Pay-in and Pay-out](#pay-in-and-pay-out), [Auction settlement](#auction-settlement), [Short delivery](#short-delivery), [COD](#cod), [USCNB](#uscnb), [DSCNB](#dscnb), [MFOS](#mfos), [CUSPA](#cuspa)
 
 **Regulatory frameworks** — [CSCRF](#cscrf), [BCP and DR](#bcp-and-dr), [System audit](#system-audit), [Concurrent audit](#concurrent-audit), [Internal audit](#internal-audit), [Statutory audit](#statutory-audit), [Inspection Type I, II, III](#inspection-type-i-ii-iii), [AP framework](#ap-framework), [TRAI DLT](#trai-dlt)
 
@@ -257,6 +257,12 @@ Both create market-disclosure obligations; brokers run automated trade-pattern d
 **Meaning:** A centralized, government-operated database of completed KYC records that all financial sector regulators (SEBI, RBI, IRDAI, PFRDA) plug into. Operated by CERSAI; technical specification and field schema are issued by CERSAI under PMLA Rules. Each individual or non-individual gets a 14-digit **KIN** (KYC Identification Number) on first registration. A broker pulls a customer's CKYC record (saving re-collection of OVDs) or pushes a freshly KYC'd customer's record. The dual-upload mandate (`SEBI/HO/MIRSD/SECFATF/P/CIR/2024/79`, 6 Jun 2024) requires both KRA AND CKYC uploads for SEBI-registered intermediaries.
 **See also:** [CKYC vendor page](/broking-kyc/vendors/identity/ckyc/), [CKYC destination](/broking-kyc/reference/field-atlas/destinations/ckyc/), [CKYC submission section](/broking-kyc/reference/field-atlas/sections/t-ckyc-submission/)
 
+### CKYCRR
+
+**Full form:** Central KYC Records Registry
+**Meaning:** The central registry operated by CERSAI that holds KYC records across the financial system, identified by a 14-digit KIN. **CKYCRR 2.0**, announced in the Union Budget 2025 and live from 1 August 2026 on a phased basis, replaced the batch-and-PDF model with real-time APIs in structured JSON, instant validation, mobile-number search, OTP-based consent for download, mandatory Aadhaar masking and facial-recognition de-duplication. Securities intermediaries upload client KYC to both a KRA and CKYCRR under the dual-upload mandate.
+**See also:** [CKYC and CKYCRR 2.0](/broking-kyc/finix-broking-setup/onboarding/03-ckyc-ckycrr2-integration/)
+
 ### Closing auction
 
 **Full form:** —
@@ -396,6 +402,12 @@ See [TRAI DLT](#trai-dlt) for SMS-pre-registration framework. Note: SEBI uses "D
 ### DSC
 **Full form:** Digital Signature Certificate (CCA-licensed; aka Class 2/3 DSC).
 **Meaning:** An X.509 certificate issued by a Controller of Certifying Authorities (CCA)-licensed CA, used to sign documents in compliance with the IT Act 2000. Used in broking for: company-level signing on regulatory filings (e.g., compliance certificates, annual returns), executive eSigns (Class 3), and per-employee KYC dossier signing. Distinct from [eSign](#esign) (Aadhaar-OTP-based, individual-only, ephemeral) and [DigiLocker eSign](#digilocker) (DigiLocker-issued).
+### DSCNB
+
+**Full form:** Downstreaming Client Nodal Bank Account
+**Meaning:** The designated client bank account, with the prescribed nomenclature “Name of the SB/CM – DSCNB account”, from which payments to clients are made after receiving funds from the clearing corporation or clearing member the same day. Paired with the USCNB on the collection side. Funds in these accounts cannot be commingled with the broker's own accounts or used for proprietary purposes.
+**See also:** [Bank account architecture](/broking-kyc/finix-broking-setup/setup/06-bank-account-architecture/)
+
 ### e-KYC Setu
 
 **Full form:** UIDAI Aadhaar e-KYC API gateway
@@ -464,6 +476,12 @@ See [TRAI DLT](#trai-dlt) for SMS-pre-registration framework. Note: SEBI uses "D
 **Full form:** Enhanced Surveillance Measure
 **Meaning:** A SEBI / exchange surveillance regime targeting small-cap and micro-cap securities with abnormal price-volume action. Two stages; Stage 1 imposes 100% margin and lower price band; Stage 2 adds T-group trade-for-trade and tighter price band. Lists published end-of-day, applied next trading day. Distinct from GSM (graded surveillance, slower-moving) and ASM (additional surveillance, more reactive). ESM is the smallest-cap-targeted of the three frameworks.
 **See also:** [Surveillance / GSM / ASM deep dive](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/)
+
+### ETI
+
+**Full form:** Enhanced Trading Interface
+**Meaning:** BSE's current session-oriented interactive interface to the BOLT Plus trading system, supporting full trading functionality, drop copy and risk alerts. It replaced the now-discontinued IML interface. A separate ETI session is required per segment while the participant identifier remains common across segments, and API versions are mandated by the exchange.
+**See also:** [BSE cash and derivatives](/broking-kyc/finix-broking-setup/exchanges/03-bse-cash-fno/)
 
 ### Family company
 
@@ -717,6 +735,12 @@ The CSCRF circular explicitly references Type-I/II/III in the audit-cycle obliga
 **Meaning:** A 20-character ISO 17442 code identifying a legal entity in financial transactions. Collected for non-individual clients where RBI or market rules require it.
 **See also:** [Account variants: Company](/broking-kyc/account-variants/company/)
 
+### LPP
+
+**Full form:** Limit Price Protection
+**Meaning:** An NSE pre-trade control introduced on 31 October 2022 in the futures and options segment, validating the price of limit orders against a dynamic range on both sides of a reference price — **in addition to** the operating price range. Incoming limit orders beyond the range are automatically rejected by the exchange. Published ranges are instrument-class specific: index and stock options ±₹20 at a reference price up to ₹50 and ±40 percent above it; index futures ±₹200 up to ₹10,000 and ±2 percent above; stock futures ±₹1.50 up to ₹50 and ±3 percent above.
+**See also:** [NSE derivatives](/broking-kyc/finix-broking-setup/exchanges/02-nse-fno/)
+
 ### LRS
 
 **Full form:** Liberalised Remittance Scheme
@@ -752,6 +776,12 @@ The CSCRF circular explicitly references Type-I/II/III in the audit-cycle obliga
 **Full form:** Ministry of Electronics and Information Technology
 **Meaning:** Union government ministry overseeing IT, electronics, digital-services policy, and the bodies that issue digital certificates. MeitY operates CCA (Controller of Certifying Authorities), licenses Certifying Authorities that issue Digital Signature Certificates / eSign, drives the DigiLocker initiative, and notifies rules under the Information Technology Act 2000 (and would notify rules under the DPDP Act 2023). For broking, MeitY / CCA's outputs are foundational — eSign, DSC, DigiLocker, IT-Act compliance for record-keeping.
 **See also:** [MeitY circulars](/broking-kyc/reference/circulars/meity/), [CCA](#cca), [DigiLocker](#digilocker)
+
+### MFOS
+
+**Full form:** Mutual Fund Overnight Scheme
+**Meaning:** Units of an overnight mutual fund scheme created out of clients' funds and pledged to a clearing corporation — one of the three permitted forms of upstreaming clients' clear credit balances, alongside cash and a lien on fixed deposit receipts.
+**See also:** [Upstreaming and downstreaming](/broking-kyc/finix-broking-setup/money/06-upstreaming-downstreaming/)
 
 ### MII
 
@@ -836,6 +866,12 @@ The CSCRF circular explicitly references Type-I/II/III in the audit-cycle obliga
 **Full form:** —
 **Meaning:** Minimum net worth (paid-up capital + free reserves) a Trading Member / Clearing Member must maintain to retain membership and operate prescribed segments. SEBI Stock Brokers Regulations and exchange byelaws set the slabs: typically INR 1 crore for a Trading Member, higher for Clearing Member, higher still for QSB. Computed on the audited financials and self-certified to the exchange semi-annually with the half-yearly compliance certificate. Breach triggers progressive consequences — restricted exposure, segment deactivation, eventually deregistration.
 **See also:** [Member compliance: BMC and ABC](/broking-kyc/deep-dives/member-compliance/bmc-abc/)
+
+### NNF
+
+**Full form:** Non-NEAT Front End
+**Meaning:** NSE's facility allowing a trading member to use its own trading front end rather than the exchange's terminal, accessed through the Computer-to-Computer Link. Members create 12-digit user identifiers under the NNF facility and must report terminal details to the exchange **before routing any order** through them. NNF protocol specifications are published and versioned per segment.
+**See also:** [User IDs, CTCL and NNF](/broking-kyc/finix-broking-setup/oms/03-user-id-ctcl-nnf/)
 
 ### Nomination
 
@@ -1203,6 +1239,12 @@ The CSCRF circular explicitly references Type-I/II/III in the audit-cycle obliga
 **Meaning:** Settlement cycle naming convention. **T+2** was the standard till Jan 2023; **T+1** went live progressively across 2023 (fully implemented Jan 2023); **T+0** rolled out in **optional beta on 21 Mar 2024** (`SEBI/HO/MRD/MRD-PoD-3/P/CIR/2024/20`) for a small list of scrips, since expanded in 2025. Under T+1, a buy on Monday means securities credited on Tuesday and funds debited Tuesday; under T+0, the same-day settlement happens by 16:30 IST. The shorter cycle improves capital efficiency for clients but compresses operational windows for brokers (margin computation, EOD, contract notes despatch).
 **See also:** [T+0 / T+1 settlement deep dive](/broking-kyc/deep-dives/settlement/t0-t1-settlement/)
 
+### TAP
+
+**Full form:** Trading Access Point
+**Meaning:** A middleware application through which a trading member's front end may connect to the NSE trading system, as an alternative to connecting directly. Where used, it is a component in the latency budget and in the failure analysis, not an implementation detail.
+**See also:** [Exchange connectivity protocols](/broking-kyc/finix-broking-setup/oms/02-exchange-connectivity-protocols/)
+
 ### TIN
 
 **Full form:** Taxpayer Identification Number (in FATCA / CRS context)
@@ -1262,6 +1304,12 @@ The CSCRF circular explicitly references Type-I/II/III in the audit-cycle obliga
 **Full form:** —
 **Meaning:** SEBI-mandated daily process (since Apr 2023, then tightened progressively) by which brokers must transfer all client funds that are *not* immediately required for settlement / margin obligations *upstream* to the clearing corporation by end-of-day, rather than retaining them in the broker's pooled bank account. The CC custodies the funds till they're needed; the broker pulls back next day's net obligation. Operational mechanics: compute the upstream amount (total client credit minus today's required cover), execute the bank transfer to CC's segregated account before cut-off, file daily compliance certificate. Failures trigger SEBI / exchange penalties and weigh heavily in inspection.
 **See also:** [Client funds upstreaming deep dive](/broking-kyc/deep-dives/settlement/client-funds-upstreaming/)
+
+### USCNB
+
+**Full form:** Upstreaming Client Nodal Bank Account
+**Meaning:** The designated client bank account, with the prescribed nomenclature “Name of the SB/CM – USCNB account”, which receives clients' funds for further upstreaming to the clearing corporations. Every client pay-in, including payment-gateway settlements, must land here rather than in the broker's own operating account — a merchant gateway's default settlement destination is wrong for a broker and is a segregation breach on every pay-in.
+**See also:** [Bank account architecture](/broking-kyc/finix-broking-setup/setup/06-bank-account-architecture/)
 
 ### VAR margin
 

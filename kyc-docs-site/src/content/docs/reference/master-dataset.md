@@ -1126,7 +1126,7 @@ In day-to-day operations, you will mostly care about "KYC Registered" and "On Ho
 | 2 | AML/CFT Guidelines | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/78 | Jun 6, 2024 | Anti-Money Laundering standards |
 | 3 | FATCA/CRS at KRAs | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12 | Feb 20, 2024 | Mandatory FATCA upload to KRA from Jul 1, 2024 |
 | 4 | KRA Validation Review | [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/41](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202441) | May 14, 2024 | On-Hold -> KYC Registered relaxation |
-| 5 | KRA Upload to CKYCRR | [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/79](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202479) | Jun 6, 2024 | Mandatory CKYC upload from Aug 1, 2024 |
+| 5 | KRA Upload to <abbr title="Central KYC Records Registry">CKYCRR</abbr> | [SEBI/HO/MIRSD/SECFATF/P/CIR/2024/79](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdsecfatfpcir202479) | Jun 6, 2024 | Mandatory CKYC upload from Aug 1, 2024 |
 | 6 | e-KYC & DigiLocker | [SEBI/HO/MIRSD/DOP/CIR/P/2020/73](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddopcirp202073) | Apr 24, 2020 | Aadhaar e-KYC + DigiLocker permitted |
 | 7 | e-KYC Setu (NPCI) | SEBI press release | Jun 30, 2025 | Aadhaar e-KYC without sharing Aadhaar number |
 | 8 | DDPI replacing POA | SEBI/HO/MIRSD/DoP/P/CIR/2022/44 | Apr 4, 2022 | DDPI mandatory from Nov 18, 2022 |

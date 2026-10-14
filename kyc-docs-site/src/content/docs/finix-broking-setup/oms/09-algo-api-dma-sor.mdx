@@ -11,7 +11,7 @@ import { Aside } from '@astrojs/starlight/components';
 
 - **The threshold that reclassifies a client is ten orders per second.** Retail application programming interface access at or below that rate is ordinary access; above it, the flow is treated as algorithmic and must be registered with a **unique algorithm identifier tagged to every order**.
 - **The broker is the principal and the algorithm provider is the agent.** The broker is accountable for any algorithm misuse through its interfaces. That is an architectural statement, not a commercial one: the controls have to live in the broker's path because the liability does.
-- **Every algorithmic order carries a tag, and the tag is validated.** Pre-trade controls include **NNF terminal identifier to algorithm identifier validation**, so an untagged or mis-tagged algorithmic order is a control failure that the exchange can see.
+- **Every algorithmic order carries a tag, and the tag is validated.** Pre-trade controls include **<abbr title="Non-NEAT Front End">NNF</abbr> terminal identifier to algorithm identifier validation**, so an untagged or mis-tagged algorithmic order is a control failure that the exchange can see.
 - **Algorithm market orders have a pre-emptive cancellation control** introduced to prevent runaway market orders — a direct response to the failure mode where an automated strategy issues market orders into a thin book.
 - **White-box and black-box classification drives the approval path.** Deterministic execution logic is treated differently from predictive or model-driven logic whose behaviour is not fully transparent.
 - **Approval is per algorithm, per exchange, per segment, per broker.** There is no portable approval, and the registry has to reflect that dimensionality or it will drift.
@@ -30,10 +30,10 @@ The third consideration is that the broker's position as principal removes the c
 
 The substance is covered in depth at [retail algo framework](/broking-kyc/deep-dives/trading-day/retail-algo-framework/). The operative instruments:
 
-- **[SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/0000013](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir20250000013)** (4 February 2025) — Safer Participation of Retail Investors in Algorithmic Trading; originally effective 1 August 2025, subsequently extended by a SEBI timeline extension circular of July 2025.
-- **[NSE/INVG/66524](/broking-kyc/reference/circulars/nse/#nseinvg66524)** (5 February 2025) → **[NSE/INVG/67858](/broking-kyc/reference/circulars/nse/#nseinvg67858)** (5 May 2025) → **[NSE/INVG/69255](/broking-kyc/reference/circulars/nse/#nseinvg69255)** (22 July 2025) — the NSE operational implementation chain, including the principal–agent accountability model and the five-year audit-trail retention for algorithmic orders.
+- **[<abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/0000013](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir20250000013)** (4 February 2025) — Safer Participation of Retail Investors in Algorithmic Trading; originally effective 1 August 2025, subsequently extended by a SEBI timeline extension circular of July 2025.
+- **[<abbr title="National Stock Exchange of India">NSE</abbr>/INVG/66524](/broking-kyc/reference/circulars/nse/#nseinvg66524)** (5 February 2025) → **[NSE/INVG/67858](/broking-kyc/reference/circulars/nse/#nseinvg67858)** (5 May 2025) → **[NSE/INVG/69255](/broking-kyc/reference/circulars/nse/#nseinvg69255)** (22 July 2025) — the NSE operational implementation chain, including the principal–agent accountability model and the five-year audit-trail retention for algorithmic orders.
 - **[NSE/FAOP/69296](/broking-kyc/reference/circulars/nse/#nsefaop69296)** (August 2025) — pre-trade controls hardening: algorithm market order pre-emptive cancellation, and NNF terminal identifier to algorithm identifier validation.
-- **[NSE/INSP/64438](/broking-kyc/reference/circulars/nse/#nseinsp64438)** and **[NSE/INSP/70900](/broking-kyc/reference/circulars/nse/#nseinsp70900)** — Type III system audit requirements for in-house algorithms.
+- **[NSE/INSP/64438](/broking-kyc/reference/circulars/nse/#nseinsp64438)** and **[NSE/INSP/70900](/broking-kyc/reference/circulars/nse/#nseinsp70900)** — Type <abbr title="—">III</abbr> system audit requirements for in-house algorithms.
 - **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — Chapter IV fraud prevention and detection, which covers surveillance over the firm's own systems including automated order flow. `[not yet in index]`
 - **Exchange facility approval frameworks** for direct market access and smart order routing, each separate from algorithmic approval.
 
@@ -237,7 +237,7 @@ The smart order routing requirement to demonstrate best execution order by order
 
 - [Retail algo framework](/broking-kyc/deep-dives/trading-day/retail-algo-framework/) — the regulatory substance in depth
 - [Order forward path](/broking-kyc/finix-broking-setup/oms/06-order-forward-path/) — the ladder programmatic flow also traverses
-- [User IDs, CTCL and NNF](/broking-kyc/finix-broking-setup/oms/03-user-id-ctcl-nnf/) — the identifiers tagging validates against
+- [User IDs, <abbr title="Computer-to-Computer Link.">CTCL</abbr> and NNF](/broking-kyc/finix-broking-setup/oms/03-user-id-ctcl-nnf/) — the identifiers tagging validates against
 - [Modification and cancellation](/broking-kyc/finix-broking-setup/oms/08-modify-cancel-rules/) — bulk cancellation and the kill switch
 - [Intraday surveillance](/broking-kyc/finix-broking-setup/rms/07-intraday-surveillance/) — pattern monitoring
 - [Entity and capital structure](/broking-kyc/finix-broking-setup/setup/01-entity-capital-structure/#5-base-minimum-capital--a-business-model-decision) — why algorithmic capability costs ₹50 lakh of base minimum capital

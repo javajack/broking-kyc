@@ -1410,7 +1410,7 @@ Two-Factor Authentication (2FA) added to easi / easiest BO login: <abbr title="O
 - **impact_areas:** onboarding, re-KYC, kyc-modification
 - **primary_url:** https://www.cdslindia.com/common/DownLoadFile.aspx?eventid=DP2024-312&action=communique
 
-Disseminates SEBI Circular SEBI/HO/MIRSD/SECFATF/P/CIR/2024/79 dated June 6, 2024 — KRAs to upload KYC records to Central KYC Records Registry (CKYCRR). Mandates DP-KRA-CKYCRR pipeline for onboarding and re-KYC.
+Disseminates SEBI Circular SEBI/HO/MIRSD/SECFATF/P/CIR/2024/79 dated June 6, 2024 — KRAs to upload KYC records to Central KYC Records Registry (<abbr title="Central KYC Records Registry">CKYCRR</abbr>). Mandates DP-KRA-CKYCRR pipeline for onboarding and re-KYC.
 
 ### CDSL/OPS/DP/POLCY/2024/230
 

@@ -40,7 +40,7 @@ The second structural idea is reproducibility. Every risk decision will eventual
 | I9 | **Configuration** | Configuration register, versioned | On change at a boundary | Last approved version | Daily diff of deployed against approved |
 
 <Aside type="caution" title="I5 is the input that fails silently and expensively">
-A collateral and balance load that runs but carries yesterday's as-of timestamp produces a risk engine that is wrong for every client, all day, in the permissive direction. Nothing errors. Orders are released. Limits look normal. The problem appears at end of day as a margin shortfall across the book, by which time the trades exist. The control is an explicit as-of assertion at the begin-of-day gate — not "did the load run" but "is the as-of timestamp today's, and does the record count match the client master". See [BOD runbook](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/).
+A collateral and balance load that runs but carries yesterday's as-of timestamp produces a risk engine that is wrong for every client, all day, in the permissive direction. Nothing errors. Orders are released. Limits look normal. The problem appears at end of day as a margin shortfall across the book, by which time the trades exist. The control is an explicit as-of assertion at the begin-of-day gate — not "did the load run" but "is the as-of timestamp today's, and does the record count match the client master". See [<abbr title="Beginning Of Day">BOD</abbr> runbook](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/).
 </Aside>
 
 ## 2. Components
@@ -88,7 +88,7 @@ Written for every decision, release or rejection.
 | Immutability | Append-only |
 | Retention | Eight-year floor under regulation 16 of the [2026 regulations](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/) |
 | Replayability | The decision re-derivable from the recorded inputs |
-| Joinability | Same identifier as the order record in the OMS |
+| Joinability | Same identifier as the order record in the <abbr title="Order Management System">OMS</abbr> |
 | Non-blocking | The write must not sit in the latency path, and must not be lost |
 
 ## 4. Intraday revaluation
@@ -201,4 +201,4 @@ The R8 row deserves emphasis. A failed revaluation engine is not a degraded feat
 - [Square-off engine](/broking-kyc/finix-broking-setup/rms/06-squareoff-engine/) — R9
 - [BOD runbook](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/) — where the input gates are applied
 - [Integration contract matrix](/broking-kyc/finix-broking-setup/stack/integration-contract-matrix/#3-risk-input-path) — these inputs as interface contracts
-- [RMS SPAN methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/) — the computation in depth
+- [<abbr title="Risk Management System">RMS</abbr> <abbr title="Standard Portfolio Analysis of Risk">SPAN</abbr> methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/) — the computation in depth

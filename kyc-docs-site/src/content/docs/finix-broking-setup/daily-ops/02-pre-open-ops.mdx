@@ -21,7 +21,7 @@ import { Aside } from '@astrojs/starlight/components';
 
 - **Pre-open phases** — order entry 09:00 to 09:08, order matching and trade confirmation 09:08 to 09:12, buffer 09:12 to 09:15, with continuous trading from 09:15. See [pre-open and closing auction](/broking-kyc/deep-dives/foundational/pre-open-closing-auction/).
 - **After-market orders** placed between the previous close and the pre-open are **released into the pre-open at 09:00**, entering the order-entry queue.
-- **Call-auction variants** for initial public offerings and relisted scrips, including indicative quantity and price disclosure, per SEBI/HO/MRD/MRD-PoD-3/P/CIR/2024/85 (20 June 2024) and **NSE/CMTR/63594** (17 September 2024). `[not yet in index]`
+- **Call-auction variants** for initial public offerings and relisted scrips, including indicative quantity and price disclosure, per <abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>/MRD-PoD-3/P/CIR/2024/85 (20 June 2024) and **<abbr title="National Stock Exchange of India">NSE</abbr>/CMTR/63594** (17 September 2024). `[not yet in index]`
 - **Session state** is driven by exchange market-state messages; see [sessions and calendars](/broking-kyc/finix-broking-setup/exchanges/06-sessions-calendars/).
 
 ## 2. By phase
@@ -94,7 +94,7 @@ Between 09:08 and 09:12 a large number of clients see fills at prices they did n
 | Signal | Why it matters here |
 |---|---|
 | **After-market release count** | The first thing that can go wrong, and clients notice |
-| Session state per exchange and segment | Three exchanges, one of them with three instances |
+| Session state per exchange and segment | Three exchanges, one of them with per-segment sessions |
 | Order acceptance rate | A begin-of-day problem surfaces as rejections |
 | **Rejection code distribution** | Tells you which begin-of-day gate was wrong |
 | Risk decision latency | Capacity warm-up |
@@ -109,9 +109,9 @@ Between 09:08 and 09:12 a large number of clients see fills at prices they did n
 |---|---|
 | NSE cash | Full pre-open as described |
 | NSE derivatives | Per the segment's rules |
-| BSE segments | **Per instance**, with independent state |
+| <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> segments | **Per instance**, with independent state |
 | Currency derivatives | Own schedule |
-| **MCX** | Opens at 09:00 on its own schedule, with no equity-style pre-open |
+| **<abbr title="Multi Commodity Exchange of India">MCX</abbr>** | Opens at 09:00 on its own schedule, with no equity-style pre-open |
 
 "Pre-open" is therefore not a firm-wide state. The operations view must be per exchange and per segment, and client messaging must name the segment.
 
@@ -156,14 +156,14 @@ Between 09:08 and 09:12 a large number of clients see fills at prices they did n
 
 - **Verify the release with counts and classify the rejections.** The rejection codes tell you which gate was wrong.
 - **Put the discovered-price explanation in the fill notification.** It is the highest-leverage copy in the product.
-- **Keep the operations view per segment.** Three exchanges, and BSE has three instances.
+- **Keep the operations view per segment.** Three exchanges, and BSE has per-segment sessions.
 - **Treat "risk not evaluating" as a stop, not a degradation.** There is no bypass, and the pre-open is the moment to find out.
 - **Write the handover.** Open items at 09:15 are the ones that become incidents at 11:00.
 - **Watch client contact volume before 09:08.** A spike there is almost always the release.
 
 ## Where this connects
 
-- [BOD runbook](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/) — what precedes this
+- [<abbr title="Beginning Of Day">BOD</abbr> runbook](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/) — what precedes this
 - [Continuous session operations](/broking-kyc/finix-broking-setup/daily-ops/03-continuous-session-ops/) — what follows
 - [NSE cash](/broking-kyc/finix-broking-setup/exchanges/01-nse-cash/) — the session structure
 - [Order attributes and validity](/broking-kyc/finix-broking-setup/oms/05-order-attributes-validity/) — the after-market window

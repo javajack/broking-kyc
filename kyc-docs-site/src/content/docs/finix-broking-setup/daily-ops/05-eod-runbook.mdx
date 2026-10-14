@@ -12,10 +12,10 @@ import { Aside } from '@astrojs/starlight/components';
 - **The pipeline blocks forward.** Trade file → reconciliation → charges → contract notes → ledger → obligations. A failure at any point stops everything after it, and the contract-note deadline does not move.
 - **Reconciliation is the chokepoint.** A difference blocks contract notes, which is correct, which means difference handling must be fast, staffed and rehearsed rather than a next-morning activity.
 - **Contract notes are generated and dispatched within 24 hours of execution, digitally signed.** Generation is the absolute deadline; dispatch may queue with evidence of attempts.
-- **The extract to RMS blocks tomorrow's open.** It is the last step in the chain and the first gate of the next day.
+- **The extract to <abbr title="Risk Management System">RMS</abbr> blocks tomorrow's open.** It is the last step in the chain and the first gate of the next day.
 - **Upstreaming is computed and instructed at end of day**, and the computed-versus-confirmed assertion is a hard daily check.
 - **Margin reporting targets an internal date materially before the five-working-day cut-off**, so a failed run has room to be rerun.
-- **The commodity close is a separate, later sequence** that runs after the MCX session ends at 23:30.
+- **The commodity close is a separate, later sequence** that runs after the <abbr title="Multi Commodity Exchange of India">MCX</abbr> session ends at 23:30.
 
 ## 1. Deadlines in the pipeline
 
@@ -23,7 +23,7 @@ import { Aside } from '@astrojs/starlight/components';
 |---|---|---|
 | **Contract notes, within 24 hours of execution** | Regulatory | A reportable breach |
 | Funds and securities pay-in | Clearing corporation, via the **bank's earlier cut-off** | Short delivery, auction, default |
-| **CUSPA auto-pledge at pay-out** | Regulatory, same day | Unsecured exposure; a statutory clock starts |
+| **<abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr> auto-pledge at pay-out** | Regulatory, same day | Unsecured exposure; a statutory clock starts |
 | CUSPA excess release | Regulatory, **by the next trading day** | Client securities over-encumbered |
 | **Upstreaming** | Regulatory, end of day | Under-upstreamed balance overnight; a breach |
 | Margin reporting | Exchange, five working days after trade date | Penalty; non-reporting treated as 100 percent short |
@@ -37,13 +37,13 @@ import { Aside } from '@astrojs/starlight/components';
 | 1 | Expected-file checklist for today's day type confirmed | Operations | Everything | Day type correct |
 | 2 | **Exchange trade files retrieved**, per exchange and segment | Operations | **Everything downstream** | Count and value asserted against an independent source |
 | 3 | Trade files loaded, idempotently | Operations | Everything | Record counts match |
-| 4 | **Three-way reconciliation** — exchange file, OMS feed, back office | Operations | **Contract notes** | Clean, or every difference classified |
+| 4 | **Three-way reconciliation** — exchange file, <abbr title="Order Management System">OMS</abbr> feed, back office | Operations | **Contract notes** | Clean, or every difference classified |
 | 5 | Differences classified and escalated | Operations | Contract notes | D2, D8 and D16 escalate immediately |
 | 6 | **Client allocation complete** | Operations | Everything | **No unallocated trades** |
 | 7 | Charges computed on effective-dated rates | Operations | Contract notes | Independent sample recomputation |
 | 8 | **Contract notes generated** | Operations | — | **Count matches clients with activity**; within the deadline |
 | 9 | Contract notes signed | Operations | Dispatch | Every note signed and verified |
-| 10 | **Contract notes dispatched**, email and SMS link with DLT templates | Operations | — | Dispatch evidence recorded |
+| 10 | **Contract notes dispatched**, email and <abbr title="Short Message Service.">SMS</abbr> link with DLT templates | Operations | — | Dispatch evidence recorded |
 | 11 | **Ledger posted** | Operations | Statements, reporting, pay-out | Note totals tie to ledger postings exactly |
 | 12 | **Obligation files retrieved and loaded** | Operations | Settlement | Client obligation sum ties to the member obligation |
 | 13 | Shortfalls identified — funds and securities | Operations | Settlement preparation | Published to the people who can act |
@@ -120,7 +120,7 @@ The contract-note clock runs from execution, not from when the back office recei
 | Content | Collateral and clear balance per client, with an as-of timestamp |
 | Consumer | Saral RMS, at tomorrow's begin-of-day |
 | **Assertion** | As-of is **today's**; record count reconciles to the client master |
-| Failure | **Tomorrow's open is blocked** — gate G5 in the [BOD runbook](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/#1-the-gates) |
+| Failure | **Tomorrow's open is blocked** — gate G5 in the [<abbr title="Beginning Of Day">BOD</abbr> runbook](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/#1-the-gates) |
 | Timing | Early enough that a failure can be fixed tonight |
 | Verification | Produced and verified before the overnight team disperses |
 

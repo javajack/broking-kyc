@@ -23,7 +23,7 @@ This page is the complete listing of <abbr title="Central Registry of Securitisa
 
 - **date_issued:** 2026-09-03
 - **issuer:** CERSAI
-- **title:** "Readiness for Go-Live of Central <abbr title="Know Your Customer (process).">KYC</abbr> Records Registry 2.0 (CKYCRR 2.0) and participation in Pilot Testing"
+- **title:** "Readiness for Go-Live of Central <abbr title="Know Your Customer (process).">KYC</abbr> Records Registry 2.0 (<abbr title="Central KYC Records Registry">CKYCRR</abbr> 2.0) and participation in Pilot Testing"
 - **applies_to:** all-intermediaries
 - **in_force_date:** 2026-09-07
 - **status:** in-force

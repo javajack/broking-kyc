@@ -5,13 +5,13 @@ description: Whether to become a depository participant or use a tie-up, the net
 
 import { Aside } from '@astrojs/starlight/components';
 
-> **Why this page is structured this way:** Depository participation is usually presented as an optional revenue line, which badly understates it. A broker that is not a DP still depends on depository functions for everything that matters — pledge of client collateral, delivery of securities at settlement, direct pay-out to client demat accounts, and the auto-pledge that the 2026 unpaid-securities regime requires at pay-out. The question is therefore not whether the firm needs depository capability, but whether it holds that capability itself or rents it. So the page starts from what depends on the depository, then the capital and admission reality, then the build, then the dependency consequences of each choice.
+> **Why this page is structured this way:** Depository participation is usually presented as an optional revenue line, which badly understates it. A broker that is not a <abbr title="Depository Participant">DP</abbr> still depends on depository functions for everything that matters — pledge of client collateral, delivery of securities at settlement, direct pay-out to client demat accounts, and the auto-pledge that the 2026 unpaid-securities regime requires at pay-out. The question is therefore not whether the firm needs depository capability, but whether it holds that capability itself or rents it. So the page starts from what depends on the depository, then the capital and admission reality, then the build, then the dependency consequences of each choice.
 
 ## TL;DR
 
-- **The net worth requirement for a stock broker to become a DP stepped up to ₹5 crore.** CDSL's published requirement was ₹3 crore with effect from 23 February 2023 and ₹5 crore with effect from 23 February 2024, under the SEBI (Depositories and Participants) (Amendment) Regulations, 2022 dated 23 February 2022; NSDL states ₹5 crore for a stock broker. `[not yet in index]`
+- **The net worth requirement for a stock broker to become a DP stepped up to ₹5 crore.** <abbr title="Central Depository Services (India) Limited">CDSL</abbr>'s published requirement was ₹3 crore with effect from 23 February 2023 and ₹5 crore with effect from 23 February 2024, under the <abbr title="Securities and Exchange Board of India">SEBI</abbr> (Depositories and Participants) (Amendment) Regulations, 2022 dated 23 February 2022; <abbr title="National Securities Depository Limited">NSDL</abbr> states ₹5 crore for a stock broker. `[not yet in index]`
 - **For Finix this is the same number as self-clearing**, so the two decisions should be taken together: ₹5 crore satisfies both the self-clearing member tier and the stock-broker DP tier, which makes DP admission substantially cheaper in marginal capital terms than it first appears.
-- **Three operationally critical things route through a depository**, regardless of whether the broker is a DP: the pledge and re-pledge chain for client collateral, securities settlement including early pay-in and direct pay-out to client demat, and the CUSPA auto-pledge at pay-out under the [2026 unpaid-securities framework](/broking-kyc/finix-broking-setup/backoffice/06-cuspa-unpaid-securities/).
+- **Three operationally critical things route through a depository**, regardless of whether the broker is a DP: the pledge and re-pledge chain for client collateral, securities settlement including early pay-in and direct pay-out to client demat, and the <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr> auto-pledge at pay-out under the [2026 unpaid-securities framework](/broking-kyc/finix-broking-setup/backoffice/06-cuspa-unpaid-securities/).
 - **Being a DP buys control over the client experience and the timeline.** A non-DP broker's client has to open a demat account somewhere, and every account-opening delay, modification and closure runs through a counterparty with its own service levels.
 - **Being a DP buys a second regulated business with its own obligations.** A DP is separately inspected, separately audited, has its own compliance officer requirement, its own charge schedule, its own grievance obligations and its own operating instructions manual.
 - **Dual-depository operation is a real design burden.** CDSL and NSDL differ in instruction formats, activation timelines, pledge mechanics and file structures. Site coverage shows CDSL beneficiary-owner activation in hours by application programming interface against roughly fifteen days by batch for NSDL — which makes NSDL the activation bottleneck in onboarding.
@@ -30,10 +30,10 @@ The decision about participation follows from that. A broker that is a DP contro
 - **SEBI (Depositories and Participants) Regulations, 2018**, as amended — eligibility categories and net worth for participants. The **SEBI (Depositories and Participants) (Amendment) Regulations, 2022** dated 23 February 2022 set the stock-broker step-up to ₹3 crore from 23 February 2023 and ₹5 crore from 23 February 2024. `[not yet in index]`
 - **Depositories Act, 1996** — the statutory basis for dematerialised holding and transfer.
 - **CDSL and NSDL bye-laws, business rules and operating instructions** — the operative rulebook for a participant, including instruction formats, timelines and charge structures. See the [CDSL circulars index](/broking-kyc/reference/circulars/cdsl/) and [NSDL circulars index](/broking-kyc/reference/circulars/nsdl/).
-- **[Margin obligations by way of pledge and re-pledge, SEBI/HO/MIRSD/DOP/CIR/P/2020/28](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddopcirp202028)** (25 February 2020) — in force from 1 August 2020; off-market transfer of client securities as collateral prohibited, beneficial ownership retained by the client, pledge chain visible in the pledgor's demat account.
+- **[Margin obligations by way of pledge and re-pledge, SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/DOP/CIR/P/2020/28](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddopcirp202028)** (25 February 2020) — in force from 1 August 2020; off-market transfer of client securities as collateral prohibited, beneficial ownership retained by the client, pledge chain visible in the pledgor's demat account.
 - **[Client unpaid securities pledgee account, HO/38/11/(9)2026-MIRSD-POD/I/15382/2026](/broking-kyc/reference/circulars/sebi-mirsd/#ho381192026-mirsd-podi153822026)** (3 July 2026) — amends paragraph 46 of the master circular; creates the CUSPA regime with auto-pledge at pay-out and depository-driven auto-release on the sixth trading day.
 - **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025).
-- **Nomination and DDPI frameworks** — see [nomination fields](/broking-kyc/reference/field-atlas/sections/i-nomination/) and [DDPI fields](/broking-kyc/reference/field-atlas/sections/o-ddpi/).
+- **Nomination and <abbr title="Demat Debit and Pledge Instruction">DDPI</abbr> frameworks** — see [nomination fields](/broking-kyc/reference/field-atlas/sections/i-nomination/) and [DDPI fields](/broking-kyc/reference/field-atlas/sections/o-ddpi/).
 
 ## 2. What depends on the depository, whether or not you are a DP
 
@@ -140,13 +140,13 @@ See [CDSL extended](/broking-kyc/appendix/cdsl-extended/) and the [batch pipelin
 
 | Downstream item | Dependency |
 |---|---|
-| [UCC registration](/broking-kyc/finix-broking-setup/onboarding/05-ucc-registration-exchanges/) | Demat identifier needed for the client master |
+| [<abbr title="Unique Client Code">UCC</abbr> registration](/broking-kyc/finix-broking-setup/onboarding/05-ucc-registration-exchanges/) | Demat identifier needed for the client master |
 | [eSign, DDPI and pledge setup](/broking-kyc/finix-broking-setup/onboarding/06-esign-ddpi-pledge-setup/) | DDPI covers depository instruction authority |
 | [Collateral and pledge](/broking-kyc/finix-broking-setup/rms/05-collateral-pledge/) | Pledge records drive recognised collateral |
 | [Settlement obligations](/broking-kyc/finix-broking-setup/backoffice/05-settlement-obligations/) | Delivery and early pay-in instructions |
 | [CUSPA](/broking-kyc/finix-broking-setup/backoffice/06-cuspa-unpaid-securities/) | Auto-pledge, recomputation, invocation, auto-release |
 | [Corporate actions](/broking-kyc/finix-broking-setup/backoffice/07-corporate-actions/) | Entitlements |
-| [EOD runbook](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/) | Holdings and pledge reconciliation |
+| [<abbr title="End Of Day">EOD</abbr> runbook](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/) | Holdings and pledge reconciliation |
 
 ## 9. Exception paths
 

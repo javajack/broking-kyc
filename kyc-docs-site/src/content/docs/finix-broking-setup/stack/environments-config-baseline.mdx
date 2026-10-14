@@ -9,9 +9,9 @@ import { Aside } from '@astrojs/starlight/components';
 
 ## TL;DR
 
-- **Six vendor systems and three exchanges means up to nine independent environment ladders**, and they do not line up. Exchange test environments exist on exchange-published schedules, not on yours; some vendor sandboxes have no market data; CKYCRR 2.0 had a pilot window with a published extension to 5 October 2026. Plan the test calendar around the least flexible participant.
+- **Six vendor systems and three exchanges means up to nine independent environment ladders**, and they do not line up. Exchange test environments exist on exchange-published schedules, not on yours; some vendor sandboxes have no market data; <abbr title="Central KYC Records Registry">CKYCRR</abbr> 2.0 had a pilot window with a published extension to 5 October 2026. Plan the test calendar around the least flexible participant.
 - **Classify every configuration item as regulatory, exchange-set or discretionary.** A regulatory value needs a circular reference. An exchange-set value needs the circular *and* a mechanism to refresh it when the exchange changes it. A discretionary value needs a board-or-committee-approved policy. Getting the classification wrong is itself an audit finding.
-- **The dangerous category is "discretionary but looks regulatory".** Brokers routinely describe their own leverage policy as though SEBI set it. The opposite error is worse: treating a mandated floor as a tunable.
+- **The dangerous category is "discretionary but looks regulatory".** Brokers routinely describe their own leverage policy as though <abbr title="Securities and Exchange Board of India">SEBI</abbr> set it. The opposite error is worse: treating a mandated floor as a tunable.
 - **Exchange-set values must be refreshed, not copied.** Margin rates, haircut lists, ban-period lists, lot sizes, bands, eligibility lists and holiday calendars all change by circular, sometimes intraday. Any value hard-coded from a circular is a defect with a date of detonation.
 - **Configuration needs the same change control as code** — version, author, approver, effective timestamp, reason, and the ability to answer "what was this value on 14 August" without a database restore.
 - **Secrets are not configuration.** Six vendor integrations means at least six credential sets plus exchange connectivity credentials, and some of them are shared-secret or certificate-based with rotation requirements that are operational events, not background tasks.
@@ -30,16 +30,16 @@ The third property, less obvious, is **separation of the refresh mechanism from 
 |---|---|---|---|
 | Saral MoneyMaker | Development, UAT, production; UAT aligned to exchange simulated environments | Only during exchange mock sessions | Order-type and protocol testing is gated by exchange mock windows, not by vendor availability |
 | SecMark back office | Development, UAT, production | Not applicable — file-driven | Can be exercised any time with synthetic exchange files; build a file generator early |
-| SecMark middleware | Development, UAT, production | Partial | Needs an OMS counterparty to be meaningful |
-| SecMark C-Safe and AML Sutra | UAT, production | Not applicable | List versions in UAT may lag production; verify before relying on a UAT screening result |
-| Digio | Sandbox, production | Not applicable | Sandbox Aadhaar and PAN flows are simulated; eSign in sandbox does not produce a legally valid signature |
-| CVL KRA | Test, production | Not applicable | Test records must be requested; do not test with real client PAN |
-| CERSAI CKYCRR 2.0 | Pilot/readiness, production | Not applicable | Phased go-live from 1 August 2026 with the pilot window extended to 5 October 2026; watch CERSAI communications for the production instruction applicable to your category |
+| SecMark middleware | Development, UAT, production | Partial | Needs an <abbr title="Order Management System">OMS</abbr> counterparty to be meaningful |
+| SecMark C-Safe and <abbr title="Anti-Money Laundering">AML</abbr> Sutra | UAT, production | Not applicable | List versions in UAT may lag production; verify before relying on a UAT screening result |
+| Digio | Sandbox, production | Not applicable | Sandbox Aadhaar and <abbr title="Permanent Account Number">PAN</abbr> flows are simulated; eSign in sandbox does not produce a legally valid signature |
+| CVL <abbr title="KYC Registration Agency">KRA</abbr> | Test, production | Not applicable | Test records must be requested; do not test with real client PAN |
+| <abbr title="Central Registry of Securitisation Asset Reconstruction and Security Interest of India">CERSAI</abbr> CKYCRR 2.0 | Pilot/readiness, production | Not applicable | Phased go-live from 1 August 2026 with the pilot window extended to 5 October 2026; watch CERSAI communications for the production instruction applicable to your category |
 | Razorpay and RazorpayX | Test mode, live mode | Not applicable | Test mode payouts do not move money; webhook signatures differ by mode |
-| NSE | Simulated/mock environments per segment, production | Yes, during published mock sessions | Mock sessions are announced by circular; certification is tied to them |
-| BSE | Mock environment, production | Yes, during published mock sessions | Separate connection and separate IML instance per segment, so each segment is a separate test track |
-| MCX | Mock environment, production | Yes, during published mock sessions | Long session hours mean mock windows can fall late in the evening |
-| CDSL / NSDL | Test, production | Not applicable | DP system testing is independent of trading |
+| <abbr title="National Stock Exchange of India">NSE</abbr> | Simulated/mock environments per segment, production | Yes, during published mock sessions | Mock sessions are announced by circular; certification is tied to them |
+| <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> | Mock environment, production | Yes, during published mock sessions | A separate <abbr title="Enhanced Trading Interface">ETI</abbr> session per segment, so each segment is a separate certification track |
+| <abbr title="Multi Commodity Exchange of India">MCX</abbr> | Mock environment, production | Yes, during published mock sessions | Long session hours mean mock windows can fall late in the evening |
+| <abbr title="Central Depository Services (India) Limited">CDSL</abbr> / <abbr title="National Securities Depository Limited">NSDL</abbr> | Test, production | Not applicable | <abbr title="Depository Participant">DP</abbr> system testing is independent of trading |
 
 <Aside type="caution" title="The test calendar is set by the least flexible participant">
 A broker's integration programme is usually planned around engineering capacity, then discovers that the only way to prove an order type behaves correctly end to end is during an exchange mock session on a Saturday announced three weeks in advance. Build the plan backwards from the published mock and certification calendar. [Certification, mock trading and go-live](/broking-kyc/finix-broking-setup/setup/10-certification-mock-golive/) sets this out as a dependency chain.
@@ -55,7 +55,7 @@ A broker's integration programme is usually planned around engineering capacity,
 | Secrets never shared across environments | A sandbox key leak must not be a production incident |
 | Non-production environments retained on the same security baseline as production | They contain the same code and often the same configuration |
 
-See [DPDP consent fields](/broking-kyc/reference/field-atlas/sections/aa-dpdp-consent/) for the consent artefacts that constrain what may be copied at all.
+See [<abbr title="Digital Personal Data Protection Act 2023 (and Rules 2025)">DPDP</abbr> consent fields](/broking-kyc/reference/field-atlas/sections/aa-dpdp-consent/) for the consent artefacts that constrain what may be copied at all.
 
 ## 2. Configuration key convention
 
@@ -105,8 +105,8 @@ Scope resolution is **most specific wins**, in the order: client, client group, 
 | Square-off trigger percentage | Regulatory | **Discretionary**, but must be disclosed to clients | Must match the risk-management policy the client was given |
 | Peak margin reporting cut-off | Discretionary | **Exchange-set** — reporting cut-off is five working days after trade date | Late reporting is itself penalised, separately from short collection |
 | Cash acceptance from clients | Discretionary with limits | **Prohibited** by regulation 20(d) of the 2026 regulations | Any configuration permitting it is a defect |
-| Unpaid-securities payment window | Discretionary | **Capped** — maximum five trading days from pay-out under the CUSPA framework | A longer window is a breach; a shorter one is permitted and must be in the policy |
-| Band or circuit filter | Exchange-set | **Exchange-set**, and intraday-variable | Must be refreshed intraday, not at BOD only |
+| Unpaid-securities payment window | Discretionary | **Capped** — maximum five trading days from pay-out under the <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr> framework | A longer window is a breach; a shorter one is permitted and must be in the policy |
+| Band or circuit filter | Exchange-set | **Exchange-set**, and intraday-variable | Must be refreshed intraday, not at <abbr title="Beginning Of Day">BOD</abbr> only |
 | Holiday calendar | Static annual | **Exchange-set**, amendable by circular mid-year | A hard-coded calendar will eventually trade on a closed day or halt on an open one |
 | Designated director residency | Not configuration | **Regulatory** — not less than 182 days in India per financial year | Tracked as a compliance item, not a system setting, but it is a monitored value |
 
@@ -129,7 +129,7 @@ Each of these is a value the broker must obtain repeatedly. The staleness behavi
 | Settlement calendar and obligations | Clearing corporation | Per settlement | Per settlement | Escalate; do not estimate obligations |
 | Holiday and session calendar | Exchange | Annual plus amendments | Immediate on circular | Manual confirmation before BOD on any boundary day |
 | Margin reporting file formats | Exchange | On change by circular | Immediate | Reject the run rather than file a malformed report |
-| Validated UPI handle directory | Payment network and exchange | On change | One business day | Fall back to verified handle on record |
+| Validated <abbr title="Unified Payments Interface">UPI</abbr> handle directory | Payment network and exchange | On change | One business day | Fall back to verified handle on record |
 
 See [file formats and downloads](/broking-kyc/finix-broking-setup/exchanges/08-file-formats-downloads/) for where each of these arrives, and [BOD runbook](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/) for the ingestion order and abort conditions.
 
@@ -168,11 +168,11 @@ The general rule used throughout this manual: **a configuration change that can 
 
 | Credential | System | Type | Rotation | Operational note |
 |---|---|---|---|---|
-| Exchange connectivity credentials | NSE, BSE, MCX | User identifiers plus session credentials | Per exchange policy | Terminal identifiers are reportable to the exchange; see [user IDs, CTCL and NNF](/broking-kyc/finix-broking-setup/oms/03-user-id-ctcl-nnf/) |
+| Exchange connectivity credentials | NSE, BSE, MCX | User identifiers plus session credentials | Per exchange policy | Terminal identifiers are reportable to the exchange; see [user IDs, <abbr title="Computer-to-Computer Link.">CTCL</abbr> and <abbr title="Non-NEAT Front End">NNF</abbr>](/broking-kyc/finix-broking-setup/oms/03-user-id-ctcl-nnf/) |
 | Exchange extranet access | NSE, BSE, MCX | Account credentials | Periodic | The single most operationally critical credential set; loss of it stops BOD |
 | Digio API credentials | Digio | Key and secret, environment-scoped | Periodic | Sandbox and production keys must be impossible to confuse; fail closed on mismatch |
 | KRA credentials | CVL KRA | Intermediary credentials plus API configuration | Periodic | Images and data are pushed; credential compromise is a personal-data incident |
-| CKYCRR credentials | CERSAI | API credentials, institution-scoped | Per CERSAI policy | 2.0 adds OTP-based consent in the download flow, which is a client-facing dependency, not just a credential |
+| CKYCRR credentials | CERSAI | API credentials, institution-scoped | Per CERSAI policy | 2.0 adds <abbr title="One-Time Password">OTP</abbr>-based consent in the download flow, which is a client-facing dependency, not just a credential |
 | Razorpay keys | Razorpay, RazorpayX | Key and secret, mode-scoped | Periodic | Payout credentials are money-moving; hold to the highest tier of control |
 | Webhook signing secrets | Razorpay | Shared secret | Periodic | Signature verification is mandatory on every inbound webhook; see [pay-out engine](/broking-kyc/finix-broking-setup/money/03-payout-engine/) |
 | Bank channel credentials | Clearing and client banks | Varies, often certificate-based | Per bank policy | Certificate expiry is a scheduled outage if not tracked |

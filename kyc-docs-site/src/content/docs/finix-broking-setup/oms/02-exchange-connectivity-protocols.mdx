@@ -1,18 +1,18 @@
 ---
 title: "OMS 2: exchange connectivity protocols"
-description: How Saral MoneyMaker reaches each exchange — NSE's Computer-to-Computer Link, Non-NEAT Front End and the Trading Access Point; BSE's Open Message Bus with one IML instance per segment; MCX's member protocol — with session management, sequencing, protocol versioning, and the operational differences that break a one-size design.
+description: How Saral MoneyMaker reaches each exchange — NSE's Computer-to-Computer Link, Non-NEAT Front End and the Trading Access Point; BSE's ETI with one session per segment; MCX's member protocol — with session management, sequencing, protocol versioning, and the operational differences that break a one-size design.
 ---
 
 import { Aside } from '@astrojs/starlight/components';
 
-> **Why this page is structured this way:** Connectivity is where "it works on NSE" stops generalising. Each exchange has a different access model, a different session concept, a different per-segment topology and a different upgrade cadence, and those differences determine how many deployments you run, how many runbooks you write and how many certification tracks you plan. So the page treats each exchange separately and in full, then pulls out the cross-cutting concerns — sessions, sequencing, versioning, capacity — that have to be solved once but configured three times.
+> **Why this page is structured this way:** Connectivity is where "it works on <abbr title="National Stock Exchange of India">NSE</abbr>" stops generalising. Each exchange has a different access model, a different session concept, a different per-segment topology and a different upgrade cadence, and those differences determine how many deployments you run, how many runbooks you write and how many certification tracks you plan. So the page treats each exchange separately and in full, then pulls out the cross-cutting concerns — sessions, sequencing, versioning, capacity — that have to be solved once but configured three times.
 
 ## TL;DR
 
 - **NSE: Computer-to-Computer Link, available only to NSE trading members**, lets the member use its own front end. Access is by unique user identifier over a wide area network on TCP/IP, with interactive TCP/IP connectivity for user-specific messages to and from the exchange. The front end may connect through middleware called the **Trading Access Point**.
-- **NSE's Non-NEAT Front End is the protocol family**, with specifications published and versioned **per segment** — the commodity, futures and options, and securities lending and borrowing protocol documents are separate documents with separate version numbers. There is no single NNF specification.
-- **BSE: the Open Message Bus, documented as BOLT Plus IML.** A **separate connection and a separate IML instance is required for each of equity, equity derivatives and currency derivatives**, and the participant application establishes a connection by a user registration request through IML. This is the single largest topology difference in the stack.
-- **MCX: its own member protocol**, with published guidance referring to ISDN or other internet connectivity with firewalls. Confirm the current approved options; the long session to 23:30 makes connectivity monitoring an evening activity.
+- **NSE's Non-NEAT Front End is the protocol family**, with specifications published and versioned **per segment** — the commodity, futures and options, and securities lending and borrowing protocol documents are separate documents with separate version numbers. There is no single <abbr title="Non-NEAT Front End">NNF</abbr> specification.
+- **<abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr>: the Enhanced Trading Interface, BSE <abbr title="Enhanced Trading Interface">ETI</abbr>**, which replaced the now-discontinued IML. ETI is **session-oriented**, and **a separate session is required per segment** while the **participant identifier stays the same across segments**. API versions are **mandated by the exchange**.
+- **<abbr title="Multi Commodity Exchange of India">MCX</abbr>: its own member protocol**, with published guidance referring to ISDN or other internet connectivity with firewalls. Confirm the current approved options; the long session to 23:30 makes connectivity monitoring an evening activity.
 - **Protocol upgrades are certification events, not deployments.** When an exchange versions a protocol, the member re-certifies. Version tracking per interface with a known upgrade window belongs in the [configuration register](/broking-kyc/finix-broking-setup/stack/environments-config-baseline/).
 - **Sequence continuity is the health signal that matters.** A connection that is up but has a sequence gap is in a worse state than one that is down, because it looks healthy while the firm's view of its own orders diverges from the exchange's.
 - **Market data is a separate concern from order flow** and must be capacity-planned separately; a volatility burst multiplies tick rates without touching order rates.
@@ -23,16 +23,16 @@ Every exchange connection is really three things bundled together: a transport, 
 
 The practical consequence of bundling them is that a single failure mode — "connectivity down" — actually covers several very different situations with very different responses. A transport failure with the session intact at the exchange means the exchange may still hold live orders. A session logout means the exchange's view of the member has changed. A sequence gap with the transport healthy means messages were lost in a way neither side has yet noticed. These require different operational responses, and a monitoring system that reports a single boolean cannot distinguish them. That is why the [integration contract matrix](/broking-kyc/finix-broking-setup/stack/integration-contract-matrix/#2-order-path--the-real-time-band) treats sequence continuity as a distinct detection mechanism rather than folding it into connection state.
 
-The second structural point is the per-segment multiplication. On NSE, segments are largely enabled on a shared connectivity stack. On BSE, each of the three segments wants its own connection and its own protocol instance, which turns one component into three. Everything that applies to a connection — provisioning, monitoring, failover, capacity, patching, version tracking, certification, runbook — now applies three times. Teams that model BSE as "NSE with different field names" discover this during certification, and the discovery is expensive because the infrastructure was sized for one.
+The second structural point is the per-segment multiplication. On NSE, segments are largely enabled on a shared connectivity stack. On BSE, each segment needs its own ETI session, so session establishment, monitoring, failover and certification all apply per segment while the participant identifier stays common. That is a smaller difference than three separate integrations and a larger one than a configuration flag — and teams that model BSE as “NSE with different field names” discover it during certification, which is the expensive moment.
 
 ## 1. Regulatory and documentary framework
 
-- **NSE platform services documentation** — Computer-to-Computer Link, Non-NEAT Front End, user identifier and CTCL identifier material, and the segment-wise NNF protocol specifications. These are the operative documents, published and versioned by the exchange. `[not yet in index]`
+- **NSE platform services documentation** — Computer-to-Computer Link, Non-NEAT Front End, user identifier and <abbr title="Computer-to-Computer Link.">CTCL</abbr> identifier material, and the segment-wise NNF protocol specifications. These are the operative documents, published and versioned by the exchange. `[not yet in index]`
 - **NSE/MSD/67755** (29 April 2025) — applications for NEAT to CTCL conversion of user identifiers and for non-NEAT user identifiers, through NSE-ENIT. `[not yet in index]`
-- **BSE Open Message Bus / BOLT Plus IML application programming interface documents** — separate documents for the equity and equity derivatives segments, separately versioned. `[not yet in index]`
+- **BSE ETI API manual and BOLT Plus connectivity manual** — published and versioned by the exchange, with **mandated API versions** applied across segments. The legacy IML interface is discontinued. `[not yet in index]`
 - **MCX connectivity and membership guidance** — including the compliance guide. `[not yet in index]`
-- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — regulation 18(5) cyber security and cyber resilience, which governs how these links are secured. `[not yet in index]`
-- **Facility approval frameworks** — internet-based trading, wireless, direct market access, algorithmic trading, smart order routing and application programming interface access all ride on this connectivity and each is separately approved. See [algo, API, DMA and SOR](/broking-kyc/finix-broking-setup/oms/09-algo-api-dma-sor/).
+- **[<abbr title="Securities and Exchange Board of India">SEBI</abbr> (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — regulation 18(5) cyber security and cyber resilience, which governs how these links are secured. `[not yet in index]`
+- **Facility approval frameworks** — internet-based trading, wireless, direct market access, algorithmic trading, smart order routing and application programming interface access all ride on this connectivity and each is separately approved. See [algo, API, DMA and <abbr title="Smart Order Routing">SOR</abbr>](/broking-kyc/finix-broking-setup/oms/09-algo-api-dma-sor/).
 
 <Aside type="caution" title="This page does not reproduce protocol layouts">
 Message structures, field layouts and tag definitions live in the exchange's own protocol documents, which are supplied under agreement and are versioned. This page describes what the connectivity *is* and how it behaves operationally, and names the document to get the layout from. Building from a third-party description of an exchange protocol is how field-level defects enter a stack.
@@ -68,28 +68,33 @@ Whichever is chosen, it is an architectural fact to be documented, monitored and
 
 | Aspect | Detail |
 |---|---|
-| Access model | BSE Open Message Bus, documented as the BOLT Plus IML application programming interface, covering equity, equity derivatives and currency derivatives |
-| **Per-segment connection** | **A separate connection is required for each of currency, equity derivatives and equity** |
-| **Per-segment instance** | **A separate IML instance is required for each segment** |
-| Session establishment | A participant application establishes connection to the trading system by a user registration request through IML |
-| Documents | Separate API documents per segment, separately versioned |
+| Interface | **BSE ETI (Enhanced Trading Interface)**, the current interactive interface to BOLT Plus |
+| Legacy | **IML is discontinued** |
+| Nature | **Session-oriented**; high-performance, low-latency; full trading, drop copy and risk alerts |
+| **Session model** | **A separate session per segment** |
+| **Participant identifier** | **Common across segments** |
+| Segments | Equity and equity derivatives in production, simulation and disaster recovery; currency and commodity derivatives also supported |
+| **Versioning** | **Exchange-mandated ETI API versions**, applied across segments |
+| Documents | ETI API manual; BOLT Plus connectivity manual |
 
-### 3.1 What three instances actually costs
+### 3.1 What per-segment sessions cost
+
+Less than three separate integrations, more than a configuration flag.
 
 | Dimension | Consequence |
 |---|---|
-| Provisioning | Three connections to order, install and test |
-| Deployment | Three instances to deploy and configure |
-| Monitoring | Three sets of session, sequence and latency metrics, with per-segment alerting |
-| Failover | Three independent failover paths, each tested |
-| Capacity | Sized per instance; a derivatives surge does not relieve the equity instance |
-| Patching and upgrade | Three upgrade windows, potentially on different exchange schedules |
-| Certification | **Three certification tracks**; success on one segment does not transfer |
-| Runbooks | Three sets of start, stop, recover and verify procedures |
-| Incident scope | A failure is segment-scoped, which is good for blast radius and bad for diagnosis — "BSE is down" is never the right first statement |
+| Provisioning | Connectivity provisioned once; **sessions established per segment** |
+| Session management | Establish, monitor and recover per segment |
+| Monitoring | Per-segment session state, sequence continuity and latency, with per-segment alerting |
+| Failover | Exercised per segment session |
+| Capacity | Message rates considered per segment |
+| **Version upgrades** | **Exchange-mandated**, scheduled, and a certification event |
+| **Certification** | **Per segment**; success on one segment does not transfer |
+| Runbooks | Start, stop, recover and verify procedures that name the segment |
+| Incident scope | **Segment-scoped** — "BSE is down" is rarely the right first statement |
 
-<Aside type="tip" title="Turn the per-segment topology into an advantage">
-The upside of three independent instances is genuine isolation: an equity derivatives problem cannot take down equity trading. Design the operational model to exploit that — segment-scoped health indicators, segment-scoped client messaging, and the ability to stop one segment cleanly while the others run. Firms that treat the three instances as an inconvenience end up with monitoring that aggregates them into one indicator, which throws away the only benefit.
+<Aside type="tip" title="Exploit the segment scoping">
+Independent sessions per segment give real isolation: an equity derivatives session problem does not have to stop equity trading. Collecting that benefit requires segment-scoped health indicators, segment-scoped client messaging and the ability to stop one segment cleanly while the others run. A firm that aggregates the segments into one "BSE status" pays for the session management and keeps none of the isolation.
 </Aside>
 
 ## 4. MCX
@@ -100,7 +105,7 @@ The upside of three independent instances is genuine isolation: an equity deriva
 | Connectivity guidance | Published guidance refers to ISDN or any other type of internet connectivity with firewalls; **confirm the current approved connectivity options with the exchange** |
 | Session hours | Non-agricultural commodities 09:00 to 23:30, or 23:55 during United States daylight saving; select agricultural such as cotton to 21:00; other agricultural to 17:00 |
 | Operational consequence | Connectivity monitoring, incident response and vendor support all extend into the evening |
-| Delivery-related messaging | Tender and delivery intentions handled through MCXCCL eClear, accepted until 19:30 on tender days — a separate system with its own availability requirement |
+| Delivery-related messaging | Tender and delivery intentions handled through <abbr title="Multi Commodity Exchange Clearing Corporation Limited">MCXCCL</abbr> eClear, accepted until 19:30 on tender days — a separate system with its own availability requirement |
 
 ### 4.1 What the long session changes
 
@@ -117,7 +122,7 @@ The upside of three independent instances is genuine isolation: an equity deriva
 
 | Concept | Design |
 |---|---|
-| Establishment | At BOD, per exchange and per segment instance, before the market opens; part of the [BOD runbook](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/) |
+| Establishment | At <abbr title="Beginning Of Day">BOD</abbr>, per exchange and per segment instance, before the market opens; part of the [BOD runbook](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/) |
 | Authentication | Per exchange mechanism, with credentials held in the managed secret store |
 | Heartbeat | Per protocol requirement, with an alert on a missed heartbeat rather than on a missed window of heartbeats |
 | Sequencing | Continuous tracking; **a gap is an incident** |
@@ -185,7 +190,7 @@ The "unexpected quiet" row is worth emphasising. A connection carrying no orders
 |---|---|---|---|
 | `finix.oms.conn.nse.mode` | CTCL with NNF | Exchange-set | Unsupported access model |
 | `finix.oms.conn.nse.tap_enabled` | Per vendor architecture | Discretionary | Unplanned latency hop |
-| `finix.oms.conn.bse.instances` | **3 — one per segment** | Exchange-set | Orders to the wrong segment instance, or a segment with no path |
+| `finix.oms.conn.bse.sessions` | **One per segment** | Exchange-set | Orders to the wrong segment instance, or a segment with no path |
 | `finix.oms.conn.mcx.mode` | Per approved option | Exchange-set | Unsupported connectivity |
 | `finix.oms.conn.<x>.<seg>.protocol_version` | Per current document | Exchange-set | Malformed messages after an exchange upgrade |
 | `finix.oms.conn.heartbeat_miss_action` | Alert immediately | Discretionary | Late detection |
@@ -204,7 +209,7 @@ The "unexpected quiet" row is worth emphasising. A connection carrying no orders
 | Both links down to one exchange | Stop new orders for that exchange and segment; preserve and display last-known order state; escalate |
 | Sequence gap | Highest-priority connectivity incident: stop new flow in that segment and reconcile against the exchange |
 | Session established but no market data | Block market orders and price-dependent risk decisions in scope |
-| BSE one instance down | Stop that segment only; the other two continue; say so precisely in client messaging |
+| One BSE segment session down | Stop that segment only; the others continue; say so precisely in client messaging |
 | MCX session drops after 20:00 | Evening escalation path; if a tender deadline is approaching, escalate to the clearing member and the exchange immediately |
 | Exchange announces an unscheduled protocol change | Assess, test in the simulated environment, plan certification; do not deploy to production untested |
 | Latency degradation without failure | Treat as an incident; degradation is the warning |
@@ -212,7 +217,7 @@ The "unexpected quiet" row is worth emphasising. A connection carrying no orders
 
 ## Practical notes
 
-- **Build three BSE runbooks, not one.** The topology forces it; pretending otherwise produces ambiguous incident handling.
+- **Name the segment in every BSE runbook and alert.** Sessions are per segment, and ambiguous scoping produces ambiguous incident handling.
 - **Monitor sequence numbers, not just connections.** It is the only signal that detects silent divergence.
 - **Put protocol versions in the configuration register with an owner.** Exchange upgrades arrive by circular and the window is finite.
 - **Read protocol change notes for semantic changes.** The discontinuation of market-price multileg orders is the kind of change a layout diff would miss entirely.
@@ -222,7 +227,7 @@ The "unexpected quiet" row is worth emphasising. A connection carrying no orders
 
 ## Where this connects
 
-- [OMS architecture](/broking-kyc/finix-broking-setup/oms/01-oms-architecture/) — the components these links attach to
+- [<abbr title="Order Management System">OMS</abbr> architecture](/broking-kyc/finix-broking-setup/oms/01-oms-architecture/) — the components these links attach to
 - [User IDs, CTCL and NNF](/broking-kyc/finix-broking-setup/oms/03-user-id-ctcl-nnf/) — the identifiers that ride on this connectivity
 - [Infrastructure and connectivity](/broking-kyc/finix-broking-setup/setup/08-infrastructure-connectivity/) — the physical links
 - [Exchange membership](/broking-kyc/finix-broking-setup/setup/03-exchange-membership/) — the approvals that unlock the facilities

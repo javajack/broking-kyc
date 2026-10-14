@@ -605,7 +605,7 @@ Revises minimum Margin Period of Risk (MPOR) — the VaR scaling factor used in 
 - **impact_areas:** file-format, cyber-security
 - **primary_url:** [unknown — verify direct MCX URL]
 
-Establishes a unified test environment for the four trading interfaces (ETI, EMDI, MDI, EOBI). Connectivity details published in Annexure 1; APIs available on the MCX website. Brokers and vendors use this for pre-production validation of binary trading and market-data connectivity.
+Establishes a unified test environment for the four trading interfaces (<abbr title="Enhanced Trading Interface">ETI</abbr>, EMDI, MDI, EOBI). Connectivity details published in Annexure 1; APIs available on the MCX website. Brokers and vendors use this for pre-production validation of binary trading and market-data connectivity.
 
 ### MCX/TRD/110/2025
 

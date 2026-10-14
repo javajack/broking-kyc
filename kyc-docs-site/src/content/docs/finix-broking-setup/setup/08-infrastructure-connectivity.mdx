@@ -1,6 +1,6 @@
 ---
 title: "Setup 8: infrastructure and connectivity"
-description: The physical and network build — primary site, disaster recovery, exchange leased lines and their per-exchange topology, the Trading Access Point and IML instance requirements, time synchronisation as an evidentiary control, capacity sizing, the system audit, and the business continuity obligations that start at go-live.
+description: The physical and network build — primary site, disaster recovery, exchange leased lines and their per-exchange topology, the Trading Access Point and BSE ETI session requirements, time synchronisation as an evidentiary control, capacity sizing, the system audit, and the business continuity obligations that start at go-live.
 ---
 
 import { Aside } from '@astrojs/starlight/components';
@@ -9,7 +9,7 @@ import { Aside } from '@astrojs/starlight/components';
 
 ## TL;DR
 
-- **Connectivity topology differs per exchange and is not a configuration variant.** NSE access is over a wide area network on TCP/IP with interactive TCP/IP connectivity for user-specific messages, and the front end may connect through middleware called the **Trading Access Point**. BSE requires **a separate connection and a separate IML instance for each of equity, equity derivatives and currency derivatives**. MCX guidance refers to ISDN or other internet connectivity with firewalls.
+- **Connectivity topology differs per exchange and is not a configuration variant.** <abbr title="National Stock Exchange of India">NSE</abbr> access is over a wide area network on TCP/IP with interactive TCP/IP connectivity for user-specific messages, and the front end may connect through middleware called the **Trading Access Point**. <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr>'s current interactive interface is **BSE <abbr title="Enhanced Trading Interface">ETI</abbr>**, which replaced the discontinued IML; it is session-oriented and requires **a separate session per segment**, with API versions mandated by the exchange. <abbr title="Multi Commodity Exchange of India">MCX</abbr> guidance refers to ISDN or other internet connectivity with firewalls.
 - **Terminal identifiers must be reported before use.** On NSE a trading member creates twelve-digit identifiers for its users under the Non-NEAT Front End facility and must report terminal details to the exchange before routing any order through them.
 - **Time synchronisation is an evidentiary control, not a hygiene item.** Order and trade timestamps are the evidence in a client dispute, a surveillance investigation and an inspection. A skewed clock does not produce an error message; it produces records that cannot be defended.
 - **Disaster recovery is a regulated capability with a drill obligation**, not a contractual line item. Recovery objectives, a usable secondary site and periodic drills with reporting are all expected. See [BCP and DR drill](/broking-kyc/deep-dives/specialty/bcp-dr-drill/).
@@ -27,13 +27,13 @@ The third characteristic is that the most consequential infrastructure control i
 
 ## 1. Regulatory framework
 
-- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — regulation 18(5) makes a robust cyber security and cyber resilience framework a statutory obligation; Chapter II infrastructure as an eligibility condition. `[not yet in index]`
-- **Cybersecurity and Cyber Resilience Framework** — the applicable framework for market intermediaries, with tiered obligations. See [CSCRF deep dive](/broking-kyc/deep-dives/compliance-audit/cscrf-deep-dive/) and [cyber resilience configuration](/broking-kyc/finix-broking-setup/compliance/04-cyber-cscrf-config/).
+- **[<abbr title="Securities and Exchange Board of India">SEBI</abbr> (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — regulation 18(5) makes a robust cyber security and cyber resilience framework a statutory obligation; Chapter <abbr title="—">II</abbr> infrastructure as an eligibility condition. `[not yet in index]`
+- **Cybersecurity and Cyber Resilience Framework** — the applicable framework for market intermediaries, with tiered obligations. See [<abbr title="Cybersecurity and Cyber Resilience Framework">CSCRF</abbr> deep dive](/broking-kyc/deep-dives/compliance-audit/cscrf-deep-dive/) and [cyber resilience configuration](/broking-kyc/finix-broking-setup/compliance/04-cyber-cscrf-config/).
 - **System audit framework for stock brokers** — scope, periodicity, auditor eligibility and reporting. See [system audit](/broking-kyc/deep-dives/compliance-audit/system-audit/).
 - **Business continuity and disaster recovery framework** — recovery objectives, site requirements, drills and reporting. See [BCP and DR drill](/broking-kyc/deep-dives/specialty/bcp-dr-drill/).
-- **Exchange connectivity documentation** — NSE's Computer-to-Computer Link, Non-NEAT Front End and Trading Access Point material and the segment-wise NNF protocol specifications; BSE's Open Message Bus and BOLT Plus IML application programming interface documents per segment; MCX's connectivity guidance. `[not yet in index]`
+- **Exchange connectivity documentation** — NSE's Computer-to-Computer Link, Non-NEAT Front End and Trading Access Point material and the segment-wise <abbr title="Non-NEAT Front End">NNF</abbr> protocol specifications; BSE's ETI API manual and BOLT Plus connectivity manual; MCX's connectivity guidance. `[not yet in index]`
 - **NSE/MSD/67755** (29 April 2025) — user identifier conversion through NSE-ENIT. `[not yet in index]`
-- **Algorithmic trading and colocation frameworks** — where applicable; see [algo, API, DMA and SOR](/broking-kyc/finix-broking-setup/oms/09-algo-api-dma-sor/) and [retail algo framework](/broking-kyc/deep-dives/trading-day/retail-algo-framework/).
+- **Algorithmic trading and colocation frameworks** — where applicable; see [algo, API, DMA and <abbr title="Smart Order Routing">SOR</abbr>](/broking-kyc/finix-broking-setup/oms/09-algo-api-dma-sor/) and [retail algo framework](/broking-kyc/deep-dives/trading-day/retail-algo-framework/).
 
 ## 2. Exchange connectivity
 
@@ -42,11 +42,11 @@ The third characteristic is that the most consequential infrastructure control i
 | Exchange | Access model | Per-segment requirement | Middleware | Notes |
 |---|---|---|---|---|
 | **NSE** | Computer-to-Computer Link for own front end; wide area network over TCP/IP; interactive TCP/IP connectivity for user-specific messages | Segments enabled on the connectivity stack | **Trading Access Point**, optional, as the middleware the front end may connect through | Twelve-digit user identifiers created by the member and reported before order routing; NNF protocol documents versioned per segment |
-| **BSE** | BSE Open Message Bus, documented as BOLT Plus IML | **Separate connection and separate IML instance for each of equity, equity derivatives and currency derivatives** | IML itself | Connection established by a user registration request through IML; separate API documents per segment with separate versions |
+| **BSE** | **BSE ETI (Enhanced Trading Interface)**, session-oriented; legacy IML discontinued | **A separate session per segment**, with a common participant identifier | None; ETI connects directly | Exchange-mandated API versions; ETI API manual and BOLT Plus connectivity manual |
 | **MCX** | MCX member protocol | Per MCX architecture | Per MCX architecture | Published guidance refers to ISDN or other internet connectivity with firewalls; confirm the current approved connectivity options |
 
 <Aside type="caution" title="BSE's per-segment instance requirement drives real cost">
-Three connections and three protocol instances means three deployments to provision, monitor, patch, fail over and certify. It is not a configuration flag. Budget BSE connectivity as three parallel integrations, plan three certification tracks, and write three operational runbooks. Teams that assume the NSE pattern generalises discover this during certification, which is the worst time.
+A session per segment means per-segment session management to provision, monitor, patch, fail over and certify. It is not a configuration flag. Budget BSE connectivity as three parallel integrations, plan a certification track per segment, and write three operational runbooks. Teams that assume the NSE pattern generalises discover this during certification, which is the worst time.
 </Aside>
 
 ### 2.2 Link design
@@ -70,7 +70,7 @@ Three connections and three protocol instances means three deployments to provis
 | User identifiers | Unique per user and per mode of connectivity |
 | NSE NNF identifiers | Twelve digits, created by the trading member |
 | Reporting obligation | Terminal details reported to the exchange **before** any order is routed through the terminal |
-| Conversion | NEAT to CTCL and non-NEAT identifier applications through NSE-ENIT per NSE/MSD/67755 dated 29 April 2025 |
+| Conversion | NEAT to <abbr title="Computer-to-Computer Link.">CTCL</abbr> and non-NEAT identifier applications through NSE-ENIT per NSE/MSD/67755 dated 29 April 2025 |
 | Register | A single internal register of every identifier, the person or system it is allocated to, the location, the segment, and the reporting status |
 | Reconciliation | The internal register reconciled against the exchange's record periodically |
 
@@ -147,7 +147,7 @@ Summarised here and expanded in [cyber resilience configuration](/broking-kyc/fi
 | Vulnerability management | Scanning, patching with service levels, exception register |
 | Logging | Centralised, tamper-evident, retained on the records floor, surviving the primary site |
 | Encryption | In transit and at rest for personal and financial data |
-| Data protection | Consent artefacts and data minimisation; see [DPDP consent fields](/broking-kyc/reference/field-atlas/sections/aa-dpdp-consent/) |
+| Data protection | Consent artefacts and data minimisation; see [<abbr title="Digital Personal Data Protection Act 2023 (and Rules 2025)">DPDP</abbr> consent fields](/broking-kyc/reference/field-atlas/sections/aa-dpdp-consent/) |
 | Vendor security | Assessed for each of the six vendor integrations, with contractual obligations |
 | Incident response | Documented, exercised, with a reporting path |
 | Backup and restore | Tested restores, not just successful backups |
@@ -160,7 +160,7 @@ Summarised here and expanded in [cyber resilience configuration](/broking-kyc/fi
 | Secondary site | Usable, with exchange connectivity, identity, monitoring and bank channel access |
 | Drills | Periodic, including a live switch rather than a tabletop, with reporting |
 | Scenario coverage | Site loss, link loss per exchange, vendor outage per vendor, bank channel outage, market data failure, database corruption |
-| Vendor dependency drills | What happens when Digio, Razorpay, the KRA or the back office is unavailable — the degraded behaviour from the [integration contract matrix](/broking-kyc/finix-broking-setup/stack/integration-contract-matrix/) |
+| Vendor dependency drills | What happens when Digio, Razorpay, the <abbr title="KYC Registration Agency">KRA</abbr> or the back office is unavailable — the degraded behaviour from the [integration contract matrix](/broking-kyc/finix-broking-setup/stack/integration-contract-matrix/) |
 | Communication plan | Clients, exchanges, the clearing corporation, vendors, and internally |
 | Post-drill actions | Tracked to closure; an unclosed action from the last drill is the finding |
 
@@ -225,7 +225,7 @@ The practical scheduling rule: **start every third-party dependency the day the 
 - **Treat the identifier register as a controlled record.** Reconcile it against the exchange and against your directory, because dealers leave and identifiers linger.
 - **Load-test with the square-off scenario included.** Your own risk engine is a significant order generator, and it fires exactly when the market is already busy.
 - **Verify time synchronisation evidence, not just configuration.** The question an auditor asks is about a past date.
-- **Write three BSE runbooks.** One per segment, because there are three instances.
+- **Write three BSE runbooks.** One per segment, because there are per-segment sessions.
 
 ## Where this connects
 

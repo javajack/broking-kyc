@@ -111,7 +111,7 @@ For order routing, NSE provides:
 |--------|---------|----------|
 | <abbr title="Computer-to-Computer Link.">CTCL</abbr> (Computer-to-Computer Link) | DMA/Algo trading | Proprietary TCP/IP (C-structure messages) |
 | NOTIS (NSE Open Trading Interface System) | Third-party front-end connectivity | API-based |
-| NNF (NSE Now Front-end) | NSE NOW terminal connectivity | Proprietary |
+| <abbr title="Non-NEAT Front End">NNF</abbr> (NSE Now Front-end) | NSE NOW terminal connectivity | Proprietary |
 
 **Note**: UCC registration is a **prerequisite** for order placement on any of these systems. The UCC is validated at every order entry point.
 

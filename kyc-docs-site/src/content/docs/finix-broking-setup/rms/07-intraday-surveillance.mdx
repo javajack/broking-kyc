@@ -11,7 +11,7 @@ import { Aside } from '@astrojs/starlight/components';
 
 - **Chapter IV of the [2026 regulations](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/) makes fraud prevention and detection statutory**, with surveillance, escalation, board accountability, a mandatory whistle-blower channel under regulation 25, and an explicit **mule-account detection obligation under regulation 23(8)**.
 - **Mule-account detection cannot be satisfied by onboarding.** Know-your-customer proves who someone is; it does not prove the account is operated by that person for their own benefit. Detection requires behavioural signals that only exist after the account is live.
-- **Two surveillance systems with different jobs.** Real-time, in the risk engine, for things that need an intervention in the session. Near-real-time and end-of-day, in SecMark AML Sutra and the surveillance module, for patterns that need investigation rather than interruption.
+- **Two surveillance systems with different jobs.** Real-time, in the risk engine, for things that need an intervention in the session. Near-real-time and end-of-day, in SecMark <abbr title="Anti-Money Laundering">AML</abbr> Sutra and the surveillance module, for patterns that need investigation rather than interruption.
 - **Blocking an order is rarely the right response to a surveillance alert.** Most patterns need investigation, not interruption; the exceptions — self-trade, restricted-list breaches, unresolved screening hits — belong in the [check ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/), not here.
 - **Thresholds must be tuned, and the tuning is evidence.** An alert set producing thousands of alerts a day is not a control; an alert set producing none is a different kind of not-a-control. The tuning record is what distinguishes a calibrated system from a dormant one.
 - **Disposition is the control, not generation.** Open-alert ageing is the metric that matters. A system generating alerts nobody closes is a liability, because the firm has demonstrably detected something and done nothing.
@@ -27,16 +27,16 @@ The third idea is that an alert is a commitment. Once a system has flagged somet
 
 ## 1. Regulatory framework
 
-- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — Chapter IV, regulations 21 to 26: fraud prevention and detection, surveillance, escalation, board accountability; regulation 23(8) mule-account detection; regulation 25 whistle-blower policy with a confidential channel and retaliation protection. `[not yet in index]`
-- **Prevention of Money Laundering Act, 2002 and the SEBI anti-money-laundering master circular** — the principal officer, the designated director, suspicious transaction identification and reporting to FIU-IND in the prescribed format. See the [FIU-IND circulars index](/broking-kyc/reference/circulars/fiu-ind/).
+- **[<abbr title="Securities and Exchange Board of India">SEBI</abbr> (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — Chapter IV, regulations 21 to 26: fraud prevention and detection, surveillance, escalation, board accountability; regulation 23(8) mule-account detection; regulation 25 whistle-blower policy with a confidential channel and retaliation protection. `[not yet in index]`
+- **Prevention of Money Laundering Act, 2002 and the SEBI anti-money-laundering master circular** — the principal officer, the designated director, suspicious transaction identification and reporting to <abbr title="Financial Intelligence Unit — India">FIU-IND</abbr> in the prescribed format. See the [<abbr title="Financial Intelligence Unit">FIU</abbr>-IND circulars index](/broking-kyc/reference/circulars/fiu-ind/).
 - **Exchange surveillance obligations on members** — alert-based surveillance obligations, transaction and client-behaviour monitoring, and periodic reporting. See [surveillance norms](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/) and [market manipulation typologies](/broking-kyc/deep-dives/foundational/market-manipulation-typologies/).
 - **Client code modification norms** — exchange-capped, monitored and penalised; see [modification and cancellation](/broking-kyc/finix-broking-setup/oms/08-modify-cancel-rules/#7-modifying-another-persons-order).
-- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025).
+- **[Master Circular for Stock Brokers SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025).
 - **Stack components**: SecMark **C-Safe** for screening against more than fifty global and domestic lists including politically exposed persons, and **AML Sutra** for transaction monitoring and suspicious transaction reporting in FINnet 2.0 format, with **ComplianceSutra** carrying the workflow and evidence.
 
 ## 2. Two systems, two jobs
 
-| Dimension | Real-time, in Saral RMS | Near-real-time and end-of-day, in SecMark |
+| Dimension | Real-time, in Saral <abbr title="Risk Management System">RMS</abbr> | Near-real-time and end-of-day, in SecMark |
 |---|---|---|
 | Purpose | Intervene in the session | Investigate patterns |
 | Latency | Seconds | Minutes to overnight |
@@ -237,7 +237,7 @@ Chapter IV requires board accountability, and the practical discharge is a perio
 ## Where this connects
 
 - [Pre-trade check ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/) — the deterministic controls that do block
-- [PEP and sanctions screening](/broking-kyc/finix-broking-setup/onboarding/04-pep-sanctions-screening/) — the onboarding and ongoing screening layer
+- [<abbr title="Politically Exposed Person">PEP</abbr> and sanctions screening](/broking-kyc/finix-broking-setup/onboarding/04-pep-sanctions-screening/) — the onboarding and ongoing screening layer
 - [SEBI registration under the 2026 regulations](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/#4-chapter-iv-in-implementation-terms) — the Chapter IV obligation
 - [Regulatory reporting pipeline](/broking-kyc/finix-broking-setup/compliance/02-reporting-pipeline/) — where reports are filed
 - [Market manipulation typologies](/broking-kyc/deep-dives/foundational/market-manipulation-typologies/) — the patterns behind the alerts

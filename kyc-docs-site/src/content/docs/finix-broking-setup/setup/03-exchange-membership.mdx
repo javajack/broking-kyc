@@ -5,14 +5,14 @@ description: Three membership processes run as three projects — eligibility an
 
 import { Aside } from '@astrojs/starlight/components';
 
-> **Why this page is structured this way:** It is tempting to treat exchange membership as one task repeated three times. It is not. The exchanges differ in entity eligibility, fee structure, deposit mechanics, connectivity architecture and the number of separate certifications required, and the differences show up at inconvenient moments — BSE needing a separate protocol instance per segment, MCX's session running until 23:30 and its membership categories pre-dating single registration. So the page starts with what is common, because that is where the bulk of the documentation effort goes, then treats each exchange separately with its own specifics, then ends with the facility approvals that are easy to forget because they come *after* admission and before go-live.
+> **Why this page is structured this way:** It is tempting to treat exchange membership as one task repeated three times. It is not. The exchanges differ in entity eligibility, fee structure, deposit mechanics, connectivity architecture and the number of separate certifications required, and the differences show up at inconvenient moments — <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> needing a separate protocol instance per segment, <abbr title="Multi Commodity Exchange of India">MCX</abbr>'s session running until 23:30 and its membership categories pre-dating single registration. So the page starts with what is common, because that is where the bulk of the documentation effort goes, then treats each exchange separately with its own specifics, then ends with the facility approvals that are easy to forget because they come *after* admission and before go-live.
 
 ## TL;DR
 
-- **Membership and SEBI registration are one interleaved workflow, not two.** The registration application is routed through a recognised exchange, which forwards it with a recommendation within thirty days, so the exchange's documentation checklist governs the front of the process.
-- **Decide the full segment list before applying.** NSE's admission fee is ₹5,00,000 plus tax for a general application but **₹50,000 if applying for Cash, Futures and Options, Currency Derivatives and Commodity segments collectively** — a ten-fold difference that rewards deciding up front.
-- **NSE's connectivity model is the Non-NEAT Front End.** A trading member using its own front end does so through the Computer-to-Computer Link facility, accesses the trading system with unique user identifiers, creates **twelve-digit identifiers** for its users, and must **report those terminal details to the exchange before routing any order through them**. Conversion of NEAT identifiers to CTCL or non-NEAT identifiers is applied for through NSE-ENIT per circular NSE/MSD/67755 dated 29 April 2025. `[not yet in index]`
-- **BSE needs a separate connection and a separate protocol instance per segment.** Equity, equity derivatives and currency derivatives each require their own connection and their own IML instance, which makes each segment a separate integration and test track rather than a configuration variant.
+- **Membership and <abbr title="Securities and Exchange Board of India">SEBI</abbr> registration are one interleaved workflow, not two.** The registration application is routed through a recognised exchange, which forwards it with a recommendation within thirty days, so the exchange's documentation checklist governs the front of the process.
+- **Decide the full segment list before applying.** <abbr title="National Stock Exchange of India">NSE</abbr>'s admission fee is ₹5,00,000 plus tax for a general application but **₹50,000 if applying for Cash, Futures and Options, Currency Derivatives and Commodity segments collectively** — a ten-fold difference that rewards deciding up front.
+- **NSE's connectivity model is the Non-NEAT Front End.** A trading member using its own front end does so through the Computer-to-Computer Link facility, accesses the trading system with unique user identifiers, creates **twelve-digit identifiers** for its users, and must **report those terminal details to the exchange before routing any order through them**. Conversion of NEAT identifiers to <abbr title="Computer-to-Computer Link.">CTCL</abbr> or non-NEAT identifiers is applied for through NSE-ENIT per circular NSE/MSD/67755 dated 29 April 2025. `[not yet in index]`
+- **BSE needs a separate <abbr title="Enhanced Trading Interface">ETI</abbr> session per segment.** Its current interactive interface is **BSE ETI**, which replaced the discontinued IML; a separate session is required per segment while the participant identifier stays common, and **certification is per segment**.
 - **MCX is structurally different.** Its published membership categories and net worth figures pre-date single registration and are materially lower than Chapter X of the 2026 regulations, its admission fee for a trading member is ₹7,50,000, and its session runs to 23:30 — which changes staffing, support and end-of-day design, not just connectivity.
 - **Facility approvals are separate from membership.** Internet-based trading, trading through wireless technology, direct market access, algorithmic trading, smart order routing and application programming interface access are each enabled as facilities, and each has its own prerequisites and certification.
 - **The documentation pack is the long pole, and it is mostly reusable.** Build it once, in a structured repository, because the same evidence goes to three exchanges, two depositories, a clearing bank and the system auditor.
@@ -27,12 +27,12 @@ The third observation concerns segments. Each segment is a separate risk regime,
 
 ## 1. Regulatory framework
 
-- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — Chapter II registration, including the application route through a recognised exchange and the exchange's thirty-day recommendation; Chapter X net worth and deposits. `[not yet in index]`
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — Chapter <abbr title="—">II</abbr> registration, including the application route through a recognised exchange and the exchange's thirty-day recommendation; Chapter X net worth and deposits. `[not yet in index]`
 - **Securities Contracts (Regulation) Act, 1956**, and the rules and bye-laws of each exchange — the membership relationship itself, admission, continuing obligations and disciplinary powers.
 - **Exchange membership circulars and published eligibility criteria** — NSE's eligibility criteria, deposits and net worth requirements, admission process and fees and charges pages; BSE's membership criteria and deposit-based membership notices; MCX's membership eligibility, fee and deposit structure and compliance guide. These are the operative documents and they change by circular. `[not yet in index]`
 - **NSE/MSD/67755** (29 April 2025) — the route for NEAT to CTCL and non-NEAT user identifier conversion through NSE-ENIT. `[not yet in index]`
 - **MCX/MEM/669/2019** (26 November 2019) — MCX processing charges for admission of a member. `[not yet in index]`
-- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — operational obligations that attach on admission.
+- **[Master Circular for Stock Brokers SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — operational obligations that attach on admission.
 
 ## 2. What is common across all three
 
@@ -42,7 +42,7 @@ Build this once as a structured repository with version control, because every i
 
 | Category | Items |
 |---|---|
-| Entity | Certificate of incorporation, memorandum and articles, PAN, GST registration, shareholding pattern, board resolutions authorising the application and the signatories |
+| Entity | Certificate of incorporation, memorandum and articles, <abbr title="Permanent Account Number">PAN</abbr>, GST registration, shareholding pattern, board resolutions authorising the application and the signatories |
 | Financial | Audited financial statements, net worth certificate in the exchange's format, bank statements evidencing capital, projected financials |
 | People | Identity and address proof for directors and significant shareholders, educational and experience evidence, NISM certificates, residency evidence for the designated director, organisation chart with reporting lines |
 | Fit and proper | Declarations by the entity, each director and each significant shareholder; litigation and regulatory-action disclosures; beneficial ownership tracing |
@@ -108,7 +108,7 @@ Plus **variable net worth of 10 percent of the average daily cash balance of cli
 |---|---|
 | Own front end | Permitted through the Computer-to-Computer Link facility, available only to NSE trading members |
 | Access | Through various modes of connectivity, each with a unique user identifier |
-| Non-NEAT Front End | Members may convert NEAT identifiers to NNF and enable them for NNF products |
+| Non-NEAT Front End | Members may convert NEAT identifiers to <abbr title="Non-NEAT Front End">NNF</abbr> and enable them for NNF products |
 | Identifier format | Trading members create **twelve-digit** identifiers for their users under the NNF facility |
 | Reporting obligation | Terminal details **must be reported to the exchange before any order is routed** through such terminals |
 | Conversion route | Applications for NEAT to CTCL conversion, or for non-NEAT user identifiers, through NSE-ENIT per NSE/MSD/67755 dated 29 April 2025 |
@@ -145,13 +145,13 @@ Each is an approval, not a setting: Computer-to-Computer Link, internet-based tr
 
 ### 4.3 Connectivity — the segment multiplication
 
-BSE's trading system is accessed through the BSE Open Message Bus, documented as the BOLT Plus IML application programming interface, covering the equity, equity derivatives and currency derivatives segments.
+BSE's trading system is accessed through the BSE Open Message Bus, with **BSE ETI (Enhanced Trading Interface)** as the current interactive interface, covering the equity, equity derivatives and currency derivatives segments.
 
 | Characteristic | Consequence |
 |---|---|
-| **A separate connection is required for each of currency, equity derivatives and equity** | Three connections to provision, monitor and fail over |
-| **A separate IML instance is required for each segment** | Three deployments, three configurations, three upgrade paths |
-| A participant application connects by a user registration request through IML | Session establishment is per instance |
+| **A separate ETI session is required for each segment** | Session establishment, monitoring and recovery per segment |
+| **Participant identifier common across segments** | One identity, several sessions |
+| A participant application establishes an ETI session per segment | Session establishment is per instance |
 | Protocol documents are versioned per segment | Equity and equity-derivatives APIs are separate documents with separate versions |
 
 <Aside type="caution" title="The per-segment instance requirement is a real project cost">
@@ -181,12 +181,12 @@ MCX's published trading-member net worth figures are materially below the ₹1 c
 
 | Factor | Consequence |
 |---|---|
-| Session to 23:30 IST, and 23:55 during United States daylight saving | Second-shift staffing for dealing, risk and support; end-of-day cannot begin at 16:00 |
+| Session to 23:30 <abbr title="Indian Standard Time (UTC+05:30)">IST</abbr>, and 23:55 during United States daylight saving | Second-shift staffing for dealing, risk and support; end-of-day cannot begin at 16:00 |
 | Non-agricultural commodities 09:00–23:30; select agricultural such as cotton 09:00–21:00; other agricultural 09:00–17:00 | Three different session-end behaviours inside one segment |
 | Physical delivery with a tender period | A delivery operations capability that equity-only brokers do not have; see [MCX commodity nuances](/broking-kyc/finix-broking-setup/exchanges/04-mcx-commodity/) |
 | Staggered delivery tender period over the last three trading days including expiry, with an 8.34 percent incremental margin across those days | A margin ladder that starts before expiry week ends |
 | Delivery period margin at the higher of 3 percent plus five-day 99 percent value-at-risk of spot price volatility, or 25 percent | Materially higher margin, needing client communication well in advance |
-| Delivery intention by buyer or seller on any tender day until 19:30 through MCXCCL eClear | An evening operational deadline on tender days |
+| Delivery intention by buyer or seller on any tender day until 19:30 through <abbr title="Multi Commodity Exchange Clearing Corporation Limited">MCXCCL</abbr> eClear | An evening operational deadline on tender days |
 | Seller margin exemption on early pay-in of goods with documentary evidence, except mark-to-market which continues | An incentive structure that only works if operations can handle warehouse documentation |
 
 ### 5.3 Authorised stock broker route
@@ -205,9 +205,9 @@ MCX publishes an authorised-stock-broker facility, which allows an existing stoc
 | Application fee | ₹10,000 plus tax | Earnest money ₹1 lakh | ₹10,000 plus taxes |
 | Admission fee | ₹5,00,000, or ₹50,000 for combined segments | Deposit-based ₹10,00,000 | ₹7,50,000 trading member |
 | Base minimum capital | ₹10 to ₹50 lakh by model | Per BSE schedule | Per MCX schedule |
-| Entity types | Corporates and LLPs primarily | Individuals, corporates, partnerships, LLPs | Widest, including HUF and co-operative societies |
-| Own front end | CTCL with NNF; Trading Access Point middleware optional | BOLT Plus IML | MCX member protocol |
-| Per-segment connection | Shared stack, segment-enabled | **Separate connection and separate IML instance per segment** | Per MCX architecture |
+| Entity types | Corporates and LLPs primarily | Individuals, corporates, partnerships, LLPs | Widest, including <abbr title="Hindu Undivided Family">HUF</abbr> and co-operative societies |
+| Own front end | CTCL with NNF; Trading Access Point middleware optional | BSE ETI | MCX member protocol |
+| Per-segment sessions | Shared stack, segment-enabled | **A separate ETI session per segment** | Per MCX architecture |
 | Identifier scheme | Twelve-digit user identifiers created by the member, reported before use | Per BSE scheme | Per MCX scheme |
 | Member portal | ENIT | BSE member portal | MCX member portal |
 | Session end | 15:30 cash and derivatives | 15:30 | 23:30, or 23:55 in United States daylight saving |
@@ -231,7 +231,7 @@ These are the items most likely to be discovered late, because they come after m
 | Clearing bank account | Settlement | Membership plus clearing arrangement |
 | Extranet and report access | Every daily file | Membership |
 
-See [algo, API, DMA and SOR](/broking-kyc/finix-broking-setup/oms/09-algo-api-dma-sor/) for the approval content, and [certification, mock trading and go-live](/broking-kyc/finix-broking-setup/setup/10-certification-mock-golive/) for the sequencing.
+See [algo, API, DMA and <abbr title="Smart Order Routing">SOR</abbr>](/broking-kyc/finix-broking-setup/oms/09-algo-api-dma-sor/) for the approval content, and [certification, mock trading and go-live](/broking-kyc/finix-broking-setup/setup/10-certification-mock-golive/) for the sequencing.
 
 ## 8. Exception paths
 
@@ -250,7 +250,7 @@ See [algo, API, DMA and SOR](/broking-kyc/finix-broking-setup/oms/09-algo-api-dm
 
 - **Ask the exchange in writing, and keep the reply.** Written clarifications resolve inspection questions years later at no cost.
 - **Apply for all segments, activate in sequence.** Capture the combined-application fee and avoid a second application, but stage certification and operational readiness. Make the distinction explicit with the exchange.
-- **Treat BSE as three integrations.** The per-segment connection and instance requirement is the single most underestimated item in this page.
+- **Treat BSE segments as separately sessioned.** The per-segment connection and instance requirement is the single most underestimated item in this page.
 - **Staff MCX before you trade MCX.** A 23:30 close with a 19:30 tender deadline on delivery days is an operating model decision, not a rota adjustment.
 - **Report terminals before routing orders through them.** On NSE this is an explicit obligation and it is trivially auditable from the exchange's side.
 - **Subscribe to every circular feed on day one of the application.** Fees, deposits, timings, protocols and report formats all change by circular, and the member is responsible from admission.

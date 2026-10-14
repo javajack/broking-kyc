@@ -32,7 +32,7 @@ Sorted by `field_id`, then `destination`.
 | A-ckyc_number | CKYC Number (KIN) | back-office | ckyc_kin | CHAR(14) | one-time | [direct] | 14-digit KIN; cross-reference field for re-KYC | [industry typical] |
 | A-ckyc_number | CKYC Number (KIN) | back-office | ckyc_xref_status | VARCHAR(2) | on-event | [direct] | CKYC submission status; 7-day window from KYC change | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/79 |
 | A-ckyc_number | CKYC Identification Number (KIN) | bse-ucc | CKYC_KIN | CHAR(14) | one-time | [direct] | Optional; KRA-validated KYC takes precedence | BSE/20240223-42 |
-| A-ckyc_number | CKYC Number | cdsl-bo | CKYC_KIN | CHAR(14) | one-time | [direct] | 14-digit KIN captured at BO opening from CKYCRR fetch; right-aligned with leading zeros | CDSL/OPS/DP/POLCY/2024/312 |
+| A-ckyc_number | CKYC Number | cdsl-bo | CKYC_KIN | CHAR(14) | one-time | [direct] | 14-digit KIN captured at BO opening from <abbr title="Central KYC Records Registry">CKYCRR</abbr> fetch; right-aligned with leading zeros | CDSL/OPS/DP/POLCY/2024/312 |
 | A-ckyc_number | CKYC Identification Number | ckyc | KYC_IDENTIFIER | CHAR(14) | one-time | [direct] | Masked-KIN search returns 'X'-prefixed identifier post 20-Jan-2025; full KIN only on authenticated download | CKYC/2024/04 |
 | A-ckyc_number | CKYC Number | fatca-crs | CKYC_KIN | CHAR(14) | on-event | [direct] | annual cadence; CKYC KIN linked to <abbr title="Foreign Account Tax Compliance Act (US)">FATCA</abbr> record at KRA; helps dedupe across intermediaries | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/12 |
 | A-ckyc_number | CKYC Identification Number | kra | CKYC_NO | CHAR(14) | on-modify | [direct] | KRA stores KIN as reference; masked in API responses post Jan 2025 | SEBI/HO/MIRSD/SECFATF/P/CIR/2024/79 |

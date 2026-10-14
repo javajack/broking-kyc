@@ -10,7 +10,7 @@ import { Aside } from '@astrojs/starlight/components';
 ## TL;DR
 
 - **Entitlement follows beneficial ownership on the record date**, which is why pledged securities still entitle the client — the pledge moved an encumbrance, not ownership.
-- **The hard cases are the edge positions**: pledged, CUSPA-pledged, in transit between settlement and demat, bought but not yet settled, sold but not yet delivered, held as collateral, and positions in a derivatives contract on the underlying.
+- **The hard cases are the edge positions**: pledged, <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr>-pledged, in transit between settlement and demat, bought but not yet settled, sold but not yet delivered, held as collateral, and positions in a derivatives contract on the underlying.
 - **Derivatives contracts are adjusted, not merely repriced.** Lot sizes, strike prices and positions change on an adjustment, and an adjustment can accelerate an expiry.
 - **Resting broker-held intent must be reviewed at every corporate action.** A Good Till Triggered instruction whose trigger was set against an unadjusted price is no longer the instruction the client gave. Finix cancels and notifies rather than adjusting silently.
 - **Collateral valuation changes.** A corporate action can change a security's price, its eligibility, or its haircut, and the risk engine must revalue rather than carry forward.
@@ -28,8 +28,8 @@ The third issue, and the one most often missed in implementation, is resting int
 ## 1. Framework
 
 - **Exchange and clearing corporation corporate action circulars** — the authoritative source for ex dates, adjustment factors, derivatives contract adjustments and any acceleration of expiry. `[not yet in index]`
-- **Depository corporate action processing** — CDSL and NSDL process entitlements for dematerialised holdings; see the [CDSL](/broking-kyc/reference/circulars/cdsl/) and [NSDL](/broking-kyc/reference/circulars/nsdl/) circulars indexes.
-- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — client servicing and records obligations.
+- **Depository corporate action processing** — <abbr title="Central Depository Services (India) Limited">CDSL</abbr> and <abbr title="National Securities Depository Limited">NSDL</abbr> process entitlements for dematerialised holdings; see the [CDSL](/broking-kyc/reference/circulars/cdsl/) and [NSDL](/broking-kyc/reference/circulars/nsdl/) circulars indexes.
+- **[Master Circular for Stock Brokers <abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — client servicing and records obligations.
 - **[SEBI/HO/MIRSD/DOP/CIR/P/2020/28](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddopcirp202028)** (25 February 2020) — the pledge regime, under which beneficial ownership remains with the client.
 - **[Client unpaid securities, HO/38/11/(9)2026-MIRSD-POD/I/15382/2026](/broking-kyc/reference/circulars/sebi-mirsd/#ho381192026-mirsd-podi153822026)** (3 July 2026) — CUSPA-pledged securities, which likewise remain the client's.
 - **Derivatives contract adjustment** — exchange and clearing corporation adjustment notices; an adjustment can accelerate an expiry.

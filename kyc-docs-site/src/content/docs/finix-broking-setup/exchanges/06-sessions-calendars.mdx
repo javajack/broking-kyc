@@ -12,7 +12,7 @@ import { Aside } from '@astrojs/starlight/components';
 - **Model the session as a state machine per exchange and segment**, driven by exchange market-state messages rather than by the clock alone. A clock-driven implementation will trade through a halt and stop during an extension.
 - **The equity day has distinct phases with different behaviours**: pre-open order entry, pre-open matching, buffer, continuous trading, closing session, post-close. Order entry, modification and cancellation differ by phase.
 - **The calendar is exchange-set and amendable**, not a static annual file. Treat it as a refreshed configuration item with a staleness behaviour, like any other exchange-set parameter.
-- **MCX has three closes inside one segment** by commodity group, and the non-agricultural close moves twice a year with United States daylight saving.
+- **<abbr title="Multi Commodity Exchange of India">MCX</abbr> has three closes inside one segment** by commodity group, and the non-agricultural close moves twice a year with United States daylight saving.
 - **Special sessions have exclusions.** Muhurat trading is excluded from the trading-day basis used to compute the commodity staggered-delivery tender window.
 - **Holiday boundaries are where calendar defects surface** — an after-market window spanning a holiday, a settlement cycle crossing one, a batch scheduled on a closed day.
 - **Settlement calendars are not the same as trading calendars.** A day can be a settlement day without being a trading day, and the deadline chain follows the settlement calendar.
@@ -28,10 +28,10 @@ The third observation concerns derived dates. Reporting cut-offs are counted in 
 ## 1. Framework
 
 - **Exchange session timings and calendars** — published per exchange and segment, **amendable by circular**. `[not yet in index]`
-- **Pre-open and closing session** — phases and eligibility; see [pre-open and closing auction](/broking-kyc/deep-dives/foundational/pre-open-closing-auction/) and **NSE/CMTR/63594** (17 September 2024) with its supersession trail. `[not yet in index]`
+- **Pre-open and closing session** — phases and eligibility; see [pre-open and closing auction](/broking-kyc/deep-dives/foundational/pre-open-closing-auction/) and **<abbr title="National Stock Exchange of India">NSE</abbr>/CMTR/63594** (17 September 2024) with its supersession trail. `[not yet in index]`
 - **MCX session hours** — non-agricultural 09:00 to 23:30, or **23:55 during United States daylight saving**; select agricultural such as cotton to 21:00; other agricultural to 17:00. **Trading day is based on availability for trading of the respective commodity and excludes special sessions such as Muhurat trading.** `[not yet in index]`
 - **Clearing corporation settlement calendars** — per clearing corporation and segment, published and amendable. `[not yet in index]`
-- **Expiry standardisation** — one weekly benchmark index contract per exchange, NSE Tuesday and BSE Thursday from 1 September 2025. `[not yet in index]`
+- **Expiry standardisation** — one weekly benchmark index contract per exchange, NSE Tuesday and <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> Thursday from 1 September 2025. `[not yet in index]`
 - **Market-wide circuit breakers and halts** — see [bands, halts and surveillance](/broking-kyc/finix-broking-setup/exchanges/07-bands-halts-surveillance/).
 
 ## 2. The session state machine
@@ -71,7 +71,7 @@ Exchanges occasionally extend a session — after a technical issue, or for an o
 | **Staleness behaviour** | **Manual confirmation before begin-of-day on any boundary day**; never assume |
 | Scope | Trading calendar **and** settlement calendar, which differ |
 | Derived values | Expiry days, tender windows, reporting cut-offs, settlement dates — all computed from it |
-| Consumers | OMS, RMS, back office, treasury, batch scheduler, client-facing communications |
+| Consumers | <abbr title="Order Management System">OMS</abbr>, <abbr title="Risk Management System">RMS</abbr>, back office, treasury, batch scheduler, client-facing communications |
 | **Never hard-coded** | A compiled calendar is a defect with a date of detonation |
 
 | Calendar type | What it determines |
@@ -173,7 +173,7 @@ Where calendar defects actually bite.
 - [NSE cash](/broking-kyc/finix-broking-setup/exchanges/01-nse-cash/) — the equity session phases
 - [MCX commodities](/broking-kyc/finix-broking-setup/exchanges/04-mcx-commodity/) — the three closes and daylight saving
 - [Bands, halts and surveillance](/broking-kyc/finix-broking-setup/exchanges/07-bands-halts-surveillance/) — halts and resumption
-- [BOD runbook](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/) — the calendar gate
+- [<abbr title="Beginning Of Day">BOD</abbr> runbook](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/) — the calendar gate
 - [Periodic calendar](/broking-kyc/finix-broking-setup/daily-ops/09-periodic-calendar/) — where daylight saving and other recurring items live
 - [Pre-open and closing auction](/broking-kyc/deep-dives/foundational/pre-open-closing-auction/) — auction mechanics
 - [Order attributes and validity](/broking-kyc/finix-broking-setup/oms/05-order-attributes-validity/) — the after-market window
