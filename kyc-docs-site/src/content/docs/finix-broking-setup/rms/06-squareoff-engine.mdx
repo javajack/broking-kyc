@@ -1,0 +1,229 @@
+---
+title: "RMS 6: the square-off engine"
+description: The most disputed action a broker takes — the trigger set, the evaluation and grace design, the selection and sequencing of what to close, order construction and the exchange constraints that can block an exit, the communication sequence, partial and failed square-offs, and the decision record that has to survive arbitration.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** A square-off is the one occasion when a broker trades a client's position without the client asking, and it is accordingly the single largest source of client disputes and arbitration in Indian broking. The page is therefore built around defensibility rather than mechanics: what triggers it, what warning precedes it, how the engine decides what to close and in what order, what happens when the market will not let you out, what the client is told and when, and what record exists afterwards. The mechanics are straightforward; the discipline around them is not.
+
+## TL;DR
+
+- **The authority comes from the client agreement and the disclosed risk management policy, not from the system.** If the policy does not describe the trigger, the timing and the method, the firm is acting without a documented mandate.
+- **Most square-offs are caused by the market, not by the client.** Mark-to-market losses and an intraday margin increase can take a client from comfortable to in-breach with no action on their part. The communication must reflect that.
+- **Warn before acting, wherever time permits.** A documented shortfall notice with an amount and a deadline converts a dispute about whether the firm should have acted into a dispute about whether the client responded — which is a far better position and, more importantly, usually produces the client funding the shortfall instead.
+- **Intraday product square-off is a different thing from margin-shortfall square-off** and must be configured, communicated and recorded separately. Conflating them produces explanations that do not match what happened.
+- **A square-off order is an ordinary exchange order.** It passes the static, restriction and price rungs of the ladder, and it can be rejected by a circuit limit, a ban period, a halt or illiquidity. The engine needs a defined behaviour for "cannot exit", not a retry loop.
+- **Sequence and selection are policy decisions, not implementation details.** Which position is closed first materially affects the client's outcome and must follow a stated, consistent rule.
+- **The decision record must reconstruct the whole event**: the trigger, the utilisation and its inputs, the notice sent, the grace given, the orders generated, their outcomes, and the residual position.
+
+## Conceptual overview
+
+Square-off is where a broker's risk management stops being arithmetic and becomes an action with consequences for someone else's money. Everything upstream — margin computation, limits, collateral — is a calculation that merely declines to do something. Square-off does something. That asymmetry is why the governance around it is heavier: a wrongly rejected order costs a client an opportunity, while a wrongly executed square-off costs them a realised loss, and the two are not comparable in a dispute.
+
+The second observation is that the client's mental model and the firm's are systematically different. The firm sees a utilisation percentage crossing a threshold. The client sees a position they chose, in a market that moved, closed by someone else at a price they did not pick. Bridging that gap is the function of communication, and the gap is widest precisely when communication is hardest — in a fast market, when many clients breach at once, and when the firm's own systems are under load. A communication design that works only in calm conditions is a communication design that does not work.
+
+The third observation is that the market is a participant in this process and does not cooperate. A client in breach on a position that is locked at a circuit limit cannot be exited, and the firm's exposure continues to grow. A derivatives position in a banned underlying can usually still be reduced, but one in a halted instrument cannot be touched at all. A thinly traded contract can be exited only by accepting a price that itself harms the client. The engine must have explicit behaviour for each of these, decided in advance, because the alternative is a retry loop generating orders into a wall while someone decides what to do.
+
+## 1. Framework
+
+- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) and **[SEBI/HO/MIRSD/POD-1/P/CIR/2024/118](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir2024118)** (9 August 2024) — margin obligations, the rights and obligations document, and client communication requirements.
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — Chapter III general obligations and Chapter VIII code of conduct, which govern how the firm acts toward a client. `[not yet in index]`
+- **The firm's risk management policy** — a day-one artefact, approved, and **disclosed to the client**. This is the operative document for square-off authority and it must describe the trigger, the notice, the timing and the method.
+- **Client agreement, rights and obligations, and the Most Important Terms and Conditions** — see [client protection frameworks](/broking-kyc/trading-risk/client-protection-frameworks/).
+- **Dispute resolution** — [investor grievance redressal](/broking-kyc/deep-dives/compliance-audit/igrc/) and [online dispute resolution](/broking-kyc/deep-dives/compliance-audit/odr/) are where an indefensible square-off ends up.
+
+<Aside type="caution" title="The policy is the mandate">
+Everything in this page is only lawful to the extent the client agreed to it. If the disclosed risk management policy says square-off occurs at 90 percent utilisation after a notice and a grace period, and the system acts at 85 percent without notice, the firm has exceeded its mandate — regardless of whether 85 percent was the more prudent number. Keep the configuration and the policy synchronised, and treat a change to either as a change to both.
+</Aside>
+
+## 2. Triggers
+
+| # | Trigger | Basis | Notice feasible | Separate policy? |
+|---|---|---|---|---|
+| T1 | **Margin utilisation threshold** | Utilised margin as a percentage of available | Usually yes | Yes |
+| T2 | **Margin shortfall** | Requirement exceeds available | Usually yes | Yes |
+| T3 | **Mark-to-market loss threshold** | Loss as a percentage of capital | Sometimes | Yes |
+| T4 | **Intraday product square-off** | Time-based, for positions taken under the intraday product | Yes — the time is published | **Yes, distinct** |
+| T5 | **Debit balance ageing** | An unpaid debit beyond the policy period | Yes, days of notice | Yes |
+| T6 | **Unpaid securities** | The CUSPA path, with its own statutory timeline | Yes, statutory | **Separate process entirely** |
+| T7 | **Exchange or regulatory direction** | External instruction | Depends | Per direction |
+| T8 | **Position or open-interest limit breach** | Exchange limits | Usually not | Yes |
+| T9 | **Ban-period or restriction entry** | Fresh positions blocked; reduction still permitted | Not applicable | Reduction only |
+| T10 | **Client instruction or account closure** | The client asks | Not applicable | — |
+
+T4 and T6 are the two most often conflated with T1. Intraday square-off is a product feature with a published time; it happens whether or not the client is in breach. The CUSPA path for unpaid securities is a statutory process with its own clock, its own notices and its own release mechanics — it is not a margin square-off and must not be run through this engine's logic. See [CUSPA and unpaid securities](/broking-kyc/finix-broking-setup/backoffice/06-cuspa-unpaid-securities/).
+
+## 3. Evaluation and grace
+
+| Stage | Threshold | Action |
+|---|---|---|
+| **Watch** | Utilisation above a monitoring level | Internal alert; client visibility of utilisation |
+| **Warn** | Utilisation above a warning level | **Shortfall notice** with the amount, the deadline and the consequence |
+| **Grace** | Between warning and action | A stated period in which the client may fund or reduce |
+| **Act** | At the action threshold, or on grace expiry | Square-off begins |
+| **Escalate** | If square-off cannot reduce the breach | Human decision |
+
+| Design point | Detail |
+|---|---|
+| Hysteresis | A client who crosses back below the threshold during grace should not be squared off; without hysteresis a volatile instrument produces oscillating triggers |
+| Debounce | The threshold must be sustained for a stated period, not met on a single tick |
+| Grace in fast markets | A grace period that is generous in a calm market can be unaffordable in a fast one; the policy should state how grace behaves when the breach is deepening |
+| Deepening breach | A separate, shorter path for a breach that is growing rapidly — stated in the policy, not improvised |
+| Notice delivery | Multiple channels; delivery recorded; failure to deliver recorded |
+| Client response | A client who funds or reduces during grace must be re-evaluated immediately, not at the next cycle |
+
+## 4. Selection and sequencing
+
+Which positions are closed, and in what order, materially changes the client's outcome. The rule must be stated and consistent.
+
+| Principle | Finix rule | Reasoning |
+|---|---|---|
+| Objective | Reduce the breach with the least disturbance to the client | Stated in the policy |
+| 1. Product priority | Intraday positions before carry-forward | Intraday was always going to close today |
+| 2. Margin efficiency | Positions releasing the most margin per unit of value closed | Fewest closures to resolve the breach |
+| 3. Liquidity | Liquid instruments before illiquid | Avoid executing into a thin book and harming the client further |
+| 4. Hedge integrity | **Do not break a recognised hedge first** | Closing one leg of a hedge can *increase* the margin requirement |
+| 5. Loss-making positions | Where the policy says so | Must be stated; this is a defensible rule only if disclosed |
+| 6. Partial where sufficient | Close only what is needed to clear the breach plus a stated buffer | Over-closing is itself a client harm |
+| Never | Close positions unrelated to the breach segment without a stated reason | — |
+
+<Aside type="note" title="Rule 4 is the one engines get wrong">
+A client holding a hedged derivatives position is margined on the net risk. Close one leg and the remaining leg is an outright position with a much larger requirement — so a square-off intended to reduce the breach has deepened it, and the engine, seeing a worse utilisation, closes more. This cascade is a real failure mode and it is entirely preventable: evaluate the margin effect of each candidate closure *before* placing the order, and never select a closure that increases the requirement.
+</Aside>
+
+## 5. Order construction
+
+| Decision | Finix default | Reasoning |
+|---|---|---|
+| Order type | Limit, priced to execute | Market orders in a stressed book produce the prices that generate disputes |
+| Price basis | A stated offset from the prevailing price, widening on non-execution per a stated ladder | Predictable, explainable, bounded |
+| Validity | Immediate or cancel for the aggressive tranches; day for resting attempts | Controls the residual |
+| Quantity | Tranche, not the whole position at once | Market impact |
+| Identifier | **Risk identifier**, never a dealer's | Attribution: this is the firm acting, not a dealer |
+| Ladder | A defined sequence of attempts with widening prices and a stop | Prevents an unbounded retry |
+| Ceiling | A maximum adverse price beyond which the engine stops and escalates | Protects the client from an unbounded exit price |
+| Logging | Every attempt, its price, its outcome | The dispute record |
+
+## 6. Exchange constraints that block an exit
+
+| Constraint | Effect | Required behaviour |
+|---|---|---|
+| **Circuit limit** | The instrument is locked; no counterparty at the limit | Stop attempting; escalate; the exposure persists and must be managed by other means |
+| **Trading halt** | No trading at all | Stop; escalate; monitor for resumption |
+| **Ban period** | Fresh positions blocked; **reduction remains permitted** | Proceed — this is exactly the case the exception exists for |
+| **Surveillance measure** | Restrictions may apply, including periodic call auction | Adapt to the applicable mechanism; a call-auction instrument cannot be exited continuously |
+| **Illiquidity** | No depth at any reasonable price | Tranche, widen within the ceiling, stop at the ceiling, escalate |
+| **Price band on the exit side** | The exit price is outside the band | Cannot execute; escalate |
+| **Lot size** | Derivatives cannot be partially exited below one lot | Residual remains; this is structural |
+| **Freeze threshold** | A large exit order goes to freeze | Tranche below the threshold |
+| **Session end** | No time left | Residual carries; escalate for the next session |
+| **Physical delivery window** | Exiting may be impossible close to expiry in commodities | Escalate early; this is predictable and should be pre-empted |
+
+| Escalation | Detail |
+|---|---|
+| To whom | Head of risk, immediately |
+| Decision | Whether to accept the residual exposure, fund it, hedge it, or pursue the client |
+| Record | The attempts made, the constraint encountered, the decision and its author |
+| Client communication | The client is told the position could not be closed and why |
+
+## 7. Communication
+
+| Stage | Message | Channel | Record |
+|---|---|---|---|
+| Watch | Utilisation visible to the client | In-app | — |
+| Warn | "Your account has a shortfall of ₹X. Please fund or reduce by [time]. If not, positions may be closed." | Multiple channels | Delivery recorded |
+| Grace reminder | Repeat, with the time remaining | Multiple channels | Delivery recorded |
+| Action beginning | "We are reducing positions to cover the shortfall." | Multiple channels | Recorded |
+| Each execution | Ordinary trade confirmation, flagged as a risk closure | Standard | Standard |
+| Completion | What was closed, at what price, and the resulting position and balance | Multiple channels | Recorded |
+| Could not close | "We were unable to close [position] because [constraint]. Your obligation is ₹X." | Multiple channels, plus a call for material amounts | Recorded |
+| Intraday product closure | Pre-notified as a product feature; a reminder before the time | In-app | Recorded |
+
+| Principle | Reason |
+|---|---|
+| Amount, deadline and consequence in the warning | A notice without all three is not actionable |
+| Say what was closed, not just that something was | The client needs to know their position |
+| Separate market-caused from client-caused | Most breaches are mark-to-market; saying so is accurate and defuses the dispute |
+| Record delivery, not just despatch | The dispute will be about whether the client was told |
+| Multi-channel in fast markets | One channel's queue is not a defence |
+
+## 8. The decision record
+
+| Field | Why |
+|---|---|
+| Trigger type and threshold in force | Which policy applied |
+| Utilisation and its full input set | Requirement, available, collateral, cash, utilised, blocked |
+| Prices used and their timestamps | Reproducibility |
+| Risk parameter and configuration versions | Reproducibility |
+| Notice content, channels, despatch and delivery timestamps | Whether and when the client was told |
+| Grace period granted and its expiry | The mandate |
+| Client actions during grace, if any | Whether they responded |
+| Re-evaluation at expiry | That the decision was current |
+| Selection logic and the candidates considered | Why these positions |
+| Every order attempt: price, quantity, outcome | What was actually done |
+| Constraints encountered | Why an exit failed |
+| Residual position and obligation | Where it left the client |
+| Escalation, decision and author | Human judgement, attributed |
+| Completion communication | What the client was told afterwards |
+
+Retained on the eight-year floor, joinable with the order records, and **producible as a single narrative** — because in an arbitration that is what is asked for.
+
+## 9. Configuration reference
+
+| Key | Finix default | Class | Mid-session | Failure mode |
+|---|---|---|---|---|
+| `finix.rms.squareoff.watch_pct.<group>` | Per policy | Discretionary, disclosed | Tightening only at a boundary | Late warning |
+| `finix.rms.squareoff.warn_pct.<group>` | Per policy | Discretionary, disclosed | **No** | Acting without notice |
+| `finix.rms.squareoff.trigger_pct.<group>` | Per policy | Discretionary, disclosed | **No** | Mass square-off from a config change |
+| `finix.rms.squareoff.grace_minutes.<group>` | Per policy | Discretionary, disclosed | No | Acting too soon |
+| `finix.rms.squareoff.deepening_breach_path` | Shorter, stated in policy | Discretionary, disclosed | No | Unmanaged fast-market breach |
+| `finix.rms.squareoff.hysteresis_pct` | Set | Discretionary | No | Oscillating triggers |
+| `finix.rms.squareoff.debounce_seconds` | Set | Discretionary | No | Trigger on a single tick |
+| `finix.rms.squareoff.selection_rule` | As section 4 | Discretionary, disclosed | No | Inconsistent client outcomes |
+| `finix.rms.squareoff.never_break_hedge` | **True** | Discretionary, strongly recommended | No | Cascade |
+| `finix.rms.squareoff.order_type` | Limit with a widening ladder | Discretionary | No | Bad exit prices |
+| `finix.rms.squareoff.price_ladder` | Stated offsets and steps | Discretionary | No | Unbounded or ineffective exits |
+| `finix.rms.squareoff.adverse_price_ceiling` | Set | Discretionary | No | Unbounded client loss |
+| `finix.rms.squareoff.tranche_size` | Below the freeze threshold | Discretionary | No | Freezes and market impact |
+| `finix.rms.squareoff.max_attempts` | Bounded, then escalate | Discretionary | No | Retry loop into a wall |
+| `finix.rms.squareoff.identifier` | Risk identifier only | Discretionary, strongly recommended | No | Mis-attribution |
+| `finix.rms.squareoff.intraday_time.<segment>` | Published | Discretionary, disclosed | No | Client surprise |
+| `finix.rms.squareoff.blocks_client_modify` | True | Discretionary, disclosed | No | Client and risk fighting |
+| `finix.rms.squareoff.manual_capability` | Always available and rehearsed | Discretionary | — | No fallback when the engine is down |
+
+## 10. Exception paths
+
+| Situation | Response |
+|---|---|
+| Engine unavailable during a volatile session | Manual square-off under documented authority; this is a rehearsed scenario, not an improvisation |
+| Instrument at a circuit limit | Stop attempting; escalate; manage the residual exposure by other means |
+| Mass breach across many clients at once | Capacity planning matters: the engine is a load spike concurrent with the volatility that caused it. Prioritise by exposure; communicate broadly; escalate early |
+| Client funds during grace | Re-evaluate immediately; cancel pending square-off orders; confirm to the client |
+| Client funds after square-off begins | Stop further closures; complete the in-flight orders; explain clearly what happened and why the earlier closures stand |
+| Square-off increases the requirement | Defect in the selection logic; stop, escalate, and fix before resuming |
+| Residual position cannot be closed by session end | Escalate; decide on carrying the exposure; inform the client the same day |
+| Client disputes the square-off | Produce the decision record as a narrative; this is what it is for |
+| Notice could not be delivered | Record the failure; it does not by itself invalidate the action if the policy permits, but it weakens the position and should be fixed |
+| Square-off order rejected by the ladder | Investigate: a risk order rejected by the firm's own checks is usually a configuration problem |
+
+## Practical notes
+
+- **Keep the configuration and the disclosed policy in lockstep.** A mismatch is the first thing an arbitrator finds.
+- **Warn with an amount, a deadline and a consequence.** Most clients fund rather than be closed out, which is better for everyone.
+- **Never break a recognised hedge first.** It is the one selection rule whose violation actively worsens the situation.
+- **Put a ceiling on the exit price.** An unbounded widening ladder protects the firm and harms the client, and that asymmetry is exactly what a dispute will focus on.
+- **Rehearse manual square-off.** Twice a year, with the real team.
+- **Load-test the engine with a mass-breach scenario.** It fires when the market is already busy.
+- **Write the "could not close" communication in advance.** It is rare, difficult and high-stakes.
+- **Separate intraday product closure from margin square-off in every message and every record.** They are different events with different causes.
+
+## Where this connects
+
+- [Limit framework](/broking-kyc/finix-broking-setup/rms/04-limit-framework/) — the capacity whose exhaustion triggers this
+- [Margin engine](/broking-kyc/finix-broking-setup/rms/02-margin-engine/) — the requirement side
+- [Order forward path](/broking-kyc/finix-broking-setup/oms/06-order-forward-path/) — square-off orders traverse it like any other
+- [Modification and cancellation](/broking-kyc/finix-broking-setup/oms/08-modify-cancel-rules/) — precedence over client modification
+- [CUSPA and unpaid securities](/broking-kyc/finix-broking-setup/backoffice/06-cuspa-unpaid-securities/) — the separate statutory path
+- [Incident playbooks](/broking-kyc/finix-broking-setup/daily-ops/07-incident-playbooks/) — mass breach and engine failure
+- [Investor grievance redressal](/broking-kyc/deep-dives/compliance-audit/igrc/) — where disputes go

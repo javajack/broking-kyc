@@ -1,0 +1,192 @@
+---
+title: "RMS 2: the margin engine"
+description: What Finix computes and from which input — upfront value-at-risk plus extreme loss margin in cash, span-based initial plus exposure margin in derivatives, delivery and tender margins, mark-to-market, additional and surveillance margins — with the ingestion contracts, the intraday snapshot clock, the 20 percent upfront option, and how the computation is proved correct.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** The margin computation itself is documented in depth elsewhere on this site, so this page does not re-derive it. What it does instead is answer the three questions a build team actually has: which number applies in which segment and when, which file it comes from and how fresh that file must be, and how the firm proves its computation matches the clearing corporation's. The snapshot clock gets its own section because it is the mechanism by which the firm's collection is tested, and the 20 percent upfront option gets one because it is a genuine design choice with a capital consequence that is rarely laid out.
+
+## TL;DR
+
+- **Upfront means before the trade, in cash as well as derivatives.** Trading and clearing members must mandatorily collect upfront value-at-risk margin plus extreme loss margin from clients in the cash segment, per paragraph 40.1.2 of the [Master Circular](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir2024118).
+- **Margins other than upfront are now due by settlement day**, not T+2. SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/57 (28 April 2025) rewrote the collection window to align with the T+1 cycle, forwarded as NSE/INSP/67739 (29 April 2025). `[not yet in index]`
+- **Derivatives upfront margin is span-based initial margin plus extreme loss margin**, with additional layers added contextually — delivery, tender, special, surveillance and event-driven.
+- **The clearing corporation computes the authoritative number**; the firm consumes the risk parameter file and computes per-client margin in real time from it. The firm's exposure is the gap between the two.
+- **Verification uses at least four random intraday snapshots** inside pre-defined windows — 11:00 to 11:30, 12:30 to 13:00, 13:30 to 14:00 and 14:30 to 15:00 — and the peak-margin requirement for the day is the maximum across them.
+- **The higher of the end-of-day shortfall and the peak-snapshot shortfall is penalised, not the sum.**
+- **Collecting a minimum 20 percent upfront in lieu of value-at-risk and extreme loss margin removes the short-collection penalty** under paragraph 40.3.2. For some client segments this is cheaper than the operational cost of precision; for others it is far more expensive. It is a decision, not a default.
+- **Prove the computation three ways**: against the clearing corporation's own margin file, against the shadow computation, and against a hand-worked example per segment.
+
+## Conceptual overview
+
+There are two margin numbers in a broker's life and confusing them causes most margin incidents. The first is the **requirement**: what the clearing corporation says the firm must have against its positions. The second is the **collection**: what the firm has actually taken from clients. The regulatory regime is built around the gap between them. Short collection is penalised; the peak-margin snapshots exist to stop a firm from collecting late and claiming it collected on time; and the reporting file is the mechanism by which the gap is declared. A firm that treats margin as one number — "the margin" — will eventually report a collection figure that does not correspond to any requirement.
+
+The second idea is that the requirement is layered and the layers appear at different times. Span-based initial margin and extreme loss margin are present from the moment the position exists. Mark-to-market appears as the market moves. Delivery margins appear in the expiry window on physically settled contracts and build over several sessions. Special, additional and surveillance margins appear by circular, sometimes intraday, sometimes targeted at a single instrument. A risk engine that models margin as a function of position and parameter file alone will miss the layers that arrive by announcement, and the client will discover the gap as a sudden shortfall.
+
+The third idea is that precision has a cost and the regulation offers an explicit escape from it. Collecting exactly the right value-at-risk and extreme loss margin, verified against four random snapshots, requires continuous computation, accurate collateral valuation and tight operational discipline. Collecting a flat minimum of 20 percent upfront instead removes the short-collection penalty entirely. For a retail book with modest leverage appetite, 20 percent may exceed the computed requirement anyway and the choice is free. For a book of derivatives clients running hedged portfolios where the computed requirement is a small fraction of notional, 20 percent is prohibitive. The right answer is usually segment-specific, which means the firm should be able to apply it selectively and should know, per client group, which regime it is operating under.
+
+## 1. Regulatory framework
+
+- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/POD-1/P/CIR/2024/118](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir2024118)** (9 August 2024) — paragraph 40.1.2, mandatory upfront collection of value-at-risk plus extreme loss margin from clients in the cash segment; paragraph 40.3.1, the penalty grid adopted by reference; paragraph 40.3.2, the 20 percent upfront alternative.
+- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — the consolidated current master circular.
+- **SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/57** (28 April 2025) — margins other than upfront due by settlement day rather than T+2, aligning collection with the T+1 cycle; rewrote paragraphs 39.1.2, 39.1.3 and 39.1.5. Forwarded as NSE/INSP/67739 (29 April 2025). `[not yet in index]`
+- **[SEBI/HO/MRD2/DCAP/CIR/P/2020/127](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2dcapcirp2020127)** (20 July 2020) — the peak-margin framework and the minimum four random client-wise snapshots per segment per day.
+- **[NCL/CMPT/45516](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt45516)** and **[NCL/CMPL/44977](/broking-kyc/reference/circulars/clearing-corps/#nclcmpl44977)** — the snapshot windows.
+- **CIR/DNPD/7/2011** (10 August 2011) — the penalty slabs still adopted by reference. `[not yet in index]`
+- **[SEBI/HO/MRD2_DCAP/CIR/2021/0598](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2_dcapcir20210598)** (20 July 2021) — segregation and monitoring of collateral at client level, including the cash-equivalent minimum at clearing-member level.
+- **[NCL/CMPT/62978](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt62978)** (18 July 2024) — cross-margin for offsetting positions with different expiry dates.
+- Full treatment: [RMS SPAN methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/) and [margin shortfall and peak margin](/broking-kyc/trading-risk/margin-shortfall-peak-margin/).
+
+## 2. What is computed, per segment
+
+| Segment | Upfront components | Additional layers | Timing |
+|---|---|---|---|
+| **Cash** | Value-at-risk margin plus extreme loss margin | Special and additional margins by circular; surveillance-measure margins; delivery-related where applicable | Upfront, before the trade |
+| **Equity derivatives** | Span-based initial margin plus extreme loss margin | Exposure margin; mark-to-market; delivery margins in the expiry window on physically settled stock contracts; special, additional and surveillance margins | Upfront; mark-to-market as it accrues; delivery margins staged across the expiry window |
+| **Currency derivatives** | Span-based initial margin plus extreme loss margin | Exposure, mark-to-market, additional | Upfront |
+| **Commodity derivatives** | Span-based initial margin plus extreme loss margin | Delivery period margin at the **higher of 3 percent plus five-day 99 percent value-at-risk of spot price volatility, or 25 percent**; an **8.34 percent incremental margin across the last three trading days including expiry** during the staggered tender period; special and additional margins | Upfront; the tender ladder begins before expiry |
+
+| Non-upfront obligation | Timing |
+|---|---|
+| Mark-to-market and other non-upfront margins | **By settlement day**, aligned with the T+1 cycle, following the April 2025 revision |
+
+<Aside type="caution" title="The commodity delivery ladder catches firms out">
+Commodity delivery margins are large and they start early. The delivery period margin is the higher of 3 percent plus a five-day 99 percent value-at-risk of spot price volatility, or 25 percent — an order of magnitude above ordinary initial margin — and an incremental 8.34 percent applies across the last three trading days including expiry. A client holding a position into the tender period experiences a step change in requirement that they will not have anticipated unless told. Build the client communication to fire several sessions before the ladder starts, not when the margin call lands. See [MCX commodity](/broking-kyc/finix-broking-setup/exchanges/04-mcx-commodity/).
+</Aside>
+
+## 3. Ingestion contracts
+
+| File or input | Source | Frequency | Applied within | Behaviour if missed |
+|---|---|---|---|---|
+| Risk parameter file, derivatives | Clearing corporation | Several times daily, intraday | Minutes of publication | Block new derivatives orders in scope |
+| Value-at-risk and extreme loss margin rates, cash | Exchange and clearing corporation | Daily, revisable | Before open and on revision | Block new cash orders in scope on a missed revision |
+| Approved collateral and haircuts | Clearing corporation | Daily, amendable | Before valuation | Exclude unlisted collateral; do not carry forward a withdrawn haircut |
+| Instrument master, lot sizes, tick sizes | Exchange | Daily, pre-open | Before open | Abort begin-of-day |
+| Ban-period list | Exchange | Daily, pre-open | Before open | Block fresh derivatives positions in listed underlyings |
+| Surveillance measure lists | Exchange | Daily and periodic | Before open | Apply the most restrictive known treatment |
+| Price bands | Exchange | Daily plus intraday | Immediately | Reject outside last-known band |
+| Client-wise margin snapshot files | Clearing corporation | Per snapshot | Before reporting | Escalate; reporting cannot be reconstructed without them |
+| Client collateral and ledger balance | SecMark back office | Begin-of-day plus intraday | Before open | Do not open |
+| Pledge positions | Depository via SecMark | Daily plus on event | Before valuation | Do not recognise disputed collateral |
+
+| Control | Requirement |
+|---|---|
+| Version everything | Every applied file carries a version or timestamp that appears in the decision record |
+| Assert, do not assume | "The job ran" is not evidence; "the applied file is dated today and contains N instruments" is |
+| Diff on apply | A parameter file whose values move dramatically is worth an alert before it is applied |
+| Replay | Re-ingestion must be safe and must not double-apply |
+
+## 4. The snapshot clock
+
+| Element | Detail |
+|---|---|
+| Mechanism | Clearing corporations send at least four client-wise margin snapshots per segment per day, taken randomly inside pre-defined windows |
+| Windows | 11:00 to 11:30, 12:30 to 13:00, 13:30 to 14:00, 14:30 to 15:00 |
+| Peak-margin requirement | The maximum across the snapshots for the day |
+| Penalty basis | The **higher** of the end-of-day shortfall and the peak-snapshot shortfall — not the sum |
+| Consequence for design | Margin must be sufficient **continuously**, not at end of day. A position opened at 11:05 and closed at 11:25 was margined for the whole of its life and may be caught by a snapshot |
+| Firm-side implication | The engine must hold enough margin from the moment a position exists, which is exactly what upfront collection means |
+
+<Aside type="note" title="Why intraday square-off does not avoid peak margin">
+A common misreading is that a position closed before the end of the day does not attract margin. The snapshot regime exists precisely to defeat that. If a snapshot falls while the position is open, the requirement at that instant counts toward the day's peak, and if the firm had not collected it, that is a short collection. This is the whole reason intraday leverage disappeared after the peak-margin framework: there is no longer a window in which a position can exist unmargined.
+</Aside>
+
+## 5. The 20 percent upfront option
+
+| Aspect | Detail |
+|---|---|
+| Rule | Paragraph 40.3.2 — if the member collects a minimum 20 percent upfront margin in lieu of value-at-risk and extreme loss margin from the client, penalty for short collection or non-collection does not apply |
+| What it buys | Immunity from the short-collection penalty, and a large reduction in the operational precision required |
+| What it costs | 20 percent of trade value, which may be far above the computed requirement for a hedged or liquid position |
+| Where it fits | Client segments where the computed requirement is typically below 20 percent anyway, or where operational precision is hard to guarantee |
+| Where it does not | Derivatives clients running hedged portfolios, where the computed requirement is a small fraction of notional |
+| Implementation | Must be applied per client group, with the regime recorded against the client, and the collected amount evidenced |
+| Reporting | The reporting must correctly reflect which basis was used |
+
+| Finix position | Reasoning |
+|---|---|
+| Computed value-at-risk plus extreme loss margin as the default | The firm is building the computation anyway and the capital efficiency matters to clients |
+| 20 percent regime available as a **configurable per-client-group option** | A deliberate fallback for segments or periods where operational precision is at risk — for example immediately after go-live |
+| Regime recorded against the client and reflected in reporting | The two bases must not be mixed in a single report |
+
+## 6. Proving the computation
+
+Three independent checks, because a single implementation is always self-consistent.
+
+| Check | Against | Cadence | On divergence |
+|---|---|---|---|
+| **Clearing corporation comparison** | The clearing corporation's own client-wise margin files and snapshots | Daily | Investigate immediately; this is a potential short-collection exposure |
+| **Shadow computation** | SecMark middleware's independent computation, off the order path | Sampled, continuously | Engineering defect report; quantify the affected population |
+| **Hand-worked examples** | A manually computed example per segment, re-verified after any parameter or code change | At release, and after every methodology change | Treat as a release blocker |
+
+| Additional assurance | Detail |
+|---|---|
+| Regression suite | A fixed set of portfolios with known expected requirements, run on every release |
+| Parameter-change testing | A new risk parameter file applied to the regression portfolios before production |
+| Segment coverage | Cash, equity derivatives, currency and commodity each covered; methodologies differ |
+| Edge portfolios | Spreads, hedges, cross-margin-eligible pairs, expiry-week physically settled stock positions, commodity positions in the tender window |
+| Documentation | The worked examples retained as evidence; they are the clearest demonstration to an inspector that the firm understands its own computation |
+
+## 7. Margin and the client
+
+| Point | Requirement |
+|---|---|
+| Pre-trade visibility | The client should be able to see the requirement for an intended trade before placing it |
+| Component breakdown | Showing span, exposure, extreme loss and additional components separately converts an unexplainable number into an explainable one |
+| Utilisation | A clear, current figure for used and available capacity |
+| Change notification | A material increase in requirement — an additional margin by circular, a delivery ladder starting, a surveillance measure — communicated proactively |
+| Daily margin statement | Issued per the prescribed requirement; see [statements and retention](/broking-kyc/finix-broking-setup/backoffice/08-statements-retention/) |
+| Shortfall communication | Explicit, with the amount, the deadline and the consequence; see [square-off engine](/broking-kyc/finix-broking-setup/rms/06-squareoff-engine/) |
+| Policy disclosure | The risk management policy given to the client must describe the margin basis actually used |
+
+## 8. Configuration reference
+
+| Key | Finix default | Class | Failure mode if wrong |
+|---|---|---|---|
+| `finix.rms.margin.basis.<segment>` | Computed value-at-risk plus extreme loss margin, span-based in derivatives | Regulatory | Collecting the wrong basis |
+| `finix.rms.margin.upfront_20pct_groups` | Empty by default; configurable per client group | Regulatory option | Mixed bases in one report |
+| `finix.rms.margin.span_file_refresh_interval` | Per publication schedule | Exchange-set | Under-margined derivatives book |
+| `finix.rms.margin.span_file_stale_action` | Block new derivatives orders in scope | Discretionary, strongly recommended | Computing on stale parameters |
+| `finix.rms.margin.var_elm_source.<segment>` | Exchange and clearing corporation published rates | Exchange-set | Wrong cash-segment margin |
+| `finix.rms.margin.mtm_frequency` | Continuous, event-driven with a periodic sweep | Discretionary | A book drifting from reality |
+| `finix.rms.margin.delivery_ladder_notice_days` | Several sessions before the ladder starts | Discretionary | Clients surprised by a step change |
+| `finix.rms.margin.additional_margin_apply` | Immediately on circular | Exchange-set | Under-collection against an announced margin |
+| `finix.rms.margin.broker_buffer_pct.<group>` | Discretionary buffer above the requirement | Discretionary, disclosed | Either under-collection or an uncompetitive offering |
+| `finix.rms.margin.shadow_sample_rate` | Weighted sampling | Discretionary | Computation defects undetected |
+| `finix.rms.margin.cc_comparison_tolerance` | Tight | Discretionary | Divergence normalised |
+| `finix.rms.margin.client_visibility` | Pre-trade requirement with components | Discretionary | Unexplainable margin calls |
+
+## 9. Exception paths
+
+| Situation | Response |
+|---|---|
+| Firm's computation diverges from the clearing corporation's | Quantify the affected clients and the shortfall; collect or fund; investigate the cause before the next session |
+| Risk parameter file arrives with implausible values | Alert before applying; a bad file applied is worse than a file applied late, within the staleness window |
+| Additional margin announced intraday | Apply immediately; communicate to affected clients; expect shortfalls |
+| Surveillance measure imposed on a held instrument | Apply the most restrictive treatment; recompute; communicate |
+| Commodity tender ladder begins | Pre-notified clients; the ladder is predictable and the communication should precede it |
+| Snapshot file not received | Escalate to the clearing corporation; reporting depends on it |
+| A client group on the 20 percent basis trades a product where it is uneconomic | Review the group assignment; the basis is a client-group decision, not a per-trade one |
+| Hand-worked example fails after a release | Release blocker; do not deploy a margin computation that fails its own example |
+| Mark-to-market losses create shortfalls across the book | This is a market event, not a defect; the [square-off engine](/broking-kyc/finix-broking-setup/rms/06-squareoff-engine/) and the communication plan carry it |
+
+## Practical notes
+
+- **Keep hand-worked examples per segment and re-run them at every release.** They are the cheapest regression test and the clearest inspection evidence.
+- **Alert on implausible parameter files before applying.** A clearing corporation file is authoritative, but a transmission or parsing error is not.
+- **Communicate the commodity delivery ladder early.** It is predictable, large, and the most avoidable client surprise in the plane.
+- **Record which margin basis each client group is on.** Mixing computed and 20 percent bases in a single report is a reporting defect.
+- **Show margin components to clients.** The support-cost reduction alone pays for it.
+- **Remember that a snapshot can catch a position that no longer exists.** Intraday does not mean unmargined.
+- **Compare against the clearing corporation daily, not monthly.** The gap is the firm's exposure, and it compounds.
+
+## Where this connects
+
+- [RMS architecture](/broking-kyc/finix-broking-setup/rms/01-rms-architecture/) — the inputs this engine consumes
+- [Pre-trade check ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/) — where the computed requirement is used
+- [Collateral and pledge](/broking-kyc/finix-broking-setup/rms/05-collateral-pledge/) — what the requirement is met with
+- [Margin reporting and penalties](/broking-kyc/finix-broking-setup/rms/08-margin-reporting-penalties/) — the declaration and its consequences
+- [RMS SPAN methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/) — the computation in depth
+- [Margin shortfall and peak margin](/broking-kyc/trading-risk/margin-shortfall-peak-margin/) — the member's obligation
+- [Collateral and cross-margin](/broking-kyc/trading-risk/collateral-cross-margin/) — offsets and eligibility

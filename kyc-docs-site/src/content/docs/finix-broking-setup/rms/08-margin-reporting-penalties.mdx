@@ -1,0 +1,220 @@
+---
+title: "RMS 8: margin reporting and penalties"
+description: The declaration side of margin — what is reported, in which file, by when, the five-working-day cut-off, the penalty grid and its escalation, how the higher of end-of-day and peak shortfall is penalised, short-allocation reason codes, who bears the penalty, dispute handling, and the controls that keep reported figures true.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Reporting is where margin stops being a computation and becomes a declaration with consequences. The page follows the actual sequence: what the obligation is, what gets reported and from what source, the deadline and what happens when it is missed, the penalty grid as the source circulars state it, how the penalty is allocated between firm and client, and then the controls that keep the reported numbers true — because the most expensive error in this area is not a late file but an accurate-looking file built on a wrong number.
+
+## TL;DR
+
+- **The firm reports margin collected from each client as at end of day, and the peak margin collected during the day**, with the reporting cut-off **five working days after the trade date**.
+- **Verification uses at least four random intraday snapshots** inside pre-defined windows — 11:00 to 11:30, 12:30 to 13:00, 13:30 to 14:00 and 14:30 to 15:00. The peak-margin requirement for the day is the maximum across them.
+- **The higher of the end-of-day shortfall and the peak-snapshot shortfall is penalised, not the sum.**
+- **The penalty grid is still the 2011 grid**: 0.5 percent of the shortfall where it is below ₹1 lakh *and* below 10 percent of the applicable margin; 1 percent otherwise. Escalation to **5 percent per day** applies beyond the third consecutive day and beyond the fifth instance in a month.
+- **Non-reporting is treated as 100 percent short reporting**, and false or incorrect reporting is a separate disciplinary matter.
+- **Collecting a minimum 20 percent upfront in lieu of value-at-risk and extreme loss margin removes the short-collection penalty** under paragraph 40.3.2 of the master circular.
+- **Allocation between firm and client must follow a disclosed policy.** A penalty caused by the firm's own failure is the firm's; one caused by a client's non-payment may be passed on only if the client agreement and policy say so.
+
+## Conceptual overview
+
+Margin reporting is the mechanism by which a firm's internal risk management becomes externally verifiable. The clearing corporation knows the requirement because it computed it. What it does not know is what the firm actually collected from each client, and that is what the report supplies. The penalty regime exists to make the report honest: a firm that collects late, collects less, or does not report at all faces a cost calibrated to the shortfall, with escalation designed to make persistent under-collection uneconomic.
+
+The snapshot mechanism is what makes the regime bite. If verification happened only at end of day, a firm could allow positions during the session and collect afterwards, and the client would have traded unmargined for hours. Four random snapshots inside known windows mean that a position has to be margined throughout its life, because the firm cannot know which moment will be sampled. This is the structural reason intraday leverage disappeared: there is no longer a window in which an unmargined position is invisible.
+
+The third observation is about the direction of error. A firm that over-collects has an unhappy client and no penalty. A firm that under-collects has a penalty, an escalating one if it persists, and — if the under-collection arose from a computation defect rather than a client's non-payment — a systematic exposure across the whole book rather than a single client. That asymmetry should shape the design: buffer upward, detect divergence from the clearing corporation's number daily, and treat a reporting difference as a risk incident rather than an administrative one.
+
+## 1. Regulatory framework
+
+- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/POD-1/P/CIR/2024/118](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir2024118)** (9 August 2024) — paragraph 40.1.2 mandatory upfront collection of value-at-risk plus extreme loss margin in the cash segment; paragraph 40.3.1 adopting the penalty grid by reference; paragraph 40.3.2 the 20 percent upfront alternative.
+- **[Master Circular SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — the consolidated current master circular.
+- **SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/57** (28 April 2025) — margins other than upfront due by settlement day rather than T+2; forwarded as NSE/INSP/67739 (29 April 2025). `[not yet in index]`
+- **[SEBI/HO/MRD2/DCAP/CIR/P/2020/127](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2dcapcirp2020127)** (20 July 2020) — the peak-margin framework and the minimum four random client-wise snapshots per segment per day.
+- **[NCL/CMPT/45516](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt45516)** and **[NCL/CMPL/44977](/broking-kyc/reference/circulars/clearing-corps/#nclcmpl44977)** — the snapshot windows.
+- **CIR/DNPD/7/2011** (10 August 2011) — the penalty slabs adopted by reference. `[not yet in index]`
+- **CIR/HO/MIRSD/DOP/CIR/P/2019/88** (1 August 2019) — false or incorrect reporting as a separate disciplinary offence. `[not yet in index]`
+- **[NSE/INSP/64315](/broking-kyc/reference/circulars/nse/#nseinsp64315)** — the margin penalty grid as forwarded to members, with the reconciliation across clearing-member level, client level, intraday and end of day.
+- **[SEBI/HO/MRD2_DCAP/CIR/2021/0598](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2_dcapcir20210598)** (20 July 2021) — client-level collateral allocation and reporting.
+- Depth: [margin shortfall and peak margin](/broking-kyc/trading-risk/margin-shortfall-peak-margin/) and [RMS SPAN methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/).
+
+## 2. What is reported
+
+| Item | Basis | Source in the Finix stack |
+|---|---|---|
+| Client identity | Unique client code per exchange and segment | SecMark client master |
+| Applicable margin | The clearing corporation's requirement for that client | Clearing corporation files, reconciled against the firm's computation |
+| **Margin collected at end of day** | Clear cash plus recognised collateral allocated to the client | SecMark ledger plus pledge records |
+| **Peak margin collected during the day** | The firm's collected position at the snapshot points | Saral RMS intraday record |
+| Shortfall | Requirement less collected, at end of day and at peak | Computed |
+| Short-allocation reason | From the prescribed code set | Operations, with a closed list |
+| Collateral composition | Cash, cash equivalent, securities | SecMark and pledge records |
+| Client-level allocation | Allocated collateral per client | Operations |
+
+| Principle | Detail |
+|---|---|
+| Collected, not required | The report declares what the firm has, not what it needs |
+| Client level | Per client, per segment, per exchange |
+| Clear balances only | Unconfirmed receipts are not collection |
+| Recognised collateral only | Confirmed pledges, approved instruments, current haircuts; see [collateral and pledge](/broking-kyc/finix-broking-setup/rms/05-collateral-pledge/) |
+| One basis per client | A client on the 20 percent upfront basis must be reported on that basis consistently |
+
+## 3. The deadline
+
+| Item | Timing |
+|---|---|
+| Upfront collection | **Before the trade** |
+| Margins other than upfront | **By settlement day**, aligned with the T+1 cycle following the April 2025 revision |
+| Reporting cut-off | **Five working days after the trade date** |
+| Internal target | Materially earlier than the cut-off, so that a failed run has room to be rerun |
+| Correction window | Within the cut-off; a correction after it is a late filing |
+
+<Aside type="caution" title="Build to an internal deadline, not the regulatory one">
+Five working days sounds generous and is not, because the file depends on reconciled trades, reconciled collateral, reconciled ledgers and clearing corporation snapshot files — each of which can be late or wrong. A firm that targets the cut-off has no room for a failed run. Finix targets completion several working days early, with the gap reserved for exception resolution. The deadline that appears in the [EOD runbook](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/) is the internal one.
+</Aside>
+
+## 4. The penalty grid
+
+As stated in the source circulars.
+
+| Shortfall | Penalty |
+|---|---|
+| **Below ₹1 lakh AND below 10 percent of the applicable margin** | **0.5 percent of the shortfall** |
+| Otherwise — ₹1 lakh or more, or 10 percent or more of the applicable margin | **1 percent of the shortfall** |
+
+| Escalation | Condition |
+|---|---|
+| **5 percent per day** | Beyond the third consecutive day of shortfall |
+| **5 percent per day** | Beyond the fifth instance of shortfall in a month |
+
+| Additional rules | Detail |
+|---|---|
+| Basis | The **higher** of the end-of-day shortfall and the peak-snapshot shortfall — not the sum |
+| Reconciliation | Across clearing-member level, client level, intraday and end of day, with the maximum taken |
+| Non-reporting | Treated as **100 percent short reporting** |
+| False or incorrect reporting | A **separate disciplinary offence**, not merely a penalty |
+| 20 percent upfront | Collecting a minimum 20 percent upfront in lieu of value-at-risk and extreme loss margin removes the short-collection penalty |
+| Tax | Goods and services tax applies to the penalty amount |
+
+The escalation structure is the part to design around. A single day's shortfall is a cost. The same shortfall persisting is a different category of problem, because the 5 percent per day rate is designed to be uneconomic. A firm whose shortfalls persist has a structural problem — a computation defect, a collateral recognition failure, or a client who is not going to pay — and the penalty structure is telling it so.
+
+## 5. Allocation between firm and client
+
+| Cause | Who bears it | Condition |
+|---|---|---|
+| Client did not pay a margin call | **Client**, if the agreement and the disclosed policy provide for it | Must be in the client agreement; disclosed; computed transparently |
+| Client's cheque or transfer failed | Client, as above | Same |
+| **Firm's computation was wrong** | **Firm** | Never passed on |
+| **Firm's collateral recognition failed** | **Firm** | Never passed on |
+| **Firm reported late or incorrectly** | **Firm** | Never passed on |
+| Firm's ingestion of a parameter file failed | **Firm** | Never passed on |
+| Clearing corporation's file was late | Firm, usually, with a dispute path | Raise with the clearing corporation |
+| Exchange-side error | Dispute | Evidence required |
+
+| Control | Requirement |
+|---|---|
+| Cause classification before allocation | Every penalty is attributed to a cause before anyone decides who pays |
+| Client-borne penalties are itemised | Shown separately on the statement, with the computation |
+| Firm-borne penalties are a defect metric | Tracked, reported to risk management, and investigated |
+| Policy disclosure | The basis for passing a penalty on must be in the client agreement and the disclosed policy |
+| Review | Monthly, with the cause distribution reported |
+
+A firm whose penalties are predominantly firm-borne has a systems problem; one whose penalties are predominantly client-borne has a credit problem. Both are informative and the cause classification is what makes the distinction visible.
+
+## 6. Controls that keep reported figures true
+
+| Control | Detail |
+|---|---|
+| **Daily comparison with the clearing corporation** | The firm's computed requirement against the clearing corporation's; a persistent gap is a defect, not a rounding difference |
+| Snapshot reconciliation | The firm's intraday collected position at each snapshot against the clearing corporation's snapshot file |
+| Collateral three-way reconciliation | Depository, back office, risk — before reporting |
+| Ledger reconciliation | Clear balances only; unconfirmed receipts excluded |
+| Basis consistency | Each client reported on one basis; no mixing of computed and 20 percent |
+| Pre-submission validation | Format, totals, counts, and a comparison with the prior day's file |
+| Submission acknowledgement | Per trade date, tracked; absence of an acknowledgement is an incident |
+| Post-submission comparison | The firm's reported shortfall against the penalty actually levied; an unexplained difference is investigated |
+| Correction process | Within the window, with a record of what changed and why |
+| Retention | Files and acknowledgements retained on the eight-year floor |
+
+## 7. Reason codes
+
+Short collection must be explained with a reason from the prescribed set. The firm's internal discipline around those codes matters more than their existence.
+
+| Practice | Detail |
+|---|---|
+| Closed list | Only the prescribed codes; no free text substituting for a code |
+| Accuracy | The code must reflect the actual cause, not the most convenient one |
+| Distribution monitoring | A shift in the code distribution is a signal about the operation |
+| Review | Monthly, with codes reconciled against the firm's own cause classification |
+| Red flag | A single code dominating is usually a sign that codes are being chosen by habit rather than by cause |
+
+## 8. The daily and periodic cycle
+
+| When | Step | Owner |
+|---|---|---|
+| Intraday | Snapshot-time collected positions captured | Risk |
+| Post-session | Trade file reconciled | Operations |
+| Post-session | Collateral and ledger reconciled | Operations |
+| Post-session | Requirement reconciled against the clearing corporation | Risk |
+| End of day | End-of-day and peak collected computed per client | Risk |
+| End of day | Shortfalls identified; reason codes assigned | Operations |
+| **Internal deadline** | File built, validated, submitted | Operations |
+| Next day | Acknowledgement verified | Operations |
+| On receipt | Penalty advice reconciled against the firm's expectation | Risk and finance |
+| Within days | Cause classification and allocation | Risk and finance |
+| Monthly | Penalty report by cause; client-borne penalties itemised on statements | Finance and compliance |
+| Monthly | Reason-code distribution review | Operations and compliance |
+| Quarterly | Trend review to the risk committee | Risk |
+
+## 9. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.rms.report.margin_cutoff_days` | 5 working days, regulatory | Exchange-set | Late filing penalty |
+| `finix.rms.report.internal_target_days` | Materially earlier | Discretionary | No room to rerun |
+| `finix.rms.report.basis.<client_group>` | Computed, or 20 percent where configured | Regulatory | Mixed bases in one file |
+| `finix.rms.report.clear_balance_only` | True | Regulatory | Over-stated collection |
+| `finix.rms.report.recognised_collateral_only` | True | Regulatory | Over-stated collection |
+| `finix.rms.report.prevalidation` | Format, totals, counts, prior-day comparison | Discretionary | Malformed or implausible filings |
+| `finix.rms.report.on_validation_failure` | **Do not submit; escalate** | Discretionary, strongly recommended | A wrong file filed on time is worse than a correct file filed late within the window |
+| `finix.rms.report.ack_tracking` | Per trade date | Discretionary | Unnoticed non-submission |
+| `finix.rms.report.reason_code_list` | Prescribed, closed | Exchange-set | Inaccurate explanations |
+| `finix.rms.penalty.cause_classification` | Mandatory before allocation | Discretionary, strongly recommended | Penalties passed on without basis |
+| `finix.rms.penalty.client_passthrough_allowed` | Only where the agreement and policy provide | Regulatory in substance | Unauthorised client charge |
+| `finix.rms.penalty.firm_borne_tracking` | As a defect metric | Discretionary | Systems problems invisible |
+| `finix.rms.report.cc_comparison_daily` | True | Discretionary, strongly recommended | Divergence discovered via penalties |
+
+## 10. Exception paths
+
+| Situation | Response |
+|---|---|
+| Validation fails near the deadline | **Do not submit a known-bad file.** Escalate; use the remaining window |
+| Snapshot file not received from the clearing corporation | Escalate immediately; the peak figure cannot be reconstructed without it |
+| Firm's requirement differs from the clearing corporation's | Risk incident; quantify the affected clients; this is a potential systematic short collection |
+| Penalty levied that the firm did not expect | Reconcile; if the firm's data differs, dispute with evidence; if it does not, classify the cause |
+| Shortfall persists for three consecutive days | Escalation to 5 percent per day applies; treat as a structural problem requiring a decision, not a daily cost |
+| Fifth shortfall instance in a month approaching | Escalate before the fifth, not after |
+| Client disputes a passed-on penalty | Produce the computation, the margin call, the delivery record and the policy clause |
+| Reason codes concentrated on one value | Review whether codes reflect causes |
+| A correction is needed after the cut-off | Late filing; record it, report it internally, and fix the process that caused it |
+| Non-submission discovered | Treated as 100 percent short reporting; immediate escalation to compliance |
+
+## Practical notes
+
+- **Compare with the clearing corporation daily.** Finding a divergence through a penalty advice means the exposure already existed for days.
+- **Never file a file that failed validation.** The penalty for lateness within the window is smaller than the consequence of false or incorrect reporting, which is a separate disciplinary matter.
+- **Classify every penalty by cause before deciding who pays.** It converts an accounting line into a defect metric.
+- **Track firm-borne penalties as an engineering signal.** They are the cheapest available measure of whether the risk stack is correct.
+- **Escalate before the third consecutive day, not after.** The 5 percent per day rate is designed to be unaffordable.
+- **Reserve several working days between the internal target and the cut-off.** Reconciliation exceptions are the norm, not the exception.
+- **Keep acknowledgements.** The absence of an acknowledgement is the only evidence that a submission did not land.
+
+## Where this connects
+
+- [Margin engine](/broking-kyc/finix-broking-setup/rms/02-margin-engine/) — the requirement and the snapshot clock
+- [Collateral and pledge](/broking-kyc/finix-broking-setup/rms/05-collateral-pledge/) — what counts as collected
+- [Margin shortfall and peak margin](/broking-kyc/trading-risk/margin-shortfall-peak-margin/) — the obligation in depth
+- [RMS SPAN methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/) — the computation
+- [EOD runbook](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/) — where the file is built
+- [Regulatory reporting pipeline](/broking-kyc/finix-broking-setup/compliance/02-reporting-pipeline/) — the wider filing machinery
+- [Ledger and accounting](/broking-kyc/finix-broking-setup/backoffice/04-ledger-accounting/) — where penalties are posted

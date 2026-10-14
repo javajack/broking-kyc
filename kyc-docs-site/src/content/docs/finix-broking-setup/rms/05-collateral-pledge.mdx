@@ -1,0 +1,225 @@
+---
+title: "RMS 5: collateral and pledge"
+description: What creates trading capacity — cash, cash equivalents and securities — the pledge and re-pledge chain through the depository, haircuts and eligibility lists that change daily, client-level segregation and allocation reporting, the cash-equivalent composition rule, the three-way reconciliation, and the operational cycle that keeps recognised collateral true.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Collateral looks like an accounting topic and behaves like an operations topic. The question "how much collateral does this client have" has four different correct answers depending on whether you mean deposited, pledged, recognised after haircut, or allocated at the clearing corporation — and the risk engine needs the fourth while clients talk about the first. So the page defines the states a unit of collateral moves through, then the chain it travels, then the valuation that converts it into capacity, then the reconciliation that keeps the four answers consistent, and ends with the daily cycle that has to run for any of it to be true tomorrow.
+
+## TL;DR
+
+- **Client securities move by pledge, not by transfer.** Since [SEBI/HO/MIRSD/DOP/CIR/P/2020/28](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddopcirp202028) (25 February 2020), in force from 1 August 2020, margin obligations are given by pledge and re-pledge in the depository system; off-market transfer of client securities as collateral is prohibited and beneficial ownership stays with the client.
+- **The chain is client → trading member → clearing member → clearing corporation**, and it is visible in the pledgor's demat account. Each hop is an instruction that can fail, and an unconfirmed hop is not collateral.
+- **Collateral is segregated and monitored at client level.** [SEBI/HO/MRD2_DCAP/CIR/2021/0598](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2_dcapcir20210598) (20 July 2021) requires client-level allocation and valuation reporting, with allocated collateral plus securities re-pledged for a client at least equal to that client's minimum margin requirement in the segment.
+- **The cash-equivalent minimum binds the clearing member, not each client.** At least 50 percent of collateral at clearing-member level must be cash or cash equivalent, and paragraph 18 expressly states it need not be applied at individual client level — but a client's surplus cash equivalent may not support another client.
+- **Haircuts and eligibility are dated operational inputs, not permanent approvals.** A corporate action or a circular can remove an instrument from the approved list, and carrying forward a withdrawn haircut silently over-states capacity.
+- **Four states, four numbers.** Deposited, pledged-and-confirmed, recognised-after-haircut, allocated-at-the-clearing-corporation. The risk engine uses recognised; the clearing corporation's reports use allocated; clients talk about deposited. Reconcile all four daily.
+- **Reconcile three ways**: depository, back office, risk. Two-way reconciliation misses the case that matters, which is collateral recognised in risk that the depository does not confirm.
+
+## Conceptual overview
+
+The pledge regime exists because of what it replaced. Client securities used to be transferred into broker-controlled accounts to serve as margin, which meant that a client's assets sat somewhere the client could not see and the broker could, in principle, use. Moving collateral to a pledge mechanism inside the depository changed three things at once: beneficial ownership stays with the client, the chain of pledges is visible in the client's own demat account, and the broker never holds the securities. Everything operationally awkward about collateral today — the instruction hops, the confirmations, the reconciliation burden — is the cost of that protection, and it is worth understanding as a deliberate trade rather than as friction.
+
+The second idea is that collateral has a valuation, and the valuation is somebody else's. The clearing corporation publishes which instruments it will accept and what haircut applies, and both lists change. A firm that treats an approved list as a static configuration will, sooner or later, recognise collateral the clearing corporation has stopped accepting — and the discovery comes as a margin shortfall rather than as an error. This is why the ingestion contract for the haircut list in [RMS architecture](/broking-kyc/finix-broking-setup/rms/01-rms-architecture/) says exclude rather than carry forward: the safe behaviour on a missing list is to stop recognising what you cannot verify.
+
+The third idea is that segregation at client level is both a protection and a constraint. The protection is obvious: one client's assets cannot silently finance another's. The constraint is subtler and shapes the firm's treasury. A client with surplus cash equivalent is not a source of flexibility for the firm; that surplus belongs to that client and may not support anyone else. The firm's own proprietary cash equivalent, by contrast, may support clients for the minimum-cash test — which permits a funding arrangement, and says nothing about whether the firm provides it free.
+
+## 1. Regulatory framework
+
+- **[SEBI/HO/MIRSD/DOP/CIR/P/2020/28](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddopcirp202028)** (25 February 2020) — margin obligations by way of pledge and re-pledge in the depository system; in force from 1 August 2020; off-market transfer of client securities as collateral prohibited; beneficial ownership retained by the client; the pledge chain visible in the pledgor's demat account.
+- **[SEBI/HO/MRD2_DCAP/CIR/2021/0598](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2_dcapcir20210598)** (20 July 2021) — segregation and monitoring of collateral at client level: collateral reporting, client-level allocation and valuation, with the cash-equivalent minimum at paragraph 18 and reporting formats at Annexure 3. In force from 28 February 2022.
+- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025).
+- **Clearing corporation acceptable-collateral norms** — for example [ICCL notice 20240710-11](/broking-kyc/reference/circulars/clearing-corps/#iccl-20240710-11) (10 July 2024) following [ICCL notice 20240531-3](/broking-kyc/reference/circulars/clearing-corps/#iccl-20240531-3) (31 May 2024).
+- **[NCL/CMPT/62978](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt62978)** (18 July 2024) — cross-margin benefits for offsetting positions with different expiry dates.
+- **[Client unpaid securities pledgee account, HO/38/11/(9)2026-MIRSD-POD/I/15382/2026](/broking-kyc/reference/circulars/sebi-mirsd/#ho381192026-mirsd-podi153822026)** (3 July 2026) — CUSPA-pledged securities may not be further pledged or transferred to banks or non-banking financial companies, may count for margin collection reporting, and may not support client trading exposure.
+- Depth: [collateral and cross-margin](/broking-kyc/trading-risk/collateral-cross-margin/) and [client funds upstreaming](/broking-kyc/deep-dives/settlement/client-funds-upstreaming/).
+
+## 2. What counts as collateral
+
+| Class | Examples | Treatment |
+|---|---|---|
+| **Cash** | Clear credit balance in the client ledger | No haircut; counts toward the cash-equivalent test |
+| **Cash equivalent** | Bank fixed deposits with a lien, bank guarantees, government securities, liquid mutual fund units and similar, as accepted by the clearing corporation | Counts toward the cash-equivalent test; haircut per the published norms |
+| **Securities** | Approved equity and other instruments, pledged | Haircut per the published list; does **not** count toward the cash-equivalent test |
+| **Not collateral** | Unconfirmed pledges, unsettled sale proceeds before they are clear, securities under a CUSPA pledge, instruments removed from the approved list | Must not create capacity |
+
+| Rule | Detail |
+|---|---|
+| Approved list | Only instruments on the clearing corporation's current acceptable-collateral list |
+| Haircut | The current published haircut, applied at valuation |
+| Concentration | Firms commonly apply their own concentration caps on a single security as collateral; this is discretionary and should be in the policy |
+| Client ownership | Collateral is the client's; it does not become the firm's asset |
+| CUSPA securities | Securities auto-pledged for unpaid obligations may count for margin collection reporting but must not support new client trading exposure, and may not be further pledged or transferred to banks or non-banking financial companies |
+
+## 3. The four states
+
+| State | Meaning | Who holds the record | Used by |
+|---|---|---|---|
+| **Deposited** | The client has the asset and has instructed a pledge, or has funds in the ledger | Client, back office | What clients say |
+| **Pledged and confirmed** | The pledge instruction is confirmed in the depository, and re-pledged up the chain where required | Depository | Operations |
+| **Recognised** | Pledged and confirmed, on the approved list, valued at the current haircut | Risk engine | **Capacity and the check ladder** |
+| **Allocated** | Allocated to the client at the clearing corporation in the client-level collateral reporting | Clearing corporation | Regulatory reporting and verification |
+
+<Aside type="caution" title="The gap between deposited and recognised is where client complaints live">
+A client pledges securities in the morning and expects capacity immediately. What they have is a deposited state. Capacity arrives at the recognised state, which requires the depository confirmation, the approved-list check and the haircut. If the instruction fails, or the instrument is not on the current list, no capacity appears and the client sees an unexplained absence. The fix is communication rather than engineering: tell the client the state, not just the balance — "pledge requested", "pledge confirmed", "available as margin" — and say what each means.
+</Aside>
+
+## 4. The pledge chain
+
+| Hop | From | To | Instruction | Failure consequence |
+|---|---|---|---|---|
+| 1 | Client demat | Trading member | Pledge creation, with the client's authority | No collateral; client believes otherwise |
+| 2 | Trading member | Clearing member | Re-pledge | Collateral not available up the chain |
+| 3 | Clearing member | Clearing corporation | Re-pledge | Collateral not recognised by the clearing corporation; shortfall despite client assets |
+| Release | Reverse | | Release instruction as the obligation reduces | Client's securities remain encumbered after the need has gone |
+| Invocation | — | | On default, per the applicable process | — |
+
+| Control | Requirement |
+|---|---|
+| Confirmation before recognition | **Never recognise an unconfirmed pledge.** The instruction is not the collateral |
+| Chain completeness | A pledge confirmed at hop 1 but not re-pledged at hop 3 does not help the firm's clearing-corporation position |
+| Release discipline | Release excess promptly; a client whose securities stay pledged after the obligation has gone has a legitimate complaint |
+| Visibility | The chain is visible in the pledgor's demat account; clients can and do check |
+| Authority | The client's authority for the pledge must exist and be evidenced; see [eSign, DDPI and pledge setup](/broking-kyc/finix-broking-setup/onboarding/06-esign-ddpi-pledge-setup/) |
+| Dual depository | CDSL and NSDL mechanics differ; both paths must be operated and reconciled |
+
+## 5. Valuation
+
+| Step | Detail |
+|---|---|
+| 1. Eligibility | Is the instrument on the clearing corporation's current acceptable-collateral list? If not, **exclude** — do not carry forward a previous status |
+| 2. Quantity | Confirmed pledged quantity, not instructed quantity |
+| 3. Price | The valuation price per the applicable basis, from the firm's reproducible price store rather than a live tick |
+| 4. Haircut | The current published haircut for that instrument |
+| 5. Concentration cap | The firm's own cap on a single security as a share of a client's collateral, where applied |
+| 6. Recognised value | The result, which is what the [check ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/) consumes |
+| 7. Revaluation | At least daily, and intraday on material moves or on list changes |
+
+| Input | Freshness | On staleness |
+|---|---|---|
+| Acceptable-collateral list | Daily, amendable | Exclude unlisted instruments; do not assume last-known status |
+| Haircut list | Daily, amendable | As above |
+| Valuation price | Daily, from the reproducible store | Do not value on a stale or unreproducible price |
+| Pledge positions | Daily and on event | Do not recognise unconfirmed or disputed quantities |
+
+## 6. Cash-equivalent composition
+
+| Rule | Detail |
+|---|---|
+| The minimum | At least 50 percent of collateral at **clearing-member level** must be cash or cash equivalent |
+| Where it binds | The clearing member, not each client — paragraph 18 expressly states the minimum need not be applied at individual client level |
+| Client surplus | **Excess client cash equivalent may not support other clients**, or the trading member's or clearing member's proprietary account |
+| Proprietary surplus | Excess proprietary cash equivalent **may** support clients for the minimum-cash test — which permits a funding arrangement, and says nothing about whether the firm provides it free |
+| Monitoring | Continuous, not an end-of-day test |
+| Operational response | Convert securities collateral to cash equivalent, or fund from own resources, before the composition breaches |
+
+This is one of the most frequently misattributed rules in Indian broking. A client told that "SEBI requires you to keep 50 percent in cash" is being told something the circular does not say. What the firm may legitimately do is apply its own client-level cash requirement as a discretionary policy — in which case it must be documented and disclosed as the firm's policy.
+
+## 7. Three-way reconciliation
+
+| Source | Holds |
+|---|---|
+| A. Depository | Confirmed pledge positions, by client and instrument |
+| B. SecMark back office | The firm's record of client collateral |
+| C. Saral RMS | What the risk engine recognises as creating capacity |
+
+| Difference | Meaning | Severity |
+|---|---|---|
+| In C but not in A | **Risk is recognising collateral the depository does not confirm** | Critical — capacity extended against nothing |
+| In A but not in C | Client has pledged, risk has not recognised | High — client has no capacity they should have |
+| In A but not in B | Back office record incomplete | High — reporting will be wrong |
+| Quantity differs | Partial confirmation, or a release not reflected | High |
+| Valuation differs between B and C | Different list, haircut or price version | Medium — but it will show up in reporting |
+| Allocated at the clearing corporation differs from C | Allocation reporting mismatch | **Critical** — this is what the clearing corporation sees |
+
+| Control | Requirement |
+|---|---|
+| Frequency | Daily, before the next session opens |
+| Automation | Differences produced automatically with ageing |
+| Disposition | Every difference investigated with a recorded outcome |
+| Escalation | Critical differences to the head of risk same day |
+| Blocking | A client with an unresolved critical difference should not increase exposure |
+
+## 8. Client-level allocation and reporting
+
+| Obligation | Detail |
+|---|---|
+| Allocation | Collateral allocated to clients and reported to the clearing corporation at client level |
+| Sufficiency | Allocated collateral plus securities re-pledged for a client must at all times be at least that client's minimum margin requirement in the segment |
+| Formats | Per the applicable annexure of the collateral-segregation circular |
+| Frequency | Daily |
+| Verification | The clearing corporation's files are the counterparty record; reconcile against them |
+| Consequence of mismatch | A client under-allocated is a short-collection exposure regardless of the firm's own view |
+
+See [margin reporting and penalties](/broking-kyc/finix-broking-setup/rms/08-margin-reporting-penalties/) for the submission mechanics.
+
+## 9. The daily cycle
+
+| Time | Step | Owner |
+|---|---|---|
+| Overnight | Depository holdings and pledge files received | Operations |
+| Pre-open | Acceptable-collateral and haircut lists ingested; **diff against yesterday with an exception report** | Risk |
+| Pre-open | Collateral valued at current haircuts | Risk |
+| Pre-open | Client-level allocation computed | Operations and risk |
+| Pre-open | **Three-way reconciliation; assert before opening** | Operations and risk |
+| Pre-open | Cash-equivalent composition checked | Treasury and risk |
+| Session | Pledge and release instructions processed | Operations |
+| Session | Intraday revaluation on material moves | Risk |
+| Session | New pledges recognised only on confirmation | Risk |
+| Session | Composition monitored continuously | Treasury |
+| End of day | Client-level allocation reported | Operations |
+| End of day | Excess collateral released where the obligation has reduced | Operations |
+| End of day | Reconciliation exceptions aged and escalated | Operations |
+
+## 10. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.rms.collateral.recognise_on` | Confirmed pledge only | Regulatory in substance | Capacity against an unconfirmed instruction |
+| `finix.rms.collateral.eligibility_source` | Clearing corporation current list | Exchange-set | Recognising withdrawn collateral |
+| `finix.rms.collateral.on_missing_list` | **Exclude** | Discretionary, strongly recommended | Over-stated capacity |
+| `finix.rms.collateral.haircut_source` | Clearing corporation current list | Exchange-set | Under-haircut collateral |
+| `finix.rms.collateral.valuation_price_source` | Reproducible store, not a live tick | Discretionary | Unreproducible valuations |
+| `finix.rms.collateral.revaluation_frequency` | Daily plus intraday on material moves | Discretionary | Stale capacity |
+| `finix.rms.collateral.single_security_cap_pct` | Firm policy | Discretionary, disclosed | Concentrated collateral |
+| `finix.rms.collateral.cash_equiv_min_pct_cm` | 50 at clearing-member level | Regulatory | Composition breach |
+| `finix.rms.collateral.client_cash_policy` | Firm policy if any, documented as the firm's | Discretionary, disclosed | Misattributing a firm policy to the regulator |
+| `finix.rms.collateral.cuspa_supports_exposure` | **False** | Regulatory | Trading exposure against unpaid securities |
+| `finix.rms.collateral.recon_block_on_critical` | True | Discretionary, strongly recommended | Exposure against unreconciled collateral |
+| `finix.rms.collateral.release_excess_by` | Promptly, per obligation reduction | Regulatory in substance | Client securities needlessly encumbered |
+
+## 11. Exception paths
+
+| Situation | Response |
+|---|---|
+| Pledge instruction rejected at the depository | Do not recognise; inform the client; investigate the cause |
+| Instrument removed from the approved list | Exclude from recognition immediately; recompute affected clients; expect shortfalls and communicate |
+| Haircut increased by circular | Apply; recompute; communicate to affected clients before they discover it as a margin call |
+| Risk recognises collateral the depository does not confirm | **Critical.** Stop increasing exposure for those clients; quantify; investigate the recognition path |
+| Client-level allocation mismatch with the clearing corporation | Correct and resubmit; assess whether a short collection occurred |
+| Cash-equivalent composition approaching the minimum | Treasury action before the breach; this is a monitored threshold, not an end-of-day discovery |
+| Corporate action on pledged security | Entitlements follow beneficial ownership; recompute valuation; see [corporate actions](/broking-kyc/finix-broking-setup/backoffice/07-corporate-actions/) |
+| Client requests release while the obligation persists | Release only the genuine excess; explain the computation |
+| CUSPA-pledged securities appear as recognised collateral | Defect; they may count for margin collection reporting but must not support new client trading exposure |
+| Depository outage during the pre-open window | Do not open against unverified collateral; this is a begin-of-day abort condition |
+
+## Practical notes
+
+- **Diff the eligibility and haircut lists daily and report the exceptions.** Clients affected by a removal should hear from the firm before they hear from a margin call.
+- **Never recognise an instruction — only a confirmation.** The gap between the two is where capacity is extended against nothing.
+- **Show clients the state, not just the number.** "Pledge requested", "confirmed", "available as margin" removes most of the support volume around collateral.
+- **Reconcile three ways and block on critical differences.** Two-way reconciliation misses the direction that costs money.
+- **Release excess promptly.** It is a client-service matter and increasingly a scrutiny matter.
+- **Describe any client-level cash requirement as the firm's own policy.** Attributing it to the regulator is both inaccurate and easy to disprove.
+- **Watch the composition continuously.** The cash-equivalent minimum is not an end-of-day test.
+
+## Where this connects
+
+- [Margin engine](/broking-kyc/finix-broking-setup/rms/02-margin-engine/) — the requirement this collateral meets
+- [Limit framework](/broking-kyc/finix-broking-setup/rms/04-limit-framework/) — how recognised collateral becomes capacity
+- [Depository participation](/broking-kyc/finix-broking-setup/setup/05-depository-participant/) — the pledge instruction path
+- [CUSPA and unpaid securities](/broking-kyc/finix-broking-setup/backoffice/06-cuspa-unpaid-securities/) — the 2026 pledge regime for unpaid positions
+- [Collateral and cross-margin](/broking-kyc/trading-risk/collateral-cross-margin/) — eligibility, haircuts and offsets in depth
+- [Treasury and exchange funding](/broking-kyc/finix-broking-setup/money/05-treasury-exchange-funding/) — the composition decision from the treasury side
+- [Margin reporting and penalties](/broking-kyc/finix-broking-setup/rms/08-margin-reporting-penalties/) — allocation reporting

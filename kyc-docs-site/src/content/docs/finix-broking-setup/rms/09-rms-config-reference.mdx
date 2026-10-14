@@ -1,0 +1,198 @@
+---
+title: "RMS 9: configuration reference"
+description: Every risk-plane tunable in one table — inputs and freshness, margin basis, limits and multipliers, collateral recognition, square-off thresholds and method, surveillance rules and thresholds, and reporting — each with its Finix default, its classification, whether it may change mid-session, and the failure mode if it is wrong.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page exists:** The risk plane holds the firm's most consequential configuration — the values that decide who may trade, how much, and when their positions are closed. Scattered across eight pages they are undefendable; collected here they are reviewable. The classification and mid-session columns carry most of the weight: a discretionary value needs an approved policy, and a value that may not change mid-session needs a deployment process that enforces that.
+
+## TL;DR
+
+- **The risk plane's discretionary values are the firm's risk appetite expressed as numbers**, and every one of them must trace to an approved, disclosed risk management policy.
+- **Three values must be identical in configuration and in the client-facing policy**: the square-off warning threshold, the action threshold, and the grace period. A mismatch is the first thing an arbitrator finds.
+- **Fourteen values must never change mid-session**, because each can turn a compliant client into a non-compliant one instantly and across a whole group.
+- **The permissive defaults are the dangerous ones.** Timeout behaviour, staleness behaviour, collateral recognition on a missing list, and capacity on an unconfirmed receipt all have a safe setting that conflicts with the instinct to keep things flowing.
+- **Every input has a freshness contract, and the contract is configuration.** The staleness threshold and the behaviour on breach are as much a control as the limit itself.
+- **Configuration is point-in-time answerable and retained on the eight-year floor.** "What was this client's square-off threshold on 14 August" is a question that gets asked.
+
+## 1. Inputs and freshness
+
+| Key | Finix default | Class | Mid-session | Failure mode |
+|---|---|---|---|---|
+| `finix.rms.input.span_file_refresh_interval` | Per publication schedule | E | Yes | Under-margined derivatives book |
+| `finix.rms.input.span_file_stale_action` | **Block new derivatives orders in scope** | D | No | Computing on stale parameters |
+| `finix.rms.input.instrument_master_assert_date` | Current day, hard gate | E | No | Opening on a stale master |
+| `finix.rms.input.collateral_load_assert_asof` | **Current day, hard gate** | D | No | Every client wrong all day, permissively |
+| `finix.rms.input.ledger_load_assert_asof` | Current day, hard gate | D | No | As above |
+| `finix.rms.input.price_staleness_ms.<segment>` | Per segment | D | Yes | Decisions on stale prices |
+| `finix.rms.input.price_stale_scope` | Per instrument | D | No | Over-broad or under-broad blocking |
+| `finix.rms.input.ban_list_assert_date` | Current day, hard gate | E | No | Fresh positions in a banned underlying |
+| `finix.rms.input.surveillance_list_assert_date` | Current day | E | No | Restrictions not applied |
+| `finix.rms.input.haircut_list_assert_date` | Current day | E | No | Collateral at a withdrawn haircut |
+| `finix.rms.input.on_missing_list` | **Exclude, never carry forward** | D | No | Over-stated capacity |
+| `finix.rms.input.position_recon_interval` | Periodic through the session | D | Yes | Late discovery of divergence |
+
+## 2. Margin
+
+| Key | Finix default | Class | Mid-session | Failure mode |
+|---|---|---|---|---|
+| `finix.rms.margin.basis.<segment>` | Computed VaR plus ELM; span-based in derivatives | R | No | Wrong collection basis |
+| `finix.rms.margin.upfront_20pct_groups` | Empty; configurable per group | R option | No | Mixed bases in one report |
+| `finix.rms.margin.mtm_frequency` | Continuous, event-driven plus sweep | D | Yes | A book drifting from reality |
+| `finix.rms.margin.delivery_ladder_notice_days` | Several sessions ahead | D | Yes | Clients surprised by a step change |
+| `finix.rms.margin.additional_margin_apply` | Immediately on circular | E | Yes | Under-collection against an announced margin |
+| `finix.rms.margin.broker_buffer_pct.<group>` | Per approved policy | D, disclosed | Upward only | Under-collection, or uncompetitiveness |
+| `finix.rms.margin.shadow_sample_rate` | Weighted sampling | D | Yes | Computation defects undetected |
+| `finix.rms.margin.cc_comparison_tolerance` | Tight | D | No | Divergence normalised |
+| `finix.rms.margin.client_visibility` | Pre-trade requirement with components | D | Yes | Unexplainable margin calls |
+
+## 3. Limits
+
+| Key | Finix default | Class | Mid-session | Failure mode |
+|---|---|---|---|---|
+| `finix.rms.limits.global_default` | **Must exist, conservative** | D | No | Unresolvable limits |
+| `finix.rms.limits.resolution_order` | Most-specific-wins | D | No | Unpredictable limits |
+| `finix.rms.limits.exposure_multiplier.<scope>` | Per approved policy | D, disclosed | **Upward only** | Collecting below the requirement |
+| `finix.rms.limits.qty_max.<scope>` | Per scope | D | Loosening only | Fat-finger exposure |
+| `finix.rms.limits.value_max.<scope>` | Per scope | D | Loosening only | Same |
+| `finix.rms.limits.gross_exposure.<scope>` | Per scope | D | Loosening only | Unbounded exposure |
+| `finix.rms.limits.firm_segment_ceiling.<segment>` | Set and monitored | D | As a risk event | Correlated client exposure |
+| `finix.rms.limits.instrument_concentration_firm.<scrip>` | Set for liquid names | D | Loosening only | Everyone on the same side |
+| `finix.rms.limits.decrease_affects_positions` | Explicit per change | D | Per change | Unintended mass square-off |
+| `finix.rms.limits.override_ttl` | Short, per-order | D | Yes | Standing overrides |
+| `finix.rms.limits.override_reason_list` | Closed list | D | No | Unexplained overrides |
+| `finix.rms.limits.capacity_on_receipt` | **Confirmed good funds only** | R in substance | No | Credit against a reversible payment |
+| `finix.rms.limits.dormant_client_action` | Reduce to the global default | D | No | Unnecessary live capacity |
+| `finix.rms.limits.oi_limit_source` | Exchange-published, daily | E | No | Position-limit breach |
+
+## 4. Collateral
+
+| Key | Finix default | Class | Mid-session | Failure mode |
+|---|---|---|---|---|
+| `finix.rms.collateral.recognise_on` | **Confirmed pledge only** | R in substance | No | Capacity against an instruction |
+| `finix.rms.collateral.eligibility_source` | Clearing corporation current list | E | Yes | Recognising withdrawn collateral |
+| `finix.rms.collateral.haircut_source` | Clearing corporation current list | E | Yes | Under-haircut collateral |
+| `finix.rms.collateral.valuation_price_source` | Reproducible store | D | No | Unreproducible valuations |
+| `finix.rms.collateral.revaluation_frequency` | Daily plus intraday on material moves | D | Yes | Stale capacity |
+| `finix.rms.collateral.single_security_cap_pct` | Firm policy | D, disclosed | Tightening at a boundary | Concentrated collateral |
+| `finix.rms.collateral.cash_equiv_min_pct_cm` | 50 at clearing-member level | R | No | Composition breach |
+| `finix.rms.collateral.client_cash_policy` | Firm policy if any, labelled as the firm's | D, disclosed | No | Misattributing a firm policy to the regulator |
+| `finix.rms.collateral.cuspa_supports_exposure` | **False** | R | No | Exposure against unpaid securities |
+| `finix.rms.collateral.recon_block_on_critical` | True | D | Yes | Exposure against unreconciled collateral |
+| `finix.rms.collateral.release_excess_by` | Promptly on obligation reduction | R in substance | Yes | Securities needlessly encumbered |
+
+## 5. Square-off
+
+Three of these — `warn_pct`, `trigger_pct` and `grace_minutes` — **must be identical to the disclosed risk management policy**.
+
+| Key | Finix default | Class | Mid-session | Failure mode |
+|---|---|---|---|---|
+| `finix.rms.squareoff.watch_pct.<group>` | Per policy | D, disclosed | Tightening at a boundary | Late warning |
+| `finix.rms.squareoff.warn_pct.<group>` | Per policy | D, **disclosed** | **No** | Acting without notice |
+| `finix.rms.squareoff.trigger_pct.<group>` | Per policy | D, **disclosed** | **No** | Mass square-off from a config change |
+| `finix.rms.squareoff.grace_minutes.<group>` | Per policy | D, **disclosed** | **No** | Acting too soon |
+| `finix.rms.squareoff.deepening_breach_path` | Shorter, in policy | D, disclosed | No | Unmanaged fast-market breach |
+| `finix.rms.squareoff.hysteresis_pct` | Set | D | No | Oscillating triggers |
+| `finix.rms.squareoff.debounce_seconds` | Set | D | No | Trigger on a single tick |
+| `finix.rms.squareoff.selection_rule` | Product, margin efficiency, liquidity, hedge integrity | D, disclosed | No | Inconsistent client outcomes |
+| `finix.rms.squareoff.never_break_hedge` | **True** | D | No | Cascade that deepens the breach |
+| `finix.rms.squareoff.order_type` | Limit with a widening ladder | D | No | Bad exit prices |
+| `finix.rms.squareoff.price_ladder` | Stated offsets and steps | D | No | Unbounded or ineffective exits |
+| `finix.rms.squareoff.adverse_price_ceiling` | Set | D | No | Unbounded client loss |
+| `finix.rms.squareoff.tranche_size` | Below the freeze threshold | D | Yes | Freezes and market impact |
+| `finix.rms.squareoff.max_attempts` | Bounded, then escalate | D | No | Retry loop into a wall |
+| `finix.rms.squareoff.identifier` | Risk identifier only | D | No | Mis-attribution |
+| `finix.rms.squareoff.intraday_time.<segment>` | Published | D, disclosed | No | Client surprise |
+| `finix.rms.squareoff.blocks_client_modify` | True | D, disclosed | No | Client and risk fighting |
+| `finix.rms.squareoff.manual_capability` | Always available, rehearsed | D | — | No fallback when the engine is down |
+
+## 6. Surveillance
+
+| Key | Finix default | Class | Mid-session | Failure mode |
+|---|---|---|---|---|
+| `finix.rms.surv.rule_enabled.<rule>` | Per the [catalogue](/broking-kyc/finix-broking-setup/rms/07-intraday-surveillance/#3-alert-catalogue) | R in substance | Yes | Missing detection coverage |
+| `finix.rms.surv.mule_rules_enabled` | **All of U1 to U10** | **R — regulation 23(8)** | No | Unmet statutory obligation |
+| `finix.rms.surv.threshold.<rule>` | Tuned and documented | D | Yes | Noise, or dormancy |
+| `finix.rms.surv.observe_only.<rule>` | For new rules, time-bound | D | Yes | Untested rules in production |
+| `finix.rms.surv.disposition_sla_days.<severity>` | Short | D | — | Ageing alerts |
+| `finix.rms.surv.open_alert_age_alarm` | Per category | D | — | Silent backlog |
+| `finix.rms.surv.screening_list_version_recorded` | True | R | No | Unprovable screening |
+| `finix.rms.surv.ccm_weekly_review` | True | D | — | Conduct signal missed |
+| `finix.rms.surv.payout_destination_change_window` | Review withdrawals in the window | D | Yes | Account-takeover loss |
+| `finix.rms.surv.tipping_off_controls` | Enforced | R | No | Offence |
+| `finix.rms.surv.board_pack_frequency` | Periodic, minuted | R | — | Accountability not discharged |
+
+## 7. Reporting and penalties
+
+| Key | Finix default | Class | Mid-session | Failure mode |
+|---|---|---|---|---|
+| `finix.rms.report.margin_cutoff_days` | 5 working days | E | No | Late filing penalty |
+| `finix.rms.report.internal_target_days` | Materially earlier | D | No | No room to rerun |
+| `finix.rms.report.basis.<group>` | Matching the margin basis | R | No | Mixed bases in one file |
+| `finix.rms.report.clear_balance_only` | True | R | No | Over-stated collection |
+| `finix.rms.report.recognised_collateral_only` | True | R | No | Over-stated collection |
+| `finix.rms.report.prevalidation` | Format, totals, counts, prior-day comparison | D | No | Malformed filings |
+| `finix.rms.report.on_validation_failure` | **Do not submit; escalate** | D | No | False or incorrect reporting |
+| `finix.rms.report.ack_tracking` | Per trade date | D | — | Unnoticed non-submission |
+| `finix.rms.report.reason_code_list` | Prescribed, closed | E | No | Inaccurate explanations |
+| `finix.rms.report.cc_comparison_daily` | True | D | — | Divergence found via penalties |
+| `finix.rms.penalty.cause_classification` | Mandatory before allocation | D | — | Penalties passed on without basis |
+| `finix.rms.penalty.client_passthrough_allowed` | Only per agreement and policy | R in substance | No | Unauthorised client charge |
+| `finix.rms.penalty.firm_borne_tracking` | As a defect metric | D | — | Systems problems invisible |
+
+## 8. Architecture
+
+| Key | Finix default | Class | Mid-session | Failure mode |
+|---|---|---|---|---|
+| `finix.rms.decision.timeout_action` | **Reject** | R in substance | No | An unevaluated order released |
+| `finix.rms.decision.timeout_ms` | Single-digit milliseconds | D | No | False rejections, or budget blown |
+| `finix.rms.decision.record_inputs` | Full input set | R | No | Undefendable decisions |
+| `finix.rms.decision.record_write_failure_action` | Alert; stop entry if sustained | R in substance | No | Releases with no record |
+| `finix.rms.reval.failure_severity` | Severity one | D | — | Flying blind while the market moves |
+| `finix.rms.audit.retention_years` | 8 | R | No | Short of the regulation 16 floor |
+
+## 9. The must-not-change-mid-session set
+
+| Key | Why |
+|---|---|
+| `finix.rms.squareoff.warn_pct.*` | Removing notice from clients already in the warning band |
+| `finix.rms.squareoff.trigger_pct.*` | Instant mass square-off |
+| `finix.rms.squareoff.grace_minutes.*` | Shortening a grace period already running |
+| `finix.rms.squareoff.selection_rule` | Inconsistent treatment within one event |
+| `finix.rms.limits.exposure_multiplier.*` downward | Recomputes every utilisation at once |
+| `finix.rms.limits.global_default` | The resolution terminator |
+| `finix.rms.limits.resolution_order` | Changes which limit applies, unpredictably |
+| `finix.rms.margin.basis.*` | Changes the requirement for every client |
+| `finix.rms.collateral.recognise_on` | Changes recognised capacity instantly |
+| `finix.rms.collateral.cash_equiv_min_pct_cm` | Regulatory |
+| `finix.rms.input.*_assert_*` | The gates themselves |
+| `finix.rms.decision.timeout_action` | The core safety default |
+| `finix.rms.report.basis.*` | Reporting consistency within a day |
+| `finix.rms.penalty.client_passthrough_allowed` | Changes client charging basis mid-cycle |
+
+<Aside type="caution" title="The policy-mirror set">
+`squareoff.warn_pct`, `squareoff.trigger_pct`, `squareoff.grace_minutes`, `squareoff.selection_rule`, `squareoff.intraday_time`, `limits.exposure_multiplier` and `collateral.client_cash_policy` all appear in the client-facing risk management policy. Changing any of them without updating the policy means the firm is operating outside its disclosed mandate. Bind them procedurally: the change request form for these keys requires the policy version that will accompany the change, and the change does not deploy without it.
+</Aside>
+
+## 10. Review cadence
+
+| Set | Frequency | Owner |
+|---|---|---|
+| Input freshness thresholds and actions | Quarterly, and after any incident | Risk and technology |
+| Margin basis and buffers | Quarterly, and on any circular | Risk committee |
+| Limits and multipliers | Quarterly; group templates monthly against overrides | Risk committee |
+| Collateral recognition and caps | Quarterly, and on clearing corporation changes | Risk |
+| Square-off thresholds and method | **With every policy revision**, and at least annually | Risk committee and board |
+| Surveillance rules and thresholds | Monthly for volume, quarterly for coverage | Compliance |
+| Reporting parameters | On every circular | Operations and compliance |
+| The must-not-change-mid-session list | Annually, and whenever a key is added | Risk and technology |
+
+## Where this connects
+
+- [Environments and configuration baseline](/broking-kyc/finix-broking-setup/stack/environments-config-baseline/) — the convention, classification and change control
+- [OMS configuration reference](/broking-kyc/finix-broking-setup/oms/10-oms-config-reference/) — the order-path tunables
+- [Back office configuration reference](/broking-kyc/finix-broking-setup/backoffice/10-backoffice-config-reference/) — the record-side tunables
+- [Compliance configuration baseline](/broking-kyc/finix-broking-setup/compliance/01-compliance-config-baseline/) — the obligation-to-configuration map
+- [Square-off engine](/broking-kyc/finix-broking-setup/rms/06-squareoff-engine/) — the policy-mirror values in context
+- [Admin workflow](/broking-kyc/operations/admin-workflow/) — maker-checker

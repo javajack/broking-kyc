@@ -1,0 +1,236 @@
+---
+title: "RMS 3: the pre-trade check ladder"
+description: The complete enumeration of every check an order passes before release — forty-two checks across eight groups, each with its source (regulatory, exchange or discretionary), the data it needs, the rejection message it produces, its evaluation cost, and whether it can be waived — plus the checks that belong elsewhere and the ones brokers commonly omit.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** The user-visible question "why was my order rejected" and the inspection question "show me your pre-trade controls" are the same question asked from two directions, and both are answered by one artefact: an ordered, sourced, complete list of checks. So this page is that list. It is grouped by the kind of question each check asks rather than by the system that performs it, because grouping by system hides the fact that a single logical control is sometimes split across the OMS and the RMS. Each check carries its source, because an inspector's first question about any control is whether it is mandated or chosen.
+
+## TL;DR
+
+- **Forty-two checks in eight groups**, every one of which must either pass or produce a specific, actionable rejection. A check that silently passes because its input was unavailable is the failure mode this page exists to prevent.
+- **Source matters more than placement.** A regulatory check traces to a circular, an exchange check traces to exchange rules and must be refreshed, a discretionary check traces to an approved policy. Misclassifying a discretionary leverage policy as a regulatory requirement is the most common error, and it is one an inspector notices immediately.
+- **Order is a design decision with reasons**: identity, then static facts, then client status, then instrument restrictions, then price, then quantity bounds, then the credit decision, then behaviour. Cheap before expensive, and deterministic before stateful.
+- **Nine checks can never be waived** — they are regulatory or exchange-mandated, and a waiver mechanism that can reach them is itself a defect.
+- **The commonly omitted checks are the interesting ones**: ban-period enforcement on *fresh* positions only, surveillance-measure application, self-trade prevention, employee and connected-person restrictions, unresolved screening alerts, and demat-active-before-delivery-trade.
+- **Every rejection must name the check.** Internally by code, externally in language the client can act on. A generic "order rejected" destroys both the client experience and the audit trail.
+- **A check whose input is stale must reject, not pass.** Fail-closed, scoped as narrowly as the missing fact allows.
+
+## Conceptual overview
+
+A pre-trade ladder is a sequence of questions about an order, arranged so that the cheapest and most certain are asked first. That ordering is not only a performance optimisation — it determines the quality of the answer the client receives. Telling someone their order has insufficient margin when it was actually for a contract that does not trade today is technically a rejection and practically a misdirection. Each check in the right position produces the right explanation, which is why the order of the ladder is a deliberate design artefact rather than an implementation accident.
+
+The deeper purpose of the ladder is that it is the firm's demonstration that it exercises control. An inspection does not ask whether a broker is careful; it asks what the controls are, where they sit, what evidences their operation, and what happens when they fail. A documented ladder with a source against every rung answers all four. The absence of such a document means the answer has to be assembled from code, which is slow, incomplete and unconvincing. This is why the classification column is not bureaucratic decoration: it is the evidence trail.
+
+The third idea concerns completeness. Most brokers implement most of these checks. The ones that get missed share a characteristic — they protect against a situation that has not yet happened to that firm. Ban-period enforcement matters only when a client tries to open a fresh position in a banned underlying. Self-trade prevention matters only when two of a client's orders meet. Employee-restriction checks matter only when an employee trades a restricted scrip. Each is rare, each is cheap, and each is an inspection finding and a potential enforcement matter when it is absent.
+
+## 1. Sources
+
+| Code | Meaning | Evidence needed |
+|---|---|---|
+| **R** | Regulatory — mandated by regulation or SEBI circular | The instrument and paragraph |
+| **E** | Exchange — mandated by exchange or clearing corporation rules | The circular, plus a named refresh job |
+| **D** | Discretionary — the firm's own policy | A board or committee-approved policy and an approver |
+
+Key regulatory and exchange anchors used below:
+
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — Chapter III general obligations, Chapter IV fraud prevention and detection. `[not yet in index]`
+- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) and **[SEBI/HO/MIRSD/POD-1/P/CIR/2024/118](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir2024118)** (9 August 2024) — upfront margin at paragraph 40.1.2 and the surrounding obligations.
+- **[SEBI/HO/MRD2/DCAP/CIR/P/2020/127](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2dcapcirp2020127)** (20 July 2020) — peak margin.
+- **[SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/0000013](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir20250000013)** (4 February 2025) and the NSE implementation chain — algorithmic controls.
+- **NSE Limit Price Protection** (31 October 2022) and exchange operating price ranges. `[not yet in index]`
+- Ban period, surveillance measure frameworks — see [surveillance norms](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/).
+
+## 2. Group A — identity and entitlement
+
+| # | Check | Source | Needs | Rejection message shape | Waivable |
+|---|---|---|---|---|---|
+| A1 | Session authenticated | R | Session state | "Your session has expired. Please sign in again." | No |
+| A2 | Two-factor authentication satisfied for internet and wireless access | R | Authentication state | Channel-specific | **No** |
+| A3 | Identifier active and enabled for routing with a confirmed exchange reporting reference | R | [Identifier register](/broking-kyc/finix-broking-setup/oms/03-user-id-ctcl-nnf/) | Internal; never shown to a client | **No** |
+| A4 | Actor's certification valid for this segment | R | Certification register | Internal | **No** |
+| A5 | Dealer's client scope includes this client | D | Entitlement configuration | Internal | With approval |
+| A6 | Proprietary and client flow segregation respected | R | Identifier class | Internal | **No** |
+| A7 | Algorithm registered, approved for this exchange and segment, and correctly tagged | R | [Algorithm registry](/broking-kyc/finix-broking-setup/oms/09-algo-api-dma-sor/) | Internal | **No** |
+| A8 | Static IP matches the registered address, where required | R | Registry | Internal | No |
+
+## 3. Group B — static validity
+
+| # | Check | Source | Needs | Rejection message shape | Waivable |
+|---|---|---|---|---|---|
+| B1 | Instrument exists in the current-day master | E | Instrument master | "This contract is not available today." | No |
+| B2 | Instrument not suspended | E | Master and intraday messages | "Trading in this security is suspended." | No |
+| B3 | Exchange and segment enabled for the firm | E | Membership configuration | Internal | No |
+| B4 | Segment enabled for this channel | D | Configuration | "This segment is not available on this app." | Yes |
+| B5 | Quantity is a multiple of the lot size | E | Master | "Quantity must be a multiple of N." | No |
+| B6 | Price is a multiple of the tick size | E | Master | "Price must be in multiples of X." | No |
+| B7 | Contract not expired; expiry valid for trading today | E | Master | "This contract has expired." | No |
+| B8 | Order type, validity and quantity condition legal for this exchange and segment | E | [Support matrix](/broking-kyc/finix-broking-setup/oms/04-order-types-catalogue/#9-support-matrix) | "This order type is not available in this segment." | No |
+| B9 | Order type present in the certification record | R | Certification record | Internal — a failure here is a configuration defect | **No** |
+| B10 | All-or-none and minimum fill absent | E | Message construction | Internal defect alert | **No** |
+| B11 | Trigger present and on the correct side for stop-loss orders | D | Price | "A sell stop-loss trigger must be below the current price." | No |
+| B12 | Disclosed quantity at or above the exchange minimum proportion | E | Master | "Disclosed quantity must be at least N." | No |
+
+## 4. Group C — client status
+
+| # | Check | Source | Needs | Rejection message shape | Waivable |
+|---|---|---|---|---|---|
+| C1 | Account active, not closed or dormant | R | Client master | "Your account is not active for trading." | No |
+| C2 | Unique client code registered on this exchange and segment | R | Client master | "Your account is not yet enabled for this exchange." | **No** |
+| C3 | Not under a voluntary freeze | R | Client state | "Your account is frozen at your request." | No |
+| C4 | Not under a regulatory or internal freeze | R | Client state | Internal, with a compliance-approved client message | **No** |
+| C5 | Segment activated for this client | R | Client master | "This segment is not activated on your account." | No |
+| C6 | Derivatives suitability or income documentation where required | R | Client master | "Additional documentation is required to trade derivatives." | No |
+| C7 | Demat account active where the order creates a delivery obligation | D | Client master | "Your demat account is not yet active." | No |
+| C8 | DDPI or equivalent authority present where the action requires it | R | Client master | "An authorisation is required for this action." | No |
+| C9 | No unresolved screening alert blocking activity | R | [Screening](/broking-kyc/finix-broking-setup/onboarding/04-pep-sanctions-screening/) | Internal, with a compliance-approved message | **No** |
+| C10 | Employee, connected-person or restricted-list constraints | R | Restricted lists | Internal | **No** |
+
+<Aside type="caution" title="C9 and C10 are the checks most often missing">
+An unresolved sanctions or politically exposed person alert that does not block trading means the firm has a screening process whose output nothing acts on. An employee trading a scrip on the firm's restricted list is a conduct matter that the firm's own system permitted. Both are cheap to implement — a flag on the client record consulted at order time — and both are serious when absent, because their absence means a control the firm claims to operate does not actually operate.
+</Aside>
+
+## 5. Group D — instrument restrictions
+
+| # | Check | Source | Needs | Rejection message shape | Waivable |
+|---|---|---|---|---|---|
+| D1 | Underlying not in the ban period — **fresh positions only**; position reduction remains permitted | E | Ban-period list | "This underlying is in the ban period. Only position reduction is allowed." | **No** |
+| D2 | Surveillance measure restrictions applied in their most restrictive known form | E | Measure lists | "This security is under a surveillance measure; [restriction] applies." | **No** |
+| D3 | Broker block list | D | Configuration | "We are not accepting orders in this security at present." | Yes |
+| D4 | Client-specific instrument restriction | D | Client configuration | Internal | Yes |
+| D5 | Illiquid or periodic-call-auction treatment applied | E | Exchange lists | "This security trades in a periodic call auction." | No |
+| D6 | Trade-for-trade or compulsory-delivery segment treatment | E | Master | "This security is in trade-for-trade; intraday is not available." | No |
+| D7 | Product treatment legal for this instrument — for example no intraday in trade-for-trade | D and E | Master plus policy | As above | Partly |
+
+The D1 distinction is the one that gets implemented wrongly: a ban period restricts the creation of *fresh* positions in derivatives on that underlying; it does not prevent a client from reducing an existing position. A blanket block is both over-restrictive and, for a client trying to exit, actively harmful.
+
+## 6. Group E — price
+
+| # | Check | Source | Needs | Rejection message shape | Waivable |
+|---|---|---|---|---|---|
+| E1 | Market data fresh for this instrument | D | Per-instrument staleness | "Live prices are unavailable for this security; please try again." | **No** |
+| E2 | Price within the exchange operating price range | E | Band, current | "The price is outside the exchange's permitted range (A to B)." | **No** |
+| E3 | Limit Price Protection awareness in derivatives | E | LPP range where available | "The exchange will reject prices far from the market; the allowed range is A to B." | No |
+| E4 | Price within the broker collar | D | Collar configuration, price | "This price is far from the last traded price. Confirm, or adjust." | With approval |
+| E5 | Market order permitted — not blocked by stale data, policy or instrument | D | Configuration | "Market orders are not available for this security right now." | Yes |
+| E6 | Trigger-to-limit relationship sane | D | Price | "Your limit is on the wrong side of your trigger." | No |
+
+## 7. Group F — quantity and value bounds
+
+| # | Check | Source | Needs | Rejection message shape | Waivable |
+|---|---|---|---|---|---|
+| F1 | Per-order quantity ceiling | D | Limit configuration | "This order exceeds the maximum quantity per order." | With approval |
+| F2 | Per-order value ceiling | D | Limit configuration | "This order exceeds the maximum value per order." | With approval |
+| F3 | Exchange quantity or value freeze threshold awareness | E | Exchange thresholds | "This order is above the exchange threshold and will need exchange approval." | No |
+| F4 | Per-scrip, per-client exposure ceiling | D | Limits, position | "You have reached your limit for this security." | With approval |
+| F5 | Per-client ceiling in the segment | D | Limits, position | "You have reached your segment limit." | With approval |
+| F6 | Branch or authorised-person aggregate ceiling | D | Limits | Internal | With approval |
+| F7 | Dealer identifier ceiling | D | Limits | Internal | With approval |
+| F8 | Firm-level segment ceiling | D | Limits | Internal | Senior approval |
+
+## 8. Group G — the credit decision
+
+| # | Check | Source | Needs | Rejection message shape | Waivable |
+|---|---|---|---|---|---|
+| G1 | Margin requirement computed on the post-trade position | R | [Margin engine](/broking-kyc/finix-broking-setup/rms/02-margin-engine/) | — computes | **No** |
+| G2 | Recognised collateral valued at current haircuts | E | Collateral, haircut list | — computes | **No** |
+| G3 | Clear cash balance, excluding unconfirmed receipts | R | Ledger | — computes | **No** |
+| G4 | Available = collateral plus clear cash, less utilised, less blocked, times the applicable multiplier | D for the multiplier; R for the structure | All of the above | — computes | Multiplier only |
+| G5 | **Requirement ≤ available** | R | G1 and G4 | "This trade requires ₹X; you have ₹Y available." | **No** |
+| G6 | Cash-equivalent composition respected where it binds | E | Collateral composition | Internal | **No** |
+| G7 | Unpaid-securities exposure not used to support new trading | R | CUSPA state | Internal | **No** |
+| G8 | Margin-funded position limits where applicable | R | Funding framework | Per framework | No |
+
+<Aside type="note" title="G5 is where the message quality is won or lost">
+"Insufficient margin" is the least useful rejection a broker produces. The same rejection expressed as "this trade requires ₹X and you have ₹Y available" tells the client the size of the gap and lets them act — add funds, reduce quantity, or choose a different instrument. The information is already in the decision record; surfacing it costs nothing and removes a large share of support contacts. Splitting the computation ([G1](#8-group-g--the-credit-decision)) from the comparison (G5) in the ladder is what makes it available.
+</Aside>
+
+## 9. Group H — position, concentration and behaviour
+
+| # | Check | Source | Needs | Rejection message shape | Waivable |
+|---|---|---|---|---|---|
+| H1 | Client-level open-interest limit | E | Open-interest data, position | "This would exceed the position limit for this underlying." | **No** |
+| H2 | Member-level open-interest limit | E | Firm position | Internal | **No** |
+| H3 | Market-wide position limit awareness | E | Exchange data | "This underlying is near its market-wide limit." | No |
+| H4 | Client concentration policy | D | Position | Internal, with a client message | With approval |
+| H5 | Hedge offsets recognised only where the clearing corporation recognises them | E | Parameter file | — computes | **No** |
+| H6 | Per-identifier and per-client order rate | D | Counters | "You are placing orders faster than permitted." | Yes |
+| H7 | Order-to-trade ratio | D and E | Counters | Internal | Yes |
+| H8 | Cancel-to-order ratio | D | Counters | Internal | Yes |
+| H9 | Consecutive rejection ceiling for automated flow | D | Counters | Internal; triggers the kill switch | Yes |
+| H10 | Self-trade prevention | R | Open orders | "This order would trade against your own order." | **No** |
+| H11 | Duplicate client reference | D | Request log | Suppressed; original state returned | No |
+| H12 | Session and market state permits this action | E | Market state | "The market is not open for this segment." | **No** |
+
+## 10. Checks that are not in the ladder
+
+Each of these belongs somewhere, and putting it in the pre-trade path is a design error.
+
+| Check | Where it belongs | Why not pre-trade |
+|---|---|---|
+| Know-your-customer completeness | Onboarding, before activation | An activated client is a client whose KYC is complete |
+| Periodic re-KYC due | Account lifecycle, with a status consequence | It changes client status; the ladder reads the status |
+| Contract note and statement delivery | Back office | Post-trade |
+| Settlement obligation computation | Back office | Post-trade |
+| Suspicious transaction evaluation | Transaction monitoring, near real time | Pattern-based, not order-based; blocking an order is rarely the right response |
+| Best execution demonstration | Smart order routing, where enabled | Routing, not acceptance |
+| Client suitability profiling | Onboarding and periodic review | Sets client status |
+| Upstreaming computation | End of day | Not an order-time concern |
+
+## 11. Waiver and override
+
+| Principle | Detail |
+|---|---|
+| Nine checks are never waivable | A2, A3, A4, A6, A7, B9, B10, C2, C4, C9, C10, D1, D2, E1, E2, G1, G2, G3, G5, G6, G7, H1, H2, H5, H10, H12 — the regulatory and exchange-mandated set. A waiver mechanism that can reach any of them is itself a defect |
+| Waivable checks need authority | Per-order, time-bound, with a role distinct from the order placer |
+| Every override is logged | Who, when, which check, which order, what reason, from a closed list |
+| Overrides are reviewed | Weekly by risk, monthly by compliance; a rising count is a limit-setting problem, not an approval problem |
+| Standing overrides do not exist | A check waived permanently is a check removed; remove it deliberately, with approval, rather than by habit |
+
+## 12. Evaluation cost and ordering
+
+| Group | Relative cost | Why it sits where it does |
+|---|---|---|
+| A identity | Negligible | Nothing can precede it |
+| B static | Negligible | Catches the largest share of malformed orders |
+| C client status | Low | Cached current-day state |
+| D instrument restrictions | Low | List membership |
+| E price | Low | One lookup, plus comparisons |
+| F quantity bounds | Low | Bounded arithmetic, before any computation |
+| **G credit** | **High** | Margin computation and limit resolution |
+| H position and behaviour | Medium | Needs the post-trade position, so it follows G |
+
+Any proposal to add a check must name the group it joins and the latency it costs. A check added without a budget allocation is a check that silently consumes someone else's.
+
+## 13. Exception paths
+
+| Situation | Response |
+|---|---|
+| A check's input is unavailable | **Reject**, scoped to what the missing input affects; never pass by default |
+| A check is disabled in configuration | Treat as a change requiring approval; a disabled regulatory check is a reportable control failure |
+| Rejection rate spikes on one check | Investigate as a configuration or data incident before assuming client behaviour |
+| An exchange rejects an order the ladder should have caught | Defect report; the ladder has drifted from exchange rules |
+| An override is requested repeatedly for the same client | The limit is wrong; fix the limit rather than approving overrides |
+| A new regulatory control is announced | Map it to a group, assign a number, implement, and update this list; the list is the artefact that must stay current |
+| A check fails open due to a code path | Severity one; quantify the orders released during the window |
+
+## Practical notes
+
+- **Keep this list as a living document with a version.** It is the single most useful artefact in an inspection of pre-trade controls, and a stale version is worse than none.
+- **Name the check in every rejection, internally.** The code is how you find the drift; the client message is how they fix the order.
+- **Classify honestly.** Calling a discretionary leverage policy regulatory is the error inspectors find fastest.
+- **Implement D1 as fresh-positions-only.** A blanket ban-period block prevents clients from exiting, which is the opposite of the intent.
+- **Build C9 and C10 even though they rarely fire.** Their absence is the finding, not their firing rate.
+- **Review overrides weekly.** A rising override count is a signal about limits, not about approvals.
+- **Add the check number to the decision record.** It makes "why was this rejected" a lookup rather than an investigation.
+
+## Where this connects
+
+- [Order forward path](/broking-kyc/finix-broking-setup/oms/06-order-forward-path/) — the same ladder from the OMS side
+- [Margin engine](/broking-kyc/finix-broking-setup/rms/02-margin-engine/) — group G
+- [Limit framework](/broking-kyc/finix-broking-setup/rms/04-limit-framework/) — groups F and G
+- [Collateral and pledge](/broking-kyc/finix-broking-setup/rms/05-collateral-pledge/) — G2 and G6
+- [Intraday surveillance](/broking-kyc/finix-broking-setup/rms/07-intraday-surveillance/) — the pattern checks in group H
+- [Order risk controls](/broking-kyc/trading-risk/order-risk-controls/) — the regulatory control set
+- [Inspection readiness](/broking-kyc/finix-broking-setup/compliance/03-inspection-readiness/) — where this list is produced

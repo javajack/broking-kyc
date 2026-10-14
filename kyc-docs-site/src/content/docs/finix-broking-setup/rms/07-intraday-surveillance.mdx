@@ -1,0 +1,245 @@
+---
+title: "RMS 7: intraday surveillance"
+description: The firm's own detection obligation under Chapter IV of the 2026 regulations — the alert catalogue across market manipulation, client behaviour, mule accounts, employee dealing and operational anomalies, threshold tuning with its evidence trail, the disposition workflow, escalation to suspicious transaction reporting, and the board reporting that closes the loop.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Surveillance became a statutory obligation rather than a circular one in January 2026, and the practical consequence is that a policy document is no longer an answer — the firm must detect, escalate, dispose and evidence. So the page is built as a system: the alert catalogue first, because that is what detection means concretely; then tuning, because an untuned alert set is either noise or theatre; then disposition, because an alert nobody closes is worse than no alert; then the escalation paths out of surveillance into reporting and into conduct; and finally the board loop, which is where accountability is discharged.
+
+## TL;DR
+
+- **Chapter IV of the [2026 regulations](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/) makes fraud prevention and detection statutory**, with surveillance, escalation, board accountability, a mandatory whistle-blower channel under regulation 25, and an explicit **mule-account detection obligation under regulation 23(8)**.
+- **Mule-account detection cannot be satisfied by onboarding.** Know-your-customer proves who someone is; it does not prove the account is operated by that person for their own benefit. Detection requires behavioural signals that only exist after the account is live.
+- **Two surveillance systems with different jobs.** Real-time, in the risk engine, for things that need an intervention in the session. Near-real-time and end-of-day, in SecMark AML Sutra and the surveillance module, for patterns that need investigation rather than interruption.
+- **Blocking an order is rarely the right response to a surveillance alert.** Most patterns need investigation, not interruption; the exceptions — self-trade, restricted-list breaches, unresolved screening hits — belong in the [check ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/), not here.
+- **Thresholds must be tuned, and the tuning is evidence.** An alert set producing thousands of alerts a day is not a control; an alert set producing none is a different kind of not-a-control. The tuning record is what distinguishes a calibrated system from a dormant one.
+- **Disposition is the control, not generation.** Open-alert ageing is the metric that matters. A system generating alerts nobody closes is a liability, because the firm has demonstrably detected something and done nothing.
+- **Client code modification is both an error signal and a conduct signal**, is capped and monitored by exchanges, and should be reviewed weekly.
+
+## Conceptual overview
+
+Surveillance in a broking firm has two distinct purposes that are often collapsed into one. The first is self-protection: detecting a client whose behaviour threatens the firm — concentration, rapid losses, patterns that precede a default. The second is market and regulatory: detecting behaviour that harms the market or other clients, which the firm is obliged to report whether or not it costs the firm anything. These have different thresholds, different urgencies and different escalation paths, and a single alert queue that mixes them produces a queue where commercially urgent items crowd out regulatory ones.
+
+The second idea is that detection obligations are about capability, not intent. Regulation 23(8)'s mule-account duty is the clearest example. A mule account passes know-your-customer because the person is real and the documents are genuine; what makes it a mule account is that someone else controls it for someone else's benefit. The only evidence of that is behavioural — devices and addresses shared across supposedly unrelated accounts, funding from third parties, dormancy followed by sudden structured activity, turnover inconsistent with a declared profile, circular transfers between accounts with no economic purpose. A firm that has not built those rules has not met the obligation, however good its onboarding is.
+
+The third idea is that an alert is a commitment. Once a system has flagged something, the firm is on notice. An alert that ages without disposition is evidence that the firm detected a pattern and did nothing about it, which is worse in an inspection than not having detected it. That is why the operational metric for a surveillance function is not alerts generated but the **age of the oldest open alert** in each category — and why tuning to reduce volume is a control activity rather than a convenience.
+
+## 1. Regulatory framework
+
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — Chapter IV, regulations 21 to 26: fraud prevention and detection, surveillance, escalation, board accountability; regulation 23(8) mule-account detection; regulation 25 whistle-blower policy with a confidential channel and retaliation protection. `[not yet in index]`
+- **Prevention of Money Laundering Act, 2002 and the SEBI anti-money-laundering master circular** — the principal officer, the designated director, suspicious transaction identification and reporting to FIU-IND in the prescribed format. See the [FIU-IND circulars index](/broking-kyc/reference/circulars/fiu-ind/).
+- **Exchange surveillance obligations on members** — alert-based surveillance obligations, transaction and client-behaviour monitoring, and periodic reporting. See [surveillance norms](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/) and [market manipulation typologies](/broking-kyc/deep-dives/foundational/market-manipulation-typologies/).
+- **Client code modification norms** — exchange-capped, monitored and penalised; see [modification and cancellation](/broking-kyc/finix-broking-setup/oms/08-modify-cancel-rules/#7-modifying-another-persons-order).
+- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025).
+- **Stack components**: SecMark **C-Safe** for screening against more than fifty global and domestic lists including politically exposed persons, and **AML Sutra** for transaction monitoring and suspicious transaction reporting in FINnet 2.0 format, with **ComplianceSutra** carrying the workflow and evidence.
+
+## 2. Two systems, two jobs
+
+| Dimension | Real-time, in Saral RMS | Near-real-time and end-of-day, in SecMark |
+|---|---|---|
+| Purpose | Intervene in the session | Investigate patterns |
+| Latency | Seconds | Minutes to overnight |
+| Data | Orders, trades, positions, limits | All of that plus funds, holdings, client profile, history, cross-client relationships |
+| Typical output | An alert to the dealing and risk desk | A case for investigation |
+| Can it block? | Only where the control belongs in the check ladder | No |
+| Examples | Utilisation spike, concentration breach, order-rate anomaly, consecutive rejections, rapid loss | Wash-trade patterns, circular trading, mule indicators, structuring, profile mismatch, cross-client linkage |
+
+<Aside type="note" title="Why most surveillance alerts should not block">
+Blocking an order on a surveillance signal looks decisive and is usually wrong. The signals are probabilistic, the cost of a false positive is a client prevented from trading legitimately, and the pattern being detected is rarely stopped by blocking one order anyway. The correct response is nearly always to investigate, and where the conclusion is adverse, to act on the account rather than the order. The exceptions are the deterministic checks — self-trade prevention, restricted lists, unresolved screening hits — which belong in the [pre-trade ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/) precisely because they are deterministic.
+</Aside>
+
+## 3. Alert catalogue
+
+### 3.1 Market conduct
+
+| # | Alert | Signal | System |
+|---|---|---|---|
+| M1 | Self-trade | A client's buy and sell orders meeting | Real-time, and blocked in the ladder |
+| M2 | Wash-like pattern | Offsetting trades between related accounts with no economic effect | End of day |
+| M3 | Circular trading | Trades cycling between a group of accounts | End of day |
+| M4 | Price influence at close | Concentrated activity near the closing window in a thin instrument | End of day |
+| M5 | Order spoofing pattern | Large orders repeatedly placed and cancelled away from the touch | Near real time |
+| M6 | Marking the open or close | Activity patterns at session boundaries | End of day |
+| M7 | Concentrated activity in an illiquid scrip | Share of traded volume | Near real time |
+| M8 | Synchronised trading | Matching orders across accounts in time and price | End of day |
+| M9 | Front-running indicators | Client activity preceding a large order in the same instrument | End of day |
+| M10 | Activity in a surveillance-flagged instrument | Membership of a measure list plus client activity | Real time |
+
+### 3.2 Client risk
+
+| # | Alert | Signal | System |
+|---|---|---|---|
+| C1 | Utilisation spike | Rapid move toward the square-off threshold | Real time |
+| C2 | Rapid loss | Loss as a share of capital in a short window | Real time |
+| C3 | Concentration | Share of capacity in one instrument | Real time |
+| C4 | Debit balance ageing | Unpaid debit beyond policy | End of day |
+| C5 | Repeated shortfalls | Pattern across days | End of day |
+| C6 | Turnover inconsistent with the declared profile | Turnover against declared income and net worth | End of day |
+| C7 | Sudden activity change | Dormant account becoming highly active | End of day |
+| C8 | Loss-making pattern consistent with intermediation | A client consistently on the wrong side against a counterparty group | End of day |
+
+### 3.3 Mule-account indicators — regulation 23(8)
+
+| # | Alert | Signal | System |
+|---|---|---|---|
+| U1 | **Shared device or network across unrelated accounts** | Device and network fingerprint overlap | Near real time |
+| U2 | **Shared address, contact or bank details across unrelated accounts** | Client master overlap | End of day, and at onboarding |
+| U3 | **Funding from a third party** | Payer name mismatch on pay-in | Real time, and blocked at the [pay-in rail](/broking-kyc/finix-broking-setup/money/02-payin-rails/) |
+| U4 | **Dormancy followed by structured activity** | Activation pattern | End of day |
+| U5 | **Circular fund movement** | Funds in and out with little trading | End of day |
+| U6 | **Turnover grossly inconsistent with the declared profile** | As C6, at a higher severity | End of day |
+| U7 | **Common beneficiary across accounts** | Pay-out destinations converging | End of day |
+| U8 | **Account operated from a location inconsistent with the client profile** | Access geography | Near real time |
+| U9 | **A cluster of accounts opened in a short window with common attributes** | Onboarding pattern | End of day |
+| U10 | **Pay-out immediately following pay-in with minimal trading** | Pass-through behaviour | End of day |
+
+### 3.4 Employee and connected persons
+
+| # | Alert | Signal | System |
+|---|---|---|---|
+| E1 | Employee trading in a restricted-list scrip | Restricted list plus employee account | Blocked in the ladder |
+| E2 | Employee trading ahead of a client order | Timing and instrument overlap | End of day |
+| E3 | Undisclosed employee account | Client master against the employee register | Periodic |
+| E4 | Dealer trading for their own benefit through a client account | Pattern and access analysis | End of day |
+| E5 | Authorised person activity anomalies | Volume, client concentration, modification counts | End of day |
+
+### 3.5 Operational and conduct
+
+| # | Alert | Signal | System |
+|---|---|---|---|
+| O1 | **Client code modification** | Count by dealer, client and reason | Real time and weekly |
+| O2 | Override usage | Count by check, client and approver | Weekly |
+| O3 | Orders placed outside the dealer's client scope | Entitlement breach | Real time |
+| O4 | Unusual cancellation rates | Per identifier | Real time |
+| O5 | Trading outside normal hours for that client | Time profile | Near real time |
+| O6 | Access anomalies | Login patterns, concurrent sessions, device changes | Near real time |
+| O7 | Complaints clustering around an individual or branch | Complaint data | Monthly |
+| O8 | Pay-out destination changed shortly before a large withdrawal | Client master change plus withdrawal | Real time |
+
+The last row is a classic fraud signature and a cheap alert: a bank-account change followed closely by a withdrawal request should always be reviewed, and most firms that have suffered account-takeover losses did not have it.
+
+## 4. Threshold tuning
+
+| Stage | Activity |
+|---|---|
+| Baseline | Run new rules in observe-only mode against historical data; measure the alert volume that would have been generated |
+| Calibrate | Set thresholds so the volume is workable for the team that must dispose of them |
+| Document | **Record the threshold, the reasoning and the expected volume** — this record is the evidence that the system is calibrated rather than dormant |
+| Review | Periodically, against actual volume, disposition outcomes and any missed events |
+| Change control | A threshold change is a control change: maker-checker, logged, with the reasoning |
+| Backtest | After any material change, re-run against history |
+| Never | Tune purely to reduce workload without recording that this is what was done and why it is acceptable |
+
+<Aside type="caution" title="The tuning record is the exhibit">
+When an inspection asks whether the firm's surveillance is effective, the two things that answer it are the tuning record and the disposition record. The first shows that thresholds were chosen deliberately and reviewed; the second shows that what was detected was acted on. A firm with neither has a surveillance product rather than a surveillance function, and the distinction is apparent within minutes.
+</Aside>
+
+## 5. Disposition workflow
+
+| Step | Owner | Timeline |
+|---|---|---|
+| 1. Alert generated | System | — |
+| 2. Triage | Surveillance analyst | Same day for real-time, next day for end-of-day |
+| 3. Enrichment | Analyst | Client profile, history, related accounts, funds |
+| 4. Initial disposition | Analyst | False positive, no further action, or escalate |
+| 5. Investigation | Senior analyst or compliance | For escalated alerts |
+| 6. Decision | Compliance | No action, client contact, restriction, closure, or report |
+| 7. Action | Operations, risk or compliance | Per the decision |
+| 8. **Record** | System | Decision, reasoning, evidence, author, timestamps |
+| 9. Review | Compliance | Sample review of closed alerts, including false positives |
+
+| Metric | Why |
+|---|---|
+| **Age of the oldest open alert by category** | The metric that matters; count alone is noise |
+| Disposition distribution | A category closing 100 percent as false positive is a tuning problem or a disposition problem |
+| Time to disposition | Trend, not average |
+| Escalation rate | Too low suggests under-escalation; too high suggests thresholds that are too tight |
+| Reopened alerts | A quality signal on initial disposition |
+
+## 6. Escalation paths out of surveillance
+
+| Destination | When | Mechanism |
+|---|---|---|
+| **Suspicious transaction report** | Where suspicion of money laundering or terrorist financing arises | AML Sutra, in FINnet 2.0 format, within the prescribed timeline, by the principal officer |
+| **Exchange reporting** | Where exchange obligations require it | Per the applicable alert-reporting framework |
+| **Client restriction or closure** | Where the firm's own assessment warrants | With the client-communication and regulatory consequences handled |
+| **Conduct process** | Employee or authorised-person matters | Human resources and compliance, independent of the line |
+| **Whistle-blower channel** | Where a report arrives through regulation 25's confidential channel | Independent of line management |
+| **Board** | Material matters and the periodic pack | Minuted |
+| **Law enforcement** | Where required or directed | Via compliance and legal |
+
+| Rule | Detail |
+|---|---|
+| Tipping off | The client must not be alerted to a suspicious transaction report |
+| Independence | Disposition sits with compliance, not with the relationship owner |
+| No commercial override | A revenue-generating client's alert is disposed on the same basis as anyone else's |
+| Record everything | Especially a decision not to report, with its reasoning |
+
+## 7. Board reporting
+
+Chapter IV requires board accountability, and the practical discharge is a periodic pack.
+
+| Content | Why |
+|---|---|
+| Alert population by category and period | What the system saw |
+| Disposition outcomes | What was done |
+| Open-alert ageing | Whether the function is keeping up |
+| Escalations and reports filed | The regulatory output |
+| **Threshold changes and their reasoning** | That the system is being calibrated deliberately |
+| Rules added or retired | Coverage change |
+| Notable cases, anonymised where necessary | Qualitative insight |
+| Mule-account detection outcomes specifically | Regulation 23(8) is explicit; report against it explicitly |
+| Whistle-blower channel activity | Regulation 25 |
+| Resource and capacity position | Whether disposition capacity matches alert volume |
+| Actions outstanding from the previous pack | Closure discipline |
+
+## 8. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.rms.surv.rule_enabled.<rule>` | Per catalogue | Regulatory in substance | Missing detection coverage |
+| `finix.rms.surv.threshold.<rule>` | Tuned and documented | Discretionary | Noise, or dormancy |
+| `finix.rms.surv.observe_only.<rule>` | For new rules, time-bound | Discretionary | Untested rules in production |
+| `finix.rms.surv.disposition_sla_days.<severity>` | Short | Discretionary | Ageing alerts |
+| `finix.rms.surv.open_alert_age_alarm` | Set per category | Discretionary | Silent backlog |
+| `finix.rms.surv.mule_rules_enabled` | **All of U1 to U10** | Regulatory — regulation 23(8) | Unmet statutory obligation |
+| `finix.rms.surv.screening_list_version_recorded` | True | Regulatory | Unprovable screening |
+| `finix.rms.surv.ccm_weekly_review` | True | Discretionary | Conduct signal missed |
+| `finix.rms.surv.payout_destination_change_window` | Review any withdrawal within the window | Discretionary, high value | Account-takeover loss |
+| `finix.rms.surv.tipping_off_controls` | Enforced | Regulatory | Offence |
+| `finix.rms.surv.board_pack_frequency` | Periodic, minuted | Regulatory | Accountability not discharged |
+
+## 9. Exception paths
+
+| Situation | Response |
+|---|---|
+| Alert volume exceeds disposition capacity | Tune, with the reasoning recorded, or add capacity; **do not let the backlog age** |
+| A rule produces no alerts for a long period | Verify it is working; a silent rule is usually broken rather than effective |
+| A high-value client triggers repeated alerts | Dispose on the same basis as any other client; escalate the commercial tension to compliance, not into the disposition |
+| A suspicious transaction report is indicated | Principal officer files within the timeline; no tipping off; record the decision chain |
+| An employee alert implicates a senior person | Escalate outside the line; this is what the whistle-blower channel's independence is for |
+| Screening list version not recorded against a result | Defect; the result is unprovable |
+| Mule indicators cluster across several accounts | Treat as one case, not several alerts; the pattern is the point |
+| Client code modification count rising | Fix order entry; review the dealer and the clients involved |
+| A detected pattern turns out to be a system defect | Record it as such; a false pattern caused by a defect is a defect report and an alert-quality signal |
+
+## Practical notes
+
+- **Build the mule rules explicitly and name them against regulation 23(8).** An inspection will ask which rules discharge that obligation, and a general answer will not do.
+- **Measure the age of the oldest open alert, not the count.** It is the only metric that distinguishes a working function from a backlog.
+- **Record the screening list version with every result.** Without it, the screening cannot be proved for a past date.
+- **Keep disposition independent of the relationship.** The commercial pressure is real and it is exactly what the independence is for.
+- **Review payout-destination changes against subsequent withdrawals.** Cheap rule, large loss prevented.
+- **Put the tuning record in the board pack.** It is the clearest evidence that the firm is calibrating rather than collecting.
+- **Run new rules in observe-only first.** Production is not the place to discover that a rule generates four thousand alerts a day.
+
+## Where this connects
+
+- [Pre-trade check ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/) — the deterministic controls that do block
+- [PEP and sanctions screening](/broking-kyc/finix-broking-setup/onboarding/04-pep-sanctions-screening/) — the onboarding and ongoing screening layer
+- [SEBI registration under the 2026 regulations](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/#4-chapter-iv-in-implementation-terms) — the Chapter IV obligation
+- [Regulatory reporting pipeline](/broking-kyc/finix-broking-setup/compliance/02-reporting-pipeline/) — where reports are filed
+- [Market manipulation typologies](/broking-kyc/deep-dives/foundational/market-manipulation-typologies/) — the patterns behind the alerts
+- [Surveillance norms](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/) — the exchange measure frameworks
+- [Modification and cancellation](/broking-kyc/finix-broking-setup/oms/08-modify-cancel-rules/) — client code modification

@@ -1,0 +1,204 @@
+---
+title: "RMS 1: architecture"
+description: The Saral MoneyMaker RMS as deployed at Finix — the nine inputs and their freshness contracts, the computation and decision components, what a decision record must contain, the shadow-check design, intraday revaluation, and the failure behaviour of every input and component.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** A risk engine is mostly inputs. The computation is deterministic and testable; what makes risk decisions wrong in production is almost always an input that is stale, missing, or fresher in one system than another. So this page leads with the input inventory and the freshness contract attached to each, because that table is the real specification. The components and the decision record follow, and the failure section is organised by input rather than by component, because that is how the failures actually present.
+
+## TL;DR
+
+- **Nine inputs, each with a freshness contract.** Risk parameter files, instrument master, price, position, collateral, ledger balance, limits, restriction lists and configuration. A stale input is not a degraded decision, it is a confidently wrong one.
+- **The engine does not invent the margin requirement.** The clearing corporation computes the authoritative number; Saral consumes the risk parameter files and computes per-client margin in real time from them. The firm's exposure is the gap between what it computes and what the clearing corporation computes.
+- **Saral's published behaviour is the right shape**: available exposure limit updated daily at the server, value-at-risk and extreme loss margin computed on order entry for the entered order, and the order allowed to flow to the exchange within the available exposure limit — with limits controllable at identifier, client and scrip level.
+- **The decision record is the deliverable.** A release or rejection without its inputs recorded cannot be defended. The record must carry the limit in force, the available amount, the computed requirement, the price and its timestamp, the parameter file version and the configuration version.
+- **A timeout rejects.** This is the single most important default in the plane and the one most likely to be changed by someone optimising for availability during an incident.
+- **The shadow check has no veto and real value.** SecMark middleware recomputes the same margin off the order path on a sampled basis; divergence is an engineering defect report, not a trading halt, and it is the only practical detector of a computation defect.
+- **Intraday revaluation is not optional.** Positions, prices and parameter files all move during the session, and a risk engine that only revalues at order time will under-margin a book that moves against it between orders.
+
+## Conceptual overview
+
+The useful way to think about a broker's risk engine is as a replica with a legal obligation. The clearing corporation computes the margin requirement that actually matters: it is the number the firm must meet, the number against which short collection is measured, and the number a penalty is computed from. The firm's engine exists to compute the same thing, continuously and per client, from the same published inputs — because the firm has to decide whether to release an order now, and the clearing corporation's number arrives later. The firm's risk, in the literal sense, is replica drift: a difference between what it computed and what the clearing corporation computed, which surfaces as a shortfall and a penalty after the fact.
+
+That framing makes the input contracts the centre of the design. If the risk parameter file is applied late, the replica diverges in a direction nobody notices until the margin file arrives. If the collateral load carries yesterday's as-of timestamp, every client has the wrong limit all day, in the loose direction, and every order that day was released against a number that was never true. These failures are silent, systematic and unidirectional, which is the worst combination. The defensive design is the freshness contract: every input carries an expected age, a staleness threshold, and a behaviour on breach, and the behaviour is almost always to refuse decisions in the affected scope rather than to proceed.
+
+The second structural idea is reproducibility. Every risk decision will eventually be questioned — by a client disputing a square-off, by an inspector testing the margin policy, by an auditor sampling releases. Answering requires replaying the decision with the inputs that were actually in force, which means the inputs must be versioned and the decision must reference the versions. A system that records "rejected: insufficient margin" has recorded an opinion. A system that records the requirement, the available amount, the price used and its timestamp, the parameter file version and the configuration version has recorded a fact that can be re-derived.
+
+## 1. The nine inputs
+
+| # | Input | Source | Expected freshness | Staleness behaviour | Detection |
+|---|---|---|---|---|---|
+| I1 | **Risk parameter files** | Clearing corporation, published intraday several times | Within minutes of each publication | Block new derivatives orders in the affected scope | Applied-file timestamp against the expected publication schedule |
+| I2 | **Instrument master** | Exchange, pre-open daily | Current day, asserted | **Abort begin-of-day; do not open** | Date assertion at the begin-of-day gate |
+| I3 | **Price** | Exchange multicast | Per instrument, sub-second | Block market orders and price-dependent decisions for that instrument | Per-instrument staleness, not connection state |
+| I4 | **Position** | Saral order state, updated on every fill | Real time | Stop increasing exposure for affected clients | Intraday reconciliation against the exchange |
+| I5 | **Collateral** | SecMark back office and depository pledge records | Begin-of-day, plus intraday on pledge events | **Do not open without a current as-of timestamp** | As-of timestamp assertion per batch, plus count reconciliation |
+| I6 | **Ledger balance** | SecMark back office, plus confirmed intraday receipts | Begin-of-day, plus intraday | As above | As above |
+| I7 | **Limits** | Configuration register | On change, with effective timing | Use last approved; never default to permissive | Configuration reconciliation |
+| I8 | **Restriction lists** | Exchange — ban period, surveillance measures, bands | Pre-open, plus intraday revisions | Apply the most restrictive known treatment | Membership diff with alerting on additions |
+| I9 | **Configuration** | Configuration register, versioned | On change at a boundary | Last approved version | Daily diff of deployed against approved |
+
+<Aside type="caution" title="I5 is the input that fails silently and expensively">
+A collateral and balance load that runs but carries yesterday's as-of timestamp produces a risk engine that is wrong for every client, all day, in the permissive direction. Nothing errors. Orders are released. Limits look normal. The problem appears at end of day as a margin shortfall across the book, by which time the trades exist. The control is an explicit as-of assertion at the begin-of-day gate — not "did the load run" but "is the as-of timestamp today's, and does the record count match the client master". See [BOD runbook](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/).
+</Aside>
+
+## 2. Components
+
+| # | Component | Responsibility | Does not do |
+|---|---|---|---|
+| R1 | Input ingestion | Fetch, validate, version and apply each of I1 to I9; assert freshness | Make decisions |
+| R2 | Instrument and parameter store | Current-day masters, risk parameters, restriction lists, with versions | — |
+| R3 | Position and exposure store | Per-client positions, updated on fills, intraday revalued | Serve as the ledger |
+| R4 | Collateral and limit store | Recognised collateral, clear balance, utilised and blocked amounts, limit hierarchy | Hold pledge records of record |
+| R5 | **Margin computation** | Value-at-risk and extreme loss margin in cash; span-based initial plus exposure margin in derivatives; delivery and additional margins where applicable | Reject |
+| R6 | **Decision engine** | The [check ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/); the single release decision | Route orders |
+| R7 | Decision record writer | The full input set with every decision | Block the decision |
+| R8 | Intraday revaluation | Continuous recomputation on price, position and parameter change | Decide |
+| R9 | Square-off engine | Trigger evaluation and exit order generation | Bypass the ladder |
+| R10 | Alerting and surveillance feed | Thresholds, utilisation, anomalies | Act autonomously beyond configured automatic actions |
+| R11 | Reporting extract | Client-level margin collected and peak margin for exchange reporting | — |
+| R12 | **Shadow check** | SecMark middleware recomputation, off path, sampled | Veto anything |
+
+## 3. The decision record
+
+Written for every decision, release or rejection.
+
+| Field | Why |
+|---|---|
+| Decision and reason code | The outcome |
+| Order reference and client | Attribution |
+| Actor and identifier | Who or what placed it |
+| Pre-trade position | The starting state |
+| Post-trade position | What the order would create |
+| **Computed margin requirement**, with its components | The cost |
+| Margin methodology and parameter file version | Reproducibility |
+| **Available amount**, with its components: recognised collateral, clear cash, utilised, blocked | The capacity |
+| Limit in force and the scope that resolved it | Which limit applied and why |
+| Multiplier applied, and its basis | The discretionary element, made explicit |
+| Price used and its timestamp | Reproducibility |
+| Restriction lists consulted, with versions | Why a restriction did or did not apply |
+| Configuration version | What policy was in force |
+| Timestamps, synchronised | Sequence |
+| Evaluation latency | Operational |
+
+| Property | Requirement |
+|---|---|
+| Completeness | Written for rejections as fully as for releases |
+| Immutability | Append-only |
+| Retention | Eight-year floor under regulation 16 of the [2026 regulations](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/) |
+| Replayability | The decision re-derivable from the recorded inputs |
+| Joinability | Same identifier as the order record in the OMS |
+| Non-blocking | The write must not sit in the latency path, and must not be lost |
+
+## 4. Intraday revaluation
+
+| Trigger | What is recomputed | Scope |
+|---|---|---|
+| Fill | Position, requirement, utilisation | That client |
+| Price move | Mark-to-market, requirement where price-sensitive | Clients holding that instrument |
+| New risk parameter file | Requirement across the segment | All clients with positions in the segment |
+| Collateral change — pledge, release, revaluation | Available amount | Affected clients |
+| Confirmed fund receipt | Available amount | That client |
+| Limit change | Available amount | Affected scope |
+| Restriction list change | Permitted actions | Affected instruments |
+| Corporate action | Position and valuation | Affected clients |
+| Scheduled cycle | Everything, as a safety net | All |
+
+| Design point | Detail |
+|---|---|
+| Event-driven, with a periodic sweep | Event-driven for latency; the sweep catches missed events |
+| Revaluation must not block order decisions | Separate execution path |
+| A revaluation that changes a client's status fires an alert | Utilisation crossing a threshold, or a shortfall appearing |
+| Mark-to-market losses consume capacity | A client can breach without placing an order; this is the most common square-off cause |
+
+The last row is worth stating plainly because client-facing explanations often miss it: a client who places no orders at all can move from comfortable to in-breach purely because the market moved. The risk engine must treat position revaluation as a first-class trigger, not as a background refresh.
+
+## 5. The shadow check
+
+| Aspect | Design |
+|---|---|
+| Who | SecMark middleware, which publicly offers real-time risk checks and margin validation |
+| Where | **Off the order path**, so it cannot add latency or create a second veto |
+| What | Independent recomputation of the margin requirement for a sampled set of orders and positions |
+| Comparison | Against Saral's computed requirement, with a tolerance |
+| On divergence | Engineering defect report, investigated; **never a trading halt** |
+| Why it matters | Two independent implementations of the same published methodology disagreeing is the only practical detector of a computation defect; a single implementation is always self-consistent |
+| Sampling | Weighted toward large positions, complex portfolios and segments with recent parameter changes |
+
+<Aside type="note" title="The trade this represents">
+Giving the release decision to one component buys a reconstructible decision and costs an independent check. The shadow design recovers most of the check without reintroducing the cost: the comparison still happens, but asynchronously, so no order waits for it and no order is vetoed by it. What is given up is catching a divergence *before* the order is released. That is an acceptable trade when the divergence is a systematic computation defect — which it almost always is — because a systematic defect affects many orders and is caught within minutes.
+</Aside>
+
+## 6. Failure behaviour by input
+
+| Input unavailable or stale | Behaviour | Scope |
+|---|---|---|
+| I1 Risk parameter file | Block new derivatives orders | Affected segment |
+| I2 Instrument master | **Do not open** | Everything |
+| I3 Price for an instrument | Block market orders and price-dependent decisions | That instrument |
+| I3 Price feed entirely | Block price-dependent decisions | The segment |
+| I4 Position uncertain after a session break | Stop increasing exposure | Affected clients |
+| I5 Collateral load stale | **Do not open** | Everything |
+| I6 Ledger balance stale | **Do not open** | Everything |
+| I7 Limits unavailable | Use the last approved set; never default permissive | — |
+| I8 Ban-period list | Block fresh derivatives positions | Affected underlyings |
+| I8 Surveillance lists | Apply the most restrictive known treatment | Affected instruments |
+| I9 Configuration | Use the last approved version | — |
+
+| Component fails | Behaviour |
+|---|---|
+| R5 Margin computation | Reject orders; no release on an uncomputed requirement |
+| R6 Decision engine | **No orders anywhere; no bypass** |
+| R6 Individual evaluation timeout | **Reject that order** |
+| R7 Decision record writer | Alert; sustained failure stops order entry |
+| R8 Intraday revaluation | Alert loudly; the book is drifting from reality while this is down |
+| R9 Square-off engine | **Critical.** Manual square-off capability must exist and be practised |
+| R12 Shadow check | Alert; no effect on trading |
+
+The R8 row deserves emphasis. A failed revaluation engine is not a degraded feature — it means the firm's view of client risk is frozen while the market moves. It should be treated with the same severity as a failed decision engine, even though orders keep flowing.
+
+## 7. Scale and performance
+
+| Dimension | Design consideration |
+|---|---|
+| Decision latency | Single-digit milliseconds; the dominant share of the [order path budget](/broking-kyc/finix-broking-setup/oms/01-oms-architecture/#3-latency-budget) |
+| Revaluation throughput | Whole book on a parameter file change; sized for the worst case, which is an intraday parameter revision during a volatile session |
+| Burst | Square-off generation is itself a load spike, concurrent with the volatility that caused it |
+| Memory | Positions, collateral and parameters resident; the cost of a cache miss on the order path is the whole budget |
+| Multi-segment | Four segments with different methodologies, concurrently |
+| Commodity hours | The engine runs to 23:30 while end-of-day batch processes run for equity |
+
+## 8. Exception paths
+
+| Situation | Response |
+|---|---|
+| Firm's computed margin diverges from the clearing corporation's | Investigate immediately; quantify the affected population; this is a potential short-collection exposure |
+| Shadow check diverges | Engineering defect; quantify; do not halt trading on it alone |
+| Collateral load as-of timestamp is yesterday's | Begin-of-day abort; do not open |
+| Risk parameter publication missed | Block new derivatives orders in scope until applied |
+| Revaluation engine down | Treat as severity one; stop increasing exposure; manual monitoring of the largest positions |
+| Position divergence found intraday | Stop increasing exposure for affected clients; reconcile against the exchange |
+| Decision record writes failing | Alert; stop order entry if sustained; a release with no record is indefensible |
+| Timeout rate rising | Capacity or input problem; do not raise the timeout as a first response |
+| Square-off engine unavailable during a volatile session | Manual square-off with documented authority; this is a rehearsed scenario |
+
+## Practical notes
+
+- **Make the as-of assertion the first begin-of-day gate.** It is the cheapest control against the most expensive silent failure.
+- **Keep the shadow check running even though it has no authority.** It is the only independent check you will have.
+- **Record the components, not just the totals.** "Requirement ₹X" is unanswerable; "span ₹A plus exposure ₹B plus additional ₹C" can be argued with.
+- **Treat revaluation failure as severity one.** It is invisible to clients and it means the firm is flying blind.
+- **Do not raise the timeout to fix timeouts.** The timeout is the control; rising timeouts are a capacity or input signal.
+- **Rehearse manual square-off.** The scenario where the engine is down and the market is moving is exactly the one you do not want to improvise.
+- **Version everything the decision depends on.** Replayability is the whole point.
+
+## Where this connects
+
+- [Margin engine](/broking-kyc/finix-broking-setup/rms/02-margin-engine/) — what R5 computes
+- [Pre-trade check ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/) — what R6 evaluates
+- [Collateral and pledge](/broking-kyc/finix-broking-setup/rms/05-collateral-pledge/) — the I5 contract in detail
+- [Square-off engine](/broking-kyc/finix-broking-setup/rms/06-squareoff-engine/) — R9
+- [BOD runbook](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/) — where the input gates are applied
+- [Integration contract matrix](/broking-kyc/finix-broking-setup/stack/integration-contract-matrix/#3-risk-input-path) — these inputs as interface contracts
+- [RMS SPAN methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/) — the computation in depth

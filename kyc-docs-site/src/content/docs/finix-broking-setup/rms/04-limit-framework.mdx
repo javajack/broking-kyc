@@ -1,0 +1,225 @@
+---
+title: "RMS 4: the limit framework"
+description: The limit hierarchy from firm down to scrip, how a limit is resolved for a given order, who may set and approve each level, the multiplier that is the firm's actual leverage policy, intraday change rules, the daily limit-setting cycle, and the controls that stop limits drifting upward one exception at a time.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Limits are where a broker's risk appetite becomes a number, and they are also where it quietly stops being a policy. The usual failure is not a badly chosen limit; it is an accumulation of individually reasonable exceptions that nobody reviews as a whole. So the page starts with the hierarchy and the resolution rule, so that "the limit" is always a well-defined thing, then treats the multiplier separately because it is the real leverage decision, then spends most of its length on authority, change control and the review mechanisms that keep the framework honest.
+
+## TL;DR
+
+- **Saral supports limits at identifier, client and scrip level**, with available exposure updated daily at the server. Finix layers firm, segment, branch and product levels on top, resolved most-specific-wins.
+- **Every key must have a global default.** A limit hierarchy without a terminating default produces orders that resolve to "no limit found", and the only safe behaviour for that is rejection — which is not what anyone intended.
+- **The multiplier is the leverage policy.** Available capacity is collateral plus clear cash, less utilised, less blocked, times a multiplier. That multiplier is discretionary, bounded by the margin rules, and it must trace to an approved policy — not to a product manager's spreadsheet.
+- **Peak margin removed the old leverage conversation.** Margin must be sufficient continuously, verified by random intraday snapshots, so a multiplier that implies margin below the requirement is not a commercial choice but a short collection.
+- **Loosening is safe mid-session; tightening is not.** A limit increase cannot make an existing position non-compliant. A decrease can, instantly, across a whole client group — which is why tightening takes effect at a boundary unless explicitly flagged.
+- **Exceptions are the drift mechanism.** A per-order override is fine; a standing override is a limit change made without approval. Review override counts weekly and fix the limit rather than approving again.
+- **Limits are inspectable.** Who set this client's limit, when, under what policy, and what was it on a given past date — all four must be answerable without a database restore.
+
+## Conceptual overview
+
+A limit framework answers one question — how much may this client do right now — but the question has several independent constraints stacked on it, and the useful design keeps them separate. There is what the client can afford, which is the collateral and cash computation. There is what the firm is willing to let them do, which is the policy multiplier and the hard ceilings. There is what the market structure permits, which is open-interest and position limits set by exchanges. And there is what the firm can afford in aggregate, which is the firm-level ceiling that exists so that a thousand individually acceptable client positions do not add up to an unacceptable firm position. Collapsing these into one number loses the ability to explain which constraint bound, which is the first thing a client and an inspector both ask.
+
+The second observation is that limits decay toward permissiveness. Nobody requests a lower limit. Every exception is justified in its own terms — a good client, a temporary situation, an important relationship — and every one of them is granted by someone who is not looking at the aggregate. The structural answer is not stricter approval but better visibility: a weekly report of overrides by client and by check, a monthly report of limits that have moved, and a rule that repeated overrides for the same client are a limit-setting defect rather than an approval workflow. The firms that keep this under control are the ones that treat an override count as a signal rather than as a workload.
+
+The third point concerns the peak-margin regime, which changed the nature of this conversation permanently. Before it, a broker's multiplier was substantially a commercial decision about how much intraday leverage to offer. After it, margin must be sufficient continuously and is verified by random snapshots, so a multiplier implying collection below the computed requirement is not aggressive pricing — it is short collection with a penalty attached. What remains discretionary is the margin *above* the requirement: how much buffer the firm holds, which client groups get how much headroom, and how quickly capacity is released as positions close.
+
+## 1. Framework
+
+- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) and **[SEBI/HO/MIRSD/POD-1/P/CIR/2024/118](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir2024118)** (9 August 2024) — upfront margin obligations that bound the multiplier.
+- **[SEBI/HO/MRD2/DCAP/CIR/P/2020/127](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2dcapcirp2020127)** (20 July 2020) — the peak-margin framework and the intraday snapshot verification.
+- **Exchange position and open-interest limits** — client-level, member-level and market-wide limits, set and published by the exchanges. See [position limits and open interest](/broking-kyc/trading-risk/position-limits-oi/).
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — Chapter III general obligations; the risk management policy is a day-one artefact disclosed to clients. `[not yet in index]`
+- **Saral published behaviour** — limits controllable at identifier, client and scrip level; available exposure limit updated daily at the server; on order entry the system computes value-at-risk and extreme loss margin and allows the order within the available exposure limit.
+
+## 2. The hierarchy
+
+Resolution is **most-specific-wins**, in this order. Every level may be absent except the global default.
+
+| Rank | Level | Scope | Typical owner | Example key |
+|---|---|---|---|---|
+| 1 | Client plus instrument | One client, one scrip or contract | Risk administration | `finix.rms.limits.qty_max.client.C1234.scrip.RELIANCE` |
+| 2 | Client plus product | One client, one product treatment | Risk administration | `…client.C1234.product.intraday` |
+| 3 | Client | One client, segment-wide | Risk administration | `…client.C1234` |
+| 4 | Client group | A defined group — retail, HNI, proprietary, employee | Head of risk | `…group.hni` |
+| 5 | Instrument | All clients, one scrip | Head of risk | `…scrip.XYZ` |
+| 6 | Instrument category | Illiquid, surveillance-flagged, trade-for-trade | Head of risk | `…category.illiquid` |
+| 7 | Branch or authorised person | A distribution node | Head of risk | `…branch.B07` |
+| 8 | Dealer identifier | One dealer | Head of risk | `…identifier.NNF…` |
+| 9 | Channel | Terminal, web, mobile, API, algorithmic | Head of risk | `…channel.api` |
+| 10 | Product | Delivery, intraday, carry-forward, funded | Risk committee | `…product.intraday` |
+| 11 | Segment | CM, FO, CD, COM | Risk committee | `…segment.fo` |
+| 12 | Exchange | NSE, BSE, MCX | Risk committee | `…exchange.mcx` |
+| 13 | **Firm** | Aggregate | Risk committee and board | `…firm` |
+| 14 | **Global default** | Everything | Risk committee | `…` — **must exist** |
+
+<Aside type="caution" title="Firm-level limits are the ones nobody sets">
+Client limits get attention because clients ask about them. Firm-level limits — total exposure in a segment, total exposure to one underlying across all clients, total intraday exposure — get set once and forgotten, if at all. They are the only control against the scenario where every client independently takes the same side of the same trade, which is exactly what happens around a news event. Set them, monitor utilisation against them continuously, and treat approaching one as a risk event requiring a decision, not an automatic rejection of the next client's order.
+</Aside>
+
+## 3. What is limited
+
+| Dimension | Applied at | Note |
+|---|---|---|
+| Order quantity | Per order | Fat-finger and error containment |
+| Order value | Per order | Same |
+| Gross exposure | Client, group, branch, segment, firm | The headline number |
+| Net exposure | Client, segment, firm | Recognises offsets where real |
+| Position quantity | Client, instrument | Against open-interest limits |
+| Open interest | Client, member | Exchange-set; see [position limits and open interest](/broking-kyc/trading-risk/position-limits-oi/) |
+| Concentration | Client, instrument | The share of a client's capacity in one name |
+| Instrument concentration across clients | Firm, instrument | The control against correlated client behaviour |
+| Loss | Client, algorithm, day | Daily loss limits, especially for automated flow |
+| Order rate | Identifier, client, algorithm, channel | Capacity and runaway protection |
+| Order-to-trade ratio | Client, algorithm | Behaviour |
+| Margin utilisation | Client | The square-off trigger basis |
+
+## 4. The multiplier
+
+| Element | Detail |
+|---|---|
+| Formula | Available = (recognised collateral + clear cash − utilised − blocked) × multiplier |
+| Nature | **Discretionary**, bounded below by the margin requirement |
+| Floor | A multiplier that implies collecting less than the computed requirement is a short collection, not a leverage product |
+| Where variation is legitimate | Headroom above the requirement, speed of capacity release, and product-specific treatment |
+| Documentation | The risk management policy, approved, and disclosed to clients |
+| Per-group | Legitimate and common — retail, HNI, proprietary and employee groups may differ |
+| Per-instrument | Legitimate — illiquid or surveillance-flagged instruments may carry a lower effective multiplier |
+| Change control | Maker-checker, at a boundary, with client communication where it reduces capacity |
+
+| Common error | Why it is wrong |
+|---|---|
+| "SEBI allows 5x" | SEBI does not set a multiplier. The margin requirement is set; the multiplier is the firm's |
+| Multiplier varies by client at a salesperson's discretion | Discretion without a policy is not a policy; group-level variation with approval is the defensible form |
+| Multiplier raised to win a client | A commercial decision with a regulatory consequence; it must go through risk, not sales |
+| Intraday multiplier higher than carry-forward | Was the industry norm before the peak-margin regime; after it, margin must be sufficient continuously |
+
+## 5. Authority
+
+| Action | Maker | Checker | Additional |
+|---|---|---|---|
+| Set or change a client limit within the group template | Risk administrator | Risk supervisor | — |
+| Set a client limit outside the group template | Risk administrator | Head of risk | Documented reason |
+| Change a group template | Head of risk | Risk committee | Policy update; client communication where capacity reduces |
+| Change a multiplier | Head of risk | Risk committee | Policy update, board awareness |
+| Change a firm-level limit | Head of risk | Risk committee | Board awareness |
+| Per-order override | Dealer or risk, requesting | Risk supervisor, approving | Logged, time-bound, reason from a closed list |
+| Emergency tightening | Head of risk | Post-hoc within one business day | Logged distinctly |
+| Instrument-level block | Risk supervisor | Head of risk | Client communication |
+
+| Separation rules | Detail |
+|---|---|
+| The person who sets a limit may not approve the change | Always |
+| The person who places orders may not set the limit they trade under | Always |
+| Sales may request; risk decides | Always |
+| Override approver is distinct from the order placer | Always |
+
+## 6. Intraday change rules
+
+| Change | Mid-session? | Handling |
+|---|---|---|
+| Increase a client limit | **Yes** | Strictly loosening; no existing order or position becomes invalid |
+| Decrease a client limit | **With care** | Specify explicitly whether existing positions are affected: block new orders only, or trigger square-off evaluation |
+| Change a group template downward | **No** | Takes effect at the next boundary; a mid-session change can put a whole group in breach at once |
+| Change a multiplier | **No**, except upward for new orders | Recomputing the whole book mid-session changes every utilisation number simultaneously |
+| Block an instrument | **Yes** | Pending orders must be explicitly handled: cancel, or leave |
+| Firm-level ceiling reached | **Yes, as a risk event** | Requires a decision, not an automatic rejection of whoever is next |
+| Per-order override | **Yes** | That is what it is for |
+| Emergency firm-wide tightening | **Yes, with authority** | Logged, communicated, and reviewed afterwards |
+
+The general rule, stated once in [environments and configuration](/broking-kyc/finix-broking-setup/stack/environments-config-baseline/#51-the-mid-session-change-problem) and applied here: **a change that can turn a compliant client into a non-compliant one does not take effect mid-session** unless someone with authority explicitly decides otherwise and the consequence is understood.
+
+## 7. The daily cycle
+
+| Time | Step | Owner |
+|---|---|---|
+| Begin of day | Collateral and ledger balance loaded with a current as-of timestamp; **assert before opening** | Operations and risk |
+| Begin of day | Limits resolved and available exposure computed per client | Risk |
+| Begin of day | Exchange position and open-interest limits refreshed | Risk |
+| Begin of day | Restriction lists applied | Risk |
+| Begin of day | Firm-level utilisation reset and baselined | Risk |
+| Session | Intraday collateral events applied — pledge, release, revaluation | Risk |
+| Session | Confirmed fund receipts increase available capacity | Risk and treasury |
+| Session | Utilisation monitored against client, group and firm levels | Risk |
+| Session | Overrides processed and logged | Risk |
+| Session | Firm-level utilisation reviewed at thresholds | Head of risk |
+| End of day | Utilisation and exceptions reported | Risk |
+| End of day | Overrides compiled for review | Risk |
+| Weekly | Override review; limits adjusted where overrides recur | Head of risk |
+| Monthly | Limit change report; policy conformance | Compliance |
+| Quarterly | Group templates and multipliers reviewed | Risk committee |
+
+<Aside type="note" title="Capacity from a fund receipt is a risk event, not a money event">
+When a client's payment is confirmed, nothing moves in the limit framework until the risk engine is told. The sequence matters: the receipt must be **confirmed good funds**, not merely authorised, before capacity is granted — otherwise the firm has extended credit against a payment that may reverse. The interface is MO-1 and RI-9 in the [contract matrix](/broking-kyc/finix-broking-setup/stack/integration-contract-matrix/#5-money-path), and its degraded behaviour is to queue rather than to grant.
+</Aside>
+
+## 8. Monitoring and review
+
+| Report | Frequency | What it answers |
+|---|---|---|
+| Client utilisation distribution | Daily | Who is close to their limit |
+| Clients above a utilisation threshold | Continuous | Who is approaching square-off |
+| Firm-level utilisation by segment | Continuous | How much of the firm's own capacity is used |
+| Concentration by instrument across clients | Daily | Correlated client exposure |
+| Limits changed | Daily and monthly | What moved, who approved it |
+| Overrides by client and by check | **Weekly** | Where the framework is being worked around |
+| Limits outside the group template | Monthly | Accumulated exceptions |
+| Clients with no limit resolved above the global default | Monthly | Clients nobody has configured |
+| Dormant clients with live limits | Monthly | Unnecessary capacity |
+| Multiplier conformance to policy | Quarterly | Whether practice matches the approved policy |
+
+The second-to-last row catches a quiet problem: a client whose limits resolve all the way down to the global default is a client nobody has thought about, and the global default was chosen for safety rather than for them.
+
+## 9. Configuration reference
+
+| Key | Finix default | Class | Mid-session | Failure mode |
+|---|---|---|---|---|
+| `finix.rms.limits.exposure_multiplier.<scope>` | Per approved policy | Discretionary | Upward only | Collecting less than the requirement |
+| `finix.rms.limits.qty_max.<scope>` | Per scope | Discretionary | Loosening only | Fat-finger exposure |
+| `finix.rms.limits.value_max.<scope>` | Per scope | Discretionary | Loosening only | Same |
+| `finix.rms.limits.gross_exposure.<scope>` | Per scope | Discretionary | Loosening only | Unbounded exposure |
+| `finix.rms.limits.firm_segment_ceiling.<segment>` | Set and monitored | Discretionary | As a risk event | Correlated client exposure unbounded |
+| `finix.rms.limits.instrument_concentration_firm.<scrip>` | Set for liquid names | Discretionary | Loosening only | Everyone on the same side |
+| `finix.rms.limits.global_default` | **Must exist, conservative** | Discretionary | No | Unresolvable limits |
+| `finix.rms.limits.resolution_order` | Most-specific-wins, as section 2 | Discretionary | No | Unpredictable limits |
+| `finix.rms.limits.decrease_affects_positions` | Explicit per change | Discretionary | Per change | Unintended mass square-off |
+| `finix.rms.limits.override_ttl` | Short, per-order | Discretionary | Yes | Standing overrides |
+| `finix.rms.limits.override_reason_list` | Closed list | Discretionary | No | Unexplained overrides |
+| `finix.rms.limits.capacity_on_receipt` | Confirmed good funds only | Regulatory in substance | No | Credit against a reversible payment |
+| `finix.rms.limits.dormant_client_action` | Reduce to the global default | Discretionary | No | Unnecessary live capacity |
+| `finix.rms.limits.oi_limit_source` | Exchange-published, refreshed daily | Exchange-set | No | Position-limit breach |
+
+## 10. Exception paths
+
+| Situation | Response |
+|---|---|
+| A client's limit resolves to nothing | Reject and alert; the global default must prevent this, and its absence is a configuration defect |
+| Firm-level ceiling reached mid-session | Risk event: a decision about which flow continues, not an automatic rejection of the next order |
+| Instrument concentration across clients breaches | Consider an instrument-level block or a reduced multiplier for that name; communicate |
+| Repeated overrides for the same client | Fix the limit; the override process is being used as a limit-setting process |
+| A limit decrease puts clients instantly in breach | Should not happen mid-session; if it does, treat as an incident and decide explicitly on square-off |
+| Exchange raises or lowers a position limit | Refresh same day; clients close to the old limit informed |
+| Client disputes a limit | The decision record and the limit history answer it; this is why both are retained |
+| Capacity granted against an unconfirmed receipt | Severity one; quantify and reverse; the receipt path must gate on confirmation |
+| A multiplier is found in production that is not in the approved policy | Control failure; revert to policy and investigate the change path |
+
+## Practical notes
+
+- **Make the global default exist and make it conservative.** It is the terminator of the resolution chain and the safety net for clients nobody configured.
+- **Set firm-level limits and watch them.** They are the only control against everyone taking the same side at once.
+- **Treat override counts as a limit signal.** Three overrides for one client in a month means the limit is wrong.
+- **Never grant capacity on an unconfirmed payment.** It is credit extension disguised as an operational convenience.
+- **State explicitly, on every limit decrease, whether existing positions are affected.** Leaving it implicit produces either a surprise square-off or an unenforced limit.
+- **Keep limit history point-in-time answerable.** "What was this client's limit on 14 August" is a question that will be asked.
+- **Review group templates quarterly against the approved policy.** Practice drifts; the policy does not.
+
+## Where this connects
+
+- [Pre-trade check ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/) — groups F and G, where limits bind
+- [Margin engine](/broking-kyc/finix-broking-setup/rms/02-margin-engine/) — the requirement the multiplier sits above
+- [Collateral and pledge](/broking-kyc/finix-broking-setup/rms/05-collateral-pledge/) — what creates capacity
+- [Square-off engine](/broking-kyc/finix-broking-setup/rms/06-squareoff-engine/) — what happens when capacity runs out
+- [Position limits and open interest](/broking-kyc/trading-risk/position-limits-oi/) — the exchange-set ceilings
+- [Environments and configuration baseline](/broking-kyc/finix-broking-setup/stack/environments-config-baseline/) — scope resolution and mid-session rules
+- [Admin workflow](/broking-kyc/operations/admin-workflow/) — the maker-checker model
