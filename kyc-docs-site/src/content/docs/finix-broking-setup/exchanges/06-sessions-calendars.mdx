@@ -1,0 +1,179 @@
+---
+title: "Exchange 6: sessions and calendars"
+description: The session state machine per exchange and segment, the calendar as an exchange-set configuration item rather than a static annual file, special sessions and their exclusions, daylight saving, holiday-boundary behaviour, and the failure modes of a calendar that is hard-coded or stale.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** A trading calendar looks like reference data and behaves like a control. It decides whether the system opens, whether an after-market queue releases, whether a batch runs, whether a tender window includes a particular day, and whether a settlement deadline falls where everyone assumes. Because it is amendable by circular mid-year and differs by exchange and sometimes by commodity group, a hard-coded calendar will eventually be wrong. So the page treats the session as a state machine first, then the calendar as a refreshed configuration item with an ingestion contract, then the boundary cases where calendar errors actually bite.
+
+## TL;DR
+
+- **Model the session as a state machine per exchange and segment**, driven by exchange market-state messages rather than by the clock alone. A clock-driven implementation will trade through a halt and stop during an extension.
+- **The equity day has distinct phases with different behaviours**: pre-open order entry, pre-open matching, buffer, continuous trading, closing session, post-close. Order entry, modification and cancellation differ by phase.
+- **The calendar is exchange-set and amendable**, not a static annual file. Treat it as a refreshed configuration item with a staleness behaviour, like any other exchange-set parameter.
+- **MCX has three closes inside one segment** by commodity group, and the non-agricultural close moves twice a year with United States daylight saving.
+- **Special sessions have exclusions.** Muhurat trading is excluded from the trading-day basis used to compute the commodity staggered-delivery tender window.
+- **Holiday boundaries are where calendar defects surface** — an after-market window spanning a holiday, a settlement cycle crossing one, a batch scheduled on a closed day.
+- **Settlement calendars are not the same as trading calendars.** A day can be a settlement day without being a trading day, and the deadline chain follows the settlement calendar.
+
+## Conceptual overview
+
+Everything in a broking operation is timed against a calendar that somebody else controls. Session open and close, settlement dates, expiry days, tender windows, reporting cut-offs counted in working days — all of them resolve against a definition of which days are trading days and which are not, and that definition is published, amendable and exchange-specific. A firm that encodes the calendar once at the start of the year has created a time bomb with a known detonation pattern: the first mid-year amendment, the first special session, the first daylight-saving change.
+
+The second observation is that the session is not a schedule, it is a state. Exchanges send market-state messages, and those messages are authoritative: a halt begins when the exchange says so, not when a clock reaches a threshold, and a session can be extended. An implementation that drives behaviour from a local clock will accept orders into a halted market and will refuse them during an extension, both of which are visible to the exchange and to clients. The clock is a prediction; the state message is the fact.
+
+The third observation concerns derived dates. Reporting cut-offs are counted in working days. Settlement cycles are counted in trading days. The commodity tender window is the last three trading days including expiry, excluding special sessions such as Muhurat. Each of these is an arithmetic on the calendar, and each produces a wrong answer if the calendar is wrong — usually silently, and usually in a direction that misses a deadline rather than one that triggers early.
+
+## 1. Framework
+
+- **Exchange session timings and calendars** — published per exchange and segment, **amendable by circular**. `[not yet in index]`
+- **Pre-open and closing session** — phases and eligibility; see [pre-open and closing auction](/broking-kyc/deep-dives/foundational/pre-open-closing-auction/) and **NSE/CMTR/63594** (17 September 2024) with its supersession trail. `[not yet in index]`
+- **MCX session hours** — non-agricultural 09:00 to 23:30, or **23:55 during United States daylight saving**; select agricultural such as cotton to 21:00; other agricultural to 17:00. **Trading day is based on availability for trading of the respective commodity and excludes special sessions such as Muhurat trading.** `[not yet in index]`
+- **Clearing corporation settlement calendars** — per clearing corporation and segment, published and amendable. `[not yet in index]`
+- **Expiry standardisation** — one weekly benchmark index contract per exchange, NSE Tuesday and BSE Thursday from 1 September 2025. `[not yet in index]`
+- **Market-wide circuit breakers and halts** — see [bands, halts and surveillance](/broking-kyc/finix-broking-setup/exchanges/07-bands-halts-surveillance/).
+
+## 2. The session state machine
+
+| State | Entered on | Order entry | Modification | Notes |
+|---|---|---|---|---|
+| `CLOSED` | After post-close | After-market queue only | Within the queue | The broker's window, not the exchange's |
+| `PRE_OPEN_ENTRY` | Exchange message | **Yes** | **Yes** | After-market queue released here |
+| `PRE_OPEN_MATCH` | Exchange message | **No** | **No** | Opening price discovered |
+| `PRE_OPEN_BUFFER` | Exchange message | No | No | Transition |
+| `OPEN` | Exchange message | Yes | Yes | Continuous trading |
+| `HALTED` | **Exchange message** | **No** | Per the halt's rules | Market-wide or instrument-level |
+| `RESUMED` | Exchange message | Yes | Yes | Often with a pre-open before resumption |
+| `CLOSING_SESSION` | Exchange message | Per the closing session's rules | Per rules | Closing price determination |
+| `POST_CLOSE` | Exchange message | No | No | Day orders cancelled by the exchange |
+| `EXTENDED` | **Exchange message** | Yes | Yes | **A clock-driven system will refuse orders here** |
+
+| Rule | Detail |
+|---|---|
+| **State is driven by exchange messages** | The clock predicts; the message decides |
+| Per exchange and per segment | And, for MCX, per commodity group |
+| Unexpected transitions handled | An unanticipated state change is an event to handle, not an error to log |
+| Client-visible | The client should see the market state, not a generic "unavailable" |
+| Risk consequences | Square-off and other automated actions must respect the state; see [square-off engine](/broking-kyc/finix-broking-setup/rms/06-squareoff-engine/) |
+
+<Aside type="caution" title="Session extensions are the case that exposes clock-driven implementations">
+Exchanges occasionally extend a session — after a technical issue, or for an operational reason. A system driven by the clock closes on schedule, refuses client orders into a market that is open, and leaves the firm explaining why its clients could not trade when everyone else could. The fix is to make the exchange's market-state message authoritative and the clock advisory, which costs nothing at build time and is effectively impossible to retro-fit cleanly during an extension.
+</Aside>
+
+## 3. The calendar as configuration
+
+| Property | Treatment |
+|---|---|
+| Source | Exchange-published, per exchange and segment |
+| **Amendable** | By circular, mid-year |
+| Ingestion | A named job, with a version and an applied timestamp |
+| **Staleness behaviour** | **Manual confirmation before begin-of-day on any boundary day**; never assume |
+| Scope | Trading calendar **and** settlement calendar, which differ |
+| Derived values | Expiry days, tender windows, reporting cut-offs, settlement dates — all computed from it |
+| Consumers | OMS, RMS, back office, treasury, batch scheduler, client-facing communications |
+| **Never hard-coded** | A compiled calendar is a defect with a date of detonation |
+
+| Calendar type | What it determines |
+|---|---|
+| **Trading calendar** | Which days the market is open, per exchange and segment |
+| **Settlement calendar** | Which days settlement occurs; a settlement day need not be a trading day |
+| Expiry calendar | Weekly and monthly expiries; NSE Tuesday, BSE Thursday for weekly index |
+| Commodity tender calendar | Derived: the last three trading days including expiry, **excluding special sessions** |
+| Working-day calendar | For reporting cut-offs counted in working days |
+| Bank holiday calendar | **Different again**, and it determines whether a funding instruction can execute |
+
+The last row is the one most often missed. A day that is a settlement day and a bank holiday is a day on which the firm must settle and cannot instruct its bank through the usual channel. That combination is predictable from two calendars the firm already has, and it is only predictable if both are modelled.
+
+## 4. Special sessions and exclusions
+
+| Session | Nature | Treatment |
+|---|---|---|
+| **Muhurat trading** | Ceremonial session, typically on a holiday | A trading session with its own timing; **excluded from the trading-day basis for the commodity tender window** |
+| Mock and simulated sessions | Testing and certification | Not production; must not affect production state or records |
+| Special live sessions | Disaster-recovery and contingency testing | Live, but with their own purpose; participation may be mandatory |
+| Extended sessions | Exchange-initiated | Handled by the state machine |
+| Pre-open on resumption | After a halt | A pre-open may precede resumption |
+| Settlement-only days | Settlement without trading | The settlement calendar governs |
+
+## 5. Daylight saving
+
+| Element | Detail |
+|---|---|
+| Scope | **MCX non-agricultural commodities** — the close moves between 23:30 and 23:55 |
+| Frequency | **Twice a year** |
+| Must reach | Session state machine, monitoring thresholds, batch scheduler, staff rota, vendor support arrangement, client communication |
+| Ownership | **A named owner on the [periodic calendar](/broking-kyc/finix-broking-setup/daily-ops/09-periodic-calendar/)** |
+| Failure mode | A session closed while the market is open, or a batch starting while trading continues |
+| Detection | A session-state mismatch alert, not a human noticing |
+
+## 6. Boundary cases
+
+Where calendar defects actually bite.
+
+| # | Case | Failure | Control |
+|---|---|---|---|
+| B1 | **After-market window spanning a holiday** | Release into a closed session | Calendar-aware window configuration |
+| B2 | Settlement cycle crossing a holiday | Wrong settlement date | Settlement calendar, not trading calendar |
+| B3 | **Settlement day on a bank holiday** | Instruction cannot execute through the usual channel | Model both calendars; plan the alternative |
+| B4 | Reporting cut-off counted in working days across holidays | Late filing | Working-day arithmetic against the current calendar |
+| B5 | **Commodity tender window including a special session** | Wrong tender days and wrong margin ladder | Exclude special sessions from the trading-day basis |
+| B6 | Expiry falling on an amended holiday | Expiry moves | Expiry derived from the current calendar, not assumed |
+| B7 | Mid-year calendar amendment | Everything derived from the calendar is wrong | Ingestion job with a version check |
+| B8 | Daylight saving change | Session mismatch | Named owner, calendar entry, alert |
+| B9 | One exchange open, another closed | Partial estate | Per-exchange state, not a global "market open" |
+| B10 | Batch scheduled on a closed day | Processing on a day with no data, or none on a day with data | Calendar-driven scheduling |
+| B11 | Begin-of-day on the first day after a long holiday | Multiple days of files and corporate actions to process | A long-weekend variant of the runbook |
+| B12 | Expiry adjacent to a holiday | Concentration shifts; capacity planning follows | Derived, communicated |
+
+## 7. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.exch.session.state_source` | **Exchange market-state messages** | Exchange-set | Trading through a halt; refusing orders during an extension |
+| `finix.exch.session.clock_role` | Advisory only | Discretionary, strongly recommended | As above |
+| `finix.exch.session.state_per` | Exchange, segment, and commodity group for MCX | Exchange-set | A single global state |
+| `finix.exch.calendar.source` | Exchange-published, ingested | Exchange-set | A stale or hard-coded calendar |
+| `finix.exch.calendar.hardcoded` | **Prohibited** | Discretionary, strongly recommended | A defect with a detonation date |
+| `finix.exch.calendar.staleness_action` | **Manual confirmation before begin-of-day on a boundary day** | Discretionary, strongly recommended | Opening on a closed day |
+| `finix.exch.calendar.types` | Trading, settlement, expiry, working-day, bank holiday | Exchange and bank set | Derived dates computed wrongly |
+| `finix.exch.calendar.special_session_exclusions` | **Muhurat excluded from the commodity trading-day basis** | Exchange-set | Wrong tender window |
+| `finix.exch.calendar.dst_owner` | Named, on the periodic calendar | Discretionary, strongly recommended | A forgotten twice-yearly change |
+| `finix.exch.calendar.amendment_monitoring` | Circular feed monitored | Exchange-set | A mid-year amendment missed |
+| `finix.oms.amo.calendar_aware` | True | Exchange-set | Release into a closed session |
+| `finix.ops.batch.calendar_driven` | True | Discretionary, strongly recommended | Batches on closed days |
+
+## 8. Exception paths
+
+| Situation | Response |
+|---|---|
+| Exchange extends the session | The state machine follows the message; continue trading; inform clients |
+| Exchange halts the market | Stop order acceptance in scope; inform clients; monitor for resumption, which may be preceded by a pre-open |
+| Calendar amended mid-year | Re-ingest; **recompute every derived date**; check expiry, tender windows and settlement dates |
+| Session state message not received | Treat as an incident; do not fall back to the clock silently |
+| Begin-of-day on a day the calendar says is closed | **Do not open**; confirm manually; a mismatch is a calendar or message problem |
+| After-market release into a closed session | Incident; clients informed; fix the calendar-awareness |
+| Daylight saving change missed | Session mismatch; correct immediately; review ownership |
+| Bank holiday on a settlement day | Alternative funding channel planned in advance |
+| Long holiday followed by a heavy begin-of-day | Use the long-weekend runbook variant; expect multiple days of files |
+| One exchange open and another closed | Per-exchange operation; client messaging must be specific |
+
+## Practical notes
+
+- **Drive the session from exchange messages and treat the clock as advisory.** It is a build-time decision that cannot be retro-fitted during an extension.
+- **Never hard-code a calendar.** It is amendable by circular and the failure is silent.
+- **Model the bank holiday calendar as well as the exchange ones.** A settlement day that is a bank holiday is foreseeable and the alternative has to be arranged in advance.
+- **Recompute every derived date after a calendar amendment.** Expiry, tender windows, settlement dates and reporting cut-offs all move.
+- **Exclude special sessions where the rule says to.** The commodity tender window is the example that matters.
+- **Give daylight saving a named owner.** Twice a year, entirely predictable, routinely forgotten.
+- **Keep per-exchange state.** "The market is open" is not a true statement when you are a member of three.
+
+## Where this connects
+
+- [NSE cash](/broking-kyc/finix-broking-setup/exchanges/01-nse-cash/) — the equity session phases
+- [MCX commodities](/broking-kyc/finix-broking-setup/exchanges/04-mcx-commodity/) — the three closes and daylight saving
+- [Bands, halts and surveillance](/broking-kyc/finix-broking-setup/exchanges/07-bands-halts-surveillance/) — halts and resumption
+- [BOD runbook](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/) — the calendar gate
+- [Periodic calendar](/broking-kyc/finix-broking-setup/daily-ops/09-periodic-calendar/) — where daylight saving and other recurring items live
+- [Pre-open and closing auction](/broking-kyc/deep-dives/foundational/pre-open-closing-auction/) — auction mechanics
+- [Order attributes and validity](/broking-kyc/finix-broking-setup/oms/05-order-attributes-validity/) — the after-market window

@@ -1,0 +1,207 @@
+---
+title: "Exchange 1: NSE cash market"
+description: Operating the NSE capital market segment — the three-part session with its pre-open phases, T+1 settlement and the optional T+0 regime, order books and their behaviour, special markets, the operational nuances that catch implementations built on assumptions, and the daily file and report set.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** The NSE cash segment is where most brokers start, which means it is also where most assumptions are formed that later fail elsewhere. So the page is deliberately explicit about what is NSE-cash-specific rather than general: the auction phases, the order-book structure, the settlement regime, and the handful of behaviours — band revisions, freezes, trade-for-trade treatment, auction market participation — that an implementation must handle rather than assume away.
+
+## TL;DR
+
+- **The day has three parts**: pre-open call auction 09:00 to 09:15, continuous trading 09:15 to 15:30, closing session 15:30 to 15:40. The pre-open itself has phases — order entry 09:00 to 09:08, matching and trade confirmation 09:08 to 09:12, and a buffer 09:12 to 09:15.
+- **After-market orders queued overnight are released into the pre-open at 09:00**, entering the order-entry queue rather than the continuous session.
+- **Settlement is T+1**, with an optional **T+0** regime extended to the top 500 scrips by SEBI/HO/MRD/MRD-PoD-2/P/CIR/2024/02 (10 December 2024).
+- **Upfront value-at-risk plus extreme loss margin applies in the cash segment**, not only in derivatives — paragraph 40.1.2 of the [Master Circular](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir2024118).
+- **The normal market has four books**: Regular Lot, Special Terms, Stop Loss and Negotiated Trade, plus the odd-lot and auction markets. All-or-none and minimum fill, which define the Special Terms book, **are not available on the system per SEBI directives**.
+- **Negotiated trades are Day orders only**, and carry a counterparty identifier.
+- **Trade-for-trade and periodic call auction treatments change what a client can do** — intraday is not available in trade-for-trade, and a call-auction scrip cannot be exited continuously.
+- **Auction market participation is an operations function**, not a client order type; it exists to settle short deliveries.
+
+## Conceptual overview
+
+The NSE cash market's structure is a continuous limit-order book bracketed by two call auctions. That bracketing is the source of several behaviours that surprise implementations: order entry in the pre-open is not the same as order entry in continuous trading, trades at 09:08 execute at a discovered price rather than at the order's price, and the closing session determines a closing price by a different mechanism again. A design that models the day as one long session with different start and end times will get the pre-open wrong, and the pre-open is where after-market orders land.
+
+The second structural feature is the book segregation. Orders are routed into different books by attribute — regular lot orders with none of all-or-none, minimum fill or stop-loss attached go to the Regular Lot book; stop-loss orders wait in the Stop Loss book until their trigger is reached or surpassed and are then released into the Regular Lot book; the Special Terms book holds all-or-none and minimum fill orders, which are not currently available. Understanding this explains why a resting stop-loss order is invisible in market depth and why the trigger is an exchange event rather than a broker one.
+
+The third feature is that a scrip's treatment is not uniform. A security may be in trade-for-trade, in a periodic call auction, under a surveillance measure, or subject to a revised band — and each changes what the client can do. A broker that models a scrip as simply tradeable or not will produce client-facing errors it cannot explain, because the explanation lives in a treatment the system did not model.
+
+## 1. Framework
+
+- **NSE trading system documentation** — the normal market book structure: Regular Lot, Special Terms, Stop Loss and Negotiated Trade books; the odd-lot market; order conditions classified as time-related, price-related and quantity-related; the statement that all-or-none and minimum fill are not currently available on the system as per SEBI directives. `[not yet in index]`
+- **Pre-open and closing session** — phases and eligibility; see [pre-open and closing auction](/broking-kyc/deep-dives/foundational/pre-open-closing-auction/) and **NSE/CMTR/63594** (17 September 2024) with its supersession trail. `[not yet in index]`
+- **SEBI/HO/MRD/MRD-PoD-3/P/CIR/2024/85** (20 June 2024) — call-auction changes for initial public offerings and relisted scrips, including indicative quantity and price disclosure. `[not yet in index]`
+- **SEBI/HO/MRD/MRD-PoD-2/P/CIR/2024/02** (10 December 2024) — optional T+0 settlement extended to the top 500 scrips. `[not yet in index]`
+- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/POD-1/P/CIR/2024/118](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir2024118)** (9 August 2024) — paragraph 40.1.2 upfront value-at-risk plus extreme loss margin in the cash segment.
+- **Settlement and clearing** — NSE Clearing rules, report set and schedules. `[not yet in index]`
+- Depth: [T+0 and T+1 settlement](/broking-kyc/deep-dives/settlement/t0-t1-settlement/), [segment rules comparison](/broking-kyc/deep-dives/foundational/segment-rules-comparison/).
+
+## 2. The session
+
+| Phase | Time | Behaviour | Broker consequence |
+|---|---|---|---|
+| **After-market window** | Previous close to the pre-open | Broker-held queue | Release verified, not assumed |
+| **Pre-open: order entry** | 09:00–09:08 | Orders accumulate; **after-market orders released here** | Order entry, modification and cancellation behave differently from continuous trading |
+| **Pre-open: matching** | 09:08–09:12 | Opening price discovered at maximum tradable volume; trades execute at that price | Clients see fills at a price they did not specify — explain it |
+| **Pre-open: buffer** | 09:12–09:15 | Transition | No new entry |
+| **Continuous trading** | 09:15–15:30 | Limit order book, price–time priority | The main session |
+| **Closing session** | 15:30–15:40 | Closing price determination | Separate rules |
+| **Post-close** | After 15:40 | Day orders cancelled by the exchange | Margin blocks released; state reconciled |
+
+<Aside type="caution" title="The pre-open is a different market, not an early session">
+Implementations commonly treat 09:00 to 09:15 as the session starting early. It is a call auction: a trade executes at a discovered price rather than at the order's limit, order modification and cancellation rules differ by phase, and the client's mental model — "my limit order at ₹100 executed at ₹97" — needs an explanation available in the interface. The after-market queue releasing into this window makes it the first thing a client sees each morning, which makes getting the explanation right disproportionately valuable.
+</Aside>
+
+## 3. Order books
+
+| Book | Holds | Visibility | Notes |
+|---|---|---|---|
+| **Regular Lot** | Orders with none of all-or-none, minimum fill or stop-loss attached | Visible in depth | The main book |
+| **Special Terms** | All-or-none and minimum fill orders | — | **Not currently available on the system per SEBI directives** |
+| **Stop Loss** | Stop-loss orders until the trigger price is reached or surpassed, then released into the Regular Lot book | **Not visible** | The trigger is an exchange event |
+| **Negotiated Trade** | Regular lot orders with a counterparty identifier | — | **Day orders only** |
+| **Odd Lot** | Orders below the regular lot size | Separate market | — |
+| **Auction** | Auction market | Separate | Settles short deliveries; an operations function |
+
+## 4. Settlement
+
+| Element | Detail |
+|---|---|
+| Default cycle | **T+1** |
+| Optional T+0 | Extended to the **top 500 scrips** by the December 2024 circular; where offered, operational and client-communication consequences follow |
+| Obligations | Daily obligation report for the day's cumulative net position; **final obligation report downloaded on T+1** |
+| Funds pay-in | Before the clearing corporation deadline, which means before the **bank's** earlier cut-off |
+| Securities pay-in | Delivery instruction; **early pay-in earns a margin benefit** |
+| Pay-out | **Direct pay-out to the client's demat account** |
+| Short delivery | Auction, then close-out; see [short delivery and auction](/broking-kyc/deep-dives/trading-day/short-delivery-auction/) |
+| Unpaid securities | **CUSPA auto-pledge at pay-out**; see [CUSPA](/broking-kyc/finix-broking-setup/backoffice/06-cuspa-unpaid-securities/) |
+
+## 5. Margin
+
+| Element | Detail |
+|---|---|
+| Upfront | **Value-at-risk plus extreme loss margin, collected upfront** — paragraph 40.1.2 |
+| Peak margin | Four random intraday snapshots; the day's peak is the maximum |
+| Other margins | Additional, special and surveillance margins by circular, sometimes intraday |
+| Reporting | Client-wise margin collected and peak, within the five-working-day cut-off |
+| Collateral | Approved list and haircuts, published and amendable |
+| Delivery margins | Where applicable |
+
+Detail at [margin engine](/broking-kyc/finix-broking-setup/rms/02-margin-engine/) and [margin reporting and penalties](/broking-kyc/finix-broking-setup/rms/08-margin-reporting-penalties/).
+
+## 6. Scrip treatments that change behaviour
+
+| Treatment | Effect | Implementation requirement |
+|---|---|---|
+| **Trade-for-trade** | Compulsory delivery; **no intraday** | The product treatment must be blocked for these scrips, with a client-facing explanation |
+| **Periodic call auction** | Illiquid securities trade in call auctions rather than continuously | A client cannot exit continuously; square-off logic must handle it |
+| **Surveillance measures** | Additional margin, reduced price bands, trade-for-trade, or restricted trading | Apply the most restrictive known treatment; see [bands, halts and surveillance](/broking-kyc/finix-broking-setup/exchanges/07-bands-halts-surveillance/) |
+| Band revision | The operating range changes, sometimes intraday | **Apply on receipt**, not at the next refresh |
+| Suspension | No trading | Block; handle resting broker-held intent |
+| Price band removal or widening | Different range | Apply |
+| Corporate action | Price, quantity and eligibility change | See [corporate actions](/broking-kyc/finix-broking-setup/backoffice/07-corporate-actions/) |
+| New listing | Call-auction rules may differ for initial public offerings and relisted scrips, with indicative quantity and price disclosure | Handle the variant rules |
+
+## 7. Special markets and windows
+
+| Market | Purpose | Broker handling |
+|---|---|---|
+| Block and bulk deals | Large transactions with disclosure | Separate windows and reporting; see [block and bulk deals](/broking-kyc/deep-dives/trading-day/block-bulk-deals/) |
+| **Auction market** | Settling short deliveries | **Operations, not a client order type** |
+| Odd lot | Below regular lot | Separate market |
+| Negotiated trades | Counterparty-identified | **Day orders only** |
+| Securities lending and borrowing | Lending and borrowing | Its own protocol; see [SLBM](/broking-kyc/deep-dives/settlement/slbm/) |
+| Public issues and offers | Applications | See [IPO and OFS broker side](/broking-kyc/deep-dives/specialty/ipo-ofs-broker-side/) |
+
+## 8. Operational nuances
+
+The behaviours that catch implementations.
+
+| # | Nuance | Consequence |
+|---|---|---|
+| 1 | Pre-open trades execute at a discovered price | Clients see fills away from their limit; explain it in the interface |
+| 2 | After-market orders enter the pre-open queue | Release verification is a begin-of-day step |
+| 3 | A resting stop-loss order is invisible in depth | Clients cannot see their own protection in the book |
+| 4 | **Band revisions can arrive intraday** | Must be applied, not logged |
+| 5 | Quantity and value freezes produce a pending state | Neither live nor rejected; represent it distinctly |
+| 6 | Trade-for-trade blocks intraday | The product treatment must be scrip-aware |
+| 7 | Periodic call auction scrips cannot be exited continuously | Square-off logic must handle it |
+| 8 | Day orders are cancelled by the exchange at end of session | A bulk state transition to process |
+| 9 | Settlement is T+1 but **the final obligation arrives on T+1** | The timeline is tighter than the label suggests |
+| 10 | Early pay-in benefit must be **recognised**, not assumed | Assert the recognition |
+| 11 | The auction market is not a client facility | Model it as operations |
+| 12 | Odd lots trade in a separate market | Quantities below the lot size behave differently |
+
+## 9. Daily files and reports
+
+Full reference at [file formats and downloads](/broking-kyc/finix-broking-setup/exchanges/08-file-formats-downloads/).
+
+| File | When | Consumer |
+|---|---|---|
+| Instrument master, lot and tick | Pre-open | OMS, RMS, back office |
+| Price bands | Pre-open plus intraday revisions | OMS, RMS |
+| Surveillance measure lists | Pre-open and periodic | RMS |
+| Value-at-risk and extreme loss margin rates | Daily | RMS |
+| Approved collateral and haircuts | Daily | RMS, back office |
+| **Trade file** | Post-session | Back office |
+| **Daily obligation report** | Post-session | Back office |
+| **Final obligation report** | **T+1** | Back office |
+| Delivery statements | Per settlement | Back office |
+| Bank summary report | Daily | Treasury |
+| Daily funds statement | Daily | Treasury |
+| Shortage and auction reports | Per settlement | Back office |
+| Margin and collateral statements | Daily and intraday | RMS |
+| Corporate action reports | Per event | Back office |
+| Settlement calendar | Published, amendable | Everything |
+
+## 10. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.exch.nse.cm.session_phases` | Per the published schedule | Exchange-set | Orders in the wrong phase |
+| `finix.exch.nse.cm.amo_release` | Into the pre-open at the window open | Exchange-set | Release into the wrong phase |
+| `finix.exch.nse.cm.settlement_cycle` | T+1; T+0 where offered and enabled | Exchange-set | Wrong obligation expectations |
+| `finix.exch.nse.cm.t0_enabled_scrips` | Per the applicable list, if offered | Exchange-set | Offering T+0 where not eligible |
+| `finix.exch.nse.cm.trade_for_trade_blocks_intraday` | **True** | Exchange-set | Intraday in a delivery-only scrip |
+| `finix.exch.nse.cm.call_auction_squareoff_handling` | Defined | Discretionary | Square-off retrying into a call auction |
+| `finix.exch.nse.cm.band_revision_apply` | **Immediately on receipt** | Exchange-set | Validation against a superseded band |
+| `finix.exch.nse.cm.freeze_state` | Distinct, pending | Exchange-set | Client acts on a wrong assumption |
+| `finix.exch.nse.cm.negotiated_validity` | **Day only** | Exchange-set | Rejected orders |
+| `finix.exch.nse.cm.aon_mf_block` | True | Exchange-set | Obscure rejections |
+| `finix.exch.nse.cm.early_payin_recognition_assert` | True | Discretionary | Benefit assumed but not received |
+| `finix.exch.nse.cm.expected_files` | Explicit list | Exchange-set | A missing file unnoticed |
+
+## 11. Exception paths
+
+| Situation | Response |
+|---|---|
+| After-market queue not released at 09:00 | Named incident; clients told promptly |
+| Band revised intraday and not applied | Staleness incident; block orders outside the last-known band |
+| Scrip enters trade-for-trade with open intraday positions | The positions must be delivered; communicate immediately |
+| Periodic call auction scrip needs square-off | The engine must handle the mechanism; do not retry continuously |
+| Freeze pending at session end | Resolve with the exchange; do not leave margin blocked indefinitely |
+| Final obligation not received on T+1 | **Escalate.** Obligations cannot be estimated |
+| Short delivery | The auction path; allocate per policy; communicate |
+| Day-order cancellation not reflected | Reconcile against the exchange before end-of-day processing |
+| New listing with variant call-auction rules | Handle the variant; do not assume the standard rules |
+| T+0 and T+1 obligations for the same client on the same day | Model both; the client's view must make the distinction clear |
+
+## Practical notes
+
+- **Explain pre-open pricing in the interface.** It is the single most common "why did my order fill there" question.
+- **Verify the after-market release, do not assume it.** It is the first client-visible event of the day.
+- **Apply band revisions on receipt.** A logged revision is an unapplied control.
+- **Make the product treatment scrip-aware.** Intraday in a trade-for-trade scrip is a defect the client discovers at settlement.
+- **Model the auction market as operations.** Treating it as a client facility produces confusion in both directions.
+- **Assert early pay-in recognition.** The margin benefit was assumed in the day's computation.
+- **Treat the final obligation's T+1 arrival as the real start of settlement work.** The label understates the compression.
+
+## Where this connects
+
+- [NSE derivatives](/broking-kyc/finix-broking-setup/exchanges/02-nse-fno/) — the other NSE segment
+- [Sessions and calendars](/broking-kyc/finix-broking-setup/exchanges/06-sessions-calendars/) — the session state machine
+- [Bands, halts and surveillance](/broking-kyc/finix-broking-setup/exchanges/07-bands-halts-surveillance/) — the treatments
+- [File formats and downloads](/broking-kyc/finix-broking-setup/exchanges/08-file-formats-downloads/) — the file reference
+- [Pre-open and closing auction](/broking-kyc/deep-dives/foundational/pre-open-closing-auction/) — auction mechanics in depth
+- [T+0 and T+1 settlement](/broking-kyc/deep-dives/settlement/t0-t1-settlement/) — the settlement regime
+- [Settlement obligations](/broking-kyc/finix-broking-setup/backoffice/05-settlement-obligations/) — the firm-side processing

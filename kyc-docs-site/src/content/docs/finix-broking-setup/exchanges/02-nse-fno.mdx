@@ -1,0 +1,203 @@
+---
+title: "Exchange 2: NSE equity derivatives"
+description: Operating the NSE futures and options segment — the single weekly expiry on Tuesday, contract sizes after the November 2024 lot revision, Limit Price Protection with its published ranges, ban periods on fresh positions, position and open-interest limits, physical settlement of stock derivatives, spread and multileg entry, and the expiry-week margin ladder.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** The derivatives segment changed more between 2024 and 2026 than any other part of the Indian market — contract sizes rose, weekly expiries were reduced to one per exchange and assigned to fixed days, and an additional price-protection layer was added. An implementation built on pre-2024 assumptions is wrong in several places at once. So the page leads with what changed and when, then the mechanisms that are specific to this segment and most likely to be mis-implemented: Limit Price Protection, ban periods, position limits, and the physical-settlement ladder that starts before expiry day.
+
+## TL;DR
+
+- **One weekly index expiry per exchange, on a fixed day.** SEBI's circular of 26 May 2025 required exchanges to offer only one weekly benchmark index contract expiring on a **Tuesday or a Thursday**, with the choice to be submitted by 15 June 2025. From **1 September 2025, NSE's expiry day is Tuesday** and BSE's is Thursday. `[not yet in index]`
+- **Contract sizes rose in November 2024.** The minimum notional value of equity index derivatives contracts was raised to approximately **₹15 lakh**, implemented through revised lot sizes — Nifty 50 from 25 to 75, Bank Nifty from 15 to 30, Financial Services from 25 to 65, Midcap Select from 50 to 120.
+- **Limit Price Protection is a second price gate, introduced 31 October 2022**, over and above the operating price range, with **dynamic** ranges on both sides of a reference price. Published ranges: index and stock options with a reference price at or below ₹50, ±₹20 absolute, above ₹50, ±40 percent; index futures at or below ₹10,000, ±₹200 absolute, above ₹10,000, ±2 percent; stock futures at or below ₹50, ±₹1.50 absolute, above ₹50, ±3 percent.
+- **Stop-loss market orders were discontinued for index and stock options from 27 September 2021** per circular NSE/FAOP/49677, following freak-trade incidents.
+- **Market-priced multileg orders were discontinued** — such orders are rejected by the exchange. Limit-priced multileg remains available.
+- **A ban period restricts fresh positions, not position reduction.** Implementing it as a blanket block prevents clients from exiting, which is the opposite of the intent.
+- **Single-stock derivatives settle physically**, with delivery margins building across the last sessions of expiry week rather than appearing on expiry day.
+
+<Aside type="caution" title="This segment's parameters change often — re-verify before relying on any figure">
+Expiry days, lot sizes, Limit Price Protection ranges, ban-period thresholds and position limits are all circular-driven and several of them changed between 2024 and 2026. The figures on this page carry their source and date precisely so that re-verification is quick. Treat every number here as a starting point for a check against the current circular, not as a configuration value to copy.
+</Aside>
+
+## 1. Framework
+
+- **SEBI circular, 26 May 2025** — one weekly benchmark index contract per exchange, expiring Tuesday or Thursday; exchanges to finalise and submit the chosen day by 15 June 2025. Standardisation effective **1 September 2025**: **Tuesday for NSE**, Thursday for BSE. `[not yet in index]`
+- **SEBI measures of October 2024 on index derivatives** — raising the minimum notional contract value to approximately ₹15 lakh, implemented through revised lot sizes from November 2024, among other measures. `[not yet in index]`
+- **NSE Limit Price Protection** — introduced **31 October 2022** in the futures and options segment as an additional validation over and above the operating price range, based on both sides of a reference price, with dynamic ranges; incoming limit orders beyond the range are automatically rejected. `[not yet in index]`
+- **NSE/FAOP/49677** — discontinuation of stop-loss market orders for index and stock options with effect from **27 September 2021**. `[not yet in index]`
+- **Multileg orders** — those with a market price condition for all futures and option contracts discontinued; such market orders are rejected by the exchange. Limit-priced multileg orders remain available. Spread, two-leg and three-leg order entry rules and structures are defined in the segment protocol. `[not yet in index]`
+- **Physical settlement of single-stock derivatives** — mandated by SEBI/HO/MRD/DOPI/CIR/P/2018/161 (31 December 2018), phased across the April, July and October 2019 expiries. `[not yet in index]`
+- **Delivery margin staging** — NSE Clearing stages the computed delivery margin across the last sessions of expiry week per NCL/CMPT/43262 (17 January 2020). `[not yet in index]`
+- **[NCL/CMPT/55330](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt55330)** (20 January 2023) as updated by **[NCL/CMPT/56167](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt56167)** (28 March 2023) — netting of derivatives delivery obligations against cash-segment obligations for the same clearing member, trading member and unique client code.
+- **[NCL/CMPT/62978](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt62978)** (18 July 2024) — cross-margin for offsetting positions with different expiry dates.
+- Depth: [exercise, assignment and physical settlement](/broking-kyc/trading-risk/exercise-assignment-physical/), [expiry day operations](/broking-kyc/trading-risk/expiry-day-operations/), [position limits and open interest](/broking-kyc/trading-risk/position-limits-oi/), [RMS SPAN methodology](/broking-kyc/deep-dives/trading-day/rms-span-methodology/).
+
+## 2. Contracts and expiry
+
+| Element | Detail |
+|---|---|
+| **Weekly index expiry** | **One per exchange**; NSE's day is **Tuesday** from 1 September 2025 |
+| Monthly expiries | Index and single-stock, per the contract specification |
+| Longer-dated | Per the contract specification |
+| **Minimum notional contract value** | Approximately **₹15 lakh**, from the November 2024 lot revision |
+| Lot sizes after revision | Nifty 50 **75**; Bank Nifty **30**; Financial Services **65**; Midcap Select **120** |
+| Lot size changes | By circular; the instrument master is the source |
+| Expiry-day behaviour | See [expiry day operations](/broking-kyc/trading-risk/expiry-day-operations/) |
+| Expiry acceleration | A corporate action adjustment can accelerate an expiry |
+
+| Broker consequence | Detail |
+|---|---|
+| A single weekly expiry concentrates activity | Capacity planning, staffing and client communication all concentrate on one day per week |
+| Larger contract sizes raise the per-trade margin | Client suitability and limit configuration both shift |
+| The NSE and BSE expiry days differ | Two concentration days a week for a member of both |
+
+## 3. Limit Price Protection
+
+| Element | Detail |
+|---|---|
+| Introduced | **31 October 2022**, futures and options segment |
+| Purpose | Strengthen pre-trade risk controls to prevent aberrant orders and ensure orderly trading |
+| Mechanism | An **additional** validation over and above the operating price range, based on both sides of a reference price, validating the price of **limit** orders |
+| Rejection | Buy orders priced above the high limit and sell orders below the low limit are **automatically rejected by the exchange** |
+| **Dynamic** | The range may change through the day based on market activity |
+
+| Instrument class | Reference price | Range |
+|---|---|---|
+| Index and stock options | ≤ ₹50 | **±₹20** absolute |
+| Index and stock options | > ₹50 | **±40 percent** |
+| Index futures | ≤ ₹10,000 | **±₹200** absolute |
+| Index futures | > ₹10,000 | **±2 percent** |
+| Stock futures | ≤ ₹50 | **±₹1.50** absolute |
+| Stock futures | > ₹50 | **±3 percent** |
+
+| Implementation requirement | Detail |
+|---|---|
+| Display where available | Show the applicable range in the ticket so a rejection is explicable |
+| Re-validate at submission | The range moves while the client types |
+| Distinct client message | Separate from an operating-range rejection; they have different causes |
+| Do not substitute | A broker collar is a third layer, not a replacement for either exchange gate |
+
+## 4. Ban periods
+
+| Element | Detail |
+|---|---|
+| Trigger | Open interest in an underlying crossing the market-wide position limit threshold |
+| Effect | **Fresh positions blocked; position reduction remains permitted** |
+| Source | Published daily, pre-open, and revised |
+| Scope | All derivatives contracts on the affected underlying |
+| Exit | When open interest falls below the threshold |
+| Penalty | Breaching the restriction attracts a penalty |
+
+| Implementation requirement | Detail |
+|---|---|
+| **Fresh-position-only block** | A blanket block prevents clients from exiting, which is both wrong and harmful |
+| Direction logic | Determining whether an order increases or reduces a position requires the current position, so this check sits after position evaluation |
+| Square-off | **Must still work in a banned underlying** — reduction is permitted |
+| Client message | Specific: "fresh positions are not permitted; you may reduce your existing position" |
+| Begin-of-day gate | The list must be current-day; see [BOD runbook](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/) |
+
+## 5. Position and open-interest limits
+
+| Level | Detail |
+|---|---|
+| Client level | Per underlying, per the published limits |
+| **Trading member level** | Aggregate across clients |
+| Market-wide | Drives the ban period |
+| Monitoring | Continuous; approaching a limit is a risk event requiring a decision |
+| Breach | Penalised; the firm must prevent rather than detect |
+| Hedge and offset recognition | Only where the clearing corporation recognises it |
+
+Detail at [position limits and open interest](/broking-kyc/trading-risk/position-limits-oi/).
+
+## 6. Margin
+
+| Component | Detail |
+|---|---|
+| Upfront | **Span-based initial margin plus extreme loss margin** |
+| Exposure margin | Additional layer |
+| Mark-to-market | As the market moves; non-upfront margins due by settlement day following the April 2025 revision |
+| **Delivery margins** | **Staged across the last sessions of expiry week**, not on expiry day |
+| Additional, special and surveillance margins | By circular, sometimes intraday |
+| Cross-margin | Spread benefits for recognised offsetting positions, including across different expiry dates since July 2024 |
+| **Expiry withdraws the spread benefit on the expiring leg** | Index contracts from 1 February 2025; single stocks per the February 2026 instruction, effective three months from issue |
+
+Detail at [margin engine](/broking-kyc/finix-broking-setup/rms/02-margin-engine/) and [collateral and cross-margin](/broking-kyc/trading-risk/collateral-cross-margin/).
+
+## 7. Physical settlement of single-stock derivatives
+
+| Element | Detail |
+|---|---|
+| Scope | Single-stock futures and options settle by **delivery of shares**; index derivatives are unaffected |
+| Direction | A long future and an exercised long call **receive**; a short future, an assigned short call and an exercised long put **deliver**; an out-of-the-money option produces no delivery |
+| Delivery margins | Build across the last sessions of expiry week |
+| **Netting** | Derivatives delivery obligations net against cash-segment obligations for the same clearing member, trading member and unique client code; securities tax and stamp duty remain segment-wise |
+| **A failed square-off is not an exit** | If illiquidity or a price band blocks the closing trade, the residual quantity stays in the delivery queue |
+| Corporate actions | Can accelerate an expiry and change the obligation |
+| Client communication | Must begin well before expiry week |
+
+## 8. Order behaviour specific to this segment
+
+| Behaviour | Detail |
+|---|---|
+| **Stop-loss market discontinued for options** | From 27 September 2021; stop-loss limit is the supported instruction |
+| **Market-priced multileg discontinued** | Rejected by the exchange; block on the broker side so the client gets an intelligible message |
+| Limit-priced multileg available | Spread, two-leg and three-leg entry per the protocol |
+| Spread margin treatment | Where the clearing corporation recognises the combination |
+| **Partial multileg execution** | One leg filled is an outright position with a different margin and risk profile |
+| Freeze thresholds | Quantity and value freezes apply; tranche below them |
+| Option premium collection | Upfront collection applies |
+
+## 9. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.exch.nse.fo.weekly_expiry_day` | **Tuesday**, per the September 2025 standardisation | Exchange-set | Wrong expiry handling and client communication |
+| `finix.exch.nse.fo.lot_size_source` | Current-day instrument master | Exchange-set | Rejections on quantity multiples |
+| `finix.exch.nse.fo.lpp_enabled` | True, with ranges from the current circular | Exchange-set | Unexplainable rejections |
+| `finix.exch.nse.fo.lpp_display` | In the ticket where available | Discretionary | Client confusion |
+| `finix.exch.nse.fo.slm_enabled` | **False** | Exchange-set | Offering a discontinued type |
+| `finix.exch.nse.fo.multileg_market_block` | **True** | Exchange-set | Exchange rejection the client cannot interpret |
+| `finix.exch.nse.fo.ban_period_fresh_only` | **True** | Exchange-set | Clients unable to exit |
+| `finix.exch.nse.fo.ban_list_assert_date` | Current day, hard gate | Exchange-set | Fresh positions in a banned underlying |
+| `finix.exch.nse.fo.squareoff_allowed_in_ban` | **True** | Exchange-set | Square-off blocked when reduction is permitted |
+| `finix.exch.nse.fo.oi_limit_source` | Published, refreshed daily | Exchange-set | Position-limit breach |
+| `finix.exch.nse.fo.delivery_margin_notice_days` | Before the ladder starts | Discretionary | Client surprise in expiry week |
+| `finix.exch.nse.fo.physical_settlement_notice` | Well before expiry week | Discretionary | Unexpected delivery obligations |
+| `finix.exch.nse.fo.expiry_concentration_capacity` | Sized for the weekly expiry peak | Discretionary | Capacity failure on the busiest day |
+
+## 10. Exception paths
+
+| Situation | Response |
+|---|---|
+| Limit Price Protection rejects an order inside the operating range | Correct exchange behaviour; explain the mechanism |
+| Underlying enters the ban period intraday | Block fresh positions; **continue to permit reduction**; communicate |
+| Client holds a position in a banned underlying and wants to exit | **Permitted.** If the system blocks it, that is the defect |
+| Position limit approached at member level | Risk event requiring a decision about which flow continues |
+| Square-off blocked by a price band in expiry week | Escalate; the residual stays in the delivery queue |
+| Client unaware their option position creates a delivery obligation | The pre-expiry communication is the preventive control; review its timing and content |
+| Corporate action accelerates an expiry | Prominent, immediate client communication; review delivery consequences |
+| Multileg order fills one leg only | The client now holds an outright position; margin changes; inform them |
+| Lot size changes by circular | Instrument master refresh; re-validate resting broker-held intent |
+| Expiry-day capacity strain | Expected and predictable; the capacity plan should already cover it |
+
+## Practical notes
+
+- **Re-verify every figure on this page against the current circular.** This segment's parameters move.
+- **Implement ban periods as fresh-position-only.** A blanket block harms the clients it is meant to protect.
+- **Show the Limit Price Protection range in the ticket.** It converts a mysterious rejection into an obvious one.
+- **Communicate physical settlement well before expiry week.** The delivery obligation is the single biggest client surprise in this segment.
+- **Plan capacity around the weekly expiry day.** One day a week now carries the concentration two or more used to.
+- **Block market-priced multileg on the broker side.** An exchange rejection tells the client nothing they can act on.
+- **Test square-off in a banned underlying.** It must work, and the test is cheap.
+
+## Where this connects
+
+- [NSE cash](/broking-kyc/finix-broking-setup/exchanges/01-nse-cash/) — the other NSE segment
+- [Order types catalogue](/broking-kyc/finix-broking-setup/oms/04-order-types-catalogue/) — what is available here
+- [Order attributes and validity](/broking-kyc/finix-broking-setup/oms/05-order-attributes-validity/) — Limit Price Protection in the attribute context
+- [Expiry day operations](/broking-kyc/trading-risk/expiry-day-operations/) and [exercise, assignment and physical settlement](/broking-kyc/trading-risk/exercise-assignment-physical/) — depth
+- [Position limits and open interest](/broking-kyc/trading-risk/position-limits-oi/) — the limit framework
+- [Collateral and cross-margin](/broking-kyc/trading-risk/collateral-cross-margin/) — spread benefits
+- [Expiry operations](/broking-kyc/finix-broking-setup/daily-ops/08-expiry-ops/) — the operated runbook

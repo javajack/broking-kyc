@@ -1,0 +1,229 @@
+---
+title: "Exchange 7: bands, halts and surveillance measures"
+description: The exchange-side restriction mechanisms a broker must apply and explain — operating price ranges and their intraday revisions, Limit Price Protection, quantity and value freezes, market-wide circuit breakers, instrument-level halts, surveillance measure frameworks, ban periods, and the behaviour each demands from the order path.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** These mechanisms are all the exchange restricting something, and from the broker's side they look similar and behave very differently. A band rejects an order; a freeze holds it pending; a halt stops everything in scope; a surveillance measure changes the terms on which an instrument trades; a ban period restricts one direction of activity only. Conflating them produces wrong client messages and, in the ban-period case, actively harmful behaviour. So the page takes each mechanism in turn with the behaviour it demands, then pulls them together into the application rules and the client-messaging map.
+
+## TL;DR
+
+- **Five distinct mechanisms, five distinct behaviours**: price bands reject, freezes hold pending, halts stop, surveillance measures change terms, and ban periods restrict fresh positions only.
+- **Price band revisions can arrive intraday and must be applied, not logged.** An unapplied revision means orders validated against a superseded range.
+- **Limit Price Protection is a second, dynamic gate in NSE derivatives**, over and above the operating price range, introduced 31 October 2022. An order can be inside the band and rejected by LPP.
+- **A freeze is neither live nor rejected.** It is pending exchange approval, and representing it as either produces wrong client behaviour and wrong risk numbers.
+- **A ban period restricts fresh positions; reduction remains permitted.** A blanket block prevents clients from exiting, which is the opposite of the intent and the single most harmful implementation error on this page.
+- **Surveillance measures change what a client can do**, not just what they pay — additional margin, reduced bands, trade-for-trade, periodic call auction, or restricted trading.
+- **Apply the most restrictive known treatment when a list is stale.** Fail closed, scoped to the affected instruments.
+- **Halts resume through a pre-open**, so the resumption is not simply the previous state returning.
+
+## Conceptual overview
+
+Exchange restrictions exist because markets occasionally produce prices that nobody intends. A fat-finger order, a liquidity vacuum, an information shock or a manipulation attempt can all move a price to a level that would cause real harm if trades executed there. The mechanisms on this page are layered responses to that: bands bound where orders may be priced, freezes catch orders that are large enough to need a second look, halts stop a market that has moved too far too fast, and surveillance measures change the trading terms of instruments that show warning signs. Each targets a different failure, which is why they behave differently.
+
+From the broker's side the common requirement is the same for all of them: the restriction must be applied as it changes, not as of some earlier snapshot, and the client must receive a message that explains what happened in terms they can act on. Both are harder than they look. Applying means the system changes behaviour, not that a file was ingested — a band revision that is parsed and not applied is indistinguishable from one that was never received. And explaining means mapping an exchange restriction to language, which is work that has to be done once, carefully, rather than improvised in an error handler.
+
+The ban period deserves separate emphasis because it is the one mechanism where a naive implementation causes direct client harm. The restriction is on creating fresh positions in derivatives on the affected underlying; reducing an existing position remains permitted precisely so that clients are not trapped. An implementation that blocks all orders in the underlying leaves clients unable to exit a position whose risk is rising, which is both wrong and the opposite of what the restriction is for.
+
+## 1. Framework
+
+- **Operating price ranges** — exchange-set, per instrument, revisable intraday. `[not yet in index]`
+- **NSE Limit Price Protection** — introduced **31 October 2022** in the futures and options segment; an additional validation over and above the operating price range, based on both sides of a reference price; **dynamic**; incoming limit orders beyond the range are automatically rejected. Published ranges are set out in [NSE derivatives](/broking-kyc/finix-broking-setup/exchanges/02-nse-fno/#3-limit-price-protection). `[not yet in index]`
+- **Quantity and value freezes** — exchange-set thresholds above which an order is held pending exchange approval. `[not yet in index]`
+- **Market-wide circuit breakers** — index-based halts at prescribed thresholds, with resumption rules. `[not yet in index]`
+- **Surveillance measure frameworks** — graded surveillance, additional surveillance and related measures; see [surveillance norms](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/).
+- **Ban period** — derivatives restriction when open interest in an underlying crosses the market-wide position limit threshold; **fresh positions blocked, reduction permitted**. See [position limits and open interest](/broking-kyc/trading-risk/position-limits-oi/).
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — Chapter III general obligations; the firm must operate within exchange restrictions. `[not yet in index]`
+- Depth: [market manipulation typologies](/broking-kyc/deep-dives/foundational/market-manipulation-typologies/) for what these mechanisms respond to.
+
+## 2. Price bands
+
+| Element | Detail |
+|---|---|
+| Nature | An operating range around a reference price within which orders are accepted |
+| Scope | Per instrument |
+| **Revision** | Daily, **and intraday** |
+| Delivery | On the market-data path, as control messages |
+| **Required behaviour** | **Apply on receipt.** A parsed-but-unapplied revision is a silent failure |
+| Rejection | Orders outside the last-known band rejected, with a message naming the range |
+| Staleness | A missed revision is a staleness incident; reject outside the last-known band and alert |
+| Client message | "The price is outside the exchange's permitted range for this security right now (currently A to B)" |
+
+## 3. Limit Price Protection
+
+| Element | Detail |
+|---|---|
+| Where | NSE futures and options |
+| Relationship to bands | **Additional**, over and above the operating price range |
+| Basis | Both sides of a reference price |
+| **Dynamic** | The range may change through the day with market activity |
+| Effect | Buy above the high limit and sell below the low limit **automatically rejected by the exchange** |
+| Ranges | Instrument-class specific; see [NSE derivatives](/broking-kyc/finix-broking-setup/exchanges/02-nse-fno/#3-limit-price-protection) |
+| Client message | Distinct from a band rejection: "The exchange rejected this price as too far from the current market" |
+| Display | Show the applicable range in the ticket where available |
+
+<Aside type="note" title="Three gates, three messages">
+A derivatives limit order can be rejected by the broker's own collar, by the operating price range, or by Limit Price Protection. They have different bases and different dynamics, and a client who receives the same message for all three cannot act on it. Map each to a distinct, specific message, and count broker-collar rejections separately from exchange rejections so that a collar that is too tight shows up as a tuning problem rather than as client behaviour.
+</Aside>
+
+## 4. Quantity and value freezes
+
+| Element | Detail |
+|---|---|
+| Trigger | Order quantity or value above the exchange's freeze threshold for the instrument |
+| **State** | **Neither live nor rejected** — pending exchange approval |
+| Margin | **Keep blocked** while pending; the order may become live |
+| Client representation | A distinct state with a distinct explanation |
+| Outcome | Approval makes it live; rejection makes it terminal |
+| Timing | Exchange-side, with its own timing; no guaranteed time can be given |
+| Prevention | Validate against known thresholds before submission so large orders are flagged, or tranched |
+| Operations | Monitored by dealing; **aged freezes escalated** |
+
+## 5. Halts
+
+| Type | Scope | Behaviour |
+|---|---|---|
+| **Market-wide circuit breaker** | The whole market, at prescribed index thresholds | Trading stops for a prescribed period |
+| Instrument-level halt | One instrument | Trading stops in that instrument |
+| Surveillance halt | One instrument | Per the measure |
+| Technical halt | Exchange-initiated | Per the exchange's communication |
+
+| Required behaviour | Detail |
+|---|---|
+| **Driven by the exchange's market-state message** | Not by a local clock or a price threshold the firm computes |
+| Order acceptance | Stops in scope |
+| Resting orders | Per the halt's rules |
+| **Resumption** | Often **preceded by a pre-open**; resumption is not simply the previous state returning |
+| Square-off | **Cannot execute during a halt**; the engine must stop attempting and escalate |
+| Client communication | Prompt, specific, and with what happens next |
+| Risk consequence | Positions cannot be exited while the exposure continues to exist |
+
+## 6. Surveillance measures
+
+| Measure type | Typical effect | Broker consequence |
+|---|---|---|
+| Additional margin | Higher requirement | Recompute; communicate before the margin call |
+| Reduced price band | Narrower operating range | Apply; more rejections |
+| **Trade-for-trade** | Compulsory delivery, **no intraday** | Product treatment must be scrip-aware |
+| **Periodic call auction** | No continuous trading | **Square-off logic must handle it** |
+| Restricted trading | Limits on participation | Apply per the measure |
+| Transfer to a different framework | Combination of the above | Apply the full set |
+| Exit from a measure | Restrictions lift | Apply promptly; a client restricted after the measure lifted is a complaint |
+
+| Control | Detail |
+|---|---|
+| List ingestion | Pre-open and on periodic revision |
+| **Staleness behaviour** | **Apply the most restrictive known treatment** |
+| Membership diff | Additions alerted; a newly added scrip is where the restriction is not yet applied |
+| Client communication | Before the client discovers it in a rejection |
+| Collateral effect | A measure can change eligibility or haircut; see [collateral and pledge](/broking-kyc/finix-broking-setup/rms/05-collateral-pledge/) |
+
+## 7. Ban periods
+
+| Element | Detail |
+|---|---|
+| Trigger | Open interest in an underlying crossing the market-wide position limit threshold |
+| **Restriction** | **Fresh positions blocked** |
+| **Permitted** | **Position reduction** |
+| Scope | All derivatives contracts on the affected underlying |
+| Source | Published daily pre-open, and revised |
+| Exit | When open interest falls below the threshold |
+| Penalty | Breaching the restriction is penalised |
+
+| Implementation requirement | Detail |
+|---|---|
+| **Fresh-position-only** | Determining whether an order increases or reduces requires the current position, so this check follows position evaluation in the [ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/) |
+| **Square-off must work** | Reduction is permitted; a blocked square-off in a banned underlying is a defect |
+| Client message | "Fresh positions are not permitted in this underlying. You may reduce your existing position." |
+| Begin-of-day gate | Current-day list, asserted |
+| Intraday entry | An underlying can enter the ban period during the session; apply immediately and communicate |
+
+<Aside type="caution" title="The blanket block is the harmful error">
+Implementing a ban period as "no orders in this underlying" is simpler, looks safer, and traps clients in positions they are trying to exit — in an underlying that is, by definition, at an elevated open-interest level. It is the single most harmful implementation error described anywhere in this manual, because the harm falls on clients at exactly the moment they are trying to reduce risk. Test it explicitly: place a reducing order in a banned underlying and confirm it is accepted.
+</Aside>
+
+## 8. Application rules
+
+| Rule | Detail |
+|---|---|
+| **Apply, do not log** | A parsed restriction that does not change behaviour is not applied |
+| **Most restrictive on staleness** | When a list is stale, apply the strictest known treatment, scoped to the affected instruments |
+| Scope narrowly | A stale surveillance list affects those instruments, not the market |
+| Intraday application | Band revisions, surveillance changes and ban-period entries can all arrive during the session |
+| Resting broker-held intent | Good Till Triggered instructions and after-market orders in affected instruments must be reviewed |
+| Collateral | Restrictions can change eligibility and haircut |
+| Square-off | Must respect every restriction; the engine's orders are ordinary orders |
+| Communication | Proactive where the client is affected, not only at the point of rejection |
+
+## 9. Client messaging map
+
+| Mechanism | Message shape |
+|---|---|
+| Outside the operating price range | "The price is outside the exchange's permitted range for this security right now (currently A to B)." |
+| Limit Price Protection | "The exchange rejected this price as too far from the current market. Try a price closer to the last traded price." |
+| Broker collar | "This price is far from the last traded price. Confirm, or adjust." |
+| **Freeze** | "This order is above the exchange's threshold and is awaiting exchange approval." |
+| Market halt | "Trading is halted in this market. We will update you when it resumes." |
+| Instrument halt | "Trading in this security is halted." |
+| Trade-for-trade | "This security is in trade-for-trade; intraday is not available and delivery is compulsory." |
+| Periodic call auction | "This security trades in a periodic call auction, not continuously." |
+| Additional surveillance margin | "A higher margin applies to this security under an exchange surveillance measure." |
+| **Ban period** | "Fresh positions are not permitted in this underlying. **You may reduce your existing position.**" |
+| Suspension | "Trading in this security is suspended." |
+
+## 10. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.exch.band.apply_on_receipt` | **True** | Exchange-set | Validation against a superseded range |
+| `finix.exch.band.stale_action` | Reject outside the last known band, and alert | Discretionary, strongly recommended | Orders accepted outside the real range |
+| `finix.exch.lpp.display` | In the ticket where available | Discretionary | Unexplainable rejections |
+| `finix.exch.freeze.state_distinct` | True | Exchange-set | Client acts on a wrong assumption |
+| `finix.exch.freeze.margin_hold` | Hold | Discretionary, strongly recommended | Margin released on an order that may live |
+| `finix.exch.freeze.age_alarm` | Set | Discretionary | Freezes forgotten at session end |
+| `finix.exch.halt.state_source` | **Exchange market-state message** | Exchange-set | Trading through a halt |
+| `finix.exch.halt.squareoff_behaviour` | **Stop attempting; escalate** | Discretionary, strongly recommended | A retry loop into a halted market |
+| `finix.exch.surv.list_assert_date` | Current day | Exchange-set | Restrictions not applied |
+| `finix.exch.surv.stale_action` | **Most restrictive known treatment** | Discretionary, strongly recommended | Trading on an unrestricted basis |
+| `finix.exch.surv.addition_alert` | On list additions | Discretionary | A newly restricted scrip unhandled |
+| `finix.exch.ban.fresh_only` | **True** | Exchange-set | **Clients trapped in positions** |
+| `finix.exch.ban.squareoff_allowed` | **True** | Exchange-set | Square-off blocked where reduction is permitted |
+| `finix.exch.ban.list_assert_date` | Current day, hard gate | Exchange-set | Fresh positions in a banned underlying |
+| `finix.exch.restriction.resting_intent_review` | On any restriction change | Discretionary, strongly recommended | A trigger firing into a restricted instrument |
+
+## 11. Exception paths
+
+| Situation | Response |
+|---|---|
+| Band revision received and not applied | Staleness incident; reject outside the last-known band; investigate the application path |
+| Order rejected by Limit Price Protection inside the band | Correct behaviour; explain the mechanism |
+| Freeze pending at session end | Resolve with the exchange; release the margin block appropriately |
+| Market halt during a square-off | Stop attempting; escalate; the exposure persists and must be managed otherwise |
+| Resumption after a halt | Often preceded by a pre-open; the state machine must handle it |
+| Surveillance measure applied to a held instrument | Recompute margin and collateral; communicate before the margin call |
+| **Reducing order blocked in a banned underlying** | **Defect.** Fix immediately; clients are being trapped |
+| Underlying enters the ban period intraday | Apply immediately; communicate; reduction continues |
+| Trade-for-trade applied with open intraday positions | The positions must be delivered; communicate immediately |
+| Periodic call auction scrip requires square-off | Handle the mechanism; do not retry continuously |
+| Restriction lifts and the firm continues to restrict | Apply promptly; a stale restriction is a client complaint |
+
+## Practical notes
+
+- **Test the reducing order in a banned underlying.** It is a one-line test for the most harmful error on this page.
+- **Apply band revisions on receipt and alert if the applied count diverges from the received count.** Logging is not applying.
+- **Give the freeze state its own words.** Clients handle "awaiting exchange approval" well and silence badly.
+- **Make square-off stop on a halt and escalate.** A retry loop into a halted market generates noise and no exits.
+- **Apply the most restrictive known treatment on a stale list, scoped to the instruments.** Fail closed, fail narrowly.
+- **Review resting broker-held intent on every restriction change.** A Good Till Triggered instruction can fire into a restricted instrument.
+- **Communicate restrictions before clients meet them in a rejection.** The proactive message costs one notification and prevents a support contact and a complaint.
+
+## Where this connects
+
+- [NSE cash](/broking-kyc/finix-broking-setup/exchanges/01-nse-cash/) and [NSE derivatives](/broking-kyc/finix-broking-setup/exchanges/02-nse-fno/) — where these mechanisms apply
+- [Sessions and calendars](/broking-kyc/finix-broking-setup/exchanges/06-sessions-calendars/) — halts and resumption in the state machine
+- [Pre-trade check ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/) — groups D and E
+- [Square-off engine](/broking-kyc/finix-broking-setup/rms/06-squareoff-engine/) — the constraints that block an exit
+- [Surveillance norms](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/) — the measure frameworks in depth
+- [Position limits and open interest](/broking-kyc/trading-risk/position-limits-oi/) — the ban-period trigger
+- [Order attributes and validity](/broking-kyc/finix-broking-setup/oms/05-order-attributes-validity/) — price conditions

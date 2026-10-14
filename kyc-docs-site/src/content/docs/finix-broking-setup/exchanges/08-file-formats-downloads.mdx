@@ -1,0 +1,216 @@
+---
+title: "Exchange 8: file formats and downloads"
+description: The complete file inventory the daily runbooks assert against — what arrives from each exchange, clearing corporation and depository, when, through which channel, who consumes it, what blocks if it is missing, and the ingestion contract every file needs.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** A broking operation runs on files. Almost every step in the begin-of-day and end-of-day runbooks is "retrieve a file, assert it, apply it", and almost every silent failure in the stack is a file that did not arrive, arrived stale, or was applied without being asserted. So this page is an inventory organised by what consumes the file and what blocks without it, followed by the ingestion contract that every file needs regardless of source. It is the reference the [BOD](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/) and [EOD](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/) runbooks assert against.
+
+## TL;DR
+
+- **The expected-file checklist is the control.** A missing file is an incident, not an absence, and the only way to know it is missing is to have listed what was expected.
+- **Three exchanges and three clearing corporations means three checklists**, with different names, timings and channels.
+- **NSE Clearing delivers reports in comma-separated format to the member's Reports folder on the Extranet**, covering trades, obligations, deliveries, auctions, corporate actions, settlements and shortages.
+- **The daily obligation report gives the day's cumulative net position; the final obligation report gives the net securities and funds obligation and is downloaded on T+1.**
+- **Assert the content, not the retrieval.** A file that downloaded successfully with eighty percent of the records returns success.
+- **Every file needs an ingestion contract**: expected arrival, staleness threshold, behaviour on staleness, version handling, idempotent re-load and a consumer list.
+- **Re-publication is normal.** Files get corrected, and a re-load must compute the difference rather than silently overwrite.
+- **The riskiest files are the ones whose absence is invisible** — a risk parameter publication that did not arrive looks exactly like a quiet market.
+
+## Conceptual overview
+
+Files are how market infrastructure talks to its members about everything that is not an order. Risk parameters, instrument definitions, restrictions, obligations, settlements, corporate actions and statements all arrive as files on a schedule, and the firm's correctness depends on consuming them completely and on time. This is unglamorous infrastructure and it is where the highest-consequence silent failures live, because a file that does not arrive produces no error — it produces a system operating on yesterday's values with complete confidence.
+
+The structural defence is the expected-file checklist. For each exchange, clearing corporation, depository and segment, the firm lists what it expects, when, and what blocks without it. Begin-of-day then asserts the list rather than reacting to failures, which converts an invisible absence into a visible gate. This is a small artefact that does more work than almost anything else in the operational design, and it is also the artefact most likely to drift as segments are added and circulars change file names.
+
+The second defence is content assertion. A download that completes is not a file that is complete. Record counts, totals, dates and, where available, independent cross-checks all have to be asserted before anything downstream consumes the data. The failure this prevents — partial processing with a successful status — is the one that reaches settlement before anybody notices.
+
+## 1. The ingestion contract
+
+Every file in this page needs all of these defined.
+
+| Attribute | Detail |
+|---|---|
+| **Expected arrival** | When the file should be available, per the published schedule |
+| Channel | Extranet, portal, SFTP, API — and the credentials for it |
+| **Content assertion** | Record count, totals, date, and any independent cross-check |
+| **Staleness threshold** | How old is too old |
+| **Behaviour on staleness** | Stop, queue, or continue — scoped as narrowly as the file's effect allows |
+| Version handling | A re-published file is a new version; **compute the difference** |
+| **Idempotent re-load** | Operators re-download under pressure; a second load must not double-apply |
+| Consumers | Which systems depend on it |
+| **Blocks** | What the firm refuses to do without it |
+| Retention | The raw file, retained on the eight-year floor |
+| Owner | A named person who gets the alert |
+
+<Aside type="caution" title="Assert the content, not the retrieval">
+The most expensive file failure is a successful download of an incomplete file. Nothing errors, the pipeline proceeds, and the shortfall appears at settlement or in a margin report. Every file in this inventory needs at least a record count asserted against an independent source — a header, a summary file, or a reconciliation against the firm's own expectation — before any downstream stage consumes it.
+</Aside>
+
+## 2. Begin-of-day files
+
+These block the open.
+
+| File | Source | When | Consumers | **Blocks if missing** |
+|---|---|---|---|---|
+| **Instrument master, lot and tick** | Exchange | Pre-open | OMS, RMS, back office | **The open, entirely** |
+| **Ban-period list** | Exchange | Pre-open | RMS | **Fresh derivatives positions in all listed underlyings** |
+| **Surveillance measure lists** | Exchange | Pre-open, periodic | RMS, back office | Apply the most restrictive known treatment |
+| **Price bands** | Exchange | Pre-open, intraday | OMS, RMS | Reject outside the last-known band |
+| **Risk parameter files, derivatives** | Clearing corporation | Pre-open and intraday | RMS | **New derivatives orders in the affected segment** |
+| Value-at-risk and extreme loss margin rates, cash | Exchange and clearing corporation | Daily | RMS | New cash orders in scope on a missed revision |
+| **Acceptable collateral and haircuts** | Clearing corporation | Daily | RMS, back office | Exclude unlisted collateral |
+| Market-wide position limit data | Exchange | Daily | RMS | Position-limit monitoring |
+| Settlement and trading calendars | Exchange, clearing corporation | Published, amendable | Everything | **Manual confirmation on a boundary day** |
+| Corporate action announcements | Exchange | On announcement | Back office, RMS | Entitlement and adjustment handling |
+
+## 3. Post-session files
+
+These block the record pipeline.
+
+| File | Source | When | Consumers | **Blocks if missing** |
+|---|---|---|---|---|
+| **Trade file** | Exchange | Post-session | Back office | **Everything downstream, including contract notes** |
+| **Daily obligation report** | Clearing corporation | Post-session | Back office | The day's position computation |
+| **Final obligation report** | Clearing corporation | **T+1** | Back office, treasury | **Settlement; obligations cannot be estimated** |
+| Delivery statements | Clearing corporation | Per settlement | Back office | Delivery instructions |
+| **Client-wise margin snapshot files** | Clearing corporation | Per snapshot | RMS | **Margin reporting cannot be reconstructed** |
+| Margin and collateral statements | Clearing corporation | Daily, intraday | RMS, treasury | Margin reconciliation |
+| **Bank summary report** | Clearing corporation | Daily | Treasury | Clearing-account reconciliation |
+| **Daily funds statement** | Clearing corporation | Daily | Treasury | The debit and credit break-up |
+| Shortage and auction reports | Clearing corporation | Per settlement | Back office | Auction cost allocation |
+| Corporate action reports | Clearing corporation | Per event | Back office | Settlement effects |
+| Penalty advices | Clearing corporation | Periodic | Risk, finance | Penalty attribution |
+
+## 4. Depository files
+
+| File | Source | When | Consumers | Blocks if missing |
+|---|---|---|---|---|
+| Holdings statement | CDSL / NSDL | Daily | Back office, RMS | Holdings reconciliation; disputed quantities not recognised as collateral |
+| Transaction statement | CDSL / NSDL | Daily | Back office | Reconciliation |
+| **Pledge position file** | CDSL / NSDL | Daily and on event | Back office, RMS | **Collateral recognition** |
+| Pledge instruction responses | CDSL / NSDL | On instruction | Back office | Pledge confirmation |
+| **CUSPA pledge confirmations** | CDSL / NSDL | At pay-out and daily | Back office | **The statutory clock; see [CUSPA](/broking-kyc/finix-broking-setup/backoffice/06-cuspa-unpaid-securities/)** |
+| Corporate action entitlements | CDSL / NSDL | Per event | Back office | Entitlement posting |
+| Account opening and modification responses | CDSL / NSDL | On submission | Onboarding | Activation |
+| Charge files | CDSL / NSDL | Per cycle | Back office | Charge billing |
+
+## 5. Money-side files
+
+| File | Source | When | Consumers | Blocks if missing |
+|---|---|---|---|---|
+| Bank statement, client nodal accounts | Bank | Daily, intraday where available | Treasury, back office | **The segregation assertion** |
+| Bank statement, clearing account | Bank | Daily | Treasury | Settlement reconciliation |
+| Gateway settlement file | Razorpay | Per settlement | Treasury | Collection reconciliation |
+| Gateway payment reports | Razorpay | Daily | Treasury | Payment reconciliation |
+| Payout statement | RazorpayX | Daily | Treasury | **Payout reconciliation and the webhook backstop** |
+| Virtual account credit reports | Razorpay | Daily, intraday where available | Treasury | Payer attribution |
+
+## 6. Channels
+
+| Source | Channel | Notes |
+|---|---|---|
+| **NSE Clearing** | Reports downloaded in **comma-separated format** to the member's **Reports folder on the Extranet** | Covering trades, obligations, deliveries, auctions, corporate actions, settlements and shortages |
+| NSE | Member portal and published downloads; **ENIT** at `enit.nseindia.com/MemberPortal/` for compliance submissions | ENIT-COMPLIANCE-NEW → Compliance → Status Report |
+| BSE and ICCL | BSE member portal and ICCL channels | A second set of names and timings |
+| MCX and MCXCCL | MCX member portal and MCXCCL channels, including **eClear** for delivery intentions | A third set |
+| CDSL and NSDL | Depository systems | Two depositories, two formats |
+| Banks | Host-to-host, API or portal | Per bank and channel |
+| Razorpay | Dashboard and API | Daily statements are the reconciliation backstop |
+
+| Control | Detail |
+|---|---|
+| Credentials | In the managed secret store; **Extranet and portal access is among the most operationally critical credential sets** |
+| Availability monitoring | A channel down at begin-of-day is a blocking incident |
+| Alternate access | Identified in advance per channel |
+| Access review | Who can retrieve, who can submit |
+
+## 7. The expected-file checklist
+
+| Property | Detail |
+|---|---|
+| Scope | Per exchange, per clearing corporation, per depository, per segment, per day type |
+| Day types | Ordinary trading day; settlement day; expiry day; commodity tender day; day after a holiday; month end |
+| Assertion | At begin-of-day and at end-of-day, as a **gate** |
+| Missing file | **An incident with an escalation path** |
+| Maintenance | Reviewed whenever a segment is added or a circular changes a file |
+| Ownership | A named owner per file |
+| Evidence | The assertion result retained |
+
+| Day type | Additional files |
+|---|---|
+| Settlement day | Final obligation, delivery statements, funds statements |
+| Expiry day | Expiry-related reports, delivery margin and physical settlement files |
+| **Commodity tender day** | Tender and delivery files; the **19:30 eClear** deadline |
+| Day after a holiday | **Multiple days of files**, including corporate actions |
+| Month end | Periodic statements and reports |
+
+## 8. Failure modes
+
+| # | Failure | Symptom | Control |
+|---|---|---|---|
+| F1 | File not published | Nothing; a quiet channel | **Expected-file checklist assertion** |
+| F2 | File published late | Pipeline delay cascading into a deadline | Expected-arrival monitoring with an alert |
+| F3 | **File incomplete** | Successful download, partial data | **Content assertion** |
+| F4 | File re-published with corrections | The firm operating on the superseded version | Version handling with a computed difference |
+| F5 | File parsed but not applied | System behaves as if the file never arrived | **Applied-state assertion, not ingestion-state** |
+| F6 | Re-load double-applies | Corrupted data | Idempotent load |
+| F7 | Format changed by circular | Parse failure, or silently wrong fields | Format version tracking; unknown-field alerts |
+| F8 | Channel unavailable | Nothing retrieved | Alternate access; escalation |
+| F9 | Credentials expired | Retrieval fails at begin-of-day | Expiry monitoring at 60, 30 and 7 days |
+| F10 | **Wrong file for the day type** | Subtly wrong processing | Day-type-aware checklist |
+
+The F5 case deserves emphasis: a file that is retrieved, parsed and stored but not applied to the running system is indistinguishable, from the system's behaviour, from a file that never arrived. Assert the **applied** state — the risk engine's parameter version, the OMS's master date — not the ingestion job's exit code.
+
+## 9. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.exch.files.expected.<source>.<segment>.<daytype>` | Explicit lists | Exchange-set | A missing file unnoticed |
+| `finix.exch.files.assertion` | **Content, not retrieval** | Discretionary, strongly recommended | Partial data processed |
+| `finix.exch.files.applied_state_assert` | **True** | Discretionary, strongly recommended | Parsed but unapplied |
+| `finix.exch.files.staleness.<file>` | Per file | Discretionary | Operating on stale values |
+| `finix.exch.files.stale_action.<file>` | Stop, queue or continue, scoped narrowly | Discretionary, strongly recommended | Over-broad or under-broad blocking |
+| `finix.exch.files.version_diff_on_republish` | True | Discretionary, strongly recommended | Superseded versions in use |
+| `finix.exch.files.idempotent_load` | Enforced | Discretionary, strongly recommended | Double application |
+| `finix.exch.files.format_version.<file>` | Tracked | Exchange-set | Silent field drift |
+| `finix.exch.files.unknown_field_alert` | True | Discretionary | Format changes undetected |
+| `finix.exch.files.raw_retention_years` | 8 | Regulatory | Short of the statutory floor |
+| `finix.exch.files.owner.<file>` | Named | Discretionary, strongly recommended | An unmonitored file |
+| `finix.exch.files.credential_expiry_alert` | 60, 30, 7 days | Discretionary, strongly recommended | Retrieval failure at begin-of-day |
+
+## 10. Exception paths
+
+| Situation | Response |
+|---|---|
+| Expected file not available at the expected time | Escalate to the source; recompute the downstream deadline position; inform compliance if a regulatory deadline is at risk |
+| Content assertion fails | **Do not proceed.** Retrieve again; escalate if genuinely incomplete |
+| File re-published after processing | Load the new version; compute the difference; assess what was produced on the old one |
+| Parsed but not applied | Treat as not received; apply, and investigate the application path |
+| Format changed without notice | Alert on unknown fields; obtain the updated specification; test before deploying |
+| Channel unavailable at begin-of-day | Alternate access; escalate; **do not open on stale inputs** |
+| Credentials expired | Emergency renewal; this is foreseeable and should be prevented |
+| Day after a long holiday | Expect multiple days of files; use the long-weekend runbook variant |
+| Commodity tender files with a 19:30 deadline | A named, present person; escalate before the deadline |
+| Operator re-downloads and re-loads | Idempotency must hold; if it does not, quantify and reverse |
+
+## Practical notes
+
+- **Maintain the expected-file checklist as a controlled artefact.** It drifts as segments are added, and it is the single most load-bearing operational document in the stack.
+- **Assert applied state, not ingestion status.** Parsed-and-not-applied is indistinguishable from never-arrived.
+- **Make day types explicit in the checklist.** Settlement, expiry, tender and post-holiday days all have additional files.
+- **Build a replay harness.** Operators re-download under pressure, and idempotency must be tested rather than claimed.
+- **Monitor the quiet channel.** A file that never arrives generates no error and changes nothing until it matters.
+- **Track credential expiry like a production dependency.** Extranet access failing at 07:30 stops begin-of-day.
+- **Keep raw files.** Re-deriving a dispute from a parsed table is unconvincing, and the retention obligation covers them.
+
+## Where this connects
+
+- [BOD runbook](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/) and [EOD runbook](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/) — where this inventory is asserted
+- [Trade import and reconciliation](/broking-kyc/finix-broking-setup/backoffice/02-trade-import-reconciliation/) — the trade file in detail
+- [Settlement obligations](/broking-kyc/finix-broking-setup/backoffice/05-settlement-obligations/) — the obligation files
+- [RMS architecture](/broking-kyc/finix-broking-setup/rms/01-rms-architecture/) — the risk input contracts
+- [Environments and configuration baseline](/broking-kyc/finix-broking-setup/stack/environments-config-baseline/#4-exchange-set-parameters-and-their-refresh-contracts) — exchange-set parameters and refresh
+- [Integration contract matrix](/broking-kyc/finix-broking-setup/stack/integration-contract-matrix/) — the interface contracts
+- [Cross-exchange difference matrix](/broking-kyc/finix-broking-setup/exchanges/05-cross-exchange-matrix/) — why there are three checklists

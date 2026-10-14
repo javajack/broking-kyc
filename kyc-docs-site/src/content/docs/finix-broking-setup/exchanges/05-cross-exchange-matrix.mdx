@@ -1,0 +1,191 @@
+---
+title: "Exchange 5: cross-exchange difference matrix"
+description: Every difference between NSE, BSE and MCX that changes an implementation — connectivity topology, identifiers, sessions, expiry days, order-type availability, price protection, settlement, clearing, collateral, files, deadlines and operating model — collected as a single matrix with the consequence of each.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page exists:** The per-exchange pages explain each market on its own terms. This one exists for the question an engineer or an operator actually asks: given that I built this for NSE, what breaks on BSE or MCX? So it is a difference matrix with a consequence column, ordered from the differences that change architecture down to the ones that change a configuration value.
+
+## TL;DR
+
+- **Three differences change architecture**: BSE's separate connection and protocol instance per segment; MCX's session running eight hours longer with physical delivery; and the second and third clearing corporations with their own files, deadlines, collateral norms and penalty streams.
+- **Two concentration days a week, not one.** NSE's weekly index expiry is **Tuesday** and BSE's is **Thursday** following the 1 September 2025 standardisation.
+- **Order-type availability is not uniform** and has been narrowing at different times on different exchanges.
+- **Price protection differs by segment, not just by exchange.** Limit Price Protection applies in NSE derivatives on top of the operating price range.
+- **Everything with a file has three versions.** Three expected-file checklists, three sets of names and timings, three ingestion jobs.
+- **Deadlines are per clearing corporation and per bank channel**, so there is no single "settlement deadline" — there is a chain per relationship.
+- **The recurring defect is assuming NSE behaviour generalises.** Verify per exchange and per segment; the assumption is what produces the surprises.
+
+## 1. Architecture-changing differences
+
+| # | Difference | NSE | BSE | MCX | Consequence |
+|---|---|---|---|---|---|
+| A1 | **Per-segment connectivity** | Shared stack, segment-enabled | **Separate connection and separate IML instance per segment** | Per MCX architecture | BSE is three integrations: provisioning, monitoring, failover, capacity, certification and runbooks, times three |
+| A2 | **Session length** | 09:00–15:40 | 09:00–15:40 | **To 23:30, or 23:55 in US daylight saving** | A second shift, a compressed maintenance window, evening escalation and vendor support |
+| A3 | **Settlement medium** | Securities | Securities | **Physical goods** | Warehouse documentation, quality grades, delivery centres — a capability, not a feature |
+| A4 | **Clearing corporation** | NSE Clearing | **Indian Clearing Corporation** | **MCX Clearing Corporation** | Three report sets, three collateral regimes, three deadline chains, three penalty streams |
+| A5 | **Delivery deadline** | Settlement-day instructions | Settlement-day instructions | **19:30 tender intention on tender days** | A named, present, authorised person on tender days |
+
+## 2. Connectivity and identifiers
+
+| # | Dimension | NSE | BSE | MCX |
+|---|---|---|---|---|
+| C1 | Access model | Computer-to-Computer Link with Non-NEAT Front End | **BOLT Plus IML** | MCX member protocol |
+| C2 | Middleware | Trading Access Point, optional | IML itself | Per architecture |
+| C3 | Transport | Wide area network over TCP/IP; interactive TCP/IP for user messages | Per IML | ISDN or other connectivity with firewalls, per published guidance |
+| C4 | Instances | Shared | **One per segment** | Per architecture |
+| C5 | Identifier format | **Twelve-digit**, created by the member | Per BSE scheme | Per MCX scheme |
+| C6 | Pre-use reporting | **Terminal details reported before routing any order** | Per BSE scheme | Per MCX scheme |
+| C7 | Identifier administration | **NSE-ENIT**, per NSE/MSD/67755 (29 April 2025) | BSE member portal | MCX member portal |
+| C8 | Protocol documents | Per segment, versioned | Per segment, versioned | Per MCX |
+| C9 | Member portal | ENIT | BSE portal | MCX portal |
+
+## 3. Sessions and calendars
+
+| # | Dimension | NSE | BSE | MCX |
+|---|---|---|---|---|
+| S1 | Pre-open | 09:00–09:15, phased: entry 09:00–09:08, matching 09:08–09:12, buffer 09:12–09:15 | Comparable | Per MCX |
+| S2 | Continuous | 09:15–15:30 | 09:15–15:30 | 09:00 to group-specific close |
+| S3 | Closing session | 15:30–15:40 | Comparable | Per MCX |
+| S4 | **Close** | 15:40 | 15:40 | **23:30 / 23:55 non-agri; 21:00 select agri; 17:00 other agri** |
+| S5 | **Daylight saving effect** | None | None | **Twice-yearly close change** |
+| S6 | After-market window | Broker-defined within exchange rules; released into the pre-open | Comparable | Per MCX |
+| S7 | Holiday calendar | Exchange-published, amendable | Exchange-published | Exchange-published; commodity calendars can differ |
+| S8 | Special sessions | Muhurat and others | Muhurat and others | **Muhurat excluded from the tender-day computation** |
+
+## 4. Products and expiry
+
+| # | Dimension | NSE | BSE | MCX |
+|---|---|---|---|---|
+| P1 | **Weekly index expiry day** | **Tuesday** | **Thursday** | Not applicable |
+| P2 | Expiry standardisation | From 1 September 2025, following SEBI's circular of 26 May 2025 | Same | — |
+| P3 | Minimum notional contract value | Approximately ₹15 lakh from the November 2024 lot revision | Comparable | Per contract |
+| P4 | Single-stock derivatives | **Physical settlement** | Per BSE | — |
+| P5 | Commodity delivery | — | — | **Staggered tender over the last three trading days including expiry** |
+| P6 | Lot sizes | Per instrument master; revised by circular | Per instrument master | Per contract specification |
+| P7 | Segments | CM, F&O, CD, COM, debt, others | EQ, EQD, CDX, others | Commodity groups |
+| P8 | NRI eligibility | Cash and others per the framework | Comparable | **Prohibited** |
+
+## 5. Order types and attributes
+
+| # | Type or attribute | NSE | BSE | MCX |
+|---|---|---|---|---|
+| O1 | Limit | ✔ | ✔ | ✔ |
+| O2 | Market | ✔ | ✔ | ✔ |
+| O3 | Stop-loss limit | ✔ | ✔ | ✔ |
+| O4 | **Stop-loss market** | **Discontinued for options from 27 Sep 2021** (NSE/FAOP/49677) | **Discontinued from 9 Oct 2023** | Confirm current availability |
+| O5 | Day validity | ✔ | ✔ | ✔ |
+| O6 | Immediate or Cancel | ✔ | ✔ | ✔ |
+| O7 | **Good Till Date** | ✖ | ✖ | **✔ commodities** |
+| O8 | **Good Till Cancelled** | ✖ | ✖ | **✔ commodities** |
+| O9 | Disclosed quantity | ✔, with a minimum proportion | ✔ | ✔ |
+| O10 | **All or None, Minimum Fill** | **Not available per SEBI directives** | Not available | Not available |
+| O11 | **Market-priced multileg** | **Discontinued; rejected by the exchange** | Confirm | Confirm |
+| O12 | Limit-priced multileg | ✔ | Confirm | ✔ |
+| O13 | Negotiated trades | ✔, **Day only** | Per BSE | — |
+| O14 | Odd lot | ✔ | ✔ | — |
+
+## 6. Price protection and restrictions
+
+| # | Mechanism | NSE | BSE | MCX |
+|---|---|---|---|---|
+| R1 | Operating price range | ✔ | ✔ | ✔ |
+| R2 | **Limit Price Protection** | **✔ derivatives, from 31 Oct 2022, dynamic** | Confirm | Confirm |
+| R3 | Quantity and value freezes | ✔ | ✔ | ✔ |
+| R4 | **Ban period** | ✔ — **fresh positions only** | ✔ | — |
+| R5 | Surveillance measures | ✔ | ✔ | Per MCX |
+| R6 | Trade-for-trade | ✔ | ✔ | — |
+| R7 | Periodic call auction | ✔ | ✔ | — |
+| R8 | Market-wide circuit breakers | ✔ | ✔ | Per MCX |
+
+## 7. Margin and collateral
+
+| # | Dimension | NSE / NSE Clearing | BSE / ICCL | MCX / MCXCCL |
+|---|---|---|---|---|
+| M1 | Cash-segment upfront | Value-at-risk plus extreme loss margin | Comparable | — |
+| M2 | Derivatives upfront | Span-based initial plus extreme loss margin | Comparable | Comparable |
+| M3 | **Delivery margins** | Staged across expiry week for stock derivatives | Per ICCL | **Higher of 3% + 5-day 99% VaR of spot volatility, or 25%** |
+| M4 | **Tender ladder** | — | — | **8.34% incremental across the last three trading days** |
+| M5 | Peak-margin snapshots | Four random windows | Per ICCL | Per MCXCCL |
+| M6 | **Acceptable collateral and haircuts** | NSE Clearing norms | **ICCL norms** | **MCXCCL norms** |
+| M7 | Cross-margin | Per NCL circulars, including different expiry dates since July 2024 | Per ICCL | Per MCXCCL |
+| M8 | Seller early pay-in exemption | — | — | **All margins except mark-to-market** |
+
+## 8. Settlement and files
+
+| # | Dimension | NSE | BSE | MCX |
+|---|---|---|---|---|
+| F1 | Cash settlement cycle | **T+1**, optional T+0 for the top 500 scrips | Comparable | — |
+| F2 | Derivatives settlement | T+1 cash settlement; physical for single stocks | Per BSE | Physical delivery per contract |
+| F3 | **Obligation files** | Daily obligation; **final obligation on T+1** | ICCL equivalents | MCXCCL equivalents |
+| F4 | Report channel | NSE Clearing Extranet, member Reports folder, comma-separated | ICCL channels | MCXCCL channels |
+| F5 | **Expected-file checklist** | One | **A second** | **A third** |
+| F6 | Bank and funds statements | Bank summary report; daily funds statement | ICCL equivalents | MCXCCL equivalents |
+| F7 | Pay-out | Direct pay-out to client demat | Comparable | Goods delivery |
+| F8 | Short delivery | Auction, then close-out | Comparable | Per commodity procedure |
+
+## 9. Operating model
+
+| # | Dimension | NSE | BSE | MCX |
+|---|---|---|---|---|
+| X1 | Staffing | Day shift | Day shift | **Day plus evening shift** |
+| X2 | Tender-day presence | — | — | **Named, certified, present before 19:30** |
+| X3 | Treasury cover | To the bank cut-off | To the bank cut-off | **Evening, with banking channels closed** |
+| X4 | Vendor support hours | Day | Day | **To the session close** |
+| X5 | Maintenance window | Evening | Evening | **Narrow slot after the commodity close** |
+| X6 | End-of-day process | One | Shared with NSE where the pipeline is common | **A separate commodity close** |
+| X7 | Certification tracks | Per segment on a shared stack | **Three, one per segment instance** | Per MCX |
+| X8 | Runbooks | Per plane | **Three for connectivity** | Separate close checklist |
+
+## 10. The consequence summary
+
+<Aside type="caution" title="The recurring defect is one sentence long">
+"It works on NSE" is the assumption that produces almost every cross-exchange defect in this matrix. The specific failures it causes: one BSE connection provisioned instead of three; a blanket ban-period block that prevents exits; an after-market window that releases into a closed session on a commodity holiday; a single expected-file checklist; one settlement deadline instead of three chains; a session state machine with one close time; and an operating model staffed for a 15:40 close. Each is cheap to prevent by verifying per exchange and per segment, and expensive to discover during certification or, worse, after go-live.
+</Aside>
+
+| Area | Build once, configure three times | Build three times |
+|---|---|---|
+| Order model and state machine | ✔ | |
+| Risk ladder and limit framework | ✔ | |
+| Ledger and client master | ✔ | |
+| Client-facing journey | ✔ | |
+| **Connectivity** | | **✔ — BSE per segment** |
+| **Session state machine** | | **✔ — per exchange and commodity group** |
+| **Expected-file checklists and ingestion** | | **✔** |
+| **Clearing integration and deadlines** | | **✔** |
+| **Collateral eligibility and haircuts** | | **✔** |
+| **Certification** | | **✔ — per exchange, segment and facility** |
+| **Runbooks** | | **✔** |
+| **Operating model and staffing** | | **✔ — MCX differs** |
+
+## 11. Verification checklist before assuming parity
+
+Run this per segment before extending a design from one exchange to another.
+
+| # | Question |
+|---|---|
+| 1 | Does this segment need its own connection and protocol instance? |
+| 2 | What is this segment's session, including any group-specific close? |
+| 3 | Does daylight saving or a special session change it? |
+| 4 | Which order types and attributes are available **here**, today? |
+| 5 | Which price-protection mechanisms apply? |
+| 6 | What are the freeze thresholds? |
+| 7 | Which restriction treatments exist — ban period, trade-for-trade, call auction, surveillance? |
+| 8 | Which clearing corporation, and what is its file set, timing and channel? |
+| 9 | What is the acceptable-collateral list and haircut source? |
+| 10 | What is the deadline chain, counted back from this bank channel's cut-off? |
+| 11 | What is the settlement medium, and does it involve physical goods? |
+| 12 | Is a separate certification required? |
+| 13 | Does the operating model need different staffing? |
+| 14 | Is the client population eligible — for example, NRIs in commodities? |
+
+## Where this connects
+
+- [NSE cash](/broking-kyc/finix-broking-setup/exchanges/01-nse-cash/), [NSE derivatives](/broking-kyc/finix-broking-setup/exchanges/02-nse-fno/), [BSE](/broking-kyc/finix-broking-setup/exchanges/03-bse-cash-fno/), [MCX](/broking-kyc/finix-broking-setup/exchanges/04-mcx-commodity/) — the per-exchange detail
+- [Exchange connectivity protocols](/broking-kyc/finix-broking-setup/oms/02-exchange-connectivity-protocols/) — the connectivity differences
+- [Order types catalogue](/broking-kyc/finix-broking-setup/oms/04-order-types-catalogue/) — the support matrix
+- [Sessions and calendars](/broking-kyc/finix-broking-setup/exchanges/06-sessions-calendars/) — the session state machines
+- [File formats and downloads](/broking-kyc/finix-broking-setup/exchanges/08-file-formats-downloads/) — the three checklists
+- [Segment rules comparison](/broking-kyc/deep-dives/foundational/segment-rules-comparison/) — the vendor-neutral reference matrix
+- [Certification, mock trading and go-live](/broking-kyc/finix-broking-setup/setup/10-certification-mock-golive/) — the certification matrix

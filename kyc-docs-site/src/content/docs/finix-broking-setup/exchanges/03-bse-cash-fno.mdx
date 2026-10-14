@@ -1,0 +1,167 @@
+---
+title: "Exchange 3: BSE cash and derivatives"
+description: What is structurally different about BSE — a separate connection and protocol instance per segment, the Thursday weekly expiry, the discontinuation of stop-loss market orders from October 2023, clearing through Indian Clearing Corporation, and the operational consequences of running three independent integrations instead of one.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Most of BSE's market mechanics resemble NSE's closely enough that repeating them would waste the reader's time. What does not resemble NSE is the connectivity topology and a handful of specific divergences, and those are what break a design that was built against NSE and extended. So this page is organised as differences: the structural one first, because it drives real cost, then the mechanical divergences, then the operational consequences, then what is genuinely the same.
+
+## TL;DR
+
+- **The structural difference is topology.** BSE's trading system is accessed through the Open Message Bus, documented as BOLT Plus IML, and **a separate connection and a separate IML instance is required for each of equity, equity derivatives and currency derivatives**. A participant application connects by a user registration request through IML.
+- **That makes each segment its own integration**, with its own provisioning, monitoring, failover, capacity, upgrade path, certification track and runbook. It is not a configuration flag.
+- **BSE's weekly index expiry day is Thursday**, following the standardisation effective 1 September 2025 that assigned NSE Tuesday and BSE Thursday.
+- **BSE discontinued stop-loss market orders from 9 October 2023**, to contain damage from freak trades — the same reasoning as NSE's 2021 discontinuation for options.
+- **Clearing is through Indian Clearing Corporation**, which means a second clearing relationship, a second report set, a second set of acceptable-collateral norms and a second deadline chain.
+- **The upside of the topology is genuine isolation.** An equity derivatives failure cannot take down equity trading — but only if the operational model exploits that rather than aggregating the three into one health indicator.
+- **Separate API documents, separately versioned**, per segment, so a protocol upgrade on one segment does not imply the others.
+
+## Conceptual overview
+
+When a broker is a member of two exchanges, the natural engineering instinct is to build one integration and parameterise the exchange. That works for most of the order path and fails at the connectivity layer, because BSE's model is per-segment where NSE's is shared. The consequence is not subtle: a firm that provisions one BSE connection and expects to enable three segments on it discovers during certification that it needs three of everything, at which point the infrastructure, the monitoring and the plan are all sized for one.
+
+The second observation is that this is not a defect to be worked around. Independent connections per segment give real blast-radius isolation, which is worth having — a problem in equity derivatives genuinely cannot affect equity trading, and a segment can be stopped cleanly while the others run. The firms that benefit are the ones whose operational model is segment-scoped: segment-level health indicators, segment-level client messaging, segment-level incident handling. The firms that do not are the ones that aggregate the three into a single "BSE status", which discards the benefit and keeps the cost.
+
+The third point is that a second exchange brings a second clearing corporation, and the clearing relationship is where the second set of deadlines, reports, collateral norms and penalties live. The connectivity cost is visible and gets planned; the clearing cost is less visible and is the one more often underestimated, because it lands on operations rather than on engineering.
+
+## 1. Framework
+
+- **BSE Open Message Bus / BOLT Plus IML application programming interface** — documented per segment for equity, equity derivatives and currency derivatives, **separately versioned**; a separate connection and a separate IML instance is required for each segment; a participant application establishes connection by a user registration request through IML. `[not yet in index]`
+- **BSE membership** — net worth of ₹1 crore for trading member and limited trading member, ₹5 crore self-clearing, ₹15 crore trading-cum-clearing, ₹50 crore professional clearing; deposit-based membership against ₹10,00,000 with ₹1 lakh earnest money; individuals, corporates, partnership firms and limited liability partnership firms eligible. See [exchange membership](/broking-kyc/finix-broking-setup/setup/03-exchange-membership/#4-bse).
+- **BSE notice discontinuing stop-loss market orders** with effect from **9 October 2023**, to contain damage from freak trades. `[not yet in index]`
+- **Weekly expiry standardisation** — effective **1 September 2025**, **Thursday for BSE**, following SEBI's circular of 26 May 2025 requiring one weekly benchmark index contract per exchange on a Tuesday or a Thursday. `[not yet in index]`
+- **Indian Clearing Corporation** — clearing rules, report set, acceptable-collateral norms and schedules. See for example [ICCL notice 20240710-11](/broking-kyc/reference/circulars/clearing-corps/#iccl-20240710-11) (10 July 2024) following [ICCL notice 20240531-3](/broking-kyc/reference/circulars/clearing-corps/#iccl-20240531-3), and the cross-margin counterpart at [ICCL notice 20240426-38](/broking-kyc/reference/circulars/clearing-corps/#iccl-20240426-38).
+- **[BSE circulars index](/broking-kyc/reference/circulars/bse/)** — the source documents.
+
+## 2. The per-segment topology
+
+| Requirement | Detail |
+|---|---|
+| **Separate connection** | For each of currency, equity derivatives and equity |
+| **Separate IML instance** | For each segment |
+| Session establishment | By a user registration request through IML |
+| Protocol documents | Separate per segment, separately versioned |
+
+### 2.1 What three instances cost
+
+| Dimension | Consequence |
+|---|---|
+| Provisioning | Three connections to order, install and test |
+| Deployment | Three instances to deploy and configure |
+| Monitoring | Three sets of session, sequence and latency metrics, with **per-segment alerting** |
+| Failover | Three independent failover paths, each tested |
+| Capacity | Sized per instance; a derivatives surge does not relieve the equity instance |
+| Patching and upgrade | Three windows, potentially on different exchange schedules |
+| **Certification** | **Three tracks**; success on one segment does not transfer |
+| Runbooks | Three sets of start, stop, recover and verify procedures |
+| Incident scope | Segment-scoped — good for blast radius, and it means "BSE is down" is never the right first statement |
+
+<Aside type="tip" title="Exploit the isolation rather than aggregating it away">
+The cost of three instances is unavoidable; the benefit is optional. A firm that builds segment-scoped health indicators, segment-scoped client messaging and segment-scoped incident handling gets genuine isolation: equity keeps trading while equity derivatives is recovered. A firm that rolls the three into one status indicator pays the cost and keeps none of the benefit, and its client communication during an incident will be wrong in a way clients notice.
+</Aside>
+
+## 3. Mechanical divergences from NSE
+
+| Dimension | NSE | BSE |
+|---|---|---|
+| Connectivity | CTCL with Non-NEAT Front End; optional Trading Access Point | **BOLT Plus IML**, per segment |
+| Per-segment connection | Shared stack, segment-enabled | **Separate connection and instance** |
+| Identifier scheme | Twelve-digit identifiers created by the member, reported before use | Per BSE scheme |
+| **Weekly index expiry** | **Tuesday** | **Thursday** |
+| Stop-loss market orders | Discontinued for options from 27 Sep 2021 | **Discontinued from 9 Oct 2023** |
+| Clearing corporation | NSE Clearing | **Indian Clearing Corporation** |
+| Report set | NSE Clearing formats and Extranet | ICCL formats and channels |
+| Acceptable collateral and haircuts | NSE Clearing norms | **ICCL norms** |
+| Member portal | ENIT | BSE member portal |
+| Protocol documents | Per segment, versioned | Per segment, versioned, separate from NSE's |
+
+| Verify per segment before relying on it | Why |
+|---|---|
+| Order-type and attribute support | Availability differs and changes |
+| Freeze thresholds | Exchange-set |
+| Price band and surveillance treatments | Exchange-set |
+| Session timings and special sessions | Exchange-set |
+| Lot sizes and contract specifications | Per contract |
+| Position and open-interest limits | Exchange-set |
+
+## 4. The second clearing relationship
+
+| Area | Consequence of a second clearing corporation |
+|---|---|
+| Deadlines | A second deadline chain, with its own bank cut-off arithmetic |
+| Reports | A second expected-file checklist, with different names and timings |
+| Collateral | A second acceptable-collateral list and haircut schedule |
+| Margin files | A second set of risk parameter files to ingest, version and apply |
+| Snapshots | Peak-margin snapshots per clearing corporation |
+| Reporting | Margin reporting per clearing corporation |
+| Penalties | A second penalty stream to reconcile and attribute |
+| Settlement | A second settlement operating path |
+| Cross-margin | ICCL's own cross-margin treatment |
+| Treasury | Funding split across two clearing relationships, with composition monitored at each |
+
+This is the part most often underestimated. Connectivity is an engineering project with a visible plan; a second clearing relationship is a permanent operational load that lands on the same people who run the first.
+
+## 5. Operational consequences
+
+| # | Consequence | Response |
+|---|---|---|
+| 1 | Three certification tracks | Plan as three projects against the published calendar |
+| 2 | Three runbooks | Written separately, not a single document with conditionals |
+| 3 | Segment-scoped incidents | Health indicators, alerts and client messaging all segment-scoped |
+| 4 | **Two concentration days a week** | NSE Tuesday and BSE Thursday; capacity and staffing cover both |
+| 5 | Two clearing deadline chains | Both counted backwards from their own bank cut-offs |
+| 6 | Two file checklists | Asserted independently |
+| 7 | Two collateral regimes | Eligibility and haircuts applied per clearing corporation |
+| 8 | Two penalty streams | Attributed and reconciled separately |
+| 9 | Cross-exchange client view | Clients see one account; obligations are per exchange and segment |
+| 10 | Smart order routing | Would require approval and demonstrable best execution; deferred at Finix |
+
+## 6. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.exch.bse.instances` | **3 — one per segment** | Exchange-set | A segment with no path, or orders to the wrong instance |
+| `finix.exch.bse.<segment>.protocol_version` | Per that segment's current document | Exchange-set | Malformed messages after an upgrade |
+| `finix.exch.bse.health_scope` | **Per segment** | Discretionary, strongly recommended | Isolation benefit discarded |
+| `finix.exch.bse.fo.weekly_expiry_day` | **Thursday** | Exchange-set | Wrong expiry handling |
+| `finix.exch.bse.slm_enabled` | **False** | Exchange-set | Offering a discontinued type |
+| `finix.exch.bse.clearing_corp` | Indian Clearing Corporation | Exchange-set | Wrong report and collateral sources |
+| `finix.exch.bse.collateral_source` | **ICCL norms** | Exchange-set | Recognising collateral the clearing corporation does not accept |
+| `finix.exch.bse.expected_files` | Explicit, separate from NSE's | Exchange-set | A missing file unnoticed |
+| `finix.exch.bse.bank_cutoff` | Per bank and channel for the ICCL settlement path | Bank-set | Missed pay-in |
+| `finix.exch.bse.certification_record` | Per segment | Exchange-set | An uncertified segment enabled |
+
+## 7. Exception paths
+
+| Situation | Response |
+|---|---|
+| One IML instance down | Stop that segment only; the others continue; **say so precisely** in client messaging |
+| A segment certified, another not | Enable only the certified segment |
+| Protocol upgrade on one segment | Treat as a certification event for that segment; the others are unaffected |
+| ICCL collateral norms change | Apply to BSE-cleared collateral; NSE-cleared collateral follows NSE Clearing's norms |
+| Thursday expiry concentration | Capacity and staffing planned; it is predictable |
+| Client sees one balance, two obligations | The client view must make the per-exchange obligation visible |
+| A design change made for NSE assumed to apply to BSE | Verify per segment; the assumption is the recurring defect |
+| Second clearing relationship's deadline missed | Same escalation as the first; the consequence path is the same |
+| BSE portal unavailable at a submission deadline | Document attempts; escalate to the exchange; retain the evidence |
+
+## Practical notes
+
+- **Plan BSE as three integrations from the start.** Discovering it during certification is the expensive path.
+- **Keep health, alerting and messaging segment-scoped.** It is the only way to collect the isolation benefit you are paying for.
+- **Budget the second clearing relationship as operational load, not an engineering task.** It is permanent and it lands on operations.
+- **Plan for two concentration days.** Tuesday and Thursday now both carry expiry weight.
+- **Verify every assumption per segment.** "It works on NSE" is the recurring source of BSE defects.
+- **Write three runbooks.** A single document with conditionals produces ambiguity during an incident.
+- **Keep ICCL and NSE Clearing collateral treatments separate.** They are different lists with different haircuts.
+
+## Where this connects
+
+- [Exchange connectivity protocols](/broking-kyc/finix-broking-setup/oms/02-exchange-connectivity-protocols/) — the BSE connectivity detail
+- [Exchange membership](/broking-kyc/finix-broking-setup/setup/03-exchange-membership/) — BSE membership and deposits
+- [Cross-exchange difference matrix](/broking-kyc/finix-broking-setup/exchanges/05-cross-exchange-matrix/) — every difference in one place
+- [Clearing arrangement](/broking-kyc/finix-broking-setup/setup/04-clearing-arrangement/) — the second clearing relationship
+- [File formats and downloads](/broking-kyc/finix-broking-setup/exchanges/08-file-formats-downloads/) — the second file checklist
+- [BSE circulars index](/broking-kyc/reference/circulars/bse/) — the source documents
+- [Certification, mock trading and go-live](/broking-kyc/finix-broking-setup/setup/10-certification-mock-golive/) — three certification tracks

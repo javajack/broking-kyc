@@ -1,0 +1,200 @@
+---
+title: "Exchange 4: MCX commodity derivatives"
+description: The commodity segment as a distinct operating model — session hours to 23:30 by commodity group, the staggered delivery tender period with its 8.34 percent incremental margin, delivery period margin at the higher of 3 percent plus VaR or 25 percent, the 19:30 eClear intention deadline, warehouse and quality operations, and the staffing and systems consequences.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** MCX is not an additional segment on an equity stack; it is a second operating model that happens to share the same order path. The session runs eight hours longer, the margin ladder is an order of magnitude larger around delivery, the delivery mechanism involves physical goods and warehouses, and the hard deadline on a tender day is in the evening. So the page leads with the session and the calendar consequences, then the delivery regime in full because that is what distinguishes the segment, then the operating model implications that most equity-first firms underestimate.
+
+## TL;DR
+
+- **The session runs to 23:30, or 23:55 during United States daylight saving**, for non-agricultural commodities — bullion, base metals and energy. Select agricultural commodities such as cotton trade to 21:00, and other agricultural commodities to 17:00. Three different session-end behaviours inside one segment.
+- **The staggered delivery tender period is the last three trading days including expiry day**, with an **8.34 percent incremental margin** applied across those days.
+- **Delivery period margin is the higher of 3 percent plus the five-day 99 percent value-at-risk of spot price volatility, or 25 percent** — an order of magnitude above ordinary initial margin, and entirely predictable.
+- **Delivery intention is given by buyer or seller on any tender day until 19:30 through MCXCCL eClear.** That is a hard evening deadline requiring a present, authorised person.
+- **Sellers tendering goods as early pay-in with documentary evidence are exempt from all margins except mark-to-market**, which MCXCCL continues to collect.
+- **The long session changes the operating model**, not the rota: evening dealing, risk and support cover; a maintenance window compressed between the commodity close and the next begin-of-day; and vendor support contracted to match.
+- **Daylight saving moves the close twice a year**, which must flow into monitoring, batch schedules and rotas.
+- **NRIs are prohibited from commodities**, which is a client-eligibility gate rather than an operational one.
+
+## Conceptual overview
+
+Every other segment in this manual settles in securities or cash, both of which exist as records. Commodities settle in goods, which exist in warehouses, have quality grades, and have to be physically delivered or taken. That single difference propagates into everything: the margin regime has to cover the risk of a party being unable to deliver real goods, the delivery process needs documentary evidence rather than an instruction, and the deadlines sit where the logistics are, not where the market is. A firm treating MCX as a third exchange connection will be correct about the order path and wrong about everything after the trade.
+
+The second difference is time. An equity-only operation has a clean daily rhythm: trade, close, process, settle, sleep. With MCX in the mix the equity end-of-day pipeline runs while the commodity market is still open, two different operating modes coexist in the same building for several hours, and the commodity close is a separate process that happens after the equity one has finished. The maintenance window that used to be an evening becomes a narrow slot after midnight. This is an operating-model decision taken at membership time, and it should be taken deliberately rather than discovered.
+
+The third difference is the predictability of the large numbers. The delivery-period margin and the tender ladder are both published and both arrive on a known calendar, which makes a client's surprise at them entirely preventable. The firms that handle commodities well are not the ones with better risk systems; they are the ones whose client communication starts several sessions before the tender period rather than when the margin call lands.
+
+## 1. Framework
+
+- **MCX trading hours** — non-agricultural commodities including bullion, base metals and energy **09:00 to 23:30**, or **23:55 during United States daylight saving**; select agricultural commodities such as cotton **09:00 to 21:00**; other agricultural commodities **09:00 to 17:00**. `[not yet in index]`
+- **Staggered delivery** — the tender period is the **last three trading days including expiry day**, with an **8.34 percent incremental margin** across those days. Trading day is based on availability for trading of the respective commodity and excludes special sessions such as Muhurat trading. `[not yet in index]`
+- **Delivery period margin** — the **higher of 3 percent plus the five-day 99 percent value-at-risk of spot price volatility, or 25 percent**. `[not yet in index]`
+- **Delivery intention** — both buyers and sellers may give intention of taking or tendering delivery on any tender day during the tender period, **until 19:30**, through **MCXCCL eClear**. `[not yet in index]`
+- **Seller margin exemption** — sellers are exempt from payment of all types of margins if goods are tendered as early pay-in with all documentary evidence; **MCXCCL continues to collect mark-to-market margins from sellers**. `[not yet in index]`
+- **MCX membership** — see [exchange membership](/broking-kyc/finix-broking-setup/setup/03-exchange-membership/#5-mcx) and the published fee and deposit structure.
+- **NRI eligibility** — NRIs are prohibited from commodities; see [segment rules comparison](/broking-kyc/deep-dives/foundational/segment-rules-comparison/).
+- **[MCX circulars index](/broking-kyc/reference/circulars/mcx/)** — the source documents, including [MCX/MEM/461/2026](/broking-kyc/reference/circulars/mcx/#mcxmem4612026) on validated handles for upstreaming accounts.
+- **MCX Clearing Corporation** — clearing rules, collateral norms and the report set.
+
+## 2. Sessions by commodity group
+
+| Group | Hours | Close behaviour |
+|---|---|---|
+| **Non-agricultural** — bullion, base metals, energy | 09:00 to **23:30**, or **23:55** in United States daylight saving | The latest close in the stack |
+| **Select agricultural** — such as cotton | 09:00 to **21:00** | Mid-evening |
+| **Other agricultural** | 09:00 to **17:00** | Shortly after equity |
+
+| Consequence | Detail |
+|---|---|
+| Three close times in one segment | The session state machine is per commodity group, not per segment |
+| **Daylight saving** | The non-agricultural close moves twice a year; monitoring, batch schedules and rotas must follow |
+| Overlap with equity end-of-day | Two operating modes concurrently; separate handovers |
+| Maintenance window | Compressed between the commodity close and the next begin-of-day |
+| Incident response | Evening escalation with named people and real authority, not best-effort |
+
+<Aside type="caution" title="Daylight saving is a calendar event with an owner">
+Twice a year the non-agricultural close moves between 23:30 and 23:55. That change has to reach the session state machine, the monitoring thresholds, the batch scheduler, the staff rota and the vendor support arrangement. It is entirely predictable, it is easy to forget, and the failure mode is a session closed while the market is open or a batch starting while trading continues. Put it on the [periodic calendar](/broking-kyc/finix-broking-setup/daily-ops/09-periodic-calendar/) with a named owner.
+</Aside>
+
+## 3. The delivery regime
+
+### 3.1 The tender period
+
+| Element | Detail |
+|---|---|
+| Window | **The last three trading days including expiry day** |
+| Trading day basis | Availability for trading of the respective commodity; **excludes special sessions such as Muhurat trading** |
+| **Incremental margin** | **8.34 percent** applied across those days |
+| Intention | By **buyer or seller**, on any tender day |
+| **Deadline** | **19:30**, through MCXCCL eClear |
+| Documentation | Goods tendered as early pay-in require **all documentary evidence** |
+
+### 3.2 Delivery period margin
+
+| Element | Detail |
+|---|---|
+| Basis | **The higher of** 3 percent plus the five-day 99 percent value-at-risk of spot price volatility, **or 25 percent** |
+| Magnitude | An order of magnitude above ordinary initial margin |
+| Predictability | **Entirely predictable** from the contract calendar and the client's position |
+| Client consequence | A step change in requirement that the client will not have anticipated unless told |
+| Firm consequence | A funding requirement that must be in the forward treasury view |
+
+### 3.3 The seller's early pay-in exemption
+
+| Element | Detail |
+|---|---|
+| Condition | Goods tendered as early pay-in **with all documentary evidence** |
+| Effect | Exempt from payment of **all types of margins** |
+| Exception | **MCXCCL continues to collect mark-to-market margins from sellers** |
+| Operational requirement | The firm must be able to handle warehouse documentation to realise this for clients |
+| Value | Substantial, given the size of delivery-period margins |
+
+## 4. Warehouse and quality operations
+
+| Element | Detail |
+|---|---|
+| Goods | Physically stored, graded and located |
+| Documentation | Warehouse receipts and quality certification |
+| Quality grades | Contract-specific; a deliverable grade is defined, not assumed |
+| Location | Delivery centres are specified; location affects logistics and sometimes price |
+| Capability | A capability the firm either builds or obtains through its clearing arrangement |
+| Finix at launch | **Clearing through a clearing member in commodities**, precisely to avoid building this at launch; see [clearing arrangement](/broking-kyc/finix-broking-setup/setup/04-clearing-arrangement/#5-the-finix-hybrid) |
+
+## 5. The operating model
+
+| Function | Requirement |
+|---|---|
+| **Dealing** | Certified staff present through the evening session |
+| **Risk monitoring** | Present while the market is open; a market open with no risk monitor is indefensible |
+| **Treasury** | Evening cover for margin events; banking channels have closed, which narrows the options |
+| Client support | Extended hours, with clients who cannot fund after banking hours |
+| **Tender-day presence** | A named, certified, authorised person present on every tender day before 19:30 — **not an on-call arrangement** |
+| Operations | Commodity close as a separate process after the equity pipeline |
+| Technology | Monitoring and incident response through the evening; maintenance in a narrow window |
+| Vendor support | **Contracted to cover the session**, not day-shift hours |
+| Handover | Written, at each shift boundary |
+
+| Consequence for risk parameters | Detail |
+|---|---|
+| Clients cannot fund after banking hours | The evening session's risk settings should reflect a client's limited ability to add funds; see [money and trade in sync](/broking-kyc/finix-broking-setup/money/07-money-trade-sync/) |
+| Square-off in the evening | The same market constraints apply, with fewer people to escalate to |
+| Margin events late in the session | The firm's own funding options are narrower |
+
+## 6. Client communication
+
+| Event | Timing | Content |
+|---|---|---|
+| **Approaching tender period** | **Several sessions before** | The margin step change, the dates, and the options |
+| Delivery period margin applying | Before it applies | The amount and the basis |
+| Tender-day deadline | On each tender day | The 19:30 cut-off and what happens after |
+| Position carried into delivery | Before the decision point | What delivery means in practice |
+| Early pay-in option for sellers | Before the tender period | The margin exemption and what documentation is required |
+| Session timing change at daylight saving | Before it changes | The new close time |
+| NRI eligibility | At onboarding | Commodities are not available |
+
+## 7. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.exch.mcx.session_close.nonagri` | **23:30**, or 23:55 in US daylight saving | Exchange-set | Session closed while the market is open |
+| `finix.exch.mcx.session_close.select_agri` | 21:00 | Exchange-set | Same |
+| `finix.exch.mcx.session_close.other_agri` | 17:00 | Exchange-set | Same |
+| `finix.exch.mcx.dst_calendar_owner` | Named, on the periodic calendar | Discretionary, strongly recommended | A forgotten twice-yearly change |
+| `finix.exch.mcx.tender_period_days` | **Last 3 trading days including expiry** | Exchange-set | Margin ladder applied on the wrong days |
+| `finix.exch.mcx.tender_incremental_margin_pct` | **8.34** | Exchange-set | Under-collection in the tender window |
+| `finix.exch.mcx.delivery_period_margin` | **Higher of 3 percent plus 5-day 99 percent VaR of spot volatility, or 25 percent** | Exchange-set | Material under-collection |
+| `finix.exch.mcx.tender_intention_cutoff` | **19:30** | Exchange-set | Missed delivery intention |
+| `finix.exch.mcx.tender_day_staffing` | **Named, certified, present** | Discretionary, strongly recommended | A missed deadline with a delivery consequence |
+| `finix.exch.mcx.seller_early_payin_handling` | Supported, with documentation handling | Discretionary | A client margin exemption forgone |
+| `finix.exch.mcx.delivery_notice_sessions` | Several sessions ahead | Discretionary, strongly recommended | Entirely avoidable client surprise |
+| `finix.exch.mcx.evening_risk_parameters` | Reflecting limited client funding ability | Discretionary | Clients unable to meet an evening call |
+| `finix.exch.mcx.nri_eligibility` | **Blocked** | Regulatory | An ineligible client trading |
+| `finix.exch.mcx.muhurat_excluded_from_trading_day` | True | Exchange-set | Tender window computed on the wrong days |
+
+## 8. Exception paths
+
+| Situation | Response |
+|---|---|
+| Tender deadline approaching with an open position and no cover | **Escalate before 19:30, not at it** |
+| Client unable to fund an evening margin call | Expected; the evening risk parameters should already reflect it; square-off options are constrained |
+| Connectivity lost after 20:00 | Evening escalation path; if a tender deadline is near, escalate to the clearing member and exchange immediately |
+| Daylight saving change not applied | Session mismatch; correct immediately; review the calendar ownership |
+| Client surprised by delivery-period margin | A communication failure, not a market event; review the notice timing |
+| Seller wants the early pay-in exemption | Supported only if the firm can handle the documentation; confirm before promising |
+| Delivery obligation the client cannot meet | The clearing member's procedure governs; the consequence is contractual as well as regulatory |
+| Commodity close cannot complete | Evening escalation; the next begin-of-day depends on it |
+| Muhurat or special session in the tender window | The tender window excludes special sessions; verify the computed days |
+| NRI client attempts commodity access | Blocked at onboarding and at the ladder |
+
+## 9. Should you take commodities at launch?
+
+| Argument for | Argument against |
+|---|---|
+| Client demand and product completeness | A second operating model with evening staffing |
+| Revenue diversification | Physical delivery capability, or dependence on a clearing member |
+| Membership fee saving if applied for with other segments | Certification, runbooks and monitoring for a segment that may be a small share of volume |
+| Easier to add at membership than later | Operating-model load on a team already standing up equity |
+
+**Finix's position**: apply for the segment with the others to capture the combined admission fee, clear through a clearing member at launch to avoid building delivery operations immediately, and activate after the equity planes are stable. The decision is recorded with a review trigger rather than left implicit. See [clearing arrangement](/broking-kyc/finix-broking-setup/setup/04-clearing-arrangement/#5-the-finix-hybrid).
+
+## Practical notes
+
+- **Staff tender days with a named, present, authorised person.** A 19:30 deadline is not an on-call arrangement.
+- **Communicate the delivery margin ladder several sessions ahead.** It is large, predictable and the most avoidable client surprise in the stack.
+- **Put daylight saving on the calendar with an owner.** Twice a year, and easy to forget.
+- **Contract vendor support to cover the session.** Day-shift support for a 23:30 market is an unmanaged risk.
+- **Set evening risk parameters knowing clients cannot fund.** The constraint is structural, not behavioural.
+- **Write a separate commodity close checklist.** It runs later, with fewer people.
+- **Decide the delivery capability deliberately.** Build it, rent it through a clearing member, or do not take delivery-bound positions.
+
+## Where this connects
+
+- [Exchange membership](/broking-kyc/finix-broking-setup/setup/03-exchange-membership/) — MCX membership and what the session changes
+- [Clearing arrangement](/broking-kyc/finix-broking-setup/setup/04-clearing-arrangement/) — the hybrid and why commodities clear through a clearing member at launch
+- [Settlement obligations](/broking-kyc/finix-broking-setup/backoffice/05-settlement-obligations/) — commodity delivery processing
+- [Margin engine](/broking-kyc/finix-broking-setup/rms/02-margin-engine/) — the commodity margin layers
+- [People, certification and organisation](/broking-kyc/finix-broking-setup/setup/07-people-certification-org/) — the shift design
+- [Money and trade in sync](/broking-kyc/finix-broking-setup/money/07-money-trade-sync/) — the evening funding constraint
+- [MCX circulars index](/broking-kyc/reference/circulars/mcx/) — the source documents
