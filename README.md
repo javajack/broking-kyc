@@ -18,6 +18,7 @@ A comprehensive technical specification for individual customer KYC (Know Your C
 - **Full SEBI/KRA/CKYC regulatory compliance** mapping with circular references
 - **Exchange & depository integration** specs for NSE, BSE, MCX, CDSL, and NSDL
 - **Cost analysis, code tables, and architecture diagrams**
+- **Finix Broking Setup** — an 88-page operational manual for standing up and running a broking business on a named vendor stack (Saral MoneyMaker for OMS/RMS, SecMark for back office and compliance, Digio for KYC and eSign, CVL KRA, CERSAI CKYCRR 2.0, Razorpay/RazorpayX, across NSE, BSE and MCX), covering membership and registration, every order type, the pre-trade check ladder, margin and square-off, settlement and CUSPA, money movement, exchange-by-exchange nuances, BOD/EOD runbooks, incident playbooks and compliance at configuration level
 
 ## Tech Stack
 
