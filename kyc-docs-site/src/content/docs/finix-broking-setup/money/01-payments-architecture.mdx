@@ -1,0 +1,187 @@
+---
+title: "Money 1: payments architecture"
+description: How Razorpay and RazorpayX sit inside a broker's prescribed account structure — the two products and why they must not share a code path, the settlement destination that the gateway default gets wrong, the money states and their transitions, where risk capacity is granted, and the full daily money flow.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import Diagram from '../../../../components/Diagram.astro';
+
+> **Why this page is structured this way:** A payment stack in a broking firm has to be understood as two different systems bolted onto one regulated account structure. Collection and disbursement look symmetric and are not: they have different counterparties, different reconciliation semantics, different failure modes and different regulatory constraints. So the page separates them explicitly, then places both inside the account map, then traces a day's money flow end to end — because the sequence is where the constraints become visible.
+
+## TL;DR
+
+- **Razorpay and RazorpayX are two products with two different jobs.** The payment gateway and Smart Collect sit on the collection side; RazorpayX Payouts sits on disbursement with a contact, fund-account and payout object model. They must not share a code path, because their idempotency, reconciliation and failure semantics differ.
+- **The gateway must settle into the Upstreaming Client Nodal Bank Account**, not the firm's operating account. The merchant default is the operating account, and for a broker that is a segregation breach on every single pay-in.
+- **Client pay-outs are made only from the Downstreaming Client Nodal Bank Account**, after funds are received from the clearing corporation or clearing member the same day.
+- **`settlement.processed` fires after Razorpay transfers funds to the business bank account, and the UTR is used to reconcile against the bank statement.** That UTR is the join key for the whole collection reconciliation.
+- **Webhooks are signed, retried and unordered.** Verify every signature, handle every event idempotently, and never assume a state sequence.
+- **Capacity is granted at confirmed good funds**, which is a later state than authorised and a different state from settled-to-the-gateway.
+- **Payer attribution is architectural.** Third-party payments are prohibited, so the design must carry enough payer identity to enforce that at credit time, not at month end.
+
+## Conceptual overview
+
+Every payment product in the Indian market is built around a merchant model: a business sells something, a customer pays, the money becomes the business's revenue, and the business decides what to do with it. A broker inverts the final step. The money collected is the client's, held by the firm, segregated by statute from the firm's own funds and from other clients' funds, and subject to a regime that pushes it out to clearing corporations at end of day. Everything awkward about integrating a payments stack into a broking operation follows from that inversion, and the single largest practical consequence is where the gateway settles.
+
+The second structural point is that collection and disbursement are not mirror images. On collection the firm is the recipient and the uncertainty is about whether money has truly arrived — authorised is not captured, captured is not settled, settled is not reconciled. On disbursement the firm is the sender and the uncertainty is about whether an instruction was duplicated, whether a terminal state is final, and whether a reversal might arrive after apparent success. These are different problems with different controls, and the common engineering instinct to build a shared "payments service" over both tends to produce a lowest-common-denominator model that handles neither well.
+
+The third point concerns the boundary between money and risk. A payment becoming capacity is a risk event, not a money event, and the two should be connected by an explicit gate rather than by a shared database write. The gate is "confirmed good funds", and everything upstream of it — initiated, authorised, captured — is visible to the client as progress but creates no trading capacity. Making that gate explicit, and showing the client the intermediate states, removes the pressure that otherwise builds to grant capacity early.
+
+## 1. The two products
+
+| | **Collection — Razorpay** | **Disbursement — RazorpayX** |
+|---|---|---|
+| Purpose | Client pays the firm | Firm pays the client |
+| Products | Payment gateway; **Smart Collect** virtual accounts for automated reconciliation of bank-transfer collections | **Payouts** over UPI, IMPS, NEFT and RTGS to accounts at all Indian banks |
+| Object model | Payment, order, settlement | **Contact → fund account → payout** |
+| Initiation | Client action | Firm action, by API or dashboard; bulk addition and queueing available |
+| Idempotency key | Payment identifier | **The firm's own reference on the payout** |
+| Events | Payment state changes; `settlement.processed` after funds transfer to the business bank account | Payout state changes, with **webhook callback on every state change** |
+| Reconciliation key | **UTR**, used to reconcile settlement funds against the bank statement | Payout reference and bank UTR |
+| Destination account | **USCNB — the upstreaming client nodal account** | Sourced from **DSCNB — the downstreaming client nodal account** |
+| Characteristic risk | Money arrived but not attributed; third-party payer | Duplicate payout; reversal after apparent success |
+| Degraded behaviour | Queue and reconcile; never credit on a client's screenshot | **Stop on ambiguity**; never retry without the idempotency reference |
+
+<Aside type="caution" title="Do not build one payments service over both">
+The shared-abstraction instinct produces a service whose retry policy is safe for one side and dangerous for the other. A collection webhook that arrives twice should be processed idempotently and is harmless; a payout submitted twice moves money twice. A collection that fails can be retried freely; a payout retried without the original reference creates a second payment. Keep them separate, with separate code paths, separate operational runbooks and separate access controls — payout credentials belong in the highest tier.
+</Aside>
+
+## 2. The account map in motion
+
+<Diagram src="/diagrams/finix-03-money-flow.svg" label="Finix money flow — collection into the upstreaming nodal account, disbursement from the downstreaming nodal account, treasury to the clearing corporation, and end-of-day upstreaming" />
+
+| Account | Prescribed name | Role in this plane |
+|---|---|---|
+| **A1 USCNB** | "Name of the SB/CM – USCNB account" | **Every client pay-in lands here**, including gateway settlements |
+| **A2 DSCNB** | "Name of the SB/CM – DSCNB account" | **Every client pay-out leaves from here**, funded same day from the clearing corporation or clearing member |
+| A3 Clearing | Per the designated clearing bank | Settlement with the clearing corporation; margin funding |
+| A5 Own operating | Conventional | The firm's revenue, after brokerage is computed and due |
+| A6 Own proprietary | Conventional | The firm's own trading funds |
+| A8 Depository charge account | Conventional, within the validated-handle extension | Depository charge collection |
+
+Full map and the permitted-movement matrix at [bank account architecture](/broking-kyc/finix-broking-setup/setup/06-bank-account-architecture/).
+
+## 3. Money states
+
+| State | Meaning | Visible to the client as | Creates capacity? | Withdrawable? |
+|---|---|---|---|---|
+| Initiated | The client started a payment | "Payment started" | No | No |
+| Authorised | Authorised at the gateway or the bank | "Payment received, confirming" | **No** | No |
+| Captured | Captured by the gateway | As above | No | No |
+| **Settled to the firm** | Transferred to the firm's bank account; `settlement.processed` with a UTR | As above | No | No |
+| **Confirmed good funds** | Settled **and reconciled** to the bank statement and attributed to the client | "Available" | **Yes** | Per policy |
+| Reversed | Chargeback, failed settlement, or reversal | "Payment reversed" | Removes capacity | — |
+| Pay-out requested | Client asked to withdraw | "Withdrawal requested" | Blocks the amount | — |
+| Pay-out queued | Accepted by the firm, pending the run | "Processing" | Blocked | — |
+| Pay-out submitted | Sent to RazorpayX | "Processing" | Blocked | — |
+| Pay-out processed | Terminal success | "Paid" | Debited | — |
+| Pay-out failed or reversed | Terminal failure, or a reversal after success | "Returned to your account" | **Re-credited** | — |
+
+| Rule | Detail |
+|---|---|
+| The capacity gate is **confirmed good funds** | Not authorised, not captured, not settled-to-gateway |
+| Show the intermediate states | A client who can see "confirming" does not demand capacity for "received" |
+| A reversal after success must debit again | And must be communicated |
+| No capacity from an unattributed credit | Money in the account that cannot be matched to a client is not that client's |
+
+## 4. A day's money flow
+
+| Time | Event | Account effect | Risk effect |
+|---|---|---|---|
+| Overnight | Clear credit balances already upstreamed | Held at the clearing corporation | Collateral recognised |
+| Pre-open | Treasury confirms margin position | A3 funded as needed | — |
+| Pre-open | Collateral and ledger balance loaded into risk | — | **Capacity established for the day** |
+| 09:00 onward | Client pays through the gateway, UPI or a virtual account | Gateway captures; transfers land in A1 | None yet |
+| Minutes later | Payment settled and reconciled | A1 credited, UTR matched | **Capacity granted** |
+| Intraday | Exchange or clearing member margin call | A3 funded from A1 for client obligations, own accounts for own | Risk utilisation changes |
+| Intraday | Client requests a pay-out | Blocked in the ledger | Capacity reduced |
+| Post-session | Obligations computed | — | — |
+| Settlement day | Funds pay-in to the clearing corporation | From A3 | — |
+| Settlement day | Funds pay-out received | Into A3, then to A2 **the same day** | — |
+| Pay-out window | Approved client pay-outs executed | **From A2 only** | Blocks released |
+| End of day | Brokerage and charges computed and transferred | A1 to A5, amounts actually due | — |
+| End of day | Upstreaming computed and instructed | A1 to the clearing corporation | Collateral position changes |
+| End of day | Reconciliation across bank, gateway and ledger | Exceptions aged | — |
+
+## 5. Ownership boundaries
+
+| Function | Owner | Not the owner |
+|---|---|---|
+| Collection channel availability | Razorpay | The firm, but the firm owns the client experience when it fails |
+| Payer attribution data | Razorpay supplies; **the firm enforces** | Razorpay does not know the third-party rule |
+| Settlement destination | **The firm configures** | A default is not a decision |
+| Client credit decision | **SecMark ledger** | Not the gateway |
+| Capacity grant | **Saral RMS**, on confirmed funds | Not the payment system |
+| Pay-out authorisation | **SecMark**, against clear balance | Not RazorpayX |
+| Pay-out execution | RazorpayX | — |
+| Bank reconciliation | **SmartReco**, firm-owned | Not the gateway dashboard |
+| Upstreaming computation | **The firm** | — |
+| Treasury decisions | **The firm** | — |
+
+The third row is the one that matters most. A payment aggregator will settle wherever it is told; telling it correctly is the firm's job, and verifying it with real money before launch is the cheapest control in the plane.
+
+## 6. Interfaces
+
+Contracts at [integration contract matrix](/broking-kyc/finix-broking-setup/stack/integration-contract-matrix/#5-money-path).
+
+| # | Interface | Direction | Key property |
+|---|---|---|---|
+| MO-1 | Client → gateway | → | Client charged but firm not notified is the failure to design for |
+| MO-2 | Gateway → firm webhook | ← | Signed, retried, **unordered**; idempotent handling mandatory |
+| MO-3 | Gateway → firm bank settlement | ← | **Must land in A1**; `settlement.processed` plus UTR |
+| MO-4 | Virtual accounts | ↔ | Payer attribution; third-party block |
+| MO-5 | Firm → RazorpayX payout | → | **Idempotency on the firm's reference**; never blind-retry |
+| MO-6 | RazorpayX → firm webhook | ← | Unordered terminal states; reversals |
+| MO-7 | Bank → firm statement | ← | The independent record |
+| MO-8 | Firm → clearing bank funding | → | Deadline-bound; the bank's cut-off governs |
+| MO-9 | Clearing corporation → firm reports | ← | Margin and collateral statements |
+| MO-10 | Firm → upstreaming | → | Daily, rule-driven |
+| MO-11 | SecMark → payout authorisation | → | Against clear, settled balance only |
+
+## 7. Configuration touchpoints
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.money.account.gateway_settlement` | **A1 USCNB** | Regulatory | Segregation breach on every pay-in |
+| `finix.money.account.payout_source` | **A2 DSCNB** | Regulatory | Pay-out from a non-permitted account |
+| `finix.money.capacity_gate` | Confirmed good funds | Regulatory in substance | Credit against reversible money |
+| `finix.money.webhook.signature_verification` | Mandatory, both products | Discretionary, strongly recommended | Forged events |
+| `finix.money.webhook.idempotent` | Enforced | Discretionary, strongly recommended | Duplicate processing |
+| `finix.money.webhook.ordering_assumed` | **False** | Discretionary, strongly recommended | State regression |
+| `finix.money.payout.idempotency_reference` | Firm-generated, mandatory | Discretionary, strongly recommended | Duplicate payouts |
+| `finix.money.payin.third_party_block` | Hard | Regulatory | Third-party credit |
+| `finix.money.payin.cash_mode` | **No code path** | Regulatory | Prohibited by regulation 20(d) |
+| `finix.money.separate_code_paths` | Collection and disbursement separate | Discretionary, strongly recommended | Shared retry semantics |
+
+## 8. Exception paths
+
+| Situation | Response |
+|---|---|
+| Gateway settles into the wrong account | **Stop collection.** Transfer with full documentation; assess the disclosure obligation; this is a breach, not a defect |
+| Client charged, firm not notified | Reconcile from the gateway, never from a screenshot; credit on reconciliation |
+| Webhook signature fails | Reject and alert; a signature failure is a security event |
+| Duplicate webhook | Idempotent handling; no effect |
+| Terminal state arrives before an intermediate one | Accept; never regress |
+| Payout reversal after apparent success | Debit the client ledger again; communicate promptly and clearly |
+| Payment reversed after capacity was granted | Remove capacity; if positions were taken, the client has a debit — follow the debit process |
+| Unattributed credit in A1 | Age it; investigate; unattributed client money is reportable if it persists |
+| Bank channel outage before a funding deadline | Alternate channel, alternate bank, escalate; document attempts |
+| Razorpay outage during the session | Clients cannot fund; communicate early; existing capacity is unaffected |
+
+## Practical notes
+
+- **Verify the settlement destination with one rupee before launch.** It is the single highest-value test in this plane.
+- **Keep collection and disbursement in separate code paths with separate credentials.** Payout credentials move money and belong in the highest control tier.
+- **Show the client the intermediate states.** It removes the pressure to grant capacity early.
+- **Treat payer attribution as a design input, not a reconciliation output.** The third-party rule has to be enforced at credit time.
+- **Assume webhooks arrive twice, out of order, and occasionally not at all.** Design to the daily statement as the backstop.
+- **Never credit on a client's screenshot.** Reconcile from the gateway and the bank.
+- **Make the capacity gate explicit and named.** "Confirmed good funds" should be a state in the system, not an implicit condition.
+
+## Where this connects
+
+- [Bank account architecture](/broking-kyc/finix-broking-setup/setup/06-bank-account-architecture/) — the account map and the movement matrix
+- [Pay-in rails](/broking-kyc/finix-broking-setup/money/02-payin-rails/) — collection in detail
+- [Pay-out engine](/broking-kyc/finix-broking-setup/money/03-payout-engine/) — disbursement in detail
+- [Money and trade in sync](/broking-kyc/finix-broking-setup/money/07-money-trade-sync/) — the race conditions
+- [Ledger and accounting](/broking-kyc/finix-broking-setup/backoffice/04-ledger-accounting/) — where money becomes a balance
+- [Limit framework](/broking-kyc/finix-broking-setup/rms/04-limit-framework/) — where confirmed funds become capacity
