@@ -1,0 +1,191 @@
+---
+title: "Stack: integration contract matrix"
+description: Every interface in the Finix stack as a contract — direction, transport, trigger, payload summary, timing, idempotency key, ordering guarantee, failure mode and degraded behaviour — across forty-plus boundaries between Saral, SecMark, Digio, the KRAs, CERSAI, Razorpay, the exchanges, the clearing corporations, the depositories and the banks.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Architecture diagrams show boxes and arrows, and arrows hide everything that matters. An arrow does not tell you whether the receiver can be called twice with the same message, whether messages can arrive out of order, what the sender does when the receiver is down, or who finds out. So this page is a contract per boundary, grouped by the band the boundary crosses, with the same ten attributes for each. The failure and degradation columns are the point: they are the difference between a stack that degrades and one that fails silently.
+
+## TL;DR
+
+- **An interface contract has ten attributes, and most integrations document two.** Direction and payload are the easy ones; trigger, timing, idempotency, ordering, failure mode, degraded behaviour, detection and recovery are where production incidents live.
+- **The order path is the only synchronous, latency-critical boundary set in the stack.** Everything else is batch, file-based, or asynchronous with retry. Confusing the two produces either a slow order path or a fragile batch.
+- **Every inbound webhook and every inbound file needs an idempotency key**, because both will be delivered more than once. Payment webhooks retry by design; exchange files get re-downloaded by operators under pressure.
+- **Ordering is not guaranteed on any asynchronous boundary here.** A payout `processed` event can arrive before the `queued` event. Design state machines to accept terminal states out of order and to never regress.
+- **"Degraded behaviour" must be decided per interface, in advance, by someone with authority.** For risk inputs the answer is nearly always *stop*; for enrichment the answer is nearly always *continue*; the dangerous case is the middle, and that is where this page is most prescriptive.
+- **Detection is part of the contract.** An interface whose failure is detected by a client complaint is an unmonitored interface, whatever the monitoring dashboard says.
+
+## Conceptual overview
+
+A broking stack has an unusual integration profile. The order path is a hard real-time system where a few milliseconds of added latency is a competitive cost and a few seconds is an outage. Everything around it — onboarding, money, records, reporting — is a batch and event world where the correct response to a failure is to retry, queue, or wait for the next cycle. These two worlds have opposite design instincts. Real-time systems fail fast and shed load; batch systems retry patiently and never drop. Putting a patient retry in the order path produces an order that executes at a price the client no longer wants. Putting fail-fast semantics in a settlement file pipeline produces a missed obligation.
+
+The practical consequence is that the stack needs two integration styles with a deliberate, visible boundary between them, and that the boundary is *the trade*. Before the trade, latency rules. After the trade, completeness rules. The trade event itself is the hand-off, and it is the one place where a message must be both fast and never lost — which is why trade capture is duplicated: the OMS has it from the exchange trade confirmation in real time, and the back office independently imports the exchange's own trade file at end of day, and the two are reconciled. That duplication is not redundancy for its own sake; it is the only way to satisfy both requirements at once.
+
+The second structural observation is about who detects failure. In a monolith, failure is visible where it happens. In this stack, the consequence of a failed interface usually surfaces somewhere else, later, as a number that does not reconcile — and frequently in a different team's queue. So every contract below names a detection mechanism that belongs to the interface, not to its downstream consequence. If the only way you learn that the KRA upload failed is that a client calls about an inactive account, the interface is unmonitored.
+
+## 1. How to read the contract tables
+
+| Attribute | What it must state |
+|---|---|
+| **Direction** | Who initiates; `→` means the left system calls the right |
+| **Transport** | Protocol or mechanism, at the level of "what breaks" |
+| **Trigger** | Event, schedule, or human action that causes traffic |
+| **Payload** | What crosses, in business terms; never a field layout |
+| **Timing** | Expected latency or window, and the hard deadline if there is one |
+| **Idempotency** | The key by which a duplicate is recognised, or `none` with a reason |
+| **Ordering** | Whether order is guaranteed, and what the receiver must tolerate |
+| **Failure mode** | What the realistic failure looks like, not the exception class |
+| **Degraded** | Explicit decision: stop, queue, or continue — and the scope |
+| **Detection** | How the interface itself tells you it is failing |
+
+<Aside type="tip" title="The three degradation choices">
+**Stop** means refuse the dependent business function in a defined scope. **Queue** means accept and defer, with a visible backlog and a maximum age. **Continue** means proceed without the input, which is only safe when the input is enrichment rather than control. A contract that says "retry" without saying which of the three applies while retrying has not made a decision.
+</Aside>
+
+## 2. Order path — the real-time band
+
+These are the only boundaries in the stack where latency is a functional requirement.
+
+| # | Boundary | Direction | Transport | Trigger |
+|---|---|---|---|---|
+| OP-1 | Client app, web, dealer terminal → Saral OMS | → | Vendor client protocol over TCP, session-authenticated | Client or dealer action |
+| OP-2 | Saral OMS → Saral RMS | → | In-stack call, synchronous | Every new, modify and cancel request |
+| OP-3 | Saral OMS → exchange gateway | → | Exchange protocol over TCP over leased line; NSE via Non-NEAT Front End with optional Trading Access Point middleware; BSE via IML per segment; MCX via its member protocol | Order release |
+| OP-4 | Exchange → Saral OMS | ← | Same session | Acknowledgement, rejection, trade confirmation, unsolicited messages |
+| OP-5 | Exchange multicast → Saral | ← | Multicast market data | Continuous during session |
+| OP-6 | Saral OMS → SecMark middleware | → | API or message bus, asynchronous | Order and trade events, for lifecycle and channel orchestration |
+| OP-7 | Third-party algo or API client → Saral | → | Vendor API, credentialed, rate-limited | Programmatic order flow |
+
+| # | Payload | Timing | Idempotency | Ordering | Failure mode | Degraded | Detection |
+|---|---|---|---|---|---|---|---|
+| OP-1 | Order intent, modify, cancel; order and position state back | Sub-second; client-perceived | Client-generated request identifier | Per session, guaranteed | Session drop mid-submission; client unsure whether order placed | **Stop** that session; client must see an unambiguous "unknown" state, never an assumed success | Session heartbeat, submission-to-acknowledgement latency percentiles |
+| OP-2 | Order with client, scrip, quantity, price; decision with reason code | Single-digit milliseconds | Order identifier | Guaranteed | Risk evaluation timeout | **Stop** — reject the order; never release on timeout | Decision latency, timeout count, reject-reason distribution |
+| OP-3 | Exchange order message | Milliseconds | Exchange order identifier plus broker order identifier | Guaranteed within session | Link down, session logged out, message rejected at gateway | **Stop** new orders for that exchange and segment; preserve and display existing order state as last-known | Session state, sequence gaps, round-trip latency, reject codes |
+| OP-4 | Acknowledgement, rejection, fill, partial fill, freeze, cancellation | Milliseconds | Exchange message sequence | Guaranteed within session | Gap in sequence; missed trade confirmation | **Stop** and reconcile from the exchange before accepting new flow in that segment | Sequence continuity check, unacknowledged-order age |
+| OP-5 | Prices, depth, open interest, band revisions | Continuous | Not applicable | Best-effort, gaps possible | Feed gap or stale feed; the worst case is *silently* stale | **Stop** risk decisions that depend on last traded price in the affected scope; block market orders | Per-instrument tick staleness, gap counters, cross-check against a second source |
+| OP-6 | Order and trade events for downstream lifecycle | Seconds; not latency-critical | Event identifier | Not guaranteed | Backlog | **Queue**, maximum age alert; must not block OP-2 or OP-3 | Queue depth and age |
+| OP-7 | Programmatic orders | Milliseconds | Client request identifier | Per session | Runaway client, rate-limit breach | **Stop** that client's access; never the whole gateway | Per-client order rate, rejection rate, cancel-to-order ratio |
+
+<Aside type="caution" title="OP-5 is the most under-engineered interface in most broking stacks">
+A dead market-data feed announces itself. A *stale* feed does not: prices simply stop changing, and every downstream consumer keeps computing confidently on a number from four minutes ago. Square-off decisions, margin utilisation, band checks and client screens are all wrong at once, and in the same direction. The contract above therefore requires per-instrument staleness detection rather than connection monitoring. [Continuous session operations](/broking-kyc/finix-broking-setup/daily-ops/03-continuous-session-ops/) treats stale-feed as a named incident with its own playbook.
+</Aside>
+
+## 3. Risk input path
+
+Inputs the RMS needs in order to be correct. The degradation answer here is nearly always *stop*, scoped as narrowly as the parameter allows.
+
+| # | Boundary | Trigger | Timing | Idempotency | Failure mode | Degraded | Detection |
+|---|---|---|---|---|---|---|---|
+| RI-1 | Clearing corporation risk parameter file → Saral RMS | Published intraday, several times | Within minutes of publication | File name plus publication timestamp | Missed publication; parsed but not applied | **Stop** new derivatives orders in affected scope | Compare applied file timestamp to expected schedule |
+| RI-2 | Exchange scrip master and lot sizes → Saral, SecMark | Pre-open, daily | Before BOD completion | File date | Stale master; new instrument missing | **Stop** — abort BOD, do not open | Mandatory BOD gate with date assertion |
+| RI-3 | Exchange price bands and circuit filters → Saral | Daily plus intraday revisions | Immediate on revision | Instrument plus effective time | Intraday revision missed | **Stop** orders outside last-known band; alert | Revision message counter versus applied count |
+| RI-4 | Securities in ban period → Saral RMS | Pre-open, daily | Before open | File date | List not applied; fresh positions allowed in banned underlying | **Stop** fresh derivatives positions in all contracts of listed underlyings | BOD gate; independent recheck at first order in each underlying |
+| RI-5 | Approved collateral and haircut list → SecMark, Saral | Daily, amendable | Before valuation run | File date | Collateral valued at a withdrawn haircut | **Stop** counting unlisted collateral; do not carry forward | Diff against previous day with exception report |
+| RI-6 | Surveillance measure lists → Saral RMS, SecMark | Daily and periodic | Before open | File date and list version | Restriction not applied to a newly added scrip | **Stop** — apply most restrictive known treatment | Membership diff with alert on additions |
+| RI-7 | Client collateral and ledger balance, SecMark → Saral RMS | BOD, plus intraday updates | BOD before open; intraday within minutes | Client plus as-of timestamp | Limits computed from yesterday's balance | **Stop** — do not open without a current balance load | As-of timestamp assertion per client batch, count reconciliation |
+| RI-8 | Pledge and collateral positions, depository → SecMark | Daily and on event | Before valuation | Instruction identifier | Pledge release not reflected; collateral double-counted | **Stop** recognising disputed collateral | Three-way reconciliation: depository, back office, risk |
+| RI-9 | Intraday fund receipt, Razorpay or bank → Saral RMS limit top-up | On confirmed receipt | Seconds to minutes | Payment identifier | Limit given on an unconfirmed payment | **Queue** — no limit until confirmed good funds | Unmatched-receipt ageing, limit-granted-without-receipt exception |
+
+See [margin engine](/broking-kyc/finix-broking-setup/rms/02-margin-engine/) for what each input feeds, and [BOD runbook](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/) for the ordering and gates.
+
+## 4. Onboarding path
+
+| # | Boundary | Direction | Transport | Trigger | Timing | Idempotency | Failure mode | Degraded | Detection |
+|---|---|---|---|---|---|---|---|---|---|
+| ON-1 | Broker journey → Digio DigiKYC | → | REST, credentialed | Client step | Seconds; interactive | Application reference | Vendor unavailable mid-journey | **Queue** — save state, let the client resume; never discard captured data | Step-level success rate and latency, abandonment at the vendor step |
+| ON-2 | Digio → DigiLocker, Aadhaar, PAN sources | → | Via vendor | Verification request | Seconds | Vendor reference | Upstream source unavailable | **Queue** with an alternative path offered | Per-source success rate |
+| ON-3 | Broker → Digio DigiSign | → | REST plus client-side redirect or SDK | Signature request | Interactive, then asynchronous completion | Document identifier | Client abandons after signing starts; signed artefact not retrieved | **Queue** — poll and reconcile; a signature that exists at the vendor but not with the broker is the dangerous state | Signed-document retrieval reconciliation, pending-signature ageing |
+| ON-4 | Broker → Digio eStamp | → | REST | DDPI or nomination document | Seconds | Document identifier | Stamp paid, document not issued | **Queue** and reconcile; money has moved | Paid-versus-issued reconciliation |
+| ON-5 | Broker → CVL KRA | → | API push of data and images; status and fetch calls | Post-verification | Minutes to days for status | PAN plus submission reference | Duplicate upload rejected because the investor is already compliant | **Continue** by switching to download: a rejection here is an expected branch, not an error | Submission-to-status ageing, rejection-reason distribution |
+| ON-6 | CVL KRA → broker | ← | Status and download | Poll or notification | Days | PAN plus updated date | A record modified after upload; the download is authoritative | **Continue** — treat the latest updated date as final and refresh the back office | Updated-date drift report |
+| ON-7 | Broker → CERSAI CKYCRR 2.0 | → | Real-time API, structured payload; SFTP for bulk | Post-verification | Seconds under 2.0 | Application reference | Download requires client OTP consent and the client is unreachable | **Queue** the download; **continue** the upload path | Upload acceptance rate, consent-failure rate |
+| ON-8 | Broker → SecMark C-Safe | → | API | Onboarding, then periodically and on list change | Seconds interactive; batch for rescreen | Client plus list version | List version drift between environments; a hit not surfaced to a human | **Stop** activation on an unresolved hit; never auto-clear | Hit rate, open-alert ageing, list version assertion |
+| ON-9 | Broker → exchange UCC upload | → | Exchange member portal or file | Post-approval | Same day typically | Client code plus batch | Partial batch rejection; client tradeable on one exchange only | **Stop** enabling trading in the segment that failed | Per-exchange, per-segment enablement reconciliation |
+| ON-10 | Broker → CDSL or NSDL account opening | → | Depository system | Post-approval | Hours to days depending on depository and mode | Application reference | Demat not active while trading is | **Stop** delivery-based trading for that client | Trading-enabled-without-demat exception report |
+| ON-11 | Onboarding → SecMark back office client master | → | API or file | On activation | Minutes | Client code | Client exists in OMS but not in back office, or vice versa | **Stop** — no trading without both | Daily client-master three-way reconciliation: onboarding, OMS, back office |
+| ON-12 | Broker → Digio eNACH or UPI AutoPay | → | REST | Mandate setup | Interactive plus asynchronous | Mandate reference | Mandate created at vendor, not recorded locally | **Queue** and reconcile | Mandate reconciliation report |
+
+Field-level detail for each destination is in the [field atlas destinations](/broking-kyc/reference/field-atlas/), and the regulatory sequence is in [onboarding](/broking-kyc/finix-broking-setup/onboarding/).
+
+## 5. Money path
+
+| # | Boundary | Direction | Transport | Trigger | Timing | Idempotency | Ordering | Failure mode | Degraded | Detection |
+|---|---|---|---|---|---|---|---|---|---|---|
+| MO-1 | Client → Razorpay pay-in | → | Hosted or in-app checkout, UPI, net banking, cards | Client action | Seconds | Payment identifier | Not applicable | Client charged, broker not notified | **Queue** — reconcile from the gateway, never from the client's screenshot | Initiated-versus-captured reconciliation |
+| MO-2 | Razorpay → broker, payment webhook | ← | HTTPS webhook, signed | Payment state change | Seconds, with retries | Event identifier | **Not guaranteed** | Duplicate delivery; out-of-order states | **Continue** — idempotent handler, never regress state | Signature failures, duplicate rate, unmatched-event count |
+| MO-3 | Razorpay → broker bank account, settlement | ← | Bank credit, `settlement.processed` event | Per settlement cycle | Per configured cycle | Settlement identifier and UTR | Not applicable | Settlement into the wrong account class | **Stop** — must settle to the designated client bank account, not an own account | Daily account-level assertion; see [pay-in rails](/broking-kyc/finix-broking-setup/money/02-payin-rails/) |
+| MO-4 | Broker → Razorpay Smart Collect virtual accounts | ↔ | Virtual account allocation; bank transfer inbound | Client transfer | Minutes | Virtual account plus UTR | Not applicable | Transfer from a third-party account into a client's virtual account | **Stop** — credit only on name or account match; third-party payment is prohibited | Payer-name mismatch exception queue |
+| MO-5 | Broker → RazorpayX payout | → | REST; contact, fund account, payout objects | Approved pay-out | Seconds to initiate | Broker-generated reference on the payout | Not applicable | Double submission creating two payouts | **Stop** on ambiguity — never retry a payout without the idempotency reference | Duplicate-payout detection, reference uniqueness assertion |
+| MO-6 | RazorpayX → broker, payout webhook | ← | HTTPS webhook, signed | Payout state change | Seconds, with retries | Event identifier | **Not guaranteed** | `processed` arrives before `queued`; reversal after apparent success | **Continue** — terminal states accepted out of order; reversal must debit the ledger again | Terminal-state reconciliation against a daily payout statement |
+| MO-7 | Bank → broker, account statement | ← | File or API | Daily, intraday where available | Daily | Statement line identifier | Sequential | Line items the broker cannot attribute | **Queue** into an exception pool; unattributed client money is a reportable condition if aged | Unmatched-line ageing, see [bank reconciliation](/broking-kyc/finix-broking-setup/money/04-bank-recon/) |
+| MO-8 | Broker → clearing bank, margin and settlement funding | → | Bank channel, often certificate-based | Treasury decision, obligation | Intraday, deadline-bound | Instruction reference | Not applicable | Instruction after cut-off; funds not recognised by the clearing corporation in time | **Stop** — escalate, never assume credit | Instruction-to-recognition reconciliation with the clearing corporation |
+| MO-9 | Clearing corporation → broker, collateral and margin statements | ← | Member reports | Daily and intraday | Per publication | Report date and type | Sequential | Report not retrieved; margin believed sufficient | **Stop** — do not open the next day without the prior day's statements | Expected-report checklist with per-report assertion |
+| MO-10 | Broker → upstreaming of client funds | → | Bank and clearing corporation mechanism | Daily, rule-driven | Deadline-bound | Instruction reference | Not applicable | Under-upstreamed balance at end of day | **Stop** — treat as a breach to be reported, not an operational variance | Daily computation versus instruction reconciliation |
+| MO-11 | SecMark back office → payout authorisation | → | API or file | Client request plus ledger check | Minutes | Request identifier | Not applicable | Payout authorised against an unsettled credit | **Stop** — authorise only against clear, settled balance | Authorised-versus-clear-balance exception |
+
+## 6. Record path
+
+| # | Boundary | Direction | Trigger | Timing | Idempotency | Failure mode | Degraded | Detection |
+|---|---|---|---|---|---|---|---|---|
+| RE-1 | Exchange trade file → SecMark back office | ← | Post-session publication | Must complete before contract notes | File name and date | Partial file; file re-published after correction | **Stop** — never produce contract notes on an incomplete file | Trade count and value reconciliation against OMS |
+| RE-2 | Saral OMS trade feed → SecMark | → | Real-time and end-of-session | Continuous | Trade identifier | Divergence from the exchange file | **Stop** contract notes; investigate every difference | Three-way: OMS, exchange file, back office |
+| RE-3 | Clearing corporation obligation files → SecMark | ← | Per settlement, final on T+1 | Deadline-bound | Settlement plus file type | Obligation not loaded; pay-in missed | **Stop** — escalate immediately | Expected-file checklist per settlement |
+| RE-4 | SecMark → contract notes to clients | → | Post-reconciliation | Within the prescribed deadline | Contract note number | Delivery failure; note generated but not delivered | **Queue** delivery, but generation deadline is absolute | Generated-versus-delivered-versus-acknowledged funnel |
+| RE-5 | SecMark → depository, delivery instructions | → | Settlement | Deadline-bound | Instruction reference | Instruction late or rejected; short delivery into auction | **Stop** and escalate; short delivery has a defined consequence path | Instruction acknowledgement reconciliation |
+| RE-6 | Depository → SecMark, holdings and transactions | ← | Daily and on event | Daily | Statement date | Holdings disagree with the back office | **Stop** recognising disputed holdings as collateral | Daily holdings reconciliation |
+| RE-7 | SecMark → exchange margin reporting | → | Daily, cut-off five working days after trade date | Deadline-bound | Trade date plus report version | Late or malformed file | **Stop** — reject the run rather than file malformed; late filing is separately penalised | Submission acknowledgement per trade date |
+| RE-8 | SecMark → CUSPA pledge instructions, depository | → | At pay-out | Same day as pay-out | Instruction reference | Auto-pledge not created; unpaid securities unsecured | **Stop** further exposure for that client | Pay-out-versus-pledge reconciliation; see [CUSPA](/broking-kyc/finix-broking-setup/backoffice/06-cuspa-unpaid-securities/) |
+| RE-9 | SecMark → client statements and holdings | → | Scheduled | Per prescribed frequency | Statement period | Statement sent with stale data | **Stop** the run; a wrong statement is worse than a late one | Pre-send assertion against ledger close |
+| RE-10 | SecMark AML Sutra → FIU-IND reporting | → | On threshold or suspicion | Per prescribed timeline | Report reference | Report not filed within the timeline | **Stop** — compliance escalation | Filing register with deadline tracking |
+| RE-11 | SecMark → SmartReco, bank and gateway reconciliation | → | Daily | Daily | Run identifier | Reconciliation runs but exceptions are not worked | **Continue** running, **stop** calling it reconciled | Exception ageing, not exception count |
+| RE-12 | SecMark Partner Portal → sub-broker and branch accounting | → | Daily | Daily | Period plus partner | Commission computed on unreconciled trades | **Queue** until the trade file is reconciled | Partner-statement-versus-ledger assertion |
+| RE-13 | SecMark → firm general ledger | → | Daily or periodic | Per close | Period | Client ledger and firm books diverge | **Queue**; resolve at close | Control-account reconciliation |
+| RE-14 | SecMark ComplianceSutra → filings and evidence | → | Per calendar | Deadline-bound | Obligation plus period | A due obligation with no owner | **Stop** — the calendar is the control | Overdue-obligation report |
+
+## 7. Cross-cutting contracts
+
+| # | Concern | Contract |
+|---|---|---|
+| X-1 | Clock | All systems synchronised to a common time source; order and trade timestamps are evidence, and a skewed clock is an evidentiary failure, not a nuisance |
+| X-2 | Client code | One client code across OMS, RMS, back office, depository mapping and exchange registration; any system that mints its own identifier must store the canonical one |
+| X-3 | Instrument identity | A single instrument master, sourced from the exchange, distributed to every consumer in the same version on the same day |
+| X-4 | Audit log | Every interface writes an immutable record of what it sent and received, retained on the eight-year floor |
+| X-5 | Monitoring | Every boundary in this page has at least one synthetic or assertion-based check that fails loudly; connection-level monitoring alone is insufficient |
+| X-6 | Replay | Every file-based inbound interface supports deliberate re-ingestion without double-posting, because operators will re-download files |
+| X-7 | Back-pressure | No asynchronous consumer may block a synchronous producer in the order path |
+| X-8 | Versioning | Exchange protocol and vendor API versions are tracked per interface with a known upgrade window; protocol upgrades are certification events |
+
+## 8. The interfaces most likely to hurt you
+
+Ranked by the gap between how simple they look and how they actually fail.
+
+| Rank | Interface | Why it is worse than it looks |
+|---|---|---|
+| 1 | OP-5 market data | Stale is invisible and poisons every downstream number simultaneously |
+| 2 | RI-7 collateral and balance load into RMS | A silent as-of failure gives every client the wrong limit all day, in the loose direction |
+| 3 | MO-6 payout webhook | Out-of-order and reversal semantics regress ledgers if the handler assumes a sequence |
+| 4 | RE-1 and RE-2 trade reconciliation | A one-trade difference blocks the entire contract-note run, and the deadline does not move |
+| 5 | ON-3 eSign retrieval | A signature that exists at the vendor but not with the broker is an account that looks incomplete and is legally complete |
+| 6 | RI-1 risk parameter file | A missed intraday publication under-margins the whole derivatives book |
+| 7 | MO-4 virtual-account credit | Third-party money credited to a client account is a regulatory breach created by a successful payment |
+| 8 | ON-9 UCC partial batch | A client who can trade in one segment and not another generates immediate complaints and looks like a system defect |
+| 9 | MO-8 clearing bank funding | Deadlines are hard, bank channels are brittle, and consequences are same-day |
+| 10 | RE-8 CUSPA auto-pledge | New in 2026, deadline-driven, and failure leaves the firm carrying unsecured exposure |
+
+## Practical notes
+
+- **Write the degraded-behaviour column before you write the integration.** It is a business decision disguised as an engineering one, and it is cheaper to get a decision in a design review than during an incident.
+- **Build a replay harness for every file interface on day one.** Operators will re-download files; the only question is whether the second load corrupts the ledger.
+- **Reconcile counts, not just status codes.** An interface that accepted a batch of 980 records when you sent 1,000 returns success. The assertion that matters is the count, then the sum, then the hash.
+- **Monitor the absence of traffic.** Most of these interfaces have an expected volume and an expected time. A quiet interface at 09:20 is an incident even though nothing has errored.
+- **Give every interface one named owner.** Not a team — a person who gets the alert and can call the vendor. Shared ownership of an interface reliably means nobody watching it.
+- **Test the degraded path in a drill.** The business continuity drill is the natural vehicle; see [BCP and DR drill](/broking-kyc/deep-dives/specialty/bcp-dr-drill/).
+
+## Where this connects
+
+- [Vendor map](/broking-kyc/finix-broking-setup/stack/vendor-map/) — which system is on each side of these boundaries, and why
+- [Environments and configuration baseline](/broking-kyc/finix-broking-setup/stack/environments-config-baseline/) — the credentials, refresh jobs and staleness rules these contracts assume
+- [Integration DAG](/broking-kyc/operations/integration-dag/) — the dependency ordering across the whole programme
+- [Error handling](/broking-kyc/operations/error-handling/) — the vendor-neutral treatment of failure classes
+- [Incident playbooks](/broking-kyc/finix-broking-setup/daily-ops/07-incident-playbooks/) — what to actually do when one of these fails mid-session

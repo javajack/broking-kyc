@@ -1,0 +1,243 @@
+---
+title: "Setup 1: entity and capital structure"
+description: Choosing the legal form, designing the shareholding so fit-and-proper and the designated-director residency rule are satisfiable, computing net worth the way the regulator computes it, planning for variable net worth that scales with client balances, and sizing the total capital requirement including deposits across three exchanges.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Capital for a broking business is not one number, it is four — net worth that must be maintained continuously, base minimum capital deposited with the exchange, security and other deposits that vary by exchange and segment, and working capital for the eighteen months before the business pays for itself. They are computed differently, they are held in different places, and only one of them is returnable. The page therefore separates them explicitly, then treats the two things that surprise first-time applicants: that net worth is computed after deducting most of the assets you would naturally buy, and that it has a variable component which grows with the client book.
+
+## TL;DR
+
+- **Net worth is capital plus free reserves, minus most of what you would spend the capital on.** The computation follows the Dr. L. C. Gupta Committee formula: share capital plus free reserves, less non-allowable assets — fixed assets, pledged securities, debts and advances other than trade debtors under three months, prepaid expenses, losses, intangible assets and 30 percent of marketable securities. Buying servers reduces net worth. `[methodology published by the exchanges; confirm the current Schedule under the 2026 regulations]`
+- **Base net worth under the 2026 regulations is ₹1 crore for a trading member, ₹5 crore self-clearing, ₹15 crore clearing and ₹50 crore professional clearing**, set out in Chapter X of the [SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/).
+- **NSE adds a variable net worth requirement of 10 percent of the average daily client cash balance retained across segments and exchanges over the previous six months.** This is the figure that catches growing brokers: succeed at gathering client funds and the net worth requirement rises behind you.
+- **Base minimum capital is a function of your business model, decided before you apply.** On NSE: ₹10 lakh proprietary without algorithms, ₹15 lakh client-only without proprietary and without algorithms, ₹25 lakh proprietary plus client without algorithms, ₹50 lakh for any member with algorithms. An API offering is an algorithm offering.
+- **Fit and proper applies to the entity, its directors and its significant shareholders**, and it is a continuing condition, not an entry test. Design the shareholding so that a future investor does not trigger a problem.
+- **The designated-director residency rule is a structural constraint.** At least one designated director must stay in India for not less than 182 days in a financial year. For a founder-team spread across jurisdictions this has to be solved at incorporation, not at application.
+- **Budget the deposits three times over.** NSE, BSE and MCX each have their own admission fee, deposit and net worth treatment, and commodity membership at MCX is structured differently from equity membership at NSE.
+
+## Conceptual overview
+
+The capital question for a broker is really a liquidity question wearing a solvency costume. The regulator cares about net worth because a broker holds client money and client securities, and the firm's own capital is the buffer between a trading loss or an operational failure and a client's assets. That is why the computation strips out illiquid and encumbered assets: a server farm and a pledged portfolio do not help a client whose funds have gone missing. Once you see the computation that way, the deductions stop looking arbitrary. Everything that cannot be turned into cash quickly and without someone else's permission is excluded.
+
+The second structural fact is that broking capital requirements are *layered by role*, not by size. A trading member that routes orders and lets someone else clear them carries ₹1 crore of net worth. The moment the firm clears its own trades, it stands between its clients and the clearing corporation for settlement, and the requirement jumps fivefold to ₹5 crore. Clear for others and it is ₹15 crore. The jumps are not proportionate to volume because the risk being capitalised is not volume risk, it is the risk of standing in the settlement chain. That makes the clearing decision in [clearing arrangement](/broking-kyc/finix-broking-setup/setup/04-clearing-arrangement/) one of the two or three most expensive decisions in the whole setup.
+
+The third fact, and the one most often missed in a business plan, is that a successful broker's regulatory capital requirement grows automatically. NSE's variable net worth component is a percentage of the average client cash balance retained. A firm that doubles its client funds under administration has increased its own net worth requirement without taking a single new risk decision. Capital planning therefore has to be a forward projection tied to the client-funds forecast, with headroom, because falling below net worth is not a soft breach — it is a condition of registration.
+
+## 1. Regulatory framework
+
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/reference/circulars/sebi-other/)** — notified 7 January 2026, file number SEBI/LAD-NRO/GN/2026/291, published in the Gazette of India Extraordinary Part III Section 4. Eleven chapters and fifty-one regulations; Chapter II registration and eligibility, Chapter X net worth and deposits. Complete repeal of the SEBI (Stock Brokers) Regulations, 1992. `[not yet in index]`
+- **Securities Contracts (Regulation) Act, 1956** and the rules under it — the statutory basis for exchange membership and the eligibility conditions that sit alongside the SEBI regulations.
+- **Companies Act, 2013** — the entity itself, including the net worth definition at section 2(57), which is *not* the same as the broking net worth computation and must not be substituted for it.
+- **Exchange net worth computation clarifications** — NSE, BSE, MCX and NCDEX publish the applicable computation format, the certifying auditor's responsibilities and the periodicity. The Dr. L. C. Gupta Committee formula and the non-allowable asset list derive from Schedule VI of the 1992 regulations as substituted in 2013; verify the corresponding schedule or annexure under the 2026 regulations before certifying. `[not yet in index]`
+- **Fit and proper criteria** — applied to the applicant, its principal officers, directors and significant shareholders as a continuing requirement. See [fit and proper](/broking-kyc/deep-dives/member-compliance/fit-and-proper/).
+- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — the consolidated operating obligations that attach once registered.
+
+## 2. Choosing the legal form
+
+| Form | Permitted | Practical assessment for Finix |
+|---|---|---|
+| Private limited company | Yes | **Chosen.** Limited liability, clean shareholding for future investment, familiar to exchanges and banks, and the only form in which the designated-director and key-management structure the regulations assume works naturally |
+| Public limited company | Yes | Unnecessary overhead at launch; a conversion path exists if listing is contemplated |
+| Limited liability partnership | Yes, at NSE and BSE | Workable, but fund-raising and employee equity are harder, and some vendor and bank processes are less well trodden |
+| Registered partnership firm | Yes at MCX; limited elsewhere | Unlimited liability for partners; not appropriate where client money is held |
+| Individual or proprietorship | Yes at MCX and for BSE deposit-based membership | Not appropriate for a client-facing business of any scale |
+| Hindu undivided family | Listed as eligible at MCX | Not appropriate |
+| Co-operative society | Listed as eligible at MCX | Not applicable |
+
+<Aside type="note" title="Eligible entity types differ by exchange">
+MCX publishes a wider list of eligible entity types — individual and proprietorship, registered partnership, HUF, private limited, public limited and co-operative societies — than a new equity-first broker would consider. BSE invites applications for deposit-based membership from individuals, corporates, partnership firms and LLPs. Pick the form that satisfies the strictest exchange you intend to join and the business you intend to build, not the most permissive one.
+</Aside>
+
+## 3. Shareholding design
+
+The shareholding structure has to survive three tests simultaneously: fit and proper on every significant shareholder, the designated-director residency rule, and whatever a future funding round does to both.
+
+| Design rule | Reason |
+|---|---|
+| Keep the significant-shareholder list short at application | Every significant shareholder is a fit-and-proper subject, each one adds documentation and diligence time |
+| Identify the designated director or directors before incorporation | The 182-day residency condition is a personal circumstance, not a corporate one; existing brokers were given a six-month window to comply, a new applicant has none |
+| Document the two-years-experience condition against a named person | The 2026 regulations require at least two years' experience in trading or dealing in securities; it must be evidenced, not asserted |
+| Avoid layered holding structures at launch | Beneficial ownership has to be traced for fit and proper and for anti-money-laundering purposes; layers add weeks |
+| Plan for change-of-control approval | A future investment that changes control is a regulatory event, not just a corporate one. See [KMP changes](/broking-kyc/deep-dives/member-compliance/kmp-changes/) |
+| Keep capital in cash at application | Net worth deductions punish anything else; see the computation below |
+
+## 4. Computing net worth the way it is computed
+
+`[methodology from exchange-published computation clarifications; verify the current schedule under the 2026 regulations]`
+
+### 4.1 What counts
+
+| Included | Detail |
+|---|---|
+| Paid-up equity share capital | Fully paid |
+| Paid-up preference share capital | As published in the computation format |
+| Fully, compulsorily and mandatorily convertible instruments | Debentures, bonds or warrants convertible within five years of issue |
+| Free reserves | Profit and loss account balance, general reserve, securities premium, preference share redemption reserve, capital redemption reserve and similar |
+| Other securities approved by the Board | As specified from time to time |
+
+### 4.2 What is deducted — the non-allowable assets
+
+| Deducted | Why it matters in practice |
+|---|---|
+| Fixed assets | Every server, every office fit-out and every piece of network hardware reduces net worth rupee for rupee |
+| Pledged securities | Collateral given to the clearing corporation is not available to absorb losses |
+| Member's card | Historic item, retained in the format |
+| Debts and advances, other than trade debtors under three months | A loan to a group company does not count; an aged client debit does not count |
+| Prepaid expenses and losses | Annual vendor licences paid up front are deducted |
+| Intangible assets | Capitalised software and goodwill do not count |
+| 30 percent of marketable securities | A haircut on own investments |
+
+<Aside type="caution" title="The practical consequence is that you need more capital than the headline figure">
+A trading member needing ₹1 crore of net worth cannot capitalise at ₹1 crore and then buy ₹30 lakh of infrastructure and prepay ₹15 lakh of annual licences — those purchases are deductions, and the firm is immediately below requirement. Size the capital as: required net worth, plus every non-allowable asset you intend to hold, plus the deposits, plus working capital. For Finix, the infrastructure and prepaid software alone move the practical equity requirement well above the regulatory floor.
+</Aside>
+
+### 4.3 Base net worth by role
+
+| Role | Base net worth |
+|---|---|
+| Trading member (stock broker) | ₹1 crore |
+| Self-clearing member | ₹5 crore |
+| Clearing member | ₹15 crore |
+| Professional clearing member | ₹50 crore |
+
+### 4.4 Variable net worth
+
+NSE requires, in addition to the base, variable net worth equal to **10 percent of the average daily cash balance of clients retained, across segments and exchanges, in the previous six months**.
+
+| Average client cash retained | Variable component | Total net worth for a trading member |
+|---|---|---|
+| ₹5 crore | ₹50 lakh | ₹1.5 crore |
+| ₹20 crore | ₹2 crore | ₹3 crore |
+| ₹50 crore | ₹5 crore | ₹6 crore |
+| ₹100 crore | ₹10 crore | ₹11 crore |
+
+Two design responses follow, and they are not mutually exclusive. The first is to hold more equity than the floor from the outset. The second is to reduce the *retained* client cash balance, which is what the running-account settlement and upstreaming regimes push towards anyway — money returned to clients or upstreamed is not retained. That makes [upstreaming and downstreaming](/broking-kyc/finix-broking-setup/money/06-upstreaming-downstreaming/) and [running account settlement](/broking-kyc/reference/field-atlas/sections/ac-running-account-settlement/) capital-relevant, not merely operational.
+
+### 4.5 Certification and monitoring
+
+| Item | Requirement |
+|---|---|
+| Certifying authority | Statutory auditor or a chartered accountant, in the exchange-published format |
+| Periodicity | As specified by the exchange, with half-yearly submission being the common pattern; confirm current periodicity for each exchange |
+| Internal monitoring | Monthly, not at submission frequency — a breach discovered at submission has already existed for months |
+| Trigger events | Any dividend, buy-back, asset purchase, prepayment, write-off or increase in client balances |
+| Breach handling | Immediate intimation and a cure plan; net worth is a condition of registration, not a reported metric |
+
+Build the net worth computation as a monthly report out of the firm's own books, with the non-allowable asset deductions automated. See [compliance configuration baseline](/broking-kyc/finix-broking-setup/compliance/01-compliance-config-baseline/).
+
+## 5. Base minimum capital — a business-model decision
+
+NSE's base minimum capital deposit depends on what the member will do:
+
+| Business model | Deposit |
+|---|---|
+| Proprietary trading only, without algorithms | ₹10 lakh |
+| Trading on behalf of clients only, without proprietary trading and without algorithms | ₹15 lakh |
+| Proprietary trading and client business, without algorithms | ₹25 lakh |
+| Any trading member with algorithms | ₹50 lakh |
+
+Plus **₹1 lakh in cash as initial or interest-free security deposit towards NSE Clearing**, which is not required if a clearing or self-clearing member clears and settles trades only on a gross basis for both securities and funds with no settlement guarantee.
+
+<Aside type="caution" title="An API is an algorithm for this purpose">
+If Finix intends to offer programmatic order entry, a strategy builder, or any facility where orders are generated without a human pressing a key for each one, it is in the algorithmic category and the deposit is ₹50 lakh rather than ₹25 lakh. Deferring the API to year two to save ₹25 lakh at application is a legitimate choice — but it means a later application, a later approval and a later certification, so decide it deliberately. See [algo, API, DMA and SOR](/broking-kyc/finix-broking-setup/oms/09-algo-api-dma-sor/).
+</Aside>
+
+See [base minimum capital and ABC](/broking-kyc/deep-dives/member-compliance/bmc-abc/) for the composition rules, the permitted forms, and the annual base capital regime.
+
+## 6. Fees and deposits across the three exchanges
+
+Figures as published by the exchanges; all of them change by circular, and the commodity structure in particular should be re-verified against the 2026 regulations.
+
+### 6.1 NSE
+
+| Item | Amount |
+|---|---|
+| Application processing fee | ₹10,000 plus applicable tax, all segments except exclusive Electronic Gold Receipts; ₹5,000 plus tax for exclusive EGR |
+| One-time admission fee | ₹5,00,000 plus tax for all segments except exclusive Commodity (₹1,00,000) and exclusive Debt (₹50,000) |
+| Admission fee, combined application | ₹50,000 if applying for Cash, Futures and Options, Currency Derivatives and Commodity segments collectively |
+| Base minimum capital | ₹10 lakh to ₹50 lakh by business model, as above |
+| Clearing deposit | ₹1 lakh cash interest-free security deposit to NSE Clearing, with the gross-basis exemption noted above |
+
+<Aside type="tip" title="Apply for segments together">
+The combined-application admission fee of ₹50,000 for Cash, F&O, Currency and Commodity, against ₹5,00,000 for a general application, is a large saving and a reason to decide the full segment list up front rather than adding segments later. The trade-off is that each segment adds its own certification and compliance surface from day one.
+</Aside>
+
+### 6.2 BSE
+
+| Item | Amount |
+|---|---|
+| Deposit-based membership | Against a deposit of ₹10,00,000 |
+| Earnest money with application | ₹1,00,000 |
+| Net worth | ₹1 crore trading member and limited trading member; ₹5 crore self-clearing; ₹15 crore trading-cum-clearing; ₹50 crore professional clearing |
+| Eligible applicants | Individuals, corporates, partnership firms and LLPs |
+
+### 6.3 MCX
+
+Figures below are from MCX's published membership material and use MCX's own categories; read them together with the net worth requirements under the 2026 regulations, which apply to a broker registered with SEBI regardless of exchange-published legacy figures.
+
+| Item | Amount |
+|---|---|
+| Processing charges | ₹10,000 plus applicable taxes, non-refundable, per MCX/MEM/669/2019 dated 26 November 2019 `[not yet in index]` |
+| Trading member admission fee | ₹7,50,000, non-refundable |
+| Minimum paid-up capital | ₹30 lakh |
+| Net worth, MCX-published categories | Trading member ₹10 lakh individual / ₹25 lakh corporate; trading-cum-clearing ₹75 lakh; professional clearing ₹500 lakh |
+| Eligible applicants | Individual or proprietorship, registered partnership, HUF, private limited, public limited, co-operative societies |
+
+<Aside type="caution" title="Reconcile the commodity net worth figures before relying on them">
+MCX's published trading-member net worth figures are materially lower than the ₹1 crore base in Chapter X of the 2026 regulations. A SEBI-registered stock broker operating in the commodity derivatives segment under single registration is subject to the regulations; the exchange-published figure may be a legacy category or may apply to a membership class the firm is not using. This is exactly the kind of discrepancy to resolve in writing with the exchange and with counsel before budgeting — and it is the reason this manual labels the source of every number.
+</Aside>
+
+## 7. Total capital plan for Finix
+
+Illustrative, assuming a private limited company, self-clearing in equity and derivatives, trading member in commodities clearing through a clearing member, client business plus proprietary, with an API offering from launch, across NSE, BSE and MCX.
+
+| Layer | Component | Indicative amount | Returnable |
+|---|---|---|---|
+| Net worth | Self-clearing member base | ₹5 crore | Maintained, not deposited |
+| Net worth | Variable component at launch assumptions | Planned headroom | Maintained |
+| Deposit | NSE base minimum capital, with algorithms | ₹50 lakh | Yes, on exit |
+| Deposit | NSE Clearing interest-free security deposit | ₹1 lakh | Yes |
+| Deposit | BSE deposit-based membership | ₹10 lakh | Per exchange terms |
+| Deposit | MCX deposits per category | Per MCX schedule | Per exchange terms |
+| Fee | NSE admission, combined segments | ₹50,000 | No |
+| Fee | NSE application processing | ₹10,000 | No |
+| Fee | BSE earnest money | ₹1 lakh | Adjusted or refunded per terms |
+| Fee | MCX processing and admission | ₹7.6 lakh | No |
+| Fee | SEBI registration and turnover fees | Chapter IX, segment-wise turnover fees of ₹1 to ₹10 per crore of turnover; clearing member ₹50,000 annually; 1 percent per month on delay | No |
+| Non-allowable | Infrastructure, connectivity, prepaid licences | Project-specific | Deducted from net worth |
+| Working capital | 18 to 24 months of operating cost | Business-plan driven | — |
+
+The practical conclusion is that the regulatory floor is the smallest number in this table. The capital that has to be raised is the floor plus the deductions plus the deposits plus the runway, and the deductions are the part that gets forgotten.
+
+## 8. Sequence and evidence
+
+| Step | Output | Needed by |
+|---|---|---|
+| 1. Decide roles and segments | Membership category per exchange, segment list | Everything downstream |
+| 2. Incorporate | Certificate of incorporation, memorandum and articles | Registration application |
+| 3. Capitalise in cash | Bank statement, share certificates, shareholding pattern | Net worth certificate |
+| 4. Identify designated directors and key people | Residency evidence, experience evidence, NISM certification plan | Eligibility under Chapter II |
+| 5. Obtain net worth certificate | Auditor certificate in the exchange format | Membership application |
+| 6. Prepare fit-and-proper documentation | Declarations and diligence for entity, directors, significant shareholders | Membership and registration |
+| 7. Pay fees and place deposits | Receipts | Admission |
+| 8. Build the monthly net worth monitor | Report with automated deductions | Ongoing compliance |
+
+## Practical notes
+
+- **Do not confuse the Companies Act net worth with the broking net worth.** Section 2(57) gives a different and generally larger figure. Auditors unfamiliar with broking have certified the wrong one.
+- **Capitalise in cash and spend afterwards, deliberately.** Every rupee converted into a fixed asset or a prepayment is a rupee off net worth. Where feasible, prefer monthly vendor billing over annual prepayment during the period when net worth headroom is thin, even at a slightly higher total cost.
+- **Model the variable net worth requirement in the business plan from month one.** The quickest route to an unexpected breach is a successful client-acquisition quarter.
+- **Keep the deposits out of the operating account.** They are not working capital and treating them as a buffer is how members end up short at a settlement deadline.
+- **Get the commodity figures confirmed in writing.** The gap between MCX's published legacy categories and the 2026 regulations is the single largest unresolved number in this page, and it is a budget-level difference.
+- **Re-verify every figure here before you rely on it.** Fees and deposits are circular-driven and this page carries dates and sources precisely so that re-verification is quick.
+
+## Where this connects
+
+- [SEBI registration under the 2026 regulations](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/) — what the capital unlocks
+- [Exchange membership](/broking-kyc/finix-broking-setup/setup/03-exchange-membership/) — the process that consumes these documents
+- [Clearing arrangement](/broking-kyc/finix-broking-setup/setup/04-clearing-arrangement/) — the decision that sets which net worth tier applies
+- [Base minimum capital and ABC](/broking-kyc/deep-dives/member-compliance/bmc-abc/) — deposits in depth
+- [Fit and proper](/broking-kyc/deep-dives/member-compliance/fit-and-proper/) — the continuing eligibility test
+- [Membership renewal](/broking-kyc/deep-dives/member-compliance/membership-renewal/) — the annual cycle that begins at admission

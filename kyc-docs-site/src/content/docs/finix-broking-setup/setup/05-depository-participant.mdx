@@ -1,0 +1,179 @@
+---
+title: "Setup 5: depository participation"
+description: Whether to become a depository participant or use a tie-up, the net worth step-up to ₹5 crore for a stock broker DP, the admission process at CDSL and NSDL, the operational capability a DP must build, and the specific dependencies that pledge, delivery, direct pay-out and the CUSPA regime create.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Depository participation is usually presented as an optional revenue line, which badly understates it. A broker that is not a DP still depends on depository functions for everything that matters — pledge of client collateral, delivery of securities at settlement, direct pay-out to client demat accounts, and the auto-pledge that the 2026 unpaid-securities regime requires at pay-out. The question is therefore not whether the firm needs depository capability, but whether it holds that capability itself or rents it. So the page starts from what depends on the depository, then the capital and admission reality, then the build, then the dependency consequences of each choice.
+
+## TL;DR
+
+- **The net worth requirement for a stock broker to become a DP stepped up to ₹5 crore.** CDSL's published requirement was ₹3 crore with effect from 23 February 2023 and ₹5 crore with effect from 23 February 2024, under the SEBI (Depositories and Participants) (Amendment) Regulations, 2022 dated 23 February 2022; NSDL states ₹5 crore for a stock broker. `[not yet in index]`
+- **For Finix this is the same number as self-clearing**, so the two decisions should be taken together: ₹5 crore satisfies both the self-clearing member tier and the stock-broker DP tier, which makes DP admission substantially cheaper in marginal capital terms than it first appears.
+- **Three operationally critical things route through a depository**, regardless of whether the broker is a DP: the pledge and re-pledge chain for client collateral, securities settlement including early pay-in and direct pay-out to client demat, and the CUSPA auto-pledge at pay-out under the [2026 unpaid-securities framework](/broking-kyc/finix-broking-setup/backoffice/06-cuspa-unpaid-securities/).
+- **Being a DP buys control over the client experience and the timeline.** A non-DP broker's client has to open a demat account somewhere, and every account-opening delay, modification and closure runs through a counterparty with its own service levels.
+- **Being a DP buys a second regulated business with its own obligations.** A DP is separately inspected, separately audited, has its own compliance officer requirement, its own charge schedule, its own grievance obligations and its own operating instructions manual.
+- **Dual-depository operation is a real design burden.** CDSL and NSDL differ in instruction formats, activation timelines, pledge mechanics and file structures. Site coverage shows CDSL beneficiary-owner activation in hours by application programming interface against roughly fifteen days by batch for NSDL — which makes NSDL the activation bottleneck in onboarding.
+- **Finix becomes a CDSL DP and reaches NSDL through a tie-up at launch**, accepting that a client who insists on an NSDL demat account is served on a longer timeline.
+
+## Conceptual overview
+
+The depository is where securities actually live. A broking account is an instruction channel; a demat account is ownership. That separation is why so much of a broker's operational risk concentrates at the depository boundary: the firm promises a client a position, the exchange confirms a trade, the clearing corporation computes an obligation, but the thing the client owns only changes when a depository record changes. Every mismatch a back office reconciles is ultimately a question about whether the depository agrees.
+
+This has become more pronounced, not less, over the last few years. The pledge regime moved client collateral out of broker-held accounts and into a visible pledge chain inside the depository system, so collateral is now a depository record rather than a transfer. Direct pay-out sends securities to the client's demat account rather than through a broker pool account. And the 2026 unpaid-securities framework requires an auto-pledge into a dedicated pledgee account at the moment of pay-out, with daily recomputation of the maximum pledge value and an automatic release by the depositories on the sixth trading day. Each of these moved a function that used to be internal to the broker into the depository, which means depository integration quality now determines whether those functions work.
+
+The decision about participation follows from that. A broker that is a DP controls account opening, modification, pledge instruction, and the service experience, and absorbs the cost of a second regulated business. A broker that is not a DP has a counterparty in the middle of its most time-sensitive onboarding step and its collateral chain. Neither is wrong, but the non-DP route is systematically underestimated: the broker still carries the client's expectation about timelines while controlling none of them.
+
+## 1. Regulatory framework
+
+- **SEBI (Depositories and Participants) Regulations, 2018**, as amended — eligibility categories and net worth for participants. The **SEBI (Depositories and Participants) (Amendment) Regulations, 2022** dated 23 February 2022 set the stock-broker step-up to ₹3 crore from 23 February 2023 and ₹5 crore from 23 February 2024. `[not yet in index]`
+- **Depositories Act, 1996** — the statutory basis for dematerialised holding and transfer.
+- **CDSL and NSDL bye-laws, business rules and operating instructions** — the operative rulebook for a participant, including instruction formats, timelines and charge structures. See the [CDSL circulars index](/broking-kyc/reference/circulars/cdsl/) and [NSDL circulars index](/broking-kyc/reference/circulars/nsdl/).
+- **[Margin obligations by way of pledge and re-pledge, SEBI/HO/MIRSD/DOP/CIR/P/2020/28](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddopcirp202028)** (25 February 2020) — in force from 1 August 2020; off-market transfer of client securities as collateral prohibited, beneficial ownership retained by the client, pledge chain visible in the pledgor's demat account.
+- **[Client unpaid securities pledgee account, HO/38/11/(9)2026-MIRSD-POD/I/15382/2026](/broking-kyc/reference/circulars/sebi-mirsd/#ho381192026-mirsd-podi153822026)** (3 July 2026) — amends paragraph 46 of the master circular; creates the CUSPA regime with auto-pledge at pay-out and depository-driven auto-release on the sixth trading day.
+- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025).
+- **Nomination and DDPI frameworks** — see [nomination fields](/broking-kyc/reference/field-atlas/sections/i-nomination/) and [DDPI fields](/broking-kyc/reference/field-atlas/sections/o-ddpi/).
+
+## 2. What depends on the depository, whether or not you are a DP
+
+| Function | Depository dependency | Consequence of a weak integration |
+|---|---|---|
+| Client demat account opening | Account creation and activation | Trading enabled without a demat account; delivery trades the client cannot settle |
+| Holdings view | Daily holdings and transaction statements | Client sees a position the depository does not confirm |
+| Collateral pledge | Client-to-member pledge, then re-pledge up the chain | Collateral not recognised; limits wrong; margin shortfall |
+| Pledge release | Release instruction on reduction of obligation | Client's securities remain encumbered after the obligation goes |
+| Securities pay-in | Delivery instruction by the settlement deadline | Short delivery, auction, close-out |
+| Early pay-in | Instruction before the deadline for margin benefit | Margin benefit lost |
+| Direct pay-out to client demat | Clearing corporation to client, not via broker pool | Securities sitting where they should not |
+| CUSPA auto-pledge | Pledge created at pay-out, reason "unpaid" | Unsecured exposure; regulatory breach |
+| CUSPA release and invocation | Daily recomputation, release of excess, invocation on non-payment, depository verification of the block against client-level obligation | Pledge auto-released on day six with the obligation unpaid |
+| Corporate actions | Entitlements on record date | Wrong entitlements; client complaints |
+| Transmission and closure | Account lifecycle | See [transmission](/broking-kyc/lifecycle/transmission/) and [closure](/broking-kyc/lifecycle/closure/) |
+| Freeze and unfreeze | Client or regulatory instruction | Voluntary freeze obligations unmet |
+
+## 3. Participation versus tie-up
+
+| Dimension | Own DP | Tie-up with a DP |
+|---|---|---|
+| Net worth | ₹5 crore for a stock broker | No incremental requirement |
+| Admission effort | Full application, infrastructure audit, operating manual, named compliance officer | Commercial agreement |
+| Account opening control | Full — timeline, experience, data quality | Counterparty's process and service level |
+| Charges | Firm sets client charges; pays depository charges | Counterparty's schedule, with a margin |
+| Revenue | Annual maintenance, transaction and other charges | None, or a share |
+| Regulatory surface | A second regulated business: separate inspection, audit, grievance handling, reporting | None |
+| Operational build | Account opening, instruction processing, pledge, reconciliation, statements | Integration with the counterparty |
+| Data | Direct access to holdings and instruction status | Mediated, often with a delay |
+| Pledge and CUSPA control | Direct | Depends entirely on the counterparty's capability and timeliness |
+| Client experience | Single relationship | Two relationships the client can tell apart, usually at the worst moment |
+| Failure coupling | The firm's own failure | The counterparty's failure, with the firm carrying the client expectation |
+
+<Aside type="caution" title="The CUSPA regime raises the cost of a weak depository tie-up">
+The unpaid-securities framework requires a pledge created at pay-out without client instruction, a daily recomputation of the maximum pledge value from the client's ledger balance and margin obligations with release of excess on or before the next trading day, an extension request by 6 PM on the fifth trading day where liquidation is blocked, and an automatic release by the depositories on the sixth trading day if the pledge is neither invoked nor released. Every one of those is a dated, same-day or next-day depository instruction. A tie-up whose instruction processing runs on a batch cycle, or whose support desk works business hours, will miss them — and the consequence is unsecured exposure plus a regulatory breach, on the broker's licence rather than the counterparty's.
+</Aside>
+
+## 4. Admission as a participant
+
+| Step | Detail |
+|---|---|
+| 1. Eligibility | Stock broker category, with net worth of ₹5 crore; registration under the broker regulations in place or in progress |
+| 2. Application | To the depository, with the documentation pack from [exchange membership](/broking-kyc/finix-broking-setup/setup/03-exchange-membership/#21-the-documentation-pack) plus depository-specific forms |
+| 3. Net worth certificate | In the depository's format, from the statutory auditor |
+| 4. Infrastructure | Premises, systems, connectivity to the depository, business continuity; inspected |
+| 5. People | Compliance officer for the DP function; trained operations staff; NISM Depository Operations certification for designated staff |
+| 6. Operating instructions | The firm's own operations manual, mapped to the depository's business rules |
+| 7. Agreement and deposits | Participant agreement, security deposit and fees per the depository's schedule |
+| 8. SEBI registration as a participant | Granted on the depository's recommendation |
+| 9. Connectivity and testing | Depository system access, test transactions, certification |
+| 10. Go-live | Account opening enabled |
+
+Verify the current net worth figure, deposit and fee schedule directly with each depository before budgeting: the step-up schedule above came from an amendment with dated effective dates, and schedules change.
+
+## 5. The operational capability a DP must build
+
+| Capability | Daily reality |
+|---|---|
+| Account opening and modification | Maker-checker, document verification, data quality; see [modifications](/broking-kyc/lifecycle/modifications/) |
+| Instruction processing | Delivery instructions, pledge creation, closure, invocation and release, each with cut-offs |
+| Pledge operations | Client-to-member pledge, re-pledge, release, invocation; CUSPA creation and daily recomputation |
+| Settlement instructions | Pay-in by deadline, early pay-in, direct pay-out handling |
+| Reconciliation | Holdings, transactions and pledge positions against the back office and against risk, daily |
+| Statements | Transaction and holding statements at prescribed frequency; see [statements and retention](/broking-kyc/finix-broking-setup/backoffice/08-statements-retention/) |
+| Corporate actions | Entitlement processing and client communication; see [corporate actions](/broking-kyc/finix-broking-setup/backoffice/07-corporate-actions/) |
+| Freeze and unfreeze | Client-initiated and regulatory |
+| Transmission and nomination | Sensitive, document-heavy, and emotionally charged; see [transmission](/broking-kyc/lifecycle/transmission/) |
+| Charges and billing | Depository charge collection, including the charge-account treatment under the validated-handle regime |
+| Grievance handling | DP complaints, separate from broking complaints |
+| Audit and inspection | Internal, concurrent where applicable, and depository inspection |
+| Reporting | Depository reporting obligations on their own calendar |
+
+<Aside type="note" title="A DP is not a feature of the broking system">
+The common architectural error is to treat DP operations as a module of the back office. It is a separate regulated activity with its own records, its own audit trail, its own compliance officer and its own inspection. SecMark's back office is described as covering depository participants as well as broking, which makes a single-vendor approach feasible — but the *records* must remain separable, because an inspection of the DP will ask for DP records, not for a report that mixes them with broking.
+</Aside>
+
+## 6. Dual-depository reality
+
+| Dimension | CDSL | NSDL |
+|---|---|---|
+| Activation speed for a beneficiary-owner account | Hours, by application programming interface | Approximately fifteen days by batch in the pattern documented on this site |
+| Consequence | Activation is not the onboarding bottleneck | **Activation is the onboarding bottleneck** |
+| Instruction formats | CDSL formats and business rules | NSDL formats and business rules |
+| Pledge mechanics | Per CDSL business rules | Per NSDL business rules |
+| File structures | Distinct | Distinct |
+| Client preference | Common default | Often driven by an existing relationship |
+
+For a new broker the practical consequence is that **the depository choice determines the onboarding promise**. A firm that is a CDSL DP can credibly promise same-day or next-day account readiness for the demat leg. The same firm serving an NSDL-insistent client through a tie-up cannot. That is a product decision as much as an operational one: either the firm standardises on CDSL and explains it, or it carries two timelines and communicates them honestly.
+
+See [CDSL extended](/broking-kyc/appendix/cdsl-extended/) and the [batch pipeline](/broking-kyc/operations/batch-pipeline/) for the activation mechanics.
+
+## 7. Finix decision
+
+| Decision | Choice | Reason |
+|---|---|---|
+| DP status | **CDSL DP** | ₹5 crore net worth is already required for self-clearing, so the marginal capital cost is nil; control over account opening, pledge and CUSPA is decisive given the 2026 framework |
+| NSDL | **Tie-up at launch** | Avoids a second participant admission during setup; accept the longer timeline for clients who require it |
+| Client default | CDSL demat opened as part of the standard journey | Shortest activation path |
+| NSDL path | Offered, with an explicitly longer stated timeline | Honesty about the timeline is cheaper than an unexplained delay |
+| Review trigger | NSDL-demat client share, or a client segment that requires it | Revisit NSDL participation when the share justifies the second admission |
+
+## 8. Dependencies this creates
+
+| Downstream item | Dependency |
+|---|---|
+| [UCC registration](/broking-kyc/finix-broking-setup/onboarding/05-ucc-registration-exchanges/) | Demat identifier needed for the client master |
+| [eSign, DDPI and pledge setup](/broking-kyc/finix-broking-setup/onboarding/06-esign-ddpi-pledge-setup/) | DDPI covers depository instruction authority |
+| [Collateral and pledge](/broking-kyc/finix-broking-setup/rms/05-collateral-pledge/) | Pledge records drive recognised collateral |
+| [Settlement obligations](/broking-kyc/finix-broking-setup/backoffice/05-settlement-obligations/) | Delivery and early pay-in instructions |
+| [CUSPA](/broking-kyc/finix-broking-setup/backoffice/06-cuspa-unpaid-securities/) | Auto-pledge, recomputation, invocation, auto-release |
+| [Corporate actions](/broking-kyc/finix-broking-setup/backoffice/07-corporate-actions/) | Entitlements |
+| [EOD runbook](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/) | Holdings and pledge reconciliation |
+
+## 9. Exception paths
+
+| Situation | Response |
+|---|---|
+| Net worth falls below the DP tier | Immediate intimation to the depository; cure plan; participation is at risk independently of broking registration |
+| Client insists on an NSDL account | Serve through the tie-up with a stated timeline; do not enable delivery-based trading before the demat account is active |
+| Pledge instruction rejected | Resolve before counting the collateral; never recognise an unconfirmed pledge in risk |
+| CUSPA pledge creation fails at pay-out | Stop further exposure for that client; escalate same day; the five-trading-day clock is already running |
+| Depository system outage at a settlement deadline | Depository and clearing corporation escalation path; document the attempt, because the consequence path for short delivery is defined |
+| Holdings mismatch at reconciliation | Depository record governs; suspend recognition of the disputed quantity as collateral until resolved |
+| Transmission request | Follow the documented process precisely; this is the most complaint-prone DP process; see [transmission](/broking-kyc/lifecycle/transmission/) |
+
+## Practical notes
+
+- **Take the DP decision together with the clearing decision.** Both land on ₹5 crore; taking them separately makes DP admission look like a new capital ask when it is not.
+- **Build pledge reconciliation as a three-way check from day one** — depository, back office, risk. Two-way reconciliation misses the case that matters, which is collateral recognised in risk that the depository does not confirm.
+- **Test the CUSPA instruction path before go-live, including the failure branches.** Auto-pledge at pay-out, daily recomputation and release of excess, invocation, and what happens if day six arrives.
+- **Keep DP records separable even inside a single back-office platform.** An inspection of the DP asks for DP records.
+- **Treat NSDL's activation timeline as a product constraint, not a bug.** It shapes what the onboarding journey can promise. See [batch pipeline](/broking-kyc/operations/batch-pipeline/).
+- **Get the DP compliance officer appointed early.** It is a named role with its own obligations, not a hat worn by the broking compliance officer by default.
+
+## Where this connects
+
+- [Clearing arrangement](/broking-kyc/finix-broking-setup/setup/04-clearing-arrangement/) — the other ₹5 crore decision
+- [Bank account architecture](/broking-kyc/finix-broking-setup/setup/06-bank-account-architecture/) — the funds side of settlement
+- [CUSPA and unpaid securities](/broking-kyc/finix-broking-setup/backoffice/06-cuspa-unpaid-securities/) — the 2026 framework in operational detail
+- [Collateral and pledge](/broking-kyc/finix-broking-setup/rms/05-collateral-pledge/) — the pledge chain in the risk engine
+- [CDSL extended](/broking-kyc/appendix/cdsl-extended/) — depository mechanics in depth
+- [Direct pay-out to demat](/broking-kyc/deep-dives/settlement/direct-payout-to-demat/) — the pay-out route

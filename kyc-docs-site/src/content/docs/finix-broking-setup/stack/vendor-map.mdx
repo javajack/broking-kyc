@@ -1,0 +1,232 @@
+---
+title: "Stack: vendor map"
+description: What each named product in the Finix stack actually does, with the public evidence for it — Saral MoneyMaker, SecMark, Digio, CVL KRA, CERSAI CKYCRR, Razorpay and RazorpayX — plus the responsibility boundaries, the functional overlaps that must be resolved by decision, and the gaps the stack does not cover.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** A vendor list is useless; a responsibility map is not. So the page is in four parts. First, what each product publicly claims, separated from what this manual assumes, so you can see where the evidence ends. Second, the capability matrix — one row per broking function, one column per product — because that is where overlaps and gaps become visible. Third, the overlaps, each of which needs a decision rather than a default. Fourth, the gaps: functions no product in this stack covers, which someone has to own anyway.
+
+## TL;DR
+
+- **Saral MoneyMaker is the order and risk layer.** Publicly: a multi-exchange dealer terminal for NSE, BSE, MCX and NCDEX with SPAN margining and a risk management system, plus browser and mobile clients, an algorithmic module with exchange-approved algorithm execution, and limit control at identifier, client and scrip level with margin computed before the order is allowed to flow to the exchange.
+- **SecMark is the record and compliance layer, and also offers middleware that overlaps the order layer.** Publicly: back office for broking, depository participants, institutional desks and proprietary trading; a middleware and API suite doing order orchestration, real-time risk checks, margin validation, trade lifecycle and reconciliation; a partner portal for sub-broker hierarchies; SmartReco for reconciliation; C-Safe for screening against more than fifty lists including PEP; AML Sutra for transaction monitoring and FINnet 2.0 reporting; and ComplianceSutra across six modules.
+- **That overlap is the single most important decision in this stack.** SecMark middleware and Saral RMS can both perform real-time risk checks and margin validation. [Only one may own the release decision](#3-overlaps-that-need-a-decision), and this manual gives it to Saral RMS.
+- **Digio is the identity, consent and signature layer** — Aadhaar and PAN verification, OCR, face match, DigiLocker, offline Aadhaar, Video KYC, CKYC and KRA connectivity, Aadhaar eSign and certificate-based signing, eStamping, DDPI and nomination document preview with digital stamp duty, and eNACH and UPI AutoPay mandates.
+- **CVL KRA is the primary KRA and is not an island.** Five KRAs are registered with SEBI and a mandated back-end interoperability framework makes them behave as one logical system: a query to any KRA returns the record whoever holds it, and a duplicate upload for an already-compliant investor is rejected rather than accepted.
+- **CERSAI CKYCRR is a different system with a different model, and it changed in 2026.** CKYCRR 2.0 went live on 1 August 2026 with real-time APIs, structured payloads, OTP-based consent for download and masked Aadhaar, replacing the batch-and-PDF model.
+- **Razorpay is two products, not one.** The payment gateway and Smart Collect sit on the collection side; RazorpayX Payouts sits on the disbursement side with a contact, fund-account and payout object model and webhooks on every state change. They have different reconciliation semantics and must not share a code path.
+- **Nothing in this stack clears, settles, custodies or lends.** Those stay with the clearing corporations, the depositories, the banks and — if the broker offers margin funding — the broker's own balance sheet.
+
+## Conceptual overview
+
+There is a temptation, when a stack has been chosen, to treat the vendor boundary as an architectural boundary. It is not. Vendors sell overlapping suites because that is how they grow, which means a broker who buys two suites has bought the same function twice and must decide which copy is authoritative. Where that decision is not made explicitly, it gets made implicitly — usually by whichever system happened to be integrated first — and the result is a stack where two components both believe they are enforcing a limit and neither is enforcing all of it.
+
+The second thing a vendor map has to do is mark where the evidence stops. A great deal of what a broking stack does is not described on a public website, for good reasons: the integration kits are confidential, the screens change, and the configuration surface is customer-specific. This manual's approach is to state the public claim, then build the operational detail as a reference implementation that satisfies the regulatory requirement, and to keep the two visually distinct. The `[public]` and `[reference implementation]` markers in the tables below carry that distinction, and they are used consistently in every plane of this section.
+
+The third thing is to be honest about gaps. The stack as specified has no treasury management system, no customer relationship or service-desk system, no data warehouse, no market-data vendor, and no general ledger for the firm's own books as distinct from client ledgers. Each of those is a real operational need. Leaving them unnamed in the brief does not make them disappear; it just means the broker will build or buy them later, under time pressure, which is the worst moment to choose.
+
+## 1. What each product publicly claims
+
+### Saral MoneyMaker — Saral Information Technology Pvt Ltd
+
+| Component | Public description | Evidence class |
+|---|---|---|
+| Money Maker Client Solo | Multi-exchange dealer trading terminal for NSE, BSE, MCX and NCDEX in a single application; advanced charting, reminders, SPAN margining, risk management system | `[public]` |
+| Money Maker Browser | Browser-based platform for market analysis, order management and reporting across multiple exchanges and segments | `[public]` |
+| Money Maker Handy | Mobile trading application across exchanges and multiple segments | `[public]` |
+| Money Maker Challenge | Automated algorithmic trading integrated into the client, with Auto Trader, risk-limiting safeguards, an algorithm modelling module, and exchange-approved algorithm execution | `[public]` |
+| Pharos | Named as a tool equipping the dealer terminal | `[public]`, function not publicly detailed |
+| Risk controls | Trading limits controllable at identifier level, client level and scrip level; available exposure limit updated daily at the MoneyMaker server; on order entry the system computes VaR margin and extreme loss margin for the entered order and allows the order to flow to the exchange within the available exposure limit | `[public]`, from a broker risk-management policy disclosure naming the product |
+| Order features | Basket orders, Good Till Triggered, Stock SIP, single-leg open breakout orders, ratio-based hedging with equity, futures or synthetic instruments, bulk file upload | `[public]` |
+| Risk views | RMS Failed Order Book, Exposure View, net obligation view | `[public]` |
+| Analytics | TradingView chart integration, option payoff charting, option chain and Greeks, technical indicators, pivot points | `[public]` |
+| Market data | Direct multicast referenced as a platform capability | `[public]` |
+| Back-office link | Back-office integration referenced as a platform capability | `[public]`, counterparty not specified |
+| IPO platform | Listed as an upcoming offering for end clients to apply for public issues | `[public]` |
+
+What this manual adds as `[reference implementation]`: the internal ordering of the pre-trade check ladder, the configuration key names, the square-off decision sequence, the specific limit hierarchy arithmetic, and the exchange-session state machine. Those are modelled on what the regulations require and what the product claims, not on product documentation.
+
+### SecMark — SecMark Consultancy Ltd
+
+| Component | Public description | Evidence class |
+|---|---|---|
+| Back Office Solution | Coverage across broking, depository participants, institutional desks and proprietary trading; marketed with claims of 300-plus clients, 85 percent fewer manual tasks, 99.9 percent uptime | `[public]` |
+| Middleware and API Suite | Order orchestration and book building, real-time risk checks and margin validation, trade lifecycle management and reconciliation, integration with major exchanges | `[public]` |
+| Partner Portal | Sub-broker and branch network management, commission tracking, partner compliance, SEBI broking hierarchies with audit trail | `[public]` |
+| SmartReco | Reconciliation engine for high-volume record matching | `[public]` |
+| e-KYC | Real-time Aadhaar and PAN integration, AI-based face matching and liveness, document capture with OCR, customisable onboarding workflows, cloud and on-premises deployment | `[public]` |
+| Mobile and Web Trading | Charting, instrument search, market feeds, technical indicators, open APIs for integration with multiple OMS and RMS platforms | `[public]` |
+| C-Safe | Client screening across more than fifty global and domestic lists including SEBI, UNSC, OFAC and PEP | `[public]` |
+| AML Sutra | Transaction monitoring and suspicious transaction reporting in FINnet 2.0 format | `[public]` |
+| ComplianceSutra | SEBI, RBI, MCA and income-tax compliance modules across six integrated modules: governance, risk, compliance, audit, project and task | `[public]` |
+| Corporate | Listed company; acquired the iBeats and Busiwin back-office products, adding more than seventy financial-market participants as clients | `[public]` |
+
+### Digio
+
+| Component | Public description | Evidence class |
+|---|---|---|
+| DigiKYC | Aadhaar and PAN verification, OCR, face sync and match, DigiLocker, offline Aadhaar, Video KYC, CKYC and KRA connectivity | `[public]` |
+| DigiSign | Aadhaar eSign with OTP, biometric, iris and face-match authentication; USB digital signature certificate signing; document signer certificate; stylus-based electronic signature | `[public]` |
+| eStamping | Digital stamp duty payment, including DDPI and nomination document preview | `[public]` |
+| Mandates | eNACH and NACH eMandate, UPI AutoPay recurring payments | `[public]` |
+| Screening | AML and counter-terrorist-financing screening | `[public]` |
+| Documents | Template-based document and agreement management; API, SDK and dashboard-initiated signature requests | `[public]` |
+
+### Identity registries
+
+| System | Operator | Public description | Evidence class |
+|---|---|---|---|
+| CVL KRA | CDSL Ventures Ltd | One of five SEBI-registered KRAs; provides an API on request that an intermediary configures to push customer data and images, and to check status, fetch details and submit details | `[public]` |
+| KRA interoperability | All five KRAs | Back-end interoperability updates the investor's record at the respective KRA; a query to one KRA returns the record regardless of which KRA holds it; an upload for an already-compliant investor is rejected and the intermediary must download instead | `[public]` |
+| Other KRAs | NSDL Database Management, CAMS, Karvy, DotEx | The remaining four registered KRAs | `[public]` |
+| CKYCRR | CERSAI | Central KYC Records Registry; CKYCRR 2.0 live 1 August 2026, phased, with pilot and readiness testing extended to 5 October 2026; real-time API-first replacing batch and PDF, structured payloads, OTP-based consent, Aadhaar masking, de-duplication, risk-tiered update schedule, SFTP retained for bulk | `[public]` |
+
+### Razorpay and RazorpayX
+
+| Component | Public description | Evidence class |
+|---|---|---|
+| Payment Gateway | Collection across UPI, cards, net banking and wallets | `[public]` |
+| Smart Collect | Virtual accounts for automated reconciliation of collections received by bank transfer | `[public]` |
+| RazorpayX Payouts | Disbursement over UPI, IMPS, NEFT and RTGS to accounts at all Indian banks; dashboard and API initiation; bulk addition and queueing; webhook callback on every state change | `[public]` |
+| Settlements | `settlement.processed` webhook fires after funds are transferred to the business bank account; the UTR is used to reconcile settlement funds against the bank statement | `[public]` |
+
+<Aside type="caution" title="A broker is not an ordinary merchant">
+Everything a payment aggregator does is built for merchant collection, where money received is the merchant's revenue. A broker's pay-in is not revenue — it is client money that must land in a designated client bank account, must be segregated from the broker's own funds by statute under regulation 18(2)(c) of the 2026 regulations, and is subject to the upstreaming regime. That changes which account the gateway settles into, how settlement timing is configured, and what the broker may do with the balance. The [money plane](/broking-kyc/finix-broking-setup/money/) treats this as its central constraint rather than a footnote, and [pay-in rails](/broking-kyc/finix-broking-setup/money/02-payin-rails/) covers the validated UPI handle regime that applies to broker collection specifically.
+</Aside>
+
+## 2. Capability matrix
+
+One row per broking function. `●` means this manual assigns primary ownership here; `○` means the product can do it and is used in a supporting role; `—` means not used for this function even if the product offers it.
+
+| Function | Saral | SecMark | Digio | KRA / CKYC | Razorpay | Exchange / CC / DP |
+|---|---|---|---|---|---|---|
+| Client identity capture and verification | — | ○ | ● | ○ | — | — |
+| KYC record upload and fetch | — | ○ | ● | ● | — | — |
+| PEP, sanctions and debarred screening | — | ● | ○ | — | — | — |
+| Signature, DDPI, stamping | — | — | ● | — | — | — |
+| UCC registration with exchanges | — | ● | — | — | — | ● |
+| Demat account opening | — | ○ | ○ | — | — | ● |
+| Order capture, dealer and client front ends | ● | ○ | — | — | — | — |
+| Order book and exchange session state | ● | — | — | — | — | ● |
+| Pre-trade risk and release decision | ● | ○ | — | — | — | ○ |
+| Margin computation at order time | ● | ○ | — | — | — | ● |
+| Limit administration | ● | ○ | — | — | — | — |
+| Collateral valuation and pledge records | ○ | ● | — | — | — | ● |
+| Square-off execution | ● | — | — | — | — | — |
+| Intraday surveillance alerting | ○ | ● | — | — | — | ● |
+| Trade import and reconciliation | — | ● | — | — | — | ● |
+| Ledger of record | — | ● | — | — | — | — |
+| Contract notes | — | ● | — | — | — | — |
+| Settlement obligation processing | — | ● | — | — | — | ● |
+| Unpaid securities and CUSPA | — | ● | — | — | — | ● |
+| Corporate actions | — | ● | — | — | — | ● |
+| Client statements and holdings | — | ● | — | — | — | ● |
+| Margin reporting to exchange | ○ | ● | — | — | — | ● |
+| Regulatory and statutory reporting | — | ● | — | — | — | — |
+| Suspicious transaction reporting | — | ● | ○ | — | — | — |
+| Compliance calendar and evidence | — | ● | — | — | — | — |
+| Sub-broker and partner management | — | ● | — | — | — | — |
+| Client pay-in collection | — | ○ | — | — | ● | — |
+| Client pay-out disbursement | — | ○ | — | — | ● | — |
+| Bank reconciliation | — | ● | — | — | ○ | — |
+| Treasury and exchange funding | — | ○ | — | — | — | ● |
+| Clearing and settlement | — | — | — | — | — | ● |
+| Custody of securities | — | — | — | — | — | ● |
+
+## 3. Overlaps that need a decision
+
+Each of these is a place where two products in the stack can do the same job. None of them has a right answer independent of the broker's circumstances; all of them have a wrong answer, which is leaving it undecided.
+
+### 3.1 Real-time risk checks: Saral RMS or SecMark middleware
+
+Both claim it. Saral states that on order entry the trading system computes VaR and extreme loss margin and allows the order to flow within the available exposure limit; SecMark states its middleware performs real-time risk checks and margin validation as part of order orchestration.
+
+**Finix decision: Saral RMS owns the release decision; SecMark middleware does not evaluate risk in the order path.**
+
+The reason is not that one product is better. It is that the release decision must be made by exactly one component, because the component that makes it is the one that must be able to explain, for any historical order, why that order was or was not released. Splitting the decision across two systems means neither holds the complete explanation, and the first inspection that asks "show me why this order passed" becomes a reconstruction exercise. A secondary reason is latency: every additional hop in the order path before release is a hop that has to be available, monitored and capacity-planned.
+
+SecMark middleware is still used — for order orchestration between channels and for the trade lifecycle and reconciliation functions on the return path, which is where its value is unambiguous. What it does not do is hold a veto.
+
+**What this costs:** SecMark's margin validation would have given a second, independent computation of the same number, which is a genuine control. Finix recovers part of that by running SecMark's computation **off the order path, as a shadow check**, comparing it to Saral's number on a sampled basis and alerting on divergence. A divergence alert is an engineering defect report, not a trading halt. See [pre-trade check ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/).
+
+### 3.2 Client onboarding front end: Digio, SecMark e-KYC, or the broker's own journey
+
+All three are available. SecMark markets an e-KYC product with face matching and liveness; Digio markets DigiKYC with the same capability set; and the broker has its own journey specified elsewhere on this site.
+
+**Finix decision: the broker owns the journey and the user interface; Digio owns the verification, signature and registry calls; SecMark e-KYC is not used.**
+
+The journey is where differentiation and conversion live, and it changes often — far more often than a vendor release cycle. The verification primitives are commodity, regulated, and expensive to build. Splitting at that line means the broker can redesign screen flow without a vendor dependency, and can swap a verification vendor without redesigning screens. Choosing *both* vendor e-KYC products would mean maintaining two sets of credentials, two audit trails and two sets of consent artefacts for the same regulatory obligation.
+
+### 3.3 Screening: SecMark C-Safe or Digio AML
+
+Both offer screening. C-Safe is described as covering more than fifty global and domestic lists including SEBI, UNSC, OFAC and PEP; Digio offers AML and counter-terrorist-financing screening.
+
+**Finix decision: SecMark C-Safe is the system of record for screening; Digio screening is not enabled.**
+
+Screening is not a one-time onboarding event. It has to re-run when a list changes, when a client's attributes change, and periodically for the whole book — and the results have to flow into transaction monitoring and suspicious transaction reporting. That lifecycle sits naturally with AML Sutra and ComplianceSutra in the same suite. Putting onboarding screening in one vendor and ongoing screening in another creates two populations of alerts with different list versions, which is indefensible in an inspection. See [PEP and sanctions screening](/broking-kyc/finix-broking-setup/onboarding/04-pep-sanctions-screening/).
+
+### 3.4 Reconciliation: SmartReco or the back office's own engine
+
+SecMark offers both a back office and SmartReco as a separate reconciliation product.
+
+**Finix decision: the back office performs trade and obligation reconciliation against exchange files; SmartReco performs bank, payment-gateway and depository reconciliation.**
+
+The split follows the data. Trade-to-obligation reconciliation is intrinsic to the back office's own processing and cannot sensibly be externalised. Bank and gateway reconciliation involves high-volume, many-to-many matching against third-party statements with partial identifiers, which is exactly the problem a dedicated matcher is built for. See [bank reconciliation](/broking-kyc/finix-broking-setup/money/04-bank-recon/).
+
+### 3.5 Market data: exchange feed, Saral, or a third party
+
+Saral references direct multicast. The exchanges sell data. The broker also needs historical data, corporate-action-adjusted series, and data for non-trading purposes such as collateral valuation and surveillance.
+
+**Finix decision: exchange multicast feeds into Saral for trading and risk; a separate data store, sourced from exchange end-of-day files, serves valuation, surveillance, reporting and client-facing history.**
+
+Risk and trading need the live feed and nothing else. Everything else needs a stable, corrected, replayable record, and using the live feed for it produces numbers that cannot be reproduced tomorrow. The valuation price used in a margin call must be reproducible in an inspection six months later; a tick from a multicast feed is not.
+
+### 3.6 Client-facing mobile and web: Saral or SecMark
+
+Both offer web and mobile trading front ends, and SecMark explicitly markets open APIs for integration with multiple OMS and RMS platforms.
+
+**Finix decision: Saral Money Maker Browser and Handy at launch; revisit before the first major client-experience programme.**
+
+At launch, a single vendor across terminal, web and mobile means one order-entry semantic, one set of order-type behaviours and one support path — which matters more in the first year than interface quality does. The decision is explicitly flagged for revisiting, because the front end is the component most likely to be replaced and SecMark's OMS-agnostic API posture is what makes a later replacement feasible.
+
+## 4. Gaps the stack does not cover
+
+| Gap | Why it matters | Finix position at launch |
+|---|---|---|
+| Treasury management | Deciding how much to place with which clearing corporation, in cash versus collateral, under an intraday margin regime, is a daily optimisation with real cost | Spreadsheet-driven with a documented decision rule; see [treasury and exchange funding](/broking-kyc/finix-broking-setup/money/05-treasury-exchange-funding/) |
+| Service desk and client communication | Complaint handling is on a 21-calendar-day statutory clock and SCORES and ODR enrolment is continuous | Ticketing tool plus ComplianceSutra for the regulatory clock and evidence |
+| Firm general ledger | Client ledgers are not the firm's books; statutory accounts, GST and tax are separate | Standard accounting package, fed from back office |
+| Data warehouse and reporting | Management information, regulatory analytics and surveillance all need history in one place | End-of-day extracts into a warehouse; explicitly not the back office's job |
+| Market data history | Reproducible valuation and surveillance | Own store from exchange end-of-day files |
+| Identity and access management | Maker-checker, privileged access, joiner-mover-leaver across six vendor systems | Central directory with per-system role mapping; see [compliance configuration baseline](/broking-kyc/finix-broking-setup/compliance/01-compliance-config-baseline/) |
+| Observability | Six external dependencies, four exchange connections, one order path | Single monitoring stack with per-interface synthetic checks; see [integration contract matrix](/broking-kyc/finix-broking-setup/stack/integration-contract-matrix/) |
+| Business continuity site | Required, drilled and reported | Covered at [infrastructure and connectivity](/broking-kyc/finix-broking-setup/setup/08-infrastructure-connectivity/); see also [BCP and DR drill](/broking-kyc/deep-dives/specialty/bcp-dr-drill/) |
+
+## 5. Single-owner rule
+
+Three things in this stack have exactly one owner, and the rule is worth stating as a rule because every plane depends on it.
+
+| Thing | Owner | Why dual ownership fails |
+|---|---|---|
+| The order book | Saral OMS | Two order books means two answers to "is this order live", and the exchange only agrees with one of them |
+| The margin number at the moment of release | Saral RMS | Two numbers means an order released against the lower one and reported against the higher one |
+| The ledger of record | SecMark back office | Two ledgers means a client balance that depends on which screen you opened, and a contract note that cannot be defended |
+
+Everything else in the stack may be duplicated, shadowed, cross-checked or reconciled. These three may not.
+
+## Practical notes
+
+- **Ask every vendor for the integration kit before signing, not after.** The kit tells you whether the published capability is an API, a file drop or a screen. That difference determines whether your integration is a week or a quarter, and it is not discoverable from marketing material.
+- **Write down the overlap decisions in the contract.** If SecMark middleware is not doing risk checks, the statement of work should say so, because otherwise you will pay for the module and inherit the obligation to test it.
+- **Version the list of lists.** C-Safe screening against "fifty-plus lists" is only meaningful if you know which fifty on the day a given client was screened. That version is evidence. See [PEP and sanctions screening](/broking-kyc/finix-broking-setup/onboarding/04-pep-sanctions-screening/).
+- **Treat the Pharos and Money Maker Challenge modules as approval-gated.** Anything that places orders without a human pressing a key is algorithmic trading, and it needs exchange approval before use. See [algo, API, DMA and SOR](/broking-kyc/finix-broking-setup/oms/09-algo-api-dma-sor/).
+- **Keep one page in your own wiki that maps vendor module to regulatory obligation.** When an inspection asks which system evidences a given paragraph, you want to answer in one minute, not one day. [Compliance configuration baseline](/broking-kyc/finix-broking-setup/compliance/01-compliance-config-baseline/) is the template.
+
+## Where this connects
+
+- [Integration contract matrix](/broking-kyc/finix-broking-setup/stack/integration-contract-matrix/) — every boundary in the matrix above, as a contract
+- [Environments and configuration baseline](/broking-kyc/finix-broking-setup/stack/environments-config-baseline/) — how the configuration those products expose is named and governed
+- [Vendor onboarding and contracts](/broking-kyc/finix-broking-setup/setup/09-vendor-onboarding-contracts/) — what to put in the agreement, including audit rights and exit
+- [Vendor atlas](/broking-kyc/vendors/atlas/) — the broader market of products in each category
+- [Vendor roadmap](/broking-kyc/appendix/vendor-roadmap/) — sequencing vendor integrations

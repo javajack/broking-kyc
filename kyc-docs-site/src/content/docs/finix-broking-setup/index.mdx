@@ -1,0 +1,101 @@
+---
+title: "Finix Broking Setup"
+description: An end-to-end operational manual for standing up and running an Indian stock broking business on a named vendor stack — Saral MoneyMaker for OMS and RMS, SecMark for back office and compliance, Digio for KYC and eSign, CVL KRA and CERSAI CKYC for identity, Razorpay for pay-in and pay-out, across NSE, BSE and MCX.
+---
+
+import { Aside, CardGrid, LinkCard } from '@astrojs/starlight/components';
+import Diagram from '../../../components/Diagram.astro';
+
+> **Why this section is structured this way:** The rest of this site is a *reference* — it tells you what a rule says and where it comes from. This section is a *manual*. It assumes you have been handed a budget, a company name and a vendor shortlist, and that somebody expects orders to reach an exchange in a few months and keep reaching it every day afterwards. So it is ordered the way the work actually arrives: first the things that cannot be parallelised (capital, registration, membership, bank accounts), then the systems that carry an order (OMS, RMS, back office), then the money that has to be in the right account before the order is allowed, then the exchange-specific behaviour that breaks naive implementations, and finally the day itself — begin-of-day, the session, end-of-day, settlement, and the incidents that happen in between. Each plane is written so that an engineer can configure from it and an operator can run from it on the same page.
+
+<Aside type="caution" title="About the vendor names on these pages">
+This section names specific products because the brief specified them: **Saral MoneyMaker** (OMS, RMS, dealer and client front ends), **SecMark** (back office, middleware, partner portal, reconciliation, PMLA screening, compliance), **Digio** (KYC, eSign, eStamp, mandates), **CVL KRA** (with four-KRA interoperability), **CERSAI CKYCRR** (CKYC), **Razorpay** and **RazorpayX** (pay-in and pay-out), and **NSE**, **BSE**, **MCX**, **CDSL** and **NSDL** as the market infrastructure.
+
+Everything attributed to a product here comes from material those vendors publish themselves, or from regulatory filings and broker disclosures that name them. Where a page describes a screen, a configuration key, a file name or a sequence that is *not* published, it is written as a **reference implementation** — a design that satisfies the regulatory requirement and is consistent with what the product publicly claims to do — and it is labelled as such. None of this is vendor documentation, none of it is an endorsement, and no vendor has reviewed it. Configure against the contract, the integration kit and the circular, never against this page. See the [site disclaimer](/broking-kyc/reference/references-sources/).
+</Aside>
+
+## TL;DR
+
+- **The hard path is not the software, it is the sequence.** Registration depends on net worth, membership depends on registration, the clearing bank account depends on membership, the connectivity approval depends on the account, and the first live order depends on an exchange certification that depends on all of it. [Setting up](/broking-kyc/finix-broking-setup/setup/) is ordered as a dependency graph for exactly this reason.
+- **A broker registered after 7 January 2026 is registered under a different law from one registered in 2024.** The [SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/) repealed the 1992 regulations outright, and several things that were circular obligations are now statutory ones — client-asset segregation, cyber resilience, an eight-year record-retention floor, a 21-calendar-day complaint clock, a whistle-blower channel, and an explicit mule-account detection duty.
+- **An order crosses roughly thirty checks before it reaches a matching engine, and the broker owns almost all of them.** The [pre-trade check ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/) sets out the order of those checks, which ones are regulatory, which ones are the exchange's, and which ones exist only because a broker chose to add them.
+- **Money and orders are two clocks that must be reconciled, not one system.** A client's pay-in can be authorised and still not be good funds; an exchange margin call can land before a treasury transfer settles. The [money plane](/broking-kyc/finix-broking-setup/money/) treats that gap as the primary subject rather than an edge case.
+- **Exchange behaviour diverges in ways that are invisible until they cost money** — different order-attribute support, different band and halt semantics, different session boundaries, different file names, and in MCX's case a delivery mechanism with a tender period and its own margin ladder. The [exchange plane](/broking-kyc/finix-broking-setup/exchanges/) is organised exchange by exchange and then as a difference matrix.
+- **The daily grind is where compliance is actually won or lost.** The [begin-of-day](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/) and [end-of-day](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/) runbooks are written as ordered, timed, owner-assigned steps with explicit abort conditions, because a missed file at 08:40 becomes a penalty at T+5.
+- **Two 2026 changes are recent enough to be missing from most internal documentation**: the [CUSPA regime](/broking-kyc/finix-broking-setup/backoffice/06-cuspa-unpaid-securities/) for unpaid securities (3 July 2026) and [CKYCRR 2.0](/broking-kyc/finix-broking-setup/onboarding/03-ckyc-ckycrr2-integration/), which went live on 1 August 2026 and replaces batch uploads with real-time APIs.
+
+## What "Finix" is
+
+Finix is a fictional broker used as a worked example throughout this section, so that configuration can be concrete instead of conditional. Where a page says "Finix does X", read it as "this is one defensible way to do X, stated precisely enough to argue with".
+
+The assumed shape of the business:
+
+| Attribute | Assumption | Consequence for this manual |
+|---|---|---|
+| Entity | Private limited company | Fit-and-proper applies to directors and shareholders; designated-director residency rule bites |
+| Registration | Stock broker under the 2026 regulations, single registration | One registration across exchanges and segments; clearing-member role on the same certificate |
+| Exchanges | NSE, BSE, MCX | Three membership processes, three connectivity stacks, three report sets |
+| Segments | Cash, equity derivatives, currency derivatives, commodity derivatives | Four margin regimes; two physical-delivery regimes |
+| Clearing | Self-clearing in equity and derivatives; clearing through a clearing member in commodities at launch | Two settlement operating models documented side by side |
+| Depository | DP of CDSL; NSDL via tie-up at launch | Dual-depository behaviour in pledge and pay-out |
+| Client base | Retail and HNI, no institutional custody at launch | Custodial-participant flows noted but not the default path |
+| Channels | Dealer terminal, web, mobile, API | Four authentication and risk surfaces for the same account |
+| Scale at launch | Below the Qualified Stock Broker thresholds | QSB obligations documented as a forward-looking section |
+
+<Aside type="note" title="This section does not replace the KYC specification">
+Client onboarding is specified in depth elsewhere on this site — the [user journey](/broking-kyc/journey/), the [field atlas](/broking-kyc/reference/field-atlas/) and the [lifecycle walkthroughs](/broking-kyc/lifecycle/). The [onboarding plane](/broking-kyc/finix-broking-setup/onboarding/) here is deliberately narrower: it covers only what changes when onboarding is wired to *this* stack — Digio as the KYC and signature layer, CVL KRA as the primary KRA, CERSAI CKYCRR 2.0 as the central registry, SecMark C-Safe for screening, and the three exchanges for unique client code registration.
+</Aside>
+
+## The reference architecture
+
+<Diagram src="/diagrams/finix-01-stack-architecture.svg" label="Finix reference architecture — the ten planes and the interfaces between them" />
+
+The picture is worth reading as four horizontal bands rather than a vendor list. The **client band** is anything a client or a dealer touches. The **decision band** is where an order is accepted, priced for risk and either released or stopped. The **market band** is the exchange and clearing-corporation boundary, which is the only place in the diagram where the broker is not in control. The **record band** is everything that has to agree afterwards — ledgers, obligations, statements, regulatory reports and the bank. Most production incidents are not failures inside a band; they are disagreements between two bands about the same number.
+
+## The ten planes
+
+<CardGrid>
+<LinkCard title="Stack" href="/broking-kyc/finix-broking-setup/stack/" description="Who does what, where the boundaries are, how environments and configuration are named, and the full interface contract matrix." />
+<LinkCard title="Setting up" href="/broking-kyc/finix-broking-setup/setup/" description="Entity and capital, SEBI registration under the 2026 regulations, membership at NSE, BSE and MCX, clearing, DP, bank architecture, people, infrastructure, certification and go-live." />
+<LinkCard title="Client onboarding" href="/broking-kyc/finix-broking-setup/onboarding/" description="Digio, CVL KRA and the four-KRA interop, CKYCRR 2.0, PEP and sanctions screening, UCC registration, eSign, DDPI and pledge setup." />
+<LinkCard title="OMS" href="/broking-kyc/finix-broking-setup/oms/" description="Saral MoneyMaker architecture, exchange protocols, user IDs and CTCL, the complete order-type catalogue, forward and return paths, modification rules, algo and API access." />
+<LinkCard title="RMS" href="/broking-kyc/finix-broking-setup/rms/" description="Margin engine, the pre-trade check ladder, the limit framework, collateral and pledge, the square-off engine, intraday surveillance, margin reporting and penalties." />
+<LinkCard title="Back office" href="/broking-kyc/finix-broking-setup/backoffice/" description="SecMark architecture, trade import and reconciliation, contract notes, the ledger, settlement obligations, CUSPA, corporate actions, statements and regulatory reporting." />
+<LinkCard title="Money movement" href="/broking-kyc/finix-broking-setup/money/" description="Razorpay pay-in rails, RazorpayX pay-out engine, bank reconciliation, treasury and exchange funding, upstreaming and downstreaming, and the money-versus-trade race conditions." />
+<LinkCard title="Exchange nuances" href="/broking-kyc/finix-broking-setup/exchanges/" description="NSE cash and F&O, BSE, MCX commodities, the cross-exchange difference matrix, sessions and calendars, bands and halts, and the file-format reference." />
+<LinkCard title="Daily operations" href="/broking-kyc/finix-broking-setup/daily-ops/" description="BOD, pre-open, continuous session, close, EOD, settlement day, expiry, the periodic calendar, and the midday incident playbooks." />
+<LinkCard title="Compliance at config level" href="/broking-kyc/finix-broking-setup/compliance/" description="The compliance configuration baseline, the reporting pipeline, inspection readiness, and the cyber-resilience configuration." />
+</CardGrid>
+
+## How to read this section
+
+The manual supports three different jobs, and reading it front to back is the right approach for only one of them.
+
+**If you are building the thing**, read [Stack](/broking-kyc/finix-broking-setup/stack/) then [Setting up](/broking-kyc/finix-broking-setup/setup/) in order, because those pages are a dependency graph and skipping forward produces work that has to be redone. Then go to the plane you own. Every plane ends in a configuration-reference page — [OMS](/broking-kyc/finix-broking-setup/oms/10-oms-config-reference/), [RMS](/broking-kyc/finix-broking-setup/rms/09-rms-config-reference/), [back office](/broking-kyc/finix-broking-setup/backoffice/10-backoffice-config-reference/), [compliance](/broking-kyc/finix-broking-setup/compliance/01-compliance-config-baseline/) — which collects every tunable the preceding pages discussed into one table with a stated default and a stated reason.
+
+**If you are running the thing**, live in [Daily operations](/broking-kyc/finix-broking-setup/daily-ops/). The runbooks are the contract; the other planes explain why a step exists when a step starts failing.
+
+**If you are assuring the thing** — compliance, audit, inspection — start at [Compliance at config level](/broking-kyc/finix-broking-setup/compliance/) and use the regulatory-framework section that opens most pages as the evidence trail back to the circular.
+
+<Aside type="tip" title="Reading a configuration table">
+Every configuration table in this section uses the same four columns: the **key** (named in the convention set out in [environments and configuration](/broking-kyc/finix-broking-setup/stack/environments-config-baseline/)), the **Finix default**, whether the value is **regulatory, exchange-set or discretionary**, and the **failure mode if it is wrong**. The third column is the one that matters in an inspection: a discretionary value needs a documented policy, a regulatory value needs a circular, and getting the classification backwards is itself a finding.
+</Aside>
+
+## What this section deliberately does not do
+
+- **It does not price the stack.** Commercial terms for every product named here are negotiated and confidential. Cost structure for the onboarding leg is modelled in [cost analysis](/broking-kyc/reference/cost-analysis/); nothing equivalent is attempted for OMS, RMS or back office because any number would be invented.
+- **It does not reproduce vendor integration kits.** Protocol field layouts, message tags and API payload schemas belong in the documents the exchange or vendor gives you under agreement. Pages here describe *what* must be sent and *why*, name the document to get the layout from, and stop there.
+- **It does not assume the figures are current.** Deposits, fees, margin percentages, penalty slabs, session timings and report names all change by circular. Every number carries its source and its date, and [the periodic calendar](/broking-kyc/finix-broking-setup/daily-ops/09-periodic-calendar/) exists partly so that re-verification has an owner.
+- **It is not legal or compliance advice**, and it was produced by an AI model working from public sources. Treat a disagreement between this page and a circular as this page being wrong.
+
+## Where this connects
+
+| If you came here for | Go to |
+|---|---|
+| The rules themselves, with sources | [Compliance blueprint](/broking-kyc/operations/compliance-blueprint/) and the [circulars index](/broking-kyc/reference/regulatory-circulars/) |
+| How a broking firm works, as a narrative | [Broker process narrative](/broking-kyc/broker-process/narrative/) |
+| Depth on one mechanism rather than one plane | [Operations deep dives](/broking-kyc/deep-dives/) |
+| Every field and where it has to go | [Field atlas](/broking-kyc/reference/field-atlas/) |
+| The order of integrations as a dependency graph | [Integration DAG](/broking-kyc/operations/integration-dag/) |
+| A role-specific reading path | [Choose your role](/broking-kyc/personas/) |
+| A term you do not recognise | [Glossary](/broking-kyc/reference/glossary/) |

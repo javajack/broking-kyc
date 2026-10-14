@@ -1,0 +1,168 @@
+---
+title: "Setup 6: bank account architecture"
+description: The complete bank account map for a broker — the upstreaming and downstreaming client nodal accounts with their prescribed nomenclature, settlement accounts, own accounts, the proprietary account used by clearing members, and the rules that govern what may move between them, with the Razorpay settlement destination resolved correctly.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** The bank account map is the physical expression of the statutory requirement that client money be segregated from the broker's money and from other clients' money. Get it wrong and the error is not a configuration defect you can patch — client money has already flowed through the wrong account, and the remediation is a disclosure. So the page starts with the regulatory constraints, then gives the account map with the prescribed names, then the permitted and prohibited movements between accounts as an explicit matrix, then the two places where new brokers most often get it wrong: where the payment gateway settles, and what sits where overnight.
+
+## TL;DR
+
+- **Client funds flow through two prescribed nodal accounts with mandated nomenclature.** The **Upstreaming Client Nodal Bank Account**, named "Name of the SB/CM – USCNB account", receives clients' funds for upstreaming to the clearing corporations. The **Downstreaming Client Nodal Bank Account**, named "Name of the SB/CM – DSCNB account", is the only account from which client payments are made, after funds are received from the clearing corporation or clearing member the same day.
+- **Clearing members clearing for other brokers use a separate designated account** with the nomenclature "Name of the CM – TM prop account" to receive or pay proprietary funds to or from stock brokers.
+- **Client clear credit balances are upstreamed to clearing corporations on an end-of-day basis**, in the form of cash, a lien on fixed deposit receipts, or a pledge of units of mutual fund overnight schemes created out of clients' funds.
+- **Funds in client accounts cannot be commingled with the broker's own accounts and cannot be used for proprietary purposes.** Under the [2026 regulations](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/), regulation 18(2)(c) makes segregation from own funds *and from other clients* a statutory obligation, and regulation 20(d) prohibits accepting cash from clients outright.
+- **The payment gateway must settle into a client account, not an own account.** This is the single most common architectural error when a broker adopts a merchant payment stack: the default configuration settles to the business's operating account, which for a broker would be a segregation breach on every pay-in.
+- **Third-party payments are prohibited, which makes payer verification an account-design problem.** Virtual accounts and validated handles exist precisely so that the payer can be attributed and matched before credit is given.
+- **Bank cut-offs are earlier than clearing corporation deadlines**, so the operative deadline for treasury is always the bank's. Build the calendar from the bank's cut-off backwards.
+
+## Conceptual overview
+
+A broker's bank architecture exists to answer one question at any instant: whose money is this? The regulatory machinery around it — nodal accounts with prescribed names, upstreaming at end of day, a prohibition on commingling, a prohibition on cash — is all directed at making that question answerable without a forensic exercise. The names are prescribed because an inspector reading a bank statement should be able to tell from the account title alone whether the balance is client money, and a bank should be able to refuse a transfer that would mix the two.
+
+The upstreaming regime adds a second idea: that client money should not sit with the broker overnight at all where it can be avoided. Clear credit balances go to the clearing corporation at end of day, in cash or in a form the clearing corporation can hold a lien over. This is a structural protection — if the broker fails, the money is already outside it — and it has a side effect that matters for [capital planning](/broking-kyc/finix-broking-setup/setup/01-entity-capital-structure/#44-variable-net-worth): money upstreamed is not money retained, and NSE's variable net worth requirement is a percentage of retained client cash.
+
+The third idea, less often articulated, is directional discipline. Money comes in through one account and goes out through another, and the outward account is funded from the clearing corporation on the same day rather than from whatever happens to be lying around. That makes the pay-out path auditable: a client pay-out should be traceable to a receipt from the clearing corporation or the clearing member, not to a pool whose composition nobody can explain. A firm that funds pay-outs from a general pool has lost the property the architecture was built to provide.
+
+## 1. Regulatory framework
+
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — regulation 18(2)(c) strict segregation of client money and securities from the broker's own account and from any other client's account; regulation 20(d) prohibition on accepting cash from clients. `[not yet in index]`
+- **Upstreaming of clients' funds by stock brokers and clearing members to clearing corporations** — the framework creating the USCNB and DSCNB account structure, their nomenclature, the end-of-day upstreaming obligation and the permitted forms of upstreaming. Issued by SEBI and operationalised by exchange and depository circulars; the framework was revised after initial issue. See the [client funds upstreaming deep dive](/broking-kyc/deep-dives/settlement/client-funds-upstreaming/). `[not yet in index]`
+- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — the consolidated provisions on client funds, running account settlement and permitted uses.
+- **[Validated and exclusive UPI identifiers, SEBI/HO/DEPA-II/DEPA-II_SRG/P/CIR/2025/86](/broking-kyc/reference/circulars/sebi-mirsd/)** (11 June 2025) — the `@valid` handle structure with the `brk` username suffix for brokers, implemented in the payment rails by [NPCI/UPI/OC No. 217/2025-26](/broking-kyc/reference/circulars/npci/#npciupioc-no-2172025-26) (3 July 2025). Coverage was extended to investor-facing collection accounts in August 2026 by [MCX/MEM/461/2026](/broking-kyc/reference/circulars/mcx/#mcxmem4612026), [CDSL/ADM/DP/GENRL/2026/543](/broking-kyc/reference/circulars/cdsl/#cdsladmdpgenrl2026543) and [NSDL/POLICY/2026/0113](/broking-kyc/reference/circulars/nsdl/#nsdlpolicy20260113). `[SEBI circular not yet in index]`
+- **Clearing corporation rules on designated clearing banks** — the list of banks usable for settlement and the account requirements.
+- **Running account settlement** — see [running account settlement fields](/broking-kyc/reference/field-atlas/sections/ac-running-account-settlement/).
+
+## 2. The account map
+
+| # | Account | Prescribed or conventional name | Purpose | Money class |
+|---|---|---|---|---|
+| A1 | Upstreaming client nodal | **"Name of the SB/CM – USCNB account"** | Receive clients' funds for upstreaming to the clearing corporations | Client |
+| A2 | Downstreaming client nodal | **"Name of the SB/CM – DSCNB account"** | The only account from which client payments are made, funded from the clearing corporation or clearing member the same day | Client |
+| A3 | Clearing or settlement account | Per the designated clearing bank's requirement, in the firm's name | Settlement with the clearing corporation; margin funding | Mixed, governed by clearing corporation rules |
+| A4 | Trading member proprietary, at a clearing member | **"Name of the CM – TM prop account"** | Used by clearing members clearing for other brokers, to receive or pay proprietary funds to or from stock brokers | Own, of the trading member |
+| A5 | Own operating account | Conventional | The firm's revenue, salaries, vendors, taxes | Own |
+| A6 | Own proprietary trading account | Conventional | The firm's own trading funds, where proprietary trading is undertaken | Own |
+| A7 | Deposit and collateral account | Per exchange and clearing corporation requirements | Base minimum capital, deposits, fixed deposits placed as collateral | Own, encumbered |
+| A8 | Depository participant charge account | Conventional, subject to the validated-handle extension | Collection of depository charges from clients | Client-facing collection |
+| A9 | Payment gateway settlement destination | **A1, not A5** | Where Razorpay settles collected client funds | Client |
+
+<Aside type="caution" title="The gateway settlement account is the error to avoid">
+A payment gateway's default assumption is that collected money is the merchant's revenue, so onboarding configures settlement into the business's operating account. For a broker, every rupee the gateway collects from a client is client money, and settling it into an own account is a segregation breach on every single pay-in — continuous, systematic, and visible in a bank statement. Settlement must be configured to the upstreaming client nodal account. Verify it with a live low-value transaction before launch, and assert it daily thereafter; the assertion is interface MO-3 in the [integration contract matrix](/broking-kyc/finix-broking-setup/stack/integration-contract-matrix/#5-money-path).
+</Aside>
+
+## 3. Permitted and prohibited movements
+
+Rows are sources, columns are destinations. `✔` permitted, `✖` prohibited, `◐` permitted only on a specific condition.
+
+| From → To | A1 USCNB | A2 DSCNB | A3 Clearing | A5 Own op. | A6 Own prop. |
+|---|---|---|---|---|---|
+| **Client pay-in** | ✔ | ✖ | ✖ | ✖ | ✖ |
+| **A1 USCNB** | — | ✖ | ◐ for client obligations and upstreaming | ◐ only for amounts actually due to the broker, such as brokerage and charges, after computation | ✖ |
+| **A2 DSCNB** | ✖ | — | ✖ | ✖ | ✖ |
+| **A3 Clearing** | ◐ receipts attributable to clients | ◐ funding client pay-outs same day | — | ◐ own entitlements | ✖ |
+| **A5 Own operating** | ✖ | ◐ only to fund a genuine broker obligation to a client, documented | ◐ own funds for own obligations | — | ✔ |
+| **A6 Own proprietary** | ✖ | ✖ | ✔ for proprietary obligations | ✔ | — |
+| **Clearing corporation** | ◐ | ◐ | ✔ | ✖ | ✖ |
+
+| Rule | Statement |
+|---|---|
+| No commingling | Funds in client accounts cannot be commingled with the broker's own bank accounts |
+| No proprietary use | Client funds cannot be used by the broker for proprietary purposes |
+| No cash | Cash cannot be accepted from clients at all |
+| No third-party funds | A client's account may only be credited from that client's own bank account |
+| Pay-out only from DSCNB | Client payments are made only from the downstreaming nodal account, after receipt of funds from the clearing corporation or clearing member the same day |
+| Brokerage withdrawal is a computation, not a sweep | Amounts due to the broker leave the client pool only after they have been computed and are actually due |
+| Upstreaming at end of day | Clear credit balances go to the clearing corporations end of day, in cash, lien on fixed deposit receipts, or pledge of mutual fund overnight scheme units created out of clients' funds |
+
+## 4. Where the money actually sits, hour by hour
+
+A worked day, to make the architecture concrete.
+
+| Time | Event | Account effect |
+|---|---|---|
+| Overnight | Client clear credit balances already upstreamed | Held at the clearing corporation in cash, FDR lien or MFOS pledge |
+| Pre-open | Treasury confirms margin availability | A3 clearing account funded as needed |
+| 09:00 onward | Client pays in through the gateway or a transfer | Gateway captures; bank transfer lands in A1 |
+| Intraday | Gateway settles | Settlement credit into **A1**, with a UTR |
+| Intraday | Limit granted after confirmed receipt | No account movement; a risk event, not a money event |
+| Intraday | Exchange or clearing member margin call | A3 funded from A1 for client obligations, or from own accounts for own obligations |
+| Post-session | Obligations computed | Client-level obligations determined in the back office |
+| Settlement day | Funds pay-in to the clearing corporation | From A3 |
+| Settlement day | Funds pay-out received | Into A3, then to A2 for client disbursement the same day |
+| Pay-out window | Approved client pay-outs executed | From **A2** only, via RazorpayX or bank channel |
+| End of day | Brokerage and charges computed | Amounts actually due transferred from A1 to A5 |
+| End of day | Upstreaming computed and instructed | Clear credit balances from A1 to the clearing corporation |
+| End of day | Reconciliation | Every account reconciled; unattributed items aged |
+
+See [upstreaming and downstreaming](/broking-kyc/finix-broking-setup/money/06-upstreaming-downstreaming/) for the computation and [EOD runbook](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/) for the sequence.
+
+## 5. Bank selection
+
+| Requirement | Why |
+|---|---|
+| Designated clearing bank for each clearing corporation | Settlement accounts must be at an eligible bank |
+| Intraday liquidity and overdraft facility | Margin calls are same-day; an overdraft against own collateral is often the only practical bridge |
+| Early and reliable cut-offs | The bank's cut-off is the operative deadline, not the clearing corporation's |
+| Host-to-host or API channel | Manual instruction at scale is an operational risk and a maker-checker burden |
+| Intraday statement availability | Pay-in attribution cannot wait for an end-of-day statement |
+| Virtual account capability | For payer attribution; see [pay-in rails](/broking-kyc/finix-broking-setup/money/02-payin-rails/) |
+| Validated UPI handle support | For the broker collection handle regime |
+| Certificate management discipline | Certificate expiry on a bank channel is a scheduled outage if untracked |
+| Resilience | A second bank for client nodal accounts is worth the liquidity fragmentation |
+| Named relationship team | Settlement-deadline escalations need a phone number, not a ticket |
+
+<Aside type="note" title="Count the bank cut-off backwards">
+If the clearing corporation's funds pay-in deadline is a given time, and the bank's cut-off for the relevant channel is earlier, and the firm's own maker-checker adds a step, then the real internal deadline is substantially earlier than the published one. Document that chain explicitly per channel per bank, and put the internal deadline — not the exchange deadline — in the [settlement day runbook](/broking-kyc/finix-broking-setup/daily-ops/06-settlement-day-ops/).
+</Aside>
+
+## 6. Account configuration reference
+
+| Key | Finix default | Class | Failure mode if wrong |
+|---|---|---|---|
+| `finix.money.account.payin_destination` | A1 USCNB | Regulatory | Segregation breach on every pay-in |
+| `finix.money.account.payout_source` | A2 DSCNB | Regulatory | Pay-out from a non-permitted account |
+| `finix.money.account.gateway_settlement` | A1 USCNB | Regulatory | Same as payin_destination; the gateway default is wrong |
+| `finix.money.account.brokerage_sweep_destination` | A5 own operating | Regulatory | Own funds in a client account, or client funds in an own account |
+| `finix.money.upstream.forms_enabled` | Cash, FDR lien, MFOS pledge | Regulatory | Upstreaming in an unpermitted form |
+| `finix.money.upstream.schedule` | End of day, daily | Regulatory | Under-upstreamed balance overnight |
+| `finix.money.payin.third_party_block` | Enabled, hard block | Regulatory | Third-party credit to a client account |
+| `finix.money.payin.cash_mode` | Not available, no code path | Regulatory | Cash receipt, prohibited by regulation 20(d) |
+| `finix.money.payout.same_day_funding_required` | True | Regulatory | Pay-out funded from a pool rather than the day's receipt |
+| `finix.money.bank.cutoff.<bank>.<channel>` | Per bank | Exchange and bank set | Missed settlement deadline |
+| `finix.money.payout.cutoff.weekday` | Per published client policy | Discretionary, disclosed | Client expectation breach |
+| `finix.money.recon.unattributed_age_limit_days` | 1 | Discretionary, tight | Unattributed client money ageing undetected |
+
+## 7. Exception paths
+
+| Situation | Response |
+|---|---|
+| Gateway settles into the wrong account | Stop collection immediately; reverse or transfer with full documentation; assess disclosure obligation; this is a breach, not a defect |
+| Third-party credit identified after posting | Reverse to source; do not give limit or allow withdrawal; record the exception |
+| Cash tendered at a branch | Refuse; it is prohibited outright. Provide the permitted channels |
+| Client pay-out requested before clearing corporation receipt | Hold until same-day funding is available in A2; do not fund from own accounts as a convenience |
+| Unattributed credit in A1 | Age it, investigate, and escalate; unattributed client money is a reportable condition if it persists |
+| Bank channel outage before a settlement deadline | Alternate channel, alternate bank, escalate to the clearing corporation; document every attempt |
+| Under-upstreamed balance discovered | Treat as a breach with a reporting obligation, not an operational variance |
+| Brokerage swept before computation | Reverse; the sweep must follow computation of amounts actually due |
+| Certificate on a bank channel expires | Pre-tracked at 60, 30 and 7 days; if it happens, treat as an outage with the alternate-channel playbook |
+
+## Practical notes
+
+- **Open the accounts with the prescribed names exactly.** Banks sometimes abbreviate account titles to fit field lengths. The title is the control; insist on it and check the statement header.
+- **Test the gateway settlement destination with real money before launch.** One rupee, one settlement cycle, one bank statement line. It is the cheapest possible verification of the most expensive possible error.
+- **Make cash structurally impossible, not merely prohibited.** No receipt mode, no ledger head, no branch process. A prohibition that relies on staff remembering is a prohibition that will be breached.
+- **Reconcile every account daily, including the ones that should be quiet.** An unexpected entry in a deposit account is more interesting than a routine one in a nodal account.
+- **Put the internal deadline in the runbook, not the published deadline.** Everyone knows the exchange time; almost nobody has written down the bank cut-off minus the maker-checker step.
+- **Model the upstreaming effect on net worth.** Upstreamed money is not retained, and retained client cash is what drives NSE's variable net worth requirement.
+
+## Where this connects
+
+- [Clearing arrangement](/broking-kyc/finix-broking-setup/setup/04-clearing-arrangement/) — whether A3 exists in the firm's name at all
+- [Pay-in rails](/broking-kyc/finix-broking-setup/money/02-payin-rails/) — collection into A1, including validated handles and virtual accounts
+- [Pay-out engine](/broking-kyc/finix-broking-setup/money/03-payout-engine/) — disbursement from A2
+- [Upstreaming and downstreaming](/broking-kyc/finix-broking-setup/money/06-upstreaming-downstreaming/) — the end-of-day computation
+- [Treasury and exchange funding](/broking-kyc/finix-broking-setup/money/05-treasury-exchange-funding/) — funding A3
+- [Bank reconciliation](/broking-kyc/finix-broking-setup/money/04-bank-recon/) — proving the architecture holds
+- [Client funds upstreaming deep dive](/broking-kyc/deep-dives/settlement/client-funds-upstreaming/) — the regime in depth

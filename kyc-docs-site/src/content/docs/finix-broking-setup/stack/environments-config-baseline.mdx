@@ -1,0 +1,220 @@
+---
+title: "Stack: environments and configuration baseline"
+description: The environment matrix across six vendor systems and three exchanges, the configuration key convention used throughout this manual, the classification of every configuration item as regulatory, exchange-set or discretionary, secret handling, change control, and the configuration items that are themselves inspectable evidence.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Configuration in a broking stack is not a deployment concern, it is a regulated object. A client-level exposure multiplier, a square-off trigger percentage, a retention period and a cut-off time are all "config", and all four will be asked about by an inspector who wants to know what the value was on a particular date and who approved it. So the page starts with the environment matrix (because you cannot govern configuration you cannot locate), then sets the naming convention used in every later table, then does the part that actually matters — classifying each item by who sets it, because that determines what evidence you need — and ends with change control and secrets.
+
+## TL;DR
+
+- **Six vendor systems and three exchanges means up to nine independent environment ladders**, and they do not line up. Exchange test environments exist on exchange-published schedules, not on yours; some vendor sandboxes have no market data; CKYCRR 2.0 had a pilot window with a published extension to 5 October 2026. Plan the test calendar around the least flexible participant.
+- **Classify every configuration item as regulatory, exchange-set or discretionary.** A regulatory value needs a circular reference. An exchange-set value needs the circular *and* a mechanism to refresh it when the exchange changes it. A discretionary value needs a board-or-committee-approved policy. Getting the classification wrong is itself an audit finding.
+- **The dangerous category is "discretionary but looks regulatory".** Brokers routinely describe their own leverage policy as though SEBI set it. The opposite error is worse: treating a mandated floor as a tunable.
+- **Exchange-set values must be refreshed, not copied.** Margin rates, haircut lists, ban-period lists, lot sizes, bands, eligibility lists and holiday calendars all change by circular, sometimes intraday. Any value hard-coded from a circular is a defect with a date of detonation.
+- **Configuration needs the same change control as code** — version, author, approver, effective timestamp, reason, and the ability to answer "what was this value on 14 August" without a database restore.
+- **Secrets are not configuration.** Six vendor integrations means at least six credential sets plus exchange connectivity credentials, and some of them are shared-secret or certificate-based with rotation requirements that are operational events, not background tasks.
+
+## Conceptual overview
+
+The reason configuration deserves a page of its own is that in a broking operation the boundary between "code" and "policy" runs straight through it. When a developer changes a square-off trigger from 80 percent to 85 percent, they have not shipped a feature; they have changed the firm's risk-management policy, and clients will be squared off differently as a result. When an operator updates a margin file every morning, they are not performing maintenance; they are the mechanism by which the exchange's risk parameters reach the firm's risk engine, and a day they forget is a day the firm computed margin on stale inputs.
+
+That makes two properties non-negotiable. The first is **attribution**: for every value, who set it, when, and on what authority. The second is **time-travel**: the ability to state what the value was at a past instant, because almost every question an inspector, an arbitrator or an aggrieved client asks is about a past instant. A configuration store that only knows the current value cannot answer either question, which is why this manual treats configuration as an append-only, versioned record rather than a mutable table.
+
+The third property, less obvious, is **separation of the refresh mechanism from the value**. Exchange-set parameters are not decisions the broker makes, but they are decisions the broker must execute daily and correctly. The failure mode is not a wrong decision; it is a missing one. So each exchange-set item in this manual carries not just a value but a named ingestion job, a staleness tolerance, and a behaviour on staleness — and the behaviour is almost always "stop trading in the affected scope", not "carry on with yesterday's number".
+
+## 1. Environment matrix
+
+| System | Environments available | Market data in non-production | Notes for planning |
+|---|---|---|---|
+| Saral MoneyMaker | Development, UAT, production; UAT aligned to exchange simulated environments | Only during exchange mock sessions | Order-type and protocol testing is gated by exchange mock windows, not by vendor availability |
+| SecMark back office | Development, UAT, production | Not applicable — file-driven | Can be exercised any time with synthetic exchange files; build a file generator early |
+| SecMark middleware | Development, UAT, production | Partial | Needs an OMS counterparty to be meaningful |
+| SecMark C-Safe and AML Sutra | UAT, production | Not applicable | List versions in UAT may lag production; verify before relying on a UAT screening result |
+| Digio | Sandbox, production | Not applicable | Sandbox Aadhaar and PAN flows are simulated; eSign in sandbox does not produce a legally valid signature |
+| CVL KRA | Test, production | Not applicable | Test records must be requested; do not test with real client PAN |
+| CERSAI CKYCRR 2.0 | Pilot/readiness, production | Not applicable | Phased go-live from 1 August 2026 with the pilot window extended to 5 October 2026; watch CERSAI communications for the production instruction applicable to your category |
+| Razorpay and RazorpayX | Test mode, live mode | Not applicable | Test mode payouts do not move money; webhook signatures differ by mode |
+| NSE | Simulated/mock environments per segment, production | Yes, during published mock sessions | Mock sessions are announced by circular; certification is tied to them |
+| BSE | Mock environment, production | Yes, during published mock sessions | Separate connection and separate IML instance per segment, so each segment is a separate test track |
+| MCX | Mock environment, production | Yes, during published mock sessions | Long session hours mean mock windows can fall late in the evening |
+| CDSL / NSDL | Test, production | Not applicable | DP system testing is independent of trading |
+
+<Aside type="caution" title="The test calendar is set by the least flexible participant">
+A broker's integration programme is usually planned around engineering capacity, then discovers that the only way to prove an order type behaves correctly end to end is during an exchange mock session on a Saturday announced three weeks in advance. Build the plan backwards from the published mock and certification calendar. [Certification, mock trading and go-live](/broking-kyc/finix-broking-setup/setup/10-certification-mock-golive/) sets this out as a dependency chain.
+</Aside>
+
+### 1.1 Data in non-production environments
+
+| Rule | Reason |
+|---|---|
+| No production client personal data in any non-production environment | Data-protection obligation, and the 2026 regulations make cyber resilience a statutory duty under regulation 18(5) |
+| Synthetic PAN, Aadhaar and bank details only | A real PAN sent to a KRA test endpoint can create a real record |
+| Production trade and obligation files may be used after de-identification | Needed to test the back office at realistic volume and shape |
+| Secrets never shared across environments | A sandbox key leak must not be a production incident |
+| Non-production environments retained on the same security baseline as production | They contain the same code and often the same configuration |
+
+See [DPDP consent fields](/broking-kyc/reference/field-atlas/sections/aa-dpdp-consent/) for the consent artefacts that constrain what may be copied at all.
+
+## 2. Configuration key convention
+
+Every configuration table in this section uses keys in this form. The convention exists so that a value discussed on one page can be found on the configuration-reference page of its plane.
+
+```
+finix.<plane>.<domain>.<item>[.<scope>]
+```
+
+| Part | Values | Example |
+|---|---|---|
+| `plane` | `oms`, `rms`, `bo`, `money`, `onb`, `exch`, `ops`, `cmp` | `rms` |
+| `domain` | Functional area within the plane | `margin`, `limits`, `squareoff` |
+| `item` | The specific tunable | `trigger_pct` |
+| `scope` | Optional qualifier: exchange, segment, product, client group | `nse.fo`, `group.hni` |
+
+Examples used later in this manual:
+
+| Key | Meaning |
+|---|---|
+| `finix.rms.limits.exposure_multiplier.group.retail` | Exposure multiplier applied to the retail client group |
+| `finix.rms.squareoff.trigger_pct.nse.fo` | Margin utilisation at which square-off is triggered in NSE derivatives |
+| `finix.oms.order.amo_window_close.nse.cm` | Time at which the after-market order window closes for NSE cash |
+| `finix.bo.cuspa.payment_window_days` | Trading days a client has to pay before unpaid securities are liquidated |
+| `finix.money.payout.cutoff.weekday` | Daily cut-off for same-day client pay-out instruction |
+| `finix.exch.margin.span_file_refresh_interval` | Interval at which the exchange risk parameter file is re-ingested |
+| `finix.cmp.retention.books_years` | Retention period for books and records |
+
+Scope resolution is **most specific wins**, in the order: client, client group, product, segment, exchange, global. Every key must have a global default so that resolution always terminates; a key with no global default is a configuration defect, not a flexible design.
+
+## 3. The classification that matters
+
+| Class | Who sets it | What evidence you need | What happens when it changes |
+|---|---|---|---|
+| **Regulatory** | SEBI, or a statute | The circular or regulation, with paragraph | Implementation project with a compliance sign-off |
+| **Exchange-set** | Exchange or clearing corporation | The circular, plus a named ingestion job | Automatic refresh; staleness is an incident |
+| **Discretionary** | The broker, under an approved policy | Board or committee approval, and the policy document | Change control, with client communication where it affects clients |
+
+### 3.1 Worked classification of commonly confused items
+
+| Item | Often assumed | Actually | Consequence |
+|---|---|---|---|
+| Record retention period | Discretionary, "we keep seven years" | **Regulatory** — minimum eight years under regulation 16 of the 2026 regulations | A shorter period is a breach; a longer one is a choice you must then honour in discovery |
+| Complaint resolution target | Discretionary service level | **Regulatory** — 21 calendar days under regulation 10(e) | The clock is calendar days, not working days |
+| Client exposure multiplier | Regulatory, "SEBI allows 5x" | **Discretionary**, bounded by margin rules | Needs a policy; cannot be defended as a regulatory requirement |
+| Margin percentage on a scrip | Discretionary | **Exchange-set** floor, with broker discretion only upward | Collecting less than the exchange requirement is a short collection with a penalty |
+| Square-off trigger percentage | Regulatory | **Discretionary**, but must be disclosed to clients | Must match the risk-management policy the client was given |
+| Peak margin reporting cut-off | Discretionary | **Exchange-set** — reporting cut-off is five working days after trade date | Late reporting is itself penalised, separately from short collection |
+| Cash acceptance from clients | Discretionary with limits | **Prohibited** by regulation 20(d) of the 2026 regulations | Any configuration permitting it is a defect |
+| Unpaid-securities payment window | Discretionary | **Capped** — maximum five trading days from pay-out under the CUSPA framework | A longer window is a breach; a shorter one is permitted and must be in the policy |
+| Band or circuit filter | Exchange-set | **Exchange-set**, and intraday-variable | Must be refreshed intraday, not at BOD only |
+| Holiday calendar | Static annual | **Exchange-set**, amendable by circular mid-year | A hard-coded calendar will eventually trade on a closed day or halt on an open one |
+| Designated director residency | Not configuration | **Regulatory** — not less than 182 days in India per financial year | Tracked as a compliance item, not a system setting, but it is a monitored value |
+
+<Aside type="note" title="The test for a discretionary value">
+If you cannot name the document that approved it and the person who approved it, the value is undocumented, not discretionary. This is the single most common configuration finding in broking inspections, and it is also the cheapest to fix in advance: one register, one column for the approving document, one column for the date.
+</Aside>
+
+## 4. Exchange-set parameters and their refresh contracts
+
+Each of these is a value the broker must obtain repeatedly. The staleness behaviour column is the part most implementations get wrong.
+
+| Parameter set | Source | Refresh frequency | Staleness tolerance | Behaviour on staleness |
+|---|---|---|---|---|
+| Derivatives risk parameter file | Clearing corporation | Multiple times daily, intraday | Until next publication | Block new derivatives orders in affected scope |
+| Approved securities and haircuts | Clearing corporation | Daily, amendable | One business day | Exclude unlisted collateral from valuation; do not assume last-known haircut |
+| Scrip master and lot sizes | Exchange | Daily, pre-open | Must be current day | Abort BOD; do not open |
+| Circuit filters and price bands | Exchange | Daily plus intraday revisions | Intraday | Reject orders outside last-known band and alert |
+| Securities in ban period | Exchange | Daily, pre-open | Must be current day | Block fresh positions in all derivatives contracts of the underlying |
+| Surveillance measure lists | Exchange | Daily, periodic revisions | One business day | Apply most restrictive known treatment |
+| Settlement calendar and obligations | Clearing corporation | Per settlement | Per settlement | Escalate; do not estimate obligations |
+| Holiday and session calendar | Exchange | Annual plus amendments | Immediate on circular | Manual confirmation before BOD on any boundary day |
+| Margin reporting file formats | Exchange | On change by circular | Immediate | Reject the run rather than file a malformed report |
+| Validated UPI handle directory | Payment network and exchange | On change | One business day | Fall back to verified handle on record |
+
+See [file formats and downloads](/broking-kyc/finix-broking-setup/exchanges/08-file-formats-downloads/) for where each of these arrives, and [BOD runbook](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/) for the ingestion order and abort conditions.
+
+## 5. Change control
+
+| Control | Requirement |
+|---|---|
+| Versioning | Every configuration value is an append-only record with effective-from and effective-to timestamps; values are never overwritten |
+| Attribution | Author, approver and reason on every version; approver is never the author for any non-discretionary class |
+| Maker-checker | Mandatory for all risk, limit, square-off and money-movement configuration; see [admin workflow](/broking-kyc/operations/admin-workflow/) |
+| Effective timing | Risk and limit changes take effect at a stated boundary (next BOD, or immediately with an explicit flag); never silently mid-session |
+| Point-in-time query | The store must answer "what was key K for scope S at timestamp T" without restore |
+| Segregation of duty | The person who can change a limit cannot approve their own change or place orders under it |
+| Emergency change | A documented break-glass path with post-hoc approval inside one business day, logged distinctly |
+| Reconciliation | Daily diff of deployed configuration against the approved register, with exceptions reported |
+| Retention | Configuration history retained on the same eight-year floor as books and records |
+
+### 5.1 The mid-session change problem
+
+Some configuration changes are safe mid-session and some are not, and the distinction is not intuitive.
+
+| Change | Mid-session? | Why |
+|---|---|---|
+| Increase a client's exposure limit | Yes | Strictly loosens; no existing order or position becomes invalid |
+| Decrease a client's exposure limit | With care | Existing positions may immediately breach; must specify whether square-off is triggered or only new orders blocked |
+| Change square-off trigger downward | No | Can cause immediate mass square-off of clients who were compliant a second earlier |
+| Add a scrip to a blocked list | Yes | Pending orders must be explicitly handled: cancel or leave |
+| Change a margin multiplier | No, except upward for new orders only | Recomputing margin for the whole book mid-session changes every utilisation number at once |
+| Change a cut-off time | No | Downstream jobs and client communications assume the published time |
+| Enable a new order type | No | Needs exchange certification, not just a flag |
+| Change contract-note content | No | Content is prescribed; changes are a release, not a toggle |
+
+The general rule used throughout this manual: **a configuration change that can turn a compliant client into a non-compliant one must not take effect mid-session**. [Square-off engine](/broking-kyc/finix-broking-setup/rms/06-squareoff-engine/) relies on this.
+
+## 6. Secrets and credentials
+
+| Credential | System | Type | Rotation | Operational note |
+|---|---|---|---|---|
+| Exchange connectivity credentials | NSE, BSE, MCX | User identifiers plus session credentials | Per exchange policy | Terminal identifiers are reportable to the exchange; see [user IDs, CTCL and NNF](/broking-kyc/finix-broking-setup/oms/03-user-id-ctcl-nnf/) |
+| Exchange extranet access | NSE, BSE, MCX | Account credentials | Periodic | The single most operationally critical credential set; loss of it stops BOD |
+| Digio API credentials | Digio | Key and secret, environment-scoped | Periodic | Sandbox and production keys must be impossible to confuse; fail closed on mismatch |
+| KRA credentials | CVL KRA | Intermediary credentials plus API configuration | Periodic | Images and data are pushed; credential compromise is a personal-data incident |
+| CKYCRR credentials | CERSAI | API credentials, institution-scoped | Per CERSAI policy | 2.0 adds OTP-based consent in the download flow, which is a client-facing dependency, not just a credential |
+| Razorpay keys | Razorpay, RazorpayX | Key and secret, mode-scoped | Periodic | Payout credentials are money-moving; hold to the highest tier of control |
+| Webhook signing secrets | Razorpay | Shared secret | Periodic | Signature verification is mandatory on every inbound webhook; see [pay-out engine](/broking-kyc/finix-broking-setup/money/03-payout-engine/) |
+| Bank channel credentials | Clearing and client banks | Varies, often certificate-based | Per bank policy | Certificate expiry is a scheduled outage if not tracked |
+| Depository system access | CDSL, NSDL | Operator credentials | Per depository policy | Maker-checker enforced at the depository, not only locally |
+| Signing certificates | Digio, document signer | Certificate | Per validity | Expiry invalidates signing silently from the client's point of view |
+
+| Rule | Detail |
+|---|---|
+| No secret in source control, configuration files, or a ticket | Including non-production secrets |
+| Secrets in a managed store, injected at runtime | Access logged and attributable to a person or service identity |
+| Rotation is a planned change, not a background task | Several of these rotations require coordinated vendor or exchange action |
+| Expiry monitoring on every certificate and key | Alert at 60, 30 and 7 days |
+| Break-glass credentials exist, sealed, and are tested | Specifically for exchange extranet and depository access |
+| Joiner-mover-leaver across all nine systems | A single leaver checklist spanning every vendor; see [compliance configuration baseline](/broking-kyc/finix-broking-setup/compliance/01-compliance-config-baseline/) |
+
+## 7. Configuration as inspection evidence
+
+An inspection does not ask for your configuration file. It asks questions whose answers happen to live in configuration. These are the recurring ones.
+
+| Question | Configuration that answers it | Where documented |
+|---|---|---|
+| What leverage did you give this client on this date, and under what policy? | Limit and multiplier history for that client, plus the approved policy | [Limit framework](/broking-kyc/finix-broking-setup/rms/04-limit-framework/) |
+| Why was this client squared off? | Trigger value in force, utilisation at the time, and the decision log | [Square-off engine](/broking-kyc/finix-broking-setup/rms/06-squareoff-engine/) |
+| How do you ensure you collect the exchange-required margin? | Risk parameter ingestion job, staleness behaviour, and shortfall detection | [Margin engine](/broking-kyc/finix-broking-setup/rms/02-margin-engine/) |
+| Show that client funds were not used for own purposes | Bank account configuration, sweep rules, upstreaming configuration | [Upstreaming and downstreaming](/broking-kyc/finix-broking-setup/money/06-upstreaming-downstreaming/) |
+| Who can change a limit, and who approved this change? | Role configuration plus the change record | [Admin workflow](/broking-kyc/operations/admin-workflow/) |
+| What order types can your clients use, and are they all approved? | Enabled order-type configuration per channel, against the certification record | [Order types catalogue](/broking-kyc/finix-broking-setup/oms/04-order-types-catalogue/) |
+| How long do you keep records, and can you produce one from six years ago? | Retention configuration and an actual retrieval | [Statements and retention](/broking-kyc/finix-broking-setup/backoffice/08-statements-retention/) |
+| Are your investor awareness messages current? | Message content configuration and its refresh date | [Compliance configuration baseline](/broking-kyc/finix-broking-setup/compliance/01-compliance-config-baseline/) |
+
+## Practical notes
+
+- **Build the configuration register before the first integration.** Retro-fitting attribution onto values that are already in production is an archaeology project, and the answers are usually "nobody remembers".
+- **Put the staleness behaviour in the same record as the value.** An ingestion job that logs a failure and continues is worse than one that does not run, because the failure is invisible and the consequence is silent.
+- **Separate "enabled" from "certified".** A feature flag that can turn on an uncertified order type or an unapproved algorithm is a compliance hazard sitting in your deployment pipeline. Gate it on a certification record, not on a boolean.
+- **Expect the exchange to change a value you treated as constant.** Lot sizes, bands, session timings and even file names have all changed by circular. The design question is not whether it happens but whether you find out from your ingestion job or from your clients.
+- **Keep the discretionary register short.** Every discretionary value is a policy you must write, approve, disclose where client-affecting, and defend. Values that could be set to the regulatory floor and left there cost nothing to govern.
+
+## Where this connects
+
+- [Integration contract matrix](/broking-kyc/finix-broking-setup/stack/integration-contract-matrix/) — the interfaces these credentials and refresh jobs run over
+- [BOD runbook](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/) — where exchange-set refresh actually happens, in order, with abort conditions
+- [Compliance configuration baseline](/broking-kyc/finix-broking-setup/compliance/01-compliance-config-baseline/) — the register, the owners and the evidence map
+- [Admin workflow](/broking-kyc/operations/admin-workflow/) — the maker-checker model this page assumes
+- [Cyber resilience configuration](/broking-kyc/finix-broking-setup/compliance/04-cyber-cscrf-config/) — the security baseline these environments sit on

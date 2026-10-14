@@ -1,0 +1,213 @@
+---
+title: "Setup 4: the clearing arrangement"
+description: The most expensive structural decision in a broking setup — self-clearing versus clearing through a clearing member versus becoming a clearing member for others — with the capital, operational, risk and dependency consequences of each, and the hybrid Finix adopts.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** The clearing decision looks like a cost comparison and is actually an architecture decision. It determines the net worth tier, who holds the collateral, who faces the clearing corporation at a settlement deadline, which files arrive and from whom, what happens in a default, and how much of the operation the firm controls versus depends on. So the page sets out what clearing actually is first, because the word is used loosely; then the three structures with their full consequence sets; then the decision framework; then the hybrid, which is what most new brokers actually do and which is rarely documented properly.
+
+## TL;DR
+
+- **Clearing is not settlement and it is not trading.** It is the function of standing between a trading member and the clearing corporation: novation of the trade, computation and collection of margin, posting of collateral, and performance of the settlement obligation. The entity that clears is the entity the clearing corporation holds responsible.
+- **The capital difference is fivefold or more.** Trading member ₹1 crore; self-clearing member ₹5 crore; clearing member ₹15 crore; professional clearing member ₹50 crore, under Chapter X of the [2026 regulations](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/).
+- **One registration covers both roles** under regulation 3 of the 2026 regulations, so the paperwork is simpler than it used to be — but the net worth, deposits and operational obligations attached to the clearing role are unchanged.
+- **Clearing through someone else trades capital for dependency.** The clearing member sees the firm's entire position and collateral, sets its own risk limits on top of the clearing corporation's, can call for additional margin, and in the extreme can stop the firm trading. That is a commercial relationship with a kill switch in it.
+- **Self-clearing is an operational build, not just a capital commitment.** Collateral management, margin files, obligation processing, pay-in and pay-out instructions, delivery and auction handling, and a clearing bank relationship all become in-house functions with hard daily deadlines.
+- **NSE's ₹1 lakh interest-free security deposit to NSE Clearing is not required if a clearing or self-clearing member clears and settles only on a gross basis for both securities and funds with no settlement guarantee** — a narrow but real structural option.
+- **Finix adopts a hybrid**: self-clearing in equity and equity derivatives where the volume justifies the build, clearing through a clearing member in commodities at launch where delivery operations would otherwise be the longest pole. The hybrid is documented explicitly because it means two settlement operating models running side by side.
+
+## Conceptual overview
+
+The cleanest way to understand clearing is to ask who the clearing corporation sues. When a trade is executed, the clearing corporation becomes the counterparty to both sides through novation, and it then has a single entity on each side that owes it funds or securities. That entity is the clearing member. If a client defaults, the trading member is exposed; if the trading member cannot cover it, the clearing member is exposed; if the clearing member cannot cover it, the clearing corporation's default waterfall begins — the member's own deposits, then the settlement guarantee fund, and so on. The clearing decision is a decision about where in that chain the firm chooses to sit.
+
+That framing makes the trade-off visible. A trading member clearing through someone else has converted a capital requirement into a counterparty relationship. It has ₹1 crore of net worth instead of ₹5 crore, no clearing bank relationship to build, no collateral management function, no obligation files to process from the clearing corporation, and no settlement deadline that it personally misses. In exchange, it has a clearing member that charges for the service, imposes its own limits, holds visibility into the firm's whole book, and has a contractual and practical ability to restrict trading. It has also outsourced a function that is close to the heart of the business, which means a future migration — and clearing migrations are genuinely difficult, because open positions, collateral and client mappings all have to move.
+
+The third consideration is time. Self-clearing adds a substantial workstream to a setup that is already dependency-constrained: a clearing bank account that cannot be opened until membership exists, a collateral and margin operation that has to be built and tested, and daily deadlines that are unforgiving from the first settlement. Clearing through a clearing member compresses the go-live timeline considerably. For a firm whose first priority is reaching the market, that is a real argument, and the honest version of the decision is often "self-clear eventually, not at launch" — which is exactly why the hybrid in section 5 deserves documentation rather than embarrassment.
+
+## 1. Regulatory framework
+
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — regulation 3 single registration across stock broker and clearing member roles; Chapter X net worth and deposits for each tier. `[not yet in index]`
+- **Clearing corporation rules, bye-laws and regulations** — NSE Clearing, Indian Clearing Corporation for BSE, and MCX Clearing Corporation. These set the member obligations, margin regimes, settlement schedules, default procedures and report sets. `[not yet in index]`
+- **[Segregation and monitoring of collateral at client level, SEBI/HO/MRD2_DCAP/CIR/2021/0598](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2_dcapcir20210598)** (20 July 2021) — client-level collateral reporting, allocation and valuation, and the cash-equivalent minimum at clearing-member level in paragraph 18.
+- **[Margin obligations by way of pledge and re-pledge, SEBI/HO/MIRSD/DOP/CIR/P/2020/28](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddopcirp202028)** (25 February 2020) — the pledge chain from client to trading member to clearing member to clearing corporation.
+- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025).
+- **Core settlement guarantee fund framework** — see [SGF and core SGF](/broking-kyc/deep-dives/foundational/sgf-core-sgf/) and [member default and recovery](/broking-kyc/deep-dives/foundational/member-default-recovery/).
+
+## 2. What the clearing function actually comprises
+
+If the firm self-clears, every one of these becomes an in-house capability with a daily deadline.
+
+| Function | What it involves | Deadline character |
+|---|---|---|
+| Novation acceptance | Trades become obligations to the clearing corporation | Automatic |
+| Margin computation and collection | Initial, exposure, mark-to-market, delivery, special and additional margins, from clients and to the clearing corporation | Intraday and end of day |
+| Collateral management | Cash and non-cash collateral, pledge and re-pledge chain, haircuts, valuation, client-level allocation and reporting | Daily, with intraday revaluation |
+| Cash-equivalent composition | Maintaining at least the prescribed minimum share of collateral in cash or cash equivalent at clearing-member level | Continuous |
+| Obligation processing | Loading daily and final obligation files, computing client-level obligations | Hard, per settlement |
+| Funds pay-in and pay-out | Instructing the clearing bank, meeting pay-in deadlines, receiving pay-out | Hard, same day |
+| Securities pay-in and pay-out | Depository instructions, early pay-in, direct pay-out to client demat | Hard, same day |
+| Short delivery and auction | Identifying shortfalls, auction participation, close-out | Hard |
+| Physical delivery | Stock derivatives delivery; commodity tender and warehouse documentation | Hard, with evening deadlines in commodities |
+| Margin reporting | Client-level margin collected and peak margin, within the reporting cut-off | Five working days after trade date |
+| Penalty management | Reconciling, disputing and accounting for penalties | Periodic |
+| Default handling | Client default, own default procedures, contribution to the default waterfall | Event-driven |
+| Reporting and reconciliation | Every clearing corporation report, reconciled daily | Daily |
+
+See [settlement obligations](/broking-kyc/finix-broking-setup/backoffice/05-settlement-obligations/) and [settlement day operations](/broking-kyc/finix-broking-setup/daily-ops/06-settlement-day-ops/) for how these run once live.
+
+## 3. The three structures
+
+### 3.1 Trading member clearing through a clearing member
+
+| Dimension | Position |
+|---|---|
+| Net worth | ₹1 crore base |
+| Clearing bank account | Not required in the firm's name for settlement |
+| Collateral | Posted to the clearing member, which re-pledges onward |
+| Who faces the clearing corporation | The clearing member |
+| Margin calls | From the clearing member, which may add its own buffer above the clearing corporation's requirement |
+| Files received | From the clearing member, in the clearing member's formats and on its timetable |
+| Cost | Clearing fees, usually per-trade or per-value, plus collateral and funding terms |
+| Go-live speed | Fastest |
+| Operational build | Smallest |
+| Dependency risk | **High.** The clearing member can increase margin, restrict segments, or in extremis stop the firm trading |
+| Information asymmetry | The clearing member sees the whole book, including client-level detail |
+| Migration difficulty | High — open positions, collateral and client mappings must move |
+| Suitable when | Launch phase, low initial volume, or a segment where the operational build is disproportionate |
+
+<Aside type="caution" title="Read the clearing agreement for the kill switch">
+Every clearing agreement contains a right for the clearing member to demand additional margin and to restrict or suspend clearing. Those clauses are reasonable from the clearing member's point of view and existential from the trading member's. The questions to negotiate are: how much notice, what objective triggers, whether restriction can be segment-specific rather than total, what happens to open positions on suspension, and what the exit and portability terms are. A clearing agreement negotiated on price alone is the commonest expensive mistake in this part of the setup.
+</Aside>
+
+### 3.2 Self-clearing member
+
+| Dimension | Position |
+|---|---|
+| Net worth | ₹5 crore base |
+| Clearing bank account | Required, in the firm's name, with a designated clearing bank |
+| Collateral | Posted directly to the clearing corporation; client-level allocation and reporting is the firm's obligation |
+| Who faces the clearing corporation | The firm |
+| Margin calls | From the clearing corporation, with no intermediary buffer |
+| Files received | Directly from the clearing corporation, in standard formats on the published timetable |
+| Cost | No clearing fee to a third party; the cost is the capital, the operation and the deposits |
+| Go-live speed | Slower — the clearing build and the clearing bank relationship are both on the critical path |
+| Operational build | Substantial: everything in section 2 |
+| Dependency risk | Low on any single commercial counterparty; high on the firm's own operational discipline |
+| Information asymmetry | None |
+| Suitable when | Volume justifies the build, or control over the settlement chain is strategically necessary |
+
+### 3.3 Clearing member for other trading members
+
+| Dimension | Position |
+|---|---|
+| Net worth | ₹15 crore base; ₹50 crore for a professional clearing member |
+| What it adds | A revenue line, and exposure to other members' clients |
+| Risk | The firm is now in the chain for defaults it did not cause and cannot see in real time |
+| Operational build | Everything in self-clearing, plus member-level risk management, limit setting on clearing clients, and their reporting |
+| Suitable when | It is a deliberate business line, not a by-product |
+
+Not contemplated for Finix at launch.
+
+## 4. The decision framework
+
+Score the decision on these axes rather than on cost alone.
+
+| Axis | Question | Favours clearing through a CM | Favours self-clearing |
+|---|---|---|---|
+| Capital | Is ₹5 crore of net worth available without starving working capital? | No | Yes |
+| Volume | Will clearing fees exceed the cost of the operation within the planning horizon? | Low volume | High volume |
+| Operational maturity | Can the firm staff hard daily deadlines from day one? | Not yet | Yes |
+| Timeline | Is reaching the market quickly decisive? | Yes | No |
+| Control | Is the ability to be restricted by a counterparty acceptable? | Acceptable | Not acceptable |
+| Segment complexity | Does the segment involve physical delivery or warehouse operations? | Yes | Only with a delivery operation |
+| Client mix | Do clients require direct clearing relationships or custodial settlement? | — | Institutional needs favour control |
+| Migration cost | Is a future migration planned and budgeted? | Only if planned | Avoids the issue |
+| Funding | Does the firm have intraday liquidity to meet margin calls directly? | No | Yes |
+
+## 5. The Finix hybrid
+
+| Segment | Arrangement | Reason |
+|---|---|---|
+| NSE cash | Self-clearing | Core segment; volume justifies the build; control over delivery and short-delivery handling matters for client experience |
+| NSE equity derivatives | Self-clearing | Margin intensity means the clearing member's additional buffer would be expensive; direct clearing-corporation relationship gives the real number |
+| NSE currency derivatives | Self-clearing | Same clearing corporation, marginal additional build |
+| BSE cash and derivatives | Self-clearing with Indian Clearing Corporation | Second clearing corporation relationship, but the operational pattern is already built |
+| MCX commodity derivatives | **Clearing through a clearing member at launch** | Physical delivery with tender periods, warehouse documentation and evening deadlines is a distinct operational capability; building it at launch would delay everything else |
+
+### 5.1 What a hybrid actually costs
+
+Running two settlement operating models at once is the part that gets underestimated.
+
+| Consequence | Detail |
+|---|---|
+| Two file sets | Standard clearing corporation reports for equity; the clearing member's formats and timetable for commodities |
+| Two reconciliation processes | The back office must reconcile against two different authorities with different cut-offs |
+| Two margin truths in commodities | The clearing corporation's requirement and the clearing member's additional buffer, both of which must reach the RMS |
+| Two collateral pools | Collateral posted to the clearing corporation directly, and collateral posted to the clearing member |
+| Client-level reporting in both | The client-level allocation and reporting obligation applies regardless of route |
+| Two default paths | Different procedures if a client defaults in equity versus commodities |
+| Two sets of deadlines in one evening | Commodity tender deadlines at 19:30 while equity settlement is already closed |
+| Migration already on the roadmap | The commodity arrangement is explicitly temporary, so the migration cost is accepted up front rather than discovered |
+
+<Aside type="note" title="Document the hybrid as a target state with a trigger">
+State the condition that will cause migration to self-clearing in commodities — a volume threshold, a delivery-volume threshold, or a date — and review it on a schedule. Hybrids that are not written down as temporary become permanent by default, and the firm ends up with a dependency nobody chose.
+</Aside>
+
+### 5.2 Interface consequences
+
+| Interface | Equity (self-clearing) | Commodity (through a CM) |
+|---|---|---|
+| Margin requirement into RMS | Clearing corporation risk parameter files | Clearing member's requirement, including its buffer |
+| Collateral valuation | Clearing corporation approved list and haircuts | Clearing member's accepted list, which may be narrower |
+| Obligation files | Clearing corporation, published timetable | Clearing member, contractual timetable |
+| Funds settlement | Firm's clearing bank account | Instruction to the clearing member |
+| Securities or goods settlement | Depository or warehouse directly | Via the clearing member |
+| Margin reporting | Firm reports to the clearing corporation | Reporting route per the clearing arrangement — confirm who reports what |
+| Penalties | Levied on the firm | Passed through, usually with the clearing member's own charge |
+
+Every row is an entry in the [integration contract matrix](/broking-kyc/finix-broking-setup/stack/integration-contract-matrix/), and the commodity rows have the weaker guarantees because they rest on a commercial agreement rather than a published standard.
+
+## 6. The clearing bank relationship
+
+Only relevant where the firm clears for itself.
+
+| Requirement | Detail |
+|---|---|
+| Designated clearing bank | The clearing corporation publishes the list of banks eligible to be used for settlement |
+| Account in the firm's name | Settlement account, distinct from client accounts and own accounts |
+| Intraday liquidity | Margin calls and pay-in deadlines are same-day and non-negotiable |
+| Channel | Often certificate-based; see [bank account architecture](/broking-kyc/finix-broking-setup/setup/06-bank-account-architecture/) |
+| Cut-offs | Bank cut-offs are earlier than clearing corporation deadlines; the effective deadline is the bank's |
+| Multiple banks | Worth considering for resilience, at the cost of liquidity fragmentation |
+
+## 7. Exception paths
+
+| Situation | Response |
+|---|---|
+| Clearing member raises margin mid-session | Treat as an incident with a funding playbook; see [incident playbooks](/broking-kyc/finix-broking-setup/daily-ops/07-incident-playbooks/) |
+| Clearing member threatens restriction | Escalate commercially and operationally at once; have a contingency clearing relationship identified even if dormant |
+| Net worth falls below the self-clearing tier | Immediate intimation; a cure plan; in the worst case, a forced move to clearing through a clearing member |
+| Clearing bank channel outage at a pay-in deadline | Alternate channel, alternate bank, and immediate escalation to the clearing corporation; never assume credit |
+| Client default large enough to threaten the firm's obligation | Own-funds cover first, because the clearing corporation's deadline does not wait for recovery from the client |
+| Commodity delivery obligation the firm cannot fulfil | Clearing member's procedure governs; the consequence is contractual as well as regulatory |
+| Cash-equivalent composition falls below the minimum | Convert collateral or fund; this is a continuous requirement, not an end-of-day test |
+
+## Practical notes
+
+- **Decide clearing before deciding capital.** It is the single biggest driver of the net worth number, and reversing it later means either idle capital or a migration.
+- **Negotiate portability into the clearing agreement at signature.** The time to agree how positions and collateral move out is when the clearing member wants your business.
+- **Keep a dormant second clearing relationship identified.** Not contracted, necessarily, but identified with a known process — because the moment you need one, you need it in days.
+- **Model intraday liquidity, not just capital.** Self-clearing firms fail at deadlines, not at solvency. The question is whether cash is available by the bank's cut-off, not whether it exists.
+- **Do not let the hybrid become invisible.** Two operating models need two runbooks, and the commodity one needs to be as well documented as the equity one even though it is temporary.
+- **Read the cash-equivalent rule carefully.** The minimum applies at clearing-member level and is expressly not required to be applied at individual client level, but a client's surplus cash equivalent cannot support another client. See [collateral and cross-margin](/broking-kyc/trading-risk/collateral-cross-margin/).
+
+## Where this connects
+
+- [Entity and capital structure](/broking-kyc/finix-broking-setup/setup/01-entity-capital-structure/) — the net worth tier this decision selects
+- [Exchange membership](/broking-kyc/finix-broking-setup/setup/03-exchange-membership/) — the membership category that carries the clearing role
+- [Bank account architecture](/broking-kyc/finix-broking-setup/setup/06-bank-account-architecture/) — the clearing bank account
+- [Settlement obligations](/broking-kyc/finix-broking-setup/backoffice/05-settlement-obligations/) — the daily processing this decision creates or avoids
+- [Collateral and pledge](/broking-kyc/finix-broking-setup/rms/05-collateral-pledge/) — the collateral chain
+- [Treasury and exchange funding](/broking-kyc/finix-broking-setup/money/05-treasury-exchange-funding/) — meeting the calls
+- [SGF and core SGF](/broking-kyc/deep-dives/foundational/sgf-core-sgf/) and [member default and recovery](/broking-kyc/deep-dives/foundational/member-default-recovery/) — what sits behind the chain

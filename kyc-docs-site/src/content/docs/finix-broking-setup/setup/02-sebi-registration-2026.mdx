@@ -1,0 +1,216 @@
+---
+title: "Setup 2: SEBI registration under the 2026 regulations"
+description: The SEBI (Stock Brokers) Regulations, 2026 — notified 7 January 2026 and a complete repeal of the 1992 framework — mapped chapter by chapter, with the new eligibility conditions, the statutory obligations that used to be circular obligations, the fraud-prevention and whistle-blower chapters, the fee structure, and what each change means at implementation and configuration level.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** A broker registered in 2026 is registered under a different law from one registered in 2024, and the differences are not cosmetic. Several things that were circular obligations — enforceable, but amendable by circular — are now statutory, which changes both the consequence of breach and the evidence an inspector expects. So the page does three things in order: it states the instrument and its structure, so that a paragraph can be cited; it maps what changed, with the regulation number; and then it does the part that matters to a build team, which is translating each change into a configuration item, a control or a document that has to exist on day one.
+
+## TL;DR
+
+- **The SEBI (Stock Brokers) Regulations, 2026 were notified on 7 January 2026** under file number SEBI/LAD-NRO/GN/2026/291, published in the Gazette of India Extraordinary, Part III, Section 4, effective from publication, and they **repeal the 1992 regulations in full**. Eleven chapters, fifty-one regulations. `[not yet in index]`
+- **Registration is routed through a recognised stock exchange**, which forwards the application with its recommendation within thirty days. SEBI then examines eligibility including infrastructure, fit-and-proper status, NISM certification, net worth and the designated-director condition.
+- **Two genuinely new entry conditions**: at least one designated director who stays in India for not less than 182 days in a financial year, and at least two years' experience in trading or dealing in securities. Existing brokers were given six months to meet the residency condition; a new applicant meets it at application.
+- **Client-asset segregation is now statutory.** Regulation 18(2)(c) requires strict segregation of client money and securities from the broker's own account *and from any other client's account*. Regulation 20(d) prohibits accepting cash from clients outright.
+- **Record retention has a statutory floor of eight years** under regulation 16, and complaint redressal has a statutory clock of **21 calendar days** under regulation 10(e). Both are configuration items with no discretion downward.
+- **Chapter IV is a new, dedicated fraud-prevention chapter** with surveillance, escalation, board accountability, a mandatory whistle-blower policy with a confidential channel and retaliation protection under regulation 25, and an explicit mule-account detection obligation under regulation 23(8).
+- **Qualified Stock Brokers and Execution Only Platforms now exist in the regulations**, not only in circulars — regulation 19 for QSBs including an orderly wind-down framework, and regulations 2(1)(g) and 15(2) for EOPs.
+- **One registration covers the stock broker and clearing member roles** under regulation 3, which simplifies the [clearing arrangement](/broking-kyc/finix-broking-setup/setup/04-clearing-arrangement/) decision but does not reduce the net worth attached to the clearing role.
+
+## Conceptual overview
+
+The 1992 regulations were a thin instrument that had been doing heavy lifting for three decades. Most of what actually governed a broker's day lived in circulars — hundreds of them, consolidated periodically into a master circular, amendable without the process that amending a regulation requires. That architecture had a practical consequence: a broker's obligations were real but their hierarchy was unclear, and the question "is this a regulation, a circular, an exchange requirement or market practice?" had no quick answer.
+
+The 2026 regulations change the centre of gravity. Obligations that go to the core of why a broker is regulated at all — that client assets are segregated, that the firm can detect fraud in its own systems, that records survive long enough to be examined, that a complaint gets resolved — have been pulled up into the regulations. This matters in three ways. Breach is a breach of regulations, with the enforcement consequences that attach. The obligation cannot be relaxed by a circular, only by amendment. And an inspection will test the obligation against the regulation's words rather than against an exchange's operational guideline, which tends to be stricter, because operational guidelines contain exceptions that regulations do not.
+
+For a firm building from scratch, this is good news disguised as more work. The 1992-era pattern — build the system, then bolt on controls as circulars are discovered — produced stacks where compliance was a layer of reports sitting on top of an architecture that had not been designed for it. A firm starting in 2026 can read the chapter structure as a specification: Chapter III is what the system must do, Chapter IV is what the system must detect, Chapter VIII is how people must behave, and Chapter X is what the balance sheet must look like. Section 3 of this page does that translation explicitly.
+
+<Aside type="caution" title="Verify against the gazette text">
+This page is built from the notification details and a structural reading of the regulations as reported by legal and professional commentary. The regulation numbers and the substance below are stated as reported; **read the gazette text before relying on any paragraph in a filing, a policy or a client document**. The master circular for stock brokers continues to carry the operational detail, and exchange operational guidelines carry the mechanics. Where this page and the gazette differ, the gazette governs.
+</Aside>
+
+## 1. The instrument
+
+| Attribute | Value |
+|---|---|
+| Title | Securities and Exchange Board of India (Stock Brokers) Regulations, 2026 |
+| Notification date | 7 January 2026 |
+| File number | SEBI/LAD-NRO/GN/2026/291 |
+| Publication | Gazette of India — Extraordinary, Part III, Section 4; GI/2026 (143) |
+| Effective | From publication in the Official Gazette |
+| Replaces | SEBI (Stock Brokers) Regulations, 1992 — complete repeal |
+| Structure | 11 chapters, 51 regulations |
+
+### 1.1 Chapter map
+
+| Chapter | Regulations | Subject | What a build team reads it for |
+|---|---|---|---|
+| I | 1–3 | Preliminary, definitions, application | Definitions of execution only platform and the single-registration rule |
+| II | 4–14 | Registration | Eligibility, application route, conditions of registration, complaint clock |
+| III | 15–20 | General obligations | The functional specification: segregation, cyber resilience, SCORES and ODR, record retention, prohibited conduct |
+| IV | 21–26 | Fraud prevention and detection | Surveillance, escalation, mule-account detection, whistle-blower policy |
+| V | 27–32 | Inspection procedure | What an inspection may demand and how it proceeds |
+| VI | 33 | Action in case of default | Consequences |
+| VII | 34–35 | Relaxation from enforcement | The narrow relief pathway |
+| VIII | 36–39 | Code of conduct | Conduct obligations for the firm and its people |
+| IX | 40–46 | Payment of fees | Turnover fees, clearing member fees, interest on delay |
+| X | 47–48 | Net worth and deposits | Capital tiers |
+| XI | 49–51 | Miscellaneous | Repeal, savings, transitional provisions |
+
+## 2. Registration process
+
+| Step | Actor | Detail |
+|---|---|---|
+| 1 | Applicant | Application routed **through a recognised stock exchange**, not directly to SEBI |
+| 2 | Exchange | Examines and **forwards with its recommendation within thirty days** |
+| 3 | SEBI | Examines eligibility: infrastructure, fit and proper, NISM certification, net worth, designated-director residency |
+| 4 | SEBI | Grants registration, subject to conditions |
+| 5 | Exchange | Activates membership; segments enabled per application |
+| 6 | Broker | Continuing conditions begin immediately — they are not deferred to go-live |
+
+<Aside type="note" title="The exchange is the first regulator you meet">
+Because the application is routed through the exchange and the exchange's recommendation is part of the process, membership admission and SEBI registration are effectively a single interleaved workflow. In practice the exchange's documentation checklist is the binding one at the front of the process, and its queries are what determine timeline. Treat the exchange's membership department as the primary counterparty for the first phase. [Exchange membership](/broking-kyc/finix-broking-setup/setup/03-exchange-membership/) covers that process per exchange.
+</Aside>
+
+### 2.1 Eligibility conditions at application
+
+| Condition | Regulation | Evidence |
+|---|---|---|
+| Designated director resident in India not less than 182 days in a financial year | Chapter II | Passport, travel record, residency declaration; forward-looking commitment |
+| At least two years' experience in trading or dealing in securities | Chapter II | Employment or engagement record of the named person |
+| Fit and proper — entity, directors, significant shareholders | Chapter II with the fit-and-proper criteria | Declarations and diligence; see [fit and proper](/broking-kyc/deep-dives/member-compliance/fit-and-proper/) |
+| NISM certification | Chapter II | Either the proprietor, one designated director or partner, or the compliance officer certified in Securities Market (Basic), Compliance Officers (Brokers) or the relevant module |
+| Net worth | Chapter X | Auditor certificate in the exchange format; see [entity and capital structure](/broking-kyc/finix-broking-setup/setup/01-entity-capital-structure/) |
+| Infrastructure | Chapter II | Premises, systems, connectivity, personnel; see [infrastructure and connectivity](/broking-kyc/finix-broking-setup/setup/08-infrastructure-connectivity/) |
+
+### 2.2 Conditions that attach after registration
+
+| Condition | Regulation | Nature |
+|---|---|---|
+| Redress investor complaints within 21 calendar days of receipt | 10(e) | Hard clock, calendar days |
+| Report material changes in registration details | Chapter II | Event-driven obligation |
+| Continuous SCORES and ODR enrolment | 18(6) | Continuous, not periodic |
+| Maintain net worth | Chapter X | Continuous |
+| Pay fees, with 1 percent per month on delay | 44(2) | Continuous |
+
+## 3. What changed, and what each change costs to implement
+
+This is the table to hand to an engineering and compliance team.
+
+| # | Change | Regulation | 1992 position | Implementation consequence |
+|---|---|---|---|---|
+| 1 | Designated director residency, 182 days | Ch. II | No requirement | Not a system change; a governance and tracking item. Monitor days-in-India per financial year per designated director as a compliance object with an alert, because a breach is a registration condition breach |
+| 2 | Two years' securities experience | Ch. II | Not specified | Documentation at application; a hiring constraint for any future replacement of that person |
+| 3 | Client asset segregation, statutory | 18(2)(c) | Via guidelines and circulars | **The bank account map and the ledger architecture are now regulation-level artefacts.** Client money segregated from own money *and from other clients* means client-level attribution of every balance, not just a pooled client account. See [bank account architecture](/broking-kyc/finix-broking-setup/setup/06-bank-account-architecture/) and [ledger and accounting](/broking-kyc/finix-broking-setup/backoffice/04-ledger-accounting/) |
+| 4 | Cash from clients prohibited | 20(d) | Addressed by circulars | Configuration must make cash receipt impossible, not merely discouraged: no cash receipt mode in the back office, no cash head in the client ledger, branch processes that cannot accept it, and a detection rule for structured deposits. See [pay-in rails](/broking-kyc/finix-broking-setup/money/02-payin-rails/) |
+| 5 | Record retention, minimum eight years | 16 | Specified period, commonly understood as five | `finix.cmp.retention.books_years = 8` as a floor, applied to every record class including configuration history, audit logs, order and trade logs, communications, consent artefacts and screening results. Storage design, cost and retrieval testing all change. See [statements and retention](/broking-kyc/finix-broking-setup/backoffice/08-statements-retention/) |
+| 6 | Complaint redressal, 21 calendar days | 10(e) | Undefined timeline | A clock object per complaint with calendar-day arithmetic, escalation at defined thresholds, and reporting. ComplianceSutra is the natural home; the common defect is implementing working days |
+| 7 | Cyber security and resilience, statutory | 18(5) | Circular only | The framework becomes a regulation-level obligation. See [cyber resilience configuration](/broking-kyc/finix-broking-setup/compliance/04-cyber-cscrf-config/) and [CSCRF deep dive](/broking-kyc/deep-dives/compliance-audit/cscrf-deep-dive/) |
+| 8 | SCORES and ODR, continuous enrolment | 18(6) | Via circulars | Enrolment state is monitored, not a one-time task. See [SCORES procedure](/broking-kyc/deep-dives/compliance-audit/scores-procedure/) and [ODR](/broking-kyc/deep-dives/compliance-audit/odr/) |
+| 9 | Dedicated fraud prevention chapter | Ch. IV, 21–26 | Circular-based | Surveillance capability, an escalation path, board-level accountability and documented procedures. This is the chapter that most changes what a *system* must do, and section 4 below treats it separately |
+| 10 | Mule account detection | 23(8) | No explicit obligation | A detection capability, with rules, alerts, investigation workflow and outcome recording. Not satisfiable by onboarding KYC alone — it is a behavioural detection obligation |
+| 11 | Whistle-blower policy | 25 | Not mandated | A confidential channel, retaliation protection, a documented policy, and a handling procedure with records |
+| 12 | Qualified Stock Brokers | 19 | No concept in regulations | Size-based designation with enhanced obligations including an orderly wind-down framework. Below threshold at launch, but design for it: see section 5 |
+| 13 | Execution Only Platforms | 2(1)(g), 15(2) | Not recognised | Relevant if Finix later distributes mutual funds through a platform model |
+| 14 | Single registration, broker and clearing member | 3 | Separate framework | One certificate, cross-applicable obligations. Simplifies paperwork; does not reduce clearing net worth |
+| 15 | Net worth tiers in the regulations | Ch. X | In a schedule | ₹1 crore / ₹5 crore / ₹15 crore / ₹50 crore |
+| 16 | Fee structure | Ch. IX, 40–46 | Schedule-based | Segment-wise turnover fees of ₹1 to ₹10 per crore of turnover; clearing member ₹50,000 annually; 1 percent per month interest on delayed payment under 44(2) |
+
+## 4. Chapter IV in implementation terms
+
+Chapter IV is the part of the 2026 regulations that a build team cannot satisfy with a policy document. It requires detection, which means data, rules, alerts and a workflow.
+
+| Obligation | What the system must actually do | Where it lives in the Finix stack |
+|---|---|---|
+| Surveillance of the firm's own activity | Rule-based detection over orders, trades, funds and client behaviour, with tunable thresholds and a tuning record | SecMark AML Sutra and surveillance, plus RMS alerts; see [intraday surveillance](/broking-kyc/finix-broking-setup/rms/07-intraday-surveillance/) |
+| Escalation | A defined path from alert to investigation to decision to filing, with timestamps and named actors at each step | ComplianceSutra workflow |
+| Board accountability | Periodic reporting to the board with the alert population, dispositions and tuning changes, minuted | Compliance reporting pack |
+| Mule account detection, reg 23(8) | Behavioural rules: shared devices and addresses across unrelated accounts, funding from unrelated third parties, dormancy followed by sudden activity, circular transfers, mismatch between declared income and turnover | Screening plus transaction monitoring plus onboarding signals; see [PEP and sanctions screening](/broking-kyc/finix-broking-setup/onboarding/04-pep-sanctions-screening/) |
+| Whistle-blower channel, reg 25 | A channel that is genuinely confidential — not a mailbox the compliance officer's manager can read — with case records and a retaliation-protection policy | Independent channel with restricted access |
+| Prevention | Preventive controls, not just detection: maker-checker on sensitive actions, segregation of duties, access review | See [compliance configuration baseline](/broking-kyc/finix-broking-setup/compliance/01-compliance-config-baseline/) |
+
+<Aside type="caution" title="Mule account detection is the obligation most likely to be under-built">
+Onboarding KYC proves who someone is. It does not prove that the account is operated by that person for their own benefit, which is what a mule account is. Detecting it requires behavioural signals that only exist after the account is live: device and network overlap across supposedly unrelated clients, funding patterns inconsistent with the declared profile, and transfer patterns that look like layering. A firm that treats regulation 23(8) as satisfied by its KYC vendor has misread it. Build the rule set, record the tuning, and keep the alert dispositions — the dispositions are the evidence.
+</Aside>
+
+## 5. Qualified Stock Broker readiness
+
+Finix is below the QSB thresholds at launch, which makes this a design question rather than a compliance one: how much of the QSB obligation set should be built now, when retro-fitting is expensive?
+
+| QSB-associated obligation | Build now? | Reasoning |
+|---|---|---|
+| Enhanced monitoring and risk management | Yes | It is the same thing a well-run broker does; retro-fitting surveillance over historical data is painful |
+| Orderly wind-down framework | Document now, test later | Writing it reveals dependencies — client data portability, position transfer, fund return sequencing — that are cheap to design in and expensive to add |
+| Enhanced governance and board oversight | Yes | Chapter IV already requires board accountability |
+| Investor-grievance capacity | Yes | The 21-day clock applies regardless of size |
+| Cyber resilience at the enhanced tier | Partially | Build the architecture to the higher tier, defer the cost-heavy controls |
+| Business continuity and recovery objectives | Yes | See [BCP and DR drill](/broking-kyc/deep-dives/specialty/bcp-dr-drill/) |
+
+The general principle: **build the data and the architecture to the QSB standard, defer the operational cost.** Designation is a function of size, and a growing broker crosses the threshold with weeks of notice, not quarters.
+
+## 6. Transitional and savings questions to resolve in writing
+
+A complete repeal with transitional provisions in Chapter XI raises questions that matter in practice and should be resolved with counsel rather than assumed.
+
+| Question | Why it matters |
+|---|---|
+| Which circulars issued under the 1992 regulations survive, and on what basis? | The master circular and hundreds of operational circulars are the day-to-day rulebook |
+| Does the master circular for stock brokers continue to apply unchanged? | It is the source for most operational detail in this manual |
+| How do pending 1992-era proceedings and conditions carry over? | Not relevant to a new applicant; relevant to any acquisition of an existing broker |
+| Are exchange bylaws and operational guidelines updated, and by when? | Exchange guidelines are what the member is actually tested against |
+| Where net worth or deposit figures differ between an exchange's published material and Chapter X, which governs? | Directly affects the commodity membership budget; see [entity and capital structure](/broking-kyc/finix-broking-setup/setup/01-entity-capital-structure/) |
+
+## 7. Day-one artefact checklist
+
+Documents and controls that must exist at registration, not at go-live.
+
+| Artefact | Driven by | Owner |
+|---|---|---|
+| Risk management policy, including leverage and square-off | Ch. III; client disclosure | Risk |
+| Client asset segregation policy and the account map | 18(2)(c) | Finance and compliance |
+| Policy prohibiting cash receipts, with the control design | 20(d) | Finance |
+| Records and retention policy, eight-year floor | 16 | Compliance and technology |
+| Investor grievance policy with the 21-day clock | 10(e), 18(6) | Compliance |
+| Cyber security and cyber resilience policy | 18(5) | Technology and compliance |
+| Fraud prevention and detection framework | Ch. IV | Compliance |
+| Whistle-blower policy and channel | 25 | Board and compliance |
+| Mule account detection rule set and tuning record | 23(8) | Compliance and surveillance |
+| Code of conduct, and its staff acknowledgement record | Ch. VIII | Human resources and compliance |
+| Unpaid securities policy | CUSPA framework; see [CUSPA](/broking-kyc/finix-broking-setup/backoffice/06-cuspa-unpaid-securities/) | Operations |
+| Inspection readiness pack | Ch. V | Compliance |
+| Orderly wind-down outline | 19, forward-looking | Board |
+| Net worth monitoring report | Ch. X | Finance |
+| Fee computation and payment process | Ch. IX | Finance |
+| Investor awareness message configuration | Project Jagrook circular, 1 October 2026 `[not yet in index]` | Compliance and product |
+
+## 8. The Project Jagrook overlay
+
+A circular dated **1 October 2026**, issued under section 11(1) of the SEBI Act, 1992, requires stock brokers to display investor awareness messages shared by SEBI. It is recent enough to be missing from most internal documentation, and it is a front-end configuration item.
+
+| Period | Requirement |
+|---|---|
+| 5 to 31 October 2026 | Messages, together with existing risk disclosures, on broker websites; display in trading applications voluntary |
+| From 1 November 2026 | Messages mandatory on website landing pages; applications must display messages and risk disclosures on alternate days |
+
+Operational notes: the messages supplement the existing risk disclosures introduced by the circular of 19 May 2023; SEBI may modify the messages and brokers must keep the displayed version current; exchanges and depositories are to inform members and update bylaws. The circular number was not verified at the time of writing — `[not yet in index]`.
+
+**Implementation consequence:** this is not a static banner. It is content under someone else's control, with an alternate-day display rule in the app, which means a content-refresh mechanism, a version record showing which message was displayed when, and a scheduler. Treat the displayed message as configuration with history, for the same reason as everything else in [environments and configuration](/broking-kyc/finix-broking-setup/stack/environments-config-baseline/): you will be asked what was displayed on a date.
+
+## Practical notes
+
+- **Cite the regulation, not the circular, where both exist.** After January 2026 the regulation is the stronger authority and the one an inspection will test against.
+- **Read Chapter V before go-live, not at first inspection.** Knowing what an inspection may demand is the cheapest way to decide what to log.
+- **Treat the eight-year floor as a storage architecture decision.** It governs order logs, communications and configuration history, not just contract notes, and retrieval has to be tested — a record you cannot produce is a record you do not have. See [inspection types](/broking-kyc/deep-dives/compliance-audit/inspection-types/).
+- **Implement the complaint clock in calendar days with a timezone.** The single most common defect in complaint systems is working-day arithmetic.
+- **Keep the whistle-blower channel genuinely independent.** A channel routed through the person a complaint might be about does not satisfy regulation 25 in substance, whatever the policy says.
+- **Watch for the operational guidelines.** The regulations set obligations; exchange operational guidelines set mechanics and dates, and they are what the member is tested against. Subscribe to every exchange's circular feed from the day the application goes in.
+
+## Where this connects
+
+- [Entity and capital structure](/broking-kyc/finix-broking-setup/setup/01-entity-capital-structure/) — Chapter X in practice
+- [Exchange membership](/broking-kyc/finix-broking-setup/setup/03-exchange-membership/) — the route the application travels
+- [People, certification and organisation](/broking-kyc/finix-broking-setup/setup/07-people-certification-org/) — the designated director, the compliance officer and NISM
+- [Compliance configuration baseline](/broking-kyc/finix-broking-setup/compliance/01-compliance-config-baseline/) — every obligation above as a configured, owned, evidenced item
+- [Compliance blueprint](/broking-kyc/operations/compliance-blueprint/) — the full obligation register across the site
+- [Circulars index](/broking-kyc/reference/regulatory-circulars/) — the source documents
