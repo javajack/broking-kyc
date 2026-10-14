@@ -1,0 +1,202 @@
+---
+title: "Onboarding 5: UCC registration across exchanges"
+description: Registering the client with NSE, BSE and MCX per segment — the submission mechanics, the partial-batch failure that leaves a client tradeable on one exchange and not another, the six-attribute matching that drives acceptance, modification handling, the enablement gate, and the daily reconciliation against each exchange's record.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Unique client code registration is a simple submission with a compound failure mode: three exchanges, several segments each, and a batch that can succeed in part. The result is a client who can trade some things and not others, which looks to them like a system defect and to an inspector like an enablement control that is not enforced. So the page concentrates on the matrix, the partial-failure handling and the enablement gate, and leaves the field-level content to the field atlas.
+
+## TL;DR
+
+- **Registration is per exchange and per segment**, not per client. A client is not "registered"; they are registered at NSE for cash and derivatives, at BSE for cash, at MCX for commodities, and each is a separate state.
+- **Partial batch acceptance is the characteristic failure.** A client accepted on one exchange and rejected on another must be enabled only where accepted, and the firm must know which is which without guessing.
+- **Enablement is gated on the registration state**, enforced at check C2 of the [ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/). A client tradeable in a segment where they are not registered is a control failure, not a user-experience problem.
+- **Attribute matching drives acceptance.** Name, PAN, date of birth and the other matched attributes must agree with the authoritative sources; see [six-attribute matching](/broking-kyc/operations/six-attribute-matching/).
+- **Modifications propagate.** A change of name, address, bank or status flows to every exchange where the client is registered, and completion must be tracked per exchange rather than assumed.
+- **Reconcile daily against each exchange's record.** The firm's enablement state and the exchange's registration state must agree; a difference in either direction is a finding.
+- **Demat and UCC are different gates.** A client can be registered and still unable to settle a delivery trade because their demat account is not active.
+
+## Conceptual overview
+
+A unique client code is the exchange's handle on a client, and it is what every order, trade, obligation and margin report is attributed to. Registration therefore has two consequences: it makes the client known to the exchange, and it makes the firm's activity on their behalf attributable. Both matter, which is why the enablement gate is a real control rather than a convenience — orders placed for an unregistered client in a segment are orders the exchange cannot attribute properly, and the firm's reporting for that client will be incomplete.
+
+The compound structure is where implementations go wrong. Because the firm submits in batches and the exchanges respond per record, the natural outcome of a submission is a mix: most accepted, some rejected for attribute mismatches, occasionally a whole segment failing for a technical reason. If the firm's model is a single "registered" flag per client, that mix has nowhere to go, and the usual resolution is to set the flag optimistically and deal with the consequences when a trade is rejected. The right model is a state per exchange per segment, with enablement derived from it.
+
+The third point is that registration is not a one-time event. Clients change names, addresses, bank accounts and status, and each change has to reach every exchange where the client is registered. A firm that treats modification as a back-office data update rather than as a propagation obligation will accumulate divergence between its own records and the exchanges', which surfaces in reporting and in inspection rather than in trading.
+
+## 1. Framework
+
+- **Exchange unique client code registration requirements** — per exchange, with the submission mechanics, formats and validation rules published by each. See [exchange registration](/broking-kyc/operations/exchange-registration/). `[not yet in index]`
+- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — client registration and records obligations.
+- **Attribute matching** — the matched-attribute framework that drives acceptance; see [six-attribute matching](/broking-kyc/operations/six-attribute-matching/).
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — Chapter III general obligations; regulation 16 retention. `[not yet in index]`
+- **Client code modification norms** — exchange-capped and monitored; see [modification and cancellation](/broking-kyc/finix-broking-setup/oms/08-modify-cancel-rules/#7-modifying-another-persons-order).
+- Field-level reference: [exchange registration fields](/broking-kyc/reference/field-atlas/sections/u-exchange-registration/) and the per-exchange destinations for [NSE](/broking-kyc/reference/field-atlas/destinations/nse-ucc/), [BSE](/broking-kyc/reference/field-atlas/destinations/bse-ucc/) and [MCX](/broking-kyc/reference/field-atlas/destinations/mcx-ucc/).
+
+## 2. The registration matrix
+
+Per client, a state per cell.
+
+| | NSE CM | NSE F&O | NSE CD | BSE CM | BSE EQD | MCX COM |
+|---|---|---|---|---|---|---|
+| Submitted | | | | | | |
+| Accepted | | | | | | |
+| Rejected, with reason | | | | | | |
+| Enabled for trading | | | | | | |
+| Last modification propagated | | | | | | |
+| Last reconciled | | | | | | |
+
+| Rule | Detail |
+|---|---|
+| **State per cell, not per client** | A single flag cannot represent a partial outcome |
+| Enablement derived | From the accepted state, never set independently |
+| Segment activation | A client registered in a segment still needs the segment activated on their account, which is a separate client-level decision |
+| Rejection reason retained | So the next submission is corrected rather than repeated |
+| Audit | Every state transition retained |
+
+<Aside type="caution" title="A single registered flag is the defect that produces the worst client experience">
+A client told their account is open, who can trade equities and is rejected on their first derivatives order, concludes the firm's systems are broken — and from their point of view they are. The cause is almost always a per-client flag standing in for a per-cell state. Model the matrix properly, derive enablement from it, and tell the client exactly what is available now and what is pending.
+</Aside>
+
+## 3. Submission
+
+| Step | Detail |
+|---|---|
+| 1. Trigger | Client approved and KYC complete; see [CVL KRA](/broking-kyc/finix-broking-setup/onboarding/02-kra-cvl-integration/) |
+| 2. Prepare | Per exchange and per segment, in the published format |
+| 3. **Pre-validate** | Against each exchange's published rules, locally, so rejections are rare |
+| 4. Submit | Through the exchange's member portal or file channel |
+| 5. Acknowledge | Submission acknowledged |
+| 6. Response | Per record: accepted, or rejected with a reason |
+| 7. Apply | Update the matrix; derive enablement |
+| 8. Correct | Rejected records corrected and resubmitted |
+| 9. Communicate | The client told what is available and what is pending |
+| 10. Reconcile | Against the exchange's record, daily |
+
+| Control | Detail |
+|---|---|
+| Count assertion | Records submitted against records responded |
+| **Partial handling** | The default outcome; handled as a normal path |
+| Rejection categorisation | By reason, trended; a rising category is a data-quality problem upstream |
+| Ageing | Submitted-but-unresponded records aged and chased |
+| Idempotency | A resubmission must not create a duplicate registration |
+
+## 4. Rejection reasons and handling
+
+| Reason class | Typical cause | Action |
+|---|---|---|
+| **Attribute mismatch** | Name, date of birth or PAN differs from the authoritative source | Correct against the source, not against the client's preference; see [six-attribute matching](/broking-kyc/operations/six-attribute-matching/) |
+| Duplicate | The client is already registered, possibly with another member | Investigate; a client may be moving from another broker |
+| Invalid PAN | Format or verification failure | Resolve upstream in the journey |
+| Missing mandatory field | Capture gap | Fix the capture, not just the record |
+| Segment not permitted for the client type | Eligibility | May be correct; check the client type and the segment rules |
+| Technical or format | Schema drift | Engineering; check the published format version |
+| Member-level | The firm's own state | Operational escalation |
+
+| Rule | Detail |
+|---|---|
+| Correct against the source | A name corrected to match what the client prefers rather than what the authoritative source holds will be rejected again |
+| Fix the capture | A rejection class that recurs is a journey defect |
+| Never force | A record that will not register is a client who cannot trade in that segment; resolve it rather than enabling anyway |
+
+## 5. Modifications
+
+| Change | Propagates to | Tracking |
+|---|---|---|
+| Name | Every exchange where registered | Per exchange, to completion |
+| Address | Every exchange where registered | Per exchange |
+| Bank account | Where the exchange holds it | Per exchange |
+| Contact details | Where held | Per exchange |
+| Status — dormant, closed, frozen | Every exchange | Per exchange |
+| Segment addition | The relevant exchange | New registration for that cell |
+| Segment removal | The relevant exchange | State change |
+| Client type change | Every exchange | May require re-registration |
+
+| Control | Detail |
+|---|---|
+| **Completion tracked per exchange** | Not assumed from one success |
+| Source alignment | A modification should flow from the authoritative change, usually at the KRA, not be entered independently |
+| Ageing | Incomplete propagations aged and escalated |
+| Reconciliation | The daily check catches propagation that silently failed |
+| Client communication | Where client-visible |
+
+## 6. Reconciliation
+
+| Check | Sources | Frequency | On difference |
+|---|---|---|---|
+| Firm enablement against exchange registration | Matrix, exchange record | **Daily** | **A client enabled where not registered is a control failure** |
+| Exchange registration against firm matrix | Both | Daily | A registration the firm does not know about |
+| Submitted against responded | Submission log, responses | Daily | Age and chase |
+| Modifications propagated | Change log, exchange record | Daily | Incomplete propagation |
+| Active clients with no registration anywhere | Client master, matrix | Daily | **Severity one** |
+| Registered clients who are closed or dormant | Both | Periodic | Status propagation gap |
+
+## 7. The enablement gate
+
+| Rule | Detail |
+|---|---|
+| Enforced at | Check **C2** of the [pre-trade ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/) |
+| Condition | The client is registered **and accepted** on this exchange and segment |
+| Also required | Segment activated on the client's account; demat active where the order creates a delivery obligation; KYC status permits trading |
+| Client message | Specific: which exchange or segment is not yet available, and when it is expected |
+| Never | Enable optimistically pending acceptance |
+
+| Related gate | Where |
+|---|---|
+| KRA status | [CVL KRA integration](/broking-kyc/finix-broking-setup/onboarding/02-kra-cvl-integration/#3-status-and-the-trading-gate) |
+| Screening | [PEP and sanctions screening](/broking-kyc/finix-broking-setup/onboarding/04-pep-sanctions-screening/) |
+| Demat active | [Depository participation](/broking-kyc/finix-broking-setup/setup/05-depository-participant/) |
+| Client master reconciled | [Back office architecture](/broking-kyc/finix-broking-setup/backoffice/01-backoffice-architecture/#3-the-three-masters) |
+
+## 8. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.onb.ucc.state_model` | **Per exchange, per segment** | Discretionary, strongly recommended | A single flag hiding partial outcomes |
+| `finix.onb.ucc.enablement_derived` | From the accepted state only | Regulatory in substance | Trading where not registered |
+| `finix.onb.ucc.pre_validation` | Against each exchange's published rules | Discretionary, strongly recommended | Avoidable rejections |
+| `finix.onb.ucc.format_version.<exchange>` | Current, recorded | Exchange-set | Format rejections |
+| `finix.onb.ucc.partial_batch_handling` | **Normal path** | Discretionary, strongly recommended | All-or-nothing assumptions |
+| `finix.onb.ucc.idempotent_resubmission` | Enforced | Discretionary | Duplicate registrations |
+| `finix.onb.ucc.rejection_categorisation` | By reason, trended | Discretionary | Upstream defects invisible |
+| `finix.onb.ucc.modification_tracking` | **Per exchange, to completion** | Regulatory in substance | Divergent records |
+| `finix.onb.ucc.recon_daily` | True | Discretionary, strongly recommended | Drift |
+| `finix.onb.ucc.enabled_without_registration_alarm` | **Alarm on any** | Regulatory in substance | A control failure |
+| `finix.onb.ucc.unregistered_active_client_alarm` | **Alarm on any** | Regulatory in substance | A client trading unregistered |
+| `finix.onb.ucc.retention_years` | 8 | Regulatory | Short of the statutory floor |
+
+## 9. Exception paths
+
+| Situation | Response |
+|---|---|
+| Partial batch acceptance | Enable only accepted cells; correct and resubmit the rest; tell the client precisely what is available |
+| Attribute mismatch rejection | Correct against the authoritative source; if the source is wrong, the client must correct it there |
+| Duplicate registration | Investigate; the client may be moving from another member |
+| Client enabled where not registered | **Control failure.** Disable immediately; investigate how enablement was set |
+| Active client with no registration anywhere | Severity one; stop trading; investigate the activation path |
+| Exchange portal unavailable at submission time | Queue; age; chase; the client's expectation must be managed honestly |
+| Modification propagated to one exchange and not another | Complete it; a partial propagation is divergence |
+| Format changed by circular | Update, test, resubmit affected records |
+| A client's segment is rejected for eligibility | May be correct; check the client type and segment rules before assuming a defect |
+| Status change — closure or dormancy — not propagated | Complete it; the exchange's record must reflect the client's status |
+
+## Practical notes
+
+- **Model the matrix, not a flag.** It is the difference between an accurate client promise and an apparent system defect.
+- **Pre-validate against each exchange's rules.** Rejections should be rare, and a recurring class is an upstream capture defect.
+- **Correct against the authoritative source.** A name corrected to the client's preference will be rejected again.
+- **Track modification propagation per exchange.** One success does not imply three.
+- **Alarm on enabled-without-registration.** It is a control failure with an easy detection.
+- **Tell the client what is available now.** Precision beats an optimistic "your account is open".
+- **Reconcile daily in both directions.** The exchange knowing about a client the firm does not is as interesting as the reverse.
+
+## Where this connects
+
+- [Exchange registration](/broking-kyc/operations/exchange-registration/) — the mechanics in depth
+- [Six-attribute matching](/broking-kyc/operations/six-attribute-matching/) — what drives acceptance
+- [Exchange registration fields](/broking-kyc/reference/field-atlas/sections/u-exchange-registration/) — field-level reference
+- [CVL KRA integration](/broking-kyc/finix-broking-setup/onboarding/02-kra-cvl-integration/) — the preceding gate
+- [Depository participation](/broking-kyc/finix-broking-setup/setup/05-depository-participant/) — the demat gate
+- [Pre-trade check ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/) — where enablement is enforced
+- [Batch pipeline](/broking-kyc/operations/batch-pipeline/) — the parallel agency pipelines

@@ -1,0 +1,211 @@
+---
+title: "Onboarding 3: CKYC and CKYCRR 2.0"
+description: The 2026 rebuild of the Central KYC Records Registry — real-time APIs replacing batch and PDF, the fourteen-digit KIN, search by PAN, Aadhaar and now mobile number, OTP-based consent for download, Aadhaar masking, de-duplication, the risk-tiered update schedule, the phased go-live, and what a broker has to build.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** CKYCRR 2.0 is recent enough that most internal documentation still describes the system it replaced, and the differences are architectural rather than cosmetic — a batch-and-PDF model became a real-time API model with consent in the download path. So the page states what changed first, then the four API patterns a broker actually implements, then the consent flow because it introduces a client-facing dependency that did not previously exist, then the migration and the operating cycle.
+
+## TL;DR
+
+- **CKYCRR 2.0 went live on 1 August 2026**, phased, after a core platform targeted around the end of February 2026. The pilot and readiness window was **extended to 5 October 2026**, and reporting entities were told to treat that period as readiness and testing and to watch CERSAI communications for their production instruction.
+- **It replaces scheduled batch uploads with real-time API submission in structured JSON**, with instant validation that rejects incomplete or malformed submissions immediately rather than in a return file days later.
+- **The registry issues a fourteen-digit KYC Identifier Number**, permanent and portable, which travels with the customer across institutions and products.
+- **Search now includes mobile number** alongside PAN and Aadhaar in permitted form, which materially improves hit rates before fresh KYC is started.
+- **Download requires OTP-based consent**, with Aadhaar masking — which introduces a **client-facing dependency in the download path** that did not exist before, and a failure mode where the client is unreachable.
+- **De-duplication uses facial recognition**, with stricter document-quality standards.
+- **SFTP remains for bulk**, but the production onboarding path is the API.
+- **Dual upload still applies**: client KYC data goes to both the KRA and the CKYC registry.
+
+## Conceptual overview
+
+The old CKYC model was a records exchange operating on the rhythm of a back office: files uploaded on a schedule, documents as PDFs, errors returned later, corrections on the next cycle. That was workable when onboarding itself ran on a multi-day timeline, and it became the constraint once onboarding compressed to minutes. CKYCRR 2.0 is a rebuild around the compressed timeline: the submission is a call, the validation is immediate, the search is richer, and the identifier is designed to be the thing other systems key on rather than a number buried in a file.
+
+The change that most affects a broker's journey design is consent in the download path. Retrieving another institution's KYC record now requires the customer's OTP-based consent, with Aadhaar masked in what is returned. That is a meaningful privacy improvement and an operational dependency: the client must be present and reachable at the moment the firm wants the record. In a live, interactive journey that is usually fine. In a back-office process — a bulk refresh, a remediation exercise, a re-KYC campaign — it is not, and the firm must design for the case where consent cannot be obtained.
+
+The third consideration is that the registry's validation is now immediate and strict. A submission that is incomplete or incorrectly formatted is rejected at the call rather than in a file read days later. This is better in every way except one: it moves the error into the client's journey, where it is visible. A field the firm captured loosely, a document that fails the quality standard, an inconsistency between sources — all now surface while the client is waiting. The design response is to validate against the registry's rules *before* submitting, so that the firm's own message appears rather than the registry's rejection.
+
+## 1. Framework
+
+- **CERSAI CKYCRR** — the Central KYC Records Registry; **CKYCRR 2.0** announced in the Union Budget 2025 and rebuilt around real-time API connectivity, instant validation, facial-recognition de-duplication, mandatory Aadhaar masking and stricter document-quality standards. `[not yet in index]`
+- **Rollout** — core platform targeted around end-February 2026; **live 1 August 2026**, phased across reporting entities; pilot and readiness testing **extended to 5 October 2026**, with reporting entities told to treat the period as readiness and to monitor CERSAI communications for production go-live instructions. A CKYCRR 2.0 API integration and reporting-entity onboarding guide dated 5 June 2026 is published on the official portal. `[not yet in index]`
+- **KIN** — a unique **fourteen-digit** KYC Identifier Number, permanent and portable across institutions, products and updates.
+- **Prevention of Money Laundering Act, 2002 and the rules** — the statutory basis for the registry and for reporting-entity obligations. See the [CERSAI circulars index](/broking-kyc/reference/circulars/cersai/).
+- **Dual upload** — client KYC data to both the KRA and CKYC; see [CVL KRA integration](/broking-kyc/finix-broking-setup/onboarding/02-kra-cvl-integration/).
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — regulation 16 retention of not less than eight years, applying to KYC records and registry correspondence. `[not yet in index]`
+- **Access route at Finix** — through Digio's CKYC connectivity; see [Digio integration](/broking-kyc/finix-broking-setup/onboarding/01-digio-integration/).
+- Field-level reference: [CKYC submission fields](/broking-kyc/reference/field-atlas/sections/t-ckyc-submission/).
+
+<Aside type="caution" title="Confirm your own category's production date with CERSAI">
+The rollout is phased, and the date that matters is the one applicable to the firm's category of reporting entity, not the headline go-live. The guidance during the extended window was explicitly to treat it as readiness and testing and to monitor CERSAI communications for the production instruction. Obtain the current API integration and onboarding guide, confirm the applicable date in writing, and do not infer it from a general announcement.
+</Aside>
+
+## 2. What changed
+
+| Aspect | Before | CKYCRR 2.0 |
+|---|---|---|
+| Submission | Scheduled batch upload | **Real-time API call, structured JSON** |
+| Validation | In a return file, later | **Immediate, at the call** |
+| Documents | PDFs | Structured data with stricter quality standards |
+| Search keys | PAN, Aadhaar in permitted form | **Plus mobile number** |
+| Download | Retrieval | **OTP-based consent required** |
+| Aadhaar | As captured | **Masked** |
+| De-duplication | Rule-based | **Facial recognition** |
+| Update cadence | Uniform | **Risk-tiered schedule** |
+| Bulk | The primary path | **Retained via SFTP, but not the production onboarding path** |
+| Customer access | Limited | Self-service portal |
+| Identifier | KIN | **Fourteen-digit KIN, permanent and portable** |
+
+## 3. The four API patterns
+
+| # | Pattern | Purpose | Finix use |
+|---|---|---|---|
+| **1. Search** | Does a record exist for this identifier? | PAN, Aadhaar in permitted form, or **mobile number** | **First call**, before any fresh capture |
+| **2. Download** | Retrieve the existing record | **Requires OTP-based consent**; Aadhaar masked | Prefill and verification |
+| **3. Generate or upload** | Create a new record | Real-time, structured, instantly validated | After verification |
+| **4. Update** | Modify an existing record | Real-time | On client-initiated change and on re-KYC |
+
+| Design rule | Detail |
+|---|---|
+| **Search first, always** | Mobile-number search improves hit rates; a found record shortens the journey materially |
+| **Pre-validate before submitting** | Validate against the registry's rules locally so the firm's own message appears, not a registry rejection in front of the client |
+| Idempotency | Submission keyed on an application reference, so a retry does not create a duplicate |
+| KIN storage | Stored against the client, used as the key for later calls |
+| Consent capture | Recorded with the download, as evidence |
+| Retention | Request, response, consent artefact and KIN, on the eight-year floor |
+
+## 4. The consent flow
+
+New in 2.0 and the main journey change.
+
+| Step | Detail |
+|---|---|
+| 1 | The firm needs an existing record |
+| 2 | A consent request is raised for the customer |
+| 3 | **The customer provides OTP-based consent** |
+| 4 | The record is returned, with **Aadhaar masked** |
+| 5 | The consent artefact is retained as evidence |
+
+| Failure branch | Behaviour |
+|---|---|
+| Customer not reachable | **Queue the download**; the upload path can still proceed |
+| Customer declines | Proceed with fresh capture; record the decline |
+| OTP not received | Retry; offer an alternative where available; do not strand the journey |
+| Consent expires | Re-request |
+| **Back-office process needing a download** | Consent cannot be obtained silently; design bulk refresh and remediation around this constraint |
+
+The last row is the structural one. Any process that previously assumed the firm could retrieve records in bulk now needs either a client-contact step or a different approach. Re-KYC campaigns, remediation exercises and data-quality programmes all have to be redesigned around a consent dependency.
+
+## 5. Validation and quality
+
+| Dimension | Requirement |
+|---|---|
+| Completeness | Mandatory fields present; instant rejection otherwise |
+| Format | Structured JSON per the published schema |
+| **Document quality** | Stricter standards; a document that was acceptable before may not be |
+| De-duplication | Facial recognition; a submission matching an existing person is handled as a duplicate |
+| Consistency | Cross-field checks |
+| **Pre-submission validation** | Replicate the registry's rules locally; the goal is that the registry never rejects a Finix submission |
+
+| Control | Detail |
+|---|---|
+| Local schema validation | Against the current published schema, versioned |
+| Image quality gate | In the capture journey, before submission, with client-facing guidance |
+| Rejection-code mapping | Every registry rejection mapped to a client-actionable message and an internal category |
+| Unknown rejection codes | Alert engineering; schema changes announce themselves this way |
+| Rejection rate monitoring | A rising rate is a capture-quality or schema-drift signal |
+
+## 6. The risk-tiered update schedule
+
+| Element | Detail |
+|---|---|
+| Principle | Update periodicity varies by customer risk classification rather than a uniform cycle |
+| Consequence | The firm's re-KYC scheduling must be driven by the client's risk category, not a single global period |
+| Inputs | Risk classification from onboarding and from ongoing monitoring; see [PEP and sanctions screening](/broking-kyc/finix-broking-setup/onboarding/04-pep-sanctions-screening/) |
+| Reclassification | A client whose risk category changes has a changed update obligation |
+| Tracking | Per client: category, last update, next due |
+| Coordination | Must align with the KRA re-KYC cycle and the firm's own periodic review; see [re-KYC](/broking-kyc/lifecycle/re-kyc/) |
+
+## 7. Migration and dual running
+
+| Item | Detail |
+|---|---|
+| Existing records | Records created under the previous model carry forward; the KIN is the continuity |
+| **Category date** | Confirm the firm's applicable production date in writing |
+| Readiness testing | Exercise all four patterns, including the consent flow, before production |
+| Parallel validity | During the phased period, be able to operate both paths if required by the applicable instruction |
+| Back-office processes | Any process assuming bulk download must be redesigned around consent |
+| Client communication | Clients will encounter an OTP consent step they have not seen before; explain it in the journey |
+| Vendor readiness | Confirm Digio's support for 2.0 patterns and the timeline for any change |
+| Rejection handling | The strictness change will surface capture-quality issues; expect an initial rejection spike and plan for it |
+
+## 8. Operating cycle
+
+| When | Step | Owner |
+|---|---|---|
+| Journey start | **Search** by PAN, Aadhaar in permitted form, or mobile number | System |
+| On a hit | Consent request, then **download** | System and client |
+| On no hit | Fresh capture through [Digio](/broking-kyc/finix-broking-setup/onboarding/01-digio-integration/) | System and client |
+| Before submission | **Local pre-validation** | System |
+| After verification | **Upload**, with dual upload to the KRA | System |
+| On acceptance | Store the KIN against the client | System |
+| On client change | **Update** | System |
+| Per risk tier | Scheduled update | Operations |
+| Daily | Reconciliation: submitted against accepted; dual-upload completeness | Operations |
+| Daily | Rejection review by code | Operations |
+| On circular or schema change | Schema version updated and tested | Technology |
+
+## 9. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.onb.ckyc.version` | **2.0** | Regulatory | Operating on a retired model |
+| `finix.onb.ckyc.production_date` | Per the firm's confirmed category instruction | Regulatory | Going live early or late |
+| `finix.onb.ckyc.search_first` | True, including mobile-number search | Discretionary, strongly recommended | Re-collecting existing data |
+| `finix.onb.ckyc.consent_required_for_download` | **True** | Regulatory | Download attempted without consent |
+| `finix.onb.ckyc.consent_unreachable_action` | **Queue download; proceed with upload path** | Discretionary | Stranded journeys |
+| `finix.onb.ckyc.pre_validation` | **Local, against the current schema** | Discretionary, strongly recommended | Registry rejections in front of the client |
+| `finix.onb.ckyc.schema_version` | Current, versioned, recorded with each call | Regulatory in substance | Malformed submissions after a schema change |
+| `finix.onb.ckyc.image_quality_gate` | In the capture journey | Discretionary, strongly recommended | Rejections on document quality |
+| `finix.onb.ckyc.idempotency_key` | Application reference | Discretionary, strongly recommended | Duplicate records |
+| `finix.onb.ckyc.kin_stored` | Against the client master | Regulatory in substance | No key for later calls |
+| `finix.onb.ckyc.dual_upload_tracking` | KRA and CKYC separately tracked | Regulatory | Partial compliance |
+| `finix.onb.ckyc.risk_tiered_update` | Driven by the client's risk category | Regulatory | Wrong update periodicity |
+| `finix.onb.ckyc.unknown_rejection_alert` | Engineering alert | Discretionary, strongly recommended | Schema drift undetected |
+| `finix.onb.ckyc.retention_years` | 8 | Regulatory | Short of the statutory floor |
+
+## 10. Exception paths
+
+| Situation | Response |
+|---|---|
+| Customer cannot provide OTP consent | Queue the download; proceed with fresh capture; record the attempt |
+| Customer declines consent | Fresh capture; record the decline |
+| Submission rejected on completeness or format | Should have been caught by pre-validation; fix locally and treat as a defect |
+| Submission rejected on document quality | Re-capture with guidance; review the capture journey's quality gate |
+| De-duplication match against another person | Investigate; this is a potentially serious identity issue, not a data-quality one |
+| Registry unavailable | Queue; the journey can proceed to the point the gate requires |
+| Schema changed without notice | Alert on unknown rejection codes; obtain the updated guide; test before deploying |
+| KIN not returned or not stored | Resolve; without it, later calls have no key |
+| Dual upload completed to CKYC but not KRA | Complete it; track the two separately |
+| Rejection rate spikes after go-live | Expected with stricter validation; triage by code and fix capture quality rather than relaxing checks |
+
+## Practical notes
+
+- **Confirm your category's production date in writing.** The phased rollout means the headline date is probably not yours.
+- **Use mobile-number search.** It is new in 2.0 and it improves hit rates, which shortens journeys.
+- **Pre-validate locally so the registry never rejects you.** With instant validation, a registry rejection happens in front of the client.
+- **Design bulk processes around the consent dependency.** Re-KYC campaigns and remediation exercises cannot download silently any more.
+- **Explain the OTP consent step in the journey.** Clients have not seen it before and an unexplained OTP request looks like a scam.
+- **Expect a rejection spike at go-live and triage by code.** The stricter standards surface existing capture-quality issues.
+- **Store the KIN and use it.** It is the permanent, portable key the whole system is built around.
+
+## Where this connects
+
+- [CVL KRA integration](/broking-kyc/finix-broking-setup/onboarding/02-kra-cvl-integration/) — the other half of the dual upload
+- [Digio integration](/broking-kyc/finix-broking-setup/onboarding/01-digio-integration/) — the access route and the capture quality gate
+- [PEP and sanctions screening](/broking-kyc/finix-broking-setup/onboarding/04-pep-sanctions-screening/) — the risk classification that drives the update tier
+- [CKYC submission fields](/broking-kyc/reference/field-atlas/sections/t-ckyc-submission/) — field-level reference
+- [Re-KYC](/broking-kyc/lifecycle/re-kyc/) — the periodic cycle
+- [CERSAI circulars index](/broking-kyc/reference/circulars/cersai/) — the source documents
+- [Batch pipeline](/broking-kyc/operations/batch-pipeline/) — the parallel agency pipelines

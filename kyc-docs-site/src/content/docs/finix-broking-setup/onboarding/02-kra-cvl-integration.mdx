@@ -1,0 +1,169 @@
+---
+title: "Onboarding 2: CVL KRA integration"
+description: Operating the KRA leg on the Finix stack — the lookup-first sequence, what each status means for trading enablement, upload within the prescribed window, the rejection-on-duplicate branch that is a normal path rather than an error, the download-is-authoritative rule, modification propagation, and the daily reconciliation.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** The KRA integration itself is documented in depth in the [KRA reference](/broking-kyc/vendors/kra/), including the Digio API specification, the status codes and the field-level upload content. This page therefore covers only the operating layer: the sequence, the branches, the gates, and the reconciliation. The single most important thing in it is that a rejection on duplicate upload is a normal branch and not an error — getting that wrong produces retry loops, support tickets and, eventually, stale client records.
+
+## TL;DR
+
+- **Look up first, always.** The first call in the flow determines whether the client needs fresh KYC or has existing records, and it is a query to one KRA that returns the record regardless of which KRA holds it, through the mandated interoperability framework.
+- **The KRA status is the trading gate.** Registered, Validated, On Hold, Rejected or Not Available. Trading is allowed at **Registered**; Validated is not required to begin.
+- **A duplicate upload for an already-compliant investor is rejected by design.** The correct response is to **download** the record, not to retry the upload. Treating this as an error produces loops and masks the real condition.
+- **The download is authoritative.** Details uploaded earlier may have been modified at verification, so the intermediary treats the download as final based on the updated date and uses it to update the back office.
+- **Upload within the prescribed window.** Intermediaries upload client KYC records to a KRA within the prescribed period of account opening; see the [KRA reference](/broking-kyc/vendors/kra/) for the current timeline.
+- **Dual upload applies.** Since the dual-upload mandate, client KYC data goes to **both** the KRA and CERSAI's CKYC registry; see [CKYCRR 2.0](/broking-kyc/finix-broking-setup/onboarding/03-ckyc-ckycrr2-integration/).
+- **Modifications propagate.** A change at one intermediary updates the investor's record at the holding KRA, and other intermediaries see it — which means the firm's own records must be refreshed, not assumed static.
+
+## Conceptual overview
+
+The KRA system exists so that an investor who has completed KYC once does not repeat it at every intermediary. For a broker that creates two obligations rather than one: look up what already exists before asking the client for anything, and contribute what the firm verifies so the next intermediary benefits. The interoperability framework makes the five registered KRAs behave as one logical system from the firm's point of view — a query to any of them returns the record, and the queried KRA fetches it from the holding KRA in the background.
+
+The design consequence that matters most is that the KRA is a shared, mutable record rather than a filing cabinet. Another intermediary can modify it, a verification step can change what was uploaded, and the status can move. A firm that treats its own uploaded copy as the truth will drift from the registry, and the drift surfaces as a client whose status blocks trading for reasons the firm's own records do not explain. The defence is simple and frequently skipped: refresh from the registry on a schedule as well as on events, and treat the downloaded record as authoritative when it differs.
+
+The third observation is about the rejection branch. When an intermediary uploads KYC for an investor who is already compliant, the KRA rejects it and the intermediary must download instead. This is correct behaviour by the registry and it is a *branch*, not a failure. Implementations that model the upload as a call that either succeeds or errors will retry the rejection, log it as a failure, alert on it, and eventually suppress the alert — at which point genuine upload failures become invisible too.
+
+## 1. Framework
+
+- **KRA framework and interoperability** — five SEBI-registered KRAs with a mandated back-end interoperability framework; a query to one returns the record regardless of which holds it; the queried KRA fetches it from the holding KRA in the background. See the [KRA reference](/broking-kyc/vendors/kra/).
+- **Upload obligation** — intermediaries upload client KYC records to a KRA within the prescribed period of account opening.
+- **Duplicate handling** — an upload for an already-compliant investor is rejected by the KRA system and the intermediary must download the record instead.
+- **Download authority** — details uploaded earlier may have been modified at verification, so the intermediary treats the download as final based on the updated date and uses it to update the back office.
+- **Dual upload** — client KYC data to both the KRA and CERSAI's CKYC registry.
+- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025).
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — regulation 16 retention of not less than eight years, applying to KYC records and the registry correspondence. `[not yet in index]`
+- **Access route at Finix** — through Digio's unified KRA interface, which abstracts the differences between the KRAs; CVL is the primary. CVL also provides an API directly on request, configured by the intermediary to push customer data and images and to check status, fetch and submit.
+
+## 2. The sequence
+
+| # | Step | Call | Outcome branches |
+|---|---|---|---|
+| 1 | **Lookup** | Status query by PAN | Record exists → fetch. No record → fresh KYC |
+| 2a | **Fetch** | Download the existing record | Use it to prefill and to update the back office |
+| 2b | **Fresh KYC** | Capture and verify through [Digio](/broking-kyc/finix-broking-setup/onboarding/01-digio-integration/) | Proceed to upload |
+| 3 | Verify in-person or video, where required | Per the applicable requirement | — |
+| 4 | **Upload** | Push data and images | Accepted → status progresses. **Rejected as duplicate → download** |
+| 5 | **Status poll** | Query status | Registered → trading gate open. Validated → complete. On Hold or Rejected → resolve |
+| 6 | **Refresh** | Periodic re-query | Catches modifications by other intermediaries |
+| 7 | Modification | On client change | Propagates to the registry |
+
+<Aside type="caution" title="Model step 4's rejection as a branch, not an error">
+The upload call has three meaningful outcomes: accepted, rejected because the investor is already compliant, and failed. The second is a normal path that leads to a download. Implementations that collapse the second and third into "error" produce retry loops that will never succeed, alerts that are mostly noise, and — because the alerts are noise — a suppressed channel in which genuine failures hide. Branch on the rejection reason explicitly.
+</Aside>
+
+## 3. Status and the trading gate
+
+| Status | Meaning | Trading |
+|---|---|---|
+| **Registered** | The record exists and is registered | **Trading allowed** |
+| **Validated** | Validated to the higher standard | Trading allowed; the completed state |
+| On Hold | The registry is holding the record | **Blocked**; resolve with the registry |
+| Rejected | The record was rejected | **Blocked**; resolve and re-upload |
+| Not Available | No record | Fresh KYC required |
+
+| Control | Detail |
+|---|---|
+| Gate on status, in code | A client whose status blocks trading must not be able to trade; this is a [ladder check](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/) |
+| Status history | Retained; status changes are meaningful events |
+| Status change handling | A client moving to On Hold or Rejected after activation must be caught by the refresh, not by a failed trade |
+| Client communication | A blocked status needs an explanation the client can act on |
+| Escalation | Persistent On Hold or Rejected states escalate to compliance |
+
+## 4. The download-is-authoritative rule
+
+| Point | Detail |
+|---|---|
+| Why | Details uploaded earlier may have been modified subsequently at verification |
+| Rule | Treat the download as **final**, based on the **updated date**, and use it to update the back office |
+| Consequence | The firm's record follows the registry, not the other way round |
+| Conflict handling | Where the registry differs from the firm's record, the registry governs; investigate the cause |
+| Client-visible fields | A change to name, address or contact details may need a client communication |
+| Downstream propagation | The back office, the order management system and the exchange registration all consume client master data; a registry change may need to propagate to all of them |
+| Audit | The before and after retained |
+
+## 5. Refresh and modification
+
+| Trigger | Action |
+|---|---|
+| Periodic schedule | Re-query status and updated date for the active book |
+| Client-initiated modification | Capture, verify, upload the modification; see [modifications](/broking-kyc/lifecycle/modifications/) |
+| Modification by another intermediary | Detected by the refresh; download and apply |
+| Re-KYC due | Per the applicable periodicity; see [re-KYC](/broking-kyc/lifecycle/re-kyc/) |
+| Status change | Apply the trading-gate consequence immediately |
+| Address or bank change | Propagates to the registry and to the exchange registration and the depository |
+| Client becomes dormant or reactivates | See [dormancy and reactivation](/broking-kyc/lifecycle/dormancy-reactivation/) |
+
+| Control | Detail |
+|---|---|
+| Refresh cadence | Defined; frequent enough that a status change is caught within an acceptable window |
+| Updated-date drift report | Clients whose registry updated date is newer than the firm's record |
+| Propagation completeness | A registry change that must reach the exchange or depository is tracked to completion |
+| Client notification | Where a change is client-visible or client-initiated |
+
+## 6. Reconciliation
+
+| Check | Sources | Frequency | On difference |
+|---|---|---|---|
+| Firm's client master against the registry | Back office, KRA | **Daily for recent activity; periodic for the full book** | The registry governs; investigate |
+| Updated-date drift | Both | Daily | Download and apply |
+| Status against the trading gate | Registry, order management system | **Daily** | A tradeable client with a blocking status is a control failure |
+| Upload submitted against status progressed | Submission log, registry | Daily | Ageing submissions escalate |
+| Dual-upload completeness | KRA and CKYC submission logs | Daily | A client uploaded to one and not the other |
+| Clients activated without a registry record | Client master, registry | Daily | **Severity one** |
+
+The last row is the one that catches the worst failure: a client trading without a KRA record at all, which usually means a gate was bypassed or a client master was created out of band.
+
+## 7. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.onb.kra.primary` | CVL KRA | Discretionary | — |
+| `finix.onb.kra.access_route` | Digio unified interface | Discretionary | — |
+| `finix.onb.kra.lookup_first` | **True** | Discretionary, strongly recommended | Re-collecting data that already exists |
+| `finix.onb.kra.duplicate_rejection_branch` | **Download, not retry** | Discretionary, strongly recommended | Retry loops and suppressed alerts |
+| `finix.onb.kra.download_authoritative` | **True** | Regulatory in substance | Firm records drifting from the registry |
+| `finix.onb.kra.upload_window` | Per the prescribed period | Regulatory | Late upload |
+| `finix.onb.kra.trading_gate_statuses` | Registered and Validated | Regulatory | Trading on a blocked status |
+| `finix.onb.kra.refresh_cadence` | Defined, frequent enough to catch changes | Discretionary | Stale client records |
+| `finix.onb.kra.dual_upload` | KRA and CKYC | Regulatory | Partial compliance |
+| `finix.onb.kra.status_change_action` | Apply the gate immediately | Regulatory in substance | A client trading on a lapsed status |
+| `finix.onb.kra.recon_daily` | True | Discretionary, strongly recommended | Drift |
+| `finix.onb.kra.no_record_activation_alarm` | **Alarm on any** | Regulatory in substance | A client trading with no registry record |
+| `finix.onb.kra.retention_years` | 8 | Regulatory | Short of the statutory floor |
+
+## 8. Exception paths
+
+| Situation | Response |
+|---|---|
+| Upload rejected as duplicate | **Download.** This is the designed path, not an error |
+| Upload fails for another reason | Retry per policy; escalate on ageing; a client cannot be left unregistered |
+| Status moves to On Hold after activation | Apply the gate; communicate; resolve with the registry |
+| Status moves to Rejected | Apply the gate; investigate; re-upload after resolution |
+| Registry record differs from the firm's | The registry governs; download, apply, and investigate the cause |
+| A client appears with a record the firm did not create | Expected — another intermediary created it; use it |
+| Registry unavailable during onboarding | Queue; the client journey can continue to the point the gate requires it |
+| Client activated with no registry record | **Severity one**; stop trading for that client; investigate the activation path |
+| Dual upload completed to KRA but not CKYC | Complete it; a partial dual upload is partial compliance |
+| Client disputes data the registry holds | The modification path exists; help them use it rather than editing locally |
+
+## Practical notes
+
+- **Look up before you ask.** It is the point of the system, and it shortens the journey materially.
+- **Branch on the rejection reason.** Collapsing "already compliant" into "error" is the defect that produces loops and noise.
+- **Let the registry govern.** A firm record that disagrees with the registry is the firm's problem, not the registry's.
+- **Refresh the active book on a schedule.** Other intermediaries change records and the firm will not be told.
+- **Gate trading on status in code.** A report that a client's status has lapsed requires somebody to act; a gate acts.
+- **Alarm on activation without a registry record.** It should be impossible and it is the worst failure here.
+- **Track dual-upload completeness separately.** Two uploads, two confirmations, two reconciliations.
+
+## Where this connects
+
+- [KRA reference](/broking-kyc/vendors/kra/) — the API specification, status codes and field-level upload content
+- [CKYC and CKYCRR 2.0](/broking-kyc/finix-broking-setup/onboarding/03-ckyc-ckycrr2-integration/) — the other half of the dual upload
+- [Digio integration](/broking-kyc/finix-broking-setup/onboarding/01-digio-integration/) — the access route
+- [UCC registration](/broking-kyc/finix-broking-setup/onboarding/05-ucc-registration-exchanges/) — the next gate
+- [Re-KYC](/broking-kyc/lifecycle/re-kyc/) and [modifications](/broking-kyc/lifecycle/modifications/) — the lifecycle events
+- [KRA submission fields](/broking-kyc/reference/field-atlas/sections/s-kra-submission/) — field-level reference
+- [Pre-trade check ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/) — where the status gate is enforced

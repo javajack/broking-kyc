@@ -1,0 +1,176 @@
+---
+title: "Onboarding 6: eSign, DDPI and pledge setup"
+description: The authority artefacts that let a broker act — the client agreement and rights-and-obligations set, the Demat Debit and Pledge Instruction and what it does and does not authorise, nomination, stamping, the signature type appropriate to each, custody and retrieval, and the operational consequences when an authority is missing.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Every operational capability in the rest of this manual rests on an authority the client gave at onboarding — to debit securities for settlement, to pledge them as collateral, to act on their behalf. When an authority is missing or defective the symptom appears far away: a settlement that cannot be instructed, collateral that cannot be pledged, a nomination dispute years later. So the page organises by authority rather than by document: what capability each one unlocks, what it specifically does not authorise, and what breaks without it.
+
+## TL;DR
+
+- **DDPI replaced the general power of attorney model** for debiting a client's demat account. It authorises specific, enumerated purposes and is deliberately narrower than what it replaced.
+- **DDPI authorises settlement debits and pledge; it does not authorise discretionary trading.** Treating it as a general mandate is the error the framework exists to prevent.
+- **Digio handles the stamping**, including **DDPI and nomination document preview with digital stamp duty payment**, which removes the physical bottleneck from the two most paperwork-heavy artefacts.
+- **Nomination is a client choice with a prescribed treatment**, including the option to opt out, and it is the artefact most likely to be examined in a transmission years later.
+- **Signature type is a per-document decision.** Aadhaar eSign for client documents; a document signer certificate for the firm's own output; a stylus electronic signature only where nothing stronger is required.
+- **Custody is the obligation.** The firm stores the artefact, its signature and its authentication record, and can produce them for the full retention period — not a link to the vendor.
+- **A missing authority surfaces downstream**, usually at the worst moment: at a settlement deadline, at a pledge instruction, or in a transmission.
+
+## Conceptual overview
+
+An onboarding journey produces two kinds of output. One is information — identity, address, bank, preferences — which flows to registries and masters. The other is authority: permission for the firm to do specific things with the client's assets. The second is smaller in volume and larger in consequence, because an information error produces a correction and an authority error produces an operation the firm cannot perform or, worse, performs without a mandate.
+
+The DDPI framework is the clearest example of the design intent. Its predecessor was a broad power of attorney that, in practice, authorised far more than clients understood and was repeatedly misused. The replacement narrows the authority to enumerated purposes — debiting securities for settlement obligations, pledging for margin, and the specific other purposes named — and makes the scope explicit on the document the client signs. For the firm this means two things: the capability set is bounded by what the DDPI covers, and any operation outside it needs a separate instruction from the client each time.
+
+The third idea is that authority artefacts are long-lived evidence. A client agreement signed in 2026 may be read in 2033 by an arbitrator; a nomination may be read by a family in circumstances where the client cannot explain what they intended. That makes custody, retrievability and the completeness of the evidence package more important than the convenience of the signing flow — and it is why the vendor-has-it-firm-does-not state described in [Digio integration](/broking-kyc/finix-broking-setup/onboarding/01-digio-integration/#3-artefact-custody) matters so much here.
+
+## 1. Framework
+
+- **Demat Debit and Pledge Instruction** — the framework replacing the power of attorney model for debiting a client's demat account, with enumerated purposes. See [DDPI fields](/broking-kyc/reference/field-atlas/sections/o-ddpi/). `[not yet in index]`
+- **[SEBI/HO/MIRSD/DOP/CIR/P/2020/28](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddopcirp202028)** (25 February 2020) — margin obligations by way of pledge and re-pledge; client authority is what makes the pledge instruction valid.
+- **Nomination framework** — the prescribed treatment including the opt-out; see [nomination fields](/broking-kyc/reference/field-atlas/sections/i-nomination/).
+- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — the client documentation set, rights and obligations, and the Most Important Terms and Conditions.
+- **Information Technology Act, 2000** — the basis for digital signature.
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — regulation 16 retention of not less than eight years. `[not yet in index]`
+- **Stamping** — state-wise stamp duty; Digio provides eStamping including **DDPI and nomination document preview with digital stamp duty payment**.
+- Client-facing framework: [client protection frameworks](/broking-kyc/trading-risk/client-protection-frameworks/).
+
+## 2. The artefact set
+
+| Artefact | Authorises or records | Signature type | Stamping |
+|---|---|---|---|
+| **Client agreement** | The broking relationship and its terms | Aadhaar eSign | Per the applicable regime |
+| **Rights and obligations document** | Acknowledgement of the standard terms | Aadhaar eSign or acknowledgement | — |
+| **Most Important Terms and Conditions** | Acknowledgement of the short standard document | Acknowledgement | — |
+| **Risk disclosure documents** | Acknowledgement | Acknowledgement | — |
+| **DDPI** | **Debiting the demat account for enumerated purposes** | Aadhaar eSign | **Stamped** |
+| **Nomination or opt-out** | Succession instruction, or a recorded decision not to nominate | Aadhaar eSign | **Stamped where applicable** |
+| Segment activation and product consents | Derivatives, commodities, margin funding | Aadhaar eSign or acknowledgement | — |
+| Running account settlement preference | The client's choice where a choice exists | Acknowledgement | — |
+| Bank and demat mapping | The accounts money and securities move to | Verified, recorded | — |
+| Mandates | eNACH or UPI AutoPay for recurring collection | Per the mandate framework | — |
+| Data-protection consent | Processing consent and its scope | Recorded | — |
+| Non-individual authority | Board resolution, authorised signatory list | Digital signature certificate | Per the applicable regime |
+
+## 3. What DDPI authorises — and does not
+
+| Authorised | Detail |
+|---|---|
+| Debit for settlement obligations | Delivering securities the client has sold |
+| Pledging for margin | Creating a pledge in favour of the trading member and up the chain |
+| The other enumerated purposes | As set out in the framework and reflected on the document |
+
+| **Not authorised** | Consequence |
+|---|---|
+| **Discretionary trading** | A separate arrangement entirely; DDPI is not a trading mandate |
+| Transfers outside the enumerated purposes | Need a specific client instruction each time |
+| Anything the document does not name | The scope is the document |
+
+<Aside type="caution" title="DDPI is a scope, not a key">
+The predecessor power-of-attorney model was abused precisely because it was treated as a general key to the client's demat account. The replacement is deliberately enumerated, and the firm's systems should enforce the enumeration: an instruction type that is not within the DDPI's scope must require a specific client instruction, not merely a policy saying it should. Build the check into the instruction path, and make the DDPI's scope a configured list rather than an assumption in somebody's head.
+</Aside>
+
+## 4. Nomination
+
+| Element | Detail |
+|---|---|
+| Choice | The client nominates, or records a decision not to |
+| Prescribed treatment | Per the applicable framework, including the opt-out mechanism |
+| Content | Nominee details, share, guardian where the nominee is a minor |
+| Change | A lifecycle event with its own process; see [modifications](/broking-kyc/lifecycle/modifications/) |
+| **Longevity** | This artefact is most likely to be read when the client cannot explain it; completeness and clarity matter more than speed |
+| Stamping | Where applicable, handled through eStamping |
+| Evidence | The signed document, its signature and authentication record, retained |
+| Downstream | Drives [transmission](/broking-kyc/lifecycle/transmission/) |
+
+## 5. Pledge authority
+
+| Element | Detail |
+|---|---|
+| What it enables | Creating a pledge of the client's securities in favour of the trading member, and the re-pledge chain onward |
+| Source of authority | The DDPI and the client's instruction framework |
+| Beneficial ownership | Stays with the client; the pledge is an encumbrance, not a transfer |
+| Operational link | [Collateral and pledge](/broking-kyc/finix-broking-setup/rms/05-collateral-pledge/) |
+| **CUSPA** | The auto-pledge at pay-out for unpaid securities operates under the [2026 framework](/broking-kyc/finix-broking-setup/backoffice/06-cuspa-unpaid-securities/) **without client instruction**, which is a specific statutory mechanism and not an exercise of DDPI |
+| Release | Excess released promptly as the obligation reduces |
+| Missing authority | The firm cannot pledge the client's securities; the client's holdings create no capacity |
+
+## 6. Custody and retrieval
+
+| Requirement | Detail |
+|---|---|
+| **Retrieve the artefact** | Not a link to the vendor |
+| Evidence package | Signature, authentication record, verification result, stamping evidence — stored together |
+| Verification on retrieval | Confirm validity at the point of storage |
+| Indexing | By client, by artefact type, by date |
+| **Retention** | Eight-year floor, independent of the vendor relationship, and longer where another obligation applies |
+| Post-termination access | Contractual; the obligation survives the vendor |
+| **Retrieval drill** | Annual: produce a DDPI and a nomination from several years ago |
+| Reconciliation | Daily: artefacts the vendor records as executed against artefacts the firm holds |
+
+## 7. The gates
+
+| Capability | Requires |
+|---|---|
+| Trading in a segment | Client agreement, segment consent, registration, KYC status |
+| **Delivery-creating trades** | Demat active, **DDPI or an equivalent instruction mechanism** |
+| Pledging collateral | DDPI, pledge authority |
+| Margin funding | Separate agreement under the applicable framework |
+| Recurring investment | A valid mandate |
+| Pay-out | Verified bank account |
+| Transmission | Nomination or the prescribed alternative process |
+
+Enforced at check **C8** of the [pre-trade ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/) for order-time authority, and in the instruction path for depository operations.
+
+## 8. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.onb.auth.ddpi_scope` | **Configured enumeration**, matching the signed document | Regulatory | Instructions outside the authorised scope |
+| `finix.onb.auth.ddpi_required_for` | Delivery-creating trades and pledging | Regulatory | Operations without authority |
+| `finix.onb.auth.instruction_outside_scope` | **Requires a specific client instruction** | Regulatory | Acting beyond the mandate |
+| `finix.onb.auth.nomination_or_optout_required` | True | Regulatory | An incomplete client record |
+| `finix.onb.auth.signature_type_by_document` | Documented per artefact | Regulatory in substance | An inadequate signature |
+| `finix.onb.auth.stamping_required_for` | DDPI, nomination where applicable | Regulatory | An unstamped instrument |
+| `finix.onb.auth.estamp_paid_vs_issued_recon` | Daily | Discretionary, strongly recommended | Money paid, document not issued |
+| `finix.onb.auth.artefact_retrieved` | **Always** | Regulatory in substance | Unproducible evidence |
+| `finix.onb.auth.verify_on_retrieval` | True | Discretionary, strongly recommended | Storing an invalid signature |
+| `finix.onb.auth.retrieval_recon_daily` | True | Discretionary, strongly recommended | The vendor-has-it-firm-does-not state |
+| `finix.onb.auth.retention_years` | 8, or longer where applicable | Regulatory | Short of the statutory floor |
+| `finix.onb.auth.retrieval_drill` | Annual | Discretionary, strongly recommended | Untested custody |
+
+## 9. Exception paths
+
+| Situation | Response |
+|---|---|
+| DDPI missing when a settlement debit is needed | The client must instruct specifically; this is a settlement-deadline problem, so detect it before the deadline |
+| DDPI missing when a pledge is needed | The client's holdings create no capacity; tell them why |
+| An instruction type outside the DDPI scope is attempted | Blocked; a specific client instruction is required |
+| Nomination incomplete | Complete or record the opt-out; an incomplete record surfaces at transmission |
+| Stamp paid, document not issued | Resolve same day; money has moved |
+| Signature verification fails on retrieval | Do not treat as valid; investigate; re-execute if necessary |
+| Vendor records an artefact as executed, the firm does not hold it | Resolve same day; the account is legally complete and operationally incomplete |
+| Client revokes DDPI | Capabilities that depend on it stop; tell the client what changes before it changes |
+| A non-individual's authorised signatory changes | Re-execute the affected authorities; the old signature does not carry over |
+| Transmission request with a disputed nomination | Follow the prescribed process precisely; see [transmission](/broking-kyc/lifecycle/transmission/) |
+
+## Practical notes
+
+- **Configure the DDPI scope as a list and enforce it in the instruction path.** A policy is not a control.
+- **Detect missing authority before a deadline needs it.** A missing DDPI discovered at a settlement cut-off is an avoidable crisis.
+- **Treat nomination with more care than its volume suggests.** It is read when the client cannot explain it.
+- **Reconcile e-stamp paid against issued daily.** Money has moved and a document may not exist.
+- **Store the artefact, not the link.** The vendor relationship ends; the obligation does not.
+- **Drill the retrieval annually, on a real old artefact.** It is the only proof that custody works.
+- **Tell clients what revoking DDPI will stop.** Most revocations are made without understanding the consequence.
+
+## Where this connects
+
+- [Digio integration](/broking-kyc/finix-broking-setup/onboarding/01-digio-integration/) — signature types and artefact custody
+- [DDPI fields](/broking-kyc/reference/field-atlas/sections/o-ddpi/) and [nomination fields](/broking-kyc/reference/field-atlas/sections/i-nomination/) — field-level reference
+- [Collateral and pledge](/broking-kyc/finix-broking-setup/rms/05-collateral-pledge/) — what pledge authority enables
+- [CUSPA and unpaid securities](/broking-kyc/finix-broking-setup/backoffice/06-cuspa-unpaid-securities/) — the statutory auto-pledge, which is not DDPI
+- [Settlement obligations](/broking-kyc/finix-broking-setup/backoffice/05-settlement-obligations/) — where settlement authority is used
+- [Transmission](/broking-kyc/lifecycle/transmission/) — where nomination is read
+- [Client protection frameworks](/broking-kyc/trading-risk/client-protection-frameworks/) — the client-facing document set

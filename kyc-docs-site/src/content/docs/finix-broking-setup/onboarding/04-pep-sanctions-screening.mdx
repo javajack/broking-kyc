@@ -1,0 +1,216 @@
+---
+title: "Onboarding 4: PEP and sanctions screening"
+description: Screening as a lifecycle rather than an onboarding event — SecMark C-Safe across fifty-plus lists including politically exposed persons, the list-version record that makes a past result provable, match tuning and disposition, the rescreening triggers, risk classification, enhanced due diligence, and the link into transaction monitoring and suspicious transaction reporting.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Screening fails in two characteristic ways — it generates so many matches that nobody reads them, or it generates so few that it is not actually screening — and both are tuning problems rather than vendor problems. So the page treats the list inventory and the matching configuration as the substance, then disposition because an undisposed match is worse than no match, then the rescreening triggers because screening at onboarding alone satisfies almost nothing, and finally the links outward into risk classification, enhanced due diligence and reporting.
+
+## TL;DR
+
+- **SecMark C-Safe is the system of record for screening at Finix**, covering more than fifty global and domestic lists including SEBI, UNSC, OFAC and politically exposed persons. Digio's own screening is deliberately not enabled, so that onboarding and ongoing screening share one list version and one disposition queue.
+- **Screening is not an onboarding event.** It re-runs when a list changes, when a client's attributes change, periodically for the whole book, and on specified triggers. A firm that screens only at onboarding has a control that decays from the day it is applied.
+- **The list version used must be recorded with every result.** Without it, a past screening result is unprovable, and "we screened them in 2026" is an assertion rather than evidence.
+- **An unresolved hit blocks activation.** Never auto-clear; the disposition is a human decision by compliance, recorded with its reasoning.
+- **Screening output feeds risk classification**, which under CKYCRR 2.0 drives the **risk-tiered update schedule** and, under the firm's own policy, the depth of due diligence.
+- **Chapter IV of the [2026 regulations](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/) adds a mule-account detection duty at regulation 23(8)** that screening does not satisfy — it is behavioural and lives in [surveillance](/broking-kyc/finix-broking-setup/rms/07-intraday-surveillance/).
+- **AML Sutra carries transaction monitoring and suspicious transaction reporting in FINnet 2.0 format**, filed by the principal officer, with no tipping off.
+
+## Conceptual overview
+
+Screening answers a narrow question — is this person or entity on a list that matters — and its difficulty is almost entirely in the matching. Names transliterate inconsistently, dates of birth are partial, entities restructure, and lists are maintained by different bodies with different conventions. Set the matching loosely and a mid-sized broker generates thousands of matches a week, nearly all false, which guarantees that the real one is buried. Set it tightly and the control stops working while continuing to produce a reassuring green tick. The tuning record — what thresholds were set, on what reasoning, with what observed volume — is therefore not documentation about the control; it *is* the evidence that the control is calibrated.
+
+The second idea is that a screening result is a statement about a moment. Lists change weekly; a client clear in January may be a match in June, not because anything about them changed but because a list did. That is why screening has to be a lifecycle with defined triggers, and why the list version must travel with every result. An inspection asking whether a client was screened against the current sanctions list on a given date can only be answered if the firm recorded which list it used.
+
+The third idea is scope. Screening proves that a client is not on a list. It does not prove that the account is operated by that person for their own benefit, which is what the mule-account duty at regulation 23(8) addresses, and it does not detect patterns, which is what transaction monitoring addresses. Firms that present screening as their anti-money-laundering control have described one layer of three. The page therefore ends by naming the boundaries explicitly.
+
+## 1. Framework
+
+- **Prevention of Money Laundering Act, 2002, the rules, and the SEBI anti-money-laundering master circular** — the obligations to identify clients, screen against prescribed lists, classify risk, apply enhanced due diligence, monitor transactions and report. See the [FIU-IND circulars index](/broking-kyc/reference/circulars/fiu-ind/).
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — Chapter IV fraud prevention and detection, with **regulation 23(8) mule-account detection** and **regulation 25 whistle-blower policy**. `[not yet in index]`
+- **[SEBI/HO/MIRSD/FATF/P/CIR/2023/0144](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdfatfpcir20230144)** — Financial Action Task Force related obligations.
+- **United Nations Security Council sanctions lists** and the designated-persons framework; **domestic debarred and prohibited lists** published by SEBI and the exchanges.
+- **Politically exposed persons** — identification and the enhanced due diligence that follows.
+- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025).
+- **Stack**: SecMark **C-Safe** for screening across more than fifty global and domestic lists including SEBI, UNSC, OFAC and PEP; **AML Sutra** for transaction monitoring and suspicious transaction reporting in **FINnet 2.0** format; **ComplianceSutra** for workflow and evidence.
+- Field-level reference: [PEP and AML fields](/broking-kyc/reference/field-atlas/sections/k-pep-aml/).
+
+## 2. The list inventory
+
+| Category | Examples | Refresh |
+|---|---|---|
+| **United Nations** | Security Council sanctions and designated persons | On publication |
+| **Domestic regulatory** | SEBI debarred and prohibited entities; exchange lists | On publication |
+| **International sanctions** | OFAC and equivalent regimes, as covered | On publication |
+| **Politically exposed persons** | Domestic and foreign, with associates and family where covered | Vendor cadence |
+| Law-enforcement and adverse media | As covered by the vendor | Vendor cadence |
+| Internal | The firm's own restricted, prohibited and connected-person lists | On change |
+| Employee and connected persons | Maintained by the firm | On change |
+
+| Control | Requirement |
+|---|---|
+| **List inventory maintained** | Which lists, from which source, at what cadence — a document, not an assumption |
+| **Version recorded with every result** | The evidence that a past screening is provable |
+| Refresh monitoring | A list that has not updated when it should have is an incident |
+| Coverage review | Periodic: are the right lists included, and has an obligation added one? |
+| Internal lists | Employee, connected person and restricted lists are the firm's own and must be current |
+
+<Aside type="caution" title="The list version is the difference between evidence and assertion">
+"We screened this client" is an assertion. "We screened this client on this date against these lists at these versions, with this result, disposed by this person for this reason" is evidence. The second costs one extra field per result and is the difference between answering an inspection question in a minute and reconstructing it from vendor logs. Make the list version a mandatory part of the stored result, and make a result without one a defect.
+</Aside>
+
+## 3. Matching configuration
+
+| Parameter | Consideration |
+|---|---|
+| Name matching | Transliteration variants, phonetic matching, word order, titles and honorifics |
+| Threshold | The central tuning decision; too loose buries the real match, too tight disables the control |
+| Secondary identifiers | Date of birth, nationality, identifier numbers — used to narrow, improving precision without losing recall |
+| Entity matching | Legal form variants, abbreviations, former names |
+| Beneficial owners | For non-individual clients, screened as well as the entity |
+| Related parties | Authorised signatories, directors, partners, guardians, nominees where applicable |
+| Partial data | A client with partial attributes produces weaker matching; the screening result must reflect that |
+| **Tuning record** | Threshold, reasoning, expected volume, date, approver — retained |
+| Backtesting | A threshold change tested against history before deployment |
+
+## 4. Disposition
+
+| Step | Owner | Rule |
+|---|---|---|
+| 1. Match generated | System | With the list version |
+| 2. Triage | Screening analyst | Within the service level |
+| 3. Enrichment | Analyst | Secondary identifiers, client data, open sources |
+| 4. **Decision** | **Compliance** | True match, false positive, or escalate |
+| 5. True match | Compliance | Per the applicable consequence: block, report, escalate |
+| 6. False positive | Compliance | **Recorded with reasoning**, and with the identifiers that distinguished the client |
+| 7. Whitelist | Compliance | A previously disposed false positive may be suppressed for that client and that list entry — **not globally** |
+| 8. Record | System | Decision, reasoning, author, timestamps, list version |
+| 9. Review | Compliance | Sample review of dispositions, including false positives |
+
+| Rule | Detail |
+|---|---|
+| **Never auto-clear** | A match is disposed by a person |
+| **Unresolved hit blocks activation** | Enforced in the [check ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/) at C9 |
+| Independence | Disposition sits with compliance, not with the relationship owner |
+| No commercial override | A valuable client's match is disposed on the same basis as anyone else's |
+| Whitelist scope | Per client, per list entry; a global suppression is a disabled control |
+| Whitelist review | Periodic — a whitelist entry that was right in 2026 may not be right later |
+| Ageing | **Open matches aged**; this is the metric |
+
+## 5. Rescreening triggers
+
+Screening at onboarding alone is a control that decays from day one.
+
+| Trigger | Scope | Timing |
+|---|---|---|
+| **List update** | Every client against the changed entries | On publication |
+| **Client attribute change** | That client against all lists | On change — name, address, nationality, beneficial ownership |
+| **Periodic** | The whole book | On the firm's cycle |
+| Risk reclassification | That client | On change |
+| Adverse information received | That client | Immediately |
+| Before a significant event | That client | Large transaction, account reactivation, product enablement |
+| Related-party change | The client and the related party | On change |
+| Regulatory direction | As directed | As directed |
+| Account reactivation | That client | At reactivation; see [dormancy and reactivation](/broking-kyc/lifecycle/dormancy-reactivation/) |
+
+| Control | Detail |
+|---|---|
+| Delta screening on list update | Screen against changed entries rather than re-screening everything, but **record that this is what was done** |
+| Full periodic screening | On the cycle, against the full lists |
+| Coverage assertion | Every active client screened within the cycle — a client missed is a client unscreened |
+| Backlog | Rescreening backlog is a control failure, not a workload |
+
+## 6. Risk classification and enhanced due diligence
+
+| Element | Detail |
+|---|---|
+| Inputs | Screening outcome, client type, geography, product, expected activity, source of funds, occupation, beneficial ownership complexity |
+| Output | A risk category per client |
+| **PEP** | Identification triggers enhanced due diligence and typically a higher risk category |
+| **CKYCRR 2.0 link** | The risk category drives the **risk-tiered update schedule**; see [CKYCRR 2.0](/broking-kyc/finix-broking-setup/onboarding/03-ckyc-ckycrr2-integration/#6-the-risk-tiered-update-schedule) |
+| Enhanced due diligence | Additional information, senior approval, source-of-funds verification, closer ongoing monitoring |
+| Monitoring intensity | Higher-risk clients monitored more closely in [transaction monitoring](/broking-kyc/finix-broking-setup/rms/07-intraday-surveillance/) |
+| Reclassification | On new information; a one-way ratchet is wrong — risk can fall as well as rise, with reasoning |
+| Record | The classification, its basis, its approver and its history |
+
+## 7. Links outward
+
+| Destination | Relationship |
+|---|---|
+| [Pre-trade check ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/) | C9 unresolved screening hit blocks activity; C10 restricted and connected-person lists |
+| [Intraday surveillance](/broking-kyc/finix-broking-setup/rms/07-intraday-surveillance/) | Transaction monitoring, and the **regulation 23(8) mule-account rules that screening does not cover** |
+| [Regulatory reporting](/broking-kyc/finix-broking-setup/backoffice/09-regulatory-reporting/) | Suspicious transaction reports in FINnet 2.0 by the principal officer |
+| [CKYCRR 2.0](/broking-kyc/finix-broking-setup/onboarding/03-ckyc-ckycrr2-integration/) | Risk category drives the update tier |
+| [Re-KYC](/broking-kyc/lifecycle/re-kyc/) | Periodicity and depth |
+| [Pay-in rails](/broking-kyc/finix-broking-setup/money/02-payin-rails/) | Third-party funding as a mule indicator |
+| [Compliance configuration baseline](/broking-kyc/finix-broking-setup/compliance/01-compliance-config-baseline/) | The obligation register |
+
+### 7.1 What screening does not cover
+
+| Obligation | Where it lives |
+|---|---|
+| **Mule-account detection, regulation 23(8)** | Behavioural rules in [surveillance](/broking-kyc/finix-broking-setup/rms/07-intraday-surveillance/#33-mule-account-indicators--regulation-238) |
+| Transaction pattern monitoring | AML Sutra |
+| Suspicious transaction identification | The principal officer, on the monitoring output |
+| Source-of-funds verification | Enhanced due diligence, a document and judgement exercise |
+| Ongoing relationship review | Periodic review, not a list check |
+
+Stating these boundaries explicitly is itself useful: an inspection that asks how the firm discharges regulation 23(8) and receives a description of its screening vendor has received the wrong answer.
+
+## 8. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.onb.screen.system` | SecMark C-Safe | Discretionary | Two screening populations |
+| `finix.onb.screen.digio_screening` | **Disabled** | Discretionary, strongly recommended | Divergent list versions and queues |
+| `finix.onb.screen.list_inventory` | Documented, with sources and cadence | Regulatory in substance | Unknown coverage |
+| `finix.onb.screen.list_version_recorded` | **Mandatory with every result** | Regulatory in substance | Unprovable screening |
+| `finix.onb.screen.threshold` | Tuned, documented, backtested | Discretionary | Noise, or a disabled control |
+| `finix.onb.screen.secondary_identifiers` | Used to narrow | Discretionary | Poor precision |
+| `finix.onb.screen.related_parties` | Beneficial owners, signatories, directors, guardians | Regulatory | Partial screening |
+| `finix.onb.screen.auto_clear` | **Prohibited** | Regulatory in substance | Unreviewed matches |
+| `finix.onb.screen.unresolved_blocks_activation` | **True** | Regulatory | A client trading with an open hit |
+| `finix.onb.screen.whitelist_scope` | Per client, per list entry | Discretionary, strongly recommended | A globally disabled control |
+| `finix.onb.screen.whitelist_review` | Periodic | Discretionary | Stale suppressions |
+| `finix.onb.screen.rescreen_on_list_update` | True | Regulatory | A control that decays |
+| `finix.onb.screen.rescreen_on_attribute_change` | True | Regulatory | Same |
+| `finix.onb.screen.periodic_cycle` | Defined; full-book coverage asserted | Regulatory | Clients unscreened |
+| `finix.onb.screen.open_match_age_alarm` | Tight | Discretionary, strongly recommended | Undisposed matches |
+| `finix.onb.screen.disposition_owner` | Compliance | Regulatory | Conflicted disposition |
+| `finix.onb.screen.retention_years` | 8 | Regulatory | Short of the statutory floor |
+
+## 9. Exception paths
+
+| Situation | Response |
+|---|---|
+| True match on a sanctions list | Do not activate; follow the prescribed consequence; escalate to the principal officer; consider a suspicious transaction report; **no tipping off** |
+| PEP identified | Enhanced due diligence, senior approval, higher risk category, closer monitoring |
+| Match on an existing client after a list update | Apply the consequence; the client may need to be restricted; this is why rescreening exists |
+| Match cannot be resolved either way | Do not activate; escalate; an unresolved hit is a block, not a default-allow |
+| Match volume exceeds disposition capacity | Tune with the reasoning recorded, or add capacity; **do not let the queue age** |
+| A valuable client generates a match | Disposed on the same basis as anyone else; escalate commercial tension to compliance, not into the disposition |
+| List not refreshed on schedule | Incident; screening against a stale list is screening against the wrong thing |
+| Result found without a list version | Defect; the result is unprovable |
+| Whitelist suppressed a later true match | Severity one; review whitelist scope and the periodic review |
+| Client challenges a screening outcome | Explain what can be explained without tipping off; the disposition record supports the firm's position |
+
+## Practical notes
+
+- **Record the list version with every result.** One field, and it converts assertion into evidence.
+- **Tune deliberately and write down why.** The tuning record is the control's calibration evidence.
+- **Measure the age of the oldest open match.** Count tells you about volume; age tells you about control.
+- **Keep whitelists narrow and review them.** A global suppression is the control switched off.
+- **Rescreen on list change, not only on a schedule.** Most new matches arrive because a list moved, not because a client did.
+- **Keep disposition with compliance.** The commercial pressure is real and the independence is the point.
+- **Name what screening does not cover.** Regulation 23(8) is a behavioural duty and belongs in surveillance.
+
+## Where this connects
+
+- [Intraday surveillance](/broking-kyc/finix-broking-setup/rms/07-intraday-surveillance/) — transaction monitoring and the mule rules
+- [CKYCRR 2.0](/broking-kyc/finix-broking-setup/onboarding/03-ckyc-ckycrr2-integration/) — the risk-tiered update schedule
+- [Pre-trade check ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/) — where the block is enforced
+- [Regulatory reporting](/broking-kyc/finix-broking-setup/backoffice/09-regulatory-reporting/) — the suspicious transaction path
+- [PEP and AML fields](/broking-kyc/reference/field-atlas/sections/k-pep-aml/) — field-level reference
+- [FIU-IND circulars index](/broking-kyc/reference/circulars/fiu-ind/) — the source documents
+- [SEBI registration under the 2026 regulations](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/#4-chapter-iv-in-implementation-terms) — Chapter IV

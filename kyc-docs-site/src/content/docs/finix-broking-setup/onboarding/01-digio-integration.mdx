@@ -1,0 +1,203 @@
+---
+title: "Onboarding 1: Digio integration"
+description: Wiring Digio into the Finix journey — DigiKYC verification primitives, DigiSign signature types and what each produces evidentially, eStamping for DDPI and nomination documents, eNACH and UPI AutoPay mandates, the sandbox parity problem, artefact custody and retrieval, and the failure branch for every call.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import Diagram from '../../../../components/Diagram.astro';
+
+> **Why this page is structured this way:** A verification vendor is a set of primitives with a set of failure modes, and the failure modes matter more than the primitives because the happy path is identical for every vendor. So the page lists what Digio provides, then treats the two things that actually determine implementation quality: artefact custody — whether the firm can produce a signed document in year seven — and the failure branch for each call, which is what the client experiences when something upstream is down.
+
+## TL;DR
+
+- **Digio supplies the primitives; Finix owns the journey.** DigiKYC for identity verification, DigiSign for signature, eStamping for stamp duty, and eNACH and UPI AutoPay for mandates. The screens, the sequence and the conversion are the broker's.
+- **DigiSign offers both digital and electronic signatures** — Aadhaar eSign with OTP, biometric, iris and face-match authentication; USB digital signature certificate; document signer certificate; and stylus-based electronic signature. They are not evidentially equivalent, and the choice must be deliberate per document.
+- **eStamping covers DDPI and nomination document preview with digital stamp duty payment**, which removes a physical bottleneck from the two most paperwork-heavy artefacts in onboarding.
+- **The dangerous state is a signature that exists at Digio and not with the broker.** The account looks incomplete and is legally complete. Reconcile retrieved artefacts daily.
+- **Sandbox is not production.** Sandbox eSign does not produce a legally valid signature, and sandbox identity flows are simulated — test with synthetic identities only, never with a real PAN.
+- **Every call needs a client-facing failure branch.** A vendor outage mid-journey must save state and let the client resume, not discard captured data.
+- **Screening is explicitly out of scope for Digio at Finix** — it belongs to SecMark C-Safe, so that onboarding screening and ongoing rescreening share one list version and one disposition queue.
+
+## Conceptual overview
+
+The useful way to think about a verification vendor is as an aggregator of other people's availability. Digio's own systems are rarely the problem; what fails is an upstream source — a government document service, an identity authority, a bank — and the vendor's value is partly in abstracting those differences and partly in telling you honestly which one failed. That shapes the integration: the firm needs per-source success rates rather than a single vendor success rate, because "Digio is slow" and "DigiLocker is down" require different client messages and different fallbacks.
+
+The second idea is that the output of this plane is evidence, and evidence has a custody problem. A signed client agreement is not useful because the signing happened; it is useful because the firm can produce it, with its signature intact and verifiable, years later when somebody disputes a term. That makes retrieval a first-class requirement rather than an afterthought, and it makes the vendor contract's retention and export clauses as important as its uptime. A firm that can sign a thousand documents a day and cannot produce one from 2026 in 2033 has built the wrong thing.
+
+The third idea is that an interrupted journey is the normal case, not the exception. Clients abandon, lose signal, get interrupted, and come back on a different device. A design that treats each verification call as part of an atomic flow will discard work and force restarts, which costs conversion and goodwill. A design that persists every captured artefact and every vendor reference lets the client resume from where they were — and, importantly, lets the firm reconcile what the vendor holds against what it holds.
+
+## 1. What Digio provides
+
+| Component | Capability | Finix use |
+|---|---|---|
+| **DigiKYC** | Aadhaar and PAN verification, OCR, face sync and match, DigiLocker, offline Aadhaar, Video KYC, CKYC and KRA connectivity | **Primary verification layer** |
+| **DigiSign** | Aadhaar eSign with OTP, biometric, iris and face-match authentication; USB digital signature certificate; document signer certificate; stylus-based electronic signature | **Signature layer** |
+| **eStamping** | Digital stamp duty payment, including **DDPI and nomination document preview** | **Stamping layer** |
+| **Mandates** | eNACH and NACH eMandate, UPI AutoPay recurring payments | Stock SIP and recurring collection |
+| Document management | Template-based document and agreement management; API, SDK and dashboard initiation | Agreement generation |
+| AML and CFT screening | Available | **Not used** — screening is SecMark C-Safe; see the [vendor map decision](/broking-kyc/finix-broking-setup/stack/vendor-map/#33-screening-secmark-c-safe-or-digio-aml) |
+
+<Diagram src="/diagrams/finix-06-onboarding-pipeline.svg" label="The Finix onboarding pipeline — broker-owned journey, vendor and registry layer, and the four gates before a client can trade" />
+
+## 2. Signature types and what each produces
+
+Not evidentially equivalent. The choice is per document and should be documented.
+
+| Type | Authentication | Typical use | Evidential considerations |
+|---|---|---|---|
+| **Aadhaar eSign, OTP** | One-time password to the registered mobile | Client agreements, DDPI, nomination | The common retail path; the evidence package includes the authentication record |
+| Aadhaar eSign, biometric | Fingerprint | Assisted or branch flows | Stronger authentication, more infrastructure |
+| Aadhaar eSign, iris | Iris | Specialised | — |
+| Aadhaar eSign, face match | Face | Where supported | Pairs naturally with the face-match verification step |
+| **USB digital signature certificate** | Hardware token | Non-individual entities, authorised signatories | Standard for corporate execution |
+| Document signer certificate | Organisational certificate | **The firm's own signing**, including contract notes | See [contract notes](/broking-kyc/finix-broking-setup/backoffice/03-contract-notes/) |
+| Stylus electronic signature | Drawn signature | Where a digital signature is not required | **Weakest**; use only where the document does not require more |
+
+| Control | Requirement |
+|---|---|
+| Per-document decision | Which type is acceptable for which artefact, documented and configured |
+| Evidence package | What the vendor returns with each signature — retained in full, not just the signed file |
+| Verification | The signature verified on retrieval, not assumed |
+| Non-individual flows | Authorised signatory identification and authority evidence |
+| Certificate expiry | For firm-held certificates, monitored like any production dependency |
+
+## 3. Artefact custody
+
+The part most likely to be under-built.
+
+| Requirement | Detail |
+|---|---|
+| **Retrieve, do not reference** | The firm stores the signed artefact itself, not a link to the vendor's copy |
+| Retrieval reconciliation | **Daily**: documents the vendor records as signed against documents the firm holds |
+| Evidence package | The signature, the authentication record and the verification result, stored together |
+| Verification on retrieval | Confirm the signature is valid at the point of storage |
+| **Retention** | Eight-year floor under regulation 16 of the [2026 regulations](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/), independent of the vendor relationship |
+| Post-termination | The contract must give access to records after termination for the retention period |
+| Retrieval drill | Produce a signed artefact from several years ago, annually; see [statements and retention](/broking-kyc/finix-broking-setup/backoffice/08-statements-retention/) |
+| Format durability | Readable without the vendor's application where feasible |
+
+<Aside type="caution" title="The vendor-has-it-firm-does-not state">
+A client completes signing, the vendor records the document as executed, and the firm's retrieval call fails or is never made. The account appears incomplete to the firm and is legally complete. The client may well believe they have an account. Nothing errors, and the discrepancy surfaces when the client tries to trade or when an inspection samples agreements. The control is a daily reconciliation between what the vendor says is signed and what the firm holds, with any difference resolved the same day — interface ON-3 in the [contract matrix](/broking-kyc/finix-broking-setup/stack/integration-contract-matrix/#4-onboarding-path).
+</Aside>
+
+## 4. Failure branches
+
+Every call needs a decided behaviour. The column that matters is what the client sees.
+
+| Call | Failure | Behaviour | Client sees |
+|---|---|---|---|
+| PAN verification | Source unavailable | **Queue**; save state; offer resume | "We could not verify your PAN just now. We have saved your progress." |
+| PAN verification | Mismatch with the name provided | Stop that path; offer correction | A specific, actionable message |
+| DigiLocker | Consent not granted | Alternative document path | "You can upload documents instead." |
+| DigiLocker | Source unavailable | Alternative path, or queue | As above |
+| Offline Aadhaar | Invalid or expired file | Specific guidance on regenerating | Actionable |
+| Face match | Below threshold | Retry, then an assisted path | Non-judgemental wording |
+| Liveness | Failed | Retry with guidance; then assisted | As above |
+| Video KYC | Dropped mid-session | Resume from the last step | "Your session was interrupted. Resume where you left off." |
+| Bank verification | Penny drop failed | Retry; then an alternative verification | Specific |
+| Bank verification | Name mismatch | **Stop** — this is the account money will flow to | Clear, with a correction path |
+| eSign | Client abandons mid-signing | **Queue**; poll; reconcile; let the client resume | "Your signing is incomplete." |
+| eSign | Signed at vendor, retrieval failed | **Queue and reconcile** — the dangerous state | Nothing, until resolved; then confirmation |
+| eStamp | Stamp paid, document not issued | **Queue and reconcile** — money has moved | Nothing, until resolved |
+| Mandate setup | Created at vendor, not recorded locally | Queue and reconcile | Nothing, until resolved |
+| Any | Vendor unavailable entirely | **Queue**; save state; communicate honestly | "We're unable to complete this step right now." |
+
+| Principle | Detail |
+|---|---|
+| **Never discard captured data** | Abandonment is normal; restarting a journey is a conversion cost and a client irritation |
+| Save state at every step | With the vendor reference, so reconciliation is possible |
+| Per-source success rates | "DigiLocker is down" and "Digio is slow" need different messages |
+| Honest messaging | Clients forgive an outage and resent a vague error |
+| Reconcile the asynchronous cases | eSign, eStamp and mandates can complete at the vendor without the firm knowing |
+
+## 5. Sandbox and production
+
+| Difference | Consequence |
+|---|---|
+| **Sandbox eSign does not produce a legally valid signature** | Never use sandbox output as evidence; never let a sandbox flow reach a real client |
+| Identity flows are simulated | Test with synthetic identities; **never with a real PAN or Aadhaar** |
+| Credentials are environment-scoped | Mode confusion must be impossible; fail closed on mismatch |
+| Behaviour may differ | Validate the production behaviour of each flow before launch, under a controlled pilot |
+| Webhook and callback behaviour | Verify in production with a low-volume pilot |
+
+A real PAN sent to a test endpoint can create a real record somewhere, which is why the synthetic-data rule is absolute rather than advisory.
+
+## 6. Mandates
+
+| Element | Detail |
+|---|---|
+| Products | eNACH and NACH eMandate; UPI AutoPay |
+| Use at Finix | Stock SIP instalments and any recurring collection |
+| AutoPay format | Per the NPCI mandate format referenced in [NPCI/UPI/OC No. 217/2025-26](/broking-kyc/reference/circulars/npci/#npciupioc-no-2172025-26) |
+| Reconciliation | Mandates created at the vendor against mandates recorded locally, daily |
+| Lifecycle | Creation, amendment, pause, cancellation — each a client-visible event |
+| Failure handling | A failed instalment is notified, retried per policy, and recorded; a silently skipped instalment is a complaint |
+| Client control | The client can see and cancel their mandates |
+
+## 7. Monitoring
+
+| Signal | Why |
+|---|---|
+| Step-level success rate and latency | Where the journey leaks |
+| **Per-upstream-source success rate** | Distinguishes vendor from source failures |
+| Abandonment by step | Conversion, and whether a step is too hard |
+| **Pending-signature ageing** | The vendor-has-it-firm-does-not state |
+| Stamp paid versus issued | Money has moved |
+| Mandate created versus recorded | Same |
+| Retrieval reconciliation differences | The custody control |
+| Mode assertion | That production credentials are in use |
+| Vendor error-code distribution | New codes signal an upstream change |
+
+## 8. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.onb.digio.scope` | DigiKYC, DigiSign, eStamping, mandates | Discretionary | Paying for and inheriting unused modules |
+| `finix.onb.digio.screening_enabled` | **False** — C-Safe owns screening | Discretionary | Two screening populations with different list versions |
+| `finix.onb.sign.type_by_document` | Documented per artefact | Regulatory in substance | An inadequate signature on a document that needs more |
+| `finix.onb.sign.retrieve_artefact` | **Always; never reference** | Regulatory in substance | Unproducible evidence |
+| `finix.onb.sign.verify_on_retrieval` | True | Discretionary, strongly recommended | Storing an invalid signature |
+| `finix.onb.sign.retrieval_recon_daily` | True | Discretionary, strongly recommended | The vendor-has-it-firm-does-not state |
+| `finix.onb.sign.pending_age_alarm` | Tight | Discretionary | Incomplete accounts ageing |
+| `finix.onb.journey.save_state_every_step` | True | Discretionary, strongly recommended | Clients forced to restart |
+| `finix.onb.journey.discard_on_failure` | **False** | Discretionary, strongly recommended | Captured data lost |
+| `finix.onb.sandbox.real_identifiers` | **Prohibited** | Regulatory in substance | A real record created in a test flow |
+| `finix.onb.mode_assertion` | Enforced | Discretionary, strongly recommended | Sandbox output treated as production |
+| `finix.onb.estamp.paid_vs_issued_recon` | Daily | Discretionary, strongly recommended | Money paid, document not issued |
+| `finix.onb.mandate.recon_daily` | True | Discretionary | Mandates at the vendor only |
+| `finix.onb.artefact.retention_years` | 8 | Regulatory | Short of the statutory floor |
+
+## 9. Exception paths
+
+| Situation | Response |
+|---|---|
+| Signed at the vendor, not retrieved | Resolve same day; the account is legally complete and operationally incomplete |
+| Stamp paid, document not issued | Resolve same day; money has moved |
+| Mandate at the vendor only | Reconcile; the client may be expecting instalments |
+| Upstream source down for an extended period | Communicate; offer the alternative path; do not let journeys accumulate silently |
+| Vendor outage during peak onboarding | Queue, save state, message honestly, and reconcile when service returns |
+| Sandbox credentials found in production | Severity one; stop; any artefacts produced are not valid evidence |
+| A real identifier used in sandbox | Investigate whether a real record was created; escalate to compliance |
+| Signature verification fails on retrieval | Do not store as valid; investigate; re-execute if necessary |
+| A client disputes a signed term | Produce the artefact, the signature and the authentication record |
+| Vendor changes an API without notice | Contractual lead-time clause; meanwhile the failure branch protects the client experience |
+
+## Practical notes
+
+- **Reconcile signed artefacts daily.** It is the one control against the most dangerous state in the plane.
+- **Measure per-upstream-source success, not just vendor success.** It changes both the client message and the escalation.
+- **Never discard captured data on a failure.** Abandonment is the normal case.
+- **Keep the artefact, not the link.** The contract ends; the obligation does not.
+- **Make mode confusion impossible.** Fail closed when credentials and environment disagree.
+- **Test the retrieval of an old artefact annually.** Signing is easy; producing is the obligation.
+- **Keep screening out of this vendor.** One list version, one disposition queue, one audit trail.
+
+## Where this connects
+
+- [User journey](/broking-kyc/journey/) — the screens these primitives serve
+- [Field atlas](/broking-kyc/reference/field-atlas/) — the fields captured
+- [CVL KRA integration](/broking-kyc/finix-broking-setup/onboarding/02-kra-cvl-integration/) and [CKYCRR 2.0](/broking-kyc/finix-broking-setup/onboarding/03-ckyc-ckycrr2-integration/) — the registry legs
+- [eSign, DDPI and pledge setup](/broking-kyc/finix-broking-setup/onboarding/06-esign-ddpi-pledge-setup/) — the authority artefacts
+- [Integration contract matrix](/broking-kyc/finix-broking-setup/stack/integration-contract-matrix/#4-onboarding-path) — the interface contracts
+- [Vendor map](/broking-kyc/finix-broking-setup/stack/vendor-map/) — the scope decisions
+- [Statements and retention](/broking-kyc/finix-broking-setup/backoffice/08-statements-retention/) — the custody obligation

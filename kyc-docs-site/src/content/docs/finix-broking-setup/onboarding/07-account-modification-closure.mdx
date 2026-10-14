@@ -1,0 +1,216 @@
+---
+title: "Onboarding 7: modification and closure operations"
+description: The lifecycle events that re-run parts of the onboarding plane — what a modification propagates to and in what order, the sensitive changes that need extra control, dormancy and reactivation, closure with its settlement and record obligations, transmission, and the reconciliation that proves a change actually completed everywhere.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** A client change is not an update to one record; it is a propagation across seven or eight systems and registries, each with its own timing and its own failure mode. The characteristic defect is a change that succeeded where it was entered and silently failed somewhere downstream, leaving the firm with divergent records it does not know about. So the page is organised around propagation: what each change touches, in what order, how completion is tracked, and what the reconciliation looks for. The lifecycle walkthroughs elsewhere on this site cover the client-facing processes; this covers the plumbing.
+
+## TL;DR
+
+- **A modification is a propagation, not an update.** Name, address, bank, contact and status changes touch the client master, the KRA, CKYC, every exchange where the client is registered, the depository, the back office and the risk engine — each tracked to completion separately.
+- **The authoritative change usually happens at the registry.** A change entered locally and not propagated produces divergence that the registry will eventually overwrite; a change made at the registry by another intermediary arrives at the firm through a refresh.
+- **Four changes are sensitive** and need extra control: bank account, contact details, nomination and DDPI revocation. Each is a fraud vector, a client-rights matter, or both.
+- **A bank-account change followed by a withdrawal is reviewed before release**, and every change is notified to the **previously registered** contact details as well as the new ones.
+- **Dormancy and reactivation re-run parts of the plane**, including screening and, depending on the elapsed period, verification.
+- **Closure is a settlement exercise before it is a records exercise**: positions closed, obligations settled, securities transferred, balance returned, and only then the account closed — with records retained for the full period regardless.
+- **Reconciliation proves completion.** Every propagation is tracked and aged, because the failure mode is silence.
+
+## Conceptual overview
+
+Onboarding is a one-off and the client lifecycle is forever. Most of the operational cost of a client relationship after the first week is in keeping records consistent across systems that update at different speeds and sometimes without the firm's involvement. The defining characteristic is that nothing errors: a propagation that failed looks exactly like one that succeeded until something downstream depends on it — a contract note to an old address, a pay-out to a closed account, an exchange record that disagrees with the firm's.
+
+The second idea is that the direction of authority varies by field and is frequently misunderstood. KYC attributes are authoritative at the registry; a local edit is at best a request. Bank account details are authoritative with the firm and must be propagated to where they are held. Status — active, dormant, closed, frozen — is authoritative with the firm and must reach the exchanges and the depository. Getting the direction wrong produces either edits that are silently overwritten or local records that the registry never learns about.
+
+The third idea is that some changes are fraud vectors. Account takeover does not usually begin with a withdrawal; it begins with a contact-detail change so that notifications go elsewhere, followed by a bank-account change, followed by a withdrawal. Treating these as ordinary data updates removes the firm's only chance to intervene. The controls are cheap — notify the old details, impose a cooling period, review a withdrawal that follows a change — and they are the difference between an attempted fraud and a loss.
+
+## 1. Framework
+
+- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — client records, modification and closure obligations.
+- **KRA and CKYC modification frameworks** — the registry paths for changes to KYC attributes; see [CVL KRA integration](/broking-kyc/finix-broking-setup/onboarding/02-kra-cvl-integration/) and [CKYCRR 2.0](/broking-kyc/finix-broking-setup/onboarding/03-ckyc-ckycrr2-integration/).
+- **Exchange and depository modification requirements** — per exchange and per depository.
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — regulation 16 retention of not less than eight years, which survives account closure. `[not yet in index]`
+- **Dormancy and reactivation framework**; **transmission framework**; **voluntary freeze facility** — see [client protection frameworks](/broking-kyc/trading-risk/client-protection-frameworks/).
+- Client-facing walkthroughs: [modifications](/broking-kyc/lifecycle/modifications/), [re-KYC](/broking-kyc/lifecycle/re-kyc/), [dormancy and reactivation](/broking-kyc/lifecycle/dormancy-reactivation/), [closure](/broking-kyc/lifecycle/closure/), [transmission](/broking-kyc/lifecycle/transmission/), [NRI conversion](/broking-kyc/lifecycle/nri-conversion/).
+
+## 2. The propagation matrix
+
+`●` must propagate · `○` may need to · `—` not applicable
+
+| Change | Client master | KRA | CKYC | Exchanges | Depository | Back office | Risk | Comms |
+|---|---|---|---|---|---|---|---|---|
+| Name | ● | ● | ● | ● | ● | ● | ○ | ● |
+| Address | ● | ● | ● | ● | ● | ● | — | ● |
+| Contact details | ● | ● | ● | ○ | ● | ● | — | ● |
+| **Bank account** | ● | ○ | ○ | ○ | — | ● | ○ | ● |
+| Demat account | ● | — | — | ○ | ● | ● | ● | ● |
+| **Nomination** | ● | — | — | — | ● | ● | — | ● |
+| **DDPI** | ● | — | — | — | ● | ● | ● | ● |
+| Segment activation | ● | — | — | ● | — | ● | ● | ● |
+| Risk category | ● | — | ○ | — | — | ● | ● | — |
+| Status: dormant | ● | ○ | — | ● | ○ | ● | ● | ● |
+| Status: frozen | ● | — | — | ● | ● | ● | ● | ● |
+| Status: closed | ● | ● | ○ | ● | ● | ● | ● | ● |
+| Client type | ● | ● | ● | ● | ● | ● | ● | ● |
+
+| Rule | Detail |
+|---|---|
+| **Completion tracked per destination** | Not inferred from one success |
+| Ordering | Registry first where the registry is authoritative; firm first where the firm is |
+| Ageing | Incomplete propagations aged and escalated |
+| Reconciliation | Daily, against each destination's record |
+| Rollback | Where a propagation partially fails, the firm must know the resulting divergence precisely |
+
+<Aside type="caution" title="The failure mode is silence">
+A propagation that fails downstream rarely produces an error anyone sees. The contract note goes to the old address, the exchange record keeps the old name, the depository has the old bank mapping. Each is invisible until a downstream event depends on it, and by then the change is weeks old. Make completion an explicit tracked state per destination, age it, and reconcile — because nothing else will surface it.
+</Aside>
+
+## 3. Sensitive changes
+
+| Change | Why sensitive | Controls |
+|---|---|---|
+| **Bank account** | The destination for the client's money | Re-verification; maker-checker; **notify the previously registered contact details**; cooling period; **review any withdrawal in the window**; see [pay-out engine](/broking-kyc/finix-broking-setup/money/03-payout-engine/#5-destination-controls) |
+| **Contact details** | Controls where every notification goes — the first step in account takeover | **Notify the old details**; cooling period before other sensitive changes; alert on a contact change followed by a bank change |
+| **Nomination** | Succession; read when the client cannot explain it | Fresh execution; stamping where applicable; confirmation to the client |
+| **DDPI revocation** | Removes capabilities the client may not realise they rely on | **Explain the consequence before executing**; confirm; apply the capability change |
+| Demat account change | Where securities go | Verification; depository propagation |
+| Client type change | Changes eligibility and registration | May require re-registration and re-screening |
+| Risk category change | Changes monitoring and update periodicity | Recorded with reasoning; drives the CKYC update tier |
+
+| Pattern alert | Detail |
+|---|---|
+| Contact change → bank change → withdrawal | **The account-takeover signature.** Each step alone is routine; the sequence is not |
+| Multiple sensitive changes in a short window | Review |
+| Change requested through an unusual channel | Verify through a known channel |
+| Change following a reported phishing attempt | Heightened verification |
+
+## 4. Dormancy and reactivation
+
+| Stage | Detail |
+|---|---|
+| Dormancy | Per the applicable criteria; status propagates to the exchanges and the back office |
+| Effect | Trading blocked at check C1 of the [ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/); capacity reduced to the global default |
+| Client communication | Before and at dormancy |
+| **Reactivation** | Re-verification per the applicable requirement and the elapsed period |
+| **Rescreening at reactivation** | Mandatory; lists have moved; see [screening](/broking-kyc/finix-broking-setup/onboarding/04-pep-sanctions-screening/#5-rescreening-triggers) |
+| KYC currency | Check whether re-KYC is due; see [re-KYC](/broking-kyc/lifecycle/re-kyc/) |
+| Registry refresh | Status and attributes may have changed while dormant |
+| Records | Retained throughout; dormancy is not closure |
+
+Walkthrough at [dormancy and reactivation](/broking-kyc/lifecycle/dormancy-reactivation/).
+
+## 5. Closure
+
+Closure is a settlement exercise before it is a records exercise.
+
+| # | Step | Must complete before the next |
+|---|---|---|
+| 1 | Client requests closure | — |
+| 2 | **Open positions closed or transferred** | Yes |
+| 3 | **Settlement obligations completed** | Yes |
+| 4 | Unpaid securities resolved, including any CUSPA pledge released or invoked | Yes |
+| 5 | Pledges released | Yes |
+| 6 | **Securities transferred** to the client's chosen destination | Yes |
+| 7 | **Funds returned** to the verified bank account | Yes |
+| 8 | Charges settled | Yes |
+| 9 | Statements issued for the final period | — |
+| 10 | Status propagated: exchanges, depository, registries, back office, risk | — |
+| 11 | Mandates cancelled | — |
+| 12 | Account closed | — |
+| 13 | **Records retained for the full period** | Always |
+
+| Control | Detail |
+|---|---|
+| No closure with open obligations | The sequence is a dependency chain, not a checklist |
+| Securities destination verified | They are going somewhere the client controls |
+| Funds to the verified account | Not to a newly supplied one without full re-verification |
+| **Records retained** | Closure ends the relationship, not the retention obligation |
+| Reopening | Treated as a new onboarding where the applicable period has elapsed |
+| Confirmation | The client receives explicit confirmation of closure and of what was returned |
+
+Walkthrough at [closure](/broking-kyc/lifecycle/closure/).
+
+## 6. Transmission
+
+| Element | Detail |
+|---|---|
+| Trigger | Death of the account holder |
+| Nature | **The most complaint-prone process in the plane**, and the most emotionally sensitive |
+| Nomination | Where present, drives the process |
+| No nomination | The prescribed alternative process |
+| Joint accounts | Survivorship treatment per the account structure |
+| Documentation | Prescribed; do not ask for more than the framework requires |
+| Timeliness | Families are waiting; delay is the main complaint driver |
+| Records | The entire chain retained |
+| Training | The staff handling this need specific training, not general process training |
+
+Walkthrough at [transmission](/broking-kyc/lifecycle/transmission/).
+
+## 7. Reconciliation
+
+| Check | Sources | Frequency | On difference |
+|---|---|---|---|
+| Client master against KRA | Both | Daily for changed records; periodic full | **The registry governs** |
+| Client master against exchanges | Both | Daily | Propagate or investigate |
+| Client master against depository | Both | Daily | Propagate or investigate |
+| Client master across onboarding, OMS and back office | All three | **Daily** | A client in one and not another must not trade |
+| Pending propagations by age | Change log | Daily | Escalate on ageing |
+| Closed clients still enabled anywhere | Status, enablement | Daily | **Severity one** |
+| Dormant clients with live capacity | Status, limits | Daily | Reduce to the global default |
+| Sensitive changes followed by withdrawals | Change log, payout log | **Continuous** | Human review before release |
+
+## 8. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.onb.mod.propagation_tracking` | **Per destination, to completion** | Regulatory in substance | Silent divergence |
+| `finix.onb.mod.registry_authoritative_fields` | KYC attributes | Regulatory | Local edits overwritten |
+| `finix.onb.mod.firm_authoritative_fields` | Bank, status, product consents | Discretionary | Registry edits assumed |
+| `finix.onb.mod.pending_age_alarm` | Tight | Discretionary, strongly recommended | Incomplete propagations |
+| `finix.onb.mod.sensitive_changes` | Bank, contact, nomination, DDPI | Discretionary, strongly recommended | Fraud vectors treated as routine |
+| `finix.onb.mod.notify_previous_contact` | **True** | Discretionary, strongly recommended | The client never learns of a fraudulent change |
+| `finix.onb.mod.cooling_period_hours` | Set, for sensitive changes | Discretionary, strongly recommended | Change-then-withdraw loss |
+| `finix.onb.mod.change_then_withdraw_review` | **Human review** | Discretionary, strongly recommended | Account-takeover loss |
+| `finix.onb.mod.sequence_alert` | Contact → bank → withdrawal | Discretionary, strongly recommended | The signature missed |
+| `finix.onb.mod.ddpi_revocation_explained` | Before execution | Discretionary, strongly recommended | Capabilities lost without understanding |
+| `finix.onb.react.rescreen_required` | **True** | Regulatory | Reactivation against stale lists |
+| `finix.onb.close.sequence_enforced` | **True** | Regulatory in substance | Closure with open obligations |
+| `finix.onb.close.funds_to_verified_account_only` | True | Regulatory in substance | Paying the wrong person |
+| `finix.onb.close.retention_years` | **8, after closure** | Regulatory | Records destroyed on closure |
+| `finix.onb.mod.closed_still_enabled_alarm` | Alarm on any | Regulatory in substance | A closed client able to trade |
+
+## 9. Exception paths
+
+| Situation | Response |
+|---|---|
+| Propagation succeeded locally, failed at a destination | Age, escalate, complete; the firm has divergent records until it does |
+| Registry overwrites a local edit | Expected where the registry is authoritative; apply the registry value and investigate why the edit was made locally |
+| Contact change followed by a bank change | Review as a sequence, not as two routine changes |
+| Bank change followed by a withdrawal | **Human review before release**; contact the client on previously registered details |
+| Client cannot be reached to confirm a sensitive change | Do not proceed; an unconfirmable sensitive change is the pattern fraud relies on |
+| Reactivation requested after a long dormancy | Full re-verification per the applicable requirement, plus rescreening |
+| Closure requested with open positions | Explain the sequence; the account cannot close until obligations are settled |
+| Closure requested with an unresolved CUSPA pledge | Resolve under the [CUSPA process](/broking-kyc/finix-broking-setup/backoffice/06-cuspa-unpaid-securities/) first |
+| Closed client found still enabled on an exchange | Severity one; propagate the status; investigate |
+| Transmission request | Follow the prescribed process precisely; prioritise timeliness; do not request documents the framework does not require |
+
+## Practical notes
+
+- **Track propagation completion per destination.** The failure mode is silence, and nothing else surfaces it.
+- **Notify sensitive changes to the previously registered contact details.** If the change is fraudulent, those are the details that reach the client.
+- **Alert on the sequence, not just the events.** Contact change, then bank change, then withdrawal is the signature.
+- **Rescreen at reactivation.** Lists moved while the client was dormant.
+- **Enforce the closure sequence as a dependency chain.** A closed account with an open obligation is a problem with no owner.
+- **Retain after closure.** The relationship ends; regulation 16 does not.
+- **Train the transmission handlers specifically.** It is the process where a procedural failure causes real distress.
+
+## Where this connects
+
+- [Modifications](/broking-kyc/lifecycle/modifications/), [re-KYC](/broking-kyc/lifecycle/re-kyc/), [dormancy and reactivation](/broking-kyc/lifecycle/dormancy-reactivation/), [closure](/broking-kyc/lifecycle/closure/), [transmission](/broking-kyc/lifecycle/transmission/), [NRI conversion](/broking-kyc/lifecycle/nri-conversion/) — the client-facing walkthroughs
+- [CVL KRA integration](/broking-kyc/finix-broking-setup/onboarding/02-kra-cvl-integration/) and [CKYCRR 2.0](/broking-kyc/finix-broking-setup/onboarding/03-ckyc-ckycrr2-integration/) — registry propagation
+- [UCC registration](/broking-kyc/finix-broking-setup/onboarding/05-ucc-registration-exchanges/) — exchange propagation
+- [Pay-out engine](/broking-kyc/finix-broking-setup/money/03-payout-engine/) — the destination controls
+- [PEP and sanctions screening](/broking-kyc/finix-broking-setup/onboarding/04-pep-sanctions-screening/) — rescreening triggers
+- [Account lifecycle fields](/broking-kyc/reference/field-atlas/sections/y-account-lifecycle/) — field-level reference
+- [Admin workflow](/broking-kyc/operations/admin-workflow/) — maker-checker on sensitive changes
