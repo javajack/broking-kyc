@@ -1,0 +1,219 @@
+---
+title: "OMS 10: configuration reference"
+description: Every OMS tunable discussed across this plane, collected in one place — key, Finix default, classification as regulatory, exchange-set or discretionary, the failure mode if it is wrong, and the change-control treatment — with the scope-resolution rules and the gates that bind configuration to certification.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page exists:** Configuration discussed across ten pages is configuration nobody can audit. This page is the single table an engineer configures from, a reviewer approves against and an inspector is shown. The classification column is the one that matters most: a regulatory value needs a circular, an exchange-set value needs a refresh mechanism, and a discretionary value needs an approved policy — and misclassifying any of them is itself a finding.
+
+## TL;DR
+
+- **Three classes, three evidence requirements.** Regulatory values trace to a regulation or circular. Exchange-set values trace to a circular *and* a named ingestion job with a staleness behaviour. Discretionary values trace to an approved policy and an approver.
+- **Scope resolution is most-specific-wins** — client, client group, product, segment, exchange, global — and every key must have a global default so resolution always terminates.
+- **Two hard gates bind configuration to reality**: an order type cannot be enabled unless the certification record contains it, and an identifier cannot route unless the register holds a confirmed exchange reporting reference.
+- **Some values must never change mid-session.** Anything that can turn a compliant client into a non-compliant one — tightening a limit, lowering a square-off trigger, changing a cut-off — takes effect at a boundary.
+- **The dangerous defaults are the permissive ones.** Risk timeout, stale-data behaviour, audit-write failure and untagged algorithmic flow all have a safe setting that an engineer optimising for availability would not choose.
+- **Configuration is retained on the eight-year floor** and must be point-in-time answerable: what was key K for scope S at timestamp T.
+
+## 1. How to read this reference
+
+| Column | Meaning |
+|---|---|
+| Key | Named per the [configuration convention](/broking-kyc/finix-broking-setup/stack/environments-config-baseline/#2-configuration-key-convention) |
+| Finix default | The value this manual assumes |
+| Class | **R** regulatory · **E** exchange-set · **D** discretionary |
+| Mid-session | Whether the value may change while a market is open |
+| Failure mode | What goes wrong if the value is wrong |
+
+Scope suffixes used below: `<exchange>` NSE, BSE, MCX · `<segment>` CM, FO, CD, COM · `<channel>` terminal, web, mobile, api, algo · `<class>` identifier class · `<algo>` algorithm identifier.
+
+## 2. Architecture and the order path
+
+| Key | Finix default | Class | Mid-session | Failure mode |
+|---|---|---|---|---|
+| `finix.oms.risk.timeout_action` | **Reject** | R | No | An unevaluated order reaching the market |
+| `finix.oms.risk.timeout_ms` | Single-digit milliseconds | D | No | Too low: false rejections. Too high: latency budget blown |
+| `finix.oms.risk.single_release_point` | Enforced architecturally | R | No | A bypass; the control ceases to exist |
+| `finix.oms.order.max_rate.<channel>` | Per channel | D | Yes, loosening only | One channel starving the gateway |
+| `finix.oms.order.client_reference_required` | True | D | No | No idempotency on resubmission |
+| `finix.oms.audit.write_failure_action` | Alert; stop entry if sustained | R | No | Trading without a record |
+| `finix.oms.audit.retention_years` | 8 | R | No | Records short of the regulation 16 floor |
+| `finix.oms.state.exchange_is_authoritative` | True | D | No | The replica treated as truth |
+| `finix.oms.state.unknown_state_enabled` | True | D | No | A guess shown to a client |
+
+## 3. Connectivity and sessions
+
+| Key | Finix default | Class | Mid-session | Failure mode |
+|---|---|---|---|---|
+| `finix.oms.conn.nse.mode` | CTCL with NNF | E | No | Unsupported access model |
+| `finix.oms.conn.nse.tap_enabled` | Per vendor architecture | D | No | An unplanned latency hop |
+| `finix.oms.conn.bse.instances` | **3 — one per segment** | E | No | A segment with no path, or orders to the wrong instance |
+| `finix.oms.conn.mcx.mode` | Per current approved option | E | No | Unsupported connectivity |
+| `finix.oms.conn.<x>.<seg>.protocol_version` | Per current document | E | No | Malformed messages after an exchange upgrade |
+| `finix.oms.conn.heartbeat_miss_action` | Alert on a single miss | D | Yes | Late detection |
+| `finix.oms.conn.sequence_gap_action` | **Stop new flow in segment; reconcile** | D | Yes | Trading on a divergent book |
+| `finix.oms.conn.reconnect_attempts` | Bounded, then escalate | D | Yes | Infinite retry masking a failure |
+| `finix.oms.conn.resume_requires_recon` | True | D | No | Unknown orders held at the exchange |
+| `finix.oms.conn.session_open_time.<x>.<seg>` | Per exchange calendar | E | No | Late session establishment |
+| `finix.oms.conn.mcx.dst_close_time` | 23:55 in United States daylight saving, else 23:30 | E | No | Session closed while the market is open |
+| `finix.oms.conn.cancel_on_disconnect` | Per exchange facility, explicitly configured | E | No | A bulk cancellation nobody initiated |
+
+## 4. Market data
+
+| Key | Finix default | Class | Mid-session | Failure mode |
+|---|---|---|---|---|
+| `finix.oms.marketdata.staleness_ms.<segment>` | Per segment | D | Yes | Decisions on stale prices |
+| `finix.oms.marketdata.stale_action` | Block price-dependent decisions in scope | D | No | Silent wrong decisions |
+| `finix.oms.marketdata.stale_scope` | Per instrument | D | No | Over-broad or under-broad blocking |
+| `finix.oms.marketdata.band_revision_apply` | Immediately on receipt | E | Yes | Validation against a superseded band |
+| `finix.oms.marketdata.gap_action` | Alert and recover | D | Yes | Undetected loss |
+| `finix.oms.marketdata.history_source` | Separate store from end-of-day files | D | No | Unreproducible valuations |
+
+## 5. Identifiers
+
+| Key | Finix default | Class | Mid-session | Failure mode |
+|---|---|---|---|---|
+| `finix.oms.userid.routing_requires_report` | **True** | R | No | Routing through an unreported terminal |
+| `finix.oms.userid.nse_format` | Twelve digits | E | No | Rejected or unmappable identifiers |
+| `finix.oms.userid.cert_expiry_action` | Deactivate automatically | D | Yes | An uncertified person trading |
+| `finix.oms.userid.test_id_max_days` | Short, mandatory expiry | D | No | Permanent test identifiers |
+| `finix.oms.userid.sharing_detection` | Enabled | D | Yes | Broken attribution |
+| `finix.oms.userid.recon_frequency` | Monthly; weekly post-launch | D | — | Undetected drift |
+| `finix.oms.userid.rate_limit.<class>` | Per class | D | Yes, loosening only | Gateway starvation |
+| `finix.oms.userid.proprietary_segregation` | Hard | R | No | Own and client flow conflated |
+
+## 6. Order types
+
+| Key | Finix default | Class | Mid-session | Failure mode |
+|---|---|---|---|---|
+| `finix.oms.ordertype.enabled.<x>.<seg>.<channel>` | Per the [support matrix](/broking-kyc/finix-broking-setup/oms/04-order-types-catalogue/#9-support-matrix) | E, certification-gated | **No** | An uncertified type reaching the market |
+| `finix.oms.ordertype.slm_enabled` | False everywhere | E | No | Offering a discontinued type |
+| `finix.oms.ordertype.multileg_market_block` | True | E | No | Exchange rejection the client cannot interpret |
+| `finix.oms.ordertype.aon_mf_validate_absent` | True | E | No | Obscure exchange rejections |
+| `finix.oms.ordertype.market_order_collar_pct.<seg>` | Per segment | D | No | Unbounded execution price |
+| `finix.oms.ordertype.market_order_on_stale_data` | Block | D | No | A market order priced against a stale book |
+| `finix.oms.gtt.max_days` | Per product policy | D | No | Stale long-dated intent |
+| `finix.oms.gtt.corporate_action_action` | Cancel and notify | D | No | A trigger evaluated against an unadjusted price |
+| `finix.oms.basket.atomicity` | Non-atomic, disclosed | D | No | Client expects all-or-nothing |
+| `finix.oms.bulk_upload.maker_checker` | Required | D | No | A mis-keyed file reaching the market |
+| `finix.oms.sip.failure_action` | Notify, retry per policy, record | D | No | Silently skipped instalments |
+
+## 7. Attributes and validity
+
+| Key | Finix default | Class | Mid-session | Failure mode |
+|---|---|---|---|---|
+| `finix.oms.validity.enabled.<x>.<seg>` | Day and IOC everywhere; GTD and GTC commodities only | E | No | Offering an unavailable validity |
+| `finix.oms.attr.disclosed_qty_min_pct.<x>.<seg>` | Per exchange requirement | E | No | Rejection, or an undisclosed large order |
+| `finix.oms.attr.aon_mf_block` | True | E | No | Obscure rejections |
+| `finix.oms.price.collar_pct.<seg>` | Per segment | D | No | Fat-finger orders reaching the market |
+| `finix.oms.price.collar_on_stale_data` | Block | D | No | A collar from a stale reference |
+| `finix.oms.price.collar_override_role` | Restricted, per-order, logged | D | No | Routine overriding |
+| `finix.oms.price.lpp_awareness` | Display the range where available | D | Yes | Unexplainable rejections |
+| `finix.oms.trigger.direction_validation` | Enforced | D | No | Orders that trigger instantly or never |
+| `finix.oms.master.lot_tick_source` | Current-day instrument master, asserted | E | No | Rejections that look like client errors |
+| `finix.oms.amo.window_open.<x>.<seg>` | Per published policy | D, disclosed | No | Client expectation breach |
+| `finix.oms.amo.window_close.<x>.<seg>` | Per published policy | D, disclosed | No | Orders accepted too late to release |
+| `finix.oms.amo.release_time.<x>.<seg>` | Per exchange order-entry open | E | No | Release late, or into a closed session |
+| `finix.oms.amo.release_failure_action` | Alert and notify clients | D | Yes | Silent non-release |
+| `finix.oms.amo.calendar_aware` | True | E | No | Release into a holiday |
+
+## 8. Return path
+
+| Key | Finix default | Class | Mid-session | Failure mode |
+|---|---|---|---|---|
+| `finix.oms.return.unknown_code_action` | Generic message plus engineering alert | D | Yes | Protocol drift undetected |
+| `finix.oms.return.propagation_order` | State → position → risk → client | D | No | Over-limit orders inside the update window |
+| `finix.oms.return.terminal_regression_block` | True | D | No | A filled order becoming live |
+| `finix.oms.return.unknown_order_message_action` | Store and alert; never discard | D | No | Invisible divergence |
+| `finix.oms.return.freeze_state_visible` | True, distinct state | D | No | Client acts on a wrong assumption |
+| `finix.oms.return.freeze_margin_hold` | Hold | D | No | Margin released on an order that may live |
+| `finix.oms.return.exchange_cancel_notify` | Always, with reason | D | Yes | Client believes the broker cancelled |
+| `finix.oms.return.member_message_escalation` | To dealing and risk immediately | D | Yes | A member-level instruction treated as a log line |
+| `finix.oms.recon.intraday_interval` | Periodic through the session | D | Yes | Late discovery of divergence |
+
+## 9. Modification and cancellation
+
+| Key | Finix default | Class | Mid-session | Failure mode |
+|---|---|---|---|---|
+| `finix.oms.modify.serialise_per_order` | True | D | No | Unresolvable order states |
+| `finix.oms.modify.requires_full_ladder` | True | D | No | Limit growth by repeated modification |
+| `finix.oms.modify.margin_release_on` | Confirmation | D | No | Phantom capacity |
+| `finix.oms.modify.allowed_fields.<x>.<seg>` | Per protocol | E | No | Illegal modifications attempted |
+| `finix.oms.modify.priority_reset_map.<x>.<seg>` | Per protocol, mock-verified | E | No | Wrong client explanation |
+| `finix.oms.modify.block_while_frozen` | True | D | No | Undefined exchange behaviour |
+| `finix.oms.modify.block_during_squareoff` | True | D, disclosed | No | Client and risk fighting over a position |
+| `finix.oms.cancel.bulk_scopes` | Client, instrument, identifier, segment, all | D | Yes | Over-broad cancellation |
+| `finix.oms.cancel.bulk_all_requires_two_person` | True | D | No | One person cancelling the firm's book |
+| `finix.oms.ccm.daily_limit` | Hard ceiling below the exchange's | E and D | No | Penalty and surveillance exposure |
+| `finix.oms.ccm.reason_required` | Closed list, maker-checker | D | No | Unexplained reallocations |
+
+## 10. Programmatic access
+
+| Key | Finix default | Class | Mid-session | Failure mode |
+|---|---|---|---|---|
+| `finix.oms.algo.registry_gate` | True | R | No | Unapproved algorithmic trading |
+| `finix.oms.algo.tag_required` | True | R | No | Untagged algorithmic flow |
+| `finix.oms.algo.nnf_algoid_validation` | Enforced | R | No | Mis-attributed orders |
+| `finix.oms.algo.ops_threshold` | 10 orders per second | R | No | Unregistered algorithmic flow |
+| `finix.oms.algo.ops_alert_at` | Below the threshold | D | Yes | Clients reclassified by surprise |
+| `finix.oms.algo.above_threshold_untagged_action` | Block | R | No | Flow that should be registered |
+| `finix.oms.algo.market_order_policy` | Pre-emptive cancellation enabled | E and D | No | Runaway market orders |
+| `finix.oms.algo.consecutive_reject_limit` | Low | D | Yes, tightening | Runaway strategy undetected |
+| `finix.oms.algo.daily_loss_limit.<algo>` | Per algorithm | D | Yes, tightening | Unbounded strategy loss |
+| `finix.oms.algo.rate_limit.<algo>` | Per algorithm | D | Yes | Gateway starvation |
+| `finix.oms.algo.instrument_whitelist.<algo>` | Explicit | D | Yes, narrowing | Trading outside approved scope |
+| `finix.oms.algo.kill_cancels_resting` | Decided, configured, disclosed | D | No | Clients surprised either way |
+| `finix.oms.algo.kill_switch_max_latency` | Seconds | D | No | A kill switch that does not kill |
+| `finix.oms.algo.audit_retention_years` | 8 | R | No | Records short of the statutory floor |
+| `finix.oms.api.rate_limit.<client>` | Per client | D | Yes | One client consuming capacity |
+| `finix.oms.api.static_ip_validation` | Where required | R | No | Attribution failure |
+| `finix.oms.dma.enabled` | False at launch | D | No | Unmonitored institutional flow |
+| `finix.oms.sor.enabled` | False at launch | D | No | Undemonstrable best execution |
+
+## 11. The gates
+
+Two configuration relationships are enforced as gates rather than as review items, because both have failed in the industry when left procedural.
+
+| Gate | Rule | Enforcement |
+|---|---|---|
+| **Certification gate** | `finix.oms.ordertype.enabled.*` ⊆ the certification record, per exchange, segment and channel | Scheduled automated diff; any difference alerts and the extra type is disabled |
+| **Reporting gate** | An identifier may route only if the register holds a confirmed exchange reporting reference | Checked at rung 2 of the [forward path](/broking-kyc/finix-broking-setup/oms/06-order-forward-path/) |
+
+<Aside type="caution" title="The defaults that an availability-minded engineer would get wrong">
+Six values on this page have a safe setting that conflicts with the instinct to keep the system up: `risk.timeout_action` = reject; `marketdata.stale_action` = block; `audit.write_failure_action` = stop if sustained; `conn.sequence_gap_action` = stop and reconcile; `conn.resume_requires_recon` = true; `algo.above_threshold_untagged_action` = block. Each trades availability for correctness, and each is right. Record the reasoning next to the value, because the first person to meet one of them during an incident will want to change it.
+</Aside>
+
+## 12. Change control
+
+| Requirement | Detail |
+|---|---|
+| Versioning | Append-only, with effective-from and effective-to timestamps |
+| Attribution | Author, approver, reason; approver never the author for R and E class |
+| Maker-checker | Mandatory for every value on this page |
+| Point-in-time query | What was key K for scope S at timestamp T, without restore |
+| Mid-session rule | Any change that can turn a compliant client into a non-compliant one takes effect at a boundary |
+| Retention | Eight-year floor, as a book and record |
+| Daily reconciliation | Deployed configuration diffed against the approved register, exceptions reported |
+| Emergency change | Documented break-glass with post-hoc approval inside one business day, logged distinctly |
+
+## 13. Review cadence
+
+| Class | Trigger |
+|---|---|
+| Regulatory | On any circular or regulation change affecting the value |
+| Exchange-set | Continuously by the ingestion job; the *configuration of the job* reviewed quarterly |
+| Discretionary | At least annually, and on any policy change |
+| Certification-gated | At every certification cycle |
+| Protocol versions | On every exchange protocol circular |
+| Rate and collar values | Quarterly against observed rejection and incident data |
+| Kill-switch and bulk-cancel scopes | After every drill |
+
+## Where this connects
+
+- [Environments and configuration baseline](/broking-kyc/finix-broking-setup/stack/environments-config-baseline/) — the convention, the classification and the change-control model
+- [RMS configuration reference](/broking-kyc/finix-broking-setup/rms/09-rms-config-reference/) — the risk-side tunables
+- [Back office configuration reference](/broking-kyc/finix-broking-setup/backoffice/10-backoffice-config-reference/) — the record-side tunables
+- [Compliance configuration baseline](/broking-kyc/finix-broking-setup/compliance/01-compliance-config-baseline/) — the obligation-to-configuration map
+- [Certification, mock trading and go-live](/broking-kyc/finix-broking-setup/setup/10-certification-mock-golive/) — the certification record the gate compares against
+- [Admin workflow](/broking-kyc/operations/admin-workflow/) — the maker-checker model

@@ -1,0 +1,285 @@
+---
+title: "OMS 4: order types catalogue"
+description: Every order type Finix supports or deliberately does not — exchange-native price conditions, the order books they live in, spread and multileg entry, special market types, and the broker-synthetic types built on top — with the exchange and segment support matrix, the types that were discontinued and why, and the certification rule that binds the enabled configuration to what was tested.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** "Order type" is a compound word hiding three independent instructions — what price, for how long, and in what quantity — plus a fourth thing brokers bundle in, the product or margin treatment. Listing order types without separating those produces a catalogue that is wrong at the edges, because the legal combinations differ by exchange and segment. So this page separates the dimensions first, then enumerates the exchange-native types, then the order books that hold them, then the synthetic types the broker builds, and only then gives the support matrix — because the matrix is the thing you configure from, and it only makes sense once the dimensions are distinct. Attributes and validity get their own page because they combine with everything here.
+
+## TL;DR
+
+- **Four independent dimensions**: the price instruction (market, limit, stop-loss variants), the time instruction (day, immediate-or-cancel, good-till-date, good-till-cancelled), the quantity instruction (full, disclosed, minimum fill, all-or-none) and the product or margin treatment the broker applies. A supported "order type" is a legal combination, not an item on a list.
+- **NSE's normal market segregates orders into books by attribute**: the Regular Lot book holds orders with none of all-or-none, minimum fill or stop-loss attached; the Special Terms book holds all-or-none and minimum fill orders, **which are not currently available on the system as per SEBI directives**; the Stop Loss book holds stop-loss orders until the trigger price is reached or surpassed, at which point the order is released into the Regular Lot book.
+- **Stop-loss market orders have been progressively withdrawn.** NSE discontinued SL-M for index and stock options from **27 September 2021** per circular NSE/FAOP/49677, following freak-trade incidents — notably 20 August 2021, when a Nifty call premium moved from about ₹80 to ₹800 in a second and swept resting SL-M orders. BSE discontinued stop-loss market orders from 9 October 2023 on the same reasoning.
+- **Multileg orders with a market price condition for all contracts were discontinued**; such market orders are rejected by the exchange. Multileg orders with a limit price condition remain available for all contracts.
+- **Good-till-cancelled and good-till-date are commodity validities.** They are not available as exchange validities in the equity segments, where long-dated client intent is served by a broker-side Good Till Triggered facility instead.
+- **Bracket and cover orders are largely gone from the Indian market.** Brokers withdrew them from around March 2020 and more decisively after the July 2020 peak-margin framework removed the leverage that made them attractive, and because in volatile markets both legs can fire. Finix does not offer them at launch.
+- **Everything you enable must be certified, and the enabled configuration must equal the certification record.** A type that passes a vendor demonstration but was never certified on that exchange and segment is a compliance defect sitting behind a feature flag.
+
+## Conceptual overview
+
+An exchange's order book is a simple thing: resting intentions sorted by price and then by time. Everything that looks like a sophisticated order type is a mechanism for deciding *when* an intention joins that book and *on what terms it may leave*. A limit order joins immediately at a stated price. A market order joins and leaves in the same instant, taking whatever is there. A stop-loss order does not join the visible book at all until a trigger condition is met, at which point it is released into the regular book and behaves like whatever it was defined to become. Seeing it this way makes the exchange's book structure obvious rather than arbitrary, and it explains why stop-loss orders have their own book and why the trigger is an exchange event rather than a broker one.
+
+The second idea is that the Indian market has been steadily removing order types that convert a price shock into a client loss. A stop-loss market order is, by construction, an instruction to trade at any price once a trigger fires — which is tolerable when the trigger reflects a real move and catastrophic when it reflects a momentary aberration. The freak-trade episodes of 2021 made that concrete, and both main exchanges withdrew the type rather than relying on clients to understand the risk. Limit Price Protection, introduced in the derivatives segment on 31 October 2022, attacks the same problem from the other direction by rejecting limit orders priced far from a reference. The direction of travel is clear and it should shape what a new broker chooses to offer: types whose worst case is unbounded are now the exception, not the default.
+
+The third idea is the division between exchange-native and broker-synthetic. A broker can build almost anything on top of the exchange's primitives — a trailing stop, a basket, a scheduled investment, a long-dated trigger — by holding intent in its own system and converting it into an ordinary exchange order when a condition fires. That flexibility comes with an obligation that is easy to understate: while the intent sits with the broker, the exchange knows nothing about it, so the broker owns the availability, the correctness and the client's expectation entirely. A Good Till Triggered instruction that fails to fire because a broker system was down is a broker problem in a way that an unfilled limit order never is. Section 7 is explicit about which risks each synthetic type creates.
+
+## 1. Regulatory and exchange framework
+
+- **NSE trading system documentation** — the normal market book structure: Regular Lot, Special Terms, Stop Loss and Negotiated Trade books, the odd-lot market, and the classification of order conditions into time-related, price-related and quantity-related. `[not yet in index]`
+- **NSE/FAOP/49677** — discontinuation of stop loss–market orders for index and stock options with effect from 27 September 2021. `[not yet in index]`
+- **BSE notice discontinuing stop loss market orders** with effect from 9 October 2023, to contain damage from freak trades. `[not yet in index]`
+- **NSE Limit Price Protection** — introduced 31 October 2022 in the futures and options segment as a pre-trade risk control; an additional validation over and above the operating price range, based on both sides of a reference price. `[not yet in index]`
+- **NSE Non-NEAT Front End protocol documents, per segment** — spread order entry rules and structure, and the rules and structure of two-leg and three-leg order entry, including the discontinuation of multileg orders with a market price condition for all contracts. `[not yet in index]`
+- **Peak margin framework** — SEBI's intraday peak margin regime from July 2020, phased to August 2021, which removed the leverage underpinning bracket and cover order products. See [margin shortfall and peak margin](/broking-kyc/trading-risk/margin-shortfall-peak-margin/).
+- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025).
+- **Saral MoneyMaker published order features** — basket orders, Good Till Triggered, Stock SIP, single-leg open breakout orders, ratio-based hedging with equity, futures or synthetic instruments, and bulk file upload.
+
+## 2. The four dimensions
+
+| Dimension | Values | Set by | Notes |
+|---|---|---|---|
+| **Price instruction** | Market, Limit, Stop-loss limit, Stop-loss market | Exchange | What price the order will accept |
+| **Time instruction** | Day, Immediate or Cancel, Good Till Date, Good Till Cancelled | Exchange | How long the intention persists |
+| **Quantity instruction** | Full quantity, Disclosed quantity, Minimum Fill, All or None | Exchange | How much of the order the market sees and will accept |
+| **Product treatment** | Delivery, intraday, carry-forward derivatives, margin-funded | **Broker** | Margin treatment and auto-square-off policy — not an exchange concept |
+
+The fourth is the one that causes client confusion, because it is presented alongside the other three in every broker interface. Delivery, intraday and carry-forward are the broker's margin and square-off policy, not an instruction to the exchange. The exchange sees the same limit order regardless. [Order attributes and validity](/broking-kyc/finix-broking-setup/oms/05-order-attributes-validity/) covers the first three in detail; section 8 below covers the fourth.
+
+## 3. Exchange-native price instructions
+
+### 3.1 Market order
+
+| Attribute | Detail |
+|---|---|
+| Behaviour | Executes at the best available price in the market, immediately |
+| Risk | Unbounded execution price in a thin or dislocated book |
+| Protection | Exchange operating price ranges and, in derivatives, Limit Price Protection; broker-side collars as an additional control |
+| Resting | Does not rest; any unexecuted portion behaves per the time instruction |
+| Finix policy | Available in liquid cash-segment instruments; **blocked when the market-data feed is stale**, and subject to a broker collar |
+| Where blocked | Where the exchange does not support it, including multileg orders with a market price condition for all contracts |
+
+### 3.2 Limit order
+
+| Attribute | Detail |
+|---|---|
+| Behaviour | Buy or sell at a specified price or better |
+| Risk | Non-execution, or partial execution |
+| Resting | Rests in the Regular Lot book at its price with time priority |
+| Protection | Subject to the operating price range and, in derivatives, **Limit Price Protection** — an incoming limit order beyond the LPP range is automatically rejected by the exchange |
+| Finix policy | The default and the recommended instruction for every client, in every segment |
+
+### 3.3 Stop-loss limit
+
+| Attribute | Detail |
+|---|---|
+| Behaviour | Held outside the visible book until the trigger price is reached or surpassed, then released into the Regular Lot book as a limit order at the stated limit price |
+| Book | **Stop Loss book** until triggered |
+| Trigger semantics | Exchange-side; the trigger and the limit are two separate prices and the gap between them is the client's protection |
+| Risk | On a gap move, the released limit order may not execute at all — the protection against a bad price is also the risk of no exit |
+| Finix policy | **The supported stop-loss instruction in every segment**, with guidance to clients on setting the trigger-to-limit gap |
+
+<Aside type="tip" title="Teach clients the trigger-to-limit gap">
+A stop-loss limit with the trigger and the limit set to the same price behaves well in an orderly market and fails exactly when it is needed, because a gapping market jumps past both. A gap that is too wide gives away price. This is the single most useful piece of client education a broker can offer about order types, and it is cheap to put in the order ticket rather than in a help article.
+</Aside>
+
+### 3.4 Stop-loss market — largely withdrawn
+
+| Attribute | Detail |
+|---|---|
+| Behaviour | On trigger, released as a market order |
+| **NSE** | **Discontinued for index and stock options from 27 September 2021** per circular NSE/FAOP/49677 |
+| **BSE** | **Discontinued from 9 October 2023** to contain damage from freak trades |
+| Why | Freak trades — on 20 August 2021 a Nifty call premium moved from about ₹80 to ₹800 in a second, sweeping resting stop-loss market orders at absurd prices |
+| Where it may still exist | Confirm current availability per exchange and segment before enabling anything; the direction of travel is withdrawal |
+| Finix policy | **Not offered.** Clients are directed to stop-loss limit, with guidance on approximating market-like behaviour by setting a limit price well beyond the trigger in the exit direction |
+
+## 4. Order books
+
+NSE's normal market segregates orders into books by attribute. Understanding which book an order is in explains its visibility, its priority and when it can trade.
+
+| Book | Holds | Notes |
+|---|---|---|
+| **Regular Lot** | Orders with none of all-or-none, minimum fill or stop-loss attached | The main book; price–time priority |
+| **Special Terms** | Orders with all-or-none or minimum fill attached | **Not currently available on the system as per SEBI directives** |
+| **Stop Loss** | Stop-loss orders, until the trigger price is reached or surpassed; then released into the Regular Lot book | Not visible to the market while resting here |
+| **Negotiated Trade** | Regular lot orders carrying a counterparty identifier | Negotiated trades are permitted only for regular lot orders and **can only be Day orders** |
+| **Odd Lot** | Orders whose size is less than the regular lot size | Traded in the odd-lot market |
+| **Auction** | Auction market orders | See [short delivery and auction](/broking-kyc/deep-dives/trading-day/short-delivery-auction/) |
+| **Spread** | Spread and multileg combination orders | Rules and structure defined in the segment protocol |
+
+<Aside type="note" title="Special Terms is a structural feature, not an available product">
+All-or-none and minimum fill exist in the book structure and in the protocol, but are not available on the system per SEBI directives. That matters for implementation in a specific way: the fields exist, so a defect can populate them, and the result is an order the exchange will reject in a way that is hard to diagnose. Validate these attributes to "absent" explicitly rather than relying on them being unset by default.
+</Aside>
+
+## 5. Spread and multileg orders
+
+| Type | Detail |
+|---|---|
+| Spread order | Entered as a combination; the segment protocol defines the order types, entry rules and structure, with corresponding modification, trade modification and cancellation structures |
+| Two-leg (2L) | Two-leg combination order entry, per the protocol |
+| Three-leg (3L) | Three-leg combination order entry, per the protocol |
+| **Market price condition** | **Multileg orders with a market price condition for all futures and option contracts have been discontinued; market orders received in such a scenario are rejected by the exchange** |
+| Limit price condition | Multileg orders with a limit price condition continue to remain available for all contracts |
+| Margin treatment | Spread positions attract spread margins rather than the sum of outright margins where the clearing corporation recognises the combination; see [collateral and cross-margin](/broking-kyc/trading-risk/collateral-cross-margin/) |
+| Risk | A combination that executes on one leg only is an outright position with a different margin and a different risk profile |
+| Finix policy | Limit-priced spread and multileg orders enabled after certification; market-priced multileg explicitly blocked in validation, so the client receives a clear broker rejection rather than an exchange rejection |
+
+## 6. Special market types
+
+| Type | Purpose | Operational notes |
+|---|---|---|
+| Pre-open | Price discovery before continuous trading | Distinct order entry, modification and cancellation behaviour; see [pre-open operations](/broking-kyc/finix-broking-setup/daily-ops/02-pre-open-ops/) and [pre-open and closing auction](/broking-kyc/deep-dives/foundational/pre-open-closing-auction/) |
+| Closing session | Closing price determination | Separate window with its own rules |
+| Auction market | Settlement of short deliveries | Participation is an operations function, not a client-facing order type; see [short delivery and auction](/broking-kyc/deep-dives/trading-day/short-delivery-auction/) |
+| Odd lot | Quantities below the regular lot | Separate market |
+| Block and bulk deals | Large transactions with disclosure obligations | Separate windows and reporting; see [block and bulk deals](/broking-kyc/deep-dives/trading-day/block-bulk-deals/) |
+| Negotiated trade | Regular lot orders with a counterparty identifier | Day orders only |
+| Securities lending and borrowing | Lending and borrowing of securities | Its own protocol document and order structure; see [SLBM](/broking-kyc/deep-dives/settlement/slbm/) |
+| Commodity tender and delivery | Delivery intention in commodity derivatives | Through MCXCCL eClear until 19:30 on tender days; see [MCX commodity](/broking-kyc/finix-broking-setup/exchanges/04-mcx-commodity/) |
+
+## 7. Broker-synthetic order types
+
+These exist in the broker's system. The exchange sees only the ordinary order the broker sends when the condition fires.
+
+| Type | What the broker holds | What the exchange sees | Risk the broker owns | Finix |
+|---|---|---|---|---|
+| **After Market Order** | A queued instruction outside market hours | A normal order when released | Release timing, queue integrity, correct handling of overnight corporate actions and band changes | **Offered**; equity window and derivatives window differ, see [attributes and validity](/broking-kyc/finix-broking-setup/oms/05-order-attributes-validity/) |
+| **Good Till Triggered** | A long-dated condition and the order to place when it fires | Nothing until it fires | Availability over months, correct trigger evaluation, corporate-action adjustment, margin availability at fire time | **Offered**, a published Saral MoneyMaker feature |
+| **Basket order** | A set of orders submitted together | Individual orders | Partial basket execution, and whether the client understands the basket is not atomic | **Offered**, a published feature |
+| **Stock SIP** | A schedule of periodic purchases | A normal order on each date | Schedule execution, funds availability, failed-instalment handling | **Offered**, a published feature |
+| **Iceberg or sliced order** | A large quantity split into tranches | A sequence of ordinary orders | Slicing logic, cumulative exposure, order-rate consumption, and whether it constitutes algorithmic trading | **Deferred** pending the algorithmic approval position |
+| **Trailing stop-loss** | A stop level that moves with price | A stop-loss order, re-placed as it moves | Continuous evaluation and re-placement; message rate | **Deferred** |
+| **Cover order** | An entry order with a compulsory stop-loss | Two orders | Leg management | **Not offered** |
+| **Bracket order** | An entry with both a target and a stop-loss | Up to three orders | Both legs firing in a volatile market; leg orphaning | **Not offered** |
+| **Single-leg open breakout** | A breakout condition | A normal order on trigger | Trigger correctness | Available in the product; enable after certification |
+| **Ratio-based hedging** | A hedge ratio across equity, futures or synthetic instruments | Multiple orders | Partial execution leaving an unhedged position | Available in the product; enable after certification |
+| **Bulk file upload** | A file of orders | Many ordinary orders | Validation before submission, rate limits, and a mis-keyed file | Available; strict pre-submission validation and a maker-checker gate |
+| **Square-off order** | The firm's own risk instruction | A normal order | Everything — this is the firm acting on the client's position; see [square-off engine](/broking-kyc/finix-broking-setup/rms/06-squareoff-engine/) | **Offered**, risk-identifier only |
+
+<Aside type="caution" title="Why Finix does not offer bracket and cover orders at launch">
+Both were withdrawn across the Indian market from around March 2020, and more decisively after the July 2020 peak-margin framework, for two reasons that both still hold. The regulatory reason is that these products existed largely to package leverage, and the peak-margin regime removed the leverage. The behavioural reason is sharper: in a volatile market both the target and the stop-loss leg can fire, leaving the client with an unintended opposite position, and the broker owns the resulting dispute. Offering them would require a leg-management design, a client-communication design and a dispute position — a substantial build for a product whose economic rationale has already gone. Re-evaluate deliberately if the market re-adopts them, rather than offering them because the OMS can.
+</Aside>
+
+### 7.1 The availability obligation on synthetic types
+
+| Type | If the broker system is unavailable when the condition fires |
+|---|---|
+| Good Till Triggered | The order is never placed. The client believes they had protection |
+| Stock SIP | The instalment is missed |
+| After Market Order | The queue is not released at the open |
+| Trailing stop-loss | The stop stops trailing, silently |
+
+Each of these is a client-facing failure with no exchange record to appeal to, which is why synthetic types belong in the business continuity design and in client communication, not only in the feature list. The firm should be able to state, for each synthetic type, what happens on a missed fire and how the client is told.
+
+## 8. Product treatment
+
+Not an exchange concept. It is the broker's margin and square-off policy, named in the order ticket.
+
+| Treatment | Meaning | Margin | Auto square-off |
+|---|---|---|---|
+| Delivery | Intended to settle; cash segment | Full applicable margin, settled by pay-in | No |
+| Intraday | Intended to close within the session | Exchange-mandated margin under the peak-margin regime; **no leverage beyond the applicable requirement** | Yes, at a published time and on a published trigger |
+| Carry-forward derivatives | Positions held across sessions | Full span-based and exposure margin | Only on shortfall |
+| Margin funded | Funded by the broker under the applicable framework | Per the framework | Per the framework; see [MTF operational](/broking-kyc/deep-dives/settlement/mtf-operational/) |
+
+| Control | Requirement |
+|---|---|
+| Margin truth | The peak-margin regime means intraday is not a leverage product; the margin collected must meet the requirement throughout the day |
+| Auto square-off disclosure | The time and the trigger must be published and must match the risk management policy given to the client |
+| Conversion | Where a client converts intraday to delivery, the margin and funding consequence must be evaluated at conversion, not at placement |
+| Naming | Whatever the labels, the client-facing explanation must say that this is the broker's policy, not an exchange order type |
+
+## 9. Support matrix
+
+`✔` enabled at Finix after certification · `◐` available but deferred · `✖` not available or not offered · `—` not applicable
+
+| Order type | NSE CM | NSE F&O | NSE CD | BSE CM | BSE EQD | MCX COM |
+|---|---|---|---|---|---|---|
+| Limit | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
+| Market | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
+| Stop-loss limit | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
+| Stop-loss market | ✖ | **✖ discontinued for options from 27 Sep 2021** | Confirm | **✖ from 9 Oct 2023** | ✖ | Confirm |
+| Disclosed quantity | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
+| All or None | ✖ not available per SEBI directives | ✖ | ✖ | ✖ | ✖ | ✖ |
+| Minimum Fill | ✖ not available per SEBI directives | ✖ | ✖ | ✖ | ✖ | ✖ |
+| Day validity | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
+| Immediate or Cancel | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
+| Good Till Date | ✖ | ✖ | ✖ | ✖ | ✖ | **✔ commodities** |
+| Good Till Cancelled | ✖ | ✖ | ✖ | ✖ | ✖ | **✔ commodities** |
+| Spread / 2L / 3L, limit priced | — | ✔ | ✔ | — | ✔ | ✔ |
+| Spread / multileg, market priced | — | **✖ discontinued, rejected by the exchange** | ✖ | — | ✖ | Confirm |
+| Negotiated trade | ✔ day only | — | — | ✔ day only | — | — |
+| Odd lot | ✔ | — | — | ✔ | — | — |
+| Auction | Operations only | — | — | Operations only | — | — |
+| After Market Order | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
+| Good Till Triggered | ✔ | ✔ | ◐ | ✔ | ◐ | ◐ |
+| Basket | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
+| Stock SIP | ✔ | — | — | ✔ | — | — |
+| Iceberg / sliced | ◐ | ◐ | ◐ | ◐ | ◐ | ◐ |
+| Trailing stop-loss | ◐ | ◐ | ◐ | ◐ | ◐ | ◐ |
+| Cover order | ✖ | ✖ | ✖ | ✖ | ✖ | ✖ |
+| Bracket order | ✖ | ✖ | ✖ | ✖ | ✖ | ✖ |
+| Bulk file upload | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
+
+<Aside type="caution" title="Treat this matrix as a template, not as truth">
+Every `✔` in this table must be replaced by a certification record before it is enabled, and every "Confirm" must be resolved against the current exchange circular. Order-type availability changes — SL-M was withdrawn on NSE in 2021 and on BSE in 2023, market-priced multileg orders were discontinued, and all-or-none and minimum fill sit in the protocol while being unavailable in practice. A matrix copied from a document is a matrix that will be wrong within a year. Rebuild it from the exchange's current documentation at each certification cycle.
+</Aside>
+
+## 10. Certification and configuration
+
+| Rule | Detail |
+|---|---|
+| Certification equals enablement | The set of order types enabled in configuration must equal the set certified, per exchange and per segment |
+| Automated diff | A scheduled job comparing the enabled set to the certification record, alerting on any difference |
+| New type process | Exchange certification → configuration change under maker-checker → client communication → enable |
+| Client disclosure | Available order types, their behaviour and their risks disclosed to clients; the stop-loss limit gap explained |
+| Validation of unavailable attributes | All-or-none and minimum fill explicitly validated to absent, and market-priced multileg explicitly blocked with a broker-side rejection |
+| Per-channel enablement | A type may be enabled on the dealer terminal and not on mobile; the configuration is per channel as well as per segment |
+
+| Key | Finix default | Class | Failure mode if wrong |
+|---|---|---|---|
+| `finix.oms.ordertype.enabled.<exchange>.<segment>.<channel>` | Per the matrix | Exchange-set, certification-gated | An uncertified type reaching the market |
+| `finix.oms.ordertype.slm_enabled` | False everywhere | Exchange-set | Offering a discontinued type |
+| `finix.oms.ordertype.multileg_market_block` | True | Exchange-set | Exchange rejection the client cannot interpret |
+| `finix.oms.ordertype.aon_mf_validate_absent` | True | Exchange-set | Hard-to-diagnose rejections |
+| `finix.oms.ordertype.market_order_collar_pct.<segment>` | Per segment | Discretionary | Unbounded execution price |
+| `finix.oms.ordertype.market_order_on_stale_data` | Block | Discretionary | Market order priced against a stale book |
+| `finix.oms.gtt.max_days` | Per product policy | Discretionary | Stale long-dated intent |
+| `finix.oms.gtt.corporate_action_action` | Cancel and notify | Discretionary | A trigger evaluated against an unadjusted price |
+| `finix.oms.basket.atomicity` | Non-atomic, disclosed to the client | Discretionary | Client expects all-or-nothing |
+| `finix.oms.bulk_upload.maker_checker` | Required | Discretionary | A mis-keyed file reaching the market |
+
+## 11. Exception paths
+
+| Situation | Response |
+|---|---|
+| Exchange discontinues an order type | Disable immediately on the effective date; notify clients in advance; migrate resting instructions where possible |
+| A client has resting Good Till Triggered instructions on a discontinued type | Convert or cancel with notice; do not let them silently fail |
+| Market-priced multileg order attempted | Broker-side rejection with a clear message; never let it reach the exchange to be rejected there |
+| Corporate action on an instrument with a resting Good Till Triggered instruction | Cancel and notify, rather than adjusting silently; an adjusted trigger the client did not set is worse than a cancelled one |
+| Basket partially executed | Client informed of the executed and unexecuted legs explicitly; do not present a basket as a single outcome |
+| Stock SIP instalment fails on funds | Notify, retry per policy, and record; a silently skipped instalment is a complaint |
+| Enabled type found not in the certification record | Disable immediately and investigate the configuration path that allowed it |
+| Stop-loss limit does not execute on a gap | Explain the mechanism; this is the type working as designed, and client education at order entry is the preventive control |
+| After-market order queue not released at the open | Named incident; clients told promptly; see [incident playbooks](/broking-kyc/finix-broking-setup/daily-ops/07-incident-playbooks/) |
+
+## Practical notes
+
+- **Put the risk in the order ticket, not the help centre.** The trigger-to-limit gap, the non-atomicity of a basket, and the fact that intraday is a broker policy are all best explained at the moment of the decision.
+- **Block unavailable combinations on the broker side.** An exchange rejection is technically correct and operationally useless, because the client sees an error code they cannot act on.
+- **Diff the enabled set against the certification record on a schedule.** It is a two-line job and it catches the defect class that matters most here.
+- **Write down what happens when a synthetic type fails to fire.** The answer is a client communication, and it should exist before the incident.
+- **Re-derive the matrix at every certification cycle.** This catalogue goes stale by exchange circular, not by code change.
+- **Resist offering types because the product supports them.** Every enabled type is a certification, a disclosure, a support burden and a dispute surface.
+
+## Where this connects
+
+- [Order attributes and validity](/broking-kyc/finix-broking-setup/oms/05-order-attributes-validity/) — the time, price and quantity conditions in detail
+- [Order forward path](/broking-kyc/finix-broking-setup/oms/06-order-forward-path/) — where type legality is validated
+- [Order return path](/broking-kyc/finix-broking-setup/oms/07-order-return-path/) — triggers, freezes and rejections
+- [Modification and cancellation](/broking-kyc/finix-broking-setup/oms/08-modify-cancel-rules/) — what may change after placement
+- [Exchange nuances](/broking-kyc/finix-broking-setup/exchanges/) — per-exchange behaviour behind the matrix
+- [Order and risk controls](/broking-kyc/trading-risk/order-risk-controls/) — the regulatory control set
+- [Certification, mock trading and go-live](/broking-kyc/finix-broking-setup/setup/10-certification-mock-golive/) — the certification that gates this matrix

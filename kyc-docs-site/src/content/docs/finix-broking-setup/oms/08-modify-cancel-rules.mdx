@@ -1,0 +1,269 @@
+---
+title: "OMS 8: modification and cancellation"
+description: What may change on a live order and what may not, which changes reset time priority, how margin is re-evaluated on a modification, the race conditions between a modification and a fill, bulk and emergency cancellation, and the controls around one person modifying another's order.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Modification is the operation that most often produces an order state nobody intended, because it is the only operation that races with the market. A client modifies; the order fills in the same instant; both sides have a defensible view of what happened. So the page starts from what can be changed at all, then what each change costs in priority and margin, then the races, each stated as a sequence with a defined correct outcome. Bulk and emergency cancellation come last because they are operational tools with their own authority requirements rather than client features.
+
+## TL;DR
+
+- **Modification is a re-evaluation, not an edit.** A modified order must pass the risk ladder again, because the change may increase the margin requirement or breach a limit that the original did not.
+- **Some changes reset time priority and some do not.** As a general rule a price change, and a quantity increase, lose priority; a quantity decrease typically does not. The exact rule is exchange and segment specific and belongs in the protocol document, not in an assumption.
+- **A modification can be rejected while the original order stays live.** This is the single most misread outcome in order handling: the client believes their change took effect, the market believes the original is working, and both are right about their own view.
+- **Cancellation can be rejected because the order already filled.** Resolve to the true terminal state and tell the client plainly that the fill preceded the cancellation. Showing "cancellation failed" alone reliably generates a complaint.
+- **Modification of a partially filled order affects only the unfilled remainder.** The filled quantity is done; a quantity reduction below the already-filled quantity is not a legal instruction.
+- **Bulk cancellation is an operational capability with its own authority**, used on a risk event, a connectivity incident or a client instruction, and it must be scoped — by client, by instrument, by segment, by identifier — because an unscoped cancel-all is rarely what anyone wanted.
+- **One person modifying another's order is a logged, restricted, exceptional action.** It is legitimate in dealing and in risk, and it should be rare enough that the audit trail is readable.
+
+## Conceptual overview
+
+An order resting in an exchange book is a standing offer, and modifying it is really a negotiation with the clock. The exchange processes messages in sequence, the market moves between a client's decision and the message's arrival, and the result is that any modification has three possible outcomes rather than two: it is applied, it is rejected, or it is overtaken by an event that makes it moot. Designing for two outcomes and treating the third as an error is where most modification defects begin.
+
+The second idea is that a modification reopens the credit question. A client increasing quantity, moving a limit price closer to the market, or changing a stop-loss trigger is asking for something the risk engine has not evaluated. Treating modification as a lightweight operation that only touches the exchange — common, because it feels like an edit — produces a path by which a client can grow a position past their limit one modification at a time. The modification must traverse the ladder, and the margin consequence must be computed on the modified order, not inherited from the original.
+
+The third idea is about priority, which clients do not see and feel acutely. Price–time priority means that a resting order's position in the queue is an asset, and some modifications spend it. Reducing quantity usually preserves it; changing price usually does not. Because the rule is exchange and segment specific, a broker that explains it in general terms will be wrong somewhere, and a broker that does not explain it at all will field complaints from clients who modified an order that was about to execute and watched it go to the back of the queue.
+
+## 1. Framework
+
+- **Segment protocol documents** — the authoritative definitions of modification and cancellation message structures and the priority consequences of each field change, per exchange and segment. Spread orders have their own modification, trade modification and cancellation structures defined in the protocol. `[not yet in index]`
+- **NSE trading system documentation** — order book structure and price–time priority. `[not yet in index]`
+- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — client authorisation and record-keeping obligations around order placement and modification.
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — regulation 16 record retention of not less than eight years applies to modification and cancellation records as much as to orders. `[not yet in index]`
+
+## 2. What may change
+
+| Field | Modifiable | Priority effect | Margin effect |
+|---|---|---|---|
+| Limit price | Yes | **Typically resets** | Recompute; may increase |
+| Quantity, increase | Yes | **Typically resets** | Recompute; increases |
+| Quantity, decrease | Yes | Typically preserved | Recompute; decreases |
+| Disclosed quantity | Yes | Per protocol | Usually none |
+| Trigger price | Yes, while untriggered | Within the Stop Loss book | Recompute if the released order changes |
+| Validity | Per exchange | Per protocol | Usually none |
+| Order type | **No** | — | — |
+| Buy or sell side | **No** | — | — |
+| Instrument | **No** | — | — |
+| Client code | **No** — see section 7 | — | — |
+| Product treatment | Broker-side, before release only | — | Changes margin basis |
+
+| Rule | Detail |
+|---|---|
+| Non-modifiable fields | Cancel and replace; a "modification" that changes side or instrument is a new order and must be treated as one, with all the ladder consequences |
+| Partially filled orders | Only the unfilled remainder may be modified; a quantity reduction below the filled quantity is illegal |
+| Triggered stop-loss orders | Once released into the Regular Lot book, modify as an ordinary order of the released type |
+| Frozen orders | Modification while a freeze is pending is exchange-dependent; default to disallowing it on the broker side rather than discovering the behaviour live |
+| Spread and multileg | Protocol-defined modification structures; leg-level versus combination-level modification differs by exchange |
+
+<Aside type="caution" title="Do not infer priority rules — read the protocol">
+"Price change resets priority, quantity decrease does not" is a good general heuristic and a bad implementation basis. The exact behaviour is defined per exchange and per segment in the protocol document, and it has changed historically. Implement from the document, verify in a mock session with a deliberately constructed queue, and record the verified behaviour per exchange and segment so that client-facing explanations are accurate.
+</Aside>
+
+## 3. The modification path
+
+A modification traverses a ladder parallel to [the forward path](/broking-kyc/finix-broking-setup/oms/06-order-forward-path/).
+
+| # | Step | Note |
+|---|---|---|
+| 1 | Entitlement | Is this actor permitted to modify this order? Own order, or an authorised modification of another's — see section 7 |
+| 2 | Order state check | Is the order in a modifiable state? Not terminal, not unknown, not frozen |
+| 3 | Field legality | Is the field modifiable? Is the new value legal for the type and segment? |
+| 4 | Static validation | New quantity a lot multiple, new price a tick multiple |
+| 5 | Price reasonability | Band, broker collar, Limit Price Protection awareness, trigger direction |
+| 6 | Quantity and value limits | Against the modified values |
+| 7 | **Margin recomputation** | On the modified order against the post-trade position |
+| 8 | Available-limit test | The delta may be positive or negative |
+| 9 | Rate controls | Modification rate counts toward order-to-trade and rate limits |
+| 10 | Release | Modification message sent; state `MODIFY_PENDING` |
+| 11 | Outcome | Confirmed, rejected, or overtaken |
+
+| State | Meaning |
+|---|---|
+| `MODIFY_PENDING` | Modification sent, outcome unknown |
+| `MODIFY_CONFIRMED` | Applied; attributes updated; priority per the protocol |
+| `MODIFY_REJECTED` | **Original order remains live and unchanged** |
+| `MODIFY_MOOT` | The order reached a terminal state before the modification took effect |
+
+## 4. Race conditions
+
+Each stated as a sequence with the correct outcome and the correct client message.
+
+### 4.1 Modification races a fill
+
+| Step | Event |
+|---|---|
+| 1 | Client submits a modification |
+| 2 | Order fills at the exchange before the modification is processed |
+| 3 | Exchange rejects the modification; sends the fill |
+
+**Correct outcome:** the order is filled. **Correct message:** "Your order was filled before the change could be applied." Not "modification failed", which invites the client to believe nothing happened.
+
+### 4.2 Modification races a partial fill
+
+| Step | Event |
+|---|---|
+| 1 | Client reduces quantity from 1,000 to 400 |
+| 2 | 700 fills before the modification is processed |
+| 3 | The requested new quantity is below the already-filled quantity |
+
+**Correct outcome:** exchange-dependent — typically the modification is rejected and the remaining 300 stays live. **Correct message:** state the filled quantity, the remaining quantity, and that the reduction could not be applied. Then let the client act again.
+
+### 4.3 Cancellation races a fill
+
+| Step | Event |
+|---|---|
+| 1 | Client cancels |
+| 2 | Order fills |
+| 3 | Cancellation rejected; fill confirmed |
+
+**Correct outcome:** filled. **Correct message:** "The order was filled before the cancellation could take effect." Resolving the two messages into one honest statement is the whole job here.
+
+### 4.4 Modification races a trigger
+
+| Step | Event |
+|---|---|
+| 1 | Client modifies a stop-loss order's trigger |
+| 2 | The original trigger is reached and the order is released |
+
+**Correct outcome:** the order is live in the Regular Lot book at the original terms. **Correct message:** the stop-loss has triggered; the change could not be applied; here is the live order.
+
+### 4.5 Modification races an exchange cancellation
+
+| Step | Event |
+|---|---|
+| 1 | Client modifies |
+| 2 | Exchange cancels the order — contract change, suspension, session end |
+
+**Correct outcome:** cancelled by the exchange. **Correct message:** names the exchange reason explicitly, so the client does not attribute it to the broker or to their own modification.
+
+### 4.6 Two modifications in flight
+
+| Step | Event |
+|---|---|
+| 1 | Client submits modification A |
+| 2 | Before A's outcome, submits modification B |
+
+**Correct outcome:** the broker should serialise per order — reject B while A is pending, with a clear message — rather than send both and attempt to reason about the outcomes. The exchange may process them in either order, and the resulting state is not predictable from the broker's side.
+
+### 4.7 Square-off races a client modification
+
+| Step | Event |
+|---|---|
+| 1 | Risk initiates square-off for a client |
+| 2 | Client simultaneously modifies an open order in the same instrument |
+
+**Correct outcome:** defined by policy and stated in the risk management policy the client was given. Finix's position: square-off takes precedence; client modification is rejected for the duration of an active square-off on that client, with an explicit message. See [square-off engine](/broking-kyc/finix-broking-setup/rms/06-squareoff-engine/).
+
+<Aside type="note" title="Serialise per order, and say so">
+The single most effective design decision in this section is to allow one in-flight modification or cancellation per order at a time. It costs clients very little — a rejected second attempt they can repeat a moment later — and it removes an entire class of unresolvable states. The alternative, sending everything and reasoning about outcomes afterwards, produces order states that nobody can explain to a client or an inspector.
+</Aside>
+
+## 5. Margin on modification
+
+| Case | Treatment |
+|---|---|
+| Quantity increase | Compute the requirement for the modified order; the incremental amount must be available; reject if not |
+| Quantity decrease | Requirement falls; release the difference **only on confirmation**, not on submission |
+| Price moved toward the market | May increase the requirement in some regimes; recompute rather than assume |
+| Trigger change on an untriggered stop-loss | Recompute what the released order would require |
+| Rejection | Any provisional block released |
+| Partial fill followed by modification | Compute on the remaining quantity plus the position created by the filled part |
+
+The common defect is releasing margin at submission rather than at confirmation. If the modification is rejected, the original order is still live and still requires its original margin, and a premature release creates a window in which the client appears to have capacity they do not have.
+
+## 6. Cancellation
+
+| Aspect | Detail |
+|---|---|
+| Single order | Ordinary path; margin released on confirmation |
+| Already terminal | Cancellation rejected; resolve to the true state and message accordingly |
+| Partially filled | Cancels the remaining quantity only |
+| Stop-loss untriggered | Cancellable while resting in the Stop Loss book |
+| Frozen | Exchange-dependent; default to a broker-side block and an operational path |
+| Broker-held intent | Good Till Triggered instructions, after-market queue entries and Stock SIP schedules are cancelled in the broker's system; there is nothing at the exchange to cancel |
+| Commodity resting orders | Good-till-date and good-till-cancelled orders must be cancellable across days, and the client must be able to see what is resting |
+
+### 6.1 Bulk and emergency cancellation
+
+| Capability | Scope | Authority | Use |
+|---|---|---|---|
+| Cancel all for a client | One client | Dealing or risk, logged | Client instruction, or a risk event |
+| Cancel all for an instrument | One instrument, all clients | Risk | Instrument-level event — suspension, extreme move |
+| Cancel all for an identifier | One dealer or system | Risk or technology | Runaway automation; see the kill switch in [algo, API, DMA and SOR](/broking-kyc/finix-broking-setup/oms/09-algo-api-dma-sor/) |
+| Cancel all for a segment | One exchange and segment | Senior risk authority | Connectivity or market incident |
+| Cancel everything | All | **Senior authority, two-person** | Genuine emergency only |
+
+| Control | Requirement |
+|---|---|
+| Scoping | Always the narrowest scope that addresses the situation |
+| Authority | Defined per scope, with two-person control at the widest |
+| Logging | Who, when, what scope, what reason, and the resulting order list |
+| Client communication | Clients whose orders were cancelled are told, with the reason |
+| Rehearsal | Exercised in a drill, because it is used under pressure |
+| Exchange-side facility | Where the exchange provides a cancel-on-disconnect or similar facility, its behaviour must be understood and configured deliberately — it is a bulk cancellation you did not initiate |
+
+## 7. Modifying another person's order
+
+| Case | Permitted | Controls |
+|---|---|---|
+| Dealer modifies an order they placed for a client | Yes | Normal entitlement; audit trail carries both identities |
+| Dealer modifies an order placed by another dealer for the same client | Restricted | Explicit entitlement, logged distinctly, reviewed |
+| Risk modifies or cancels a client order | Yes, as a risk action | Risk identifier, reason recorded, client informed |
+| Operations modifies an order | **No** | Operations has no order-entry authority |
+| **Client code modification after trade** | Exceptional, controlled, reported | Client code modification post-trade is a regulated, monitored activity subject to exchange limits and penalties; it is an error-correction mechanism and is monitored as a surveillance indicator. See [intraday surveillance](/broking-kyc/finix-broking-setup/rms/07-intraday-surveillance/) |
+
+<Aside type="caution" title="Client code modification is a surveillance red flag, not a convenience">
+Changing the client to which a trade is allocated after execution exists so that a genuine punching error can be fixed. It is also the classic mechanism for shifting profits and losses between accounts, which is why exchanges cap it, monitor it and penalise excess. The firm's controls should mirror that: a hard numeric ceiling, a mandatory reason from a closed list, maker-checker, immediate surveillance alerting, and a monthly review by compliance of every instance. A firm whose modification counts are rising needs to fix its order entry, not raise its ceiling.
+</Aside>
+
+## 8. Configuration reference
+
+| Key | Finix default | Class | Failure mode if wrong |
+|---|---|---|---|
+| `finix.oms.modify.serialise_per_order` | True | Discretionary, strongly recommended | Unresolvable order states |
+| `finix.oms.modify.requires_full_ladder` | True | Discretionary, strongly recommended | Limit growth by repeated modification |
+| `finix.oms.modify.margin_release_on` | Confirmation, not submission | Discretionary, strongly recommended | Phantom capacity |
+| `finix.oms.modify.allowed_fields.<exchange>.<segment>` | Per protocol | Exchange-set | Rejections, or illegal modifications attempted |
+| `finix.oms.modify.priority_reset_map.<exchange>.<segment>` | Per protocol, verified in a mock session | Exchange-set | Wrong client explanation |
+| `finix.oms.modify.block_while_frozen` | True | Discretionary | Undefined exchange behaviour |
+| `finix.oms.modify.block_during_squareoff` | True | Discretionary, disclosed | Client and risk fighting over the same position |
+| `finix.oms.cancel.bulk_scopes` | Client, instrument, identifier, segment, all | Discretionary | Over-broad cancellation |
+| `finix.oms.cancel.bulk_all_requires_two_person` | True | Discretionary, strongly recommended | A single person cancelling the firm's book |
+| `finix.oms.cancel.on_disconnect_behaviour` | Per exchange facility, explicitly configured | Exchange-set | A bulk cancellation nobody expected |
+| `finix.oms.ccm.daily_limit` | Hard ceiling, below the exchange's | Exchange-set and discretionary | Penalty and surveillance exposure |
+| `finix.oms.ccm.reason_required` | Closed list, maker-checker | Discretionary | Unexplained reallocations |
+
+## 9. Exception paths
+
+| Situation | Response |
+|---|---|
+| Modification confirmed but the client disputes the terms | Audit trail with before and after values, timestamps and the actor; this is exactly why every modification writes |
+| Modification outcome never arrives | Treat like an order in `UNKNOWN`: reconcile with the exchange before further action on that order |
+| Second modification attempted while one is pending | Rejected with a clear message; the client can retry |
+| Margin released on submission by a defect | Severity-one defect; quantify the exposure window |
+| Bulk cancellation executed at the wrong scope | Incident; affected clients informed; re-placement is their decision, not the broker's |
+| Exchange cancel-on-disconnect fires unexpectedly | Incident; clients informed; verify the configuration was deliberate |
+| Client code modification ceiling approached | Escalate to compliance before the ceiling, not after; investigate the entry process |
+| Risk and client both acting on the same order | Policy decides; Finix gives precedence to square-off, disclosed in the risk management policy |
+| Spread order modification affects only one leg | Verify against the protocol; an unintended single-leg change creates an outright position |
+
+## Practical notes
+
+- **Serialise modifications per order.** The simplest decision on this page and the one that removes the most ambiguity.
+- **Release margin on confirmation, never on submission.** The failure mode is phantom capacity, which is exactly the capacity a client will use.
+- **Write the race-condition messages before launch.** They are needed under pressure and they are the difference between an explanation and a complaint.
+- **Verify priority behaviour in a mock session with a constructed queue.** Do not take the heuristic on trust, and record what you verified.
+- **Keep bulk cancellation scoped and rehearsed.** It is used at the worst moment by people who are not calm.
+- **Monitor client code modification weekly, not monthly.** It is both an error signal and a conduct signal, and the exchanges watch it too.
+- **Make square-off precedence explicit in the client-facing risk management policy.** Then the behaviour is disclosed rather than discovered.
+
+## Where this connects
+
+- [Order forward path](/broking-kyc/finix-broking-setup/oms/06-order-forward-path/) — the ladder a modification re-traverses
+- [Order return path](/broking-kyc/finix-broking-setup/oms/07-order-return-path/) — modification and cancellation outcomes among the return classes
+- [Order attributes and validity](/broking-kyc/finix-broking-setup/oms/05-order-attributes-validity/) — the fields in play
+- [Square-off engine](/broking-kyc/finix-broking-setup/rms/06-squareoff-engine/) — precedence and bulk action
+- [Algo, API, DMA and SOR](/broking-kyc/finix-broking-setup/oms/09-algo-api-dma-sor/) — the kill switch
+- [Intraday surveillance](/broking-kyc/finix-broking-setup/rms/07-intraday-surveillance/) — client code modification monitoring
+- [Admin workflow](/broking-kyc/operations/admin-workflow/) — maker-checker on exceptional actions

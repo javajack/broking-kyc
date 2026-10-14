@@ -1,0 +1,256 @@
+---
+title: "OMS 6: the order forward path"
+description: Every step an order takes from a client's tap to the exchange's matching engine — the thirteen-rung check ladder in order, what each rung needs and what it rejects, the order state machine, what is written at each hop, the latency attribution, and the conditions under which the path refuses to run at all.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import Diagram from '../../../../components/Diagram.astro';
+
+> **Why this page is structured this way:** The forward path is a sequence, so the page is a sequence. Each rung is given in the order it executes, with what it requires, what it rejects and why it sits where it does — because the ordering is not arbitrary. Cheap deterministic checks come before expensive ones; checks that depend on external state come after the state has been verified fresh; and the release decision is last because everything before it is an input to it. The state machine and the write-points follow, because they are what makes the path auditable, and the page ends with the preconditions under which the path should refuse to run at all.
+
+## TL;DR
+
+- **Thirteen rungs, in a fixed order**, ending in a single release decision. The ordering is a design choice with reasons, and changing it changes both latency and the quality of rejection messages.
+- **Cheap and deterministic first, expensive and stateful last.** Authentication, static validation and order-type legality need no external state and reject the largest share of bad orders. Margin computation and the available-limit test are the expensive rungs and come last.
+- **Every rung writes.** An order that is rejected at rung 3 leaves the same quality of record as one that reaches the exchange, because "why was this rejected" is as much a client question as "why was this released".
+- **The release decision is one component, one moment, one record.** Its inputs — the limit in force, the available balance, the computed margin, the position, the configuration version — are recorded with the decision so that the decision is reconstructible years later.
+- **A timeout at the risk rung rejects.** This is the one default that must be counter-intuitive to anyone optimising for availability, and it should be contractual as well as configured.
+- **The path has preconditions.** Stale risk parameters, an unloaded collateral position, a stale market-data feed, an unreported terminal identifier or an unreconciled session after a break are each sufficient reason for the path to refuse orders in a defined scope rather than run on bad inputs.
+- **Broker-side rejection beats exchange-side rejection** every time, because the broker can say what the client should do differently and an exchange error code cannot.
+
+## Conceptual overview
+
+An order's journey forward is a funnel of increasingly expensive questions. The earliest questions are about the message itself — is this a real user, is this a real instrument, is this combination of attributes even legal here — and they can be answered from static data in microseconds. The middle questions are about the client and the instrument's current status, which require current-day state but not computation. The last questions are about money and risk, and they require both current state and real work: computing a margin requirement, resolving a limit hierarchy, and evaluating the resulting position. Ordering the funnel this way is not only a latency optimisation; it also produces better rejections, because a client told "this instrument is not enabled for your account" at rung 5 gets a more useful answer than one told "insufficient margin" at rung 9 for an order that was never going to be legal.
+
+The second organising idea is that the path must be explicable. Every rejection a client disputes, every order an exchange asks about, and every square-off an arbitrator examines resolves to the question of what the system knew at a particular instant and what it did with it. That is why each rung writes, why the release decision records its inputs rather than just its outcome, and why the configuration version in force is part of the record. A system that can only say "the order was rejected for insufficient margin" cannot defend itself; one that can say "the order was rejected because the computed requirement was X against an available limit of Y, where the limit was set on this date by this person under this policy version" can.
+
+The third idea is preconditions. Most discussion of an order path concerns what happens to an order, but the more consequential design question is when the path should decline to process orders at all. A risk engine computing against yesterday's collateral load will cheerfully release orders all day, and every one of them is wrong in the same direction. A stale market-data feed produces confident price validations against a price nobody can trade at. These failures are silent and systematic, which makes them far more dangerous than loud ones, and the only defence is a set of explicit preconditions that fail closed.
+
+## 1. The path
+
+<Diagram src="/diagrams/finix-02-order-path.svg" label="The thirteen-rung forward path, and the return path it feeds" />
+
+| # | Rung | Needs | Rejects | Why here |
+|---|---|---|---|---|
+| 1 | **Channel entry** | Session, client or dealer identity | Malformed messages, unauthenticated sessions | Nothing can precede identity |
+| 2 | **Authentication and entitlement** | Directory, identifier register, certification register | Expired session, lapsed certification, identifier not enabled for routing, dealer acting outside client scope | Cheap, deterministic, and gates everything |
+| 3 | **Static validation** | Instrument master of the current day | Unknown instrument, suspended instrument, segment not enabled, quantity not a lot multiple, price not a tick multiple | Static data; the largest share of malformed orders |
+| 4 | **Order-type legality** | The [support matrix](/broking-kyc/finix-broking-setup/oms/04-order-types-catalogue/#9-support-matrix) and certification record | Unsupported type, illegal attribute combination, all-or-none or minimum fill populated, market-priced multileg, discontinued stop-loss market | Prevents exchange rejections the client cannot interpret |
+| 5 | **Client-state checks** | Client master | Inactive or closed account, voluntary or regulatory freeze, segment not activated for the client, missing DDPI where required for the action, unresolved screening hit | Client status is current-day state, cheap to read |
+| 6 | **Scrip and product restrictions** | Ban-period list, surveillance measure lists, broker block list | Fresh derivatives positions in a banned underlying, orders breaching a surveillance restriction, instruments the broker has blocked | Instrument-level restrictions before any client computation |
+| 7 | **Price reasonability** | Market data, operating price range, broker collar | Price outside the band, outside the broker collar, market order while the feed is stale | Needs current price; cheap once available |
+| 8 | **Quantity and value limits** | Limit configuration | Order quantity or value above the per-order, per-scrip, per-client, per-branch or per-segment ceiling | Bounded arithmetic before margin computation |
+| 9 | **Margin computation** | Risk parameter file, position, price | — computes, does not reject | The expensive rung; its output feeds rung 10 |
+| 10 | **Available-limit test** | Collateral and balance load, utilised and blocked amounts | Insufficient available limit | The core credit decision |
+| 11 | **Position and concentration** | Position book, open-interest limits, concentration policy | Open-interest limit breach, client concentration breach, positions that would breach a product restriction | Needs the post-trade position, so it follows margin |
+| 12 | **Rate and behaviour controls** | Per-identifier and per-client counters | Rate-limit breach, order-to-trade ratio breach, self-trade prevention | Behavioural, evaluated last before release |
+| 13 | **Release decision** | Everything above | — records and releases, or records the rejection | One component, one moment, one record |
+
+<Aside type="caution" title="Rung 9 does not reject">
+Margin computation produces a number. The rejection, if there is one, belongs at rung 10 where that number is compared to an available limit. Separating them matters for two reasons: the client message can distinguish "this trade requires ₹X" from "you have ₹Y available", which is far more actionable than "insufficient margin"; and the computed requirement is recorded even for orders that are released, which is what makes margin reporting and the shadow-check comparison possible. Collapsing the two rungs is a common simplification and it costs you both.
+</Aside>
+
+## 2. Rung detail
+
+### 2.1 Rungs 1–4: deterministic
+
+| Rung | Checks |
+|---|---|
+| 1 Channel entry | Session established and authenticated; message well-formed; client request reference present for idempotency; timestamp captured at the earliest point |
+| 2 Authentication and entitlement | Two-factor authentication satisfied for internet and wireless channels; identifier active and enabled for routing with a confirmed exchange reporting reference; NISM certification valid for the segment where the actor is a dealer; dealer's client scope includes this client; proprietary and client flow segregation respected |
+| 3 Static validation | Instrument exists in the current-day master; instrument not suspended; exchange and segment enabled for the firm and the channel; quantity a multiple of lot size; price a multiple of tick size; expiry not past; series or contract valid for trading today |
+| 4 Order-type legality | Type enabled for this exchange, segment and channel per the certification record; validity legal; quantity condition legal; trigger present and on the correct side where required; disclosed quantity at or above the minimum proportion; all-or-none and minimum fill absent; multileg price condition legal |
+
+### 2.2 Rungs 5–6: client and instrument status
+
+| Rung | Checks |
+|---|---|
+| 5 Client state | Account active; unique client code registered on this exchange and segment; not under voluntary freeze or a regulatory freeze; segment activated; risk profile permits the product where a suitability rule applies; demat active where the action requires delivery; DDPI or equivalent authority present where the action requires it; no unresolved screening alert blocking activity |
+| 6 Scrip and product restrictions | Underlying not in the ban period for fresh derivatives positions; surveillance measure restrictions applied in their most restrictive known form; broker block list; instrument-specific client restrictions; prohibition lists for employees and connected persons where applicable |
+
+See [intraday surveillance](/broking-kyc/finix-broking-setup/rms/07-intraday-surveillance/) for the employee and connected-person dimension, and [surveillance norms](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/) for the measure frameworks.
+
+### 2.3 Rung 7: price
+
+| Check | Detail |
+|---|---|
+| Market-data freshness | **Per instrument.** If the price for this instrument is stale beyond the threshold, block market orders and price-dependent validation |
+| Operating price range | Reject outside the last-known band; a missed band revision is a staleness incident, not a pass |
+| Broker collar | Percentage from last traded price, per segment and liquidity; blocks rather than widens on stale data |
+| Limit Price Protection awareness | The exchange will apply its own dynamic range in derivatives; display it where available so the rejection is explicable |
+| Trigger relationship | Trigger on the correct side of last traded price; trigger-to-limit relationship sane |
+
+### 2.4 Rung 8: quantity and value limits
+
+| Level | Typical basis |
+|---|---|
+| Per order | A ceiling on a single order's quantity and value |
+| Per scrip, per client | Exposure to one instrument |
+| Per client | Across the segment |
+| Per branch or authorised person | Aggregate of a distribution node |
+| Per dealer identifier | What one person can do in one order and in aggregate |
+| Per segment, firm level | The firm's own exposure |
+| Per channel | API and algorithmic flow bounded separately |
+
+Resolution is most-specific-wins, as set out in [the configuration convention](/broking-kyc/finix-broking-setup/stack/environments-config-baseline/#2-configuration-key-convention), with a global default so resolution always terminates.
+
+### 2.5 Rungs 9–11: the credit decision
+
+| Rung | Detail |
+|---|---|
+| 9 Margin computation | Value-at-risk and extreme loss margin for the entered order in the cash segment; span-based initial margin plus exposure margin in derivatives; delivery margins where applicable in the expiry window; the computation is on the **post-trade** position, not the order in isolation, so that offsets are recognised |
+| 10 Available-limit test | Available = recognised collateral plus clear cash, less utilised margin, less blocked amounts, adjusted by the applicable multiplier for the client group and product; the order is released only within the available exposure limit |
+| 11 Position and concentration | Post-trade position against open-interest limits at client and member level; client concentration policy; product-level position restrictions; hedge offsets recognised only where the clearing corporation recognises them |
+
+Saral's published behaviour matches this shape: on order entry the trading system computes value-at-risk margin and extreme loss margin for the entered order and, within the available exposure limit, allows the order to flow to the exchange — with the available exposure limit updated daily at the server and limits controllable at identifier, client and scrip level.
+
+See [margin engine](/broking-kyc/finix-broking-setup/rms/02-margin-engine/) and [limit framework](/broking-kyc/finix-broking-setup/rms/04-limit-framework/).
+
+### 2.6 Rung 12: behaviour
+
+| Control | Purpose |
+|---|---|
+| Per-identifier and per-client order rate | One actor cannot consume the gateway |
+| Order-to-trade ratio | Excessive order activity relative to trades |
+| Cancel and modify rate | A proxy for runaway automation |
+| Self-trade prevention | Avoid a client trading with themselves |
+| Duplicate detection | Same client reference already seen |
+| Message size and burst | Protocol and capacity protection |
+
+### 2.7 Rung 13: the release decision
+
+| Recorded with the decision | Why |
+|---|---|
+| Decision and reason code | The outcome |
+| Limit in force and its scope resolution | Which limit applied and why |
+| Available amount at the instant | The credit position |
+| Computed margin requirement | The cost of the order |
+| Pre-trade and post-trade position | The risk context |
+| Market price used and its timestamp | Reproducibility |
+| Risk parameter file version | Reproducibility |
+| Configuration version | What policy was in force |
+| Actor and identifier | Attribution |
+| Timestamps | Sequence |
+
+## 3. Order state machine, forward portion
+
+| State | Entered when | Next states |
+|---|---|---|
+| `RECEIVED` | Message accepted at the channel | `VALIDATED`, `REJECTED_BROKER` |
+| `VALIDATED` | Rungs 2–8 passed | `RISK_EVALUATING`, `REJECTED_BROKER` |
+| `RISK_EVALUATING` | At rungs 9–12 | `RELEASED`, `REJECTED_RISK`, `REJECTED_TIMEOUT` |
+| `REJECTED_BROKER` | Any broker rung rejected | Terminal |
+| `REJECTED_RISK` | Risk declined | Terminal |
+| `REJECTED_TIMEOUT` | Risk evaluation timed out | Terminal |
+| `RELEASED` | Sent to the exchange gateway | `SENT` |
+| `SENT` | Written to the exchange session | `ACKNOWLEDGED`, `REJECTED_EXCHANGE`, `UNKNOWN` |
+| `UNKNOWN` | Sent, no response, session broken | `ACKNOWLEDGED`, `REJECTED_EXCHANGE`, `CANCELLED` — **only after reconciliation** |
+| `ACKNOWLEDGED` | Exchange acknowledged | Return-path states |
+| `QUEUED_AMO` | Accepted into the after-market queue | `RECEIVED` at release, or `CANCELLED` |
+| `PENDING_TRIGGER` | Broker-held Good Till Triggered instruction | `RECEIVED` on fire, or `CANCELLED`, `EXPIRED` |
+
+The `UNKNOWN` state is the one that distinguishes a defensible implementation. It must exist, it must be visible to the client, and it must not resolve by assumption. See [OMS architecture](/broking-kyc/finix-broking-setup/oms/01-oms-architecture/#4-session-management-and-recovery).
+
+## 4. Write points
+
+| Point | What is written |
+|---|---|
+| Channel entry | Raw instruction, actor, channel, client reference, timestamp |
+| Each rung | Pass, or the specific failure with a reason code |
+| Release decision | The full input set from section 2.7 |
+| Send | Broker order reference, terminal identifier, exchange session, timestamp |
+| Any exception | Full context, including partial evaluation state |
+
+All retained on the eight-year floor under regulation 16 of the [2026 regulations](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/), joinable on a single identifier.
+
+## 5. Path preconditions
+
+The path refuses to process orders, in the stated scope, unless all of these hold.
+
+| Precondition | Scope of refusal if unmet | Verified at |
+|---|---|---|
+| Instrument master is current-day | Everything | BOD gate |
+| Risk parameter file applied and current | The affected segment | BOD and on each publication |
+| Ban-period list applied and current-day | Fresh derivatives positions in the affected underlyings | BOD gate |
+| Surveillance measure lists applied | The affected instruments | BOD gate |
+| Collateral and balance load has a current as-of timestamp | Everything | BOD gate |
+| Exchange session established and sequence continuous | That exchange and segment | Continuous |
+| Session reconciled after any break | That exchange and segment | On reconnection |
+| Market data fresh for the instrument | Market orders and price-dependent validation for that instrument | Continuous, per instrument |
+| Identifier reported and enabled | That identifier | Continuous |
+| Certification valid for the actor and segment | That actor | Continuous |
+| Audit trail writing successfully | Everything, if sustained failure | Continuous |
+
+<Aside type="note" title="Fail closed, scoped as narrowly as the fact allows">
+The design principle running through this table: refuse, but refuse only what the missing fact actually affects. A stale risk parameter file for one segment should not stop cash trading. A stale price for one instrument should not block the market. Narrow scoping is what makes a fail-closed design operationally acceptable — a system that stops everything for any reason gets configured permissive by the people who have to run it.
+</Aside>
+
+## 6. Latency attribution
+
+| Rungs | Expected share | Notes |
+|---|---|---|
+| 1–4 | Small | In-memory, static data |
+| 5–6 | Small | Current-day state, cached |
+| 7 | Small | Market data lookup |
+| 8 | Small | Limit resolution, cached hierarchy |
+| **9–11** | **The majority** | Margin computation and position evaluation |
+| 12 | Small | Counters |
+| 13 | Small, plus the audit write | The write must not block the send |
+
+| Control | Rule |
+|---|---|
+| Measure per rung | Degradation in one rung is actionable; end-to-end degradation is not |
+| Alert on percentile movement | Not on failure |
+| Budget before adding | A new check costs milliseconds and must be allocated, not absorbed |
+| Audit write asynchronous but guaranteed | Never block the send; never lose the record |
+
+## 7. Channel differences
+
+| Channel | Differences on the path |
+|---|---|
+| Dealer terminal | Dealer acts for a client; rung 2 checks dealer certification and client scope; order attribution carries both identities |
+| Web | Client acts for self; two-factor authentication at rung 2; broker collar typically tighter |
+| Mobile | As web; additional device considerations |
+| API | Per-client rate limits bind at rung 12; client reference idempotency is mandatory; collars typically tighter |
+| Algorithmic | Strategy approval reference checked at rung 2; strategy-level limits at rung 8; kill switch available at every point |
+| Square-off, risk-initiated | Originates inside the firm; rung 5 client checks are informational rather than blocking; **must still pass rungs 3, 4, 6 and 7** — a square-off order in a banned or halted instrument will be rejected by the exchange like any other |
+| Bulk upload | Validated as a set before submission; maker-checker gate; rate-limited release |
+
+The square-off row is operationally important: the risk engine's own orders are ordinary exchange orders and are subject to every exchange constraint. A square-off that cannot execute because the instrument is at a circuit limit is a known and recurring situation, and the [square-off engine](/broking-kyc/finix-broking-setup/rms/06-squareoff-engine/) must have a defined behaviour for it rather than retrying blindly.
+
+## 8. Exception paths
+
+| Situation | Response |
+|---|---|
+| Risk evaluation times out | **Reject.** Never release |
+| Risk component unavailable | Stop order entry; no bypass |
+| Collateral load as-of timestamp is yesterday's | Do not open; this is a BOD abort condition |
+| Risk parameter file missed an intraday publication | Block new derivatives orders in the affected scope |
+| Market data stale for an instrument | Block market orders and price-dependent validation for that instrument |
+| Ban-period list not applied | Block fresh derivatives positions across the affected underlyings |
+| Order released but no exchange acknowledgement | `UNKNOWN`; reconcile before new flow in that segment |
+| Duplicate client reference | Suppress, return the original order's state, alert |
+| Rate limit breached by one client | Throttle that client only; never the gateway |
+| Audit write failing | Alert; stop entry if sustained |
+| Dealer certification lapses mid-session | Identifier deactivated; in-flight orders complete, no new orders |
+| Configuration change mid-session that tightens a limit | New orders evaluated against the new limit; existing positions handled per the [mid-session change rules](/broking-kyc/finix-broking-setup/stack/environments-config-baseline/#51-the-mid-session-change-problem) |
+
+## Practical notes
+
+- **Reject on the broker side wherever the exchange would reject.** The message quality difference is the whole point.
+- **Separate "requires X" from "you have Y".** Clients act on the difference; they cannot act on "insufficient margin".
+- **Record the inputs to the release decision, not just the outcome.** It is the difference between defending a decision and re-deriving it.
+- **Make the preconditions explicit and scope them narrowly.** Fail-closed designs survive only if their failures are proportionate.
+- **Test the square-off path against a halted instrument.** It is a predictable situation and an unprepared system retries into a wall.
+- **Measure every rung separately from day one.** Retro-fitting per-rung timing during a latency incident is miserable.
+- **Keep the ordering stable and documented.** Changing rung order changes rejection messages, which changes client behaviour and support volume.
+
+## Where this connects
+
+- [Order return path](/broking-kyc/finix-broking-setup/oms/07-order-return-path/) — everything that comes back
+- [Pre-trade check ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/) — rungs 6 to 12 from the risk engine's perspective
+- [Margin engine](/broking-kyc/finix-broking-setup/rms/02-margin-engine/) — rung 9 in detail
+- [Limit framework](/broking-kyc/finix-broking-setup/rms/04-limit-framework/) — rungs 8 and 10 in detail
+- [OMS architecture](/broking-kyc/finix-broking-setup/oms/01-oms-architecture/) — the components the path traverses
+- [Order types catalogue](/broking-kyc/finix-broking-setup/oms/04-order-types-catalogue/) and [attributes](/broking-kyc/finix-broking-setup/oms/05-order-attributes-validity/) — what rungs 3 and 4 validate against
+- [BOD runbook](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/) — where the preconditions are established

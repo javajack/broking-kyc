@@ -1,0 +1,277 @@
+---
+title: "OMS 5: order attributes and validity"
+description: The time, price and quantity conditions that combine with every order type — Day, Immediate or Cancel, Good Till Date and Good Till Cancelled, disclosed quantity, minimum fill and all-or-none, trigger prices, the after-market order window, Limit Price Protection and operating price ranges — with the legality matrix and the combinations that silently fail.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** NSE classifies order conditions into three categories — time-related, price-related and quantity-related — and that classification is the right mental model because the three are independent and combine. Most order-entry defects are not wrong order types; they are illegal or unsupported *combinations*, or attributes populated where they should be absent. So the page takes each category in turn, states the behaviour and the exchange-specific availability, then gives the combination legality matrix, then treats the two exchange-side price controls that reject orders the broker's own checks would pass.
+
+## TL;DR
+
+- **Order conditions are time-related, price-related and quantity-related**, and they combine with the price instruction to produce what a client interface calls an "order type".
+- **Day and Immediate or Cancel are the universally available time conditions.** An IOC order must be executed immediately in full or in part, and any unexecuted portion is cancelled immediately.
+- **Good Till Date and Good Till Cancelled are commodity validities.** They are not exchange validities in the equity segments, where long-dated intent is served by the broker's Good Till Triggered facility instead — a different thing with different risk ownership.
+- **Disclosed quantity shows the market only part of the order.** An order of 1,000 with a disclosed quantity of 200 shows 200 at a time. Exchanges impose a minimum disclosed proportion; verify it per segment before enabling.
+- **All or None and Minimum Fill are not available on the system per SEBI directives**, despite existing in the Special Terms book structure and in the protocol. Validate them to absent rather than relying on defaults.
+- **Trigger price is a separate price from the limit price**, and the gap between them is the client's protection and the client's execution risk simultaneously. It is the most misunderstood attribute in retail trading.
+- **Two exchange-side price controls reject orders independently of the broker**: the operating price range, and **Limit Price Protection**, introduced on 31 October 2022 in the futures and options segment, which validates limit prices against a dynamic range on both sides of a reference price, over and above the operating range.
+- **After-market orders are a broker facility with a broker-defined window.** Equity and derivatives windows differ, and the release at the open is the broker's obligation.
+
+## Conceptual overview
+
+The useful way to think about an order's attributes is as a set of constraints on an intention. The price instruction says what prices are acceptable. The time condition says how long the intention survives if it cannot be satisfied now. The quantity condition says how much of it the market may see and how much must be taken at once. Each is an independent axis, and an exchange supports a subset of the full product space — which is why a catalogue of "order types" is always an enumeration of supported combinations rather than of primitives.
+
+The second thing to hold onto is that unavailable is not the same as nonexistent. All-or-none and minimum fill have a book, a protocol representation and a long history, and they are not available per SEBI directives. That combination — present in the wire format, absent in practice — is a specific implementation hazard, because a defect can populate the field and the resulting rejection will be obscure. The defensive design is to validate explicitly that these attributes are absent, so that a broker-side error message appears instead of an exchange-side one.
+
+The third is that price validation now happens twice on the exchange side, and the second layer is dynamic. The operating price range is the familiar band. Limit Price Protection, added to the derivatives segment in 2022, is a further validation based on a reference price with instrument-class-specific ranges that change through the day with market activity. An order can be inside the operating range and still be rejected by LPP. For a broker this means two things: the client-facing explanation of "why was my order rejected" needs both mechanisms in it, and any broker-side price collar should be understood as a third, independent layer rather than a substitute for either.
+
+## 1. Regulatory and exchange framework
+
+- **NSE trading system documentation** — order conditions classified as time-related, price-related and quantity-related; the Regular Lot, Special Terms, Stop Loss and Negotiated Trade books; the statement that all-or-none and minimum fill are not currently available on the system as per SEBI directives. `[not yet in index]`
+- **NSE Limit Price Protection** — introduced 31 October 2022 in the futures and options segment to strengthen pre-trade risk controls against aberrant orders; an additional validation over and above the operating price range, based on both sides of a reference price; incoming limit orders beyond the range are automatically rejected. `[not yet in index]`
+- **NSE/FAOP/49677** — discontinuation of stop-loss market orders for index and stock options from 27 September 2021. `[not yet in index]`
+- **BSE notice** discontinuing stop-loss market orders from 9 October 2023. `[not yet in index]`
+- **Segment protocol documents** — the authoritative field-level definitions of every attribute, per exchange and segment. `[not yet in index]`
+- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025).
+
+## 2. Time-related conditions
+
+### 2.1 Day
+
+| Attribute | Detail |
+|---|---|
+| Behaviour | Valid for the trading day; cancelled by the exchange at end of session if unexecuted |
+| Availability | All exchanges, all segments |
+| Negotiated trades | Negotiated trade orders **can only be Day orders** |
+| Client expectation | The order disappears overnight; clients routinely expect otherwise, which is a support cost |
+| Finix default | The default validity in every segment |
+
+### 2.2 Immediate or Cancel
+
+| Attribute | Detail |
+|---|---|
+| Behaviour | Must be executed immediately in full or in part as soon as the order is released into the market; any unexecuted portion is cancelled immediately |
+| Partial match | Permitted; the unmatched portion is cancelled, not retained |
+| Availability | All exchanges, all segments |
+| Use | Taking liquidity without leaving a resting order; common in algorithmic flow and in square-off sequences |
+| Risk | Partial execution leaving an incomplete position, which matters most in square-off and multileg contexts |
+| Finix policy | Enabled; used by the [square-off engine](/broking-kyc/finix-broking-setup/rms/06-squareoff-engine/) with explicit handling of the unexecuted remainder |
+
+### 2.3 Good Till Date
+
+| Attribute | Detail |
+|---|---|
+| Behaviour | A limit order that, if not filled completely, remains valid in the market until a specified date |
+| Availability | **Applicable for commodities** |
+| Not available | Equity segments |
+| Client-facing substitute in equity | The broker's Good Till Triggered facility, which is a different mechanism with different risk ownership |
+| Operational | A resting order across days must survive corporate actions, contract rolls and margin changes; the firm must know what it has resting every morning |
+
+### 2.4 Good Till Cancelled
+
+| Attribute | Detail |
+|---|---|
+| Behaviour | Remains active until executed or cancelled |
+| Availability | **Applicable for commodities** |
+| Not available | Equity segments |
+| Operational | The same cross-day obligations as Good Till Date, without an end date to bound them; set a broker-side maximum age even where the exchange does not |
+
+<Aside type="caution" title="Do not present Good Till Triggered as Good Till Cancelled">
+In the equity segments a long-dated client instruction is held by the broker, not by the exchange. If the broker's system is unavailable when the condition is met, the order is never placed and there is no exchange record to appeal to. Presenting this as though the exchange were holding a resting order misrepresents where the risk sits. The client-facing wording should make clear that the instruction is held by the broker and acted on when the condition is met. See [order types catalogue](/broking-kyc/finix-broking-setup/oms/04-order-types-catalogue/#71-the-availability-obligation-on-synthetic-types).
+</Aside>
+
+### 2.5 After-market order window
+
+| Attribute | Detail |
+|---|---|
+| Nature | **A broker facility**, not an exchange validity |
+| Typical equity window | From after the close in the afternoon until shortly before the pre-open the next morning |
+| Typical derivatives window | Extending somewhat later into the morning than equity |
+| Release | Queued orders are released to the exchange around the start of the order-entry window |
+| Modification | Modifiable or cancellable by the client before release |
+| Variants | Limit and market after-market orders |
+| Broker obligations | Release at the right time; correct handling of overnight corporate actions, band revisions and margin changes; clear communication if release fails |
+| Finix configuration | Windows configured per exchange and segment, published to clients, and asserted at BOD |
+
+The precise window times are a broker policy within what the exchange permits, and they are published to clients — which makes them a disclosed, discretionary configuration item rather than a technical detail. See [BOD runbook](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/) for the release step and its verification.
+
+## 3. Price-related conditions
+
+### 3.1 The price fields
+
+| Field | Meaning | Required for |
+|---|---|---|
+| Limit price | The worst price acceptable | Limit, stop-loss limit |
+| Trigger price | The price at which a stop-loss order is released into the Regular Lot book | Stop-loss variants |
+| No price | Take the best available | Market |
+
+### 3.2 Trigger price semantics
+
+| Point | Detail |
+|---|---|
+| Release condition | The order is held in the Stop Loss book until the trigger price is reached or surpassed, then released into the Regular Lot book |
+| Direction | For a sell stop-loss the trigger sits below the current price; for a buy stop-loss, above. Reversing this produces an order that triggers immediately or never |
+| Relationship to the limit | They are two separate prices. The gap between them determines whether the released order can execute in a fast market |
+| Validation | The broker should validate the relationship between trigger, limit and last traded price before release, with a clear message |
+| Visibility | A resting stop-loss order is not visible in the market depth |
+
+### 3.3 Operating price range
+
+| Point | Detail |
+|---|---|
+| Nature | The exchange's band around a reference price within which orders are accepted |
+| Effect | Orders outside it are rejected or require special handling |
+| Dynamics | Revised intraday; revisions arrive on the market-data path and must be **applied**, not merely logged |
+| Broker obligation | Reject outside the last-known band with a clear message, and treat a missed revision as a staleness incident |
+
+### 3.4 Limit Price Protection
+
+| Point | Detail |
+|---|---|
+| Introduced | **31 October 2022**, in the futures and options segment |
+| Purpose | Strengthen pre-trade risk controls to prevent aberrant orders and ensure orderly trading |
+| Mechanism | An additional validation **over and above** the operating price range; the LPP range is based on both sides of a reference price and validates the price of limit orders |
+| Rejection | An incoming limit order beyond the LPP range is **automatically rejected by the exchange** — a buy priced above the high LPP limit, or a sell priced below the low LPP limit |
+| Dynamics | **The range is dynamic and may change through the day based on market activity** |
+| Published ranges by instrument class | Index and stock options with a reference price of ₹50 or below: an absolute range of ±₹20. Options above ₹50: ±40 percent of the reference price. Index futures with a reference price of ₹10,000 or below: ±₹200 absolute; above ₹10,000: ±2 percent. Stock futures at ₹50 or below: ±₹1.50 absolute; above ₹50: ±3 percent. |
+
+<Aside type="note" title="Three independent price gates, and the client sees one rejection">
+A derivatives limit order has to survive the broker's own collar, the operating price range and Limit Price Protection. They have different bases and different dynamics, and a rejection from any of them looks the same to a client staring at an order ticket. The practical consequences are: map exchange rejection codes to distinct, intelligible client messages rather than passing through a code; show the applicable range in the ticket where feasible; and never set a broker collar so wide that it is decorative, or so narrow that it duplicates the exchange's job badly.
+</Aside>
+
+### 3.5 Broker-side price collar
+
+| Point | Detail |
+|---|---|
+| Nature | A discretionary broker control, additional to both exchange mechanisms |
+| Purpose | Catch fat-finger errors before they reach the exchange, and bound market orders |
+| Basis | A percentage from last traded price, with per-segment and per-liquidity tuning |
+| Behaviour on stale market data | **Block rather than widen**; a collar computed from a stale reference is worse than no collar |
+| Override | Where an override exists it must be per-order, logged, and restricted to a role that does not place the order |
+
+## 4. Quantity-related conditions
+
+### 4.1 Disclosed quantity
+
+| Point | Detail |
+|---|---|
+| Behaviour | Allows the member to disclose only part of the order quantity to the market — an order of 1,000 with a disclosed quantity of 200 shows 200 at a time |
+| Purpose | Reduce market impact of a large order |
+| Minimum proportion | Exchanges impose a minimum disclosed proportion of the total; **verify the current requirement per exchange and segment** |
+| Priority effect | Each refreshed tranche takes fresh time priority; this is the cost of using it |
+| Availability | Widely available across exchanges and segments |
+| Finix policy | Enabled, with validation of the minimum proportion before submission |
+
+### 4.2 Minimum Fill
+
+| Point | Detail |
+|---|---|
+| Behaviour | The order must achieve at least a stated minimum quantity |
+| Book | Special Terms book |
+| Availability | **Not currently available on the system as per SEBI directives** |
+| Implementation | Validate explicitly to absent |
+
+### 4.3 All or None
+
+| Point | Detail |
+|---|---|
+| Behaviour | The order must be executed in its entirety or not at all |
+| Book | Special Terms book |
+| Availability | **Not currently available on the system as per SEBI directives** |
+| Implementation | Validate explicitly to absent |
+
+### 4.4 Quantity and value freezes
+
+| Point | Detail |
+|---|---|
+| Nature | Exchange limits above which an order is not accepted directly but goes into a freeze for approval |
+| Effect | The order is neither rejected nor live; it is pending, and the client experience is unlike anything else |
+| Broker obligation | Represent the freeze state distinctly in the order book and to the client; do not show it as live, and do not show it as rejected |
+| Operational | Freeze approval is an exchange process with its own timing; see [order return path](/broking-kyc/finix-broking-setup/oms/07-order-return-path/) |
+
+### 4.5 Lot size and tick size
+
+| Point | Detail |
+|---|---|
+| Lot size | Derivatives quantities must be in multiples of the contract lot size; lot sizes change by circular |
+| Tick size | Prices must be in multiples of the tick size, which varies by instrument and price band |
+| Source | The daily instrument master; a stale master produces rejections that look like client errors |
+| Finix policy | Validate both before submission with a clear message naming the required multiple |
+
+## 5. Combination legality
+
+`✔` legal and enabled · `✖` not available · `—` not applicable to that price instruction
+
+| Price instruction | Day | IOC | GTD | GTC | Disclosed qty | Min fill | AON | Trigger price |
+|---|---|---|---|---|---|---|---|---|
+| Limit | ✔ | ✔ | commodities only | commodities only | ✔ | ✖ | ✖ | — |
+| Market | ✔ | ✔ | ✖ | ✖ | ✖ | ✖ | ✖ | — |
+| Stop-loss limit | ✔ | ✔ | commodities only | commodities only | ✔ | ✖ | ✖ | **required** |
+| Stop-loss market | discontinued on NSE options from 27 Sep 2021 and on BSE from 9 Oct 2023 | — | — | — | — | — | — | — |
+| Multileg, limit priced | ✔ | ✔ | — | — | Confirm | ✖ | ✖ | — |
+| Multileg, market priced | **✖ discontinued; rejected by the exchange** | ✖ | ✖ | ✖ | ✖ | ✖ | ✖ | — |
+| Negotiated trade | **Day only** | ✖ | ✖ | ✖ | — | — | — | — |
+
+| Validation rule | Behaviour |
+|---|---|
+| Illegal combination | Broker-side rejection with a specific message, before the exchange sees it |
+| Attribute unavailable on this exchange or segment | Broker-side rejection naming the segment |
+| Trigger missing on a stop-loss order | Broker-side rejection |
+| Trigger on the wrong side of last traded price | Broker-side rejection with an explanation of the direction rule |
+| Disclosed quantity below the minimum proportion | Broker-side rejection naming the minimum |
+| Quantity not a multiple of the lot size | Broker-side rejection naming the lot size |
+| Price not a multiple of the tick size | Broker-side rejection naming the tick |
+| All-or-none or minimum fill populated | Broker-side rejection; treat as a defect and alert engineering |
+
+## 6. Configuration reference
+
+| Key | Finix default | Class | Failure mode if wrong |
+|---|---|---|---|
+| `finix.oms.validity.enabled.<exchange>.<segment>` | Day, IOC everywhere; GTD and GTC commodities only | Exchange-set | Offering an unavailable validity |
+| `finix.oms.attr.disclosed_qty_min_pct.<exchange>.<segment>` | Per exchange requirement | Exchange-set | Rejection, or an undisclosed large order |
+| `finix.oms.attr.aon_mf_block` | True | Exchange-set | Obscure exchange rejections |
+| `finix.oms.price.collar_pct.<segment>` | Per segment | Discretionary | Fat-finger orders reaching the market |
+| `finix.oms.price.collar_on_stale_data` | Block | Discretionary | A collar computed from a stale reference |
+| `finix.oms.price.collar_override_role` | Restricted, per-order, logged | Discretionary | Routine overriding, which defeats the control |
+| `finix.oms.price.lpp_awareness` | Display the applicable range where available | Discretionary | Unexplainable client rejections |
+| `finix.oms.price.band_revision_apply` | Apply immediately on receipt | Exchange-set | Orders validated against a superseded band |
+| `finix.oms.amo.window_open.<exchange>.<segment>` | Per published policy | Discretionary, disclosed | Client expectation breach |
+| `finix.oms.amo.window_close.<exchange>.<segment>` | Per published policy | Discretionary, disclosed | Orders accepted too late to release |
+| `finix.oms.amo.release_time.<exchange>.<segment>` | Per exchange order-entry open | Exchange-set | Queue released late, or into a closed session |
+| `finix.oms.amo.release_failure_action` | Alert, notify clients, do not retry blindly | Discretionary | Silent non-release |
+| `finix.oms.trigger.direction_validation` | Enforced | Discretionary | Orders that trigger instantly or never |
+| `finix.oms.master.lot_tick_source` | Daily instrument master, current day asserted | Exchange-set | Rejections that look like client errors |
+
+## 7. Exception paths
+
+| Situation | Response |
+|---|---|
+| Exchange revises the operating price range intraday | Apply immediately; re-validate pending client intent where the broker holds it |
+| Limit Price Protection rejects an order inside the operating range | Explain the mechanism in the client message; this is correct exchange behaviour, not a defect |
+| LPP range changes while a client is composing an order | Re-validate at submission, not at ticket open |
+| Disclosed quantity rejected on minimum proportion | Broker-side validation should have caught it; treat a pass-through to the exchange as a defect |
+| Lot size changes by circular | Instrument master refresh at BOD; resting broker-held intent re-validated |
+| Freeze triggered on quantity or value | Represent as pending, inform the client, follow the exchange approval process; never present as live |
+| Good Till Date order resting across a corporate action in commodities | Review resting orders at each corporate action; cancel and notify where the basis has changed |
+| After-market order window straddles a holiday | Window configuration must be calendar-aware; a release into a closed session is an incident |
+| All-or-none or minimum fill populated by a defect | Block, alert engineering, and treat as a release defect rather than a client error |
+
+## Practical notes
+
+- **Validate on the broker side for everything the exchange would reject.** The client can act on "disclosed quantity must be at least X" and cannot act on an exchange error code.
+- **Re-validate at submission, not at ticket open.** Bands and Limit Price Protection ranges move during the seconds a client spends typing.
+- **Show the applicable price range in the ticket where you can.** It converts a mysterious rejection into an obvious one.
+- **Set a maximum age on commodity good-till-cancelled orders even though the exchange does not.** Resting orders that nobody remembers placing are a client-complaint generator.
+- **Make the after-market window calendar-aware.** Holiday boundaries are where release logic fails.
+- **Treat an all-or-none or minimum fill field appearing in an outbound message as a severity-one defect.** It means the order construction path is not doing what you think.
+- **Explain the trigger-to-limit gap at the point of entry.** It is the single highest-value piece of order-type education.
+
+## Where this connects
+
+- [Order types catalogue](/broking-kyc/finix-broking-setup/oms/04-order-types-catalogue/) — the price instructions these attributes combine with
+- [Order forward path](/broking-kyc/finix-broking-setup/oms/06-order-forward-path/) — where each validation sits in the ladder
+- [Order return path](/broking-kyc/finix-broking-setup/oms/07-order-return-path/) — triggers, freezes and rejection handling
+- [Modification and cancellation](/broking-kyc/finix-broking-setup/oms/08-modify-cancel-rules/) — which attributes may change after placement
+- [Bands, halts and surveillance](/broking-kyc/finix-broking-setup/exchanges/07-bands-halts-surveillance/) — the band mechanisms in depth
+- [Order and risk controls](/broking-kyc/trading-risk/order-risk-controls/) — the regulatory control set

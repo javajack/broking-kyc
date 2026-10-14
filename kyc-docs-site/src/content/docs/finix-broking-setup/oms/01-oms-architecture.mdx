@@ -1,0 +1,222 @@
+---
+title: "OMS 1: architecture"
+description: The Saral MoneyMaker order management architecture as deployed at Finix — components and their boundaries, the single release point rule, who owns which piece of order state, the latency budget hop by hop, session and recovery design, the audit trail, and the failure modes of each component.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import Diagram from '../../../../components/Diagram.astro';
+
+> **Why this page is structured this way:** An order management system is a state machine with network boundaries in awkward places. The important design properties are therefore about ownership and timing, not features: exactly one component may decide to release an order, exactly one component may hold the authoritative order state, and the total time from client action to exchange acknowledgement has to fit in a budget that the firm chooses rather than discovers. So the page defines the components, then the two ownership rules, then the latency budget, then what happens when each component fails — because the failure behaviour is the part that distinguishes a system that degrades from one that misleads.
+
+## TL;DR
+
+- **Four Saral front ends, one order path.** Money Maker Client Solo as the dealer terminal, Money Maker Browser for web, Money Maker Handy for mobile, and programmatic access — all converging on a single order acceptance and release path. Divergent paths are the failure mode this architecture exists to prevent.
+- **Exactly one release point.** Saral RMS makes the release decision for every order from every channel. If any channel can reach an exchange gateway without passing it, the control does not exist, whatever the policy says. This is an architectural property to be proved, not a configuration to be set.
+- **The OMS owns order state; the RMS owns the margin number; the back office owns the ledger.** None of the three may be duplicated. Everything else in the stack may be shadowed or cross-checked.
+- **Saral computes margin before release.** The published behaviour is that on order entry the system computes value-at-risk margin and extreme loss margin for the entered order and allows it to flow to the exchange within the available exposure limit, with limits controllable at identifier, client and scrip level and available exposure updated daily at the server.
+- **Risk evaluation timeout must reject, never release.** A timeout is the one failure where the safe default is counter-intuitive to an engineer optimising for availability, and it must be contractual as well as configured.
+- **The latency budget is a design input.** Decide the total, allocate it per hop, measure each hop separately, and alert on percentile degradation rather than on failure — degradation precedes failure and is the only useful warning.
+- **State recovery after a session break is the hardest normal-operation problem.** The firm must reconcile against the exchange before accepting new flow in that segment, and the client must never be shown an assumed outcome for an order whose fate is unknown.
+
+## Conceptual overview
+
+The architecture of an order path is dominated by one asymmetry: sending is fast and irreversible, while finding out what happened can be slow and ambiguous. A message leaves the firm in microseconds and cannot be recalled. The acknowledgement may arrive in milliseconds, or may not arrive at all because the session dropped in between — and in that case the firm genuinely does not know whether the exchange has the order. Everything in the design that looks like paranoia is a response to that asymmetry: idempotent references, sequence tracking, mandatory reconciliation before resuming, and a client-facing state that can say "unknown" rather than guessing.
+
+The second dominant idea is single ownership. It is tempting, in a stack with a capable middleware layer and a capable risk layer, to let both participate in the release decision — the middleware doing a fast pre-filter, the risk engine doing the full computation. The result is a system where no single component can answer the question an inspector will ask, which is why a specific historical order was or was not released. The [vendor map](/broking-kyc/finix-broking-setup/stack/vendor-map/#31-real-time-risk-checks-saral-rms-or-secmark-middleware) resolves this in favour of Saral RMS and moves SecMark's independent computation off the path as a shadow check. That is a deliberate trade of a real control for a real property, and the reasoning should be written down because someone will propose reversing it.
+
+The third idea is that the order path's job includes producing evidence. Every order, modification, cancellation, rejection and fill is a record that must survive for the statutory retention period, with a timestamp that can be defended. That means the audit trail is not instrumentation bolted on for debugging; it is a primary output of the system, with the same reliability requirements as the order itself. A design that can lose a log line under load is a design that can lose the answer to a client dispute.
+
+## 1. Components
+
+<Diagram src="/diagrams/finix-02-order-path.svg" label="Finix order path — forward path through the check ladder, and the return path with every message class" />
+
+| # | Component | Product | Responsibility | Does not do |
+|---|---|---|---|---|
+| C1 | Dealer terminal | Saral Money Maker Client Solo | Dealer order entry across NSE, BSE, MCX and NCDEX in one application; charting; exposure and net obligation views | Hold authoritative state |
+| C2 | Web front end | Saral Money Maker Browser | Client order entry, market analysis, order management and reporting | Hold authoritative state |
+| C3 | Mobile front end | Saral Money Maker Handy | Client order entry across exchanges and segments | Hold authoritative state |
+| C4 | Programmatic access | Saral API surface | Order entry for approved API and algorithmic clients | Bypass risk |
+| C5 | Algorithmic module | Saral Money Maker Challenge, with Auto Trader and the modelling module | Exchange-approved algorithm execution with risk-limiting safeguards | Operate without approval |
+| C6 | Order acceptance | Saral OMS | Validation, enrichment, order identifier assignment, sequencing | Decide release |
+| C7 | **Risk and release** | Saral RMS | **The single release decision**, margin computation at order time, limit enforcement at identifier, client and scrip level | Route orders |
+| C8 | Exchange gateway, NSE | Saral, over CTCL with Non-NEAT Front End, optionally via the Trading Access Point | Session management, protocol encoding, sequencing | Re-evaluate risk |
+| C9 | Exchange gateway, BSE | Saral, over BSE Open Message Bus, **one IML instance per segment** | As above, per segment | As above |
+| C10 | Exchange gateway, MCX | Saral, over the MCX member protocol | As above | As above |
+| C11 | Market data | Exchange multicast into Saral, with a separate store for non-trading use | Prices, depth, open interest, band revisions | Serve as a valuation record of history |
+| C12 | Order state store | Saral OMS | Authoritative order and position state for the session | Serve as the ledger |
+| C13 | Audit trail | Saral, replicated to the firm's log store | Immutable record of every order event with timestamps | — |
+| C14 | Downstream event feed | Saral to SecMark middleware | Order and trade events for lifecycle and reconciliation | Block the order path |
+| C15 | Shadow risk check | SecMark middleware, off-path | Independent margin computation on a sampled basis, compared for divergence | Veto anything |
+
+## 2. The two ownership rules
+
+### 2.1 Single release point
+
+| Statement | Implication |
+|---|---|
+| Every order from every channel passes C7 before reaching C8, C9 or C10 | No channel-specific fast path, no dealer override that skips risk, no API shortcut |
+| C7's decision is recorded with its inputs | The reason an order was released is reconstructible years later |
+| C7's unavailability stops order entry | It does not open a bypass |
+| C7's timeout rejects | Explicitly configured, contractually required, and tested |
+| Proof is architectural, not procedural | There must be no network path from a front end to a gateway that omits C7 |
+
+<Aside type="caution" title="Prove the absence of a bypass; do not assert it">
+This is testable. Attempt to reach each exchange gateway from each front end with the risk component stopped, and confirm that nothing reaches the exchange. Repeat for the API surface and the algorithmic module, which are the two most likely places for a bypass to exist by accident. Make this a standing test in the release pipeline, because a bypass introduced by a well-meaning performance change is exactly the kind of defect that survives code review.
+</Aside>
+
+### 2.2 State ownership
+
+| State | Owner | Why not elsewhere |
+|---|---|---|
+| Order and its status | C12, Saral OMS | Two order books means two answers to "is this live", and the exchange agrees with only one |
+| Position, intraday | C12 with C7 | Risk decisions need the same position the order book implies |
+| Margin requirement at order time | C7, Saral RMS | Two numbers means release on the lower and report on the higher |
+| Available limit | C7 | Derived from the balance load and intraday events |
+| Client ledger of record | SecMark back office | Intraday risk views are working numbers, not the ledger |
+| Trade of record | Exchange trade file, into SecMark | The OMS feed is real time; the file is authoritative |
+| Holdings of record | Depository, into SecMark | The depository is ownership |
+
+The general pattern: **the fast copy is for decisions, the authoritative copy is for records, and the two are reconciled rather than merged.** The reconciliation points are interfaces RE-1 and RE-2 in the [integration contract matrix](/broking-kyc/finix-broking-setup/stack/integration-contract-matrix/#6-record-path).
+
+## 3. Latency budget
+
+Finix sets a total budget and allocates it, rather than measuring what happens and calling it the budget. Figures are illustrative targets for a retail and HNI broker without colocation, not vendor commitments.
+
+| Hop | Allocation | Measured as | Degradation alert |
+|---|---|---|---|
+| Front end to order acceptance | Network-dependent | Client-perceived submission to acknowledgement | 95th percentile over target |
+| Order acceptance validation and enrichment | Low single-digit milliseconds | Internal | 99th percentile |
+| **Risk evaluation** | Single-digit milliseconds | Internal, per decision | 99th percentile, plus timeout count |
+| Gateway encoding and send | Sub-millisecond | Internal | 99th percentile |
+| Exchange round trip | Exchange and link dependent | Send to acknowledgement | 95th and 99th percentile per segment |
+| Acknowledgement to client visibility | Low milliseconds | Internal | 95th percentile |
+| **Total, client action to client-visible acknowledgement** | A stated target | End to end | Breach of target at the 95th percentile |
+
+| Budget discipline | Rule |
+|---|---|
+| Nothing is added to the path without a budget allocation | A new check costs milliseconds; the question is which hop gives them up |
+| Asynchronous work never sits on the path | C14 and C15 are off-path by design |
+| Logging is on the path but must be non-blocking | An audit write that can block is a latency and availability risk |
+| Measure per hop, not just end to end | End-to-end degradation without per-hop attribution is unactionable |
+| Alert on percentile movement, not on failure | Degradation is the only early warning you get |
+
+## 4. Session management and recovery
+
+| Aspect | Design |
+|---|---|
+| Session establishment | Per exchange and, on BSE, per segment instance; at BOD, before the market opens |
+| Heartbeat | Per protocol requirement, monitored with an alert on miss |
+| Sequence tracking | Continuous; a gap is an incident, not a warning |
+| Reconnection | Automatic with bounded attempts, then human escalation |
+| **State on reconnection** | Reconcile against the exchange before accepting new flow in that segment |
+| Unknown-fate orders | Marked unknown, surfaced to dealing and risk, never assumed either way |
+| Client-visible state | An order whose fate is unknown is shown as unknown; the client is never shown a guess |
+| Duplicate suppression | Broker order reference used to detect a resend that the exchange already has |
+| Resumption gate | New order entry in a segment resumes only after reconciliation completes |
+
+<Aside type="caution" title="The most expensive mistake is optimistic resumption">
+After a session break the tempting behaviour is to reconnect and carry on, because the alternative is visible downtime. The risk is that the exchange holds orders the firm does not know about — which means positions the risk engine is not accounting for and square-off decisions made on a false book. Reconciling first costs minutes of unavailability in a segment. Not reconciling costs an unquantified exposure that surfaces at end of day. [Incident playbooks](/broking-kyc/finix-broking-setup/daily-ops/07-incident-playbooks/) treats session recovery as a named incident with a mandatory reconciliation step.
+</Aside>
+
+## 5. Audit trail
+
+| Event | Captured | Retention |
+|---|---|---|
+| Order received at the front end | Channel, user or client identifier, raw instruction, timestamp | Eight-year floor |
+| Validation outcome | Pass, or the specific failure | Eight-year floor |
+| Risk decision | Decision, reason code, and the inputs: limit, available, margin computed, position | Eight-year floor |
+| Order sent to exchange | Exchange order reference, broker reference, terminal identifier, timestamp | Eight-year floor |
+| Exchange acknowledgement | Exchange order identifier, timestamp | Eight-year floor |
+| Rejection | Source, code, text | Eight-year floor |
+| Modification and cancellation | Before and after values, outcome | Eight-year floor |
+| Fill | Quantity, price, trade identifier, timestamp | Eight-year floor |
+| Exchange-initiated events | Freeze, cancellation, unsolicited messages | Eight-year floor |
+| Algorithmic orders | Strategy identifier and approval reference in addition to the above | Eight-year floor |
+| Configuration in force | Reference to the configuration version at the time of the decision | Eight-year floor |
+
+| Property | Requirement |
+|---|---|
+| Immutability | Append-only; no edit path, not even administrative |
+| Timestamps | From a synchronised clock, with the synchronisation itself evidenced |
+| Completeness | Reconciled against exchange-side counts daily |
+| Replication | To a store that survives the loss of the primary site |
+| Retrieval | Tested — a record you cannot produce in year seven is a record you do not have |
+| Linkage | Order, risk decision and configuration version joinable by a single identifier |
+
+The last row is the one that matters in a dispute. Being able to say "this order was released because the limit was X, the available was Y, the computed margin was Z, under configuration version V" is a complete answer. Having the pieces in four systems with no join key is not.
+
+## 6. Component failure behaviour
+
+| Component fails | Behaviour | Client sees | Rationale |
+|---|---|---|---|
+| A front end | That channel unavailable; other channels unaffected | Channel-specific error | Channel isolation |
+| Order acceptance | No new orders anywhere; existing exchange orders unaffected and still live | Clear unavailability message | Existing orders at the exchange remain the client's risk and must be visible |
+| **Risk and release** | No new orders; **no bypass** | Unavailability | The control is the point |
+| Risk evaluation timeout, individual order | **Reject** that order | Rejection with a reason | Never release on an unevaluated order |
+| One exchange gateway | That exchange and segment stops; others continue | Segment-specific unavailability | Blast-radius containment |
+| Market data feed down | Block market orders and risk decisions dependent on last traded price in scope | Explicit explanation | A price-dependent decision without a price is a guess |
+| **Market data stale, undetected** | The dangerous case; per-instrument staleness detection is mandatory | — | See the [contract matrix](/broking-kyc/finix-broking-setup/stack/integration-contract-matrix/#2-order-path--the-real-time-band) |
+| Order state store | Stop everything and reconcile from the exchange | Unavailability | Operating without authoritative state is worse than being down |
+| Audit trail write failure | Alert immediately; a sustained failure stops order entry | Unavailability if sustained | Trading without an audit trail is indefensible |
+| Downstream event feed | Queue, with an age alert; order path unaffected | Nothing | Off-path by design |
+| Shadow risk check | Alert; order path unaffected | Nothing | It has no veto |
+| Algorithmic module | That module's flow stops; kill switch available | Strategy-level message | Containment |
+
+## 7. Multi-exchange and multi-segment design
+
+| Concern | Design |
+|---|---|
+| Instrument identity | Single instrument master, exchange-sourced, same version to every consumer on the same day |
+| Session independence | A failure in one exchange or segment must not affect another |
+| BSE per-segment instances | Three instances, monitored and failed over independently, with three runbooks |
+| Order routing | Explicit per order; no implicit cross-exchange routing without smart order routing approval |
+| Position aggregation | Per client across exchanges for risk, while obligations remain segment-wise |
+| Margin | Segment-specific regimes, aggregated only where cross-margin is actually recognised; see [collateral and cross-margin](/broking-kyc/trading-risk/collateral-cross-margin/) |
+| Session hours | MCX to 23:30, or 23:55 in United States daylight saving, while equity is closed — the system must support a partially open estate cleanly |
+| Calendars | Per exchange and segment, refreshed; a hard-coded calendar eventually trades on a closed day |
+
+## 8. Configuration touchpoints
+
+Full list at the [OMS configuration reference](/broking-kyc/finix-broking-setup/oms/10-oms-config-reference/).
+
+| Key | Finix default | Class | Failure mode if wrong |
+|---|---|---|---|
+| `finix.oms.risk.timeout_action` | Reject | Regulatory in substance | An unevaluated order reaching the market |
+| `finix.oms.risk.timeout_ms` | Single-digit milliseconds | Discretionary | Too low causes false rejections; too high inflates the budget |
+| `finix.oms.session.resume_requires_recon` | True | Discretionary, strongly recommended | Trading on an unknown book |
+| `finix.oms.marketdata.staleness_ms.<segment>` | Per segment | Discretionary | Decisions on a stale price |
+| `finix.oms.marketdata.stale_action` | Block price-dependent decisions in scope | Discretionary | Silent wrong decisions |
+| `finix.oms.audit.write_failure_action` | Alert, stop entry if sustained | Regulatory in substance | Trading without a record |
+| `finix.oms.gateway.instance.<exchange>.<segment>` | Per exchange topology | Exchange-set | Orders to the wrong instance; BSE needs one per segment |
+| `finix.oms.order.max_rate.<channel>` | Per channel | Discretionary | One channel starving the gateway |
+
+## 9. Exception paths
+
+| Situation | Response |
+|---|---|
+| Order sent, no acknowledgement, session drops | Mark unknown; reconcile with the exchange before new flow in that segment; never show the client a guess |
+| Sequence gap detected | Treat as an incident; reconcile; do not paper over it |
+| Risk component degraded but not down | Stop new orders rather than accept slow decisions; a slow release is still a release on stale inputs |
+| Front end shows a position the state store disagrees with | State store governs; refresh the front end; investigate the divergence |
+| State store and exchange disagree | **Exchange governs.** Reconcile to the exchange and investigate |
+| Duplicate order detected by broker reference | Suppress and alert; do not send a second |
+| Audit write failing intermittently | Alert immediately; if the pattern persists, stop entry |
+| A bypass path discovered | Stop trading, remediate, and report internally as a control failure |
+
+## Practical notes
+
+- **Write the latency budget down and defend it.** Budgets that exist only as measurements become whatever the code does.
+- **Test the bypass absence in the release pipeline.** It is the cheapest high-value test in the stack.
+- **Make "unknown" a first-class order state in the user interface.** Clients handle uncertainty far better than they handle a confident wrong answer.
+- **Keep the shadow risk check running even though it has no veto.** Divergence between two independent computations of the same margin is the best available detector of a computation defect.
+- **Alert on percentile movement, not thresholds.** A path that is twice as slow as yesterday and still inside the threshold is already failing.
+- **Join the audit trail on one identifier.** The ability to answer a dispute in one query, rather than four, is worth designing for.
+
+## Where this connects
+
+- [Exchange connectivity protocols](/broking-kyc/finix-broking-setup/oms/02-exchange-connectivity-protocols/) — what C8, C9 and C10 speak
+- [Pre-trade check ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/) — what C7 actually evaluates, in order
+- [Order forward path](/broking-kyc/finix-broking-setup/oms/06-order-forward-path/) and [return path](/broking-kyc/finix-broking-setup/oms/07-order-return-path/) — the full traversal
+- [Integration contract matrix](/broking-kyc/finix-broking-setup/stack/integration-contract-matrix/) — the interface contracts for every boundary above
+- [Infrastructure and connectivity](/broking-kyc/finix-broking-setup/setup/08-infrastructure-connectivity/) — what this runs on
+- [OMS internals](/broking-kyc/deep-dives/trading-day/oms-internals/) — the vendor-neutral treatment
