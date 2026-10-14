@@ -1,0 +1,144 @@
+---
+title: "Daily ops 4: close and post-close"
+description: The transition from trading to processing — closing session handling, exchange cancellation of day orders, margin block release, final intraday reconciliation, resolving unknown-state orders before they become settlement problems, the handover into end-of-day, and the commodity sessions that are still running.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** The close is a short window in which the day's loose ends either get tied or get carried into the record pipeline, where they are much more expensive. The page is therefore a checklist of what must be resolved before end-of-day processing begins — unknown orders, unexplained differences, pending freezes — followed by the handover, and a reminder that for a member of MCX the day is not over.
+
+## TL;DR
+
+- **The closing session is a separate mechanism**, running 15:30 to 15:40 and determining the closing price by its own rules.
+- **Day orders are cancelled by the exchange at end of session.** Process the bulk state transition and release the margin blocks.
+- **Orders in `UNKNOWN` must be resolved before the session ends.** An unknown order carried into end-of-day becomes a reconciliation difference and potentially a settlement problem.
+- **Pending freezes must be resolved**, not left holding margin overnight.
+- **Final intraday reconciliation happens here**, not in the end-of-day pipeline — order and trade counts against the exchange, and positions against the firm's book.
+- **The handover into end-of-day is written**, with open items named and owned.
+- **For a member of MCX, the day is not over.** The commodity session runs to 23:30 while the equity pipeline processes, and the commodity close is a separate, later checklist.
+
+## 1. The closing session
+
+| Element | Detail |
+|---|---|
+| Window | 15:30 to 15:40 |
+| Purpose | Closing price determination |
+| Mechanism | Per the exchange's closing session rules; distinct from continuous trading |
+| Order behaviour | Per the session's own rules |
+| Monitoring | Session state, acceptance, trade confirmations |
+| Client questions | Closing prices and the mechanism; same education problem as the pre-open, at lower volume |
+
+## 2. Post-close checklist
+
+| # | Step | Owner | Assertion | If not met |
+|---|---|---|---|---|
+| 1 | Session state confirmed as post-close, per exchange and segment | Technology | State message received | Investigate; do not infer from the clock |
+| 2 | **Day orders cancelled by the exchange** | Operations | Bulk transition processed; counts reconcile | Reconcile against the exchange |
+| 3 | **Margin blocks released** for cancelled orders | Risk | Utilisation reflects the release | Investigate; clients are holding blocks they should not |
+| 4 | **Orders in `UNKNOWN` resolved** | Operations and technology | **Zero remaining** | **Escalate**; reconcile with the exchange before end-of-day |
+| 5 | **Pending freezes resolved** | Dealing | None left holding margin | Escalate to the exchange |
+| 6 | **Final intraday reconciliation** — order and trade counts, values, positions | Operations | Matches the exchange | **Investigate before end-of-day processing** |
+| 7 | Open client warnings and grace periods reviewed | Risk | Each has a disposition for tomorrow | Carry with an owner |
+| 8 | Unresolved square-offs and residual positions recorded | Risk | Known and owned | Escalate |
+| 9 | Surveillance alerts from the session triaged | Compliance | Within the service level | Carry with ageing visible |
+| 10 | Pay-in attribution queue cleared | Treasury | Clients not left waiting overnight | Work it |
+| 11 | Pay-out queue status reviewed | Treasury | Terminal states known | Investigate pending items |
+| 12 | Client contact themes reviewed | Support | Any theme the board did not surface | Investigate the gap |
+| 13 | **Written handover into end-of-day** | All | Signed | — |
+
+<Aside type="caution" title="Resolve unknown orders here, not in the pipeline">
+An order in the `UNKNOWN` state is one the firm sent and for which it never received an outcome. Carried into end-of-day it becomes a trade-file reconciliation difference, which blocks contract notes, which puts a regulatory deadline at risk. Resolving it at 15:45 is a conversation with the exchange; resolving it at 19:00 is the same conversation with a deadline running. Make zero unknown orders an explicit post-close assertion.
+</Aside>
+
+## 3. What must not be carried forward
+
+| Item | Why |
+|---|---|
+| **Orders in `UNKNOWN`** | Become reconciliation differences and settlement problems |
+| **Unexplained order or trade count differences** | Block contract notes |
+| **Pending freezes** | Hold client margin overnight with no resolution |
+| Unreleased margin blocks | Clients are constrained for no reason |
+| Unattributed pay-ins | Clients waiting for capacity overnight |
+| Position differences against the exchange | A risk difference, not an administrative one |
+| Open severity-one incidents | Should have escalated already |
+
+## 4. What is legitimately carried
+
+| Item | With |
+|---|---|
+| Client warnings and grace periods | A named owner and a tomorrow disposition |
+| Residual positions that could not be squared off | An escalation record and a plan |
+| Surveillance alerts within the service level | Visible ageing |
+| Reconciliation exceptions within their ageing tolerance | Owner and age |
+| Commodity positions and tender-day items | The evening shift |
+| Resting broker-held intent — Good Till Triggered, Stock SIP, after-market | Reviewed against any restriction changes |
+
+## 5. The handover into end-of-day
+
+| Content | Detail |
+|---|---|
+| Gate status from the morning | Any exceptions accepted at the open |
+| Incidents during the session | Open and closed |
+| Reconciliation status | Counts matched, or differences and their investigation |
+| Clients under warning | With amounts and dispositions |
+| Residual positions | With owners |
+| Treasury position | What was funded, what is outstanding |
+| Pay-in and pay-out queue status | Items carried |
+| **Anything that could delay contract notes** | The deadline runs from execution |
+| Commodity status | Positions, tender-day items, evening cover |
+| Signed | By both shifts |
+
+## 6. The commodity reality
+
+| Item | Detail |
+|---|---|
+| MCX still trading | To **23:30**, or **23:55** in United States daylight saving |
+| Concurrency | The equity end-of-day pipeline runs alongside |
+| Separation | **Two operating modes in the same building**; separate handovers and separate checklists |
+| Tender days | The **19:30** eClear deadline falls during this period |
+| Commodity close | A **separate, later checklist**; see [EOD runbook](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/#8-the-commodity-close) |
+| Risk cover | Must continue through the evening session |
+| Treasury | Evening cover with banking channels closed |
+
+## 7. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.ops.close.unknown_orders_zero_assert` | **True** | Discretionary, strongly recommended | Unknown orders entering the pipeline |
+| `finix.ops.close.recon_before_eod` | **True** | Discretionary, strongly recommended | Differences discovered under deadline pressure |
+| `finix.ops.close.freeze_resolution_assert` | True | Discretionary | Margin blocked overnight |
+| `finix.ops.close.margin_release_assert` | True | Discretionary | Clients constrained without cause |
+| `finix.ops.close.handover_written` | True, signed | Discretionary, strongly recommended | Open items lost |
+| `finix.ops.close.separate_commodity_checklist` | True | Discretionary, strongly recommended | The evening treated as an appendix |
+
+## 8. Exception paths
+
+| Situation | Response |
+|---|---|
+| Orders remain in `UNKNOWN` | Escalate to the exchange; **do not begin end-of-day processing on an unresolved book** |
+| Order or trade counts differ from the exchange | Investigate now; the exchange governs |
+| Position difference against the exchange | Stop increasing exposure for affected clients tomorrow until resolved |
+| Freeze unresolved at close | Escalate to the exchange; decide on the margin block |
+| Day-order cancellation not reflected | Reconcile against the exchange |
+| A residual position could not be squared off | Escalate; decide on carrying the exposure; inform the client the same day |
+| Pay-in unattributed at close | Work it; a client waiting overnight for their own money is a service failure |
+| Handover not completed | The receiving shift should refuse to accept an unwritten handover |
+| Commodity session issue during equity end-of-day | Two incidents, two owners; do not serialise them |
+
+## Practical notes
+
+- **Make zero unknown orders a hard post-close assertion.** It is the cheapest protection for the contract-note deadline.
+- **Reconcile counts before the pipeline starts, not inside it.** Differences found later collide with deadlines.
+- **Release margin blocks and verify it.** Clients notice constraints they cannot explain.
+- **Write and sign the handover.** The items that get lost are precisely the ones that matter.
+- **Keep the commodity evening on its own checklist.** It runs later, with fewer people, in parallel with a heavy pipeline.
+- **Clear the pay-in queue before you go home.** Overnight waiting on a confirmed payment is a service failure with no upside.
+
+## Where this connects
+
+- [Continuous session operations](/broking-kyc/finix-broking-setup/daily-ops/03-continuous-session-ops/) — what precedes
+- [EOD runbook](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/) — what follows
+- [Order return path](/broking-kyc/finix-broking-setup/oms/07-order-return-path/) — the `UNKNOWN` state and end-of-session handling
+- [Trade import and reconciliation](/broking-kyc/finix-broking-setup/backoffice/02-trade-import-reconciliation/) — what unresolved differences block
+- [MCX commodities](/broking-kyc/finix-broking-setup/exchanges/04-mcx-commodity/) — the evening session
+- [Incident playbooks](/broking-kyc/finix-broking-setup/daily-ops/07-incident-playbooks/) — if something is unresolved

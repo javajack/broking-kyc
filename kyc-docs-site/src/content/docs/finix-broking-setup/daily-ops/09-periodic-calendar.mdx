@@ -1,0 +1,182 @@
+---
+title: "Daily ops 9: the periodic calendar"
+description: Everything that is not daily — weekly reviews, monthly reconciliations and disclosures, quarterly committee items and re-verifications, half-yearly and annual obligations, event-driven items, and the ownership model that makes an obligation without an owner impossible.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Daily work gets done because its failure is immediate and visible. Periodic work fails quietly: a quarterly review that slips a quarter, an annual drill that becomes biennial, a figure nobody has re-verified since go-live. So the page is a calendar with an owner against every item, grouped by frequency, with a short section on the ownership model — because the control that makes this work is not the list but the rule that no item exists without a named owner.
+
+## TL;DR
+
+- **An obligation without an owner is the failure mode this calendar exists to prevent.** Alarm on any unowned item.
+- **ComplianceSutra holds the regulatory calendar**; this page is the operational superset, including internal items that no regulation requires but whose absence shows up in an inspection.
+- **Weekly items are mostly exception and conduct reviews** — overrides, client code modifications, reconciliation ageing.
+- **The quarterly re-verification of exchange-set figures is the item most likely to slip** and the one that keeps this manual's numbers from going stale in production.
+- **Annual items include the retrieval drill, the manual square-off rehearsal and the data-export test** — three things that are only proven by doing them.
+- **Daylight saving is a twice-yearly calendar item with a named owner**, because it moves the MCX close and everything downstream of it.
+- **Every item carries evidence.** A review that happened without a record is indistinguishable from one that did not.
+
+## 1. The ownership model
+
+| Rule | Detail |
+|---|---|
+| **Every item has a named owner** | A person, not a team |
+| A deputy | Named, for leave and departure |
+| **Alarm on any unowned item** | The single most valuable control on this page |
+| Due date and lead time | Both, so the item surfaces before it is due |
+| Evidence | What is retained to show it happened |
+| Escalation | Who is told if it slips, and when |
+| Review of the calendar itself | Annual: is anything missing, is anything obsolete |
+| Joiner, mover, leaver | Items re-owned when a person changes role or leaves |
+
+## 2. Weekly
+
+| Item | Owner | Evidence |
+|---|---|---|
+| **Override review** — by check, client and approver | Head of risk | Register with dispositions; repeated overrides mean the limit is wrong |
+| **Client code modification review** | Operations and compliance | Count by dealer and client, against the ceiling |
+| **Reconciliation exception ageing** across all categories | Operations | Age of the oldest open item per category |
+| Surveillance alert ageing and disposition rate | Compliance | Open-alert ageing |
+| Unattributed client money | Treasury | Aged list, trending to zero |
+| Margin shortfalls and penalties incurred | Risk | By cause, firm-borne versus client-borne |
+| Client complaints opened and closed against the 21-calendar-day clock | Compliance | Register |
+| Incident actions outstanding | Operations | Closure tracking |
+| Capacity and latency trends | Technology | Percentile movement |
+| Identifier register anomalies | Compliance | Diff against the directory |
+
+## 3. Monthly
+
+| Item | Owner | Evidence |
+|---|---|---|
+| **Net worth monitor** with non-allowable asset deductions | Finance | Computation, trended |
+| **Investor complaint disclosure** | Compliance | Published |
+| Limits changed and limits outside the group template | Head of risk | Change register |
+| Clients resolving to the global default limit | Head of risk | List; it means nobody configured them |
+| Dormant clients with live capacity | Risk | List |
+| Full charge recomputation against contract notes | Finance | Sample result |
+| Correction and rejection trends — contract notes, filings, UCC | Operations | By cause |
+| Penalty cause classification and allocation | Risk and finance | Report |
+| Surveillance rule volume and tuning review | Compliance | Tuning record |
+| Screening list coverage and refresh verification | Compliance | List inventory status |
+| Vendor service level review against deadline-linked metrics | Operations | Review record |
+| Access review exceptions | Technology and compliance | Report |
+| Partner and authorised-person activity review | Compliance | Report |
+
+## 4. Quarterly
+
+| Item | Owner | Evidence |
+|---|---|---|
+| **Re-verification of exchange-set figures** — fees, deposits, margin rates, penalty slabs, session timings, report names | Compliance and operations | A dated verification record per figure |
+| Limit group templates and the exposure multiplier against the approved policy | Risk committee | Minutes |
+| **Risk management policy review**, including square-off thresholds and grace | Risk committee | Minutes; **and the configuration updated in lockstep** |
+| Collateral eligibility, concentration caps and haircut treatment | Risk | Review record |
+| Input freshness thresholds and staleness behaviours | Risk and technology | Review record |
+| Configuration register review by class | Compliance and technology | Diff of deployed against approved |
+| Surveillance rule coverage, not just volume | Compliance | Coverage assessment |
+| Vendor personnel access review | Technology | Report |
+| Business continuity and incident drill schedule progress | Operations | Drill register |
+| Board and risk committee pack: alerts, dispositions, incidents, penalties | Compliance | Minutes |
+| Capacity plan against observed peaks | Technology | Plan update |
+
+<Aside type="caution" title="The quarterly re-verification is what keeps the numbers true">
+Every figure in this manual — deposits, margin rates, penalty slabs, session timings, lot sizes, file names, expiry days — is circular-driven and will change. The quarterly re-verification is the mechanism that keeps a production configuration from drifting into a historical one. It needs a dated record per figure showing who checked it against which source and when, because "we think it is still right" is not a verification. This item slips more often than any other on the page, and its slippage is invisible until a penalty or a rejection reveals it.
+</Aside>
+
+## 5. Half-yearly
+
+| Item | Owner | Evidence |
+|---|---|---|
+| **Net worth certificate** in the exchange format, per exchange periodicity | Finance | Certificate |
+| **Manual square-off rehearsal** | Risk | Drill record |
+| **Daylight saving changeover** — MCX close, monitoring, batch schedule, rota, vendor support | Operations | Change record, twice a year |
+| Internal audit cycle item | Internal audit | Report |
+| Policy set review for currency | Compliance | Review record |
+| Fit-and-proper refresh for directors and significant shareholders | Compliance | Declarations |
+| Kill-switch rehearsal for programmatic flow | Risk and technology | Drill record |
+
+## 6. Annual
+
+| Item | Owner | Evidence |
+|---|---|---|
+| **Records retrieval drill** — produce a contract note, a ledger balance, a configuration value and a risk decision from six or seven years ago | Compliance and technology | Timed drill record |
+| **Vendor data-export test** | Technology | Export and verification |
+| **Business continuity site switch**, live rather than tabletop | Technology and operations | Drill report with closed actions |
+| System audit | Compliance | Report |
+| Cyber-resilience assessment | Technology and compliance | Report |
+| Membership and registration renewals and annual fees | Finance and compliance | Receipts and confirmations |
+| **NISM certification renewals** against the register | Compliance | Register with expiry dates |
+| Insurance and professional indemnity review | Finance | Policy |
+| Vendor contract and pricing review | Operations | Review record |
+| Concentration-risk assessment across vendors | Operations and compliance | Assessment |
+| Whistle-blower channel test and policy review | Board and compliance | Record |
+| Board approval of the risk management policy and limits | Board | Minutes |
+| **Calendar review**: is anything missing, is anything obsolete | Compliance | Updated calendar |
+| Orderly wind-down framework review | Board | Record |
+
+## 7. Event-driven
+
+| Trigger | Items | Owner |
+|---|---|---|
+| **A circular affecting a configured value** | Assess, implement, update the configuration register and this manual's figure | Compliance |
+| **A circular changing a report format** | Vendor obligation invoked; test; deploy before the effective date | Operations |
+| An exchange protocol version change | Certification event; plan against the calendar | Technology |
+| A new segment or facility | Certification, runbooks, monitoring, file checklist, staffing | Operations |
+| A key management personnel change | Intimation; NISM; access; identifier register | Compliance |
+| A designated director's residency at risk | Immediate escalation | Compliance |
+| A vendor change of control | Contract clause; concentration reassessment | Operations |
+| An incident | Review, dated actions, playbook update, drill if unrehearsed | Operations |
+| A penalty | Cause classification; control fix | Risk |
+| A client complaint escalation | 21-calendar-day clock; SCORES and ODR | Compliance |
+| Crossing a Qualified Stock Broker threshold | Enhanced obligations; orderly wind-down | Compliance |
+| A net worth breach | Immediate intimation and a cure plan | Finance |
+| A new acceptable-collateral or haircut list | Apply; recompute; communicate | Risk |
+| Daylight saving | Section 5 | Operations |
+
+## 8. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.ops.cal.owner_required` | **True; alarm on any unowned item** | Discretionary, strongly recommended | An obligation nobody owns |
+| `finix.ops.cal.deputy_required` | True | Discretionary | Items stalling on leave |
+| `finix.ops.cal.lead_time.<item>` | Per item | Discretionary | Items surfacing on the due date |
+| `finix.ops.cal.evidence_required` | True, per item | Regulatory in substance | A review with no record |
+| `finix.ops.cal.escalation_on_slip` | Defined per item | Discretionary | Silent slippage |
+| `finix.ops.cal.quarterly_figure_verification` | **Dated record per figure** | Discretionary, strongly recommended | Production configuration drifting into history |
+| `finix.ops.cal.annual_review` | True | Discretionary | A calendar that never changes |
+| `finix.ops.cal.jml_reassignment` | On joiner, mover, leaver | Discretionary, strongly recommended | Orphaned items |
+| `finix.ops.cal.source` | ComplianceSutra for regulatory; this superset for operational | Discretionary | Two calendars, neither complete |
+
+## 9. Exception paths
+
+| Situation | Response |
+|---|---|
+| An item has no owner | **Assign immediately**; investigate how it was created unowned |
+| An item slips | Escalate per its rule; record the slip and the reason |
+| An owner leaves | Reassign as part of the leaver checklist |
+| A quarterly figure verification is skipped | The configuration may already be stale; verify now and assess what was affected |
+| A drill is not run | Reschedule and record; an unrun drill is a finding, especially business continuity |
+| A retrieval drill fails | **High-severity**; retention that cannot retrieve is not retention |
+| A circular is identified late | Assess what was non-compliant in the interval; report if material |
+| The calendar is found to be missing an obligation | Add it; investigate how it was missed; the annual review should have caught it |
+| Two calendars disagree | Reconcile; ComplianceSutra holds the regulatory items and must not conflict with this superset |
+
+## Practical notes
+
+- **Alarm on unowned items.** It is one rule and it prevents the whole failure class.
+- **Give every item a lead time.** An item that surfaces on its due date is already late.
+- **Treat the quarterly figure re-verification as a real task with a dated record.** It is what keeps configuration from drifting into history.
+- **Run the three proof-by-doing annual items**: retrieval, export and a live site switch. Each is only true if it has been done.
+- **Put daylight saving on the calendar.** Twice a year, entirely predictable, routinely forgotten.
+- **Reassign items on every leaver.** Orphaned periodic items are how obligations go quiet.
+- **Review the calendar annually.** Obligations are added by circular and the calendar does not update itself.
+
+## Where this connects
+
+- [Compliance configuration baseline](/broking-kyc/finix-broking-setup/compliance/01-compliance-config-baseline/) — the obligation register and its owners
+- [Compliance blueprint](/broking-kyc/operations/compliance-blueprint/) — the full obligation set across the site
+- [Inspection readiness](/broking-kyc/finix-broking-setup/compliance/03-inspection-readiness/) — where the evidence is produced
+- [Statements and retention](/broking-kyc/finix-broking-setup/backoffice/08-statements-retention/) — the retrieval drill
+- [Incident playbooks](/broking-kyc/finix-broking-setup/daily-ops/07-incident-playbooks/) — the drill schedule
+- [BCP and DR drill](/broking-kyc/deep-dives/specialty/bcp-dr-drill/) — the business continuity obligation
+- [Membership renewal](/broking-kyc/deep-dives/member-compliance/membership-renewal/) — the annual membership cycle

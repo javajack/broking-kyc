@@ -1,0 +1,177 @@
+---
+title: "Daily ops 1: begin-of-day runbook"
+description: The ordered, timed, owner-assigned begin-of-day sequence with explicit abort conditions — overnight verification, master and parameter ingestion, the six hard gates, collateral and balance loading, connectivity, capacity establishment, after-market release, and the go or no-go decision before the pre-open.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import Diagram from '../../../../components/Diagram.astro';
+
+> **Why this page is structured this way:** This is a runbook, so it instructs rather than explains. Each step has a time, an owner, an action, an assertion and an abort condition, and the explanation lives behind the link. The gates are stated separately and first, because the single most important property of begin-of-day is that it refuses to open on bad inputs — and the people running it at 07:40 need to know which failures stop the open and which stop only a segment.
+
+## TL;DR
+
+- **Six hard gates.** Instrument master current-day, risk parameters applied, ban-period list current-day, surveillance lists applied, collateral and ledger as-of today, and exchange sessions established with sequence continuity. Each has a defined scope of refusal.
+- **Two of them abort the open entirely**: a stale instrument master and a collateral or ledger load whose as-of timestamp is not today's.
+- **Assert, do not assume.** "The job ran" is not evidence. "The applied file is dated today and contains N instruments" is.
+- **The after-market queue release is verified, not assumed.** It is the first client-visible event of the day.
+- **Go or no-go is a decision with a named owner**, taken before the pre-open, and recorded.
+- **Amber is no-go by default.** The cost of a late open is far lower than the cost of a day's trading on wrong inputs.
+- **The day after a holiday is a different runbook.** Multiple days of files, corporate actions and a longer sequence.
+
+<Diagram src="/diagrams/finix-04-trading-day-timeline.svg" label="The Finix trading day — begin-of-day gates, the sessions, end-of-day, and the commodity close" />
+
+## 1. The gates
+
+| # | Gate | Assert | **Scope of refusal if unmet** |
+|---|---|---|---|
+| **G1** | Instrument master | Current-day date; expected record count; new and delisted instruments reviewed | **Do not open. Everything.** |
+| **G2** | Risk parameter files | Applied version matches the expected publication; values plausible against yesterday | **New derivatives orders in the affected segment** |
+| **G3** | Ban-period list | Current-day date; membership diff reviewed | **Fresh derivatives positions in all listed underlyings** |
+| **G4** | Surveillance measure lists | Current-day; additions alerted | **Most restrictive known treatment on affected instruments** |
+| **G5** | Collateral and ledger load | **As-of timestamp is today's**; record count reconciles to the client master | **Do not open. Everything.** |
+| **G6** | Exchange sessions | Established per exchange and per BSE segment instance; sequence continuous; heartbeats healthy | **That exchange and segment** |
+
+<Aside type="caution" title="G5 is the gate that prevents the most expensive silent failure">
+A collateral and balance load that runs successfully but carries yesterday's as-of timestamp gives every client the wrong limit, all day, in the permissive direction. Nothing errors. Orders are released. The problem appears at end of day as a margin shortfall across the book, by which time the trades exist. The assertion is not "did the load run" but "is the as-of timestamp today's, and does the record count reconcile to the client master". It takes seconds and it is the highest-value gate in the runbook.
+</Aside>
+
+## 2. The sequence
+
+Times are indicative for an ordinary trading day; the day-after-a-holiday variant is in section 6.
+
+| Time | # | Step | Owner | Assertion | Abort |
+|---|---|---|---|---|---|
+| 07:30 | 1 | **Overnight verification**: batch completion, commodity close completion, overnight alerts reviewed | Operations | All overnight jobs completed; no unresolved severity-one alerts | Escalate; assess whether to proceed |
+| 07:35 | 2 | Expected-file checklist loaded for **today's day type** | Operations | Day type correct — ordinary, settlement, expiry, tender, post-holiday, month end | — |
+| 07:40 | 3 | **Calendar confirmation** | Operations | Today is a trading day per the current calendar, per exchange and segment | **Do not open** on a mismatch |
+| 07:45 | 4 | **Instrument master ingested and applied** — **G1** | Technology | Current-day date; record count; new and delisted reviewed | **Abort the open** |
+| 07:50 | 5 | Lot sizes and tick sizes refreshed | Technology | Changes reviewed against circulars | Escalate |
+| 07:55 | 6 | **Risk parameter files ingested and applied** — **G2** | Risk | Applied version and timestamp; values plausible | **Block new derivatives orders in scope** |
+| 08:00 | 7 | Value-at-risk and extreme loss margin rates applied | Risk | Current | Block new cash orders in scope |
+| 08:05 | 8 | **Acceptable collateral and haircut lists applied** | Risk | Current-day; **diff against yesterday reported** | Exclude unlisted collateral |
+| 08:10 | 9 | **Ban-period list applied** — **G3** | Risk | Current-day; membership diff | **Block fresh derivatives positions in listed underlyings** |
+| 08:15 | 10 | **Surveillance measure lists applied** — **G4** | Risk | Current-day; additions alerted | **Most restrictive treatment** |
+| 08:20 | 11 | Price bands loaded | Technology | Current | Reject outside last-known band |
+| 08:25 | 12 | Market-wide position limit data loaded | Risk | Current | Position-limit monitoring degraded; escalate |
+| 08:30 | 13 | **Collateral and ledger balance loaded into RMS** — **G5** | Operations and risk | **As-of is today's; count reconciles to the client master** | **Abort the open** |
+| 08:35 | 14 | Pledge positions reconciled — depository, back office, risk | Operations | Three-way clean, or exceptions identified | Block exposure increase for affected clients |
+| 08:40 | 15 | Limits resolved; **available exposure computed per client** | Risk | Every active client has a resolved limit | Investigate clients resolving to the global default |
+| 08:45 | 16 | **Firm-level utilisation baselined** | Risk | Firm ceilings loaded and current | Escalate |
+| 08:50 | 17 | **Exchange sessions established** — **G6** | Technology | Per exchange and per BSE segment instance; sequence continuous; heartbeats healthy | **Block that exchange and segment** |
+| 08:52 | 18 | Market data feeds verified | Technology | Per-instrument staleness within threshold once feeds start | Block price-dependent decisions in scope |
+| 08:55 | 19 | **Client master three-way reconciliation** — onboarding, OMS, back office | Operations | Clean, or mismatched clients identified and blocked | Block mismatched clients |
+| 08:57 | 20 | Certification and identifier register checks | Compliance | No lapsed certificates on active identifiers; no unreported identifiers enabled | **Disable affected identifiers** |
+| 09:00 | 21 | **After-market queue released** | Technology | **Release verified**, with counts | **Incident**; clients informed |
+| 09:00 | 22 | **Go or no-go decision** | Named owner | All gates green, or exceptions explicitly accepted with scope | **No-go is the default on amber** |
+| 09:00 | 23 | Pre-open monitoring begins | Dealing and risk | — | See [pre-open operations](/broking-kyc/finix-broking-setup/daily-ops/02-pre-open-ops/) |
+
+## 3. The go or no-go decision
+
+| Element | Detail |
+|---|---|
+| Owner | A named person on the rota, with the authority to stop |
+| Input | The gate status board, with each gate green, amber or red |
+| **Default on amber** | **No-go**, or open in a reduced scope with the exception explicitly recorded |
+| Red on G1 or G5 | **Do not open** |
+| Red on G2, G3, G4 or G6 | Open with the stated scope of refusal applied |
+| Recording | Decision, time, owner, gate status, any accepted exceptions |
+| Communication | If the open is delayed or scoped, clients and the exchange are informed promptly |
+| Escalation | To the head of operations and the head of risk |
+
+## 4. Verification practices
+
+| Practice | Detail |
+|---|---|
+| **Assert applied state, not job status** | The risk engine's parameter version and the OMS's master date, not the ingestion job's exit code |
+| **Count, then value, then diff** | A file with eighty percent of records returns success |
+| Diff against yesterday | Parameter and list files whose values move dramatically are worth an alert before application |
+| Reconcile to an independent source | Client counts against the client master; instrument counts against the exchange's summary |
+| Evidence | The gate status board retained; it is the record that the day opened properly |
+| **Real operators** | The runbook is run by the operations team, not the project team |
+
+## 5. Commodity considerations
+
+| Item | Detail |
+|---|---|
+| MCX session opens at 09:00 | The same gates apply to the commodity segment |
+| Commodity-specific files | Included in the expected-file checklist |
+| **Tender day** | If today is a tender day, the 19:30 eClear deadline has a named owner from the start of the day |
+| Daylight saving | On the changeover day, confirm the close time has been applied |
+| Previous commodity close | Verified in step 1; a commodity close that did not complete affects today's position |
+
+## 6. Day-after-a-holiday variant
+
+| Difference | Detail |
+|---|---|
+| **Multiple days of files** | All intervening publications, in order |
+| Corporate actions | Events over the holiday period processed before the open |
+| Longer sequence | Start earlier; the standard timings do not fit |
+| Settlement | A settlement may have fallen in the period |
+| **Bank holiday interaction** | If a settlement day coincided with a bank holiday, confirm the funding position |
+| Resting broker-held intent | Good Till Triggered instructions and after-market orders accumulated over several days |
+| Client communication | Expect higher volume at the open |
+| Capacity | Elevated login and order rates at the open |
+
+## 7. Abort and partial-open handling
+
+| Scenario | Action | Communication |
+|---|---|---|
+| G1 red — instrument master stale | **Do not open.** Escalate to the exchange and the vendor | Clients and exchange informed of the delay |
+| G5 red — collateral or ledger as-of not today | **Do not open.** This is an internal failure; fix and reload | As above |
+| G2 red for one segment | Open; block new derivatives orders in that segment | Segment-specific client message |
+| G3 red | Open; block fresh derivatives positions in the listed underlyings; **reduction remains permitted** | Specific message |
+| G6 red for one exchange or segment | Open the others; that one stays closed | **Segment-specific**, never "the market is down" |
+| After-market release failed | **Incident.** Clients informed; orders handled per the playbook | Prompt and specific |
+| Multiple ambers | Default to no-go; a day of trading on several degraded inputs is not worth the open | As above |
+
+## 8. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.ops.bod.gates` | **G1 to G6, each with a scope of refusal** | Discretionary, strongly recommended | Opening on bad inputs |
+| `finix.ops.bod.master_assert_current_day` | True, hard gate | Exchange-set | Trading on a stale master |
+| `finix.ops.bod.collateral_asof_assert` | **True, hard gate** | Discretionary, strongly recommended | Every client's limit wrong, permissively |
+| `finix.ops.bod.ledger_asof_assert` | True, hard gate | Discretionary, strongly recommended | As above |
+| `finix.ops.bod.applied_state_assert` | **True** | Discretionary, strongly recommended | Parsed but unapplied |
+| `finix.ops.bod.param_diff_alert` | On material movement | Discretionary | A bad file applied |
+| `finix.ops.bod.amo_release_verify` | **True, with counts** | Discretionary, strongly recommended | Silent non-release |
+| `finix.ops.bod.go_nogo_owner` | Named on the rota | Discretionary, strongly recommended | Nobody with authority to stop |
+| `finix.ops.bod.amber_default` | **No-go** | Discretionary, strongly recommended | Opening on degraded inputs |
+| `finix.ops.bod.daytype_aware_checklist` | True | Discretionary, strongly recommended | Wrong file set for the day |
+| `finix.ops.bod.post_holiday_variant` | Defined | Discretionary | Standard timings that do not fit |
+| `finix.ops.bod.evidence_retention` | Gate status board retained | Regulatory in substance | No record that the day opened properly |
+
+## 9. Exception paths
+
+| Situation | Response |
+|---|---|
+| A file is late | Escalate to the source; assess against the open; **do not substitute yesterday's** |
+| An ingestion job succeeds but the applied state is unchanged | Treat as not received; this is the F5 failure in [file formats](/broking-kyc/finix-broking-setup/exchanges/08-file-formats-downloads/#8-failure-modes) |
+| A parameter file's values look implausible | Alert before applying; verify with the source |
+| Collateral three-way reconciliation has critical exceptions | Block exposure increase for those clients; open for the rest |
+| A client resolves to the global default limit | Investigate; it means nobody configured them |
+| An identifier has a lapsed certificate | **Disable it**; the holder cannot trade until renewed |
+| Exchange session will not establish | Technology escalation; that exchange and segment stays closed |
+| After-market release fails | Named incident; clients informed; orders handled per the playbook |
+| Go or no-go owner unavailable | The rota names a deputy; an open without a decision is not an option |
+| The firm opens late | Inform clients and the exchange; record the cause; review the gate that caused it |
+
+## Practical notes
+
+- **Assert the as-of timestamp before anything else that depends on it.** It is seconds of work against a day of wrong limits.
+- **Have the real operators run it.** Every ambiguity, missing credential and undocumented step surfaces in one morning.
+- **Default amber to no-go and mean it.** The pressure runs the other way every single day.
+- **Keep the gate status board as evidence.** It is the record that the day opened properly.
+- **Write the post-holiday variant separately.** Standard timings do not fit and improvising at 06:30 is avoidable.
+- **Verify the after-market release with counts.** It is the first thing clients see.
+- **Name the segment, never "the market".** Partial opens are normal with three exchanges and client messaging must be precise.
+
+## Where this connects
+
+- [Exchange file formats and downloads](/broking-kyc/finix-broking-setup/exchanges/08-file-formats-downloads/) — the checklist this asserts
+- [RMS architecture](/broking-kyc/finix-broking-setup/rms/01-rms-architecture/) — the input contracts behind the gates
+- [Sessions and calendars](/broking-kyc/finix-broking-setup/exchanges/06-sessions-calendars/) — the calendar confirmation
+- [Pre-open operations](/broking-kyc/finix-broking-setup/daily-ops/02-pre-open-ops/) — what follows
+- [EOD runbook](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/) — which produces the extract this depends on
+- [Incident playbooks](/broking-kyc/finix-broking-setup/daily-ops/07-incident-playbooks/) — when a gate fails
+- [Integration DAG](/broking-kyc/operations/integration-dag/bod/) — the vendor-neutral dependency view

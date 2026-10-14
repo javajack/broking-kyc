@@ -1,0 +1,246 @@
+---
+title: "Compliance 4: cyber resilience configuration"
+description: Regulation 18(5) at configuration level — the statutory shift from circular to regulation, the control domains across identity, network, data, change, logging, vendor and client-facing security, two-factor authentication for trading access, incident classification and reporting, testing obligations, and the evidence each control produces.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Cyber security documentation is usually a framework restatement. This page is not; it assumes the framework is known and asks the implementation question: for each control domain, what is configured, what evidences it, and who owns it. The one domain treated at length is client-facing authentication, because it is where a broking firm differs from an ordinary business and where the regulatory requirement is most specific.
+
+## TL;DR
+
+- **Cyber security and cyber resilience became statutory in January 2026.** Regulation 18(5) of the [2026 regulations](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/) requires a robust framework, which moves it from a circular obligation to a condition of registration.
+- **Two-factor authentication is mandatory for internet-based trading and wireless trading, and the two factors must not be the same.** This is specific, long-standing and frequently implemented loosely.
+- **Nine control domains** cover the implementation: identity and access, privileged access, network segmentation, client-facing authentication, data protection, change management, logging and monitoring, vendor security, and resilience.
+- **The order path is a segmentation boundary**, not just an application. It should not share a network with general corporate traffic.
+- **Logging must survive the primary site** and be retained on the eight-year records floor; losing the diagnostic record with the system is a common and avoidable design defect.
+- **Vendor security is in scope.** Six vendor integrations touch client personal data and the firm remains accountable.
+- **Testing is the evidence.** Vulnerability management, drills and audits produce the records that demonstrate the framework operates.
+
+## 1. Framework
+
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — **regulation 18(5)**, a statutory obligation to maintain a robust cyber security and cyber resilience framework. Also Chapter IV fraud prevention and detection, which assumes the systems can detect. `[not yet in index]`
+- **Cybersecurity and Cyber Resilience Framework** for market intermediaries, with tiered obligations by size and criticality. See [CSCRF deep dive](/broking-kyc/deep-dives/compliance-audit/cscrf-deep-dive/).
+- **Two-factor authentication for internet-based trading and securities trading through wireless technology** — a minimum of two factors in the authentication flow is mandatory and **the two factors must not be the same**; see [client protection frameworks](/broking-kyc/trading-risk/client-protection-frameworks/) for the circular chain, including the cyber-security annexure requirements such as a cryptographically secure biometric mechanism for mobile applications and account lock after failed attempts.
+- **System audit framework** — see [system audit](/broking-kyc/deep-dives/compliance-audit/system-audit/).
+- **Digital Personal Data Protection Act, 2023 and its rules** — the firm as data fiduciary; see [DPDP consent fields](/broking-kyc/reference/field-atlas/sections/aa-dpdp-consent/) and the [MeitY circulars index](/broking-kyc/reference/circulars/meity/).
+- **Business continuity and disaster recovery** — see [BCP and DR drill](/broking-kyc/deep-dives/specialty/bcp-dr-drill/).
+
+<Aside type="caution" title="What the statutory shift changes in practice">
+Before January 2026 a cyber framework was required by circular; now it is required by regulation, as a condition of registration. Three consequences follow. The obligation cannot be relaxed by a circular, only by amendment. A breach is a breach of regulations rather than of an operational requirement. And an inspection will test the framework against the regulation's words — a robust framework — rather than against a checklist, which in practice means it will test whether the controls actually operate rather than whether they are documented.
+</Aside>
+
+## 2. The nine domains
+
+### D1 — Identity and access
+
+| Control | Configuration | Evidence |
+|---|---|---|
+| Central directory, one identity per person | Directory configuration | Directory |
+| Role-based access from templates | Per-role entitlement maps across all nine systems | Role definitions |
+| Least privilege | Entitlement review | Review records |
+| **Joiner, mover, leaver** | **Same-day leaver checklist spanning every system** | Completed checklists |
+| Mover handling | Remove before grant | Change records |
+| Periodic recertification | By the role owner | Recertification records |
+| **Certification coupling** | Entitlements for certified functions gated on a valid certificate | Certification register |
+| Segregation of duties | The [incompatible pairs](/broking-kyc/finix-broking-setup/setup/07-people-certification-org/#5-segregation-of-duties--the-real-headcount-floor) | Role design |
+
+### D2 — Privileged access
+
+| Control | Configuration | Evidence |
+|---|---|---|
+| Separate privileged identities | Not daily-use accounts | Directory |
+| **Time-bound elevation** | Just-in-time, with an expiry | Elevation records |
+| Approval | Per elevation | Approval records |
+| Session logging | Full | Logs |
+| Review | Periodic, of all privileged access | Review records |
+| **Vendor support access** | **Just-in-time, supervised, logged** — never standing | Access records |
+| Break-glass | Sealed, tested, logged distinctly | Test records |
+
+### D3 — Network segmentation
+
+| Control | Configuration | Evidence |
+|---|---|---|
+| **Order path segmented** | Separate from corporate and general traffic | Architecture and firewall rules |
+| Back office segmented | Separate zone | As above |
+| Management network | Separate | As above |
+| Exchange connectivity | Dedicated, with diverse paths | Link inventory |
+| Egress control | Restricted and logged | Rules and logs |
+| Firewall rule review | Periodic, with removal of unused rules | Review records |
+| **Blast radius** | A compromise in one zone does not reach the order path | Architecture, tested |
+
+### D4 — Client-facing authentication
+
+The domain where a broking firm's requirements are most specific.
+
+| Control | Requirement |
+|---|---|
+| **Two-factor authentication** | **Mandatory for internet-based trading and trading through wireless technology** |
+| **Factor distinctness** | **The two factors must not be the same** |
+| Mobile applications | A cryptographically secure biometric mechanism where applicable |
+| Account lock | After a defined number of failed attempts |
+| Session management | Timeout, concurrent-session control, re-authentication for sensitive actions |
+| Device and session visibility | The client can see active sessions |
+| **Sensitive actions re-authenticated** | Bank-account change, pay-out, DDPI changes |
+| **Notification on change** | To the **previously registered** contact details as well as the new |
+| Credential recovery | Hardened; this is the common attack path |
+| Client education | Phishing, SIM swap, and the validated UPI handle |
+
+See [client protection frameworks](/broking-kyc/trading-risk/client-protection-frameworks/) for the wider client-side stack, including the proposed device and SIM binding framework and SEBI Check.
+
+### D5 — Data protection
+
+| Control | Configuration | Evidence |
+|---|---|---|
+| Encryption in transit | All client-facing and inter-system paths | Configuration |
+| Encryption at rest | Personal and financial data | Configuration |
+| Key management | Managed store, rotation, access logged | Key records |
+| **No production personal data in non-production** | Enforced | Environment policy and testing |
+| Synthetic test data | Mandatory | Test data sets |
+| Data minimisation | Consistent with the eight-year retention obligation, reasoned and recorded | Policy |
+| **Consent artefacts** | Captured, retained, exportable | Consent records |
+| Deletion | Controlled, after retention obligations end | Deletion records |
+| Localisation | Where applicable, including through vendors | Vendor contracts |
+
+### D6 — Change management
+
+| Control | Configuration | Evidence |
+|---|---|---|
+| Approval | Approver distinct from the author | Change records |
+| Testing | Evidence before production | Test records |
+| Rollback | Planned | Change records |
+| **Segregation** | The person who develops does not deploy to production unsupervised | Pipeline configuration |
+| Emergency change | Break-glass with post-hoc approval inside one business day | Change records |
+| **Configuration as change** | Values under the same control as code | [Configuration register](/broking-kyc/finix-broking-setup/stack/environments-config-baseline/) |
+| **No deployment on expiry days** | A standing rule | Change calendar |
+
+### D7 — Logging and monitoring
+
+| Control | Configuration | Evidence |
+|---|---|---|
+| Centralised logging | All systems | Log store |
+| **Tamper-evident** | Append-only | Store configuration |
+| **Survives the primary site** | Replicated | Architecture |
+| **Retention** | Eight-year records floor | Retention configuration |
+| Clock synchronisation | Common source, drift monitored, **evidenced** | Synchronisation records |
+| Security monitoring | Alerting on defined conditions | Alert configuration |
+| Access logging | Who did what, when | Logs |
+| **Order-path audit trail** | Complete, immutable, joinable | [Decision records](/broking-kyc/finix-broking-setup/rms/01-rms-architecture/#3-the-decision-record) |
+
+### D8 — Vendor security
+
+| Control | Configuration | Evidence |
+|---|---|---|
+| Assessment before production data | Per vendor | Assessment records |
+| Contractual obligations | Audit rights, breach notification **in hours**, sub-processor control, localisation, retention | Contracts |
+| Periodic review | Annual, or on change | Review records |
+| **Concentration** | Assessed, given how many planes SecMark covers | Assessment |
+| Access | Just-in-time, supervised, logged | Access records |
+| Incident cooperation | Contractual | Contracts |
+| Exit | Data export tested annually | Export test |
+
+See [vendor onboarding and contracts](/broking-kyc/finix-broking-setup/setup/09-vendor-onboarding-contracts/).
+
+### D9 — Resilience
+
+| Control | Configuration | Evidence |
+|---|---|---|
+| Recovery objectives | Stated per system; tightest on the order path | Design |
+| **Secondary site usable** | With exchange connectivity, identity and monitoring | Drill reports |
+| **Monitoring and identity survive the primary site** | Architecture | Design, tested |
+| Backup and **tested restore** | Restores, not just backups | Restore records |
+| **Live drills** | Not tabletop, with closed actions | Drill reports |
+| Vendor-outage drills | Per vendor, exercising the degraded behaviours | Drill records |
+| Incident response | Documented, exercised, with a reporting path | Playbooks and drills |
+
+## 3. Incident classification and reporting
+
+| Class | Examples | Internal | External |
+|---|---|---|---|
+| **Confirmed data breach** | Client personal or financial data exposed | S1; designated director; compliance | Per the applicable reporting obligation and timeline |
+| Security incident without confirmed exposure | Intrusion attempt, malware contained | S2 | Per the framework |
+| Account takeover | Client credentials compromised | S1 for the client | Per the obligation; client informed |
+| Availability incident with a security cause | Denial of service | S1 or S2 | Per the obligation |
+| Vendor incident affecting the firm | Vendor breach | S1 or S2 | The firm remains accountable |
+| Insider incident | Misuse by a person with access | S1; outside the line | Per the obligation |
+
+| Control | Detail |
+|---|---|
+| **Vendor notification window shorter than the firm's** | Contractual, in hours — see [vendor contracts](/broking-kyc/finix-broking-setup/setup/09-vendor-onboarding-contracts/#2-the-clauses-that-close-the-accountability-gap) |
+| Classification decided early | It drives the reporting obligation |
+| Evidence preservation | Before remediation, where feasible |
+| Client communication | Prepared template, legally reviewed in advance |
+| Post-incident | Root cause, dated actions, closure |
+
+## 4. Testing and assurance
+
+| Activity | Frequency | Evidence |
+|---|---|---|
+| Vulnerability scanning | Continuous or periodic | Scan results and remediation |
+| Patching to service levels | Continuous | Patch records; exception register |
+| Penetration testing | Periodic | Report and remediation |
+| **System audit** | Per the applicable cycle | Report and action closure |
+| Cyber-resilience assessment | Annual | Report |
+| **Business continuity live switch** | Per the obligation, **live rather than tabletop** | Drill report with closed actions |
+| Vendor-outage drills | Periodic | Drill records |
+| Access recertification | Periodic | Records |
+| **Leaver checklist sample test** | Periodic | Sample results |
+| Restore test | Periodic | Restore records |
+| Bypass test on the order path | **Every release** | Pipeline results |
+
+## 5. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.cmp.cyber.framework` | Per the applicable tier | **Regulatory — reg 18(5)** | Statutory non-compliance |
+| `finix.cmp.cyber.2fa_trading` | **Mandatory for internet and wireless** | Regulatory | Non-compliant client access |
+| `finix.cmp.cyber.2fa_factors_distinct` | **Enforced** | Regulatory | Two factors that are the same |
+| `finix.cmp.cyber.account_lock_attempts` | Per the framework | Regulatory | Unbounded credential attempts |
+| `finix.cmp.cyber.sensitive_action_reauth` | Bank change, pay-out, DDPI | Discretionary, strongly recommended | Account-takeover loss |
+| `finix.cmp.cyber.notify_previous_contact` | **True** | Discretionary, strongly recommended | The client never learns of a fraudulent change |
+| `finix.cmp.cyber.order_path_segmented` | **True** | Discretionary, strongly recommended | Blast radius reaching the order path |
+| `finix.cmp.cyber.logs_survive_primary` | **True** | Discretionary, strongly recommended | Diagnostic record lost with the system |
+| `finix.cmp.cyber.identity_survives_primary` | **True** | Discretionary, strongly recommended | Nobody can authenticate to recover |
+| `finix.cmp.cyber.log_retention_years` | 8 | Regulatory | Short of the records floor |
+| `finix.cmp.cyber.clock_sync_evidence` | Retained | Regulatory in substance | Timestamps unprovable |
+| `finix.cmp.cyber.prod_data_in_nonprod` | **Prohibited** | Regulatory in substance | Personal data exposure |
+| `finix.cmp.cyber.vendor_breach_window_hours` | **Shorter than the firm's obligation** | Discretionary, strongly recommended | The firm late through the vendor |
+| `finix.cmp.cyber.jit_vendor_access` | True | Discretionary, strongly recommended | Standing vendor access |
+| `finix.cmp.cyber.bypass_test_every_release` | **True** | Discretionary, strongly recommended | A bypass introduced by a change |
+| `finix.cmp.cyber.live_dr_switch` | Per the obligation | Regulatory | An untested secondary site |
+
+## 6. Exception paths
+
+| Situation | Response |
+|---|---|
+| Confirmed data breach | S1; classify; preserve evidence; report per the obligation and timeline; inform affected clients |
+| Account takeover reported by a client | Freeze; investigate; the change-then-withdraw review should have caught it |
+| Vendor reports a breach | The firm remains accountable; assess exposure; report per the firm's own obligation |
+| A leaver's access found active | Control failure; revoke; investigate the checklist; sample-test the rest |
+| Standing vendor access found | Convert to just-in-time; review what was accessed |
+| **A bypass of the risk release point found** | **Stop trading**; remediate; treat as a severity-one control failure |
+| Logs lost with a site failure | Design defect; fix the replication; the diagnostic record for that incident is gone |
+| Clock drift detected | Investigate; records written in the window are suspect |
+| Production data found in a non-production environment | Severity one; remove; assess exposure; investigate the path |
+| A drill fails | Dated remediation; an untested secondary site effectively does not exist |
+| Two-factor authentication using the same factor twice | Non-compliant; fix immediately |
+
+## Practical notes
+
+- **Check that your two factors are actually different.** It is specific, long-standing, and the most commonly loose implementation in client-facing security.
+- **Keep logging and identity off the primary site's fate.** Both are needed precisely when the primary site is gone.
+- **Segment the order path.** It is the asset whose compromise is least recoverable.
+- **Notify sensitive changes to the old contact details.** If the change is fraudulent, those are the details that reach the client.
+- **Make vendor breach windows contractual and short.** The firm's clock starts when the vendor's does.
+- **Test the bypass absence every release.** It is cheap and it protects the control everything else depends on.
+- **Run the business continuity drill live.** A tabletop exercise proves the plan is readable, not that the site works.
+
+## Where this connects
+
+- [SEBI registration under the 2026 regulations](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/) — regulation 18(5)
+- [Infrastructure and connectivity](/broking-kyc/finix-broking-setup/setup/08-infrastructure-connectivity/) — the physical and network build
+- [CSCRF deep dive](/broking-kyc/deep-dives/compliance-audit/cscrf-deep-dive/) — the framework in depth
+- [Client protection frameworks](/broking-kyc/trading-risk/client-protection-frameworks/) — two-factor authentication and the client-side stack
+- [People, certification and organisation](/broking-kyc/finix-broking-setup/setup/07-people-certification-org/) — segregation of duties and the leaver checklist
+- [Vendor onboarding and contracts](/broking-kyc/finix-broking-setup/setup/09-vendor-onboarding-contracts/) — vendor security obligations
+- [BCP and DR drill](/broking-kyc/deep-dives/specialty/bcp-dr-drill/) and [system audit](/broking-kyc/deep-dives/compliance-audit/system-audit/) — the assurance cycle

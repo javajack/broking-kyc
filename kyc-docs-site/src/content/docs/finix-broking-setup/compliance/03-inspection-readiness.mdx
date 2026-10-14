@@ -1,0 +1,221 @@
+---
+title: "Compliance 3: inspection readiness"
+description: Being ready rather than preparing — the questions inspections actually ask and where each answer lives, the standing evidence pack, the self-inspection drill, how to handle an inspection in progress, common findings and their root causes, and the controls that make evidence a by-product rather than a project.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** An inspection is a sequence of questions, and a firm is ready to the extent that each question has a known answer with known evidence and a known owner. So the page is organised as the question set — grouped by what inspections are actually testing — with the location of each answer. The self-inspection drill follows, because readiness is only proven by rehearsal, and the common findings section is last because it is the most useful diagnostic: almost every finding traces to one of a small number of root causes.
+
+## TL;DR
+
+- **Readiness is a property of normal operation, not a project.** Evidence produced as a by-product of doing things properly is available immediately; evidence assembled before an inspection is visibly assembled.
+- **Thirty-odd questions cover most of an inspection**, and each has a known answer, a known artefact and a known owner. Section 2 is that list.
+- **The four artefacts asked for first** are the [configuration baseline map](/broking-kyc/finix-broking-setup/compliance/01-compliance-config-baseline/), the [pre-trade check ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/), the policy set, and the registers.
+- **Run a self-inspection annually** using the real question set and the real evidence path, timed. A question that takes a day to answer in a drill takes a day in an inspection.
+- **Most findings trace to five root causes**: an unowned obligation, a misclassified value, a configuration that drifted from a policy, an ageing exception queue, and an untested retrieval.
+- **Answer what is asked.** Volunteering adjacent material lengthens the inspection and raises questions nobody had.
+- **A known breach reported is handled differently from one discovered.** Report before the inspection finds it.
+
+## 1. Framework
+
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — **Chapter V inspection procedure**, regulations 27 to 32; Chapter VI action in case of default. `[not yet in index]`
+- **Exchange inspection frameworks** — member inspection by the exchanges, with their own scope and periodicity. See [inspection types](/broking-kyc/deep-dives/compliance-audit/inspection-types/).
+- **Internal and concurrent audit** — see [concurrent audit](/broking-kyc/deep-dives/compliance-audit/concurrent-audit/).
+- **System audit** — see [system audit](/broking-kyc/deep-dives/compliance-audit/system-audit/).
+- **Depository participant inspection** — separate, with separate records.
+- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025).
+
+## 2. The question set
+
+### 2.1 Client assets
+
+| Question | Answer lives in | Owner |
+|---|---|---|
+| Show that client money was never used for the firm's own purposes | Account map; **daily segregation assertion**; bank statements with prescribed titles | Finance |
+| How do you ensure client money is segregated from other clients' | Ledger posting model where inter-client postings are impossible; client-level attribution | Finance |
+| How do you prevent cash receipts from clients | No receipt mode, no ledger head, no branch process; detection rule | Finance |
+| Show the upstreaming computation and its confirmation for a date | Computation, instruction, confirmation, and the daily assertion | Treasury |
+| How is client collateral recognised and allocated | Pledge records; client-level allocation files; three-way reconciliation | Operations |
+| Show the handling of unpaid securities for a client | CUSPA pledge, daily recomputation, releases, invocation if any | Operations |
+
+### 2.2 Risk and margin
+
+| Question | Answer lives in | Owner |
+|---|---|---|
+| **What are your pre-trade controls** | **The [check ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/)**, with the source against each check | Risk |
+| Can an order reach the market without a risk check | Architecture; the single release point; the standing bypass test | Technology and risk |
+| **Why was this specific order released** | The decision record with its full input set | Risk |
+| **Why was this client squared off** | The square-off decision record as a narrative: trigger, notice, grace, orders, outcome | Risk |
+| How do you ensure you collect the exchange-required margin | Ingestion jobs, staleness behaviour, comparison against the clearing corporation | Risk |
+| What leverage did this client have on this date, and under what authority | Limit history plus the approved policy | Risk |
+| How do you prevent position-limit breaches | Monitoring, limits, the ladder checks | Risk |
+
+### 2.3 Records and servicing
+
+| Question | Answer lives in | Owner |
+|---|---|---|
+| **Produce this client's contract note from six years ago** | The retention store; **the annual retrieval drill proves it works** | Compliance |
+| Show the dispatch evidence for it | Dispatch records | Operations |
+| How long do you keep records, and what classes | Retention configuration covering all classes, not only documents | Compliance |
+| Show this client's ledger balance at a past timestamp | Point-in-time query | Finance |
+| How are complaints handled and within what clock | Complaint register with **calendar-day** arithmetic | Compliance |
+| Show the investor awareness messages displayed on a date | Content version history | Compliance |
+
+### 2.4 Fraud prevention — Chapter IV
+
+| Question | Answer lives in | Owner |
+|---|---|---|
+| **How do you discharge the mule-account detection obligation** | **The U1 to U10 rule set**, tuning record, alert population, dispositions | Compliance |
+| Show the surveillance alerts for a period and their dispositions | Alert register with reasoning | Compliance |
+| **Show the tuning record for a threshold** | Threshold, reasoning, expected volume, date, approver | Compliance |
+| How does the board discharge accountability | Board pack and **minutes** | Compliance and board |
+| Show the whistle-blower channel and its independence | Policy, channel configuration, access restrictions, annual test | Board |
+| Show a decision not to file a suspicious transaction report | The decision record with its reasoning | Principal officer |
+
+### 2.5 Governance and systems
+
+| Question | Answer lives in | Owner |
+|---|---|---|
+| Who can change a limit, and who approved this change | Role configuration plus the change record | Risk |
+| **Show your configuration for this value on this date** | The configuration register, point-in-time | Technology |
+| Under what authority is this value set | **The classification column** | Compliance |
+| Show the identifier register and its reconciliation | Register plus three-way reconciliation output | Compliance |
+| Were all terminals reported before use | Register with reporting references; routing gate | Compliance |
+| Show certifications for the people performing these functions | Certification register with expiries | Compliance |
+| How is the designated-director residency condition monitored | Tracking record | Compliance |
+| Show your cyber-resilience framework and its testing | Policy, audits, drills | Technology |
+| Show business continuity drill evidence with closed actions | Drill reports | Technology and operations |
+| Show the system audit report and the actions taken | Report and closure tracking | Compliance |
+
+### 2.6 Order and trade
+
+| Question | Answer lives in | Owner |
+|---|---|---|
+| Show the audit trail for this order | Order record joined to the risk decision and the configuration version | Technology |
+| What order types do you offer, and are all certified | Enabled configuration diffed against the certification record | Operations |
+| Show client code modifications for a period | Modification register with reasons and approvals | Operations |
+| Show the algorithm registry and approvals | Registry with per-exchange, per-segment approvals | Compliance |
+| How are algorithmic orders tagged and validated | Tagging configuration; NNF-to-algorithm-identifier validation | Technology |
+
+## 3. The standing evidence pack
+
+Maintained continuously, not assembled.
+
+| # | Artefact | Source |
+|---|---|---|
+| E1 | **Configuration baseline map** — obligation, configuration, system, owner | [Compliance baseline](/broking-kyc/finix-broking-setup/compliance/01-compliance-config-baseline/) |
+| E2 | **Pre-trade check ladder** with sources | [Check ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/) |
+| E3 | Policy set with versions and approvals | Policy register |
+| E4 | The eleven registers | As listed in the baseline |
+| E5 | Organisation chart with named roles and certifications | Compliance |
+| E6 | Account map with prescribed titles | Finance |
+| E7 | Daily assertion results for a sample period | Operations |
+| E8 | Reconciliation outputs with exception ageing | Operations |
+| E9 | Incident register with closed actions | Operations |
+| E10 | Drill records — business continuity, retrieval, square-off, kill switch | Operations and technology |
+| E11 | Audit reports and action closure | Compliance |
+| E12 | Filing register with acknowledgements | Compliance |
+| E13 | Board and committee minutes | Company secretary |
+| E14 | Vendor register with assessments | Operations |
+| E15 | Certification matrix against enabled configuration | Operations |
+
+## 4. The self-inspection drill
+
+| Element | Detail |
+|---|---|
+| Frequency | **Annually**, and in week four after go-live |
+| Method | Use the **real question set** in section 2 and the real evidence path |
+| **Timed** | A question that takes a day in a drill takes a day in an inspection |
+| Independent | Run by someone who did not build the thing being tested; internal audit is the natural choice |
+| Sampling | Real clients, real dates, real orders — not prepared examples |
+| **Hardest questions first** | "Why was this order released", "why was this client squared off", "produce a contract note from six years ago" |
+| Output | A findings list with dated actions and owners |
+| Closure | Tracked; **an unclosed action from the last drill is the first finding of the next** |
+
+<Aside type="caution" title="Use real samples, chosen by the person running the drill">
+A self-inspection using examples the team selected is a demonstration, not a test. The value comes from a sample the operator did not prepare: a client picked at random, an order from an arbitrary minute, a date six years back. If the answer comes quickly, the firm is ready. If it requires a query to be written, a vendor to be called, or a backup to be restored, the firm has found exactly what an inspection would find, with time to fix it.
+</Aside>
+
+## 5. During an inspection
+
+| Practice | Detail |
+|---|---|
+| Single point of contact | Compliance coordinates; others do not respond directly |
+| **Answer what is asked** | Volunteering adjacent material lengthens the inspection and raises new questions |
+| Accuracy over speed | A wrong answer corrected later is worse than a considered one |
+| **Log every request and response** | What was asked, what was provided, when, by whom |
+| Produce from the system | Not from a spreadsheet prepared for the purpose |
+| **Report known breaches** | Before the inspection finds them; this is handled differently |
+| Do not speculate | "I will confirm and revert" is a complete answer |
+| Escalate internally | Senior management informed of scope and direction |
+| Working space | Separate, with controlled access |
+| After | Findings, responses, remediation plan with dates and owners, closure tracking |
+
+## 6. Common findings and their root causes
+
+| Finding | Root cause | Prevention |
+|---|---|---|
+| A value in use is not in any approved policy | **Configuration drift from policy** | Monthly diff of deployed against the approved register |
+| A discretionary value is described as regulatory | **Misclassification** | The classification column, reviewed |
+| An obligation was not filed | **An unowned obligation** | Alarm on unowned calendar items |
+| Reconciliation exceptions aged | **Measuring count, not age** | Age of the oldest open item as the metric |
+| A record could not be produced | **Untested retrieval** | The annual retrieval drill |
+| Square-off thresholds differ from the disclosed policy | **Policy-mirror drift** | Change request requires the policy version |
+| A terminal was used before reporting | Procedural gate rather than a technical one | Routing gated on the reporting reference |
+| A certification lapsed and the person continued | A report instead of an action | Automatic deactivation on expiry |
+| Screening results without a list version | Missing field | Mandatory list version with every result |
+| An alert population with no dispositions | Capacity, or no workflow | Open-alert ageing as the metric |
+| A client traded without a registry record | A bypassed gate | Alarm on activation without a record |
+| Contract notes issued on unreconciled trades | Deadline pressure overriding the gate | The gate enforced in code |
+| Client funds in a non-client account | Gateway settlement configuration | Daily account-level assertion |
+| Board accountability not evidenced | Pack produced without minutes | Minutes as the evidence |
+
+The pattern is visible: almost every finding is one of **unowned**, **misclassified**, **drifted**, **aged**, or **untested**. A firm that builds controls against those five words prevents most of the list.
+
+## 7. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.cmp.insp.evidence_pack_maintained` | Continuously | Discretionary, strongly recommended | Evidence assembled under pressure |
+| `finix.cmp.insp.self_inspection_frequency` | **Annual**, plus week four after go-live | Discretionary, strongly recommended | Readiness untested |
+| `finix.cmp.insp.self_inspection_samples` | **Real, selected by the drill runner** | Discretionary, strongly recommended | A demonstration rather than a test |
+| `finix.cmp.insp.timed` | True | Discretionary | Slow answers not identified |
+| `finix.cmp.insp.single_point_of_contact` | Compliance | Discretionary, strongly recommended | Inconsistent answers |
+| `finix.cmp.insp.request_log` | True | Regulatory in substance | No record of what was provided |
+| `finix.cmp.insp.known_breach_reporting` | **Before discovery** | Regulatory | A breach found rather than reported |
+| `finix.cmp.insp.action_closure_tracking` | True | Discretionary, strongly recommended | Repeat findings |
+| `finix.cmp.insp.config_policy_diff` | Monthly | Discretionary, strongly recommended | Drift |
+
+## 8. Exception paths
+
+| Situation | Response |
+|---|---|
+| A question cannot be answered from the system | Note it; answer as fully as possible; **treat it as a finding to fix** |
+| A record cannot be retrieved | High severity; escalate internally; be straightforward with the inspector |
+| A breach is identified during preparation | **Report it before the inspection finds it** |
+| An inspector asks about an area with no evidence | Say so; produce what exists; remediate |
+| A finding is disputed | Respond factually with evidence; do not argue without it |
+| Remediation cannot be completed in the stated time | Propose a dated plan rather than missing a commitment |
+| A self-inspection fails badly | Treat it as the gift it is; dated actions; re-run after remediation |
+| An unclosed action from the previous drill appears | It is the first finding; close it |
+
+## Practical notes
+
+- **Maintain the evidence pack continuously.** The difference between produced and assembled is visible within minutes.
+- **Run the drill with samples the operators did not choose.** Anything else is a rehearsal of a performance.
+- **Time the drill.** Slow is the same as absent when there are twenty more questions.
+- **Build controls against the five words**: unowned, misclassified, drifted, aged, untested.
+- **Report known breaches first.** The handling is materially different.
+- **Answer what is asked.** Helpfulness lengthens inspections.
+- **Close the actions.** An unclosed action is the finding that compounds.
+
+## Where this connects
+
+- [Compliance configuration baseline](/broking-kyc/finix-broking-setup/compliance/01-compliance-config-baseline/) — the first artefact produced
+- [Pre-trade check ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/) — the second
+- [Statements and retention](/broking-kyc/finix-broking-setup/backoffice/08-statements-retention/) — the retrieval drill
+- [Regulatory reporting pipeline](/broking-kyc/finix-broking-setup/compliance/02-reporting-pipeline/) — the filing register
+- [Inspection types](/broking-kyc/deep-dives/compliance-audit/inspection-types/) — what inspections look like
+- [Concurrent audit](/broking-kyc/deep-dives/compliance-audit/concurrent-audit/) and [system audit](/broking-kyc/deep-dives/compliance-audit/system-audit/) — the audit cycle
+- [Periodic calendar](/broking-kyc/finix-broking-setup/daily-ops/09-periodic-calendar/) — where the drill is scheduled

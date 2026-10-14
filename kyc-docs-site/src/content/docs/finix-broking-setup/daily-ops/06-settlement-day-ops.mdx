@@ -1,0 +1,194 @@
+---
+title: "Daily ops 6: settlement day operations"
+description: The timed settlement-day sequence — obligation loading and client allocation, shortfall identification early enough to act, the funding decision chain counted back from the bank cut-off, securities and funds pay-in, pay-out receipt and same-day client disbursement, short delivery handling, and the assertions that prove the day settled.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Settlement day is the only day where a failure costs money the same day with a defined consequence path and no recovery window. The page is therefore organised around the deadline chain, with prevention first — identify shortfalls while there is still time to fix them — and the sequence second. The assertions at the end exist because "we instructed it" and "it settled" are different statements and only the second one is true.
+
+## TL;DR
+
+- **The operative deadline is the bank's cut-off**, which is earlier than the clearing corporation's, and the internal deadline is earlier still by the maker-checker time plus a buffer.
+- **Prevention beats cure by an enormous margin.** A securities shortfall identified at 15:45 can be fixed; the same shortfall identified when the instruction is rejected cannot.
+- **The final obligation report arrives on T+1**, so the settlement working window is tighter than the T+1 label suggests.
+- **Client obligations must tie to the member obligation** before settlement preparation proceeds.
+- **Early pay-in earns a margin benefit** and the recognition must be asserted, not assumed.
+- **Pay-out received is moved to the downstreaming nodal account and disbursed to clients the same day.**
+- **Short delivery has a defined and expensive consequence path** — auction, then close-out — with the cost allocated per the disclosed policy.
+- **Assert recognition, not instruction.** An instruction sent is not an obligation met.
+
+## 1. The deadline chain
+
+Count backwards. The number in the runbook is the internal one.
+
+| Step | Set by | Relationship |
+|---|---|---|
+| Clearing corporation pay-in deadline | Clearing corporation | Published |
+| **Bank channel cut-off** | The bank | **Earlier**, per bank and channel, **in writing** |
+| Maker-checker time | The firm | Measured |
+| Contingency buffer | The firm | For a failed first attempt |
+| **Internal deadline** | The firm | **In the runbook** |
+| **Decision point** | The firm | Early enough that a funding decision can be executed by the internal deadline |
+
+<Aside type="caution" title="Everyone knows the exchange time; almost nobody has written down the real one">
+The published clearing corporation deadline is the number that appears in every discussion and the number that matters least operationally. The one that decides whether the firm settles is the bank's channel cut-off minus the firm's own approval time minus a buffer. Obtain the bank cut-offs in writing per channel, measure your own approval time rather than estimating it, and publish the resulting internal deadline. Then alert at the decision point, not at the deadline.
+</Aside>
+
+## 2. The sequence
+
+| # | Step | Owner | Assertion | If not met |
+|---|---|---|---|---|
+| 1 | Settlement calendar confirmed for today | Operations | Settlement day, per the **settlement** calendar, not the trading calendar | Verify manually |
+| 2 | **Bank holiday check** | Treasury | Banking channels available today | **Alternative channel arranged in advance** |
+| 3 | **Final obligation report retrieved** | Operations | Received; counts and totals asserted | **Escalate.** Obligations cannot be estimated |
+| 4 | Obligations loaded | Operations | Idempotent | Re-load |
+| 5 | **Client-level obligations computed** | Operations | **Sum ties to the member obligation** | **Block preparation**; investigate |
+| 6 | **Funds shortfalls identified** | Operations | Published to treasury and client-facing teams | — |
+| 7 | **Securities shortfalls identified** | Operations | Published; **early enough to act** | — |
+| 8 | Early pay-in candidates identified | Operations | Clients holding what they must deliver | — |
+| 9 | Client communication on shortfalls | Support and risk | Delivered | Record the failure |
+| 10 | **Funding decision** | Treasury | At the decision point | Escalate |
+| 11 | Early pay-in instructed | Operations | Instruction acknowledged | Investigate |
+| 12 | **Early pay-in recognition asserted** | Operations | **Benefit actually recognised** | Investigate same day |
+| 13 | Securities pay-in instructed | Operations | Before the depository cut-off | Escalate |
+| 14 | **Funds instruction prepared and approved** | Treasury | Maker-checker complete | — |
+| 15 | **Funds instruction sent** | Treasury | **Before the bank's cut-off** | Alternate channel; escalate |
+| 16 | Bank debit confirmed | Treasury | Debit visible | Investigate |
+| 17 | **Clearing corporation recognition asserted** | Operations | **Recognised, not assumed** | **Escalate immediately** |
+| 18 | Securities pay-out received | Operations | Per the obligation | Investigate |
+| 19 | **Direct pay-out to client demat verified** | Operations | Securities where the client expects | Investigate |
+| 20 | **CUSPA auto-pledge for unpaid positions** | Operations | Pledges created match pay-outs against unpaid obligations | Stop further exposure; escalate |
+| 21 | Funds pay-out received into the clearing account | Treasury | Per the obligation | Investigate |
+| 22 | **Moved to the downstreaming nodal account, same day** | Treasury | A2 funded | **Client pay-outs cannot proceed** |
+| 23 | Client pay-outs disbursed from A2 | Treasury | Within the published cut-off | — |
+| 24 | **Short deliveries identified** | Operations | Known before the auction | — |
+| 25 | Auction participation and outcomes | Operations | Per the clearing corporation process | — |
+| 26 | Auction and close-out costs allocated | Operations | Per the disclosed policy | — |
+| 27 | Client communication on short delivery | Support | What happened, the cost, and why | — |
+| 28 | **Settlement reconciliation** | Operations and treasury | Bank summary report and daily funds statement against the ledger | Investigate |
+| 29 | Settlement assertions complete | Operations | Section 5 | Escalate |
+| 30 | Written handover | All | Signed | — |
+
+## 3. Shortfall prevention
+
+| Shortfall | Identify by | Options while there is time |
+|---|---|---|
+| **Client funds** | As soon as client obligations are computed | Client pays; the firm funds and recovers; reduce the obligation where possible |
+| **Client securities** | As soon as obligations and holdings are known | Client transfers in; buy-in; accept the auction path knowingly |
+| Firm funds against the member obligation | On the obligation | Facility; collateral conversion; own funds |
+| Collateral composition | Continuously | Convert; fund |
+
+| Control | Detail |
+|---|---|
+| **Run shortfall identification as early as the data allows** | It is the single highest-value habit in this runbook |
+| Publish it to people who can act | Treasury, risk, support, and the client |
+| Client contact | Early and specific: the amount, the deadline and the consequence |
+| Track the resolution | Not just the identification |
+
+## 4. Funding execution
+
+| Element | Detail |
+|---|---|
+| Sources | Client funds in the nodal account for client obligations; own funds for own obligations; facility for timing |
+| **Segregation** | Client obligations funded from client money; the firm's own obligations from own money; **no cross-client use** |
+| Channel | Per bank, with an alternate identified |
+| Approval | Maker-checker, measured |
+| **Recognition** | **Asserted with the clearing corporation**, not assumed from the bank debit |
+| Escalation | Named bank contact with a phone number |
+| Record | Instruction, approval, send time, debit, recognition |
+
+## 5. The settlement assertions
+
+| # | Assertion | Evidence |
+|---|---|---|
+| S1 | Client obligations tie to the member obligation | Computation against the obligation file |
+| S2 | Funds pay-in **recognised** by the clearing corporation | Clearing corporation confirmation |
+| S3 | Securities pay-in instructed and acknowledged | Depository acknowledgement |
+| S4 | Early pay-in **benefit recognised** | Margin statement |
+| S5 | Pay-out received per the obligation | Clearing corporation and bank |
+| S6 | **Direct pay-out reached client demat accounts** | Depository |
+| S7 | **CUSPA pledges created for unpaid positions** | Depository confirmations |
+| S8 | **Funds pay-out moved to A2 the same day** | Bank |
+| S9 | Client disbursements made from A2 only | Bank and payout records |
+| S10 | Short deliveries identified and costs allocated | Shortage and auction reports |
+| S11 | Clearing account movements reconciled | Bank summary report, daily funds statement, ledger |
+| S12 | **Segregation assertion holds** | Ledger against client money held plus upstreamed |
+
+## 6. Short delivery
+
+| Stage | Action | Communication |
+|---|---|---|
+| Identified before the deadline | Buy-in, or client transfer | Client told, with the deadline |
+| Not resolved | Goes to auction | Client told what will happen |
+| Auction | Clearing corporation conducts it | — |
+| Close-out | Where the auction does not succeed, at the prescribed basis | — |
+| Cost | Price difference plus charges | **Itemised to the client, with the computation** |
+| Allocation | Per the agreement and the disclosed policy | — |
+| Recurrence | A client with repeated short deliveries is a credit and conduct matter | Internal escalation |
+
+Depth at [short delivery and auction](/broking-kyc/deep-dives/trading-day/short-delivery-auction/).
+
+## 7. Commodity settlement differences
+
+| Element | Detail |
+|---|---|
+| Clearing route | Through a clearing member at launch; the clearing member's formats and timetable govern |
+| Delivery | Physical, with warehouse documentation and quality grades |
+| **Tender intention** | By **19:30** on tender days through MCXCCL eClear |
+| Seller early pay-in | Exempts all margins except mark-to-market, with documentary evidence |
+| Margin ladder | Delivery period margin and the 8.34 percent tender increment |
+| Timing | The commodity settlement work happens in the evening, alongside the equity pipeline |
+
+## 8. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.ops.settle.internal_deadline` | **Bank cut-off minus maker-checker minus buffer** | Discretionary, strongly recommended | Missed pay-in |
+| `finix.ops.settle.decision_point_alert` | Before the internal deadline | Discretionary, strongly recommended | Decisions too late to execute |
+| `finix.ops.settle.bank_cutoff_source` | **In writing, per bank and channel** | Bank-set | Wrong deadline assumption |
+| `finix.ops.settle.bank_holiday_check` | Daily, against the bank calendar | Bank-set | A settlement day with no channel |
+| `finix.ops.settle.obligation_tie_out` | **Required before preparation** | Discretionary, strongly recommended | Settling on an unreconciled obligation |
+| `finix.ops.settle.shortfall_identification_time` | As early as the data allows | Discretionary, strongly recommended | Preventable short deliveries |
+| `finix.ops.settle.early_payin_recognition_assert` | True | Discretionary, strongly recommended | Benefit assumed but not received |
+| `finix.ops.settle.recognition_assert` | **True** | Discretionary, strongly recommended | Assumed credit |
+| `finix.ops.settle.payout_to_a2_same_day` | True | Regulatory | Client pay-outs funded from a pool |
+| `finix.ops.settle.short_delivery_cost_itemised` | True, with the computation | Regulatory in substance | Unexplainable client charges |
+| `finix.ops.settle.assertions` | S1 to S12 | Discretionary, strongly recommended | "We instructed it" treated as "it settled" |
+
+## 9. Exception paths
+
+| Situation | Response |
+|---|---|
+| Final obligation not received | **Escalate immediately.** Do not estimate |
+| Client obligation sum does not tie | Block preparation; investigate; the clearing corporation governs |
+| Funds shortfall at the decision point | Treasury decision: facility, collateral conversion, own funds. **The deadline does not wait for client recovery** |
+| Bank channel fails before the cut-off | Alternate channel, alternate bank, escalate to the clearing corporation; document every attempt |
+| Instruction sent, recognition not confirmed | **Escalate immediately**; a sent instruction is not a met obligation |
+| Securities shortfall identified late | Buy-in if time permits; otherwise prepare the auction path and tell the client |
+| Early pay-in not recognised | Investigate same day; the benefit was assumed in the margin computation |
+| Pay-out not received as expected | Escalate to the clearing corporation; client disbursements may be affected |
+| A2 not funded from the day's receipt | **Client pay-outs cannot proceed**; explain to clients rather than funding from a pool |
+| CUSPA pledge not created | Stop further exposure; escalate; the statutory clock is running |
+| Client disputes a close-out cost | Produce the obligation, the shortfall, the auction outcome and the policy clause |
+| Settlement day coincides with a bank holiday | The alternative channel must already be arranged; this is foreseeable |
+
+## Practical notes
+
+- **Put the internal deadline in the runbook, not the exchange's.** It is the only one that decides anything.
+- **Run shortfall identification as early as the data allows and publish it.** Prevention is cheaper than the auction path by an order of magnitude.
+- **Assert recognition, never assume it.** The gap between a bank debit and clearing corporation recognition is where defaults happen.
+- **Check the bank calendar as well as the settlement calendar.** The combination is foreseeable and the alternative has to be arranged in advance.
+- **Itemise short-delivery costs with the computation.** Clients dispute what they cannot reconstruct.
+- **Treat repeated short delivery as a credit matter.** It is a pattern, not a series of accidents.
+- **Complete the twelve assertions before you call the day settled.** Instructed is not settled.
+
+## Where this connects
+
+- [Settlement obligations](/broking-kyc/finix-broking-setup/backoffice/05-settlement-obligations/) — the processing detail
+- [Treasury and exchange funding](/broking-kyc/finix-broking-setup/money/05-treasury-exchange-funding/) — the funding decision
+- [Bank account architecture](/broking-kyc/finix-broking-setup/setup/06-bank-account-architecture/) — A2 and the same-day rule
+- [CUSPA](/broking-kyc/finix-broking-setup/backoffice/06-cuspa-unpaid-securities/) — the pay-out pledge
+- [Short delivery and auction](/broking-kyc/deep-dives/trading-day/short-delivery-auction/) — the consequence path
+- [EOD runbook](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/) — the pipeline this sits inside
+- [Incident playbooks](/broking-kyc/finix-broking-setup/daily-ops/07-incident-playbooks/) — when funding or instruction fails

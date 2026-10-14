@@ -1,0 +1,193 @@
+---
+title: "Daily ops 8: expiry operations"
+description: The expiry-week and expiry-day sequence — the client communication timeline that starts well before the week, the delivery-margin ladder, position review and the square-off decision points, the Tuesday and Thursday concentration, physical settlement handling, commodity tender days, and the day-after reconciliation.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Expiry is predictable, which makes almost every expiry problem preventable. The page is therefore a timeline that starts well before expiry week rather than on expiry day, because the decisions that matter — tell the client, review the position, plan the funding — have to be made while there is still time to act on them. Expiry day itself is mostly execution and monitoring; the work is earlier.
+
+## TL;DR
+
+- **Two concentration days a week now, not one.** NSE's weekly index expiry is **Tuesday** and BSE's is **Thursday**, following the standardisation effective 1 September 2025.
+- **Delivery margins build across the last sessions of expiry week**, not on expiry day. The step change arrives before most clients are thinking about expiry.
+- **Client communication starts well before expiry week.** A client who discovers a physical-settlement obligation on expiry day has been failed by the communication, not by the market.
+- **A failed square-off is not an exit.** If illiquidity or a price band blocks the closing trade, the residual quantity stays in the delivery queue and becomes an obligation.
+- **Commodity tender days have a 19:30 eClear deadline** and a margin ladder that starts three trading days before expiry.
+- **Capacity concentrates.** Order rates, modification rates and square-off activity all peak in the final hour, and the firm's own risk engine is one of the largest order generators.
+- **The day after expiry is a reconciliation day**: delivery obligations, assignments, residual positions and corrected contract notes.
+
+## 1. Framework
+
+- **Expiry standardisation** — one weekly benchmark index contract per exchange; **NSE Tuesday, BSE Thursday**, effective 1 September 2025 following SEBI's circular of 26 May 2025. `[not yet in index]`
+- **Physical settlement of single-stock derivatives** — mandated by SEBI/HO/MRD/DOPI/CIR/P/2018/161 (31 December 2018), phased across the 2019 expiries. `[not yet in index]`
+- **Delivery margin staging** — staged across the last sessions of expiry week per NCL/CMPT/43262 (17 January 2020). `[not yet in index]`
+- **[NCL/CMPT/55330](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt55330)** (20 January 2023) as updated by **[NCL/CMPT/56167](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt56167)** (28 March 2023) — netting of derivatives delivery obligations with cash-segment obligations for the same clearing member, trading member and unique client code.
+- **Expiry withdraws the cross-margin spread benefit on the expiring leg** — index contracts from 1 February 2025 under [SEBI/HO/MRD/TPD/P/CIR/2024/132](/broking-kyc/reference/circulars/sebi-other/#sebihomrdtpdpcir2024132); single stocks per the February 2026 instruction effective three months from issue.
+- **Commodity staggered delivery** — tender period over the last three trading days including expiry, with an **8.34 percent incremental margin**; delivery intention until **19:30** through MCXCCL eClear; delivery period margin at the higher of 3 percent plus five-day 99 percent value-at-risk of spot volatility, or 25 percent.
+- Depth: [expiry day operations](/broking-kyc/trading-risk/expiry-day-operations/), [exercise, assignment and physical settlement](/broking-kyc/trading-risk/exercise-assignment-physical/).
+
+## 2. The timeline
+
+| When | Activity | Owner |
+|---|---|---|
+| **Monthly, in advance** | Expiry calendar published internally; capacity and staffing planned | Operations |
+| **Several sessions before expiry week** | **Client communication**: which positions expire, what physical settlement means, what the margin ladder will do | Support and risk |
+| **Several sessions before** | Commodity clients told about the tender period and the delivery-period margin | Support and risk |
+| Start of expiry week | Position review: who holds what, who will have a delivery obligation | Risk |
+| Start of expiry week | **Forward funding view** for the delivery-margin ladder | Treasury |
+| **Across expiry week** | **Delivery margins stage upward**; margin calls follow | Risk |
+| Expiry week | Cross-margin spread benefit withdrawn on expiring legs | Risk |
+| Expiry week | Clients contacted about positions heading into delivery | Support |
+| **Expiry day, pre-open** | Final position review; square-off decision points identified | Risk |
+| Expiry day, session | Elevated monitoring; capacity watched | All |
+| **Expiry day, final hour** | Concentration peak; square-off execution; residual tracking | Risk and dealing |
+| Expiry day, close | Residual positions recorded; delivery obligations known | Risk and operations |
+| **Expiry day, evening** | Delivery obligations processed; netting applied | Operations |
+| **Day after** | Reconciliation: assignments, deliveries, residuals, corrections | Operations |
+
+<Aside type="caution" title="The client who is surprised on expiry day was failed a week earlier">
+Physical settlement, the delivery-margin ladder and the commodity tender period are all published, predictable and computable from the client's own position days in advance. A client who learns on expiry day that their option position creates a share-delivery obligation, or that their commodity position now requires a margin an order of magnitude larger, has not been caught out by the market — they have been failed by a communication that should have gone several sessions earlier. Treat the pre-expiry communication as the primary control, with square-off as the fallback rather than the plan.
+</Aside>
+
+## 3. Position review
+
+| Review | When | Output |
+|---|---|---|
+| **Positions expiring this week** | Start of expiry week | A list, by client, by instrument |
+| **Which will create a delivery obligation** | Start of expiry week | Direction matters: long futures and exercised long calls receive; short futures, assigned short calls and exercised long puts deliver |
+| Clients without the capacity to take or make delivery | Start of expiry week | Early contact |
+| Clients without an active demat account | Start of expiry week | **Cannot settle a delivery**; urgent |
+| Positions in illiquid contracts | Mid-week | **Square-off may fail**; plan earlier |
+| Positions in instruments under a restriction | Mid-week | A band, halt or call auction can block the exit |
+| Commodity positions heading into the tender period | **Before the tender period starts** | The margin ladder and the tender deadline |
+| Cross-margin positions with an expiring leg | Before the benefit is withdrawn | The requirement will rise |
+
+## 4. Square-off decision points
+
+| Point | Consideration |
+|---|---|
+| Early in expiry week | Liquidity is best; the client has the most options |
+| Mid-week | The delivery ladder is building; margin pressure begins |
+| **Expiry day, early** | Still liquid; the firm has time to act if an exit fails |
+| **Expiry day, final hour** | **Liquidity thins, prices move, and a failed exit becomes an obligation** |
+| After close | Too late; the position settles |
+
+| Rule | Detail |
+|---|---|
+| Decide early | The firm's disclosed policy should state what it does with positions heading into delivery |
+| **A failed square-off is not an exit** | The residual stays in the delivery queue; escalate rather than retry |
+| Restrictions apply | A banned underlying still permits reduction; a halted or band-locked instrument does not |
+| Lot size | Derivatives cannot be partially exited below one lot; a structural residual |
+| Communication | Before acting, where time allows; see [square-off engine](/broking-kyc/finix-broking-setup/rms/06-squareoff-engine/) |
+
+## 5. Capacity on expiry day
+
+| Pressure | Source |
+|---|---|
+| Order rate | Client activity concentrated in the final hour |
+| Modification and cancellation rate | Repositioning |
+| **Square-off generation** | **The firm's own engine, concurrent with the volatility that triggered it** |
+| Market data | Tick rates multiply |
+| Risk computation | Every position revalued repeatedly |
+| Client logins and screens | Concentration |
+| Support contact | Concentration |
+| **Two days a week** | NSE Tuesday and BSE Thursday |
+
+| Preparation | Detail |
+|---|---|
+| Load-tested at the measured peak **including the square-off burst** | See [infrastructure and connectivity](/broking-kyc/finix-broking-setup/setup/08-infrastructure-connectivity/#31-capacity-sizing) |
+| Staffing uplift on both concentration days | Dealing, risk, support, technology |
+| No changes deployed on expiry days | A standing rule |
+| Monitoring attention raised | Latency, rejection rate, queue depths |
+| Escalation pre-staged | Named people available |
+
+## 6. Physical settlement handling
+
+| Step | Detail |
+|---|---|
+| Direction determined | Per leg, not per profit: long future and exercised long call receive; short future, assigned short call and exercised long put deliver; out-of-the-money options produce nothing |
+| Obligation computed | Per client |
+| **Netting** | Derivatives delivery obligations net against cash-segment obligations for the same clearing member, trading member and unique client code; **securities tax and stamp duty remain segment-wise** |
+| Delivery instructions | Through the depository, by the deadline |
+| Shortfall | The short-delivery path; see [settlement day operations](/broking-kyc/finix-broking-setup/daily-ops/06-settlement-day-ops/#6-short-delivery) |
+| Unpaid obligations | CUSPA applies at pay-out |
+| Client communication | What they must deliver or will receive, and by when |
+| Corporate actions | Can accelerate an expiry and change the obligation |
+
+## 7. Commodity tender days
+
+| Element | Detail |
+|---|---|
+| Window | The last three trading days including expiry, **excluding special sessions such as Muhurat** |
+| Margin | **8.34 percent incremental** across those days, on top of the delivery period margin |
+| **Deadline** | **19:30** for delivery intention through MCXCCL eClear |
+| Staffing | **A named, certified, present, authorised person** on every tender day |
+| Seller early pay-in | Exempts all margins except mark-to-market, with documentary evidence |
+| Clearing route | Through the clearing member at launch; their timetable governs |
+| Escalation | Before 19:30, not at it |
+
+## 8. The day after
+
+| # | Activity | Owner |
+|---|---|---|
+| 1 | Expiry processing verified: settled, assigned, delivered | Operations |
+| 2 | **Assignment outcomes reconciled** against client positions | Operations and risk |
+| 3 | Delivery obligations reconciled, including netting | Operations |
+| 4 | Residual positions from failed square-offs reconciled | Risk |
+| 5 | Short deliveries identified and the auction path started | Operations |
+| 6 | Contract notes for expiry-day activity verified | Operations |
+| 7 | Margin released on expired positions | Risk |
+| 8 | Client queries handled — assignments are the main theme | Support |
+| 9 | **Review**: what surprised clients, what surprised the firm | All |
+| 10 | Next expiry's communication plan adjusted | Support and risk |
+
+## 9. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.ops.expiry.client_notice_sessions` | **Several sessions before expiry week** | Discretionary, strongly recommended | Avoidable client surprise |
+| `finix.ops.expiry.commodity_notice_sessions` | Before the tender period | Discretionary, strongly recommended | A large, predictable margin surprise |
+| `finix.ops.expiry.position_review_start` | Start of expiry week | Discretionary | Late discovery of delivery obligations |
+| `finix.ops.expiry.no_demat_alert` | Immediate | Discretionary, strongly recommended | A client who cannot settle |
+| `finix.ops.expiry.squareoff_policy` | Disclosed; states what the firm does with delivery-bound positions | Discretionary, disclosed | Undisclosed action |
+| `finix.ops.expiry.failed_exit_escalation` | Escalate, do not retry | Discretionary, strongly recommended | A retry loop into an illiquid book |
+| `finix.ops.expiry.no_deploy_rule` | **No changes on expiry days** | Discretionary, strongly recommended | A change colliding with the peak |
+| `finix.ops.expiry.capacity_plan` | Measured peak including the square-off burst | Discretionary, strongly recommended | Capacity failure on the busiest day |
+| `finix.ops.expiry.staffing_uplift` | Both concentration days | Discretionary | Understaffed peaks |
+| `finix.ops.expiry.tender_day_presence` | Named, certified, present | Discretionary, strongly recommended | A missed 19:30 deadline |
+
+## 10. Exception paths
+
+| Situation | Response |
+|---|---|
+| Square-off fails on illiquidity | Escalate; the residual becomes a delivery obligation; inform the client |
+| Instrument band-locked or halted during the final hour | Cannot exit; escalate; manage the resulting obligation |
+| Client without a demat account holding a delivery-bound position | Urgent: resolve or close the position; a client who cannot settle is a short delivery |
+| Corporate action accelerates an expiry | **Prominent, immediate communication**; review delivery consequences |
+| Capacity strain in the final hour | Expected; the plan should cover it; rate-limit by client if needed, never globally |
+| Commodity tender deadline approaching without cover | Escalate before 19:30 |
+| Assignment outcome disputed | Produce the position, the assignment and the direction rules |
+| Short delivery after expiry | The auction path; costs allocated per the disclosed policy |
+| Cross-margin benefit withdrawal causes a breach | Predictable; the forward view should have flagged it |
+| Both exchanges' expiries in the same week with a holiday | Concentration shifts; re-plan staffing |
+
+## Practical notes
+
+- **Communicate several sessions before expiry week, not during it.** It is the primary control and it is cheap.
+- **Review positions against demat status early.** A client who cannot settle is a short delivery with a known cost.
+- **Treat a failed square-off as an escalation, not a retry.** The residual is an obligation.
+- **Do not deploy on expiry days.** It should be a standing rule, not a judgement call.
+- **Load-test with the square-off burst included.** The firm's own engine is a major order generator at exactly the wrong moment.
+- **Staff both concentration days.** Tuesday and Thursday now both carry weight.
+- **Review after every expiry.** The surprises repeat unless the communication plan changes.
+
+## Where this connects
+
+- [NSE derivatives](/broking-kyc/finix-broking-setup/exchanges/02-nse-fno/) — expiry days, contract sizes and the delivery ladder
+- [MCX commodities](/broking-kyc/finix-broking-setup/exchanges/04-mcx-commodity/) — the tender period
+- [Expiry day operations](/broking-kyc/trading-risk/expiry-day-operations/) and [exercise, assignment and physical settlement](/broking-kyc/trading-risk/exercise-assignment-physical/) — depth
+- [Square-off engine](/broking-kyc/finix-broking-setup/rms/06-squareoff-engine/) — the decision points and failed exits
+- [Settlement obligations](/broking-kyc/finix-broking-setup/backoffice/05-settlement-obligations/) — physical and commodity delivery
+- [Collateral and cross-margin](/broking-kyc/trading-risk/collateral-cross-margin/) — the spread-benefit withdrawal
+- [Periodic calendar](/broking-kyc/finix-broking-setup/daily-ops/09-periodic-calendar/) — where expiry planning sits

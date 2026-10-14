@@ -1,0 +1,233 @@
+---
+title: "Compliance 1: the configuration baseline"
+description: The obligation-to-configuration-to-evidence map — every statutory and circular obligation matched to the value that implements it, the system that evidences it and the person who owns it, with the policy set, the registers, the classification rules and the daily, weekly and periodic assertions that keep the map true.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** An inspection does not ask whether the firm is compliant; it asks what the control is, where it sits, what evidences its operation and who owns it. That is a four-column table, and a firm that has it answers in minutes while a firm that does not spends a fortnight assembling it from code and recollection. So this page is that table, preceded by the classification rules that make it meaningful and followed by the registers and assertions that keep it honest.
+
+## TL;DR
+
+- **Four columns answer almost every inspection question**: obligation, configuration that implements it, system that evidences it, person who owns it.
+- **Classification is the part that is easiest to get wrong and fastest to be noticed.** Regulatory values need a circular; exchange-set values need an ingestion job with a staleness behaviour; discretionary values need an approved policy and an approver.
+- **Five values are statutory absolutes** with no discretion: the eight-year retention floor, the 24-hour contract-note window, the five-trading-day CUSPA cap, the 21-calendar-day complaint clock, and the prohibition on cash from clients.
+- **Seven values must mirror the client-facing risk management policy** exactly, because operating outside a disclosed mandate is the finding an arbitrator reaches first.
+- **Eleven registers carry the evidence**, and each has an owner and a retention period.
+- **The daily assertions are the heartbeat**: segregation, upstreaming computed versus confirmed, the begin-of-day gates and the extract that unblocks tomorrow.
+- **An obligation without an owner should alarm.** It is the single most valuable control on this page.
+
+## 1. Classification rules
+
+| Class | Evidence required | What must also exist |
+|---|---|---|
+| **Regulatory** | The regulation or circular, with paragraph | Implementation evidence; change control through compliance |
+| **Exchange-set** | The circular, **plus a named ingestion job** | A staleness threshold and a stated behaviour on staleness |
+| **Discretionary** | A board or committee-approved policy, with an approver and a date | Client disclosure where client-affecting |
+
+| Common misclassification | Reality |
+|---|---|
+| "SEBI allows 5x leverage" | The **multiplier is discretionary**, bounded by margin rules |
+| "We keep records for seven years" | **Eight years is a statutory floor** under regulation 16 |
+| "Complaint resolution in 21 working days" | **21 calendar days** under regulation 10(e) |
+| "We allow 50 percent cash because SEBI requires it" | The cash-equivalent minimum binds the **clearing member**, not each client |
+| "The exchange sets our square-off trigger" | **Discretionary and disclosed** |
+| "Cash is discouraged" | **Prohibited** by regulation 20(d) |
+| "Our unpaid-securities window is our policy" | **Capped at five trading days**; shorter is permitted, longer is a breach |
+
+<Aside type="caution" title="Misclassification is visible immediately">
+An inspector asking "under what authority do you apply this limit" and receiving a circular reference for a discretionary value, or a policy document for a statutory one, learns something about the firm's understanding in one question. The classification column is therefore not administrative tidiness — it is a direct demonstration of whether the firm knows which of its rules are its own. Review it with the same seriousness as the values themselves.
+</Aside>
+
+## 2. The map
+
+### 2.1 Client assets and money
+
+| Obligation | Source | Configuration | System and evidence | Owner |
+|---|---|---|---|---|
+| Client money segregated from own and from other clients | **Reg 18(2)(c)** | `finix.bo.ledger.inter_client_posting` = impossible; `finix.bo.ledger.prop_separation` = hard; account map | SecMark ledger; **daily segregation assertion** | Finance |
+| Cash from clients prohibited | **Reg 20(d)** | `finix.bo.ledger.cash_head` = absent; `finix.money.payin.cash_mode` = no code path | Ledger structure; payment configuration | Finance |
+| Collection into the prescribed nodal account | Upstreaming framework | `finix.money.payin.settlement_account` = A1 USCNB | Bank statement header; daily account assertion | Treasury |
+| Pay-out from the prescribed account, same-day funded | Upstreaming framework | `finix.money.payout.source_account` = A2; `same_day_funding_required` = true | Bank and payout records | Treasury |
+| End-of-day upstreaming in permitted forms | Upstreaming framework | `finix.money.upstream.schedule`, `forms_enabled` | **Computed-versus-confirmed assertion** | Treasury |
+| Third-party payments prohibited | Master circular | `finix.money.payin.third_party_block` = hard | Payer-attribution records | Treasury |
+| Client-level collateral allocation and reporting | **CIR/2021/0598** | `finix.rms.collateral.*` | Allocation files; three-way reconciliation | Operations |
+| Pledge, not transfer, for client collateral | **CIR/P/2020/28** | `finix.rms.collateral.recognise_on` = confirmed pledge | Depository records | Operations |
+| Unpaid securities under CUSPA | **HO/38/11/(9)2026-MIRSD-POD/I/15382/2026** | `finix.bo.cuspa.*` | Pledge confirmations; day-five and day-six tracking | Operations |
+
+### 2.2 Risk and margin
+
+| Obligation | Source | Configuration | System and evidence | Owner |
+|---|---|---|---|---|
+| Upfront margin collection | Master circular para 40.1.2 | `finix.rms.margin.basis` | Margin computation records | Risk |
+| Margin sufficient continuously | Peak-margin framework | Snapshot handling; `finix.rms.margin.mtm_frequency` | Snapshot reconciliation | Risk |
+| Margin reporting within the cut-off | Exchange | `finix.rms.report.margin_cutoff_days`, `internal_target_days` | Submissions and **acknowledgements** | Risk |
+| Pre-trade controls | Chapter III; exchange | The [check ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/) | Decision records with inputs | Risk |
+| No order reaches the market unevaluated | Architecture | `finix.oms.risk.timeout_action` = reject; single release point | Architectural proof plus a standing test | Technology and risk |
+| Position and open-interest limits | Exchange | `finix.rms.limits.oi_limit_source` | Monitoring records | Risk |
+| Ban-period restriction on fresh positions only | Exchange | `finix.exch.ban.fresh_only` = true | Rejection and acceptance records | Risk |
+| Square-off per the disclosed policy | Client agreement | `finix.rms.squareoff.*` **mirroring the policy** | Decision records | Risk |
+
+### 2.3 Records and client servicing
+
+| Obligation | Source | Configuration | System and evidence | Owner |
+|---|---|---|---|---|
+| **Records retained not less than eight years** | **Reg 16** | `finix.cmp.retention.books_years` = 8; scope = all classes | Retention configuration; **annual retrieval drill** | Compliance and technology |
+| Contract notes within 24 hours, digitally signed | Exchange format circulars | `finix.bo.cn.deadline_hours` = 24; signing certificate | Generation and dispatch evidence | Operations |
+| **Complaints redressed within 21 calendar days** | **Reg 10(e)** | `finix.cmp.complaint.clock_days` = 21; `clock_basis` = calendar | Complaint register | Compliance |
+| Continuous SCORES and ODR enrolment | **Reg 18(6)** | Enrolment monitored | Enrolment status | Compliance |
+| Monthly complaint disclosure | Master circular | Publication job | Published page | Compliance |
+| Statements at prescribed frequency and channel | Master circular | `finix.bo.stmt.frequency`, `channel` | Dispatch evidence | Operations |
+| **Investor awareness messages displayed** | **1 Oct 2026 circular** | `finix.cmp.awareness_messages.display`, `version_history` | Screenshot plus version record | Compliance and product |
+| Investor charter published | Master circular | Publication | Published page | Compliance |
+
+### 2.4 Fraud prevention and detection — Chapter IV
+
+| Obligation | Source | Configuration | System and evidence | Owner |
+|---|---|---|---|---|
+| Surveillance over the firm's own activity | **Regs 21–26** | `finix.rms.surv.rule_enabled.*` | Alert population and dispositions | Compliance |
+| **Mule-account detection** | **Reg 23(8)** | `finix.rms.surv.mule_rules_enabled` = **U1 to U10** | Rule set, tuning record, dispositions | Compliance |
+| Escalation path | Chapter IV | Workflow configuration | Case records with timestamps | Compliance |
+| Board accountability | Chapter IV | Board pack frequency | **Minutes** | Compliance and board |
+| **Whistle-blower policy and confidential channel** | **Reg 25** | Channel configuration, access-restricted | Policy; case records; annual test | Board and compliance |
+| Screening against prescribed lists | AML framework | `finix.onb.screen.*`, **list version recorded** | Screening results with list versions | Compliance |
+| Suspicious transaction reporting | PMLA framework | `finix.bo.rpt.str_*` | Filings; **and decisions not to file** | Principal officer |
+
+### 2.5 Governance and registration
+
+| Obligation | Source | Configuration | System and evidence | Owner |
+|---|---|---|---|---|
+| **Designated director resident ≥182 days per financial year** | Chapter II | Monitored as a compliance object | Residency tracking | Compliance |
+| Two years' securities experience | Chapter II | Documented at application | Evidence file | Compliance |
+| Net worth maintained | Chapter X | Monthly monitor with deductions | Computation; **half-yearly certificate** | Finance |
+| Fit and proper, continuing | Fit-and-proper criteria | Declarations and diligence | Register | Compliance |
+| NISM certification | Chapter II; exchange | `finix.oms.userid.cert_expiry_action` = deactivate | **Certificate register with expiry** | Compliance |
+| Identifier reporting before use | Exchange | `finix.oms.userid.routing_requires_report` = true | Identifier register; three-way reconciliation | Compliance |
+| Fees paid, with interest on delay | Chapter IX | Payment calendar | Receipts | Finance |
+| Cyber security and resilience | **Reg 18(5)** | [Cyber configuration](/broking-kyc/finix-broking-setup/compliance/04-cyber-cscrf-config/) | Framework, audits, drills | Technology and compliance |
+
+## 3. The statutory absolutes
+
+No discretion in either direction.
+
+| Value | Rule |
+|---|---|
+| `finix.cmp.retention.books_years` | **8** — a floor, not a target |
+| `finix.bo.cn.deadline_hours` | **24 from execution** — a ceiling |
+| `finix.bo.cuspa.payment_window_days` | **5 trading days** — a cap; shorter is permitted |
+| `finix.cmp.complaint.clock_days` / `clock_basis` | **21 / calendar** — a ceiling, in calendar days |
+| `finix.bo.ledger.cash_head` | **Absent** — a prohibition |
+
+## 4. The policy-mirror set
+
+These configuration values appear verbatim in the client-facing risk management policy. **Changing one without updating the other puts the firm outside its disclosed mandate.**
+
+| Value | Policy statement it mirrors |
+|---|---|
+| `finix.rms.squareoff.warn_pct` | When the client is warned |
+| `finix.rms.squareoff.trigger_pct` | When the firm acts |
+| `finix.rms.squareoff.grace_minutes` | How long the client has |
+| `finix.rms.squareoff.selection_rule` | Which positions are closed first |
+| `finix.rms.squareoff.intraday_time` | When intraday positions are closed |
+| `finix.rms.limits.exposure_multiplier` | The leverage offered |
+| `finix.rms.collateral.client_cash_policy` | Any client-level cash requirement, **as the firm's own policy** |
+
+| Control | Detail |
+|---|---|
+| Change request | For any of these keys, requires the policy version that will accompany it |
+| Deployment gate | The change does not deploy without the policy update |
+| Review | Quarterly, in the risk committee, against the published policy |
+| Client communication | Where capacity reduces |
+
+## 5. The policy set
+
+Day-one artefacts, each approved, owned and reviewed.
+
+| Policy | Driven by | Owner |
+|---|---|---|
+| Risk management policy, including leverage and square-off | Chapter III; client disclosure | Risk |
+| Client asset segregation policy and the account map | Reg 18(2)(c) | Finance |
+| Policy prohibiting cash receipts, with the control design | Reg 20(d) | Finance |
+| Records and retention policy | Reg 16 | Compliance |
+| Investor grievance policy with the 21-day clock | Reg 10(e), 18(6) | Compliance |
+| Cyber security and cyber resilience policy | Reg 18(5) | Technology |
+| Fraud prevention and detection framework | Chapter IV | Compliance |
+| **Whistle-blower policy and channel** | Reg 25 | Board |
+| Mule-account detection rule set and tuning record | Reg 23(8) | Compliance |
+| Code of conduct with staff acknowledgement | Chapter VIII | Human resources |
+| Unpaid securities policy | CUSPA framework | Operations |
+| Anti-money-laundering policy | PMLA framework | Principal officer |
+| Outsourcing and vendor policy | Outsourcing guidelines | Operations |
+| Business continuity and disaster recovery policy | BCP framework | Technology |
+| Inspection readiness pack | Chapter V | Compliance |
+| Orderly wind-down outline | Reg 19, forward-looking | Board |
+| Running account settlement policy | Master circular | Operations |
+| Authorised person policy | AP framework | Compliance |
+
+## 6. The registers
+
+| # | Register | Contents | Owner | Retention |
+|---|---|---|---|---|
+| R1 | **Configuration register** | Every value, version, class, approver, effective period | Compliance and technology | 8 years |
+| R2 | **Obligation and calendar register** | Obligation, owner, frequency, due date, evidence | Compliance | 8 years |
+| R3 | **Identifier register** | Allocation, reporting, entitlements, withdrawal | Compliance | 8 years |
+| R4 | **Certification register** | Person, module, number, expiry, function authorised | Compliance | 8 years |
+| R5 | **Policy register** | Policy, version, approver, date, next review | Compliance | 8 years |
+| R6 | Approval and override register | Overrides by check, client, approver, reason | Risk | 8 years |
+| R7 | Incident register | Incidents, severity, timeline, actions, closure | Operations | 8 years |
+| R8 | Complaint register | Complaint, receipt, clock, resolution, delivery | Compliance | 8 years |
+| R9 | Screening and alert register | Alerts, list versions, dispositions, reasoning | Compliance | 8 years |
+| R10 | Filing register | Obligation, period, submission, **acknowledgement** | Compliance | 8 years |
+| R11 | Vendor register | Vendor, scope, contract, assessments, reviews | Operations | 8 years |
+
+## 7. Assertions
+
+| Frequency | Assertion | Owner | Alarm |
+|---|---|---|---|
+| **Daily** | **Segregation**: client ledger total equals client money held plus upstreamed | Finance | **Yes, severity one** |
+| **Daily** | **Upstreaming computed equals confirmed** | Treasury | **Yes** |
+| Daily | Begin-of-day gates G1 to G6 | Operations | Yes, scoped |
+| Daily | Extract to RMS produced with today's as-of | Operations | Yes |
+| Daily | Trading enabled only where registered and status permits | Operations | Yes |
+| Daily | Certification valid on every active identifier | Compliance | Yes |
+| Daily | No client activated without a registry record | Operations | **Yes** |
+| Daily | No trading on an unresolved screening hit | Compliance | Yes |
+| Weekly | Exception ageing across all reconciliations | Operations | On threshold |
+| Weekly | Override counts by client and check | Risk | On threshold |
+| Monthly | Deployed configuration diffed against the approved register | Technology | On any difference |
+| Monthly | **Every calendar obligation has an owner** | Compliance | **Yes, on any unowned item** |
+| Quarterly | Policy-mirror values match the published policy | Compliance | On any difference |
+| Quarterly | Exchange-set figures re-verified with a dated record | Compliance | On slippage |
+| Annually | Retrieval drill; export test; live site switch | Compliance and technology | On failure |
+
+## 8. Exception paths
+
+| Situation | Response |
+|---|---|
+| A deployed value differs from the approved register | Investigate the change path; revert or approve; this is a control failure |
+| A policy-mirror value changed without the policy | **Revert immediately**; the firm is operating outside its disclosed mandate |
+| A statutory absolute found outside its bound | Severity one; correct; assess the period affected and the disclosure obligation |
+| An obligation is found with no owner | Assign; investigate how it was created unowned |
+| A register is incomplete | Reconstruct; a register with gaps is weak evidence |
+| A circular changes a configured value | Assess, implement, update the register and the manual's figure |
+| Evidence cannot be produced for a past period | **High severity**; this is what retention and registers exist for |
+| An inspection asks a question the map does not answer | Add the row; the map is a living artefact |
+
+## Practical notes
+
+- **Build the map as the stack is built.** Retro-fitting it is archaeology.
+- **Review the classification column as carefully as the values.** It demonstrates whether the firm knows which rules are its own.
+- **Gate the policy-mirror keys on a policy version.** It is the cheapest protection against the finding an arbitrator reaches first.
+- **Alarm on unowned obligations.** One rule, one failure class prevented.
+- **Keep the filing register on acknowledgements, not submissions.** Non-submission is treated far more harshly than late submission.
+- **Diff deployed configuration against the approved register monthly.** Drift is silent and cumulative.
+- **Treat the daily segregation assertion as the heartbeat.** It is the firm's central claim about client money.
+
+## Where this connects
+
+- [SEBI registration under the 2026 regulations](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/) — the obligations behind most of this map
+- [OMS](/broking-kyc/finix-broking-setup/oms/10-oms-config-reference/), [RMS](/broking-kyc/finix-broking-setup/rms/09-rms-config-reference/) and [back office](/broking-kyc/finix-broking-setup/backoffice/10-backoffice-config-reference/) configuration references — the values themselves
+- [Environments and configuration baseline](/broking-kyc/finix-broking-setup/stack/environments-config-baseline/) — classification and change control
+- [Periodic calendar](/broking-kyc/finix-broking-setup/daily-ops/09-periodic-calendar/) — the operational calendar
+- [Inspection readiness](/broking-kyc/finix-broking-setup/compliance/03-inspection-readiness/) — where this map is produced
+- [Compliance blueprint](/broking-kyc/operations/compliance-blueprint/) — the full obligation register across the site

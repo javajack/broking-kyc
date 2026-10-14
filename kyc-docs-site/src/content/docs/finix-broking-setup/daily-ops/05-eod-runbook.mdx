@@ -1,0 +1,214 @@
+---
+title: "Daily ops 5: end-of-day runbook"
+description: The ordered end-of-day sequence with its blocking dependencies and deadlines — trade file retrieval and three-way reconciliation, charge computation, contract note generation and dispatch, ledger posting, obligations, CUSPA, upstreaming, margin reporting, the extract that unblocks tomorrow's open, reconciliations, and the separate commodity close.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** End-of-day is a pipeline with a regulatory deadline inside it, so the runbook states the blocking dependency and the deadline risk at every step. The step that matters most is reconciliation, because it gates contract notes and the contract-note clock runs from execution rather than from when the back office started. The commodity close is at the end as a separate sequence, because it is.
+
+## TL;DR
+
+- **The pipeline blocks forward.** Trade file → reconciliation → charges → contract notes → ledger → obligations. A failure at any point stops everything after it, and the contract-note deadline does not move.
+- **Reconciliation is the chokepoint.** A difference blocks contract notes, which is correct, which means difference handling must be fast, staffed and rehearsed rather than a next-morning activity.
+- **Contract notes are generated and dispatched within 24 hours of execution, digitally signed.** Generation is the absolute deadline; dispatch may queue with evidence of attempts.
+- **The extract to RMS blocks tomorrow's open.** It is the last step in the chain and the first gate of the next day.
+- **Upstreaming is computed and instructed at end of day**, and the computed-versus-confirmed assertion is a hard daily check.
+- **Margin reporting targets an internal date materially before the five-working-day cut-off**, so a failed run has room to be rerun.
+- **The commodity close is a separate, later sequence** that runs after the MCX session ends at 23:30.
+
+## 1. Deadlines in the pipeline
+
+| Deadline | Source | Consequence of missing |
+|---|---|---|
+| **Contract notes, within 24 hours of execution** | Regulatory | A reportable breach |
+| Funds and securities pay-in | Clearing corporation, via the **bank's earlier cut-off** | Short delivery, auction, default |
+| **CUSPA auto-pledge at pay-out** | Regulatory, same day | Unsecured exposure; a statutory clock starts |
+| CUSPA excess release | Regulatory, **by the next trading day** | Client securities over-encumbered |
+| **Upstreaming** | Regulatory, end of day | Under-upstreamed balance overnight; a breach |
+| Margin reporting | Exchange, five working days after trade date | Penalty; non-reporting treated as 100 percent short |
+| **Extract to RMS** | Internal, before tomorrow's begin-of-day | **Tomorrow's open is blocked** |
+| Commodity tender intention | **19:30** on tender days | A delivery consequence |
+
+## 2. The sequence
+
+| # | Step | Owner | Blocks | Assertion |
+|---|---|---|---|---|
+| 1 | Expected-file checklist for today's day type confirmed | Operations | Everything | Day type correct |
+| 2 | **Exchange trade files retrieved**, per exchange and segment | Operations | **Everything downstream** | Count and value asserted against an independent source |
+| 3 | Trade files loaded, idempotently | Operations | Everything | Record counts match |
+| 4 | **Three-way reconciliation** — exchange file, OMS feed, back office | Operations | **Contract notes** | Clean, or every difference classified |
+| 5 | Differences classified and escalated | Operations | Contract notes | D2, D8 and D16 escalate immediately |
+| 6 | **Client allocation complete** | Operations | Everything | **No unallocated trades** |
+| 7 | Charges computed on effective-dated rates | Operations | Contract notes | Independent sample recomputation |
+| 8 | **Contract notes generated** | Operations | — | **Count matches clients with activity**; within the deadline |
+| 9 | Contract notes signed | Operations | Dispatch | Every note signed and verified |
+| 10 | **Contract notes dispatched**, email and SMS link with DLT templates | Operations | — | Dispatch evidence recorded |
+| 11 | **Ledger posted** | Operations | Statements, reporting, pay-out | Note totals tie to ledger postings exactly |
+| 12 | **Obligation files retrieved and loaded** | Operations | Settlement | Client obligation sum ties to the member obligation |
+| 13 | Shortfalls identified — funds and securities | Operations | Settlement preparation | Published to the people who can act |
+| 14 | Early pay-in candidates identified and instructed | Operations | Margin benefit | Recognition asserted |
+| 15 | Settlement instructions prepared | Operations and treasury | Settlement | — |
+| 16 | **CUSPA**: auto-pledge at pay-out; daily maximum recomputed; excess released | Operations | **A statutory clock** | Pledges created match pay-outs against unpaid obligations |
+| 17 | **Margin collected and peak computed per client** | Risk | Margin reporting | Reconciled against clearing corporation files |
+| 18 | **Margin reporting file built and validated** | Risk | — | **Do not submit a file that failed validation** |
+| 19 | Margin reporting submitted; acknowledgement captured | Risk | — | Acknowledgement per trade date |
+| 20 | **Upstreaming computed** | Treasury | — | One shared definition of clear credit balance |
+| 21 | **Upstreaming instructed and confirmed** | Treasury | — | **Computed equals confirmed** |
+| 22 | Brokerage and charges transferred to the own account | Finance | — | Amounts actually due, computed |
+| 23 | **Collateral and balance extract to RMS** | Operations and risk | **Tomorrow's open** | As-of today; count reconciles to the client master |
+| 24 | Bank, gateway and depository reconciliations | Treasury and operations | — | Exceptions aged, not just counted |
+| 25 | **Segregation assertion**: client ledger total against client money held plus upstreamed | Finance | — | **Alarm on any shortfall** |
+| 26 | Statements generated and dispatched, per frequency | Operations | — | Ledger closed first |
+| 27 | Partner and commission processing | Operations | Partner statements | On reconciled trades |
+| 28 | Corporate action processing | Operations | Entitlements | Reconciled against the depository |
+| 29 | Regulatory reports per the calendar | Compliance | — | Validated before submission |
+| 30 | Firm general ledger extract | Finance | Close | Control accounts reconciled |
+| 31 | Overnight batch scheduled and monitored | Technology | Tomorrow | Calendar-driven |
+| 32 | **Written handover** | All | — | Signed |
+
+<Aside type="caution" title="Step 4 is where the deadline is won or lost">
+The contract-note clock runs from execution, not from when the back office received the file. Every minute between the file becoming available and the reconciliation difference being surfaced comes out of the same budget. Produce the difference report within minutes of load rather than at the end of a batch, classify against the [taxonomy](/broking-kyc/finix-broking-setup/backoffice/02-trade-import-reconciliation/#4-difference-taxonomy) so diagnosis is a lookup, and escalate deadline risk to compliance before the deadline rather than after.
+</Aside>
+
+## 3. The hard stops
+
+| Condition | Stop |
+|---|---|
+| Trade file incomplete | **Do not proceed.** Retrieve again; escalate |
+| Unexplained reconciliation difference | **No contract notes** |
+| Unallocated trades | **No further processing** |
+| Signing certificate invalid or expired | **No dispatch**; escalate |
+| Contract note count does not match clients with activity | **Block the run** |
+| Ledger does not tie to contract note totals | **No statements** |
+| Client obligation sum does not tie to the member obligation | **No settlement preparation** |
+| Margin reporting file fails validation | **Do not submit** |
+| Upstreaming computed exceeds confirmed | **Escalate to compliance the same evening** |
+| Extract to RMS not produced or as-of wrong | **Tomorrow's open is blocked** — fix tonight |
+| Segregation assertion fails | **Severity one**; fund immediately; investigate |
+
+## 4. Timing discipline
+
+| Practice | Detail |
+|---|---|
+| Internal deadlines, not external | Published in the runbook; the external deadline is reference |
+| Difference report latency measured | Minutes from load |
+| Remaining contract-note time visible | On the operations screen |
+| Escalate deadline risk early | To compliance, in writing, before it passes |
+| Margin reporting internal target | Materially before the five-working-day cut-off |
+| Settlement instruction internal deadline | Bank cut-off minus maker-checker minus buffer |
+
+## 5. Reconciliations in this window
+
+| # | Reconciliation | Blocking? |
+|---|---|---|
+| Trades, three-way | **Yes — contract notes** |
+| Obligations, client against member | **Yes — settlement** |
+| Contract notes to ledger | **Yes — statements** |
+| Collateral, three-way | Blocks exposure increase tomorrow |
+| CUSPA pledges against pay-outs | Blocks further exposure for affected clients |
+| Margin, firm against clearing corporation | Risk incident if divergent |
+| Bank, gateway, depository | Exceptions aged |
+| **Segregation assertion** | **Severity one on failure** |
+| Upstreaming computed, instructed, confirmed | **Breach on difference** |
+| Control accounts to general ledger | Blocks close |
+
+## 6. The extract that unblocks tomorrow
+
+| Element | Detail |
+|---|---|
+| Content | Collateral and clear balance per client, with an as-of timestamp |
+| Consumer | Saral RMS, at tomorrow's begin-of-day |
+| **Assertion** | As-of is **today's**; record count reconciles to the client master |
+| Failure | **Tomorrow's open is blocked** — gate G5 in the [BOD runbook](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/#1-the-gates) |
+| Timing | Early enough that a failure can be fixed tonight |
+| Verification | Produced and verified before the overnight team disperses |
+
+## 7. Overnight
+
+| Activity | Owner |
+|---|---|
+| Batch jobs, calendar-driven | Technology |
+| Monitoring and on-call | Technology |
+| Depository and bank file retrieval where overnight | Operations |
+| Data warehouse extracts | Technology |
+| Alerting on batch failure | Technology |
+| **Verification at begin-of-day** | Operations, step 1 of the BOD runbook |
+
+## 8. The commodity close
+
+A separate, later sequence after the MCX session ends at **23:30**, or **23:55** in United States daylight saving.
+
+| # | Step | Owner |
+|---|---|---|
+| 1 | Session end confirmed per commodity group | Technology |
+| 2 | Day orders cancelled; margin blocks released | Operations |
+| 3 | Unknown orders resolved | Operations |
+| 4 | Commodity trade files retrieved and reconciled | Operations |
+| 5 | Commodity contract notes per the applicable deadline | Operations |
+| 6 | Commodity obligations loaded | Operations |
+| 7 | **Tender-day items confirmed** — intentions given before 19:30, delivery documentation | Operations |
+| 8 | Commodity margin position and reporting | Risk |
+| 9 | Clearing member reconciliation, since commodities clear through a clearing member | Operations |
+| 10 | Commodity extract to RMS | Operations and risk |
+| 11 | Written handover to overnight | All |
+
+| Note | Detail |
+|---|---|
+| Separate checklist | Not an appendix to the equity one |
+| Fewer people, later | Which is where tired mistakes happen |
+| Narrow maintenance window | Between this and tomorrow's begin-of-day |
+| Daylight saving | The close time moves twice a year |
+
+## 9. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.ops.eod.difference_report_latency` | Minutes from load | Discretionary, strongly recommended | The clock consumed by batch latency |
+| `finix.ops.eod.cn_time_remaining_visible` | True | Discretionary, strongly recommended | Teams unaware of the deadline position |
+| `finix.ops.eod.hard_stops` | As section 3 | Discretionary, strongly recommended | Proceeding on bad data |
+| `finix.ops.eod.margin_report_internal_target` | Materially before the cut-off | Discretionary, strongly recommended | No room to rerun |
+| `finix.ops.eod.upstream_assert` | **Computed equals confirmed, with an alarm** | Regulatory in substance | Silent breach |
+| `finix.ops.eod.segregation_assert` | **Daily, with an alarm** | Regulatory in substance | Silent client-funds shortfall |
+| `finix.ops.eod.rms_extract_asof_assert` | **Today's** | Discretionary, strongly recommended | Tomorrow's open blocked, or opened on stale balances |
+| `finix.ops.eod.rms_extract_verify_before_disperse` | True | Discretionary, strongly recommended | A failure discovered at 07:30 |
+| `finix.ops.eod.commodity_separate_checklist` | True | Discretionary, strongly recommended | The evening treated as an appendix |
+| `finix.ops.eod.handover_written` | True, signed | Discretionary | Open items lost |
+
+## 10. Exception paths
+
+| Situation | Response |
+|---|---|
+| Trade file late | Escalate to the exchange; recompute the deadline position; **inform compliance if the contract-note clock is at risk** |
+| Reconciliation difference | Classify; D2, D8 and D16 escalate immediately; do not generate contract notes |
+| Contract note deadline missed | **Report it.** A missed regulatory deadline is a breach to record, not to absorb |
+| Signing certificate expired | Emergency process; this is foreseeable and should never happen |
+| Obligation file not received | **Escalate.** Obligations cannot be estimated |
+| Funds shortfall against the obligation | Treasury decision; own funds if necessary; the deadline does not wait |
+| CUSPA pledge creation fails | Stop further exposure for that client; escalate; a statutory clock is running |
+| Margin reporting validation fails | **Do not submit**; use the remaining window |
+| Upstreaming computed exceeds confirmed | **Breach**; escalate to compliance the same evening |
+| Segregation assertion fails | **Severity one**; fund immediately; investigate; assess disclosure |
+| Extract to RMS fails | Fix tonight; tomorrow's open depends on it |
+| Commodity close cannot complete | Evening escalation; tomorrow's begin-of-day depends on it |
+
+## Practical notes
+
+- **Surface differences within minutes of load.** The clock started at execution.
+- **Put the remaining contract-note time on the screen.** Teams behave differently when they can see it.
+- **Never submit a margin file that failed validation.** False or incorrect reporting is a separate disciplinary matter.
+- **Verify the RMS extract before the team disperses.** Discovering it at 07:30 means a late open.
+- **Make the segregation assertion a daily alarm.** It is the firm's central claim about client money.
+- **Escalate deadline risk in writing, before the deadline.** Compliance can act before; it can only record after.
+- **Give the commodity close its own checklist and its own people.** Later, fewer, tired — design for it.
+
+## Where this connects
+
+- [Back office architecture](/broking-kyc/finix-broking-setup/backoffice/01-backoffice-architecture/) — the pipeline this operates
+- [Trade import and reconciliation](/broking-kyc/finix-broking-setup/backoffice/02-trade-import-reconciliation/) — step 4 in detail
+- [Contract notes](/broking-kyc/finix-broking-setup/backoffice/03-contract-notes/) — steps 8 to 10
+- [CUSPA](/broking-kyc/finix-broking-setup/backoffice/06-cuspa-unpaid-securities/) — step 16
+- [Upstreaming and downstreaming](/broking-kyc/finix-broking-setup/money/06-upstreaming-downstreaming/) — steps 20 and 21
+- [Margin reporting and penalties](/broking-kyc/finix-broking-setup/rms/08-margin-reporting-penalties/) — steps 17 to 19
+- [BOD runbook](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/) — which depends on step 23
+- [Settlement day operations](/broking-kyc/finix-broking-setup/daily-ops/06-settlement-day-ops/) — the settlement-day additions

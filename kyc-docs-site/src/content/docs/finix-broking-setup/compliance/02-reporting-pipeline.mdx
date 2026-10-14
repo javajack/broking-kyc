@@ -1,0 +1,170 @@
+---
+title: "Compliance 2: the regulatory reporting pipeline"
+description: Reporting seen from the compliance plane — the obligation inventory across every authority, the calendar mechanics that surface an item before it is due, ownership and escalation, format-currency management, acknowledgement tracking, the evidence model, and the controls that distinguish a filed obligation from a submitted file.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is separate from the back-office treatment:** [Regulatory reporting](/broking-kyc/finix-broking-setup/backoffice/09-regulatory-reporting/) covers generation, validation and submission — the mechanics of producing a correct file. This page covers the layer above: knowing what is owed to whom and when, making sure each obligation has an owner, surfacing it before it is due, and proving afterwards that it was discharged. A firm can have an excellent generation pipeline and still miss an obligation nobody knew about, which is the failure this plane prevents.
+
+## TL;DR
+
+- **The obligation inventory is the control.** A filing pipeline cannot file something nobody has listed.
+- **Seven authority groups** receive filings: clearing corporations, exchanges, SEBI, FIU-IND, depositories, the identity registries, and the tax and corporate authorities.
+- **Lead time, not due date.** An item that surfaces on its due date is already late; the calendar alerts on a lead time sized to the work.
+- **An obligation is discharged when it is acknowledged**, not when it is submitted. The filing register tracks acknowledgements.
+- **Format currency is contracted to the back-office vendor**, with an interim manual path for every critical filing in case the lead time is missed.
+- **Evidence is the file, the validation output, the approval, the submission and the acknowledgement**, retained on the eight-year floor.
+- **An obligation without an owner should alarm.** It is the failure the calendar exists to prevent.
+
+## 1. The authority groups
+
+| # | Authority | Typical filings | Cadence | Owner |
+|---|---|---|---|---|
+| A1 | **Clearing corporations** — NSE Clearing, ICCL, MCXCCL | Client-wise margin collected and peak; client-level collateral allocation; settlement submissions | Daily, per settlement | Risk and operations |
+| A2 | **Exchanges** — NSE, BSE, MCX | Compliance submissions through the member portal; terminal and identifier reporting; algorithm registration; internal and system audit reports; net worth certificates; client code modification data; investor complaint data | Periodic and event-driven | Compliance |
+| A3 | **SEBI** | Registration-related and event-driven filings; SCORES complaint handling | Event-driven and continuous | Compliance |
+| A4 | **FIU-IND** | Suspicious transaction reports and other prescribed reports, in **FINnet 2.0** format | On suspicion; per the framework | **Principal officer** |
+| A5 | **Depositories** — CDSL, NSDL | Participant reporting on the depository calendar | Periodic | DP compliance officer |
+| A6 | **Registries** — KRA, CERSAI CKYCRR | KYC record upload, update and lifecycle | Per onboarding and lifecycle | Operations |
+| A7 | **Tax and corporate** | Securities transaction tax, goods and services tax, stamp duty, tax deducted at source, annual information; corporate filings | Statutory calendar | Finance |
+
+<Aside type="caution" title="The filings most often missed are the event-driven ones">
+Periodic filings have a date and a rhythm, and they get done. Event-driven filings — a key management personnel change, a material change in registration details, an algorithm withdrawal, a terminal identifier change, a change of control — depend on somebody recognising that the event has occurred and that it carries a reporting obligation. That recognition is the weak link. The control is to attach the reporting obligation to the event in whatever system records the event, rather than relying on the person making the change to remember.
+</Aside>
+
+## 2. The calendar mechanics
+
+| Element | Detail |
+|---|---|
+| Source | ComplianceSutra holds the regulatory calendar; the [periodic calendar](/broking-kyc/finix-broking-setup/daily-ops/09-periodic-calendar/) is the operational superset |
+| Entry | Obligation, authority, frequency, due date, **lead time**, owner, deputy, evidence required, escalation rule |
+| **Lead time** | Sized to the work, not to the comfort of the owner; an item surfaces when there is still time |
+| **Owner** | A named person; **alarm on any unowned obligation** |
+| Forward view | What is due in the next period, visible to the compliance function and the function that must produce it |
+| Escalation on slip | Defined per obligation, with a named escalation point |
+| Dependency | Where a filing depends on a reconciliation or a close, the dependency is explicit |
+| Review | Annually, and whenever a circular adds or changes an obligation |
+
+| Anti-pattern | Why it fails |
+|---|---|
+| A spreadsheet maintained by one person | Single point of failure, no alerting, no evidence |
+| Due dates without lead times | Everything surfaces too late |
+| Team ownership | Nobody is accountable |
+| Calendar separate from evidence | The two drift, and the evidence is reconstructed |
+| No annual review | Obligations are added by circular; the calendar does not update itself |
+
+## 3. The pipeline, from the compliance side
+
+| # | Stage | Compliance's role |
+|---|---|---|
+| 1 | Obligation surfaces at its lead time | Confirm the owner and the dependencies |
+| 2 | Source data closed | Confirm the dependency is met |
+| 3 | Generation | Monitor; escalate on failure |
+| 4 | **Validation** | **Confirm the rule: do not submit a file that failed validation** |
+| 5 | Review and approval | Maker-checker, with the approver recorded |
+| 6 | Submission | Confirm it happened |
+| 7 | **Acknowledgement** | **Capture; an unacknowledged filing is not discharged** |
+| 8 | Evidence filed | Against the calendar entry |
+| 9 | Post-submission comparison | Against any consequence — a penalty advice, a query, a return file |
+| 10 | Closure | The calendar entry closed with evidence |
+
+Mechanics at [regulatory reporting](/broking-kyc/finix-broking-setup/backoffice/09-regulatory-reporting/).
+
+## 4. Format currency
+
+| Mechanism | Detail |
+|---|---|
+| **Vendor obligation** | SecMark contractually obliged to keep every regulatory format current within a stated lead time of a circular |
+| Circular monitoring | Every issuer's feed monitored; format-affecting circulars routed to the obligation owner |
+| Format register | Current version per filing, with circular reference and effective date |
+| Testing | Against production-shaped data before the effective date |
+| Parallel run | Where feasible, for one period |
+| **Interim manual path** | **For every critical filing**, in case the vendor's lead time is missed |
+| Version recorded | With every filing, so a historical submission is explicable |
+
+## 5. Evidence
+
+| Artefact | Retained |
+|---|---|
+| The submitted file | 8 years |
+| Validation output | 8 years |
+| Approval record | 8 years |
+| Submission confirmation | 8 years |
+| **Acknowledgement** | 8 years |
+| Format version used | With the filing |
+| Source-data closure evidence | With the filing |
+| Corrections and their cause | 8 years |
+| For suspicious transaction reports: **the decision, including a decision not to file** | 8 years, confidential |
+
+| Principle | Detail |
+|---|---|
+| Evidence attaches to the calendar entry | Not stored separately and matched later |
+| Produced as a by-product | Not assembled before an inspection |
+| Confidentiality | Suspicious transaction reports and related records restricted |
+| Retrieval | Tested in the annual drill |
+
+## 6. Metrics
+
+| Metric | Target |
+|---|---|
+| **Obligations without an owner** | **Zero** |
+| Obligations surfaced at lead time | All |
+| Filings submitted by the internal target | All |
+| **Filings acknowledged** | **All** |
+| Validation failures | Trended; a rise is a source-data or format problem |
+| Corrections by cause | Trending to zero |
+| Time from a format circular to implementation | Within the vendor's contracted lead time |
+| Event-driven obligations recognised at the event | All; a miss means the attachment failed |
+| Overdue obligations | Zero, with any slip escalated and recorded |
+
+## 7. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.cmp.rpt.inventory_complete` | Reviewed annually and on circular | Regulatory in substance | A filing nobody knew about |
+| `finix.cmp.rpt.owner_required` | **True; alarm on unowned** | Discretionary, strongly recommended | An obligation with no accountability |
+| `finix.cmp.rpt.lead_time.<obligation>` | Sized to the work | Discretionary, strongly recommended | Items surfacing too late |
+| `finix.cmp.rpt.event_obligation_attachment` | **Attached to the event record** | Discretionary, strongly recommended | Event-driven filings missed |
+| `finix.cmp.rpt.ack_required` | True, per filing | Regulatory in substance | Unnoticed non-submission |
+| `finix.cmp.rpt.validation_blocking` | **Do not submit on failure** | Discretionary, strongly recommended | False or incorrect reporting |
+| `finix.cmp.rpt.format_version_recorded` | With every filing | Regulatory in substance | Historical filings unexplainable |
+| `finix.cmp.rpt.interim_manual_path` | For every critical filing | Discretionary, strongly recommended | No path when a vendor is late |
+| `finix.cmp.rpt.evidence_on_calendar_entry` | True | Regulatory in substance | Evidence assembled under pressure |
+| `finix.cmp.rpt.str_confidentiality` | Restricted access | Regulatory | Tipping off |
+| `finix.cmp.rpt.retention_years` | 8 | Regulatory | Short of the statutory floor |
+
+## 8. Exception paths
+
+| Situation | Response |
+|---|---|
+| An obligation is discovered with no calendar entry | Add it; assess whether past periods were missed; report if material |
+| An obligation has no owner | Assign immediately; investigate how it was created unowned |
+| An item surfaces on its due date | The lead time was wrong; fix it |
+| An event-driven obligation is recognised late | Assess the period of non-compliance; report if material; fix the attachment |
+| Validation fails near a deadline | Escalate; **the default is not to submit** within the window |
+| Acknowledgement not received | Treat as potentially unsubmitted; chase; escalate |
+| A vendor misses a format lead time | Invoke the contract; use the interim manual path |
+| A penalty or query indicates a wrong filing | Investigate the source data, not just the file; correct and remediate |
+| A filing is late | Record it as such; report internally; find the upstream cause |
+| Evidence cannot be produced for a past filing | High severity; this is what the evidence model exists for |
+
+## Practical notes
+
+- **Attach event-driven obligations to the event record.** Relying on the person making a change to remember a filing is the weakest control in the plane.
+- **Size lead times to the work.** A one-day lead time on a filing that needs a reconciliation is not a lead time.
+- **Track acknowledgements, not submissions.** Non-submission is penalised far more harshly than lateness.
+- **Keep an interim manual path for every critical filing.** Vendors occasionally miss; deadlines do not move.
+- **Attach evidence to the calendar entry.** Matching evidence to obligations later is the work an inspection makes you do at speed.
+- **Review the inventory annually and on every relevant circular.** Obligations accumulate.
+- **Record decisions not to file a suspicious transaction report.** The absence of a record looks like the absence of consideration.
+
+## Where this connects
+
+- [Regulatory reporting](/broking-kyc/finix-broking-setup/backoffice/09-regulatory-reporting/) — the generation and submission mechanics
+- [Margin reporting and penalties](/broking-kyc/finix-broking-setup/rms/08-margin-reporting-penalties/) — the filing with its own penalty regime
+- [Compliance configuration baseline](/broking-kyc/finix-broking-setup/compliance/01-compliance-config-baseline/) — the obligation map and the registers
+- [Periodic calendar](/broking-kyc/finix-broking-setup/daily-ops/09-periodic-calendar/) — the operational superset
+- [Inspection readiness](/broking-kyc/finix-broking-setup/compliance/03-inspection-readiness/) — where the evidence is produced
+- [Compliance blueprint](/broking-kyc/operations/compliance-blueprint/) — the full obligation register
+- [Vendor onboarding and contracts](/broking-kyc/finix-broking-setup/setup/09-vendor-onboarding-contracts/) — the format-currency clause

@@ -1,0 +1,319 @@
+---
+title: "Daily ops 7: incident playbooks"
+description: Twenty-two named incidents with their detection, immediate action, scope of stop, client and regulatory communication, recovery and post-incident steps — connectivity, market data, risk, money, settlement, vendor, record and conduct incidents — plus the severity model, the command structure, and the communication templates that have to exist before they are needed.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** An incident playbook is only useful if it can be followed by someone who is stressed, possibly junior, and possibly alone. So each playbook here is short, imperative and in a fixed shape: detect, stop, communicate, recover, review. The severity model and command structure come first because the first decision in any incident is who is in charge and how wide the stop is. The judgement — why the stop is scoped that way, what the trade-off is — lives on the linked pages, not here.
+
+## TL;DR
+
+- **The first two decisions are scope and command.** How wide does the stop go, and who is running this. Everything else follows.
+- **Scope the stop as narrowly as the failure allows.** One instrument, one segment, one exchange, one client, one identifier — rarely everything.
+- **Communicate early and specifically.** "The NSE derivatives segment is unavailable" is useful; "we are experiencing technical issues" is not, and clients can tell the difference.
+- **Three incidents justify stopping all order entry**: no risk evaluation, no audit trail, and a confirmed bypass of the release point.
+- **The silent incidents are the dangerous ones** — stale market data, a stale collateral load, a quiet connection, an unapplied parameter file. They have no error and no symptom until the consequence arrives.
+- **Compliance is informed when a regulatory deadline is at risk**, not after it has passed.
+- **Templates must exist before the incident.** Nobody writes well under pressure, and the hardest messages — a trade cancelled after confirmation, a square-off that should not have happened — are the ones most likely to be needed.
+- **Every incident ends with a review that produces a dated action**, and an unclosed action from a previous incident is itself a finding.
+
+## 1. Severity model
+
+| Severity | Definition | Command | Communication |
+|---|---|---|---|
+| **S1** | Order path compromised; client money at risk; a statutory breach occurring or occurred | Head of operations **and** head of risk | Clients, exchange, compliance immediately; board if material |
+| **S2** | A segment or major function unavailable; a regulatory deadline at risk | Head of the affected function | Clients affected; compliance; exchange if relevant |
+| **S3** | Degraded service; a workaround exists | Team lead | Clients if client-visible |
+| **S4** | Internal only; no client or regulatory effect | On-duty owner | Internal |
+
+| Rule | Detail |
+|---|---|
+| **Escalate early** | The cost of an unnecessary escalation is far below the cost of a late one |
+| Named people, not roles | A rota with names and phone numbers, current |
+| **Compliance at S2** | When a deadline is at risk, not after it passes |
+| One commander | Decisions have one owner during an incident |
+| A scribe | Timeline recorded as it happens, not reconstructed |
+| Clock | Every action timestamped |
+
+## 2. The playbook shape
+
+Each playbook below has: **detect** — how you know; **stop** — the immediate action and its scope; **tell** — who is informed and with what; **recover** — how normal service resumes; **after** — what the review must produce.
+
+## 3. Connectivity incidents
+
+### P1 — Exchange link down, one exchange or segment
+
+**Detect** Session state, heartbeat loss, order failures.
+**Stop** New orders for **that exchange and segment only**. Preserve and display existing order state as last-known. Do not assume resting orders are cancelled.
+**Tell** Clients, naming the segment. Technology escalation. Exchange if the fault may be theirs.
+**Recover** Reconnect; **reconcile against the exchange before accepting new flow**; verify sequence continuity; then resume.
+**After** Root cause; was failover tested; did the scope of stop hold.
+
+### P2 — Sequence gap
+
+**Detect** Sequence continuity monitor.
+**Stop** **New flow in that segment immediately.** This is more serious than a link being down, because divergence already exists and the connection looks healthy.
+**Tell** Technology and risk immediately; the exchange.
+**Recover** Reconcile every order and trade against the exchange; resolve unknown-state orders; only then resume.
+**After** How the gap occurred; whether any orders or fills were missed; whether risk decisions were made on a divergent book.
+
+### P3 — Unexpected quiet on a healthy connection
+
+**Detect** Volume-profile alert; no orders where there should be some.
+**Stop** Nothing yet; **investigate as an incident**.
+**Tell** Technology; dealing.
+**Recover** Verify with a controlled test order where safe; check channels, sessions and client-side paths.
+**After** Why the profile alert was the first detection; what else should have caught it.
+
+### P4 — Session extension or unscheduled halt
+
+**Detect** Exchange market-state message.
+**Stop** Follow the message, not the clock. On a halt, stop order acceptance in scope; **stop square-off attempts**.
+**Tell** Clients, naming the scope and what happens next.
+**Recover** Resumption is often preceded by a pre-open; the state machine handles it.
+**After** Did any component act on the clock rather than the message.
+
+## 4. Market-data incidents
+
+### P5 — Market data stale for one or more instruments
+
+**Detect** **Per-instrument staleness monitor** — not connection state.
+**Stop** Block market orders and price-dependent risk decisions **for the affected instruments**. Square-off decisions on those instruments pause.
+**Tell** Dealing and risk. Clients if the scope is wide.
+**Recover** Restore the feed; verify tick freshness per instrument; cross-check against a second source before resuming.
+**After** How long it was stale before detection; what decisions were made on stale prices; quantify.
+
+### P6 — Market data feed down entirely
+
+**Detect** Feed monitor.
+**Stop** Block price-dependent decisions in the segment; block market orders; **square-off pauses**.
+**Tell** Clients, naming the segment; technology escalation.
+**Recover** Failover; verify; resume.
+**After** Was the secondary source adequate; was the pause correct.
+
+## 5. Risk incidents
+
+### P7 — Risk engine unavailable
+
+**Detect** Decision failures, timeouts, health check.
+**Stop** **All order entry. There is no bypass.**
+**Tell** Clients immediately; S1 command.
+**Recover** Restore; verify decisions and latency; confirm inputs are current; resume.
+**After** Was any order released without evaluation; if so, this is a separate and more serious incident.
+
+### P8 — Risk evaluation timing out at volume
+
+**Detect** Timeout count and latency percentiles.
+**Stop** Orders reject on timeout, which is correct. **Do not raise the timeout.**
+**Tell** Technology and risk.
+**Recover** Capacity; or identify the input causing slow evaluation.
+**After** Capacity planning; was the timeout the control working or a capacity failure.
+
+### P9 — Collateral or balance load stale, discovered intraday
+
+**Detect** As-of assertion, or a pattern of wrong limits.
+**Stop** **Stop increasing exposure across the book.** Every client's limit is wrong in the permissive direction.
+**Tell** S1 command; risk, operations, compliance.
+**Recover** Reload with the correct as-of; recompute limits; reassess positions taken on wrong capacity.
+**After** Why gate G5 did not catch it; quantify the exposure window.
+
+### P10 — Risk parameter publication missed
+
+**Detect** Applied-version against expected-publication monitor.
+**Stop** **New derivatives orders in the affected segment.**
+**Tell** Risk, dealing; clients if prolonged.
+**Recover** Ingest, apply, verify; recompute margin for the segment; resume.
+**After** Was margin under-collected in the window; is there a short-collection exposure.
+
+### P11 — Mass client breach in a volatile market
+
+**Detect** Utilisation distribution; square-off queue depth.
+**Stop** Nothing stops; this is the system working. **Expect the square-off engine to be a load spike** concurrent with the volatility.
+**Tell** Clients under warning, at volume, through multiple channels. Risk command.
+**Recover** Prioritise by exposure; escalate residual positions that cannot be closed; monitor firm-level exposure.
+**After** Were warnings delivered; was re-evaluation on confirmed receipts fast enough; did capacity hold.
+
+### P12 — Square-off engine unavailable
+
+**Detect** Health check; square-offs not executing.
+**Stop** **Manual square-off capability invoked under documented authority.**
+**Tell** S1 if the market is moving; risk command.
+**Recover** Restore; reconcile what was done manually; resume.
+**After** Was the manual path rehearsed; how long was the gap.
+
+## 6. Money incidents
+
+### P13 — Payment gateway settling to the wrong account
+
+**Detect** Daily account-level assertion on settlement destination.
+**Stop** **Stop collection immediately.**
+**Tell** S1; compliance; finance. This is a **segregation breach**, not a configuration defect.
+**Recover** Correct the configuration; transfer the funds with full documentation; verify with a test settlement.
+**After** How long; how much; **assess the disclosure obligation**; who changed or failed to set the configuration.
+
+### P14 — Duplicate payout
+
+**Detect** Payout register; daily statement reconciliation.
+**Stop** **Stop the payout run**; identify any other duplicates.
+**Tell** S1; treasury, finance, compliance; the affected client.
+**Recover** Recovery from the recipient; correct the ledger.
+**After** How the idempotency reference was bypassed; was it a blind retry.
+
+### P15 — Bank channel failure before a funding deadline
+
+**Detect** Instruction failures; channel monitor.
+**Stop** Nothing trades differently; **the funding must still happen**.
+**Tell** Treasury command; the bank's named contact; the clearing corporation if the deadline is at risk.
+**Recover** Alternate channel; alternate bank; document every attempt.
+**After** Was the alternate path tested; was the escalation contact current.
+
+### P16 — Client funds shortfall on the segregation assertion
+
+**Detect** The daily A1 assertion.
+**Stop** **Fund immediately from the firm's own resources.**
+**Tell** **S1.** Head of finance, head of operations, compliance, the designated director.
+**Recover** Investigate the cause; correct; re-assert.
+**After** **Assess the disclosure obligation**; this is among the most serious conditions in the stack.
+
+### P17 — Unattributed client money ageing
+
+**Detect** Exception ageing.
+**Stop** Nothing stops; work the queue.
+**Tell** Treasury, compliance if persistent.
+**Recover** Attribute or return to source.
+**After** Why attribution failed; is it a channel, a format, or a process problem.
+
+## 7. Settlement and record incidents
+
+### P18 — Trade file late or incomplete
+
+**Detect** Expected-file assertion; count assertion.
+**Stop** **Do not proceed with reconciliation or contract notes on an incomplete file.**
+**Tell** Exchange; operations command; **compliance if the contract-note deadline is at risk**.
+**Recover** Retrieve again; verify counts; proceed.
+**After** Was the deadline met; if not, the breach is reported.
+
+### P19 — Unexplained trade reconciliation difference
+
+**Detect** Three-way reconciliation.
+**Stop** **No contract notes.**
+**Tell** Operations command; risk if it implies the intraday book was wrong; compliance if the deadline is at risk.
+**Recover** Classify against the taxonomy; the exchange file governs; resolve.
+**After** Which class; is it recurring; what upstream defect produces it.
+
+### P20 — Contract-note deadline at risk or missed
+
+**Detect** Remaining-time monitor.
+**Stop** Prioritise generation over everything else in the pipeline.
+**Tell** **Compliance before the deadline passes**, in writing.
+**Recover** Generate, sign, dispatch; document the delay.
+**After** **A missed deadline is a reportable breach** — record and report it; find the upstream cause.
+
+### P21 — CUSPA pledge creation failed at pay-out
+
+**Detect** Pay-out-against-pledge reconciliation.
+**Stop** **Stop further exposure for the affected clients.**
+**Tell** Operations command; compliance.
+**Recover** Create the pledge; if it cannot be created, the position is unsecured and the five-trading-day clock is running regardless.
+**After** Why it failed; is the day-six auto-release horizon at risk.
+
+### P22 — Exchange cancels or modifies a trade after client confirmation
+
+**Detect** Trade file version difference; exchange message.
+**Stop** Nothing stops; the correction must flow through.
+**Tell** **The client, promptly and explicitly**, using the prepared template. Compliance.
+**Recover** Adjust position, ledger, obligation and margin; re-issue the corrected contract note.
+**After** Client handling quality; was the template adequate.
+
+<Aside type="caution" title="The three incidents that justify stopping everything">
+Most incidents are scoped: one segment, one instrument, one client. Three are not. **No risk evaluation** (P7) means orders would reach the market unevaluated. **No audit trail** means trading without a record, which is indefensible. **A confirmed bypass of the release point** means the firm's central control does not exist. In each case the correct action is to stop all order entry and accept the visible outage, because the alternative is an invisible and unbounded one.
+</Aside>
+
+## 8. Communication
+
+| Audience | When | Principle |
+|---|---|---|
+| **Clients** | As soon as there is something true to say | **Name the scope.** "NSE derivatives is unavailable" beats "technical issues" |
+| Clients | Updates at a stated interval | Even "no change" is an update |
+| **Exchange** | Per the obligation, and early where the fault may be theirs | Factual |
+| **Compliance** | **At S2, when a deadline is at risk** | In writing |
+| Regulator | Per the applicable obligation | Through compliance |
+| Vendor | Immediately where they are involved | With the evidence |
+| Internal | Continuously during the incident | One channel, one commander |
+| Board | For material incidents | Through the designated path |
+
+| Templates that must exist in advance | Why |
+|---|---|
+| Segment unavailable | Frequent, and precision matters |
+| Order state unknown | Hard to write well under pressure |
+| Square-off occurred during a payment | Emotionally charged; most likely to reach arbitration |
+| **Trade cancelled after confirmation** | Rare, high-sensitivity, impossible to improvise |
+| Contract note delayed | Regulatory, and clients notice |
+| Pay-out delayed or returned | Money, and clients escalate |
+| Payment reversed after trading | The client has a debit they did not expect |
+| Data or security incident | Legal review needed, so pre-approve the shape |
+
+## 9. After the incident
+
+| Step | Detail |
+|---|---|
+| Timeline | From the scribe's record, with timestamps |
+| **Detection** | How long between occurrence and detection; this is usually the biggest improvement available |
+| Scope | Was the stop correctly scoped — too wide and clients lost service unnecessarily; too narrow and harm continued |
+| Client impact | Quantified, with individuals identified |
+| Regulatory | Any breach identified and reported |
+| **Root cause** | Not the proximate trigger |
+| **Dated actions** | With owners |
+| Closure | Tracked; **an unclosed action from a previous incident is itself a finding** |
+| Playbook update | If the playbook was wrong or missing, fix it now |
+| Drill | If the playbook was never rehearsed, schedule it |
+
+## 10. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.ops.inc.severity_model` | S1 to S4 with named owners | Discretionary, strongly recommended | Unclear command |
+| `finix.ops.inc.compliance_at_s2` | **True** | Discretionary, strongly recommended | Compliance informed after a breach |
+| `finix.ops.inc.stop_all_conditions` | **No risk evaluation; no audit trail; bypass confirmed** | Discretionary, strongly recommended | Unbounded invisible harm |
+| `finix.ops.inc.scope_default` | Narrowest that addresses the failure | Discretionary, strongly recommended | Unnecessary client outage |
+| `finix.ops.inc.templates` | Pre-written and approved | Discretionary, strongly recommended | Poor communication under pressure |
+| `finix.ops.inc.scribe_required` | S1 and S2 | Discretionary | Reconstructed timelines |
+| `finix.ops.inc.rota_current` | Names and numbers, verified periodically | Discretionary, strongly recommended | Nobody reachable |
+| `finix.ops.inc.action_closure_tracking` | True | Discretionary, strongly recommended | Repeat incidents |
+| `finix.ops.inc.drill_frequency` | Periodic, covering the top playbooks | Discretionary, strongly recommended | Playbooks that have never been run |
+
+## 11. Drills
+
+| Scenario | Frequency | Why |
+|---|---|---|
+| Exchange link failover | Periodic | P1 |
+| Session recovery with reconciliation | Periodic | P1, P2 |
+| Risk engine unavailable | Periodic | **P7 — the full-stop case** |
+| **Manual square-off** | At least twice a year | P12, and the hardest to improvise |
+| Mass breach at volume | Periodic, as a load test | P11 |
+| Bank channel failure before a deadline | Periodic | P15 |
+| Bulk cancellation at each scope | Periodic | Used under pressure |
+| Kill switch for programmatic flow | At least annually | [Algo kill switch](/broking-kyc/finix-broking-setup/oms/09-algo-api-dma-sor/#7-the-kill-switch) |
+| Business continuity site switch | Per the obligation | [BCP and DR drill](/broking-kyc/deep-dives/specialty/bcp-dr-drill/) |
+| Vendor outage, per vendor | Periodic | The degraded behaviours in the [contract matrix](/broking-kyc/finix-broking-setup/stack/integration-contract-matrix/) |
+
+## Practical notes
+
+- **Decide scope and command in the first minute.** Everything else is easier afterwards.
+- **Name the segment in client messaging.** Clients forgive outages and resent vagueness.
+- **Write the hard templates now.** Nobody writes a trade-cancellation message well at 22:00.
+- **Measure time-to-detection in every review.** It is usually the largest available improvement.
+- **Rehearse manual square-off.** It is the playbook most likely to be needed and least likely to work unrehearsed.
+- **Track action closure.** An unclosed action from the last incident is the finding in the next one.
+- **Keep the rota current.** The most common incident failure is that nobody could reach the person who could decide.
+
+## Where this connects
+
+- [Continuous session operations](/broking-kyc/finix-broking-setup/daily-ops/03-continuous-session-ops/) — the board that detects these
+- [BOD runbook](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/) — the gates whose failure produces several of them
+- [EOD runbook](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/) — the record incidents
+- [Settlement day operations](/broking-kyc/finix-broking-setup/daily-ops/06-settlement-day-ops/) — the money incidents
+- [Integration contract matrix](/broking-kyc/finix-broking-setup/stack/integration-contract-matrix/) — the degraded behaviours these implement
+- [Square-off engine](/broking-kyc/finix-broking-setup/rms/06-squareoff-engine/) — P11 and P12
+- [BCP and DR drill](/broking-kyc/deep-dives/specialty/bcp-dr-drill/) — the obligation behind the drill calendar

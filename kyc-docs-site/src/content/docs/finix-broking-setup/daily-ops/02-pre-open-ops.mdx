@@ -1,0 +1,171 @@
+---
+title: "Daily ops 2: pre-open operations"
+description: The fifteen minutes that set up the day — the after-market queue release and its verification, order entry, matching and buffer phase behaviour, what monitoring looks for in each phase, the client questions that arrive at 09:12, and the handover into continuous trading.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** The pre-open is short, high-attention and has phase-specific rules, so the page is organised by phase with the monitoring and the client-facing consequence of each. It also carries the one piece of client education that produces the most support contact in the whole trading day — why an order filled at a price the client did not specify — because handling that well at 09:12 is worth more than handling it well in a help article.
+
+## TL;DR
+
+- **The after-market queue is released into the pre-open order-entry window**, which makes its verification the first client-visible event of the day. Verify with counts; do not assume.
+- **Three phases with different rules**: order entry 09:00 to 09:08, matching and trade confirmation 09:08 to 09:12, buffer 09:12 to 09:15. Order entry and modification behave differently in each.
+- **Trades execute at a discovered price**, not at the order's limit. This is the single largest source of "why did my order fill there" contact, and it arrives in a two-minute window.
+- **Monitoring in the pre-open is about readiness, not volume.** Session state, order acceptance, the release count, and whether risk is evaluating.
+- **The pre-open is where a bad begin-of-day shows up.** A limit that resolves wrongly, a master that is stale in one instrument, a session that is up but not accepting — all surface here rather than at 09:15.
+- **Commodity and currency segments open on their own schedules**, so "pre-open" is not a single firm-wide state.
+- **Handover into continuous trading is explicit**, with open items named.
+
+## 1. Framework
+
+- **Pre-open phases** — order entry 09:00 to 09:08, order matching and trade confirmation 09:08 to 09:12, buffer 09:12 to 09:15, with continuous trading from 09:15. See [pre-open and closing auction](/broking-kyc/deep-dives/foundational/pre-open-closing-auction/).
+- **After-market orders** placed between the previous close and the pre-open are **released into the pre-open at 09:00**, entering the order-entry queue.
+- **Call-auction variants** for initial public offerings and relisted scrips, including indicative quantity and price disclosure, per SEBI/HO/MRD/MRD-PoD-3/P/CIR/2024/85 (20 June 2024) and **NSE/CMTR/63594** (17 September 2024). `[not yet in index]`
+- **Session state** is driven by exchange market-state messages; see [sessions and calendars](/broking-kyc/finix-broking-setup/exchanges/06-sessions-calendars/).
+
+## 2. By phase
+
+### 09:00 — release and order entry opens
+
+| Step | Owner | Assertion |
+|---|---|---|
+| **After-market queue released** | Technology | **Count released matches count queued**; rejections identified and classified |
+| Session state confirmed as pre-open entry | Technology | Per exchange and segment |
+| Order acceptance verified | Dealing | A test or first live order accepted and acknowledged |
+| Risk evaluating | Risk | Decisions being made; latency within target |
+| Client channels up | Technology | Web, mobile, terminal, API |
+| Rejection monitoring begins | Dealing and risk | Rate and code distribution |
+
+| Watch for | Meaning |
+|---|---|
+| Release count mismatch | Orders lost or duplicated; **incident** |
+| High rejection rate on released orders | Usually a master, band or limit problem from begin-of-day |
+| Orders rejected for limits | A collateral or ledger load issue surfacing |
+| No orders flowing | A channel or session problem, not a quiet market at 09:00 |
+
+### 09:00 to 09:08 — order entry
+
+| Activity | Detail |
+|---|---|
+| Client order entry | Active; modification and cancellation permitted |
+| Dealer activity | Active |
+| Monitoring | Acceptance, rejection codes, latency, session stability |
+| Risk | Evaluating normally; limits in force |
+| Market data | Indicative prices where published |
+| Client questions | Mostly about the after-market release |
+
+### 09:08 to 09:12 — matching and trade confirmation
+
+| Activity | Detail |
+|---|---|
+| **Order entry closed** | New orders, modifications and cancellations not accepted |
+| Matching | The exchange discovers the opening price and executes at it |
+| **Trade confirmations arrive** | Positions, margins and client views update |
+| Risk | Post-trade positions recomputed; utilisation changes |
+| **Client contact spikes** | "Why did my order fill at a different price" |
+| Monitoring | Trade confirmation receipt; position and margin propagation |
+
+<Aside type="caution" title="The two-minute explanation window">
+Between 09:08 and 09:12 a large number of clients see fills at prices they did not specify, all at once, because the opening price is discovered rather than quoted. If the explanation is in a help article, they contact support. If it is in the fill notification and on the order screen — "executed at the pre-open discovered price of ₹X" — most of them do not. This is the highest-leverage piece of client education in the trading day, and it costs one line of interface copy.
+</Aside>
+
+### 09:12 to 09:15 — buffer
+
+| Activity | Detail |
+|---|---|
+| No new entry | Transition period |
+| Reconciliation | Pre-open trades reconciled; counts checked |
+| Position and margin verification | Post-auction positions confirmed before continuous trading |
+| **Readiness check for continuous** | Session state, risk, channels |
+| Handover | Pre-open monitoring to session monitoring |
+
+### 09:15 — continuous trading
+
+| Step | Owner |
+|---|---|
+| Session state confirmed as open | Technology |
+| First continuous orders monitored | Dealing |
+| Latency and rejection baselines established | Technology |
+| Handover complete, with open items named | All |
+
+## 3. Monitoring during pre-open
+
+| Signal | Why it matters here |
+|---|---|
+| **After-market release count** | The first thing that can go wrong, and clients notice |
+| Session state per exchange and segment | Three exchanges, one of them with three instances |
+| Order acceptance rate | A begin-of-day problem surfaces as rejections |
+| **Rejection code distribution** | Tells you which begin-of-day gate was wrong |
+| Risk decision latency | Capacity warm-up |
+| Limits resolving | Clients hitting the global default means a configuration gap |
+| Market data arrival | Staleness detection starts as feeds begin |
+| Channel availability | Login volume concentrates at the open |
+| Client contact volume | A spike before 09:08 usually means a release problem |
+
+## 4. Multi-segment reality
+
+| Segment | Pre-open behaviour |
+|---|---|
+| NSE cash | Full pre-open as described |
+| NSE derivatives | Per the segment's rules |
+| BSE segments | **Per instance**, with independent state |
+| Currency derivatives | Own schedule |
+| **MCX** | Opens at 09:00 on its own schedule, with no equity-style pre-open |
+
+"Pre-open" is therefore not a firm-wide state. The operations view must be per exchange and per segment, and client messaging must name the segment.
+
+## 5. Common pre-open incidents
+
+| Incident | First response |
+|---|---|
+| After-market release fails or is partial | **Named incident.** Quantify, inform clients, decide whether to re-release or cancel; see [incident playbooks](/broking-kyc/finix-broking-setup/daily-ops/07-incident-playbooks/) |
+| Released orders rejected en masse | Check the begin-of-day gate that produced the rejection code |
+| Session up but orders not accepted | Technology escalation; verify the state message |
+| Risk not evaluating | **No order entry**; escalate immediately; there is no bypass |
+| Limits wrong across many clients | The collateral or ledger load; this should have been caught at G5 |
+| Market data absent | Block price-dependent decisions; escalate |
+| A channel down | Segment- and channel-specific client message |
+| Exchange delays the pre-open | Follow the state message; inform clients |
+
+## 6. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.ops.preopen.amo_release_verify` | **Count-verified** | Discretionary, strongly recommended | Silent non-release |
+| `finix.ops.preopen.amo_rejection_classification` | By reason | Discretionary | Begin-of-day problems undiagnosed |
+| `finix.ops.preopen.phase_state_source` | Exchange market-state messages | Exchange-set | Entry in the wrong phase |
+| `finix.ops.preopen.discovered_price_messaging` | In the fill notification and on the order screen | Discretionary, strongly recommended | Avoidable support volume |
+| `finix.ops.preopen.per_segment_view` | True | Discretionary, strongly recommended | "The market is down" messaging |
+| `finix.ops.preopen.handover_written` | True | Discretionary | Open items lost at 09:15 |
+
+## 7. Exception paths
+
+| Situation | Response |
+|---|---|
+| Release count does not match the queue | Incident; quantify; inform clients; decide re-release or cancel |
+| Orders released into a closed session | Calendar-awareness failure; incident |
+| Mass rejections on released orders | Trace the rejection code to the begin-of-day gate; fix before continuous trading if possible |
+| Exchange extends or delays the pre-open | Follow the state message; inform clients; do not act on the clock |
+| Client disputes a pre-open fill price | Explain the discovery mechanism; the order and trade records support it |
+| Risk latency high at 09:00 | Capacity warm-up; if it persists past the open, treat as an incident |
+| One BSE instance not in pre-open | That segment only; message precisely |
+| Position or margin not propagated after matching | Stop increasing exposure for affected clients; reconcile |
+
+## Practical notes
+
+- **Verify the release with counts and classify the rejections.** The rejection codes tell you which gate was wrong.
+- **Put the discovered-price explanation in the fill notification.** It is the highest-leverage copy in the product.
+- **Keep the operations view per segment.** Three exchanges, and BSE has three instances.
+- **Treat "risk not evaluating" as a stop, not a degradation.** There is no bypass, and the pre-open is the moment to find out.
+- **Write the handover.** Open items at 09:15 are the ones that become incidents at 11:00.
+- **Watch client contact volume before 09:08.** A spike there is almost always the release.
+
+## Where this connects
+
+- [BOD runbook](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/) — what precedes this
+- [Continuous session operations](/broking-kyc/finix-broking-setup/daily-ops/03-continuous-session-ops/) — what follows
+- [NSE cash](/broking-kyc/finix-broking-setup/exchanges/01-nse-cash/) — the session structure
+- [Order attributes and validity](/broking-kyc/finix-broking-setup/oms/05-order-attributes-validity/) — the after-market window
+- [Pre-open and closing auction](/broking-kyc/deep-dives/foundational/pre-open-closing-auction/) — auction mechanics in depth
+- [Incident playbooks](/broking-kyc/finix-broking-setup/daily-ops/07-incident-playbooks/) — the release-failure playbook

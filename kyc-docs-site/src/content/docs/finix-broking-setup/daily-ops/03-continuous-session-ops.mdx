@@ -1,0 +1,197 @@
+---
+title: "Daily ops 3: continuous session operations"
+description: Running the market hours — the monitoring board and what each signal means, the intraday cycle of risk parameter refreshes and peak-margin snapshots, treasury decision points, pay-in attribution, surveillance triage, the escalation ladder, shift handovers, and the commodity evening session.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** During the session the operation is not executing a sequence; it is watching a board and responding. So the page is built around the board — what is monitored, what each signal means, and what the first response is — followed by the few timed activities that do punctuate the day, then the escalation ladder, then the evening session, which is a different operating mode in the same building.
+
+## TL;DR
+
+- **The session is a monitoring discipline, not a task list.** The board is the artefact: every signal has a meaning and a first response, decided in advance.
+- **Three signals matter more than they look**: per-instrument market-data staleness, sequence continuity, and unexpected quiet on a healthy connection.
+- **Risk parameter files arrive several times a day** and must be applied within minutes of publication; a missed publication blocks new derivatives orders in that segment.
+- **Peak-margin snapshots fall in four random windows** — 11:00 to 11:30, 12:30 to 13:00, 13:30 to 14:00 and 14:30 to 15:00 — which is why margin must be sufficient continuously rather than at end of day.
+- **Treasury works to decision points, not deadlines.** The decision must be made early enough to be executed before the bank's cut-off.
+- **Pay-in attribution is a client-experience function**, and the published confirmation time is a promise the operation has to keep.
+- **The commodity evening session is a second operating mode** running concurrently with the equity end-of-day pipeline.
+- **Handovers are written.** Open items at a shift boundary are the ones that become incidents.
+
+## 1. The monitoring board
+
+| # | Signal | Normal | Meaning when abnormal | First response |
+|---|---|---|---|---|
+| M1 | **Session state** per exchange and segment | Open | Halt, extension, or a state the firm did not expect | Follow the state message; message clients by segment |
+| M2 | **Sequence continuity** | Continuous | **Divergence already exists** | Stop new flow in that segment; reconcile |
+| M3 | Heartbeats | Healthy | Connectivity degrading | Investigate before it fails |
+| M4 | Round-trip latency percentiles | Within target | Degradation precedes failure | Investigate; do not wait for an outage |
+| M5 | **Per-instrument market-data staleness** | Fresh | **Silent, and poisons every downstream number** | Block price-dependent decisions in scope |
+| M6 | Order rate by channel and client | Within profile | Runaway automation, or a channel problem | Throttle the client, never the gateway |
+| M7 | **Rejection rate and code distribution** | Stable | A configuration or data problem | Trace the code; broker-preventable rejections are defects |
+| M8 | Risk decision latency and timeout count | Within target | Capacity or input problem | Do not raise the timeout as a first response |
+| M9 | **Unacknowledged order age** | Zero | Orders in limbo | Investigate; mark unknown rather than assume |
+| M10 | Orders in `UNKNOWN` | Zero | Session trouble | Reconcile before the session ends |
+| M11 | **Client utilisation distribution** | Stable | Clients approaching square-off | Warning process; see [square-off engine](/broking-kyc/finix-broking-setup/rms/06-squareoff-engine/) |
+| M12 | **Firm-level utilisation** | Within ceiling | Correlated client exposure | Risk event requiring a decision |
+| M13 | Instrument concentration across clients | Within policy | Everyone on the same side | Consider an instrument-level control |
+| M14 | **Risk parameter file freshness** | Current | Under-margined derivatives book | Block new derivatives orders in scope |
+| M15 | Collateral and pledge events | Processing | Recognition delays | Investigate; do not recognise unconfirmed pledges |
+| M16 | **Pay-in attribution queue** | Clearing | Clients waiting for capacity | Work it; the confirmation time is a promise |
+| M17 | Unattributed credits | Zero | Client money unallocated | Age tightly; investigate |
+| M18 | Pay-out queue and terminal states | Flowing | Disbursement problems | Check the provider; never blind-retry |
+| M19 | **Treasury position against requirement** | Comfortable | A funding decision is due | **Decide at the decision point** |
+| M20 | Surveillance alerts | Triaged | Backlog building | Work it; ageing is the metric |
+| M21 | Client contact volume and themes | Baseline | An incident the board has not surfaced | Investigate the theme |
+| M22 | **Unexpected quiet** | Expected volume | A silent failure | Investigate; healthy components with no traffic is an incident |
+
+<Aside type="caution" title="M5 and M22 are the two that announce nothing">
+A stale market-data feed does not disconnect; prices simply stop changing, and every downstream decision — square-off, margin utilisation, band validation, client screens — continues confidently on a number from minutes ago. A quiet connection does not error; it just carries no orders at 10:30. Neither appears on a connection-status dashboard. Both require an expectation to compare against: per-instrument tick age, and a volume profile. They are the cheapest high-value additions to any monitoring board.
+</Aside>
+
+## 2. The intraday cycle
+
+| Time | Activity | Owner |
+|---|---|---|
+| Continuous | Board monitoring | Operations, risk, technology |
+| **Several times a day** | **Risk parameter file publication** — ingest and apply within minutes | Risk |
+| On publication | Price band revisions — apply on receipt | Technology |
+| On publication | Surveillance list revisions — apply, most restrictive on ambiguity | Risk |
+| Intraday | Ban-period list revisions — apply; an underlying can enter during the session | Risk |
+| **11:00–11:30, 12:30–13:00, 13:30–14:00, 14:30–15:00** | **Peak-margin snapshot windows** — margin must be sufficient throughout | Risk |
+| Continuous | Pay-in attribution and capacity grants | Treasury and operations |
+| Continuous | Pay-out processing within the published cut-off | Treasury |
+| **At decision points** | Treasury funding decisions, before the bank's cut-off | Treasury |
+| Continuous | Surveillance triage | Compliance |
+| Continuous | Client support | Support |
+| Periodic | **Intraday reconciliation**: order and trade counts, positions | Operations |
+| Periodic | Override review | Risk |
+| Shift boundaries | **Written handover** | All |
+
+## 3. Risk management during the session
+
+| Activity | Detail |
+|---|---|
+| Utilisation monitoring | Continuous, with watch and warn thresholds |
+| **Warning process** | A shortfall notice with the **amount, the deadline and the consequence** |
+| Grace management | Tracked per client; re-evaluate immediately on a confirmed receipt |
+| Square-off decisions | Per the disclosed policy; exceptions escalate to a human |
+| Mark-to-market monitoring | Clients can breach without placing an order |
+| Firm-level utilisation | Approaching a ceiling is a decision, not an automatic rejection of whoever is next |
+| Concentration | Across clients in one instrument |
+| Override handling | Per-order, logged, by an approver distinct from the placer |
+| Restriction changes | Applied immediately; affected clients informed |
+
+## 4. Treasury during the session
+
+| Activity | Detail |
+|---|---|
+| Position monitoring | Requirement against available, continuously |
+| **Decision points** | Alerts before the internal deadline, which is before the bank's cut-off |
+| Funding execution | Maker-checker, then send, then **assert recognition** |
+| Composition monitoring | Cash-equivalent minimum is continuous, not an end-of-day test |
+| Intraday receipts | Confirmed receipts increase capacity; unconfirmed do not |
+| Pay-out funding | From the day's clearing corporation receipt, same day |
+| Escalation | Early, to the head of treasury and the head of risk |
+
+## 5. Surveillance during the session
+
+| Activity | Detail |
+|---|---|
+| Real-time alerts | Utilisation spikes, concentration, order-rate anomalies, consecutive rejections, self-trade |
+| Triage | Within the service level; **ageing is the metric** |
+| Client code modification monitoring | Count by dealer and client, against the daily ceiling |
+| Restricted-list enforcement | Employee and connected-person activity |
+| Escalation | To compliance; disposition is theirs |
+| Recording | Every alert, every disposition, with reasoning |
+
+## 6. The escalation ladder
+
+| Level | Trigger | Owner | Authority |
+|---|---|---|---|
+| L1 | A board signal outside normal | Operations, risk or technology on duty | Investigate; apply the documented first response |
+| L2 | Not resolved within a stated period, or a named incident type | Team lead | Invoke the playbook; communicate internally |
+| L3 | Client-affecting, or a regulatory deadline at risk | Head of the function | Client and exchange communication; scoped stops |
+| L4 | **Severity one** — order path, client money, a statutory breach | Head of operations and head of risk | Stop trading in scope; notify compliance |
+| L5 | Firm-level | Board or designated director | Regulatory notification; external communication |
+
+| Rule | Detail |
+|---|---|
+| Escalate early | The cost of an unnecessary escalation is far below the cost of a late one |
+| Named people, not roles | A rota with names and numbers |
+| **Compliance informed at L3**, not after | A deadline that will be missed is a different conversation from one that was |
+| Record | Every escalation, with times |
+
+## 7. The commodity evening session
+
+| Item | Detail |
+|---|---|
+| Hours | To **23:30**, or **23:55** in United States daylight saving, for non-agricultural commodities |
+| Concurrency | **The equity end-of-day pipeline runs while this is open** |
+| Staffing | Certified dealing, risk monitoring, support and treasury cover |
+| **Tender days** | A named, present, authorised person before **19:30** |
+| Treasury constraint | Banking channels closed; client funding options narrow |
+| Risk parameters | Evening settings should reflect the client's limited ability to fund |
+| Escalation | An evening path with real authority, not best-effort |
+| Handover | Into the commodity close, written |
+
+## 8. Handovers
+
+| Boundary | Content |
+|---|---|
+| Pre-open to session | Open items from the release and the gates |
+| Shift to shift | Open incidents, clients under warning, pending treasury decisions, unresolved exceptions |
+| Equity close to evening | Commodity positions, tender-day status, treasury position |
+| Evening to overnight | Commodity close status, open items, on-call contacts |
+| **Written** | Not verbal; the receiving shift signs for it |
+
+## 9. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.ops.session.board_signals` | M1 to M22, each with a first response | Discretionary, strongly recommended | Monitoring without meaning |
+| `finix.ops.session.volume_profile_alert` | **Enabled** | Discretionary, strongly recommended | Silent quiet undetected |
+| `finix.ops.session.marketdata_staleness_alert` | **Per instrument** | Discretionary, strongly recommended | The silent killer |
+| `finix.ops.session.latency_percentile_alert` | On movement, not thresholds | Discretionary | Degradation missed |
+| `finix.ops.session.intraday_recon_interval` | Periodic | Discretionary, strongly recommended | Late discovery |
+| `finix.ops.session.treasury_decision_alert` | Before the internal deadline | Discretionary, strongly recommended | Decisions too late to execute |
+| `finix.ops.session.escalation_ladder` | L1 to L5 with named people | Discretionary, strongly recommended | Unclear authority during an incident |
+| `finix.ops.session.compliance_at_l3` | True | Discretionary, strongly recommended | Compliance informed after a breach |
+| `finix.ops.session.handover_written` | True, signed | Discretionary, strongly recommended | Open items lost |
+| `finix.ops.session.evening_authority` | Named, with real authority | Discretionary, strongly recommended | Evening escalations stalling |
+
+## 10. Exception paths
+
+| Situation | Response |
+|---|---|
+| Sequence gap | **Highest-priority connectivity incident.** Stop new flow in that segment; reconcile |
+| Market data stale for an instrument | Block price-dependent decisions in scope; escalate |
+| Risk parameter publication missed | Block new derivatives orders in scope until applied |
+| Risk component degraded | **Stop new orders** rather than accept slow decisions |
+| Mass client breach in a volatile market | Prioritise by exposure; communicate broadly; escalate early; expect the square-off engine to be a load spike |
+| Firm-level ceiling approached | Decision about which flow continues, not an automatic rejection |
+| Treasury decision point passed without a decision | Escalate immediately; the bank's cut-off does not move |
+| Pay-in attribution backlog | Work it; the published confirmation time is a client promise |
+| Surveillance backlog building | Tune with reasoning recorded, or add capacity; do not let it age |
+| A client reports something the board did not show | Investigate the gap in the board, not just the client's issue |
+| Exchange halts the market | Follow the state message; stop square-off attempts; communicate |
+
+## Practical notes
+
+- **Give every board signal a documented first response.** A board without responses is a wall of numbers at 11:00.
+- **Alert on unexpected quiet.** It costs a volume profile and catches failures nothing else catches.
+- **Measure per-instrument staleness, not connection health.** Stale is silent and systematic.
+- **Escalate to compliance at L3, before the deadline passes.** The conversation is entirely different.
+- **Make handovers written and signed.** Verbal handovers lose exactly the items that matter.
+- **Staff the evening session properly.** A market open with best-effort cover is an unmanaged position.
+- **Do not raise a timeout to fix timeouts.** It is the control, and rising timeouts are a signal.
+
+## Where this connects
+
+- [Pre-open operations](/broking-kyc/finix-broking-setup/daily-ops/02-pre-open-ops/) — what precedes
+- [Close and post-close](/broking-kyc/finix-broking-setup/daily-ops/04-close-post-close-ops/) — what follows
+- [Incident playbooks](/broking-kyc/finix-broking-setup/daily-ops/07-incident-playbooks/) — the named incidents
+- [Square-off engine](/broking-kyc/finix-broking-setup/rms/06-squareoff-engine/) — the warning and action process
+- [Treasury and exchange funding](/broking-kyc/finix-broking-setup/money/05-treasury-exchange-funding/) — the decision points
+- [Intraday surveillance](/broking-kyc/finix-broking-setup/rms/07-intraday-surveillance/) — the alert catalogue
+- [Money and trade in sync](/broking-kyc/finix-broking-setup/money/07-money-trade-sync/) — the race conditions that surface here
