@@ -1,0 +1,198 @@
+---
+title: "Money 6: upstreaming and downstreaming"
+description: The end-of-day movement of clients' clear credit balances to the clearing corporations — the two prescribed nodal accounts and their nomenclature, the permitted forms of upstreaming, the daily computation, the downstreaming rule that client pay-outs are funded same day, the capital effect, and the controls that prevent an under-upstreamed balance overnight.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Upstreaming is a short daily process with a large consequence, and almost all of its difficulty is in the computation rather than the movement. So the page states the account structure and the permitted forms first, because they bound what is possible, then the computation with its inputs, then the instruction and confirmation, then downstreaming — which is a different rule often treated as the mirror image and is not — and ends with the capital effect, which is the reason this process belongs in a business plan and not only in an operations manual.
+
+## TL;DR
+
+- **Two prescribed nodal accounts carry client money.** The **Upstreaming Client Nodal Bank Account**, "Name of the SB/CM – USCNB account", receives clients' funds for upstreaming to the clearing corporations. The **Downstreaming Client Nodal Bank Account**, "Name of the SB/CM – DSCNB account", is the only account from which client payments are made.
+- **Clear credit balances are upstreamed on an end-of-day basis** in one of three permitted forms: **cash, a lien on fixed deposit receipts, or a pledge of units of mutual fund overnight schemes created out of clients' funds**.
+- **Downstreaming is not the mirror image.** Payment to clients is made from the DSCNB account **after receiving funds from the clearing corporation or clearing member the same day** — a funding rule, not merely an account rule.
+- **A clearing member clearing for other brokers uses a separate designated account** with the nomenclature "Name of the CM – TM prop account" to receive or pay proprietary funds to or from stock brokers.
+- **Funds in these accounts cannot be commingled with the broker's own accounts and cannot be used for proprietary purposes.**
+- **The computation is the hard part.** What is a clear credit balance, after which obligations and reserves, as at what moment — each input has to be defined and consistent with the ledger and the risk engine.
+- **Upstreaming has a capital effect.** Money upstreamed is not retained, and NSE's variable net worth requirement is 10 percent of the average daily client cash balance **retained**.
+
+## Conceptual overview
+
+The upstreaming regime exists to move client money out of the broker overnight. If the firm fails, money already at a clearing corporation is outside the failure; money sitting in a broker's account is not. That is the whole idea, and the prescribed account names, the permitted forms and the end-of-day timing all follow from it. Seen that way, the regime is less an operational burden than a structural protection that the firm executes on clients' behalf — which is a useful framing when explaining to clients why their money moves.
+
+The second feature is that the computation carries all the complexity. "Clear credit balance" is not simply a ledger balance: unconfirmed receipts are not clear, amounts required against obligations are not free, and the definition has to be the same one the ledger uses and the risk engine assumes. Firms that compute upstreaming from a slightly different basis than the ledger end up either under-upstreaming — a breach — or over-upstreaming, which strands money they need the next morning. Getting the definition written down once and used everywhere is the single highest-value piece of work in this page.
+
+The third feature is that downstreaming is a different rule wearing a symmetrical name. Upstreaming is about where money sleeps; downstreaming is about where client payments come from and how they are funded. The requirement that payment to clients be made from the DSCNB account after receiving funds from the clearing corporation or clearing member the same day ties each pay-out to a receipt, which is what makes the flow auditable. A firm that funds pay-outs from a general balance satisfies the account rule and defeats its purpose.
+
+## 1. Framework
+
+- **Upstreaming of clients' funds by stock brokers and clearing members to clearing corporations** — the framework creating the USCNB and DSCNB structure, the prescribed nomenclature, the end-of-day upstreaming obligation and the permitted forms. Issued by SEBI and operationalised by exchange and depository circulars; subsequently revised. `[not yet in index]`
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — regulation 18(2)(c) segregation of client money from the firm's own account **and from any other client's account**. `[not yet in index]`
+- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — client funds, running account settlement and permitted uses.
+- **[SEBI/HO/MRD2_DCAP/CIR/2021/0598](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2_dcapcir20210598)** (20 July 2021) — client-level collateral segregation, which interacts with what is upstreamed and how it is allocated.
+- **NSE variable net worth** — 10 percent of the average daily cash balance of clients **retained** across segments and exchanges in the previous six months; see [entity and capital structure](/broking-kyc/finix-broking-setup/setup/01-entity-capital-structure/#44-variable-net-worth).
+- Depth: **[client funds upstreaming](/broking-kyc/deep-dives/settlement/client-funds-upstreaming/)**.
+
+## 2. The accounts
+
+| Account | Prescribed nomenclature | Purpose |
+|---|---|---|
+| **USCNB** | **"Name of the SB/CM – USCNB account"** | Receive clients' funds for further upstreaming to the clearing corporations |
+| **DSCNB** | **"Name of the SB/CM – DSCNB account"** | **The only account** from which client payments are made, after receiving funds from the clearing corporation or clearing member the same day |
+| Clearing member proprietary account | **"Name of the CM – TM prop account"** | Used by clearing members clearing for other brokers, to receive or pay **proprietary** funds to or from stock brokers |
+
+| Rule | Detail |
+|---|---|
+| Nomenclature is the control | An inspector reading a statement header should be able to tell what class of money it holds; insist on the exact title |
+| **No commingling** | Funds in these accounts cannot be commingled with the broker's own bank accounts |
+| **No proprietary use** | They cannot be used by the broker for proprietary purposes |
+| Collection destination | Every client pay-in, including gateway settlements, lands in the USCNB account |
+| Disbursement source | Every client pay-out leaves from the DSCNB account |
+
+## 3. Permitted forms of upstreaming
+
+| Form | Detail | Operational note |
+|---|---|---|
+| **Cash** | Transferred to the clearing corporation | Simplest; a standing instruction reduces the daily load |
+| **Lien on fixed deposit receipts** | A lien marked in favour of the clearing corporation | A standing arrangement with the bank is far better than arranging each time |
+| **Pledge of units of mutual fund overnight scheme** | Units **created out of clients' funds**, pledged | Serves as both an upstreaming form and collateral; the units must be created out of clients' funds |
+
+| Control | Detail |
+|---|---|
+| Form selection rule | Documented; usually a mix, with cash as the residual |
+| Creation from clients' funds | For overnight scheme units, this is explicit and must be evidenced |
+| Timing | Each form has its own operational lead time; a form that cannot be executed by end of day is not available today |
+| Confirmation | Each instruction confirmed; an instructed but unconfirmed upstream is not upstreamed |
+| Reversal next morning | The position must be available for the next day's funding; plan the unwind as deliberately as the wind-up |
+
+## 4. The computation
+
+| Input | Definition | Must be consistent with |
+|---|---|---|
+| Client ledger credit balances | Per the ledger of record | [Ledger and accounting](/broking-kyc/finix-broking-setup/backoffice/04-ledger-accounting/) |
+| **Clear** | Confirmed good funds only; unconfirmed receipts excluded | The capacity gate in the risk engine |
+| Obligations and requirements | Amounts required against margin and settlement obligations | [Margin engine](/broking-kyc/finix-broking-setup/rms/02-margin-engine/) |
+| Debits | Client debits reduce the pool | Ledger |
+| Blocked amounts | Pay-outs blocked but not yet executed | [Pay-out engine](/broking-kyc/finix-broking-setup/money/03-payout-engine/) |
+| **As-of moment** | A defined end-of-day instant, applied consistently | All of the above |
+| Result | The clear credit balance to be upstreamed | — |
+
+| Control | Requirement |
+|---|---|
+| **One definition** | Written down once and used by the ledger, the risk engine and this computation |
+| Reproducibility | The computation re-derivable for a past date |
+| Reconciliation | Computed against instructed against confirmed, daily — reconciliation R12 in [bank reconciliation](/broking-kyc/finix-broking-setup/money/04-bank-recon/) |
+| Exception handling | A client whose balance cannot be computed is an exception, not a zero |
+| Evidence | The computation retained on the eight-year floor |
+
+<Aside type="caution" title="Under-upstreaming is a breach, not a variance">
+If the computation produces a number and the instruction moves less, client money has stayed with the broker overnight in breach of the obligation. That is not an operational variance to be caught in tomorrow's reconciliation; it is a condition to be reported. Make the computed-versus-confirmed reconciliation a hard daily assertion with an alarm, and escalate any difference to compliance the same evening rather than the next working day.
+</Aside>
+
+## 5. The instruction
+
+| Step | Owner | Control |
+|---|---|---|
+| 1. Compute | Operations and treasury | Reproducible, reconciled to the ledger |
+| 2. Decide the form mix | Treasury | Per the documented rule |
+| 3. Prepare instructions | Treasury, maker | Per form |
+| 4. Approve | Treasury, checker | Maker-checker |
+| 5. **Send before the operative cut-off** | Treasury | The bank's and the clearing corporation's, whichever is earlier |
+| 6. **Confirm** | Treasury | Instructed is not upstreamed |
+| 7. Reconcile | Treasury and operations | Computed, instructed, confirmed |
+| 8. Record | System | Retained |
+| 9. Escalate differences | Treasury to compliance | Same evening |
+
+## 6. Downstreaming
+
+| Element | Detail |
+|---|---|
+| Rule | Payment to clients is made **only from the DSCNB account**, **after receiving funds from the clearing corporation or clearing member the same day** |
+| Why | It ties each pay-out to a receipt, which makes the flow auditable and demonstrates that client money was not used for other purposes |
+| Not the mirror image | Upstreaming concerns where money sleeps; downstreaming concerns where pay-outs come from and how they are funded |
+| Practical consequence | The pay-out run depends on the day's receipt, so the run time follows settlement rather than preceding it |
+| Failure | A pay-out funded from a general balance satisfies the account rule and defeats its purpose |
+| Control | Verified as step 5 of the [pay-out run](/broking-kyc/finix-broking-setup/money/03-payout-engine/#4-the-run) |
+
+## 7. The capital effect
+
+| Mechanism | Detail |
+|---|---|
+| NSE variable net worth | **10 percent of the average daily cash balance of clients retained** across segments and exchanges in the previous six months |
+| **Upstreamed is not retained** | Money moved to the clearing corporation at end of day is not retained client cash |
+| Running account settlement | Money returned to clients is likewise not retained; see [ledger and accounting](/broking-kyc/finix-broking-setup/backoffice/04-ledger-accounting/#5-running-account-settlement) |
+| Consequence | Two regulatory processes that look purely operational are also capital levers |
+| Planning | The business plan's net worth projection should model retained client cash after upstreaming and running account settlement, not gross client balances |
+
+This is worth stating explicitly because it is routinely missed: a firm that grows client funds under administration and does not model the variable net worth consequence will meet an unexpected capital requirement, and the two processes that reduce it are ones it is already obliged to run.
+
+## 8. Controls and metrics
+
+| Control | Detail |
+|---|---|
+| Account title verification | The prescribed nomenclature confirmed on the statement header, periodically |
+| Computed-versus-confirmed assertion | **Daily, with an alarm** |
+| Form availability check | Before relying on a form that has an operational lead time |
+| Confirmation tracking | Per instruction, per form |
+| Exception escalation | Same evening to compliance |
+| Next-morning availability | The unwind planned, so funding is available at the open |
+| Retention | Computation, instruction and confirmation retained |
+
+| Metric | Behaviour |
+|---|---|
+| Computed versus confirmed difference | **Zero** |
+| Instructions sent before the cut-off | All |
+| Confirmations received | All |
+| Average retained client cash | Trended, because it drives the variable net worth requirement |
+| Form mix | Trended, against the documented rule |
+
+## 9. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.money.upstream.schedule` | **End of day, daily** | Regulatory | Under-upstreamed balance overnight |
+| `finix.money.upstream.forms_enabled` | Cash, FDR lien, MFOS pledge | Regulatory | Upstreaming in an unpermitted form |
+| `finix.money.upstream.form_mix_rule` | Documented | Discretionary | Unplanned mix; forms unavailable at the time needed |
+| `finix.money.upstream.clear_definition` | **One shared definition** across ledger, risk and this computation | Discretionary, strongly recommended | Over- or under-upstreaming |
+| `finix.money.upstream.asof_moment` | Defined and consistent | Discretionary, strongly recommended | Irreproducible computations |
+| `finix.money.upstream.computed_vs_confirmed_assert` | **Daily, with an alarm** | Regulatory in substance | Silent breach |
+| `finix.money.upstream.exception_escalation` | Same evening, to compliance | Discretionary, strongly recommended | A breach discovered next working day |
+| `finix.money.downstream.source_account` | **A2 DSCNB** | Regulatory | Pay-out from a non-permitted account |
+| `finix.money.downstream.same_day_funding_required` | True | Regulatory | Pay-out from a pool |
+| `finix.money.account.title_verification` | Periodic, against the statement header | Regulatory in substance | A mis-titled account |
+| `finix.money.upstream.retention_years` | 8 | Regulatory | Short of the statutory floor |
+
+## 10. Exception paths
+
+| Situation | Response |
+|---|---|
+| Computed exceeds confirmed | **Breach.** Escalate to compliance the same evening; investigate; remediate |
+| A form is unavailable at instruction time | Fall back per the documented rule; cash is the residual |
+| Bank or clearing corporation channel fails before the cut-off | Alternate channel; escalate; document every attempt; an unexecuted upstream is still a breach and must be reported |
+| A client's balance cannot be computed | Exception, not a zero; resolve before the computation is treated as complete |
+| Over-upstreamed, leaving insufficient funding next morning | The unwind must be planned; adjust the next day's funding and review the computation inputs |
+| Account title found to differ from the prescribed nomenclature | Correct with the bank; a mis-titled account undermines the control |
+| Pay-out requested before the day's clearing corporation receipt | Hold until the DSCNB account is funded; this is the rule, not a preference |
+| Retained client cash rising materially | Model the variable net worth consequence; it is a capital planning input |
+| Instruction confirmed by the bank but not recognised by the clearing corporation | Escalate to both; recognition is what counts |
+
+## Practical notes
+
+- **Write the "clear credit balance" definition once and reference it everywhere.** Divergent definitions are the root of most upstreaming differences.
+- **Make computed-versus-confirmed a hard daily assertion.** A silent shortfall is a breach nobody notices.
+- **Arrange standing lien and pledge mechanics in advance.** Reactive arrangements do not complete by end of day.
+- **Plan the next morning's unwind.** Upstreaming is half the cycle.
+- **Check the account titles periodically.** Banks reformat titles and the title is the control.
+- **Model retained client cash in the capital plan.** Upstreaming and running account settlement are capital levers as well as obligations.
+- **Escalate a shortfall the same evening.** It is a breach with a reporting consequence, not a reconciliation item.
+
+## Where this connects
+
+- [Bank account architecture](/broking-kyc/finix-broking-setup/setup/06-bank-account-architecture/) — the account map
+- [Ledger and accounting](/broking-kyc/finix-broking-setup/backoffice/04-ledger-accounting/) — the clear balance definition and running account settlement
+- [Pay-out engine](/broking-kyc/finix-broking-setup/money/03-payout-engine/) — the downstreaming rule in operation
+- [Treasury and exchange funding](/broking-kyc/finix-broking-setup/money/05-treasury-exchange-funding/) — the funding consequence
+- [Bank reconciliation](/broking-kyc/finix-broking-setup/money/04-bank-recon/) — reconciliation R12
+- [Entity and capital structure](/broking-kyc/finix-broking-setup/setup/01-entity-capital-structure/) — the variable net worth effect
+- [Client funds upstreaming](/broking-kyc/deep-dives/settlement/client-funds-upstreaming/) — the regime in depth

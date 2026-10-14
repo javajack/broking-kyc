@@ -1,0 +1,194 @@
+---
+title: "Money 4: bank and gateway reconciliation"
+description: Proving that every rupee is where it should be and belongs to whom it should — the reconciliation set across bank, gateway, ledger and clearing corporation, matching keys and tolerances, the exception taxonomy, exception ageing as the operating metric, unattributed client money, and the daily assertion that evidences segregation.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Reconciliation is usually described as a matching exercise and is better understood as an evidence exercise: its output is not a tick but a statement the firm can make to a regulator about where client money is. So the page starts from the assertions that must be true, then the reconciliations that produce them, then the exception taxonomy with a cause and an action for each, then ageing — because a reconciliation that runs daily and leaves exceptions open is producing a backlog, not evidence.
+
+## TL;DR
+
+- **The assertion that matters is segregation**: the sum of what clients are owed equals client money held in the designated accounts plus what has been upstreamed. A gap in either direction is serious.
+- **SmartReco handles bank, gateway and depository reconciliation**; trade-to-obligation reconciliation stays inside the back office because it is intrinsic to processing. The split follows the data, not the vendor.
+- **The UTR is the key on the collection side.** `settlement.processed` fires after Razorpay transfers funds to the business bank account, and the UTR reconciles that settlement against the bank statement.
+- **Exception ageing is the metric, not exception count.** A hundred one-day-old items is a busy day; one ninety-day-old item is a finding.
+- **Unattributed client money is a reportable condition if it persists.** Money in a client account that cannot be matched to a client is not any client's, and it accumulates quietly.
+- **A credit in the ledger with no corresponding bank receipt is severity one.** The firm has given capacity against money it does not hold.
+- **Reconcile intraday where the data allows.** A difference found at 11:00 is an investigation; the same difference at 23:00 collides with upstreaming and the next day's capacity load.
+
+## Conceptual overview
+
+A broking firm holds other people's money in accounts it controls, and the entire regulatory architecture around that — prescribed account names, segregation, upstreaming, the prohibition on proprietary use — rests on the firm being able to demonstrate, daily, that the money is where it should be and attributed to whom it should be. Reconciliation is how that demonstration is produced. It is therefore not a back-office hygiene task but the evidence base for the firm's most fundamental compliance claim, and it should be resourced accordingly.
+
+The second idea is that reconciliation discovers things rather than confirming them. A clean reconciliation tells you almost nothing you did not already believe; the value is entirely in the exceptions. That reframes the operating model: the goal is not to get the reconciliation to balance but to surface differences quickly, classify them accurately and resolve them before they age. Teams that are measured on "reconciliations completed" optimise for closing; teams measured on "age of the oldest open exception" optimise for resolving, which is the behaviour that matters.
+
+The third idea is about direction. Most reconciliation differences are benign timing items that resolve themselves. A few are not, and they are asymmetric: money in the bank that the ledger does not know about is untidy, while money in the ledger that the bank does not have is a solvency statement. Treating both with the same urgency wastes effort; treating them with the same process misses the serious one. The exception taxonomy in section 4 separates them explicitly.
+
+## 1. Framework
+
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — regulation 18(2)(c) segregation of client money from the firm's own and from other clients', which is what these reconciliations evidence; regulation 16 retention of not less than eight years, which covers the reconciliation outputs. `[not yet in index]`
+- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — client funds and books-and-records obligations.
+- **Upstreaming framework** — the USCNB and DSCNB accounts and the end-of-day computation; see [upstreaming and downstreaming](/broking-kyc/finix-broking-setup/money/06-upstreaming-downstreaming/).
+- **Clearing corporation reports** — the bank summary report gives transactions in the member's clearing account at the clearing bank; the daily funds statement gives the break-up of debits and credits in that account. `[not yet in index]`
+- **Razorpay settlement semantics** — `settlement.processed` after funds transfer to the business bank account, with the **UTR** used to reconcile settlement funds against the bank statement.
+- **Internal and concurrent audit** — these reconciliations are standard audit evidence; see [concurrent audit](/broking-kyc/deep-dives/compliance-audit/concurrent-audit/).
+
+## 2. The assertions
+
+Everything in this page exists to support these statements, made daily.
+
+| # | Assertion | Evidence |
+|---|---|---|
+| **A1** | The sum of client credit balances equals client money held in the designated accounts plus amounts upstreamed | Ledger total, bank balances, clearing corporation collateral and upstreaming records |
+| A2 | No client money sits in a firm account | Account-level attribution |
+| A3 | No firm money sits in a client account beyond amounts legitimately due | Brokerage computation and transfer records |
+| A4 | Every bank entry is attributed to a client or to the firm | Bank statement against ledger and firm records |
+| A5 | Every client credit corresponds to money actually received | Ledger against bank |
+| A6 | Every client debit for a pay-out corresponds to money actually sent | Ledger against bank and payout records |
+| A7 | Gateway collections have landed in the bank | Gateway settlements against bank credits, by UTR |
+| A8 | Depository holdings and pledges match the firm's records | Depository against back office and risk |
+| A9 | Settlement movements match the clearing corporation's record | Clearing corporation reports against ledger |
+| A10 | No inter-client movement has occurred | Posting model plus exception review |
+
+<Aside type="caution" title="A1 is the one that must never fail silently">
+If the sum of what clients are owed exceeds client money held plus upstreamed, the firm has a shortfall in client funds. That is not a reconciliation difference to be investigated over a few days — it is a condition requiring immediate funding from the firm's own resources, investigation, and an assessment of the disclosure obligation. Make A1 an explicit daily assertion with an alarm, not a line in a report somebody reads later.
+</Aside>
+
+## 3. The reconciliation set
+
+| # | Reconciliation | Sources | Key | Frequency | Owner |
+|---|---|---|---|---|---|
+| R1 | **Client ledger to client bank accounts and upstreamed amounts** | Ledger, bank, clearing corporation | Totals | **Daily** | Finance |
+| R2 | Gateway settlement to bank credits | Razorpay settlement file, bank statement | **UTR** | Daily | Treasury |
+| R3 | Gateway payments to ledger credits | Gateway payments, ledger | Payment identifier | Daily | Treasury |
+| R4 | Virtual account credits to clients | Virtual account allocation, bank credit | Virtual account plus UTR | Daily, intraday where available | Treasury |
+| R5 | Pay-outs to bank debits | Payout records, bank statement | Payout reference, UTR | Daily | Treasury |
+| R6 | Clearing account movements | Clearing corporation bank summary and daily funds statement, bank, ledger | Settlement reference | Daily | Operations |
+| R7 | Depository holdings | Depository, back office | Client and instrument | Daily | Operations |
+| R8 | Pledges | Depository, back office, risk | Instruction reference | Daily | Operations and risk |
+| R9 | Trades to obligations | Exchange, clearing corporation, back office | Trade and settlement | Daily | Operations |
+| R10 | Charges collected to statutory dues remitted | Ledger, filings | Period | Per period | Finance |
+| R11 | Control accounts to the firm's general ledger | Back office, general ledger | Account | Per close | Finance |
+| R12 | Upstreaming computed to instructed to confirmed | Computation, instruction, clearing corporation | Day | Daily | Treasury |
+
+## 4. Exception taxonomy
+
+| # | Exception | Direction | Severity | Typical cause | Action |
+|---|---|---|---|---|---|
+| E1 | **Ledger credit with no bank receipt** | Ledger > bank | **Severity one** | Defect, or a reversed payment | Investigate immediately; capacity may have been given against money not held |
+| E2 | **Client funds shortfall on A1** | Ledger > held | **Severity one** | Multiple possible | Fund from own resources; investigate; assess disclosure |
+| E3 | **Unattributed bank credit in a client account** | Bank > ledger | High, rising with age | Transfer with poor narration; third party | Attribute; return if third-party; **age tightly** |
+| E4 | Gateway settled, not in the bank | Gateway > bank | Medium | Settlement timing or defect | Age against the expected cycle; escalate beyond it |
+| E5 | Captured, not settled | Gateway internal | Low | Settlement cycle | Age |
+| E6 | Pay-out debited in the ledger, not in the bank | Ledger > bank | High | Failed or pending payout | Verify the terminal state; release the block if failed |
+| E7 | Bank debit with no payout record | Bank > records | **Severity one** | Unauthorised movement | Investigate as a security incident |
+| E8 | Depository holding difference | Either | High | Instruction timing, corporate action | Do not recognise disputed quantity as collateral |
+| E9 | Pledge recognised in risk, not confirmed by the depository | Risk > depository | **Severity one** | Recognition defect | Stop increasing exposure; see [collateral](/broking-kyc/finix-broking-setup/rms/05-collateral-pledge/) |
+| E10 | Obligation difference | Either | High | Trade or allocation difference | Settlement is at risk; escalate |
+| E11 | Payer mismatch on a credit | — | High | Third-party payment | Do not credit; return to source |
+| E12 | Duplicate credit | Bank > expected | Medium | Gateway retry, operator error | Reverse the duplicate; investigate idempotency |
+| E13 | Charges collected exceed remitted | Ledger | High | Remittance failure | Investigate; this is a statutory liability |
+| E14 | Control account difference at close | Books | Medium | Timing or posting | Resolve before close |
+| E15 | Upstreaming computed but not confirmed | Treasury | High | Instruction failure | Under-upstreamed overnight is a breach |
+
+## 5. Matching design
+
+| Element | Design |
+|---|---|
+| Keys | Strongest available: UTR, payment identifier, payout reference, instruction reference, virtual account |
+| Fallback matching | Amount plus date plus narration, with a defined tolerance, **only where no key exists** |
+| Tolerance | Documented, consistent; never operator discretion per item |
+| Many-to-many | Supported — a single bank credit may cover several gateway payments and vice versa |
+| Partial matching | Supported, with the residual tracked rather than written off |
+| Auto-match rate | Measured; a falling rate is a signal about data quality upstream |
+| Manual match | Logged with the matcher's identity and reason |
+| **Unmatchable** | Routed to the exception queue, never force-matched to clear a report |
+| Re-run safety | Idempotent; re-running must not create duplicate matches |
+
+## 6. Ageing
+
+| Category | Target | Alarm |
+|---|---|---|
+| Unattributed client money | Resolve same day | **Any item beyond a tight threshold** |
+| Ledger credit with no receipt | Immediate | Any |
+| Bank debit with no record | Immediate | Any |
+| Pledge recognised but unconfirmed | Immediate | Any |
+| Gateway settlement pending | Within the expected cycle | Beyond the cycle |
+| Pay-out pending | Within the expected cycle | Beyond the cycle |
+| Depository difference | Same day | Beyond one day |
+| Obligation difference | Before the settlement deadline | Approaching the deadline |
+| Control account difference | Before close | At close |
+
+| Metric | Why |
+|---|---|
+| **Age of the oldest open item per category** | The metric that matters |
+| Items opened and closed per day | Whether the function keeps pace |
+| Auto-match rate | Upstream data quality |
+| Exceptions by cause | Where the systemic defect is |
+| Recurring exceptions | A process defect, not a daily task |
+| Manual matches | Should be rare; a rising count means the keys are not working |
+
+## 7. Intraday reconciliation
+
+| Leg | Feasible intraday? | Value |
+|---|---|---|
+| Virtual account credits | Yes, where intraday statements are available | Faster capacity for clients |
+| Gateway payments to ledger | Yes | Faster capacity |
+| Pay-out terminal states | Yes | Faster client confirmation |
+| Clearing account movements | Partially | Treasury visibility before the deadline |
+| Depository pledges | On event | Collateral recognition |
+| Client ledger to bank totals | End of day | The assertion |
+
+The case for intraday reconciliation is not neatness; it is that a difference found at 11:00 can be investigated calmly, while the same difference found at 23:00 collides with upstreaming, the margin reporting extract and the next day's capacity load — all of which are deadline-bound.
+
+## 8. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.money.recon.a1_assertion_daily` | **Mandatory, with an alarm** | Regulatory in substance | Silent client-funds shortfall |
+| `finix.money.recon.engine` | SmartReco for bank, gateway and depository | Discretionary | Weak matching on high-volume legs |
+| `finix.money.recon.keys.<leg>` | Strongest available; UTR on settlement | Discretionary, strongly recommended | Fallback matching where a key exists |
+| `finix.money.recon.tolerance.<leg>` | Documented, consistent | Discretionary | Inconsistent operator judgement |
+| `finix.money.recon.force_match` | **Prohibited** | Discretionary, strongly recommended | Exceptions cleared rather than resolved |
+| `finix.money.recon.unattributed_age_limit_days` | Tight | Discretionary, strongly recommended | Unattributed client money ageing |
+| `finix.money.recon.severity_one_categories` | E1, E2, E7, E9 | Discretionary, strongly recommended | Serious items in an ordinary queue |
+| `finix.money.recon.intraday_legs` | Virtual accounts, gateway, payouts | Discretionary | Late discovery |
+| `finix.money.recon.idempotent_rerun` | Enforced | Discretionary, strongly recommended | Duplicate matches |
+| `finix.money.recon.manual_match_logging` | Identity and reason | Discretionary | Unexplained matching |
+| `finix.money.recon.retention_years` | 8 | Regulatory | Short of the statutory floor |
+
+## 9. Exception paths
+
+| Situation | Response |
+|---|---|
+| A1 assertion fails with a client-funds shortfall | **Fund immediately from own resources**; investigate; assess disclosure; this is not an operational variance |
+| Ledger credit with no bank receipt | Severity one; quantify any capacity given; investigate the credit path |
+| Bank debit with no payout record | Severity one; treat as a security incident until proven otherwise |
+| Unattributed credit ageing past the threshold | Escalate to compliance; persistent unattributed client money is reportable |
+| Pledge recognised in risk but not confirmed | Stop increasing exposure for those clients; correct |
+| Gateway settlement missing beyond the cycle | Escalate to the gateway with the UTR |
+| A reconciliation is "completed" with open exceptions | It is not completed; the exceptions are the output |
+| Auto-match rate falling | Investigate upstream data quality rather than adding matching rules |
+| An operator force-matches to clear a report | Control failure; the match is a fabricated fact |
+| Backlog growing across categories | Resource or process problem; escalate before it becomes a regulatory one |
+
+## Practical notes
+
+- **Make A1 a named daily assertion with an alarm.** It is the firm's central compliance claim about client money.
+- **Measure the oldest open item, not the count.** It changes behaviour from closing to resolving.
+- **Never force-match.** A cleared report built on invented matches is worse than an honest exception queue.
+- **Reconcile intraday where the data allows.** It moves investigation out of the deadline window.
+- **Treat E1, E2, E7 and E9 as severity one by configuration**, so they cannot sit in an ordinary queue.
+- **Watch the auto-match rate as an upstream signal.** Falling match rates usually mean a data-quality change somewhere else.
+- **Keep the reconciliation outputs for eight years.** They are the evidence, and an auditor will ask for a past date.
+
+## Where this connects
+
+- [Pay-in rails](/broking-kyc/finix-broking-setup/money/02-payin-rails/) and [pay-out engine](/broking-kyc/finix-broking-setup/money/03-payout-engine/) — the legs being reconciled
+- [Ledger and accounting](/broking-kyc/finix-broking-setup/backoffice/04-ledger-accounting/) — the ledger side
+- [Collateral and pledge](/broking-kyc/finix-broking-setup/rms/05-collateral-pledge/) — the pledge three-way check
+- [Upstreaming and downstreaming](/broking-kyc/finix-broking-setup/money/06-upstreaming-downstreaming/) — the end-of-day movement
+- [Settlement obligations](/broking-kyc/finix-broking-setup/backoffice/05-settlement-obligations/) — the obligation leg
+- [EOD runbook](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/) — where these run
+- [Concurrent audit](/broking-kyc/deep-dives/compliance-audit/concurrent-audit/) — who examines them

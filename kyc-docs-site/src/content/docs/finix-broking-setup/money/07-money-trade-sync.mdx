@@ -1,0 +1,349 @@
+---
+title: "Money 7: money and trade in sync"
+description: Every race condition between the money clock and the trading clock, each stated as a sequence with its correct resolution — payment versus order, square-off versus payment, pay-out versus trade, settlement versus withdrawal, reversal after exposure, upstreaming versus overnight positions, and the cross-exchange and commodity cases where the two clocks diverge furthest.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Everything in the money plane that is genuinely hard reduces to one fact — money and trading run on different clocks with different latencies, different reversibility and different authorities — and the consequences show up as specific, repeatable sequences. So this page is a catalogue of those sequences. Each is stated as an ordered set of events with the correct resolution, the wrong resolution people reach for, and the control that prevents the situation arising. It is written to be read by an engineer designing a handler and by an operator deciding what to do at 14:50.
+
+## TL;DR
+
+- **The two clocks differ in three ways**: latency (a trade is milliseconds, a payment is minutes to days), reversibility (a trade is irreversible once matched, a payment can be reversed for days), and authority (the exchange decides a trade, a bank decides a payment).
+- **The capacity gate is the seam.** Capacity is granted at confirmed good funds; everything before that is progress a client can see and cannot trade on.
+- **The default resolution is almost always "the slower clock wins".** Do not act on the faster clock's optimism — do not grant capacity on an authorisation, do not pay out on an unsettled credit, do not release a block on a submission.
+- **A reversal after exposure is the asymmetric case.** The payment can be undone; the trade cannot. The client ends with a debit and the firm with a conversation, and the only prevention is the capacity gate.
+- **Square-off racing a payment is the most emotionally charged sequence** and the one most likely to reach arbitration. Re-evaluate immediately on a confirmed receipt, and make the re-evaluation latency a published number.
+- **Upstreaming interacts with overnight positions.** Money leaves at end of day while positions stay; the morning's capacity depends on the unwind, not on last night's ledger.
+- **Commodities diverge furthest**, because the market is open until 23:30 while banking and equity settlement have closed hours earlier.
+
+## Conceptual overview
+
+In a broking firm two systems claim to know what a client can afford. The trading side knows positions, margin requirements and limits, and it updates in milliseconds. The money side knows cash, and it updates on the timetable of banks, payment networks and clearing corporations. They are reconciled rather than unified, and every difficult situation in this plane is a moment when a decision has to be taken while they disagree.
+
+The structure of the right answer is almost always the same: the slower, less reversible clock governs. A payment that has been authorised but not settled might reverse; a trade placed against it cannot. A credit that has not cleared might not arrive; a withdrawal against it cannot be recalled. A payout that has been submitted might fail; a ledger block released on submission might be spent twice. In each case acting on the faster clock's optimism converts a timing difference into a loss, and the loss falls on whoever cannot undo their side — which is usually the firm, and occasionally a client who is then owed an explanation.
+
+The second structural point is that these races are not rare. They happen every day, at volume, and the ones that become incidents are the ones with no designed handler. A firm that enumerates them, decides each resolution in advance, and writes the client-facing wording in calm conditions handles them as routine. A firm that meets each one for the first time during a volatile session handles them inconsistently, which is both an operational and a conduct problem, because clients in identical situations get different outcomes.
+
+## 1. Why the clocks differ
+
+| Dimension | Trading clock | Money clock |
+|---|---|---|
+| Latency | Milliseconds | Seconds to days |
+| Reversibility | Irreversible once matched | Reversible for days — chargebacks, failed settlements, returns |
+| Authority | The exchange | Banks, payment networks, clearing corporations |
+| Availability | Market hours, and to 23:30 in commodities | Bank cut-offs, settlement cycles, holidays |
+| Finality | On trade, then on settlement | On clearing, then on irrevocability |
+| Granularity | Per order | Per payment, often batched |
+| Visible to the client | Instantly | With a lag they do not expect |
+
+## 2. The race catalogue
+
+### R1 — Payment races an order
+
+| # | Event |
+|---|---|
+| 1 | Client initiates a payment |
+| 2 | Client immediately places an order requiring that money |
+| 3 | Payment is authorised but not confirmed |
+
+**Correct:** reject the order for insufficient capacity. Capacity arrives at confirmed good funds.
+**Wrong:** grant capacity on authorisation, because the payment usually succeeds.
+**Control:** the capacity gate, plus visible intermediate states and a published expected confirmation time.
+**Client wording:** "Your payment is being confirmed. Funds are usually available within [time]."
+
+### R2 — Payment arrives mid-square-off
+
+| # | Event |
+|---|---|
+| 1 | Client is in breach; warning issued; grace running |
+| 2 | Client pays |
+| 3 | Payment confirms while square-off orders are in flight |
+
+**Correct:** on confirmation, **re-evaluate immediately**; cancel pending square-off orders; let executed ones stand; tell the client exactly what happened.
+**Wrong:** complete the square-off because it started, or cancel executed trades because the client paid.
+**Control:** re-evaluation on every confirmed receipt, with a published latency; square-off orders cancellable individually.
+**Client wording:** "Your payment cleared at [time]. We stopped the remaining closures. [N] positions had already been closed before it cleared."
+
+<Aside type="caution" title="R2 is the sequence most likely to reach arbitration">
+The client's view is that they paid and were sold out anyway. The firm's view is that the payment cleared after some orders had executed. Both are true. What decides the dispute is the record: the warning with its amount and deadline, the delivery evidence, the exact confirmation timestamp, the exact execution timestamps, and the re-evaluation that stopped the rest. If the firm's re-evaluation latency is long, or unmeasured, or the timestamps come from unsynchronised clocks, the firm will lose a dispute it should have won. See [square-off engine](/broking-kyc/finix-broking-setup/rms/06-squareoff-engine/).
+</Aside>
+
+### R3 — Pay-out races a trade
+
+| # | Event |
+|---|---|
+| 1 | Client requests a withdrawal; the amount is blocked |
+| 2 | Client places an order needing that amount |
+
+**Correct:** the block holds; the order is rejected for capacity.
+**Wrong:** allow the order because the pay-out has not left yet.
+**Control:** block at request, release only on terminal failure.
+**Client wording:** "₹X is held for your withdrawal request. Cancel the withdrawal to use it for trading."
+
+### R4 — Trade races a pay-out authorisation
+
+| # | Event |
+|---|---|
+| 1 | Pay-out authorised against clear balance |
+| 2 | Before execution, the client trades and creates a margin requirement |
+
+**Correct:** the pay-out proceeds — it was authorised against clear balance and blocked — and the new trade is evaluated against the reduced capacity.
+**Wrong:** cancel the pay-out to fund the trade.
+**Control:** block at authorisation, so the trade never sees that money as available.
+
+### R5 — Reversal after exposure
+
+| # | Event |
+|---|---|
+| 1 | Payment confirmed; capacity granted |
+| 2 | Client trades |
+| 3 | Payment reversed — chargeback, failed settlement, or return |
+
+**Correct:** remove capacity; the client has a debit for the position; follow the debit process and communicate immediately.
+**Wrong:** absorb it quietly, or square off without notice.
+**Control:** the capacity gate is the prevention; after the fact there is only the debit process.
+**Client wording:** "A payment of ₹X was returned by your bank on [date]. Your account now shows a debit of ₹Y against open positions."
+**Note:** persistent reversals from one client are a surveillance signal.
+
+### R6 — Settlement proceeds race a withdrawal
+
+| # | Event |
+|---|---|
+| 1 | Client sells |
+| 2 | Client requests withdrawal of the proceeds |
+| 3 | Settlement has not completed |
+
+**Correct:** per the disclosed policy on when sale proceeds become withdrawable, applied consistently across the ledger, the app and the pay-out engine.
+**Wrong:** three different answers in three systems.
+**Control:** one definition, one place, referenced everywhere.
+**Client wording:** "Proceeds from your sale on [date] will be available for withdrawal on [date]."
+
+### R7 — Margin call races the bank cut-off
+
+| # | Event |
+|---|---|
+| 1 | Intraday margin requirement rises |
+| 2 | The firm must fund the clearing account |
+| 3 | The bank's cut-off approaches |
+
+**Correct:** decide at the decision point, not the deadline; draw the facility; escalate.
+**Wrong:** wait for client payments that may not confirm in time.
+**Control:** decision-point alerts, a pre-arranged facility, alternate channels.
+See [treasury and exchange funding](/broking-kyc/finix-broking-setup/money/05-treasury-exchange-funding/).
+
+### R8 — Client payment races the firm's own funding deadline
+
+| # | Event |
+|---|---|
+| 1 | Client is short; firm must meet the clearing corporation on their behalf |
+| 2 | Client promises to pay |
+| 3 | The firm's deadline arrives first |
+
+**Correct:** the firm funds from its own resources and recovers from the client. **The clearing corporation's deadline does not wait.**
+**Wrong:** miss the deadline while waiting for the client.
+**Control:** the shortfall identification runs early enough to make the decision calmly.
+
+### R9 — Upstreaming races overnight positions
+
+| # | Event |
+|---|---|
+| 1 | Clear credit balances upstreamed at end of day |
+| 2 | Client holds overnight positions |
+| 3 | Morning margin requirement must be met |
+
+**Correct:** the computation excludes amounts required against obligations; the morning's capacity reflects the unwind, not last night's gross ledger.
+**Wrong:** upstream the gross balance and discover a funding gap at the open.
+**Control:** one shared definition of clear credit balance; a planned unwind.
+See [upstreaming and downstreaming](/broking-kyc/finix-broking-setup/money/06-upstreaming-downstreaming/).
+
+### R10 — Corporate action races a payment
+
+| # | Event |
+|---|---|
+| 1 | Client pledges securities as collateral |
+| 2 | A corporate action changes their value or eligibility |
+| 3 | Capacity falls |
+
+**Correct:** revalue on the ex date; communicate before the margin call.
+**Wrong:** carry the pre-event value forward.
+**Control:** collateral revaluation on corporate action, and eligibility recheck.
+See [corporate actions](/broking-kyc/finix-broking-setup/backoffice/07-corporate-actions/).
+
+### R11 — Commodity session races banking hours
+
+| # | Event |
+|---|---|
+| 1 | MCX trades until 23:30 |
+| 2 | A client needs to fund a position at 21:00 |
+| 3 | Banking channels and equity settlement have closed |
+
+**Correct:** the commodity session's funding options are narrower; publish what is available after hours, and set risk parameters knowing the client's ability to add funds is limited.
+**Wrong:** assume the equity-session funding model applies all evening.
+**Control:** segment-specific funding expectations, communicated to clients; evening treasury cover.
+
+### R12 — Cross-exchange capacity
+
+| # | Event |
+|---|---|
+| 1 | A client has capacity computed across exchanges |
+| 2 | Obligations are segment-wise and exchange-wise |
+| 3 | A shortfall exists in one segment while surplus sits in another |
+
+**Correct:** recognise offsets only where the clearing corporation recognises them; otherwise fund the segment that is short.
+**Wrong:** treat aggregate capacity as fungible across clearing corporations.
+**Control:** segment-wise obligation computation; cross-margin only where genuinely recognised.
+
+### R13 — Pay-out webhook races the ledger
+
+| # | Event |
+|---|---|
+| 1 | Pay-out submitted; block held |
+| 2 | `processed` webhook arrives before `queued` |
+
+**Correct:** accept terminal states out of order; never regress; debit on processed.
+**Wrong:** assume a sequence and reject the out-of-order event.
+**Control:** idempotent, order-independent webhook handling.
+
+### R14 — Two pay-out requests race
+
+| # | Event |
+|---|---|
+| 1 | Client submits a withdrawal from the app |
+| 2 | Simultaneously requests one through support |
+
+**Correct:** serialise per client; the second sees the first's block and is rejected or reduced.
+**Wrong:** both authorised against the same balance.
+**Control:** block at request; serialise per client.
+
+### R15 — Pay-in races the capacity load at begin of day
+
+| # | Event |
+|---|---|
+| 1 | Client pays overnight or very early |
+| 2 | Begin-of-day capacity load runs from the end-of-day ledger |
+
+**Correct:** the capacity load's as-of moment is defined; payments after it are applied as intraday events, not missed.
+**Wrong:** the payment is invisible until the next day.
+**Control:** an explicit intraday capacity-update path, in addition to the begin-of-day load.
+
+### R16 — CUSPA clock races a client payment
+
+| # | Event |
+|---|---|
+| 1 | Unpaid securities pledged at pay-out; the five-trading-day window runs |
+| 2 | The client pays on day five, late in the day |
+
+**Correct:** release the pledge promptly on confirmation; confirm to the client. If the payment confirms after the extension cut-off at 6 PM and invocation has begun, the record must show the exact sequence.
+**Wrong:** invoke despite a confirmed payment, or let the pledge auto-release on day six because nobody checked.
+**Control:** CUSPA positions re-evaluated on every confirmed receipt; day-five alerts well before 6 PM.
+See [CUSPA](/broking-kyc/finix-broking-setup/backoffice/06-cuspa-unpaid-securities/).
+
+### R17 — Running account settlement races a trade
+
+| # | Event |
+|---|---|
+| 1 | Running account settlement computes an amount to return |
+| 2 | The client trades before the transfer executes |
+
+**Correct:** the settlement computation accounts for obligations as at its own as-of moment; a trade after it reduces what is returnable next cycle, not this one, unless the policy says otherwise.
+**Wrong:** return money the client now needs for margin.
+**Control:** a defined as-of moment and a short gap between computation and execution.
+
+### R18 — Client funds during the grace period, then trades
+
+| # | Event |
+|---|---|
+| 1 | Client in breach; grace running |
+| 2 | Client pays and the payment confirms |
+| 3 | Client immediately places a new order |
+
+**Correct:** re-evaluate; if the breach is cleared, the new order is evaluated on the new capacity like any other.
+**Wrong:** block the client because they were recently in breach, or allow the order before re-evaluation.
+**Control:** immediate re-evaluation; no sticky breach state.
+
+## 3. Resolution principles
+
+| # | Principle | Applies to |
+|---|---|---|
+| P1 | **The slower, less reversible clock governs** | R1, R5, R6 |
+| P2 | **Block at request, release at terminal state** | R3, R4, R13, R14 |
+| P3 | **Re-evaluate immediately on a confirmed receipt** | R2, R16, R18 |
+| P4 | **One definition, used everywhere** | R6, R9, R17 |
+| P5 | **Decide at the decision point, not the deadline** | R7, R8 |
+| P6 | **Never assume event ordering** | R13 |
+| P7 | **Communicate the state, not just the balance** | R1, R2, R5, R6 |
+| P8 | **Segment-wise where obligations are segment-wise** | R11, R12 |
+| P9 | **The firm's deadline is met from the firm's resources** | R8 |
+| P10 | **Record the sequence with synchronised timestamps** | all of them |
+
+## 4. Instrumentation
+
+What has to be measured for these resolutions to be defensible.
+
+| Measure | Why |
+|---|---|
+| **Time from payment confirmation to capacity granted** | The published promise in R1 and the fairness of R2 |
+| **Time from confirmed receipt to square-off re-evaluation** | Decides R2 outcomes |
+| Time from withdrawal request to block | R3, R14 |
+| Time from payout terminal state to ledger finalisation | R13 |
+| Reversal rate and lag by channel | R5 exposure |
+| Payments confirming after the begin-of-day as-of moment | R15 volume |
+| Clock synchronisation evidence | Every sequence above |
+| Clients affected per race type | Which races matter here, as opposed to in general |
+
+<Aside type="note" title="Publish the two latencies that clients feel">
+"Funds are usually available within [time] of payment" and "we re-evaluate your position within [time] of a confirmed payment" are the two numbers clients experience directly in these races. Measuring them, publishing them and meeting them converts the most common disputes into expectations that were set in advance. Firms that do not measure them cannot defend R2 at all.
+</Aside>
+
+## 5. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.money.sync.capacity_gate` | **Confirmed good funds** | Regulatory in substance | Exposure against reversible money |
+| `finix.money.sync.capacity_grant_target_latency` | Published | Discretionary, disclosed | Unmet client expectation |
+| `finix.money.sync.reevaluate_on_receipt` | **Immediate** | Discretionary, strongly recommended | Avoidable square-offs |
+| `finix.money.sync.reevaluation_target_latency` | Published | Discretionary, disclosed | Indefensible R2 outcomes |
+| `finix.money.sync.block_on_request` | True | Discretionary, strongly recommended | Double-spend |
+| `finix.money.sync.release_on_terminal_only` | True | Discretionary, strongly recommended | Double-spend |
+| `finix.money.sync.serialise_payout_per_client` | True | Discretionary, strongly recommended | Two payouts on one balance |
+| `finix.money.sync.sale_proceeds_definition` | **One definition, shared** | Discretionary, disclosed | Three answers to one question |
+| `finix.money.sync.intraday_capacity_update` | Enabled | Discretionary, strongly recommended | Payments invisible until the next day |
+| `finix.money.sync.bod_asof_moment` | Defined | Discretionary | Ambiguity about which payments are included |
+| `finix.money.sync.reversal_creates_debit` | True | Regulatory in substance | Unrecognised exposure |
+| `finix.money.sync.commodity_evening_funding` | Published options and limits | Discretionary, disclosed | Clients unable to fund an open position |
+| `finix.money.sync.cross_segment_fungibility` | **Only where recognised** | Exchange-set | Funding the wrong segment |
+| `finix.money.sync.clock_sync_evidence` | Retained | Regulatory in substance | Sequences unprovable |
+
+## 6. Exception paths
+
+| Situation | Response |
+|---|---|
+| A race occurs that is not in this catalogue | Record it, decide the resolution deliberately, add it here; the catalogue is the artefact |
+| Two clients in the same sequence get different outcomes | Conduct issue; the resolution must be systematic, not discretionary |
+| Re-evaluation latency is long during a volatile session | Capacity problem; the engine is a load spike concurrent with the volatility; see [square-off engine](/broking-kyc/finix-broking-setup/rms/06-squareoff-engine/) |
+| A client disputes an R2 outcome | Produce the full sequence with synchronised timestamps and delivery evidence |
+| Reversals cluster on one channel | Channel risk; consider restricting it or tightening the confirmation rule |
+| A payment confirms after the client has been squared off completely | Explain plainly; the trades stand; consider whether the warning and grace were adequate |
+| Commodity client cannot fund at 21:00 | Risk parameters for the evening session should already reflect this; review them |
+| Cross-segment surplus assumed fungible | Correct the computation; fund the short segment |
+
+## Practical notes
+
+- **Enumerate the races and decide each resolution before launch.** The catalogue is cheap to write and expensive to improvise.
+- **Measure and publish the two client-facing latencies.** They convert disputes into expectations.
+- **Block at request and release only at terminal state.** It removes an entire class of double-spend.
+- **Re-evaluate on every confirmed receipt, immediately.** It is the single most valuable control in R2, R16 and R18.
+- **Use one definition of sale-proceeds availability everywhere.** Three systems with three answers is a permanent support load.
+- **Keep clock synchronisation evidence.** Every sequence here is decided by timestamps.
+- **Write the client wording in calm conditions.** These conversations happen at the worst moment.
+
+## Where this connects
+
+- [Payments architecture](/broking-kyc/finix-broking-setup/money/01-payments-architecture/) — the state ladder and the capacity gate
+- [Pay-in rails](/broking-kyc/finix-broking-setup/money/02-payin-rails/) and [pay-out engine](/broking-kyc/finix-broking-setup/money/03-payout-engine/) — the mechanics each race involves
+- [Square-off engine](/broking-kyc/finix-broking-setup/rms/06-squareoff-engine/) — R2, R18
+- [CUSPA and unpaid securities](/broking-kyc/finix-broking-setup/backoffice/06-cuspa-unpaid-securities/) — R16
+- [Upstreaming and downstreaming](/broking-kyc/finix-broking-setup/money/06-upstreaming-downstreaming/) — R9
+- [Treasury and exchange funding](/broking-kyc/finix-broking-setup/money/05-treasury-exchange-funding/) — R7, R8
+- [Incident playbooks](/broking-kyc/finix-broking-setup/daily-ops/07-incident-playbooks/) — when a race becomes an incident

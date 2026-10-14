@@ -1,0 +1,194 @@
+---
+title: "Money 2: pay-in rails"
+description: Collecting client money correctly — the validated UPI handle regime with the broker suffix and SEBI Check, virtual accounts for payer attribution, the prohibition on third-party payments and on cash, the authorised-to-confirmed state ladder, capacity granting, and the reconciliation that closes every collection.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Collection looks simple and carries two hard constraints that ordinary merchant collection does not: the money must land in a prescribed account, and it must come from the client's own bank account. Both have to be enforced at the moment of credit, not discovered in reconciliation. So the page starts with the channels, then the validated-handle regime that is specific to brokers, then payer attribution as a design problem, then the state ladder and the capacity gate, and ends with the reconciliation that proves every rupee.
+
+## TL;DR
+
+- **Validated UPI handles apply to broker collection.** The `@valid` handle structure was created by SEBI/HO/DEPA-II/DEPA-II_SRG/P/CIR/2025/86 (11 June 2025), with brokers using the username suffix **`brk`**, and implemented in the payment rails by [NPCI/UPI/OC No. 217/2025-26](/broking-kyc/reference/circulars/npci/#npciupioc-no-2172025-26) (3 July 2025), which sets merchant category code 6211, the `@validbankpsp` nomenclature, handle length limits and the AutoPay mandate format. Investor availability began **1 October 2025**.
+- **Coverage was extended in August 2026 to every investor-facing collection account**, with [MCX/MEM/461/2026](/broking-kyc/reference/circulars/mcx/#mcxmem4612026) setting 6 September 2026 for upstreaming accounts, and [CDSL/ADM/DP/GENRL/2026/543](/broking-kyc/reference/circulars/cdsl/#cdsladmdpgenrl2026543) and [NSDL/POLICY/2026/0113](/broking-kyc/reference/circulars/nsdl/#nsdlpolicy20260113) giving participants 30 days and **expressly including depository-participant charge accounts**.
+- **Third-party payments are prohibited**, which makes payer attribution a design requirement. Virtual accounts and validated handles exist partly so that the payer can be identified before credit is given.
+- **Cash is prohibited outright** by regulation 20(d) of the [2026 regulations](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/). There should be no receipt mode and no ledger head.
+- **Everything settles into the Upstreaming Client Nodal Bank Account.** The gateway's merchant default is the firm's operating account and must be changed before any client transacts.
+- **Capacity is granted on confirmed good funds.** Authorised is not captured, captured is not settled, settled is not reconciled, and only reconciled-and-attributed creates trading capacity.
+- **Show the client the intermediate states.** A client who can see "payment received, confirming" does not demand capacity against an authorisation.
+
+## Conceptual overview
+
+A broker's collection problem has an unusual shape. An ordinary merchant wants the money to arrive and does not much care who sent it. A broker must care intensely, because a payment from someone other than the client is prohibited and because the resulting credit is client money in a segregated account rather than revenue. That turns payer identity from a nice-to-have into a control, and it explains the architecture that has grown up around broker collection: dedicated handles that identify the recipient as a registered intermediary, virtual accounts that identify the payer, and a prohibition on the one channel — cash — where neither identification is possible.
+
+The validated handle regime attacks the problem from the recipient side. An investor transferring money to a "broker" bank account previously had no way to verify that the account belonged to a registered intermediary at all, which is exactly the gap that fake-app and fake-advisory frauds exploited. A reserved handle structure with a public lookup tool closes it: the handle itself is evidence that the recipient is who they claim to be. For the firm this is an obligation to obtain and use the right handle, and an opportunity — a client who can verify the destination is a client less likely to be defrauded and less likely to blame the firm when they are.
+
+Payer attribution attacks it from the sending side, and here the firm carries the burden. A UPI collection carries payer details; a bank transfer into a virtual account carries the remitter's name and account; a card payment carries the cardholder. The firm must capture that data, compare it to the client's registered bank account, and refuse the credit where it does not match — at credit time, not at month end, because a mismatched credit that has already funded a trade cannot be cleanly unwound.
+
+## 1. Framework
+
+- **SEBI/HO/DEPA-II/DEPA-II_SRG/P/CIR/2025/86** (11 June 2025) — standardised, validated and exclusive UPI identifiers: the handle structure, transaction limits, SEBI Check, and the activity-wise timetable ending with investor availability from **1 October 2025**. Brokers use the username suffix **`brk`**. `[not yet in index]`
+- **[NPCI/UPI/OC No. 217/2025-26](/broking-kyc/reference/circulars/npci/#npciupioc-no-2172025-26)** (3 July 2025) — the payments-side implementation: merchant category code **6211**, the `@validbankpsp` nomenclature, handle length limits and the AutoPay mandate format.
+- **SEBI Press Release 64/2025** (1 October 2025) — roll-out of validated UPI handles and SEBI Check. `[not a circular]`
+- **August 2026 extension to investor-facing collection accounts** — [MCX/MEM/461/2026](/broking-kyc/reference/circulars/mcx/#mcxmem4612026) sets 6 September 2026 for upstreaming accounts; [CDSL/ADM/DP/GENRL/2026/543](/broking-kyc/reference/circulars/cdsl/#cdsladmdpgenrl2026543) and [NSDL/POLICY/2026/0113](/broking-kyc/reference/circulars/nsdl/#nsdlpolicy20260113) give participants 30 days and expressly include **depository-participant charge accounts**.
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — regulation 18(2)(c) segregation; **regulation 20(d) cash from clients prohibited**. `[not yet in index]`
+- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — client funds and the third-party payment prohibition.
+- **Upstreaming framework** — the USCNB account and its prescribed nomenclature; see [bank account architecture](/broking-kyc/finix-broking-setup/setup/06-bank-account-architecture/).
+- Client-side context: [client protection frameworks](/broking-kyc/trading-risk/client-protection-frameworks/).
+
+## 2. Channels
+
+| Channel | Mechanism | Payer attribution | Notes |
+|---|---|---|---|
+| **UPI with a validated handle** | Client pays to the firm's `@valid`-structured handle with the `brk` suffix | Payer virtual payment address and name | The client can verify the recipient through SEBI Check |
+| UPI collect request | Firm requests, client approves | As above | Convenient; the request must come from the validated handle |
+| **UPI AutoPay mandate** | Recurring, per the NPCI mandate format | Mandate-bound | For Stock SIP and similar; set up through Digio eNACH or UPI AutoPay |
+| **Virtual account, Smart Collect** | A per-client virtual account; the client transfers by NEFT, RTGS or IMPS | **Remitter name and account, with the UTR** | The strongest attribution available for bank transfers |
+| Net banking through the gateway | Bank redirect | Account holder details | Attribution quality varies by bank |
+| Cards | Gateway | Cardholder | Consider whether card funding of a trading account is appropriate at all |
+| Direct bank transfer to the nodal account | Client transfers to the named USCNB account | Remitter details from the statement | Weakest attribution; prefer virtual accounts |
+| **Cash** | — | — | **Prohibited by regulation 20(d); no code path, no ledger head, no branch process** |
+| Cheque or demand draft | Physical instrument | Drawer | Clearing time and dishonour risk; if offered, credit only on realisation |
+
+<Aside type="caution" title="Prefer virtual accounts over a shared nodal account for transfers">
+A client transferring to a single shared nodal account leaves the firm matching on a free-text narration and a remitter name that the client's bank may truncate. A per-client virtual account makes the destination itself the attribution: money arriving at that account belongs to that client, and the remitter details are a confirmation rather than the only evidence. It also makes the third-party check reliable, because a mismatch between the remitter and the client who owns the virtual account is unambiguous.
+</Aside>
+
+## 3. The validated handle regime
+
+| Element | Detail |
+|---|---|
+| Purpose | An investor can verify that the recipient is a registered intermediary before paying |
+| Handle structure | The `@valid` structure created by the June 2025 circular |
+| **Broker suffix** | Username suffix **`brk`** |
+| Payment-rail implementation | `@validbankpsp` nomenclature, merchant category code **6211**, handle length limits, AutoPay mandate format — per the July 2025 NPCI circular |
+| Verification tool | **SEBI Check**, allowing an investor to verify the handle |
+| Investor availability | From **1 October 2025** |
+| **Scope extension** | August 2026: every investor-facing collection account, including depository-participant charge accounts; MCX set 6 September 2026 for upstreaming accounts, and the depositories gave participants 30 days |
+| Firm obligations | Obtain the handle; use it for all investor-facing collection; keep the handle directory current; publish it clearly to clients |
+| Client communication | Tell clients the handle and tell them to verify it; this is a fraud control that only works if clients know about it |
+
+| Control | Requirement |
+|---|---|
+| Handle registry | The firm's own record of every validated handle and the account it maps to |
+| Directory refresh | The validated handle directory consulted and refreshed; stale data falls back to the verified handle on record |
+| Coverage audit | Every investor-facing collection account checked against the extension scope, **including depository charge collection** |
+| Client-facing display | The handle shown prominently, with an instruction to verify |
+| Monitoring | Collections arriving at a non-validated handle or account, where one should be used |
+
+## 4. Payer attribution and the third-party rule
+
+| Step | Detail |
+|---|---|
+| 1. Capture | Payer name, account or virtual payment address, bank, and the UTR where available |
+| 2. Compare | Against the client's registered bank account on the client master |
+| 3. Decide | Match → credit. Mismatch → **do not credit**; route to an exception queue |
+| 4. Resolve | Contact the client; where the payment genuinely came from a third party, **return it to source** |
+| 5. Record | The capture, the comparison, the decision and the resolution |
+| 6. Monitor | Mismatch rate by client and in aggregate; a client with repeated mismatches is a surveillance signal — see [mule indicators](/broking-kyc/finix-broking-setup/rms/07-intraday-surveillance/#33-mule-account-indicators--regulation-238) |
+
+| Matching rule | Detail |
+|---|---|
+| Exact account match | Strongest; available with virtual accounts and most bank transfers |
+| Name match | Fuzzy by necessity; banks truncate and reformat names |
+| Tolerance | Defined, documented, and applied consistently; not left to an operator's judgement each time |
+| Joint accounts | Handled explicitly; a joint holder is not a third party, but the rule must be stated |
+| Minor and guardian accounts | Handled explicitly per the account structure |
+| Non-individual clients | The entity's own account; a director's personal account is a third party |
+| **Default on ambiguity** | **Do not credit.** An uncredited payment is an inconvenience; a third-party credit is a breach |
+
+## 5. The state ladder and the capacity gate
+
+| State | Trigger | Client sees | Capacity | Withdrawable |
+|---|---|---|---|---|
+| Initiated | Client starts | "Payment started" | No | No |
+| **Authorised** | Gateway or bank authorises | "Received, confirming" | **No** | No |
+| Captured | Gateway captures | As above | No | No |
+| Settled to the firm | `settlement.processed`, funds in the bank with a UTR | As above | No | No |
+| **Confirmed good funds** | Settled, reconciled to the bank statement, **and attributed to the client** | "Available" | **Yes** | Per policy |
+| Rejected on attribution | Payer mismatch | "We could not match this payment" | No | Returned to source |
+| Reversed | Chargeback, failed settlement | "Payment reversed" | **Removed** | — |
+
+| Rule | Reason |
+|---|---|
+| Capacity at confirmed good funds only | Earlier states can reverse |
+| Attribution is part of confirmation | Money that cannot be matched to a client is not that client's |
+| Reversal removes capacity | And if positions were taken, the client has a debit |
+| Intermediate states visible | It removes the pressure to grant capacity early |
+| Target time to confirmation published | Clients tolerate a known wait and not an unknown one |
+
+## 6. Reconciliation
+
+Detail at [bank reconciliation](/broking-kyc/finix-broking-setup/money/04-bank-recon/).
+
+| Leg | Sources | Key |
+|---|---|---|
+| Gateway to bank | Gateway settlement file, bank statement | **UTR** |
+| Bank to ledger | Bank statement, client ledger | UTR plus client attribution |
+| Gateway to ledger | Gateway payments, client ledger | Payment identifier |
+| Virtual account to client | Virtual account allocation, bank credit | Virtual account plus UTR |
+| Initiated to captured | Gateway | Payment identifier |
+
+| Exception | Meaning | Action |
+|---|---|---|
+| Captured, not settled | In the gateway's cycle | Age; chase beyond the expected cycle |
+| Settled, not in the bank | Settlement defect | Escalate to the gateway |
+| In the bank, not attributed | **Unattributed client money** | Age tightly; this is reportable if it persists |
+| Attributed, not credited | Ledger defect | Fix; the client is owed |
+| Credited, no bank receipt | **Severity one** | Investigate immediately; the firm has credited money it does not have |
+| Payer mismatch | Third-party payment | Return to source |
+| Duplicate | Gateway retry or operator error | Idempotent handling |
+
+## 7. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.money.payin.settlement_account` | **A1 USCNB** | Regulatory | Segregation breach on every pay-in |
+| `finix.money.payin.validated_handle` | Obtained, with the `brk` suffix | Regulatory | Non-conforming collection |
+| `finix.money.payin.handle_scope_audit` | All investor-facing accounts, including DP charge collection | Regulatory | Partial compliance with the 2026 extension |
+| `finix.money.payin.handle_directory_refresh` | Per the published cadence; fall back to the verified handle on record | Exchange-set | Stale handle data |
+| `finix.money.payin.third_party_block` | **Hard** | Regulatory | Third-party credit |
+| `finix.money.payin.name_match_tolerance` | Defined and documented | Discretionary | Inconsistent operator judgement |
+| `finix.money.payin.ambiguity_default` | **Do not credit** | Discretionary, strongly recommended | Breach rather than inconvenience |
+| `finix.money.payin.cash_mode` | **No code path, no ledger head** | Regulatory | Prohibited receipt |
+| `finix.money.payin.capacity_gate` | Confirmed good funds | Regulatory in substance | Credit against reversible money |
+| `finix.money.payin.state_visibility` | All intermediate states shown | Discretionary | Pressure to grant capacity early |
+| `finix.money.payin.virtual_accounts` | Preferred over a shared nodal account for transfers | Discretionary, strongly recommended | Weak attribution |
+| `finix.money.payin.unattributed_age_limit_days` | Tight | Discretionary | Unattributed client money ageing |
+| `finix.money.payin.cheque_credit_on` | Realisation only | Discretionary | Credit against an uncleared instrument |
+| `finix.money.payin.reversal_action` | Remove capacity; create a debit if positions were taken | Regulatory in substance | Exposure against reversed money |
+
+## 8. Exception paths
+
+| Situation | Response |
+|---|---|
+| Gateway settling to the wrong account | **Stop collection.** Transfer with documentation; assess disclosure; this is a breach |
+| Client charged, firm not notified | Reconcile from the gateway and bank; never credit on a screenshot |
+| Payer mismatch | Do not credit; contact the client; return to source if genuinely third-party |
+| Repeated mismatches from one client | Surveillance signal; see the mule indicators |
+| Unattributed credit ageing | Investigate; escalate; unattributed client money is reportable if it persists |
+| Payment reversed after capacity was used | The client has a debit; follow the debit process and communicate |
+| Cash tendered at a branch | Refuse; direct to a permitted channel; the prohibition is absolute |
+| Validated handle not yet obtained for a collection account in scope | Stop using that account for investor collection until it is |
+| UPI or gateway outage | Clients cannot fund; communicate early; alternative channels where available; existing capacity is unaffected |
+| A client disputes an unrecognised debit from their account | Produce the payment record and the UTR; involve the gateway |
+
+## Practical notes
+
+- **Audit every investor-facing collection account against the 2026 handle extension**, including depository charge collection, which is explicitly named.
+- **Use per-client virtual accounts for transfers.** The destination becomes the attribution.
+- **Default to not crediting on ambiguity.** The asymmetry between inconvenience and breach is large.
+- **Publish the validated handle and tell clients to verify it.** A fraud control nobody knows about does not work.
+- **Show the confirmation state and publish an expected time.** It converts a support contact into a progress bar.
+- **Treat a credit without a bank receipt as severity one.** The firm has given capacity against money it does not hold.
+- **Track payer-mismatch rate per client.** It is both an operational metric and a surveillance input.
+
+## Where this connects
+
+- [Payments architecture](/broking-kyc/finix-broking-setup/money/01-payments-architecture/) — the account map and the two products
+- [Pay-out engine](/broking-kyc/finix-broking-setup/money/03-payout-engine/) — the other direction
+- [Bank reconciliation](/broking-kyc/finix-broking-setup/money/04-bank-recon/) — proving every collection
+- [Limit framework](/broking-kyc/finix-broking-setup/rms/04-limit-framework/) — where confirmed funds become capacity
+- [Ledger and accounting](/broking-kyc/finix-broking-setup/backoffice/04-ledger-accounting/) — clear funds and availability
+- [Intraday surveillance](/broking-kyc/finix-broking-setup/rms/07-intraday-surveillance/) — third-party funding as a mule indicator
+- [Client protection frameworks](/broking-kyc/trading-risk/client-protection-frameworks/) — validated handles and SEBI Check in context

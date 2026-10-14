@@ -1,0 +1,194 @@
+---
+title: "Money 5: treasury and exchange funding"
+description: Getting money to the clearing corporation before the deadline — the daily funding decision, the cash-equivalent composition rule and what it actually binds, intraday liquidity and facilities, the deadline chain counted backwards from the bank cut-off, collateral substitution, and the escalation path when the money will not arrive in time.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Treasury in a broking firm is a deadline function, not an optimisation function. The question is not what the best use of capital is; it is whether the right amount of the right kind of money is in the right account before a cut-off that somebody else set. So the page starts from the obligations that create demand, then the forms in which that demand can be met, then the composition rule that constrains the mix, then the deadline chain, and only then the optimisation — because a firm that optimises before it reliably meets deadlines is solving the wrong problem.
+
+## TL;DR
+
+- **The operative deadline is the bank's cut-off, not the clearing corporation's**, and the firm's own maker-checker sits inside that. Count backwards and publish the internal number.
+- **Demand comes from three places**: margin requirements against open positions, settlement obligations on settlement day, and additional or special margins announced by circular, sometimes intraday.
+- **At least 50 percent of collateral at clearing-member level must be cash or cash equivalent**, and that minimum binds the clearing member, not each client — paragraph 18 of the collateral-segregation circular states expressly that it need not be applied at individual client level.
+- **A client's surplus cash equivalent may not support another client**, or the firm's proprietary account. **The firm's own surplus proprietary cash equivalent may support clients** for the minimum-cash test, which permits a funding arrangement.
+- **Composition is a continuous requirement, not an end-of-day test.** Monitor it through the session and act before the breach.
+- **Intraday liquidity is the thing that fails**, not solvency. Firms miss deadlines because cash is not available by a bank cut-off, not because they lack capital.
+- **Upstreaming interacts with funding.** Clear credit balances leave at end of day in cash, FDR lien or mutual fund overnight scheme pledge, which changes what is available tomorrow morning.
+
+## Conceptual overview
+
+The treasury function in a self-clearing broker exists to answer one question several times a day: will there be enough of the right kind of money in the right account before the next deadline? Everything else — yield on idle balances, the cost of a facility, the choice between cash and collateral — is secondary to that, and firms that invert the priority discover it at a settlement deadline. This is why the function's core artefact is not a cash-flow forecast but a deadline chain, counted backwards from the bank's cut-off, with an owner and an escalation point at each step.
+
+The second feature is that the demand is partly outside the firm's control and partly outside its foresight. Margin requirements move with positions and with the clearing corporation's parameter files, which are published several times a day. Additional and special margins can be announced intraday. A volatile session can produce a margin call that did not exist at breakfast. The treasury design therefore needs headroom as a standing policy rather than as a reaction: a buffer sized for a plausible intraday move, a facility that can be drawn quickly, and a rule about when to act rather than wait.
+
+The third feature is the composition constraint. Collateral at clearing-member level must be at least half cash or cash equivalent, which means the firm cannot simply post securities and be done. It must hold or be able to create cash-equivalent collateral, and the mix changes as positions and valuations move. The constraint is widely misunderstood as a client-level rule — it is not, and telling clients otherwise is both inaccurate and easy to disprove. What a firm may legitimately do is apply its own client-level cash policy, documented and disclosed as the firm's.
+
+## 1. Framework
+
+- **[SEBI/HO/MRD2_DCAP/CIR/2021/0598](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2_dcapcir20210598)** (20 July 2021) — segregation and monitoring of collateral at client level; **paragraph 18** carries the cash-equivalent minimum at clearing-member level and states expressly that the minimum need not be applied at individual client level. In force from 28 February 2022.
+- **Upstreaming framework** — clear credit balances upstreamed to clearing corporations on an end-of-day basis, in **cash, a lien on fixed deposit receipts, or a pledge of units of mutual fund overnight schemes created out of clients' funds**; see [upstreaming and downstreaming](/broking-kyc/finix-broking-setup/money/06-upstreaming-downstreaming/). `[not yet in index]`
+- **[SEBI/HO/MRD2/DCAP/CIR/P/2020/127](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2dcapcirp2020127)** (20 July 2020) — peak margin; margin must be sufficient continuously, verified by random intraday snapshots.
+- **Clearing corporation acceptable-collateral norms** — for example [ICCL notice 20240710-11](/broking-kyc/reference/circulars/clearing-corps/#iccl-20240710-11) (10 July 2024) following [ICCL notice 20240531-3](/broking-kyc/reference/circulars/clearing-corps/#iccl-20240531-3).
+- **Clearing corporation reports** — the bank summary report and the daily funds statement for the member's clearing account. `[not yet in index]`
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — regulation 18(2)(c) segregation, which constrains which money may fund what. `[not yet in index]`
+- Depth: [collateral and cross-margin](/broking-kyc/trading-risk/collateral-cross-margin/) and [client funds upstreaming](/broking-kyc/deep-dives/settlement/client-funds-upstreaming/).
+
+## 2. Where demand comes from
+
+| Source | Timing | Predictability |
+|---|---|---|
+| Initial and exposure margin on open positions | Continuous | Predictable from positions |
+| Mark-to-market | Continuous | Moves with the market |
+| **Intraday risk parameter revisions** | Several times a day | Announced, not forecastable |
+| **Additional and special margins by circular** | Any time, including intraday | **Unpredictable** |
+| Surveillance-measure margins | On list changes | Semi-predictable |
+| Delivery margins in equity derivatives | Across the expiry week | **Predictable and large** |
+| Commodity delivery period margin | Higher of 3 percent plus five-day 99 percent value-at-risk of spot volatility, or 25 percent | Predictable; very large |
+| Commodity staggered tender margin | 8.34 percent incremental across the last three trading days | Predictable |
+| Settlement funds obligation | Settlement day | Known on the final obligation report |
+| Auction and close-out costs | On short delivery | Event-driven |
+| Penalties | Periodic | Partly predictable from exceptions |
+| Base minimum capital and deposits | On change | Planned |
+
+<Aside type="caution" title="The predictable large items are the ones firms still get caught by">
+Delivery margins in the expiry week and the commodity delivery ladder are both published, both large, and both arrive on a known calendar. Firms are nonetheless caught by them, because the position that triggers them was taken weeks earlier by someone who was not thinking about the funding consequence. The fix is a forward funding view: project the margin requirement for known expiry and tender dates on the current position book, several sessions ahead, and surface it to both treasury and the client.
+</Aside>
+
+## 3. Forms of funding
+
+| Form | Counts toward the cash-equivalent test | Speed | Notes |
+|---|---|---|---|
+| **Cash** | Yes | Immediate, within bank cut-offs | The simplest and the most expensive to hold |
+| **Fixed deposit with a lien** | Yes, as cash equivalent | Hours to set up; instant once in place | A standing arrangement is better than a reactive one |
+| **Bank guarantee** | Yes, per the norms | Days to arrange | Standing facility |
+| Government securities | Per the norms | — | Per the accepted-collateral list |
+| **Mutual fund overnight scheme units, pledged** | Per the norms; a permitted upstreaming form | Operational | Also a permitted form of upstreaming clients' funds |
+| Approved securities, pledged | **No** | Operational | Does not help the cash-equivalent test |
+| Client collateral | Per the client's own allocation | — | **Cannot be reallocated between clients** |
+| Own funds | Yes | Immediate | The buffer of last resort |
+| Overdraft or credit facility | Yes once drawn | Minutes, if the facility is in place | **Arrange before you need it** |
+
+## 4. The cash-equivalent composition rule
+
+| Statement | Detail |
+|---|---|
+| The minimum | At least **50 percent** of collateral at **clearing-member level** must be cash or cash equivalent |
+| **Where it binds** | The clearing member. Paragraph 18 states expressly that the minimum **need not be applied at individual client level** |
+| **Client surplus** | **Excess client cash equivalent may not support other clients**, or the trading member's or clearing member's proprietary account |
+| **Proprietary surplus** | **Excess proprietary cash equivalent may support clients** for the minimum-cash test — which permits a funding arrangement, and says nothing about whether the firm provides it free |
+| Monitoring | **Continuous**, not an end-of-day test |
+| Action before breach | Convert securities collateral to cash equivalent, or fund from own resources |
+| Client-level cash policy | A firm may apply one as **its own policy**, documented and disclosed as such — not as a regulatory requirement |
+
+The last row matters for client communication. A client told that "SEBI requires 50 percent cash" is being told something the circular does not say. If the firm requires it, the firm should say so and point to its own policy.
+
+## 5. The deadline chain
+
+| Step | Who sets it | Typical relationship |
+|---|---|---|
+| Clearing corporation deadline | Clearing corporation | Published |
+| **Bank channel cut-off** | The bank | **Earlier**, per bank and per channel, obtained in writing |
+| Maker-checker time | The firm | Measured, not assumed |
+| Contingency buffer | The firm | For a failed first attempt |
+| **Internal deadline** | The firm | **This is the number in the runbook** |
+| Decision point | The firm | Earlier still — the point at which a funding decision must be made to meet the internal deadline |
+
+| Control | Detail |
+|---|---|
+| Cut-offs in writing per bank and channel | Verbal cut-offs are not cut-offs |
+| The internal deadline published | Not the exchange's |
+| Alert at the decision point | Not at the deadline |
+| Alternate channel identified | Per bank |
+| Alternate bank identified | For the clearing account, where feasible |
+| Escalation contact | A named person at the bank, with a phone number |
+| **Recognition asserted** | An instruction sent is not an obligation met; confirm the clearing corporation has recognised it |
+
+## 6. The daily cycle
+
+| Time | Step | Owner |
+|---|---|---|
+| Overnight | Positions, margin requirement and collateral position reviewed | Treasury |
+| Pre-open | Clearing corporation margin and collateral statements reconciled | Treasury and operations |
+| Pre-open | Available liquidity and composition confirmed | Treasury |
+| Pre-open | **Forward view: expiry, tender and known large requirements** | Treasury |
+| Session | Risk parameter publications monitored for requirement changes | Risk and treasury |
+| Session | Intraday margin position monitored against available | Treasury |
+| Session | **Decision point alerts** | Treasury |
+| Session | Funding instructions prepared, approved and sent before the bank cut-off | Treasury |
+| Session | Composition monitored continuously | Treasury |
+| Settlement day | Settlement funding per the final obligation | Treasury and operations |
+| Post-session | Pay-out received, moved to the downstreaming account the same day | Treasury |
+| End of day | Upstreaming computed and instructed | Treasury |
+| End of day | Position for tomorrow assessed, including the effect of upstreaming | Treasury |
+| End of day | Reconciliation of all clearing account movements | Treasury and operations |
+
+## 7. Optimisation, after reliability
+
+Only once deadlines are met reliably.
+
+| Lever | Consideration |
+|---|---|
+| Cash versus collateral mix | Holding more cash than the composition requires is a cost; holding less is a breach risk |
+| Fixed deposit laddering | Liens on deposits that mature on a schedule, rather than ad hoc arrangements |
+| Mutual fund overnight scheme units | Serve both as collateral and as a permitted upstreaming form |
+| Idle balance in nodal accounts | Constrained by the upstreaming regime — clear credit balances leave at end of day |
+| Facility sizing | A facility costs money unused and saves a default when drawn |
+| Collateral substitution | Replacing cash with securities where composition allows, to release cash |
+| Early pay-in | Earns a margin benefit; see [settlement obligations](/broking-kyc/finix-broking-setup/backoffice/05-settlement-obligations/) |
+| Cross-margin benefits | Reduce requirement where recognised; see [collateral and cross-margin](/broking-kyc/trading-risk/collateral-cross-margin/) |
+| Variable net worth effect | Upstreaming reduces retained client cash, which reduces NSE's variable net worth requirement — see [entity and capital structure](/broking-kyc/finix-broking-setup/setup/01-entity-capital-structure/#44-variable-net-worth) |
+
+## 8. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.money.treasury.bank_cutoff.<bank>.<channel>` | In writing, per bank and channel | Bank-set | Wrong deadline assumption |
+| `finix.money.treasury.internal_deadline` | Cut-off minus maker-checker minus buffer | Discretionary, strongly recommended | Missed deadline |
+| `finix.money.treasury.decision_point_alert` | Before the internal deadline | Discretionary | Decisions made too late to execute |
+| `finix.money.treasury.cash_equiv_min_pct_cm` | **50 at clearing-member level** | Regulatory | Composition breach |
+| `finix.money.treasury.composition_monitor` | **Continuous** | Discretionary, strongly recommended | End-of-day discovery |
+| `finix.money.treasury.composition_action_threshold` | Above the minimum | Discretionary | Acting at the breach rather than before it |
+| `finix.money.treasury.client_surplus_reallocation` | **Prohibited** | Regulatory | Cross-client support |
+| `finix.money.treasury.prop_surplus_supports_clients` | Permitted, documented | Regulatory option | Undocumented funding arrangement |
+| `finix.money.treasury.buffer_pct` | Sized for a plausible intraday move | Discretionary | Reactive funding |
+| `finix.money.treasury.facility_available` | Arranged in advance | Discretionary, strongly recommended | No fast source when needed |
+| `finix.money.treasury.recognition_assert` | True | Discretionary, strongly recommended | Assumed credit |
+| `finix.money.treasury.forward_view_days` | Covering expiry and tender horizons | Discretionary | Predictable large items as surprises |
+| `finix.money.treasury.alternate_channel` | Identified per bank | Discretionary | No path on a channel failure |
+
+## 9. Exception paths
+
+| Situation | Response |
+|---|---|
+| Intraday margin call exceeds available liquidity | Draw the facility; convert collateral; escalate; **decide before the internal deadline, not at it** |
+| Bank channel fails before a cut-off | Alternate channel, alternate bank, escalate to the clearing corporation; document every attempt |
+| Instruction sent, recognition not confirmed | **Do not assume.** Escalate to the bank and the clearing corporation |
+| Composition approaching the minimum | Act before the breach: convert or fund |
+| Composition breached | Immediate remediation; this is a continuous requirement |
+| A client's surplus cash equivalent is tempting as a source | **It is not available.** Client surplus may not support other clients or the firm |
+| Clearing member raises margin at short notice in commodities | Treat as an incident with a funding playbook; see [clearing arrangement](/broking-kyc/finix-broking-setup/setup/04-clearing-arrangement/) |
+| Settlement funding shortfall | Own funds first; the clearing corporation's deadline does not wait for client recovery |
+| Expiry or tender margin arrives as a surprise | Process failure in the forward view, not a market event; fix the projection |
+| Upstreaming leaves insufficient liquidity for tomorrow | The computation is rule-driven; the funding plan must account for it rather than treating it as optional |
+
+## Practical notes
+
+- **Get bank cut-offs in writing, per channel.** They differ by channel and they are the real deadline.
+- **Alert at the decision point, not the deadline.** A decision made at the deadline cannot be executed by it.
+- **Arrange the facility before you need it.** The day you need it is the day it takes too long to arrange.
+- **Project expiry and tender margins forward on the current book.** Both are predictable, large, and still catch firms out.
+- **Monitor composition continuously.** It is a continuous requirement and an end-of-day check is too late.
+- **Never reach for client surplus.** It is not the firm's flexibility and the prohibition is explicit.
+- **Assert recognition, never assume it.** An instruction sent is not an obligation met.
+
+## Where this connects
+
+- [Bank account architecture](/broking-kyc/finix-broking-setup/setup/06-bank-account-architecture/) — the clearing account
+- [Clearing arrangement](/broking-kyc/finix-broking-setup/setup/04-clearing-arrangement/) — self-clearing versus a clearing member
+- [Settlement obligations](/broking-kyc/finix-broking-setup/backoffice/05-settlement-obligations/) — the obligation being funded
+- [Collateral and pledge](/broking-kyc/finix-broking-setup/rms/05-collateral-pledge/) — what counts and at what haircut
+- [Upstreaming and downstreaming](/broking-kyc/finix-broking-setup/money/06-upstreaming-downstreaming/) — the end-of-day movement
+- [Margin engine](/broking-kyc/finix-broking-setup/rms/02-margin-engine/) — where the requirement comes from
+- [Collateral and cross-margin](/broking-kyc/trading-risk/collateral-cross-margin/) — the composition rule in depth

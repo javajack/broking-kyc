@@ -1,0 +1,208 @@
+---
+title: "Money 3: the pay-out engine"
+description: Disbursing client money safely — authorisation against clear settled balance, the contact and fund-account model, mandatory idempotency on the firm's own reference, webhook handling with unordered terminal states and reversals, the same-day funding rule, bank-account change controls, and the failure modes that move money twice.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Pay-out is the only process in the stack that moves money out of the firm on an instruction, which makes two failure modes dominant: paying twice, and paying the wrong person. Everything here is organised around preventing those. Authorisation comes first because it is where "the wrong amount" is stopped; the object model and idempotency come next because that is where "twice" is stopped; destination controls come after because that is where "the wrong person" is stopped; and the webhook section is last because the state semantics are where an otherwise correct implementation regresses a ledger.
+
+## TL;DR
+
+- **Pay-outs leave only from the Downstreaming Client Nodal Bank Account**, after funds are received from the clearing corporation or clearing member the **same day**.
+- **Authorise against clear, settled balance.** Not available margin, not unsettled sale proceeds, not an authorised but unconfirmed receipt.
+- **Idempotency is mandatory and is the firm's responsibility.** Every payout carries a firm-generated reference, and a retry without that reference creates a second payment.
+- **RazorpayX uses a contact → fund account → payout object model**, with webhook callbacks on every state change. Payouts go over UPI, IMPS, NEFT and RTGS to accounts at all Indian banks.
+- **Webhook ordering is not guaranteed.** A `processed` event can arrive before a `queued` event; terminal states must be accepted out of order and never regressed.
+- **A reversal can arrive after apparent success**, and must debit the client ledger again and be communicated.
+- **A bank-account change shortly before a large withdrawal is a classic fraud signature** and should trigger review before the payout, not after.
+- **Never blind-retry a payout.** On ambiguity, stop, reconcile against the daily statement, and resume only with certainty.
+
+## Conceptual overview
+
+Collection is forgiving and disbursement is not. A collection that fails can be retried freely; a disbursement retried without care moves money twice, and recovering it depends on the goodwill of whoever received it. That asymmetry should shape every design decision in this page: prefer stopping to retrying, prefer an idempotency key to a deduplication check, prefer an extra approval to a faster cycle, and treat ambiguity as a reason to pause rather than to assume.
+
+The second idea is that a pay-out has two independent correctness questions. Is the amount right — which is the ledger's question, answered by authorising against clear settled balance under a documented policy. And is the destination right — which is the client master's question, answered by verifying the bank account and controlling changes to it. These fail separately and have separate controls, and firms that build one well and the other casually tend to discover the gap through an account-takeover loss rather than through a reconciliation.
+
+The third idea concerns the regulatory shape of the flow. Client pay-outs are made from a specific named account, funded the same day from money received from the clearing corporation or clearing member. That is not an accounting nicety: it makes the pay-out traceable to a receipt rather than to a pool whose composition nobody can explain. A firm that funds pay-outs from a general balance has given up the property the account structure exists to provide, and will struggle to demonstrate that client money was never used for its own purposes.
+
+## 1. Framework
+
+- **Upstreaming and downstreaming framework** — payment to clients is made **only from the DSCNB account**, with the nomenclature "Name of the SB/CM – DSCNB account", **after receiving funds from the clearing corporation or clearing member the same day**. See [bank account architecture](/broking-kyc/finix-broking-setup/setup/06-bank-account-architecture/) and [client funds upstreaming](/broking-kyc/deep-dives/settlement/client-funds-upstreaming/). `[not yet in index]`
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — regulation 18(2)(c) segregation of client money from the firm's own and from other clients'. `[not yet in index]`
+- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — client funds, running account settlement and permitted uses.
+- **Running account settlement** — the periodic return of client funds; see [running account settlement fields](/broking-kyc/reference/field-atlas/sections/ac-running-account-settlement/).
+- **RazorpayX Payouts** — contact, fund account and payout objects; UPI, IMPS, NEFT and RTGS to accounts at all Indian banks; dashboard and API initiation; bulk addition and queueing; webhook callback on every state change.
+
+## 2. Authorisation
+
+| Check | Detail |
+|---|---|
+| Client identity and status | Active, not frozen, not restricted |
+| **Clear settled balance** | Not available margin; not unsettled sale proceeds; not an authorised-but-unconfirmed receipt |
+| Open obligations | Margin requirements, settlement obligations and aged debits reduce what is withdrawable |
+| Unpaid securities | A client under the [CUSPA](/broking-kyc/finix-broking-setup/backoffice/06-cuspa-unpaid-securities/) regime has an outstanding obligation |
+| Policy limits | Any per-day or per-transaction limits the firm applies, disclosed |
+| **Destination verified** | The registered bank account, verified at onboarding or at change |
+| Bank-account change window | A recent change triggers review before release — see section 5 |
+| Maker-checker | Separation between the person who prepares and the person who approves |
+| Screening status | An unresolved screening alert blocks disbursement |
+| Record | The authorisation with its inputs, approver and timestamp |
+
+<Aside type="caution" title="Available margin is not withdrawable balance">
+The number a client sees as "available" in a trading app is usually available *margin*, which includes collateral value and may include unsettled proceeds. Withdrawable balance is a different, smaller number: clear settled cash, less obligations. Showing one number and authorising against the other produces a predictable support problem — clients requesting withdrawals that are declined for reasons they cannot see. Show both, label them clearly, and authorise against the smaller one.
+</Aside>
+
+## 3. The object model and idempotency
+
+| Object | Role | Lifecycle |
+|---|---|---|
+| **Contact** | The client as a payee | Created once; updated on client change |
+| **Fund account** | The client's bank account or virtual payment address | Created on verification; **a new account is a new fund account, not an edit** |
+| **Payout** | One disbursement instruction | Created per pay-out, carrying the firm's reference |
+
+| Idempotency rule | Detail |
+|---|---|
+| **Firm-generated reference on every payout** | Unique per pay-out request, stored before submission |
+| Submission | The reference accompanies the instruction |
+| **Retry** | **Only with the same reference.** A retry without it creates a second payment |
+| Ambiguity | Where the outcome of a submission is unknown, **stop**; reconcile against the daily statement; do not resubmit on a guess |
+| Duplicate detection | Independent of the provider: the firm checks its own register before submitting |
+| Reference lifecycle | Retained with the payout record on the eight-year floor |
+
+## 4. The run
+
+| Step | Owner | Control |
+|---|---|---|
+| 1. Client requests a withdrawal | Client | Amount and destination shown |
+| 2. Ledger blocks the amount | Back office | Prevents double-spend of the same balance |
+| 3. Authorisation checks | Back office | Section 2 |
+| 4. Approval | Treasury checker | Maker-checker |
+| 5. **Same-day funding verified** | Treasury | A2 funded from the clearing corporation receipt |
+| 6. Reference generated and stored | System | Before submission |
+| 7. Submission to RazorpayX | Treasury | Over UPI, IMPS, NEFT or RTGS |
+| 8. Acknowledgement | System | Submission recorded |
+| 9. Webhooks processed | System | Idempotent, unordered |
+| 10. Terminal state | System | Processed, failed, or reversed |
+| 11. Ledger finalised | Back office | Debit confirmed, or block released on failure |
+| 12. Client notified | System | Outcome, with the destination's last digits |
+| 13. **Daily statement reconciliation** | Treasury | The backstop; see [bank reconciliation](/broking-kyc/finix-broking-setup/money/04-bank-recon/) |
+
+| Cut-off | Detail |
+|---|---|
+| Client-facing pay-out cut-off | Published; a disclosed discretionary policy |
+| Internal run time | Before the bank's channel cut-off for the rail used |
+| Weekend and holiday behaviour | Published, and calendar-aware |
+| Rail selection | UPI and IMPS for immediacy, NEFT and RTGS by amount and timing; selection rule documented |
+
+## 5. Destination controls
+
+| Control | Detail |
+|---|---|
+| Verification at onboarding | The client's bank account verified; see [onboarding](/broking-kyc/finix-broking-setup/onboarding/) |
+| **Change control** | A bank-account change is a sensitive client-master change: re-verification, maker-checker, and a client notification to the **existing** contact details |
+| **Cooling period** | A defined period after a change during which withdrawals are reviewed before release |
+| **Change-then-withdraw alert** | A bank-account change shortly followed by a large withdrawal is reviewed by a human before the payout — this is a classic account-takeover signature |
+| Multiple accounts | Where permitted, each separately verified; the default destination explicit |
+| Third-party destination | **Prohibited**; the destination must be the client's own account |
+| Closure and transmission | Special handling; see [closure](/broking-kyc/lifecycle/closure/) and [transmission](/broking-kyc/lifecycle/transmission/) |
+| Notification | Every change notified to the previously registered contact details, not only the new ones |
+
+## 6. Webhooks
+
+| Property | Requirement |
+|---|---|
+| **Signature verification** | On every event, without exception; a signature failure is a security event, not a parsing error |
+| **Idempotent handling** | Keyed on the event identifier; duplicates are expected |
+| **Ordering** | **Not guaranteed.** A `processed` event may arrive before a `queued` event |
+| **Terminal states** | Accepted out of order; **never regressed** — a processed payout does not become queued |
+| **Reversal** | Can arrive after apparent success; must **debit the client ledger again** and be communicated |
+| Unknown event types | Logged and alerted, never silently discarded |
+| Missing events | The daily statement reconciliation is the backstop; never rely solely on webhooks |
+| Mode separation | Test and live signing secrets separate and impossible to confuse |
+| Replay protection | Timestamp and signature checks |
+
+| State | Ledger effect | Client sees |
+|---|---|---|
+| Queued | Amount blocked | "Processing" |
+| Submitted | Blocked | "Processing" |
+| **Processed** | **Debited** | "Paid", with the destination's last digits |
+| Failed | **Block released** | "Returned to your balance", with a reason |
+| **Reversed after processed** | **Debit reversed; amount back in the balance** | "The payment was returned", with an explanation |
+| Cancelled | Block released | "Cancelled" |
+
+<Aside type="note" title="The reversal case is the one that regresses ledgers">
+An implementation that treats `processed` as final and stops listening will miss a reversal, leaving the client's ledger debited for money that came back to the firm. The symptom appears days later as a bank balance that does not match the ledger, by which time attributing it is work. Keep listening after the terminal state, handle reversal as a distinct event that re-credits the client, and let the daily statement reconciliation catch anything the webhooks missed.
+</Aside>
+
+## 7. Failure modes
+
+| Failure | Cause | Prevention | Response |
+|---|---|---|---|
+| **Paid twice** | Retry without the idempotency reference | Mandatory firm reference; stop on ambiguity | Recover from the client; treat as a severity-one control failure |
+| **Paid the wrong person** | Unverified or recently changed destination | Verification, change control, cooling period, change-then-withdraw review | Immediate recall attempt; treat as a fraud incident |
+| Paid more than the clear balance | Authorising against available margin | Authorise against clear settled balance | Debit the client; review the authorisation path |
+| Paid from the wrong account | Configuration | `payout_source` fixed to A2 | Breach; document; assess disclosure |
+| Paid without same-day funding | Policy bypass | Verified at step 5 | Breach of the downstreaming rule |
+| Block released on submission rather than confirmation | Design error | Release on terminal state only | Quantify the double-spend window |
+| Reversal unprocessed | Stopped listening after terminal | Keep listening; reconcile daily | Correct the ledger; communicate |
+| Payout to a closed account | Stale client master | Verification and bank response handling | Funds return; re-verify before resubmitting |
+| Client claims non-receipt | Varies | UTR captured and shown | Produce the UTR; involve the bank |
+| Mass pay-out failure | Provider or bank outage | Alternate rail; communicate early | Clients told promptly; blocks retained until resolved |
+
+## 8. Configuration reference
+
+| Key | Finix default | Class | Failure mode |
+|---|---|---|---|
+| `finix.money.payout.source_account` | **A2 DSCNB** | Regulatory | Pay-out from a non-permitted account |
+| `finix.money.payout.same_day_funding_required` | True | Regulatory | Funding from a pool |
+| `finix.money.payout.authorise_against` | **Clear settled balance** | Regulatory in substance | Over-payment |
+| `finix.money.payout.maker_checker` | Required | Discretionary, strongly recommended | Unapproved outflow |
+| `finix.money.payout.idempotency_reference` | **Firm-generated, mandatory** | Discretionary, strongly recommended | Duplicate payment |
+| `finix.money.payout.blind_retry` | **Prohibited** | Discretionary, strongly recommended | Duplicate payment |
+| `finix.money.payout.block_release_on` | Terminal state, not submission | Discretionary, strongly recommended | Double-spend window |
+| `finix.money.payout.destination_verified_required` | True | Regulatory in substance | Paying the wrong person |
+| `finix.money.payout.bank_change_cooling_hours` | Set | Discretionary, strongly recommended | Account-takeover loss |
+| `finix.money.payout.change_then_withdraw_review` | **Human review** | Discretionary, strongly recommended | Account-takeover loss |
+| `finix.money.payout.third_party_destination` | **Prohibited** | Regulatory | Payment to a third party |
+| `finix.money.payout.cutoff.weekday` | Published | Discretionary, disclosed | Client expectation breach |
+| `finix.money.payout.rail_selection_rule` | Documented, by amount and timing | Discretionary | Unpredictable timing |
+| `finix.money.payout.webhook_signature_verification` | Mandatory | Discretionary, strongly recommended | Forged events |
+| `finix.money.payout.webhook_ordering_assumed` | **False** | Discretionary, strongly recommended | State regression |
+| `finix.money.payout.reversal_handling` | Re-credit and notify | Regulatory in substance | Ledger regression |
+| `finix.money.payout.daily_statement_recon` | Mandatory | Discretionary, strongly recommended | Missed events undetected |
+
+## 9. Exception paths
+
+| Situation | Response |
+|---|---|
+| Submission outcome unknown | **Stop.** Reconcile against the daily statement; resume only with certainty |
+| Duplicate payout detected | Severity one; recover; investigate the retry path |
+| Bank-account change followed by a large withdrawal | Human review before release; contact the client on previously registered details |
+| Destination account closed or invalid | Funds return; re-verify with the client; do not resubmit to the same account |
+| Reversal after processed | Re-credit the client ledger; notify; reconcile |
+| A2 not funded from the day's clearing corporation receipt | Do not pay out; this is the downstreaming rule, not a preference |
+| Provider outage | Alternate rail where available; communicate early; retain blocks |
+| Client disputes non-receipt | Produce the UTR; involve the bank; do not reissue without evidence |
+| Payout approved by the same person who prepared it | Control failure; investigate the maker-checker configuration |
+| Payout requested by a client with an unresolved screening alert | Blocked; compliance decides |
+
+## Practical notes
+
+- **Make the idempotency reference mandatory in the code path, not by convention.** It is the single control against paying twice.
+- **Stop on ambiguity.** Reconciliation is cheaper than recovery.
+- **Review change-then-withdraw before releasing.** It is the cheapest fraud control in the plane and the one firms most often add after a loss.
+- **Show withdrawable balance alongside available margin, labelled.** Most pay-out support contacts are this confusion.
+- **Keep listening after the terminal state.** Reversals arrive late and regress ledgers quietly.
+- **Reconcile pay-outs against the daily bank statement.** Webhooks are the fast path; the statement is the truth.
+- **Notify bank-account changes to the old contact details.** If the change is fraudulent, the old details are the ones that reach the client.
+
+## Where this connects
+
+- [Payments architecture](/broking-kyc/finix-broking-setup/money/01-payments-architecture/) — the account map and the two products
+- [Pay-in rails](/broking-kyc/finix-broking-setup/money/02-payin-rails/) — the other direction
+- [Bank reconciliation](/broking-kyc/finix-broking-setup/money/04-bank-recon/) — the backstop
+- [Ledger and accounting](/broking-kyc/finix-broking-setup/backoffice/04-ledger-accounting/) — clear balance and running account settlement
+- [Settlement obligations](/broking-kyc/finix-broking-setup/backoffice/05-settlement-obligations/) — where the same-day funding comes from
+- [Intraday surveillance](/broking-kyc/finix-broking-setup/rms/07-intraday-surveillance/) — the change-then-withdraw alert
+- [Modifications](/broking-kyc/lifecycle/modifications/) — bank-account change as a client-master event
