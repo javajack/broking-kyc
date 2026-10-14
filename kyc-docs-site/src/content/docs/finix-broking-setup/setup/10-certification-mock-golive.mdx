@@ -1,0 +1,266 @@
+---
+title: "Setup 10: certification, mock trading and go-live"
+description: The last gate before a live order — exchange certification per segment and facility, mock trading sessions and what they actually test, the internal readiness gates across all ten planes, the go-live sequence with abort criteria, the first-day and first-settlement watch, and the thirty-day stabilisation plan.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Go-live is the one point in the setup where the cost of being wrong is immediate and public, and it is also the point where every earlier shortcut becomes visible. So the page works backwards from the first live order: what the exchange must certify, what a mock session can and cannot prove, what the firm must verify for itself because nobody else will, then the sequence with explicit abort criteria, then the first day, then the first settlement — which is a bigger event than the first trade — and then the thirty days in which the operation either stabilises or accumulates a backlog it never clears.
+
+## TL;DR
+
+- **Certification is per exchange, per segment and per facility.** Three exchanges, four segments and the facility set — own front end, internet-based trading, wireless, direct market access, algorithmic trading, smart order routing, application programming interface — multiply into a certification matrix, not a single event.
+- **Mock sessions are scheduled by the exchange, not by you.** They are announced by circular on the exchange's calendar, and certification is tied to them. The whole programme plan must be built backwards from the published mock and certification calendar.
+- **A mock session proves connectivity and message correctness. It does not prove your operation.** It does not exercise your end-of-day, your settlement, your reconciliation, your pay-out run, your contract notes or your margin reporting — all of which fail on different days for different reasons.
+- **The first settlement matters more than the first trade.** A trade that executes is immediately visible and easy to verify. A settlement failure surfaces days later, with a penalty, a short delivery, or a client whose securities did not arrive.
+- **Go live narrow and widen deliberately.** One exchange, one segment, internal accounts, then staff, then a small client cohort, then general availability — with a stated dwell time and exit criteria at each step.
+- **Have an abort criterion written down before the day.** The hardest decision in go-live is to stop, and it is much easier if the condition was agreed in advance by people who were not under pressure.
+- **BSE needs three certification tracks** because it requires a separate connection and a separate protocol instance per segment. Plan them as three projects.
+
+## Conceptual overview
+
+There is a gap between being technically able to send an order and being operationally able to run a broking business, and go-live planning is the discipline of not confusing the two. Exchange certification closes the first gap: it establishes that the firm's systems speak the protocol correctly, handle the order types it claims to support, behave properly on rejection, and do not do anything that would destabilise the market. That is necessary and it is narrow. It says nothing about whether the firm can produce a contract note by the deadline, fund a margin call before the bank's cut-off, reconcile a trade file with a discrepancy in it, or explain to a client why their pay-out is late.
+
+The second gap is closed only by doing the whole cycle, which is why the sequencing in this page insists on completing a full operational cycle — trade, reconcile, contract note, obligation, settlement, pay-out, report — before widening the client base. A firm that opens to clients after a successful mock session has proved the easiest part of its operation and is about to discover the rest in public. Running the full cycle on proprietary or staff accounts first costs a week and converts a public failure into a private one.
+
+The third idea is that go-live should be reversible for as long as possible. Each widening step should have a rollback: stop onboarding, stop a segment, revert to a smaller cohort. Reversibility erodes quickly — once clients hold positions, you cannot un-launch — so the valuable reversibility is early, and it is worth paying for with a slower ramp. The firms that have the worst launches are not the ones that discover problems; everyone discovers problems. They are the ones that discover them after reversibility has gone.
+
+## 1. Regulatory framework
+
+- **Exchange certification and mock trading circulars** — each exchange publishes its certification requirements per segment and facility, its mock trading calendar, and the certification process. These are the operative documents and they are announced and amended by circular. `[not yet in index]`
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — registration conditions apply from registration, not from go-live, so the compliance obligations are already live before the first order. `[not yet in index]`
+- **Facility approval frameworks** — internet-based trading, securities trading through wireless technology, direct market access, algorithmic trading, smart order routing and application programming interface access, each with its own prerequisites. See [algo, API, DMA and SOR](/broking-kyc/finix-broking-setup/oms/09-algo-api-dma-sor/).
+- **System audit framework** — a pre-go-live audit, or an audit within a defined period of commencement, depending on the applicable requirement. See [system audit](/broking-kyc/deep-dives/compliance-audit/system-audit/).
+- **Business continuity and disaster recovery drill obligations** — begin once operational. See [BCP and DR drill](/broking-kyc/deep-dives/specialty/bcp-dr-drill/).
+- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025).
+
+## 2. The certification matrix
+
+Each cell is a separate certification or a confirmation that the cell is not applicable.
+
+| Facility | NSE CM | NSE F&O | NSE CD | BSE CM | BSE EQD | BSE CDX | MCX COM |
+|---|---|---|---|---|---|---|---|
+| Own front end, dealer terminal | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
+| Internet-based trading | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
+| Trading through wireless technology | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
+| Application programming interface | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
+| Algorithmic trading | ✔ | ✔ | — at launch | ✔ | ✔ | — | ✔ |
+| Direct market access | Deferred | Deferred | — | Deferred | Deferred | — | — |
+| Smart order routing | Deferred | Deferred | — | Deferred | Deferred | — | — |
+| Separate protocol instance | Shared stack | Shared stack | Shared stack | **Own instance** | **Own instance** | **Own instance** | Per MCX |
+
+| Planning consequence | Detail |
+|---|---|
+| BSE is three tracks | Separate connection and separate IML instance per segment |
+| Facilities are not free | Each facility certification is separate work and separate evidence |
+| Deferred is a decision | Direct market access and smart order routing deferred to a later phase, documented, not forgotten |
+| Algorithmic certification has a capital link | The algorithmic category sets base minimum capital at ₹50 lakh; see [entity and capital structure](/broking-kyc/finix-broking-setup/setup/01-entity-capital-structure/#5-base-minimum-capital--a-business-model-decision) |
+
+## 3. What a mock session tests, and what it does not
+
+| Tested in a mock session | Not tested in a mock session |
+|---|---|
+| Connectivity and session establishment per segment | End-of-day processing |
+| Login, logout, session recovery | Trade file import and reconciliation |
+| Order entry for each supported order type | Contract note generation and despatch |
+| Order modification and cancellation | Obligation processing |
+| Rejection handling and error codes | Funds and securities settlement |
+| Trade confirmation handling | Pay-out run and client disbursement |
+| Market data consumption | Margin reporting to the exchange |
+| Band, freeze and halt behaviour | Upstreaming computation |
+| Pre-open session behaviour | Client onboarding at volume |
+| Sequence continuity and gap handling | Real money movement |
+| Message rate behaviour | Reconciliation with a genuine discrepancy |
+| Risk rejections, where the risk engine participates | Depository instruction cut-offs |
+| Algorithmic order behaviour where approved | A vendor outage mid-session |
+| | Staff under time pressure |
+
+<Aside type="caution" title="Use the mock session for the things only a mock session can do">
+Mock windows are scarce, so spend them on what cannot be tested otherwise: real exchange behaviour on every order type and attribute you intend to offer, rejection codes, band and freeze semantics, pre-open mechanics, and sequence recovery after a deliberate disconnection. Do not spend a mock session verifying your own internal plumbing; that can be done any day with a simulator. And do take the opportunity to test the ugly cases — a modification on a partially filled order, a cancellation racing a fill, an order at the band edge — because those are the ones that generate client disputes later.
+</Aside>
+
+### 3.1 Mock session test plan
+
+| # | Scenario | Purpose |
+|---|---|---|
+| 1 | Session establishment, each segment, each instance | Connectivity |
+| 2 | Deliberate disconnection and recovery | Sequence continuity and state recovery |
+| 3 | Every order type in the [catalogue](/broking-kyc/finix-broking-setup/oms/04-order-types-catalogue/), per segment | Supported-feature truth |
+| 4 | Every validity and attribute combination | Attribute support differs by exchange |
+| 5 | Modification of unfilled, partially filled and nearly filled orders | Race conditions |
+| 6 | Cancellation racing a fill | Ambiguous outcomes |
+| 7 | Order at and beyond the price band | Band semantics |
+| 8 | Order breaching a quantity or value freeze | Freeze handling |
+| 9 | Order in a security under a surveillance measure | Restriction application |
+| 10 | Order in a derivatives contract on a banned underlying | Ban-period enforcement |
+| 11 | Pre-open order entry, modification and cancellation; price discovery | Pre-open behaviour |
+| 12 | After-market order queue and release | Window and release timing |
+| 13 | Risk rejection at each rung of the [check ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/) | Risk is on the path |
+| 14 | Square-off order generation under a simulated shortfall | The firm's own burst load |
+| 15 | High message rate burst | Capacity and rate limits |
+| 16 | Algorithmic order flow, where approved | Approved behaviour only |
+| 17 | Market data gap and stale detection | The [most dangerous interface](/broking-kyc/finix-broking-setup/stack/integration-contract-matrix/#2-order-path--the-real-time-band) |
+| 18 | Expiry-day behaviour, if a mock covers it | Expiry mechanics |
+| 19 | Commodity tender and delivery messages, where applicable | MCX specifics |
+| 20 | Multi-segment concurrent load | Shared-stack contention |
+
+## 4. Internal readiness gates
+
+Certification is the exchange's gate. These are the firm's, and nobody else will apply them.
+
+| Plane | Gate | Evidence |
+|---|---|---|
+| [Setup](/broking-kyc/finix-broking-setup/setup/) | Registration, membership, DP, bank accounts, deposits all in place | Certificates, account statements, receipts |
+| Setup | Net worth monitor running, with current certified figure | Monthly report |
+| Setup | All named roles filled; certification register complete and current | Register with expiry dates |
+| [Stack](/broking-kyc/finix-broking-setup/stack/) | Every interface in the contract matrix has an owner, a monitor and a tested degraded path | Interface register |
+| Stack | Configuration register populated, classified and approved | Register with approvals |
+| [Onboarding](/broking-kyc/finix-broking-setup/onboarding/) | Full journey completed end to end for a real client, including KRA, CKYC, screening, UCC and demat | A live activated account |
+| Onboarding | Screening list versions recorded; unresolved-hit block tested | Screening evidence |
+| [OMS](/broking-kyc/finix-broking-setup/oms/) | Certified order types match the enabled configuration exactly | Certification record versus configuration diff |
+| OMS | No path to the exchange bypasses the risk release point | Architectural proof plus test |
+| [RMS](/broking-kyc/finix-broking-setup/rms/) | Risk parameter ingestion, staleness behaviour and abort tested | Ingestion logs, forced-failure test |
+| RMS | Square-off engine tested including the failure-to-square-off path | Test record |
+| RMS | Margin reporting file produced and format-validated | Sample file, validation output |
+| [Back office](/broking-kyc/finix-broking-setup/backoffice/) | Trade import, reconciliation with a seeded discrepancy, contract notes, obligations — full cycle | Cycle evidence |
+| Back office | CUSPA auto-pledge, recomputation, release and invocation tested | Depository test records |
+| Back office | Every regulatory report generated once in the correct format | Sample set |
+| [Money](/broking-kyc/finix-broking-setup/money/) | Gateway settles to the client nodal account, verified with real money | Bank statement line |
+| Money | Pay-out run executed, including a reversal case | Payout records |
+| Money | Upstreaming computed and instructed once | Instruction and confirmation |
+| Money | Third-party payment block tested | Rejected test transaction |
+| [Exchanges](/broking-kyc/finix-broking-setup/exchanges/) | Every file in the [download reference](/broking-kyc/finix-broking-setup/exchanges/08-file-formats-downloads/) retrieved and parsed | Parse logs |
+| [Daily ops](/broking-kyc/finix-broking-setup/daily-ops/) | BOD and EOD runbooks executed by the actual staff, not the project team | Signed checklists |
+| Daily ops | One incident playbook rehearsed | Drill record |
+| [Compliance](/broking-kyc/finix-broking-setup/compliance/) | Policy set approved; compliance calendar populated with owners | Board minutes, calendar |
+| Compliance | Investor awareness messages configured per the October 2026 circular | Screenshot plus configuration record |
+| Compliance | Complaint clock in calendar days, tested | Test case |
+| Infrastructure | DR drill passed with a live switch; monitoring survives primary-site loss | Drill report |
+| Infrastructure | Time synchronisation evidence retained | Synchronisation records |
+| Infrastructure | Load test at measured peak including square-off burst | Test report |
+
+<Aside type="note" title="Have the real operators run the runbook">
+The most informative pre-go-live test is to have the people who will actually do BOD and EOD execute the runbook unaided, with the project team watching and not helping. Every ambiguity, missing credential and undocumented step surfaces in one morning. Project teams running their own runbooks successfully proves only that the authors understand their own document.
+</Aside>
+
+## 5. Go-live sequence
+
+| Phase | Scope | Dwell | Exit criteria | Rollback |
+|---|---|---|---|---|
+| **P0** | Certification complete; no live orders | — | All certification records in hand; configuration matches certification | — |
+| **P1** | Proprietary account, NSE cash only, minimal quantity | 3 trading days | Full cycle completed: trade, reconcile, contract note, obligation, settlement, statement. Zero unexplained breaks | Stop trading |
+| **P2** | Staff accounts, NSE cash and F&O | 5 trading days | Margin computed correctly against the exchange's number; margin reporting filed; a deliberate square-off executed; pay-in and pay-out cycle completed | Stop onboarding; close positions |
+| **P3** | Pilot client cohort, capped count and capped exposure, NSE only | 10 trading days | Onboarding at low volume without exception backlog; complaint path exercised; reconciliation exceptions cleared daily; no settlement break | Stop onboarding; cohort retained |
+| **P4** | General availability, NSE; BSE activated | 10 trading days | BSE certification per segment; cross-exchange reconciliation clean | Deactivate BSE |
+| **P5** | MCX activated, with the clearing member arrangement | 10 trading days | Commodity cycle including a tender period if one falls in the window; second-shift staffing proven | Deactivate MCX |
+| **P6** | Algorithmic and API access enabled for approved clients | Ongoing | Per-client rate limits tested; kill switch tested | Disable facility |
+| **P7** | Authorised-person distribution | Later phase | Monitoring capability proven on the direct book first | Suspend appointments |
+
+### 5.1 Abort criteria, agreed in advance
+
+| Condition | Action |
+|---|---|
+| Any order reaches an exchange without passing the risk release point | **Stop trading immediately.** Architectural defect, not a bug |
+| Margin computed by the firm diverges materially from the exchange's number | Stop new positions in the affected segment |
+| Risk parameter ingestion fails and the staleness behaviour does not trigger | Do not open |
+| Trade file does not reconcile and the difference cannot be explained | Do not generate contract notes; escalate |
+| Contract notes cannot be produced by the deadline | Immediate escalation; a known regulatory breach must be reported, not concealed |
+| Client funds found in a non-client account | Stop collection; remediate; assess disclosure |
+| CUSPA pledge cannot be created at pay-out | Stop further exposure for affected clients |
+| Market data stale without detection | Stop risk-dependent decisions; do not widen |
+| Any cohort widening with the previous phase's exceptions unresolved | Do not widen. This is the discipline that is hardest to keep |
+| Key certified person unavailable for a segment | Do not open that segment |
+
+## 6. First day
+
+| Time | Action | Owner |
+|---|---|---|
+| T−1 evening | Go or no-go call against the gate list; decision minuted | Programme |
+| T−1 evening | Confirm staffing, escalation contacts, vendor support on standby | Operations |
+| 07:30 | BOD runbook, executed and signed | Operations |
+| 08:15 | Confirm every file ingested, every assertion green | Operations |
+| 08:30 | Confirm exchange sessions established on every certified segment | Technology |
+| 08:45 | Confirm collateral and balance load with a current as-of timestamp | Risk |
+| 09:00 | After-market order queue reviewed before release | Dealing |
+| 09:00–09:15 | Pre-open monitoring | Dealing and risk |
+| 09:15 | **First live order**, minimal quantity, proprietary | Dealing, with risk and technology watching |
+| 09:16 | Verify: order log, exchange acknowledgement, trade confirmation, risk record, position, client ledger entry — all six, manually | Risk and operations |
+| Session | Hourly reconciliation of order and trade counts against the exchange | Operations |
+| Session | Latency, rejection rate, and session stability monitored continuously | Technology |
+| 15:30 | Close monitoring; post-close session handling | Dealing |
+| Post-close | EOD runbook, executed and signed | Operations |
+| Post-close | Trade file import; **reconcile to zero before proceeding** | Operations |
+| Post-close | Contract notes generated, verified line by line on day one | Operations and compliance |
+| Post-close | Margin reporting file produced and validated | Risk |
+| Post-close | Upstreaming computed and instructed | Treasury |
+| Evening | Day-one review; every anomaly logged with an owner | Programme |
+
+## 7. First settlement
+
+The first settlement cycle is the more important event, and it needs its own watch.
+
+| Check | Why |
+|---|---|
+| Obligation file loaded and client-level obligations computed | The input to everything else |
+| Funds pay-in instructed **before the bank's cut-off**, not the exchange's | The bank's cut-off is the real deadline |
+| Securities pay-in instructed and acknowledged | Short delivery has a defined and expensive consequence path |
+| Early pay-in, where used, recognised for margin benefit | Benefit lost silently if not recognised |
+| Pay-out received and reconciled | Into the clearing account, then to the downstreaming account |
+| Direct pay-out to client demat verified for a real client | The client-visible outcome |
+| Client pay-out executed from the downstreaming account only | Segregation |
+| CUSPA auto-pledge created for any unpaid position | Dated obligation from the pay-out date |
+| Short delivery, if any, handled through the auction path | See [short delivery and auction](/broking-kyc/deep-dives/trading-day/short-delivery-auction/) |
+| Penalties, if any, identified and understood | Not just accounted for — understood |
+| Every clearing corporation report retrieved and reconciled | Absence of a report is an incident |
+| Ledger, obligation and bank all agree | The three-way check |
+
+## 8. Thirty-day stabilisation
+
+| Week | Focus | Success measure |
+|---|---|---|
+| 1 | Daily cycle completion | BOD and EOD complete on time every day; no unexplained breaks |
+| 1 | Exception discipline | Reconciliation exceptions cleared the same day |
+| 2 | Margin and reporting | Margin reporting filed within cut-off; no short-collection penalty from a reporting error |
+| 2 | Client experience | Pay-in recognition time; pay-out within the published cut-off; complaints logged and clocked |
+| 3 | Resilience | One unannounced failover exercise; one vendor-degradation exercise |
+| 3 | Surveillance | Alert population reviewed; thresholds tuned with the tuning recorded |
+| 4 | Widening | Next cohort or segment opened only against the exit criteria |
+| 4 | Audit readiness | A self-inspection against the [inspection readiness](/broking-kyc/finix-broking-setup/compliance/03-inspection-readiness/) checklist |
+| Ongoing | Backlog | **Exception backlog trending to zero, not stable.** A stable backlog is an accumulating liability |
+
+<Aside type="caution" title="The exception backlog is the leading indicator">
+Everything else in the first month can look fine while an exception backlog grows: unmatched bank lines, unreconciled depository positions, open screening alerts, unresolved reconciliation breaks. Each is individually small and collectively becomes the firm's first regulatory problem, because the oldest items are the ones that turn into unattributed client money, an unreported suspicious transaction or an undetected shortfall. Track the **age** of the oldest open item in each category daily, not the count.
+</Aside>
+
+## 9. Exception paths
+
+| Situation | Response |
+|---|---|
+| Certification fails on an order type | Remove it from the enabled configuration; do not launch with an uncertified type enabled |
+| Mock session cancelled or missed | Re-plan go-live; the calendar is the exchange's |
+| A gate is amber on go-live eve | Default to no-go. The cost of a week is much lower than the cost of a first-month breach |
+| Exchange session unstable on day one | Stop trading on that segment; this is what a narrow launch is for |
+| First settlement produces an unexplained break | Do not widen; resolve first |
+| A penalty arrives in the first month | Treat as a design signal, not an accounting item; find the control that should have prevented it |
+| A vendor cannot meet a deadline-linked service level in week one | Invoke the contract and put a manual compensating control in place immediately |
+| Staff cannot complete the runbook without the project team | The runbook is incomplete; fix the document, not the staffing |
+
+## Practical notes
+
+- **Build the plan backwards from the published mock and certification calendar.** It is the only fixed point in the programme.
+- **Diff the certification record against the enabled configuration, automatically.** The gap between "what we certified" and "what is switched on" is a real and common defect.
+- **Verify all six records for the first trade by hand.** Order log, exchange acknowledgement, trade confirmation, risk record, position, ledger. Once.
+- **Treat the first settlement as a bigger event than the first trade.** Staff it accordingly.
+- **Write the abort criteria before the week of go-live**, and have them approved by someone who will not be in the room on the day.
+- **Do not widen with open exceptions.** It is the single most reliable predictor of a bad first quarter.
+- **Keep the pilot cohort informed.** Clients who know they are in a pilot are tolerant; clients who discover it are not.
+
+## Where this connects
+
+- Every setup page from [entity and capital structure](/broking-kyc/finix-broking-setup/setup/01-entity-capital-structure/) onward — the gates above test them all
+- [Order types catalogue](/broking-kyc/finix-broking-setup/oms/04-order-types-catalogue/) — what has to be certified
+- [Pre-trade check ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/) — what must be on the path
+- [BOD runbook](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/) and [EOD runbook](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/) — the runbooks the real operators must pass
+- [Settlement day operations](/broking-kyc/finix-broking-setup/daily-ops/06-settlement-day-ops/) — the first settlement
+- [Inspection readiness](/broking-kyc/finix-broking-setup/compliance/03-inspection-readiness/) — the self-inspection in week four
+- [Incident playbooks](/broking-kyc/finix-broking-setup/daily-ops/07-incident-playbooks/) — rehearsed before go-live

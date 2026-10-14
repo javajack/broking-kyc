@@ -1,0 +1,262 @@
+---
+title: "Setup 9: vendor onboarding and contracts"
+description: What to negotiate before signing with Saral, SecMark, Digio, the KRA, CERSAI, Razorpay and the banks — scope boundaries that match the vendor map, service levels tied to regulatory deadlines rather than uptime, audit and inspection rights, data protection and localisation, source-code escrow, exit and portability, and the implementation governance that follows.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** A vendor contract in a regulated business has to do something unusual: it has to make the vendor's obligations line up with the firm's regulatory obligations, even though the regulator has no relationship with the vendor. The firm is accountable for the outcome and the vendor is accountable only for what the contract says. So this page is organised around that gap. It starts with the clauses that close it — audit rights, regulatory cooperation, service levels tied to deadlines rather than availability, and data obligations — then moves to the clauses that protect the firm when the relationship ends, which is the part negotiated last and needed most. The per-vendor sections at the end list what is specific to each.
+
+## TL;DR
+
+- **The regulator holds the broker accountable, not the vendor.** Every obligation the firm outsources stays the firm's obligation. The contract's job is to make the vendor's duties coextensive with the firm's exposure — which is not the vendor's default position.
+- **Service levels must be expressed as regulatory deadlines, not as uptime percentages.** "99.9 percent monthly availability" is satisfied by being down for forty-three minutes — and forty-three minutes at 09:15, or at a settlement cut-off, is a different event from forty-three minutes on a Sunday. Define availability windows and deadline-linked obligations separately.
+- **Audit and inspection rights are not optional.** The firm's auditor, its internal audit, and the regulator or exchange acting through the firm must be able to examine the vendor's controls relating to the firm's data and processes. Vendors resist this; it is the clause most worth spending negotiating capital on.
+- **Scope must match the [vendor map](/broking-kyc/finix-broking-setup/stack/vendor-map/) decisions explicitly.** If SecMark middleware is not performing risk checks in the order path, the statement of work should say so — otherwise the firm pays for the module and inherits the obligation to test and control it.
+- **Get the integration kit before signing, not after.** Whether a published capability is an API, a file drop or a screen determines whether an integration is a week or a quarter, and it is not discoverable from marketing material.
+- **Exit and portability are negotiated at signature or not at all.** Data export in a usable format, transition assistance, a defined term, and — for the back office and the order management system — source-code escrow for the specific build in production.
+- **Personal data obligations flow through.** Six vendors touch client personal data. Each needs purpose limitation, sub-processor control, breach notification on a timeline that lets the firm meet its own, localisation where applicable, and deletion on exit.
+
+## Conceptual overview
+
+Outsourcing in a regulated business is a transfer of execution, never a transfer of accountability. When a KYC vendor's verification fails, the firm has onboarded a client improperly. When a payment vendor settles into the wrong account, the firm has breached segregation. When a back-office vendor's run fails, the firm has missed a reporting deadline. In every case the regulator's counterparty is the broker. That asymmetry is the whole reason vendor contracting in this sector is different from ordinary procurement: the firm is buying not just a capability but a set of assurances it can stand behind in an inspection.
+
+The practical consequence is that the contract has to reach into the vendor's operation. The firm needs to know the vendor's controls are adequate, which means assessment rights at onboarding and audit rights thereafter. It needs breach notification fast enough to meet its own notification obligations, which means the vendor's timeline must be strictly shorter than the firm's. It needs the vendor to cooperate when a regulator or exchange asks a question that only the vendor can answer. And it needs the vendor to keep records for as long as the firm must — which, under regulation 16 of the [2026 regulations](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/), is a minimum of eight years, longer than most standard vendor retention terms.
+
+The second structural issue is concentration. In this stack SecMark provides the back office, the middleware, the partner portal, reconciliation, screening, transaction monitoring and the compliance platform. That is efficient and it is also a single point of failure across the record and compliance bands simultaneously. The right response is not to fragment for its own sake but to be deliberate: understand what a SecMark outage or a SecMark commercial dispute would mean, hold the data in a form the firm controls, and make sure the exit provisions are real. A vendor whose failure would stop the firm reporting to a regulator deserves different contractual treatment from one whose failure would degrade a screen.
+
+## 1. Regulatory framework
+
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — regulation 16 record retention of not less than eight years; regulation 18(5) cyber security and cyber resilience; Chapter IV fraud prevention, which includes systems the vendor operates; Chapter V inspection, which can reach records held by a vendor on the firm's behalf. `[not yet in index]`
+- **Outsourcing guidelines for intermediaries** — the principle that core activities may not be outsourced and that outsourcing does not dilute the intermediary's obligations, with due diligence, agreement, monitoring and contingency requirements. `[not yet in index]`
+- **Cybersecurity and Cyber Resilience Framework** — third-party and supply-chain obligations. See [CSCRF deep dive](/broking-kyc/deep-dives/compliance-audit/cscrf-deep-dive/).
+- **Digital Personal Data Protection Act, 2023 and its rules** — the firm as data fiduciary, the vendor as data processor, with consequent obligations. See [DPDP consent fields](/broking-kyc/reference/field-atlas/sections/aa-dpdp-consent/) and the [MeitY circulars index](/broking-kyc/reference/circulars/meity/).
+- **System audit framework** — which examines vendor management as a domain. See [system audit](/broking-kyc/deep-dives/compliance-audit/system-audit/).
+- **Payment and settlement regulation** — for the payment aggregator relationship, the applicable Reserve Bank framework and the settlement account requirements. See the [RBI circulars index](/broking-kyc/reference/circulars/rbi/).
+
+## 2. The clauses that close the accountability gap
+
+| Clause | What it must say | Why vendors resist |
+|---|---|---|
+| **Regulatory cooperation** | The vendor will cooperate with SEBI, the exchanges, the depositories and the firm's auditors, including providing information and access relating to the firm's data and processes, within a stated time | Open-ended obligation to third parties |
+| **Audit and inspection rights** | The firm, its internal and statutory auditors, its system auditor, and a regulator acting through the firm may examine controls, records and processes relevant to the firm | Cost and disruption; multi-tenant concerns |
+| **Right to a controls report** | Annual independent controls assurance, or the right to audit if none is provided | Prefers a certificate to an audit |
+| **Record retention** | Records relating to the firm retained for not less than the firm's statutory period, currently eight years, and produced on request including after termination | Longer than standard retention; storage cost |
+| **Breach notification** | Security or data breach notified within a period **strictly shorter** than the firm's own notification obligation, with enough detail to assess | Prefers "without undue delay" |
+| **Incident cooperation** | Participation in the firm's incident response and post-incident review; root cause provided in writing | Reluctance to document fault |
+| **Sub-processors** | Named at signature, changes notified in advance with a right to object, same obligations flowed down | Operational flexibility |
+| **Data localisation and residency** | Where the data sits, and a restriction on moving it | Cloud region flexibility |
+| **Purpose limitation** | Firm data used only to provide the service; no analytics, model training or aggregation without specific consent | Loss of a data asset |
+| **Personnel** | Background checks, confidentiality, and removal on the firm's reasonable request | Employment constraints |
+| **Change control** | Material changes to the service, including protocol or format changes, notified with lead time sufficient to test | Prefers unilateral change rights |
+| **Business continuity** | Vendor's own recovery objectives, disclosed and tested, with participation in the firm's drills | Scope creep |
+| **Concentration disclosure** | Whether the vendor depends on a single cloud, data centre or upstream provider the firm also depends on | Commercially sensitive |
+
+<Aside type="caution" title="The notification-window arithmetic">
+If the firm must notify a regulator within a defined period of becoming aware of an incident, and the vendor's contract says "without undue delay", the firm can be in breach while entirely compliant with its own contract. The vendor's window must be a fraction of the firm's — hours, not days — and it must start from the vendor's awareness, not from its internal confirmation. This is a small drafting point with a large consequence and it is frequently missed.
+</Aside>
+
+## 3. Service levels that mean something
+
+Replace or supplement generic availability with deadline-linked obligations.
+
+| Service | Wrong metric | Right metric |
+|---|---|---|
+| Order management system | Monthly availability percentage | Availability during market hours per segment, measured per minute; order-path latency percentiles; maximum unplanned outage during market hours; no planned change during market hours |
+| Risk system | Availability | Decision latency percentile; **behaviour on timeout must be reject, contractually**; risk parameter ingestion within a stated period of publication |
+| Back office | Availability | Trade import complete by a stated time; contract notes generated by the prescribed deadline; obligation processing by the settlement deadline; margin reporting file ready before the five-working-day cut-off |
+| Reconciliation | Availability | Daily run complete by a stated time; exception file produced even on partial failure |
+| Screening | Availability | Interactive response time; list refresh within a stated period of publication; **list version disclosed with every result** |
+| Transaction monitoring | Availability | Alert generation within a stated period; regulatory report format compliance and timely format updates |
+| KYC and eSign | Availability | Interactive response time; completion-callback delivery; **signed artefact retrievable for the retention period**; sandbox parity |
+| Payment collection | Availability | Authorisation success rate; webhook delivery and retry behaviour; settlement to the designated account within the agreed cycle |
+| Payouts | Availability | Initiation acknowledgement time; terminal-state notification time; **idempotency guarantee on the firm's reference**; reversal notification |
+| Bank channel | Availability | Availability before the cut-off; cut-off times stated per channel; alternate channel availability |
+| Exchange connectivity vendor, if any | Availability | Availability during market hours; failover time; certification support |
+
+| Enforcement mechanism | Note |
+|---|---|
+| Service credits | Useful signalling; never adequate compensation for a regulatory penalty |
+| Penalty pass-through | Where a vendor failure directly causes an exchange penalty, the vendor should bear it; expect resistance and a cap |
+| Step-in rights | For critical services, the right to take over operation or appoint a third party on persistent failure |
+| Termination for repeated breach | Defined, objective triggers rather than a materiality judgement |
+| Root cause and remediation | Written, with a dated plan, within a stated period |
+
+## 4. Exit, portability and escrow
+
+Negotiated at signature because the vendor's incentive to agree declines to zero afterwards.
+
+| Provision | Requirement |
+|---|---|
+| **Data export** | Complete export of the firm's data in a documented, non-proprietary format, including history and audit trails, on demand and at termination, at a pre-agreed cost |
+| **Export testing** | The right to test the export annually, and an actual test performed — an untested export clause is a promise |
+| **Transition assistance** | A defined period of cooperation at pre-agreed rates, including knowledge transfer and parallel running |
+| **Post-termination access** | Access to records for the statutory retention period, since the firm's eight-year obligation survives the contract |
+| **Deletion** | Certified deletion after the retention obligation ends |
+| **Source-code escrow** | For the order management system and the back office: escrow of the **specific build in production**, with build instructions and dependencies, verified by the escrow agent, released on defined triggers including insolvency and persistent unremedied failure |
+| **No lock-in by format** | Proprietary formats permitted only with a documented export mapping |
+| **Assignment and change of control** | The firm's consent required, or a termination right; relevant where a vendor is acquired |
+| **Term** | Long enough to amortise implementation, short enough to retain leverage; avoid auto-renewal with long notice |
+| **Price protection** | Caps on increases, and protection against per-unit charges rising with the firm's success |
+
+<Aside type="note" title="Escrow is only useful if it is verified">
+An escrow arrangement that holds whatever the vendor deposited, unverified, is a filing cabinet. The useful version has the escrow agent verify that the deposit builds and that the deposited build corresponds to the production version, on a periodic basis. It costs more and it is the only version that would actually help.
+</Aside>
+
+## 5. Implementation governance
+
+| Item | Requirement |
+|---|---|
+| Statement of work | Scope matching the vendor map, with explicit exclusions |
+| Integration kit | Provided before signature, or signature conditional on its adequacy |
+| Environments | Sandbox and UAT with stated parity and availability; see [environments and configuration](/broking-kyc/finix-broking-setup/stack/environments-config-baseline/) |
+| Test data | Vendor-provided test identities and records; the firm must not test with real client data |
+| Acceptance criteria | Written, measurable, tied to the certification and go-live gates |
+| Named people | Implementation lead, escalation contacts, and a support path with hours and response times |
+| Milestones and payment | Payment tied to acceptance, not to elapsed time |
+| Protocol and format changes | Lead time, test window, and vendor responsibility for exchange-driven format changes |
+| Certification support | Explicit obligation to support exchange certification, including attendance at mock sessions |
+| Training | Named roles trained before go-live, with materials the firm retains |
+| Documentation | Delivered and licensed to the firm, retained independently of the vendor portal |
+| Security assessment | Completed before production data is shared, not after |
+
+## 6. Per-vendor specifics
+
+### 6.1 Saral — order management and risk
+
+| Item | What to pin down |
+|---|---|
+| Scope | Which front ends: Client Solo dealer terminal, Browser, Handy mobile, and whether Money Maker Challenge or Pharos modules are in scope |
+| Order types | **An explicit list of supported order types and attributes per exchange and segment**, because this is the basis for what the firm can offer; see [order types catalogue](/broking-kyc/finix-broking-setup/oms/04-order-types-catalogue/) |
+| Risk ownership | That Saral RMS is the single release-decision point, with a contractual statement of the timeout behaviour being reject |
+| Limit model | The limit hierarchy and resolution order, documented, since limits at identifier, client and scrip level are a published capability |
+| Margin computation | Which margin methodology is computed where, and the source and refresh of the risk parameter inputs |
+| Exchange protocol versions | Current versions supported per exchange and segment, and the upgrade commitment when an exchange changes a protocol |
+| Certification | Obligation to support certification for every segment and facility applied for |
+| Algorithmic modules | Approval support: the exchange approves algorithms, and the vendor must supply what the approval requires |
+| Capacity | Stated order-rate capacity and the behaviour at saturation |
+| Audit trail | Completeness of the order audit trail and its exportability for the retention period |
+| Escrow | Production build in escrow, verified |
+
+### 6.2 SecMark — back office, middleware, compliance
+
+| Item | What to pin down |
+|---|---|
+| Modules in scope | Back office, middleware, Partner Portal, SmartReco, C-Safe, AML Sutra, ComplianceSutra — each priced and scoped separately |
+| Modules explicitly out of scope | e-KYC and the trading front ends, per the vendor map decisions, so the firm neither pays for nor inherits them |
+| Middleware boundary | That the middleware does **not** perform risk checks in the order path |
+| Regulatory format currency | **Obligation to keep every regulatory report format current** as circulars change, within a stated lead time — this is the single most valuable clause in the back-office contract |
+| Deadline-linked service levels | Trade import, contract notes, obligations, margin reporting, as in section 3 |
+| Screening lists | Which lists, their sources, refresh frequency, and **list version returned with every screening result** |
+| FINnet format | Obligation to maintain suspicious transaction report format compliance |
+| DP records separability | DP records separable and separately producible for a DP inspection |
+| Data model documentation | Delivered, so the firm can build its own warehouse and reporting |
+| Concentration | Disclosure of the vendor's own dependencies, given how many planes it covers |
+| Escrow | Production build in escrow, verified |
+
+### 6.3 Digio — KYC, eSign, eStamp, mandates
+
+| Item | What to pin down |
+|---|---|
+| Services in scope | DigiKYC components used, DigiSign signature types, eStamping including DDPI and nomination documents, eNACH and UPI AutoPay |
+| Screening | Explicitly out of scope, per the vendor map |
+| Signature validity | Which signature types produce a legally valid signature, and the evidentiary package delivered with each |
+| **Artefact custody** | The signed document and its audit trail retrievable by the firm for the full retention period, and exportable — a signature the firm cannot produce in year seven is a problem |
+| Sandbox parity | Explicit statement of what differs, since sandbox eSign does not produce a valid signature |
+| Upstream dependencies | Behaviour and notification when DigiLocker, Aadhaar or PAN sources are unavailable |
+| Consent artefacts | Consent records captured, retained and exportable |
+| Per-transaction pricing | Unit pricing with volume protection, and clarity on charges for failed attempts |
+| Data protection | Processor obligations, localisation, deletion |
+| Completion callbacks | Delivery guarantees and a reconciliation mechanism for the vendor-has-it-firm-does-not case |
+
+### 6.4 CVL KRA and CERSAI CKYCRR
+
+These are not ordinary commercial vendors — they are regulated infrastructure — so the relationship is governed by their operating instructions rather than negotiated.
+
+| Item | Position |
+|---|---|
+| Nature | Registry access under published operating instructions; terms are largely non-negotiable |
+| What to obtain | Current operating instructions, API specification, test environment and test records, charge schedule, support path |
+| KRA interoperability | Understand that a query to one KRA returns the record regardless of which holds it, and that a duplicate upload for an already-compliant investor is rejected and must be followed by a download |
+| CKYCRR 2.0 | Real-time API model live from 1 August 2026, phased, with the pilot and readiness window extended to 5 October 2026; **monitor CERSAI communications for the production instruction applicable to the firm's category** |
+| Change management | Registry-driven format and process changes; the firm absorbs them, so build for change |
+| Internal obligation | Because there is no negotiating leverage, the firm's protection is implementation quality: idempotent handling, retry, reconciliation and alerting |
+
+### 6.5 Razorpay and RazorpayX
+
+| Item | What to pin down |
+|---|---|
+| **Settlement account** | Settlement into the upstreaming client nodal account, documented and tested; the gateway default is wrong for a broker; see [bank account architecture](/broking-kyc/finix-broking-setup/setup/06-bank-account-architecture/) |
+| Settlement cycle | Timing and any ability to accelerate, since client money sitting at the aggregator is client money the firm cannot upstream |
+| Third-party payment controls | Payer attribution data provided with every collection, so the prohibition on third-party funds can be enforced |
+| Virtual accounts | Smart Collect allocation model, the identifiers provided, and the data available for matching |
+| Validated UPI handle | Support for the broker collection handle regime |
+| **Payout idempotency** | Contractual guarantee that a payout submitted with the same firm reference is not duplicated |
+| Webhook reliability | Delivery, retry, signing, and the explicit statement that ordering is not guaranteed |
+| Reversals | Notification mechanism and timing for a reversal after an apparent success |
+| Reconciliation files | Daily statements sufficient for independent reconciliation, not just the dashboard |
+| Mode separation | Test and live key separation, and signature differences between modes |
+| Charge structure | Per-transaction pricing by instrument, and who bears a failed payout's cost |
+
+### 6.6 Banks
+
+| Item | What to pin down |
+|---|---|
+| Account titles | **Exact prescribed nomenclature** on the nodal accounts, confirmed on the statement header |
+| Cut-offs | Per channel, in writing, including any difference between the stated and effective cut-off |
+| Channel | Host-to-host or API, with certificate lifecycle and renewal process documented |
+| Intraday statements | Availability and frequency, for pay-in attribution |
+| Intraday liquidity | Overdraft or credit facility terms, and the trigger process |
+| Escalation | A named team and a phone path for settlement-deadline incidents |
+| Virtual accounts | Where used directly rather than through the aggregator |
+| Clearing bank eligibility | Confirmed against the clearing corporation's list |
+
+## 7. Vendor monitoring after go-live
+
+| Activity | Frequency |
+|---|---|
+| Service level review against deadline-linked metrics | Monthly |
+| Incident and root-cause review | Per incident, with a monthly rollup |
+| Security posture and controls report review | Annual, or on change |
+| Sub-processor list review | Annual, and on notification |
+| Export test | Annual |
+| Business continuity drill participation | Per drill calendar |
+| Contract and pricing review | Annual |
+| Concentration risk assessment | Annual, and on any vendor acquisition |
+| Regulatory format currency confirmation | On every relevant circular |
+| Access review of vendor personnel | Quarterly |
+
+Vendor monitoring is a named domain in the system audit and a standing item in the compliance calendar. See [compliance configuration baseline](/broking-kyc/finix-broking-setup/compliance/01-compliance-config-baseline/).
+
+## 8. Exception paths
+
+| Situation | Response |
+|---|---|
+| Vendor refuses audit rights | Escalate commercially; if unresolved, this is a reason not to proceed for any vendor in the record or compliance bands |
+| Vendor changes a format without lead time | Contractual breach; meanwhile the firm absorbs it, which is why the lead-time clause matters |
+| Vendor outage causes a missed regulatory deadline | Report the breach, invoke the contract, and document the vendor's root cause; the firm's obligation was never transferred |
+| Vendor acquired by a competitor or a firm the broker will not share data with | Change-of-control clause; this is why it is negotiated |
+| Vendor seeks to use firm data for model training | Purpose limitation clause; refuse absent specific, informed consent |
+| Sub-processor added in a jurisdiction the firm cannot accept | Objection right |
+| Escrow release trigger occurs | Verified build matters; an unverified deposit will not help |
+| Exit becomes necessary mid-term | Transition assistance at pre-agreed rates, tested export, post-termination record access |
+
+## Practical notes
+
+- **Spend negotiating capital on audit rights, format currency and exit.** Price is recoverable; these are not.
+- **Make the vendor map decisions contractual.** Modules excluded on purpose should be excluded in the statement of work, or the firm owns their risk for free.
+- **Demand the integration kit before signature.** It is the single best predictor of implementation effort.
+- **Test the data export in year one.** Not at exit, when it is too late to discover the format is unusable.
+- **Match the retention clause to the eight-year floor.** Standard vendor retention is usually shorter, and the firm's obligation survives the contract.
+- **Write the vendor's notification window in hours.** The firm's own clock starts when the vendor's does, whether the contract says so or not.
+- **Keep documentation outside the vendor's portal.** Access ends when the contract does.
+
+## Where this connects
+
+- [Vendor map](/broking-kyc/finix-broking-setup/stack/vendor-map/) — the scope decisions these contracts must reflect
+- [Integration contract matrix](/broking-kyc/finix-broking-setup/stack/integration-contract-matrix/) — the technical contract behind the commercial one
+- [Environments and configuration baseline](/broking-kyc/finix-broking-setup/stack/environments-config-baseline/) — environments, credentials and test data
+- [Certification, mock trading and go-live](/broking-kyc/finix-broking-setup/setup/10-certification-mock-golive/) — the vendor obligations at certification
+- [System audit](/broking-kyc/deep-dives/compliance-audit/system-audit/) — vendor management as an audit domain
+- [Vendor roadmap](/broking-kyc/appendix/vendor-roadmap/) — sequencing integrations
+- [Vendor atlas](/broking-kyc/vendors/atlas/) — the alternatives, if a decision is revisited

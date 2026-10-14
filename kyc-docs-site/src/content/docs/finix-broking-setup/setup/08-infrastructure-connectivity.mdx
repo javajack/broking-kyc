@@ -1,0 +1,238 @@
+---
+title: "Setup 8: infrastructure and connectivity"
+description: The physical and network build — primary site, disaster recovery, exchange leased lines and their per-exchange topology, the Trading Access Point and IML instance requirements, time synchronisation as an evidentiary control, capacity sizing, the system audit, and the business continuity obligations that start at go-live.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Infrastructure for a broker is assessed by three different parties with three different concerns — the exchange wants to know you will not destabilise the market, the system auditor wants evidence of controls, and the operation needs the thing to work at 09:15 every day. Those concerns do not conflict but they do produce different checklists. So the page is organised by what the infrastructure has to carry: exchange connectivity first, because it is the part with the least flexibility and the longest lead time; then the compute and data layer; then the controls that are evidentiary rather than functional, of which time synchronisation is the most under-appreciated; then resilience; then the audit.
+
+## TL;DR
+
+- **Connectivity topology differs per exchange and is not a configuration variant.** NSE access is over a wide area network on TCP/IP with interactive TCP/IP connectivity for user-specific messages, and the front end may connect through middleware called the **Trading Access Point**. BSE requires **a separate connection and a separate IML instance for each of equity, equity derivatives and currency derivatives**. MCX guidance refers to ISDN or other internet connectivity with firewalls.
+- **Terminal identifiers must be reported before use.** On NSE a trading member creates twelve-digit identifiers for its users under the Non-NEAT Front End facility and must report terminal details to the exchange before routing any order through them.
+- **Time synchronisation is an evidentiary control, not a hygiene item.** Order and trade timestamps are the evidence in a client dispute, a surveillance investigation and an inspection. A skewed clock does not produce an error message; it produces records that cannot be defended.
+- **Disaster recovery is a regulated capability with a drill obligation**, not a contractual line item. Recovery objectives, a usable secondary site and periodic drills with reporting are all expected. See [BCP and DR drill](/broking-kyc/deep-dives/specialty/bcp-dr-drill/).
+- **The system audit is scoped by what the systems do**, and it will look at access, change management, configuration, logging, capacity, business continuity and the integrity of the order path. Build the evidence as you build the system rather than assembling it afterwards.
+- **Capacity has to be sized for the worst minute, not the average day.** Expiry day, a results-driven surge, a circuit-breaker reopening and a mass square-off all produce order rates far above the mean, and the mean is useless for sizing.
+- **The lead times are longer than engineering estimates suggest.** Leased lines, exchange connectivity provisioning, colocation if used, bank channel certificates and depository connectivity are all third-party dependent and all sit on the critical path to [certification](/broking-kyc/finix-broking-setup/setup/10-certification-mock-golive/).
+
+## Conceptual overview
+
+Broking infrastructure has an unusual shape because the latency-critical part is small and the rest is ordinary. The order path — client to order management system to risk to exchange gateway and back — is a narrow, hot, latency-sensitive channel where a few milliseconds matter and an outage is immediately visible to clients and to the exchange. Everything else, which is most of the compute by volume, is batch and database work with generous windows. The design error is to treat them uniformly: either the whole estate gets engineered to order-path standards, which is expensive, or the order path gets built like a web application, which fails under load at the worst moment.
+
+The second characteristic is that infrastructure here is inspected. An exchange assesses it before admission, a system auditor examines it periodically, and an inspection will ask for evidence about access, change and logging. That changes the economics of doing things properly: a configuration management practice that would be merely good hygiene in another industry is here a source of evidence that an inspector will ask for by name. Teams that build the evidence trail as a by-product of normal operation spend far less than teams that reconstruct it before each audit.
+
+The third characteristic is that the most consequential infrastructure control is also the least interesting. Time synchronisation determines whether the firm can prove the sequence of events. When a client disputes an order, when surveillance examines a pattern, when an exchange asks why an order was placed at a particular moment, the answer is a timestamp — and a timestamp is only evidence if the clock that produced it was synchronised and the synchronisation can be demonstrated. This is cheap to get right at build time and effectively impossible to fix retrospectively, because the records already exist with the wrong times in them.
+
+## 1. Regulatory framework
+
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — regulation 18(5) makes a robust cyber security and cyber resilience framework a statutory obligation; Chapter II infrastructure as an eligibility condition. `[not yet in index]`
+- **Cybersecurity and Cyber Resilience Framework** — the applicable framework for market intermediaries, with tiered obligations. See [CSCRF deep dive](/broking-kyc/deep-dives/compliance-audit/cscrf-deep-dive/) and [cyber resilience configuration](/broking-kyc/finix-broking-setup/compliance/04-cyber-cscrf-config/).
+- **System audit framework for stock brokers** — scope, periodicity, auditor eligibility and reporting. See [system audit](/broking-kyc/deep-dives/compliance-audit/system-audit/).
+- **Business continuity and disaster recovery framework** — recovery objectives, site requirements, drills and reporting. See [BCP and DR drill](/broking-kyc/deep-dives/specialty/bcp-dr-drill/).
+- **Exchange connectivity documentation** — NSE's Computer-to-Computer Link, Non-NEAT Front End and Trading Access Point material and the segment-wise NNF protocol specifications; BSE's Open Message Bus and BOLT Plus IML application programming interface documents per segment; MCX's connectivity guidance. `[not yet in index]`
+- **NSE/MSD/67755** (29 April 2025) — user identifier conversion through NSE-ENIT. `[not yet in index]`
+- **Algorithmic trading and colocation frameworks** — where applicable; see [algo, API, DMA and SOR](/broking-kyc/finix-broking-setup/oms/09-algo-api-dma-sor/) and [retail algo framework](/broking-kyc/deep-dives/trading-day/retail-algo-framework/).
+
+## 2. Exchange connectivity
+
+### 2.1 Per-exchange topology
+
+| Exchange | Access model | Per-segment requirement | Middleware | Notes |
+|---|---|---|---|---|
+| **NSE** | Computer-to-Computer Link for own front end; wide area network over TCP/IP; interactive TCP/IP connectivity for user-specific messages | Segments enabled on the connectivity stack | **Trading Access Point**, optional, as the middleware the front end may connect through | Twelve-digit user identifiers created by the member and reported before order routing; NNF protocol documents versioned per segment |
+| **BSE** | BSE Open Message Bus, documented as BOLT Plus IML | **Separate connection and separate IML instance for each of equity, equity derivatives and currency derivatives** | IML itself | Connection established by a user registration request through IML; separate API documents per segment with separate versions |
+| **MCX** | MCX member protocol | Per MCX architecture | Per MCX architecture | Published guidance refers to ISDN or other internet connectivity with firewalls; confirm the current approved connectivity options |
+
+<Aside type="caution" title="BSE's per-segment instance requirement drives real cost">
+Three connections and three protocol instances means three deployments to provision, monitor, patch, fail over and certify. It is not a configuration flag. Budget BSE connectivity as three parallel integrations, plan three certification tracks, and write three operational runbooks. Teams that assume the NSE pattern generalises discover this during certification, which is the worst time.
+</Aside>
+
+### 2.2 Link design
+
+| Element | Requirement | Reason |
+|---|---|---|
+| Primary link per exchange | Leased line or exchange-approved connectivity | Order path |
+| Redundant link per exchange | Diverse path, ideally diverse provider | A single fibre cut should not stop trading |
+| Diverse physical entry | Separate building entry points where possible | Shared conduit defeats redundancy |
+| Bandwidth | Sized for peak message rate plus market data, with headroom | Expiry and surge days |
+| Latency monitoring | Continuous, per link, with alerting on degradation | Degradation precedes failure |
+| Failover | Tested, documented, with a known recovery time | Untested failover is a hope |
+| Market data | Multicast feed per exchange and segment | Separate from the order path in capacity terms |
+| Firewalls and segmentation | Order path segmented from general corporate network | Security and blast radius |
+| DR site connectivity | Independent links to each exchange from the secondary site | A DR site without exchange connectivity is a filing cabinet |
+
+### 2.3 Identifiers and reporting
+
+| Item | Requirement |
+|---|---|
+| User identifiers | Unique per user and per mode of connectivity |
+| NSE NNF identifiers | Twelve digits, created by the trading member |
+| Reporting obligation | Terminal details reported to the exchange **before** any order is routed through the terminal |
+| Conversion | NEAT to CTCL and non-NEAT identifier applications through NSE-ENIT per NSE/MSD/67755 dated 29 April 2025 |
+| Register | A single internal register of every identifier, the person or system it is allocated to, the location, the segment, and the reporting status |
+| Reconciliation | The internal register reconciled against the exchange's record periodically |
+
+The identifier register is a classic inspection item precisely because it is easy to let drift: a dealer leaves, their identifier stays allocated, and the exchange's record and the firm's record diverge. See [user IDs, CTCL and NNF](/broking-kyc/finix-broking-setup/oms/03-user-id-ctcl-nnf/).
+
+## 3. Sites and compute
+
+| Layer | Primary site | Secondary site |
+|---|---|---|
+| Order path | Order management and risk, on dedicated capacity, segmented | Warm, with exchange connectivity and tested failover |
+| Market data | Feed handlers and distribution | Independent feed |
+| Back office | Processing and database | Recoverable within the stated objective |
+| Onboarding | Client journey and vendor integrations | Recoverable; interactive, so degradation is visible to clients |
+| Money | Payment integration and treasury tooling | Recoverable; access to bank channels from the secondary site |
+| Data store | Market data history, reporting, surveillance | Replicated |
+| Monitoring and logging | Independent of the systems monitored | **Must survive the primary site**, or you lose the diagnostic record with the system |
+| Identity and access | Directory | Available at the secondary site, or nobody can log in to recover |
+
+<Aside type="note" title="Two failures that recur in DR design">
+First, monitoring and logging hosted on the infrastructure being monitored — so when the site fails you lose both the service and the ability to see what happened. Second, identity services available only at the primary site, so the recovery team cannot authenticate to the secondary environment. Both are obvious in hindsight and both are common, because DR planning tends to start from the trading application and work outwards.
+</Aside>
+
+### 3.1 Capacity sizing
+
+Size for the worst minute. The events that produce it:
+
+| Event | Effect |
+|---|---|
+| Expiry day | Order and modification rates far above the mean, concentrated in the final hour |
+| Results or news surge in a single scrip | Concentrated load, often with band hits and freezes |
+| Circuit breaker reopening | A burst of queued intent arriving at once |
+| Mass square-off | The firm's own system generating a large order burst; see [square-off engine](/broking-kyc/finix-broking-setup/rms/06-squareoff-engine/) |
+| Pre-open order entry and matching | A distinct load profile; see [pre-open operations](/broking-kyc/finix-broking-setup/daily-ops/02-pre-open-ops/) |
+| Market data burst | Volatility multiplies tick rates |
+| Mass client login | Market open, and after any outage |
+| Algorithmic client activity | Order-to-trade ratios much higher than manual flow |
+| End-of-day batch overlapping the commodity session | Two heavy workloads concurrently |
+
+| Sizing control | Requirement |
+|---|---|
+| Measured peak, not mean | Per-minute and per-second peaks retained as a metric |
+| Headroom policy | A stated multiple over observed peak, documented |
+| Load testing | Against the measured peak profile, before go-live and after major change |
+| Rate limiting | Per client and per channel, so one client cannot consume the gateway; see [algo, API, DMA and SOR](/broking-kyc/finix-broking-setup/oms/09-algo-api-dma-sor/) |
+| Back-pressure | Asynchronous consumers must never block the order path |
+| Graceful degradation | Defined behaviour when a component saturates, decided in advance |
+
+## 4. Time synchronisation
+
+| Control | Requirement |
+|---|---|
+| Source | Synchronised to the reference time source applicable to the market, with a documented chain |
+| Scope | Every system that writes a timestamp: order management, risk, back office, onboarding, payment integration, logging, and the network devices |
+| Monitoring | Continuous drift monitoring with alerting on a threshold |
+| Evidence | Synchronisation records retained, because the question is not whether the clock is right now but whether it was right then |
+| Order path | Timestamp capture at the earliest possible point, and immutably |
+| Audit trail | Order, modification, cancellation, rejection and trade timestamps retained on the eight-year records floor |
+| Reconciliation | Firm timestamps reconciled against exchange timestamps, with divergence investigated |
+
+Why this matters more than it looks: every substantive dispute in broking resolves to a sequence. Was the square-off executed before or after the client's payment? Did the order reach the exchange before the band revision? Was the modification accepted before the fill? Each answer is a timestamp comparison, and if clocks drifted, the firm's record is not evidence.
+
+## 5. Security baseline
+
+Summarised here and expanded in [cyber resilience configuration](/broking-kyc/finix-broking-setup/compliance/04-cyber-cscrf-config/).
+
+| Domain | Baseline |
+|---|---|
+| Network segmentation | Order path, back office, corporate and management networks separated |
+| Access control | Central directory, role-based, least privilege, periodic recertification |
+| Privileged access | Separate, time-bound, logged, reviewed |
+| Multi-factor authentication | For all administrative access and all client-facing trading access |
+| Client authentication | Two factors for internet-based and wireless trading, and the two factors must not be the same; see [client protection frameworks](/broking-kyc/trading-risk/client-protection-frameworks/) |
+| Change management | Approved, logged, reversible, with evidence |
+| Vulnerability management | Scanning, patching with service levels, exception register |
+| Logging | Centralised, tamper-evident, retained on the records floor, surviving the primary site |
+| Encryption | In transit and at rest for personal and financial data |
+| Data protection | Consent artefacts and data minimisation; see [DPDP consent fields](/broking-kyc/reference/field-atlas/sections/aa-dpdp-consent/) |
+| Vendor security | Assessed for each of the six vendor integrations, with contractual obligations |
+| Incident response | Documented, exercised, with a reporting path |
+| Backup and restore | Tested restores, not just successful backups |
+
+## 6. Resilience and drills
+
+| Item | Requirement |
+|---|---|
+| Recovery objectives | Stated per system, with the order path having the tightest |
+| Secondary site | Usable, with exchange connectivity, identity, monitoring and bank channel access |
+| Drills | Periodic, including a live switch rather than a tabletop, with reporting |
+| Scenario coverage | Site loss, link loss per exchange, vendor outage per vendor, bank channel outage, market data failure, database corruption |
+| Vendor dependency drills | What happens when Digio, Razorpay, the KRA or the back office is unavailable — the degraded behaviour from the [integration contract matrix](/broking-kyc/finix-broking-setup/stack/integration-contract-matrix/) |
+| Communication plan | Clients, exchanges, the clearing corporation, vendors, and internally |
+| Post-drill actions | Tracked to closure; an unclosed action from the last drill is the finding |
+
+See [BCP and DR drill](/broking-kyc/deep-dives/specialty/bcp-dr-drill/) for the obligation detail.
+
+## 7. The system audit
+
+| Dimension | What the auditor looks for | Build-time action |
+|---|---|---|
+| Access management | Joiner, mover, leaver evidence; recertification; privileged access | Central directory, same-day leaver checklist across nine systems |
+| Change management | Approvals, testing evidence, rollback, segregation | Change records with approver distinct from author |
+| Configuration | Values, their classification, approval and history | The register from [environments and configuration](/broking-kyc/finix-broking-setup/stack/environments-config-baseline/) |
+| Order path integrity | That orders cannot bypass risk checks | A single release point, demonstrable |
+| Logging and audit trail | Completeness, immutability, retention | Centralised logging with the eight-year floor |
+| Time synchronisation | Source, scope, monitoring, evidence | As section 4 |
+| Capacity | Sizing basis, monitoring, headroom | Peak metrics retained |
+| Business continuity | Objectives, site, drill evidence | Drill reports with closed actions |
+| Data protection | Consent, minimisation, non-production data handling | Policy plus technical enforcement |
+| Vendor management | Assessments, contracts, monitoring | See [vendor onboarding and contracts](/broking-kyc/finix-broking-setup/setup/09-vendor-onboarding-contracts/) |
+| Algorithmic controls | Approvals, limits, kill switch | See [algo, API, DMA and SOR](/broking-kyc/finix-broking-setup/oms/09-algo-api-dma-sor/) |
+
+<Aside type="tip" title="Design the audit evidence into normal operation">
+Almost every item above produces evidence as a side effect of doing the thing properly: a change record exists because changes are approved, an access review exists because reviews happen on a schedule, a drill report exists because the drill happened. Firms that treat audit as a separate exercise end up producing documents that describe a process rather than evidencing one, and auditors can tell the difference immediately.
+</Aside>
+
+## 8. Lead times and the critical path
+
+| Item | Dependency | Why it is slow |
+|---|---|---|
+| Leased lines per exchange | Membership for provisioning | Provider survey, installation, testing |
+| Exchange connectivity provisioning | Membership activation | Exchange process |
+| User identifier allocation and reporting | Connectivity | Exchange process |
+| Colocation or proximity hosting | Separate application | Separate commercials and capacity |
+| Secondary site | Procurement | Build plus connectivity |
+| Bank channel certificates | Account opening | Bank process |
+| Depository connectivity | Participant admission | Depository process |
+| Vendor environment provisioning | Contracts | Vendor process |
+| Load testing | Production-shaped environment | Needs the full stack |
+| System audit | A built system | Auditor availability |
+| Exchange certification slots | Published calendar | Fixed windows; see [certification, mock trading and go-live](/broking-kyc/finix-broking-setup/setup/10-certification-mock-golive/) |
+
+The practical scheduling rule: **start every third-party dependency the day the dependency becomes orderable**, even if the internal work that consumes it is weeks away. Internal work can be compressed; a provider's installation queue cannot.
+
+## 9. Exception paths
+
+| Situation | Response |
+|---|---|
+| Primary link to an exchange fails mid-session | Failover; if both links fail, the degraded behaviour is to stop new orders for that exchange and segment and preserve last-known order state; see [incident playbooks](/broking-kyc/finix-broking-setup/daily-ops/07-incident-playbooks/) |
+| Market data feed stale | Stop risk decisions dependent on last traded price in scope; block market orders; this is a named incident |
+| Clock drift detected | Investigate immediately and record the window; any records written in the window are suspect |
+| Capacity saturation during a surge | Rate-limit by client and channel, not globally; preserve the order path |
+| Secondary site found unusable during a drill | Treat as a high-severity finding with a dated remediation; a DR site that fails a drill does not exist |
+| Vendor outage during the session | Apply the degraded behaviour from the contract matrix; communicate to clients early |
+| Identifier found unreported | Stop routing through it immediately and report; this is a direct breach |
+| Patch required urgently in the order path | Emergency change path with post-hoc approval inside one business day |
+
+## Practical notes
+
+- **Order the long-lead items before you need them.** Leased lines and certification slots do not respond to escalation.
+- **Keep monitoring and identity off the primary site's fate.** The two most common DR design defects, and both are cheap to avoid.
+- **Make the order path the only path.** If any channel can reach the exchange without passing the single release point, the control does not exist. Prove it architecturally, not by policy.
+- **Treat the identifier register as a controlled record.** Reconcile it against the exchange and against your directory, because dealers leave and identifiers linger.
+- **Load-test with the square-off scenario included.** Your own risk engine is a significant order generator, and it fires exactly when the market is already busy.
+- **Verify time synchronisation evidence, not just configuration.** The question an auditor asks is about a past date.
+- **Write three BSE runbooks.** One per segment, because there are three instances.
+
+## Where this connects
+
+- [Exchange membership](/broking-kyc/finix-broking-setup/setup/03-exchange-membership/) — the approvals that unlock connectivity
+- [Exchange connectivity protocols](/broking-kyc/finix-broking-setup/oms/02-exchange-connectivity-protocols/) — the protocol detail
+- [User IDs, CTCL and NNF](/broking-kyc/finix-broking-setup/oms/03-user-id-ctcl-nnf/) — identifiers in operation
+- [Certification, mock trading and go-live](/broking-kyc/finix-broking-setup/setup/10-certification-mock-golive/) — what this infrastructure must pass
+- [Cyber resilience configuration](/broking-kyc/finix-broking-setup/compliance/04-cyber-cscrf-config/) — the security baseline in detail
+- [System audit](/broking-kyc/deep-dives/compliance-audit/system-audit/) and [BCP and DR drill](/broking-kyc/deep-dives/specialty/bcp-dr-drill/) — the obligations
+- [Integration contract matrix](/broking-kyc/finix-broking-setup/stack/integration-contract-matrix/) — the degraded behaviours this infrastructure must implement
