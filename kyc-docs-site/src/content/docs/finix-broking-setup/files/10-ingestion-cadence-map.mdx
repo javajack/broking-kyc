@@ -1,0 +1,203 @@
+---
+title: "Files 10: the ingestion cadence map"
+description: How many times a day files actually arrive and must be applied — the risk-parameter and value-at-risk batches per segment, the random margin and position snapshots, the delta files, the settlement-price and trade-file clock, and for each ingestion event the systems it touches and what goes wrong downstream if it is skipped.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** The register in [the file register and its architecture](/broking-kyc/finix-broking-setup/files/01-file-register-architecture/) answers "which files exist". This page answers the question an architect actually asks: **how many times in a day does something have to be ingested and applied, and what breaks if one is missed.** Those are different questions, because a single logical file family can be an eight-times-a-day obligation. Section 3 is the useful part: each ingestion event mapped to the systems it touches, because almost every file touches more than one and the second one is the one nobody wires.
+
+## TL;DR
+
+- **Risk parameters are not a daily file. They are a several-times-a-day obligation**, and the count differs by segment — six for equity derivatives, more for commodities, fewer for debt.
+- **The cash value-at-risk file runs in six batches**, one at begin of day, four intraday and one at end of day.
+- **Margin and position snapshots are taken at random times** within defined windows, a minimum of four a day, which is why a firm must compute continuously rather than at the snapshot.
+- **A firm on all segments faces roughly forty to fifty distinct ingest-and-apply events on an ordinary day**, before any settlement, expiry or corporate-action overlay.
+- **The commodity trade file can arrive after midnight**, on the next calendar day, so a pipeline that closes in the evening misses it entirely.
+- **Every parameter ingestion touches at least two systems** — the risk engine and, through capacity, the order path. The second is the one that gets missed.
+
+## 1. Why cadence is the right unit
+
+A register organised by file answers "do we have the collateral haircut file". A register organised by **cadence** answers "have we applied the current one", which is the question that determines whether the firm is margining correctly at this moment. The distinction matters because of how the measurement works: margin sufficiency and position-limit compliance are both tested at **randomly chosen intraday moments**, so a firm that applies a parameter file once a day is not slightly stale — it is computing a different quantity from the one it will be judged on, for most of the day.
+
+The second reason is operational. A begin-of-day ingestion has an hour of slack and a named owner at a desk. An intraday ingestion at midday has neither: nobody is watching, the previous value keeps working, and the failure is silent. So the intraday events need automated application with an **applied-state assertion** and an alert on staleness, not a human in the loop — and the firm needs to know how many of them there are in order to staff and monitor them at all.
+
+## 2. The intraday cadence
+
+### Risk parameter files, by segment
+
+| Segment | Batches per day | Shape |
+|---|---|---|
+| **Equity derivatives** | **Six** | **Begin of day, four intraday, and end of day.** The intraday files are generated on prices at four defined points through the session |
+| **Currency derivatives** | **Seven** | Begin of day, five intraday, end of day |
+| **Commodity derivatives** | **Ten** | Begin of day, **eight intraday**, end of day — the long evening session needs more |
+| **Debt** | **Six** | Begin of day, four intraday, end of day |
+| A scaled variant | Same cadence again | A separate parameter set applies **only to clearing members who opted for same-day mark-to-market settlement**, using a different look-ahead. **Applying the wrong variant mis-margins every client** |
+
+### Cash-segment value-at-risk
+
+| Element | Position |
+|---|---|
+| **Batches per day** | **Six** — batch one at begin of day, batches two to five intraday, batch six at end of day |
+| The end-of-day batch | Has a published standard time in the late afternoon |
+| What it drives | Value-at-risk plus extreme loss margin for **every cash client** |
+| If missed | **No cash margin computation**, therefore upfront short collection, therefore a penalty on every affected client |
+
+### Snapshots — taken by the venue, not published on a timetable
+
+| Snapshot | Cadence |
+|---|---|
+| **Client margin requirement snapshots** | **A minimum of four a day, taken randomly within pre-defined windows**, computed on fixed begin-of-day parameters. The detailed margin files carry both the end-of-day figure and the **peak across snapshots** |
+| **Index derivatives position-limit snapshots** | **A minimum of four random snapshots**; from October 2025 **at least one falls late in the session**; from July 2026 an **additional fifth window** exists after the index equilibrium price is determined |
+| **Market-wide limit utilisation** | Checked at **least four random times** per session, with a terminal broadcast above a threshold |
+| Short allocation, intraday | Produced **at the moment of the peak margin snapshot**, so its cadence follows the snapshots |
+
+**The consequence of randomness** is that no ingestion schedule can align with it. The firm's own computation must be continuous, and the published parameter batches are inputs to that continuous computation rather than events to compute at.
+
+### Delta files
+
+| File | Cadence |
+|---|---|
+| Per-contract delta factors | **Intraday batches plus an end-of-day file** |
+| **The afternoon batch specifically** | Used for the ban-period base-position revaluation, which is why it has an **operational action window** attached — see [real-time and near-real-time obligations](/broking-kyc/finix-broking-setup/monitoring/02-realtime-near-realtime/) |
+
+### The end-of-day clock
+
+Approximate published standard times, which differ by segment and are the reason the pipeline cannot be a single batch.
+
+| Artefact | When |
+|---|---|
+| Cash mark-to-market prices | Late afternoon |
+| Cash value-at-risk, final batch | Late afternoon |
+| Interim cash bhavcopy | Immediately after the close |
+| Derivatives settlement prices | Early evening |
+| Equity derivatives risk parameters, end of day | Early evening |
+| Cash trade report | Early evening |
+| Clearing trade reports | Early evening, shortly after the exchange trade file |
+| Derivatives trade report | Later evening |
+| Currency settlement prices and trade report | Later evening again |
+| **Securities in a ban period** | After the close, **dated for the next trading day** |
+| **Commodity trade report** | **After midnight, on the next calendar day** |
+| Obligation files | Evening, with a **revised final version the next day** where custodial confirmation changed it |
+
+<Aside type="danger" title="Two clock facts that break pipelines built on an assumption">
+**The commodity trade file arrives on the next calendar day.** A firm whose end-of-day pipeline runs to completion in the evening and marks the day closed will never ingest it, and will discover the gap as a position and obligation mismatch the following day. The manifest must carry a business date distinct from the arrival date, and the pipeline must either wait or run a second pass for that segment.
+
+**The ban-period file is dated for the next trading day.** It tells the firm what will be banned tomorrow. Treating the date in the name as the file's own business date applies yesterday's list today — permitting fresh positions in a security that just entered a ban, which is a penalty, and blocking one that just left, which is a complaint. Both directions are wrong and the error is invisible in the file itself.
+</Aside>
+
+## 3. What each ingestion touches
+
+The column that matters. Almost every file touches more than one system, and the second or third is the one that gets wired late or not at all.
+
+| Ingestion | Risk engine | Order path | Back office | Treasury | Client-facing | Compliance |
+|---|---|---|---|---|---|---|
+| Instrument and contract master | Eligibility | **Tradeable universe** | Reference data | — | Instrument search | — |
+| Corporate action adjustment | **Multipliers, margin** | **Contract set** | Holdings, entitlements | — | Positions | — |
+| **Risk parameter batch** | **Margin computation** | **Capacity, therefore order release** | — | — | **Displayed margin** | Margin reporting basis |
+| **Value-at-risk batch** | **Cash margin** | **Capacity** | — | — | Displayed margin | Reporting basis |
+| Collateral and haircut file | **Collateral value** | **Capacity** | Collateral ledger | — | **Displayed collateral** | Client collateral reporting |
+| Collateral eligibility list | **Eligibility** | Capacity | — | — | Which holdings count | — |
+| **Ban-period list** | Fresh-position block | **Order rejection** | — | — | Order-entry message | Breach exposure |
+| **Surveillance indicator** | Margin treatment | **Order rejection and the pre-order confirmation** | Settlement type | — | **The prescribed confirmation prompt** | — |
+| Price bands | Validation | **Order rejection** | — | — | Band display | — |
+| Position-limit files | **Limit monitoring** | **Order rejection** | — | — | — | Breach reporting |
+| Delta files | **Future-equivalent computation** | Limit enforcement | — | — | — | Monitoring |
+| Settlement and mark-to-market prices | **Marking** | — | **Valuation, ledger** | Funding estimate | Profit and loss | — |
+| Interim bhavcopy | — | — | **Early pipeline start** | — | — | — |
+| Final bhavcopy | Revaluation | — | **Valuation of record** | — | Statements | — |
+| **Trade file** | Position | — | **Everything downstream** | Obligation | Contract notes | Reporting |
+| Trade modification file | Attribution | — | **Reallocation** | — | Contract notes | **Monitored metric** |
+| **Obligation file, and its revision** | — | — | **Settlement** | **Funding requirement** | Pay-in calls | — |
+| Margin reports and intraday files | **Reconciliation of requirement** | — | — | — | — | **Reporting input** |
+| Short allocation | **Shortfall identification** | Blocks | — | — | Margin calls | Penalty exposure |
+| Penalty file | — | — | **Client debit** | — | Statements | **Allocation decision** |
+| Collateral statement | **Available margin** | Capacity | Collateral ledger | Collateral placement | Client collateral view | Segregation reporting |
+| Client collateral report | Client allocation | — | — | — | **The client portal** | Reporting |
+| Depository change export | Pledge and holdings | Capacity via collateral | **Holdings of record** | — | Holdings | — |
+| Pledge and release reports | **Collateral recognition** | Capacity | Pledge ledger | — | Pledge status | — |
+| Bank statement | — | — | **Ledger** | **Position** | Funds balance | Segregation |
+| Gateway settlement | — | — | Receipts | Position | — | — |
+| Exercise and assignment | **Position** | — | **Obligation** | Funding | Notifications | — |
+| Delivery margin | **Margin escalation** | **Capacity** | — | Funding | **Advance warning** | — |
+| Settlement calendar | — | — | **Every date** | **Every funding date** | Credit release | — |
+| Response files on submissions | — | — | — | — | — | **Whether the firm reported** |
+
+## 4. The daily total, honestly
+
+A firm active on cash, equity derivatives, currency and commodity faces, on an **ordinary** day:
+
+| Class | Approximate ingest-and-apply events |
+|---|---|
+| Risk parameter batches across segments | **Around twenty-five to thirty** |
+| Cash value-at-risk batches | Six |
+| Delta file batches | Several |
+| Masters, lists and reference files at begin of day | Around a dozen |
+| Margin and short-allocation files, intraday and end of day | Several per segment |
+| End-of-day settlement, trade, obligation and collateral files | Around twenty |
+| Depository and bank files | Several |
+| Response files on whatever was submitted | One per submission |
+
+**Order of magnitude: forty to fifty distinct ingest-and-apply events on an ordinary day**, of which **roughly fifteen to twenty are intraday** and therefore unattended. A settlement day, an expiry, a tender day, a corporate-action record date, a post-holiday day or a month end each add to it.
+
+**This number is the argument for the architecture.** It is too many to operate manually, too many for a per-file bespoke job, and too varied for a single schedule — which is why the register, the manifest and the applied-state assertion exist rather than a folder of scripts.
+
+## 5. Gates against degradations
+
+| Ingestion | If missing |
+|---|---|
+| Instrument and contract master | **Do not open** |
+| Collateral and ledger load | **Do not open** |
+| Risk parameter batch, begin of day | **Segment stays closed, or opens on the pre-decided fallback** |
+| Risk parameter batch, intraday | **Degrade**: continue on the last applied version, with the staleness recorded and compliance informed the same day |
+| Value-at-risk batch | As above, for the cash segment |
+| Ban-period list | **Block fresh positions in the listed underlyings** |
+| Surveillance indicator | **Apply the most restrictive prior treatment** |
+| Price bands | Reject outside the last known band |
+| Trade file | **No reconciliation, therefore no contract notes** — the pipeline chokepoint |
+| Obligation file | **Settlement cannot be instructed** |
+| Settlement prices | **Marking cannot be computed** |
+| Collateral statement | Capacity frozen at the last good value; **reductions only** |
+| Response file | **Treat the submission as unmade** |
+
+Every gate needs a **pre-decided fallback with a trigger time**, derived from the deadline it protects — see [handling exceptions](/broking-kyc/finix-broking-setup/files/08-file-handling-exceptions/).
+
+## 6. Scheduling
+
+| Concern | Position |
+|---|---|
+| Windows, not points | A file published at a stated time is available over a window. **Alert on the window's end**, not its start |
+| Overlap | Several end-of-day families land within the same hour across segments; the pipeline must parallelise by segment and serialise within one |
+| **The chokepoint** | Trade reconciliation gates everything downstream, and its input arrives at different times per segment |
+| The late segment | The commodity file arrives after the others, often after midnight — **a second pass, not a longer wait for everything** |
+| Intraday application | **Automated, with an applied-state assertion and a staleness alert.** No human in the loop at midday |
+| Staleness alerting | Per file, per segment, against its expected cadence — **the only detector for a silent intraday miss** |
+| Post-holiday | Multiple days accumulate, with an explicit supersede-or-accumulate decision per file |
+
+## 7. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.files.cadence.expected_count_per_file_per_day` | **E** | Per file, per segment | The basis for staleness detection |
+| `finix.files.cadence.staleness_alert` | **D** | **true** | Per file, against its cadence |
+| `finix.files.cadence.intraday_application_automated` | **D** | **true** | No human at midday |
+| `finix.files.cadence.applied_state_asserted` | **D** | true | Query the consumer, not the job |
+| `finix.files.cadence.parameter_variant` | **E** | Standard unless the firm opted for same-day marking | **The wrong variant mis-margins everyone** |
+| `finix.files.cadence.business_date_distinct_from_arrival` | **D** | **true** | The commodity and ban-list cases |
+| `finix.files.cadence.second_pass_for_late_segment` | **D** | **true** | Rather than delaying the whole pipeline |
+| `finix.files.cadence.alert_on_window_end` | **D** | true | Not on the expected time |
+| `finix.files.cadence.downstream_map_maintained` | **D** | **true** | The section 3 table, per file |
+| `finix.files.cadence.fallback_trigger_per_gate` | **D** | true | Derived from the protected deadline |
+
+## Practical notes
+
+- **Count your own ingestions and compare with section 4.** A firm that believes it has a dozen a day has not found the intraday batches.
+- **Alert on staleness per file, not on job failure.** The intraday miss does not fail; it simply stops updating.
+- **Maintain the downstream map in section 3 as configuration.** When a file is late, the question is what is now at risk, and that is a lookup rather than an investigation.
+- **Run a second pass for the late segment.** Holding the whole pipeline for the commodity file delays everything else that had a deadline.
+- **Verify the parameter variant at go-live and after any clearing change.** It is a single setting that silently mis-margins the entire book.
+- **Check the business-date handling on the two known traps** — the next-day-dated ban list and the next-calendar-day commodity file.
+
+## Where this connects
+
+The register, validation and applied-state model are in [the file register and its architecture](/broking-kyc/finix-broking-setup/files/01-file-register-architecture/); the per-venue detail in [<abbr title="National Stock Exchange of India">NSE</abbr> and NSE Clearing files](/broking-kyc/finix-broking-setup/files/02-nse-files/), [clearing corporation files](/broking-kyc/finix-broking-setup/files/05-clearing-corporation-files/) and [depository files](/broking-kyc/finix-broking-setup/files/06-depository-files/); and the failure handling in [handling exceptions](/broking-kyc/finix-broking-setup/files/08-file-handling-exceptions/). The continuous-measurement obligation these feed is [real-time and near-real-time obligations](/broking-kyc/finix-broking-setup/monitoring/02-realtime-near-realtime/), the gates are in [the master trading-day checklist](/broking-kyc/finix-broking-setup/daily-ops/10-master-trading-day-checklist/), and the capacity consequences in [the limit impact matrix](/broking-kyc/finix-broking-setup/rms/10-limit-impact-matrix/).

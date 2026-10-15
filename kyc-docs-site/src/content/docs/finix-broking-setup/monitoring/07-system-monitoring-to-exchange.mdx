@@ -1,0 +1,163 @@
+---
+title: "Monitoring 7: system monitoring communicated to the exchange"
+description: Whether a broker streams telemetry to the exchange or merely reports incidents — the answer differs by designation; the logging and monitoring parameter set and the conflicts in its published definition, the incident clocks and what changed in 2026, the one continuous link a small broker has from day one, and the per-client impact attribution that is the real engineering burden.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** There is one question a firm needs answered before it designs anything here — **does the exchange watch my systems continuously, or does it only hear from me when something breaks?** The answer is not the same for every broker, and getting it wrong in either direction is expensive: a firm that assumes continuous monitoring builds a telemetry pipeline it does not owe, and a firm that assumes incident-only reporting discovers at designation that it must serve a named parameter set in real time. So section 2 answers it by category, before anything else. Sections 5 and 6 then record the genuine conflicts in the published material rather than resolving them silently.
+
+## TL;DR
+
+- **A broker outside the exchange-designated list pushes no continuous telemetry.** Its obligations are **incident reporting plus internal self-monitoring**. That is the answer for a greenfield firm.
+- **Designated brokers do stream.** They stand up an interface gateway and make a named parameter set available, and the exchange independently monitors those parameters **in real time**.
+- **Whether that is a pull or a push is genuinely unresolved in the primary material** — one annexure says the values are *served by* the broker, an audit term of reference says data *is published in* a monitoring server. Both are primary. This page flags it rather than choosing.
+- **No exchange-installed agent appears in any primary source.** If a vendor proposes one, that is a vendor design, not a regulatory requirement.
+- **The parameter count itself is inconsistent** — the instrument lists fourteen, the auditor's terms of reference carry two extra. Build to the superset.
+- **No threshold values are published anywhere**, and no specific financial disincentive line exists for the parameters. The firm sets its own thresholds and must justify them.
+- **The one continuous link a small broker has from day one is a security one** — the cyber framework routes smaller regulated entities onto an exchange-operated security operations centre. That is security telemetry, not performance.
+
+## 1. Framework
+
+- **Technical glitch framework of 25 November 2022** — the original, with intimation within **one hour**, a preliminary report the next day, and a root-cause analysis within **fourteen days**. `[not yet in index]`
+- **Revised framework effective 9 January 2026** — intimation within **two hours**, a preliminary report the next day **with trading-holiday relief added**, and a root-cause analysis within **fourteen working days**. `[not yet in index]`
+- **Exchange inspection master of April 2026**, whose submissions exhibit carries an item for **parameters for monitoring technical glitches** with a periodicity of **real time**. `[not yet in index]`
+- **Exchange system-audit terms of reference of April 2026** — the auditor's scope over the monitoring mechanism, including the parameter list and the publication requirement. `[not yet in index]`
+- **The cyber security and resilience framework** — categorisation of regulated entities, and the routing of smaller entities onto an exchange-operated security operations centre. `[not yet in index]`
+- **Regulator press release of 2025** describing a **common reporting mechanism** that allows a common report to be filed at one exchange rather than at several, live from **1 August 2025**. `[not yet in index]`
+- **Regulator circular of 24 August 2026** — cyber incident reporting aligned to a standard report format. `[not yet in index]`
+
+## 2. The question, answered by category
+
+| Category | Continuous telemetry to the exchange? | What is actually owed |
+|---|---|---|
+| **A broker outside the designated list** — including every greenfield firm | **No** | **Incident reporting** on the glitch and cyber clocks, **internal self-monitoring** of the parameter set, capacity planning, and the audit evidence that both exist |
+| **A designated broker** | **Yes** | An **interface gateway** through which a **named parameter set is made available**, which the exchange **independently monitors in real time**, in addition to everything above |
+| Every broker, for security | **Yes, in substance** | The cyber framework routes smaller regulated entities onto an **exchange-operated security operations centre** — a continuous link, but **security telemetry rather than system performance** |
+
+<Aside type="danger" title="Designation is the switch, and it is not in the firm's control">
+The difference between these two postures is a list the exchange publishes, not a size the firm chooses. A firm below the line owes self-monitoring and incident reporting; a firm on the list owes a real-time interface. The engineering implications are entirely different, and the transition is not gradual — you are off the list, then you are on it.
+
+Two consequences for planning. **Build the parameter instrumentation from day one even while off the list**, because you owe the self-monitoring anyway and because the only thing designation then changes is exposure rather than measurement. And **treat the designated-broker interface as a known future project with a known trigger**, rather than something to discover when the list is published. The equivalent planning point for the enhanced-obligation regime generally is in [the 2026 regulatory change register](/broking-kyc/finix-broking-setup/compliance/06-regulatory-change-2026/).
+</Aside>
+
+## 3. The incident clocks
+
+| Obligation | 2022 framework | **Revised, effective 9 January 2026** |
+|---|---|---|
+| Intimation to the exchange | **Within one hour** of occurrence | **Within two hours** |
+| Preliminary incident report | Next day | Next day, **with trading-holiday relief added** |
+| Root-cause analysis | Within **fourteen days** | Within **fourteen working days** |
+| Cyber incident reporting | Within hours of detection, to the exchanges, the regulator and the national response team | Unchanged in timing; **aligned to a standard initial, intermediate and final report sequence** from August 2026 |
+
+**The clock runs from occurrence or detection**, not from escalation — which is why the compliance officer must be reachable at any hour, since they file. The internal path is in [escalation and on-call](/broking-kyc/finix-broking-setup/roles/05-escalation-oncall/) and the full incident treatment in [incident and breach reporting](/broking-kyc/finix-broking-setup/monitoring/05-incident-breach-reporting/).
+
+## 4. The reporting mechanism
+
+| Element | Position |
+|---|---|
+| The common reporting mechanism | Described at regulator level as a **technology-based common reporting mechanism enabling a common report to be filed at one exchange instead of at several**, live from **1 August 2025** |
+| Its name | **Verified at regulator level.** **The exchange's own circulars do not use that name** — they describe "technology-based sharing mechanisms of common submissions among exchanges" |
+| **A portal address** | **Does not appear in any source examined.** Do not configure one from a secondary reference |
+| What this means practically | Use the exchange's own described route and name, and treat the regulator-level name as the policy label rather than a system identifier |
+
+## 5. The parameter set, and its conflicts
+
+The monitoring mechanism has a named parameter set. Two things about it are inconsistent in the published material and both matter for implementation.
+
+| Conflict | Detail | How to handle it |
+|---|---|---|
+| **Count** | The instrument lists **fourteen** parameters. The **auditor's terms of reference carry two additional ones** — a network latency measure and a name-resolution failure measure | **Build to the superset.** The auditor examines against their own list, so instrumenting only the shorter one produces a finding |
+| **Pull or push** | One annexure describes the values as **served by** the broker, implying the exchange retrieves them. An audit term of reference asks whether data **is being published in** a monitoring server, implying the broker sends them | **Genuinely unresolved in primary material.** Design the gateway so it can do both — expose a retrievable endpoint and retain the ability to publish — and **obtain written clarification from the exchange** before committing to one |
+| **Thresholds** | **No threshold values are published anywhere** | **The firm sets its own, documents the basis, and has it reviewed.** An unjustified threshold is the finding, not a wrong number |
+| **A specific disincentive** | **No financial-disincentive line item exists for the parameters themselves** | The exposure is through the glitch framework and the inspection process, not a published per-parameter penalty |
+| **An exchange-installed agent** | **Appears in no primary source** | If a vendor proposes one, it is a vendor design choice. Do not describe it as mandated |
+
+<Aside type="caution" title="Why the pull-versus-push ambiguity is worth resolving in writing">
+This is not an academic distinction. A **pull** model means the firm exposes an authenticated endpoint, the exchange calls it on its own schedule, and availability of that endpoint becomes a monitored dependency — a firm whose gateway is down has stopped serving even if its trading systems are healthy. A **push** model means the firm is responsible for delivery, retry, backfill after an outage, and the question of what happens to data generated while the link was down.
+
+The security posture, the failure modes and the operational ownership all differ. Because both readings sit in current primary documents, the right action is a written question to the exchange rather than an inference, and the answer should be retained with the design. Building a gateway that can satisfy either is the cheap hedge in the meantime.
+</Aside>
+
+## 6. Two further discrepancies worth recording
+
+| Item | Detail |
+|---|---|
+| **"Top twenty" against the printed list** | A provision describing the designated population as the top twenty by client base **prints a list of forty-two names**. Do not compute your own designation from the stated rule — **use the published list** |
+| Dead text in a current master | The exchange's current master still describes the **investor risk reduction platform**, which was **discontinued on 7 May 2026**. Keep it out of runbooks and out of any outage promise to clients |
+
+The general lesson, which recurs across this manual: **a consolidated circular is not authority for the currency of everything in it.** See the change-management discipline in [the 2026 regulatory change register](/broking-kyc/finix-broking-setup/compliance/06-regulatory-change-2026/).
+
+## 7. The real engineering burden
+
+Not the telemetry. The hardest obligation in this area is **attribution of impact to clients**, for arbitrary windows, certified by an auditor and held immutably.
+
+| Requirement | Consequence |
+|---|---|
+| **Per-client impact attribution** | For an incident, the firm must be able to say **which clients were affected** |
+| **For arbitrary short windows** | Impact attributable over a small window rather than a whole session |
+| **Auditor-certified** | The method and the output are examined, not merely asserted |
+| **Immutable retention over years** | The underlying data cannot be summarised away afterwards |
+| What this means in design | Per-client, per-request outcome data at a granularity fine enough to window, with durable immutable storage sized for years — **a data-retention and lineage problem, not a monitoring one** |
+| Where it lands architecturally | The event log, which is already a regulatory record for order and trade purposes — see [the front-end gateway and the event architecture](/broking-kyc/finix-broking-setup/stack/bff-and-event-architecture/) |
+
+**This is the item most likely to be under-scoped.** Dashboards and alerts are straightforward; reconstructing, two years later, exactly which clients could not place an order during a particular few minutes is not, unless the data was captured at that granularity at the time.
+
+## 8. Capacity planning
+
+| Element | Position |
+|---|---|
+| The obligation | Capacity planned **proportionally to client and turnover growth** |
+| Who checks | The **system auditor**, as an explicit scope item |
+| What must exist | A documented plan, the basis of the projection, headroom measurement, and evidence that it is revisited as the business grows |
+| What is examined alongside | Software testing and change management **including vendor-provided order and risk systems**, log preservation, that order-placing and routing servers are at the broker's premises, and recovery-site and live-drill compliance |
+| The practical metric | **Headroom at peak**, measured rather than assumed, with the peak taken from observed load rather than a nominal figure |
+
+## 9. What the exchange sends the broker about the broker's own systems
+
+| Stream | Position |
+|---|---|
+| Latency, message rate or session-health alerting about the member's systems | **No such stream was established in the material examined.** The member monitors itself |
+| Operational notices, maintenance windows, release notes | Yes, through ordinary circulars and notices |
+| The utilisation broadcast and automatic trade cancellation | **Terminal messages**, and market-facing rather than system-health — see [real-time and near-real-time obligations](/broking-kyc/finix-broking-setup/monitoring/02-realtime-near-realtime/) |
+| Penalty and enforcement advices | Through the channels in [alerts received](/broking-kyc/finix-broking-setup/monitoring/04-alerts-received-and-response/) |
+
+## 10. Resilience indices and what is not yours
+
+| Item | Position |
+|---|---|
+| **The information-technology resilience index** | **A market-infrastructure-institution obligation only** — established from the addressee list, which names exchanges, clearing corporations and depositories rather than brokers. It carries nine weighted parameters |
+| Why it matters to a broker at all | Only as an interface: the institutions' resilience programmes may change what they expect of members. **Do not record it as a broker return** |
+| Market-infrastructure continuity consultation of September 2026 | Also theirs, and a **proposal** |
+
+## 11. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.monitoring.sys.designation_status` | **E** | From the published list | **Not computed from the stated rule** |
+| `finix.monitoring.sys.parameters_instrumented` | **R** interpretation | **The superset of both published lists** | The auditor checks against theirs |
+| `finix.monitoring.sys.gateway_supports_pull_and_push` | **D** | **true** | The ambiguity hedge |
+| `finix.monitoring.sys.exchange_clarification_obtained` | **D** | Required before committing | Retained with the design |
+| `finix.monitoring.sys.thresholds_documented` | **D** | **true, with the basis** | No values are published |
+| `finix.monitoring.sys.no_agent_assumed` | **D** | true | No primary source mentions one |
+| `finix.monitoring.sys.glitch_intimation_hours` | **R** | 2 from occurrence | Was 1 under the 2022 framework |
+| `finix.monitoring.sys.rca_working_days` | **R** | 14 | **Working** days under the revised framework |
+| `finix.monitoring.sys.per_client_impact_attribution` | **R** | **true** | Arbitrary short windows |
+| `finix.monitoring.sys.impact_data_immutable_years` | **R** | Per the framework's hold period | Sized for years |
+| `finix.monitoring.sys.capacity_headroom_measured` | **R** | true | Against observed peak |
+| `finix.monitoring.sys.market_soc_connected` | **R** | Per cyber categorisation | **Security telemetry, not performance** |
+| `finix.monitoring.sys.itri_is_not_a_broker_return` | **D** | true | Recorded so it is not adopted |
+
+## 12. Practical notes
+
+- **Settle the designation question first.** Everything else here is conditional on it, and it comes from a published list rather than a calculation.
+- **Instrument the superset of parameters from day one**, even off the list. You owe the self-monitoring, and designation then changes exposure rather than measurement.
+- **Get the pull-versus-push answer in writing** and keep it with the design. Both readings are currently supportable.
+- **Set thresholds and document why.** The absence of published values makes the justification the deliverable.
+- **Scope the per-client impact attribution early.** It is a retention and lineage problem and it is the item most often under-estimated.
+- **Do not describe an exchange-installed agent as required.** It appears nowhere in primary material.
+- **Measure headroom against observed peak, not a nominal figure**, because that is what the auditor will ask about.
+
+## Where this connects
+
+The incident clocks and their internal path are in [incident and breach reporting](/broking-kyc/finix-broking-setup/monitoring/05-incident-breach-reporting/) and [escalation and on-call](/broking-kyc/finix-broking-setup/roles/05-escalation-oncall/). The market-facing real-time obligations — a different subject from system telemetry — are in [real-time and near-real-time obligations](/broking-kyc/finix-broking-setup/monitoring/02-realtime-near-realtime/), and the overall picture in [the monitoring obligation map](/broking-kyc/finix-broking-setup/monitoring/01-monitoring-obligation-map/). The audit scope is in [the audit machinery](/broking-kyc/finix-broking-setup/compliance/05-audit-machinery/), the cyber controls in [cyber resilience configuration](/broking-kyc/finix-broking-setup/compliance/04-cyber-cscrf-config/), the event-log granularity in [the front-end gateway and the event architecture](/broking-kyc/finix-broking-setup/stack/bff-and-event-architecture/), and the infrastructure in [infrastructure and connectivity](/broking-kyc/finix-broking-setup/setup/08-infrastructure-connectivity/).

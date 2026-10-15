@@ -319,6 +319,7 @@ export default defineConfig({
                 { label: "Vendor Map", slug: "finix-broking-setup/stack/vendor-map" },
                 { label: "Environments & Config", slug: "finix-broking-setup/stack/environments-config-baseline" },
                 { label: "Integration Contracts", slug: "finix-broking-setup/stack/integration-contract-matrix" },
+                { label: "Gateway & Event Architecture", slug: "finix-broking-setup/stack/bff-and-event-architecture" },
               ],
             },
             {
@@ -421,6 +422,7 @@ export default defineConfig({
                 { label: "6. Upstreaming & Downstreaming", slug: "finix-broking-setup/money/06-upstreaming-downstreaming" },
                 { label: "7. Money & Trade in Sync", slug: "finix-broking-setup/money/07-money-trade-sync" },
                 { label: "8. Operations Catalogue", slug: "finix-broking-setup/money/08-money-operations-catalogue" },
+                { label: "9. Real-Time Limit Updates", slug: "finix-broking-setup/money/09-realtime-limit-updates" },
               ],
             },
             {
@@ -482,6 +484,7 @@ export default defineConfig({
                 { label: "7. Outbound Submissions", slug: "finix-broking-setup/files/07-outbound-submissions" },
                 { label: "8. Handling Exceptions", slug: "finix-broking-setup/files/08-file-handling-exceptions" },
                 { label: "9. Bank & Payment Files", slug: "finix-broking-setup/files/09-bank-payment-files" },
+                { label: "10. Ingestion Cadence Map", slug: "finix-broking-setup/files/10-ingestion-cadence-map" },
               ],
             },
             {
@@ -495,6 +498,7 @@ export default defineConfig({
                 { label: "4. Alerts & Response", slug: "finix-broking-setup/monitoring/04-alerts-received-and-response" },
                 { label: "5. Incident & Breach Reporting", slug: "finix-broking-setup/monitoring/05-incident-breach-reporting" },
                 { label: "6. AML Monitoring & Reporting", slug: "finix-broking-setup/monitoring/06-aml-monitoring-reporting" },
+                { label: "7. System Monitoring to Exchange", slug: "finix-broking-setup/monitoring/07-system-monitoring-to-exchange" },
               ],
             },
             {

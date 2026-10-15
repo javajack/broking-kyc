@@ -1,0 +1,251 @@
+---
+title: "Stack: the front-end gateway and the event architecture"
+description: How the confluence of order, risk, record, money and depository systems sits behind a per-channel gateway with an event-driven core — what must be synchronous and what must not, ordering and idempotency guarantees, the in-flight state problem, why an unacknowledged order must never be retried, back-pressure, and why the event log is a regulatory record rather than infrastructure.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Every page before this one describes a system or an obligation. This one describes the **substrate** they sit on, because the way a firm wires these systems together determines which failures are possible at all. The page leads with the two boundaries that must not move — the gateway must not be the risk boundary, and the exchange must remain authoritative for order state — then covers the event model's guarantees, then the specific failure modes that only exist in an asynchronous architecture. Section 7 is the most important: an unacknowledged order placement is the one message in this entire stack that must never be retried.
+
+## TL;DR
+
+- **The gateway is a channel adapter, not a business layer.** Risk decisions belong in the decision band. A gateway that evaluates risk gives each channel its own risk posture, which is precisely what a single pre-trade ladder exists to prevent.
+- **Order placement is a command; everything returning is an event.** The forward path needs a definitive synchronous answer; the reverse path is irreducibly asynchronous.
+- **Order ordering per order is essential; global ordering is not.** Partition by order identity and you get the guarantee you need without the throughput cost of total ordering.
+- **Delivery is at-least-once, so every consumer must be idempotent.** A fill applied twice doubles a position, and nothing downstream will tell you.
+- **Never retry an unacknowledged order send.** Retrying is how a firm places the same order twice at the exchange. The correct response is query-and-reconcile, and if state cannot be established, freeze entry.
+- **The event log is the order log.** It is append-only, non-tamperable and retained for years because it is a regulatory record, which constrains the technology choice.
+
+## Conceptual overview
+
+A broking stack has an unusual property: it is a distributed system in which one participant — the exchange — is authoritative, cannot be asked to repeat itself conveniently, and will not reconcile on your behalf. Almost every architectural rule here follows from that asymmetry. Internally the firm may choose its consistency model; externally it has none to choose. So the design problem is not "how do these systems agree" but "how does the firm converge on what the exchange already decided, fast enough to act and durably enough to explain".
+
+The second idea is that the channels differ in everything except the decision. A dealer terminal, a mobile application, a web front end and a programmatic interface have different latency expectations, different session models, different authentication, different presentation of the same state, and different failure handling. What they must not have is different risk treatment. The architecture that satisfies both is a thin per-channel gateway over a single decision path — the gateway shapes the request and the response, and the decision is made once, in one place, by one evaluation of the ladder in [the pre-trade check ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/). Every attempt to optimise by moving a check into the gateway produces a channel-specific risk posture that nobody intended and that an inspection will find.
+
+The third idea concerns the vendor reality. A named stack of this kind is not event-native. An order and risk product exposes synchronous interfaces and files; a back office consumes files and produces files; a depository interface is request-response with batch exports. The event architecture therefore wraps products rather than replacing them, and the **adapter is where the guarantees are enforced** — idempotency, ordering, deduplication and replay all live in the adapter layer because the vendor product does not provide them. Treating a middleware or orchestration component as if it already guaranteed these is the commonest way a firm discovers it has none. Note that SecMark's published middleware and interface suite describes order orchestration, real-time risk checks, margin validation, trade lifecycle and reconciliation functions `[public]`, which is the right shape for this layer; what any given deployment actually guarantees is a question for the integration contract rather than the brochure.
+
+## 1. The two boundaries that must not move
+
+| Boundary | Rule | Consequence of moving it |
+|---|---|---|
+| **The gateway is not the risk boundary** | Risk is evaluated once, in the decision band, for every channel | Per-channel risk posture; a limit enforced on web and not on the programmatic interface; an inspection finding that the ladder is not uniformly applied |
+| **The exchange is authoritative for order state** | The firm's record converges toward the exchange; never the reverse | A position the firm believes in and nothing external supports — the class of incident reconciliation cannot fix afterwards |
+
+Two corollaries worth stating because they are routinely violated:
+
+- **The gateway must not cache risk state.** A cached available-capacity figure is a stale figure, and the window in which it is stale is exactly the window in which a client places a second order.
+- **The record band must not be in the synchronous path.** A ledger write that blocks an order release couples the order path's availability to the back office's.
+
+## 2. Commands and events
+
+| Direction | Nature | Needs |
+|---|---|---|
+| **Client to venue** | **A command** — place, modify, cancel, convert | A **definitive synchronous answer**: accepted and forwarded, or rejected with a reason. "Submitted" is not an answer a client can act on |
+| **Venue to client** | **Events** — acknowledgement, rejection, fill, partial fill, freeze outcome, cancellation, administrative message, trade cancellation | **Asynchronous, ordered per order, idempotent, fanned out to several consumers with different criticality** |
+
+The asymmetry drives the architecture. Commands need low latency and a clear outcome, so they run a short synchronous path with a strict latency budget. Events need durability, ordering and replay, so they run through a log. Conflating the two — making placement asynchronous, or making the reverse path synchronous — produces either a client who does not know whether they have an order, or a reverse path that stalls when one consumer is slow.
+
+## 3. The in-flight state problem
+
+An order exists in three places and they are never simultaneously current.
+
+| Holder | What it knows | When it is wrong |
+|---|---|---|
+| **The exchange** | The truth | Never, from the firm's perspective |
+| **The order system** | What it has been told, plus what it sent | Between sending and acknowledgement; after a dropped message; after a sequence gap |
+| **The client's view** | A projection of the order system | Whenever the projection lags, and whenever the order system itself is wrong |
+
+| State | Meaning | Handling |
+|---|---|---|
+| Intent recorded | The firm has decided to place | Durable before sending — see the outbox in section 4 |
+| **Sent, unacknowledged** | **The dangerous state.** The exchange may or may not have it | **Query, never retry.** See section 7 |
+| Acknowledged | The exchange has it, with its identifier | Normal |
+| Terminal | Filled, cancelled, rejected, expired | Margin released, client notified, record written |
+| **Unknown** | State cannot be established | **Freeze entry for the scope affected and reconcile.** Do not accept new orders into uncertainty |
+
+**The client's view must be driven from the order system, not from the gateway's optimism.** A gateway that shows an order as placed before acknowledgement is showing a state that may never become true.
+
+## 4. The forward path, mechanically
+
+| Step | Requirement |
+|---|---|
+| 1 | The gateway authenticates, resolves the channel and the acting identity, and shapes the request. **No risk evaluation** |
+| 2 | **Attribution is fixed here**: client code, dealer identifier where assisted, channel, and the instruction record where the order is on a client's instruction |
+| 3 | The decision path evaluates the ladder **once** |
+| 4 | **The intent and the outbound message are persisted atomically** — the outbox pattern. A crash after sending and before persisting is otherwise indistinguishable from a crash before sending |
+| 5 | Margin is blocked **before** the message leaves, not after acknowledgement. Otherwise a fast fill arrives against unblocked capacity |
+| 6 | The message is sent on the venue session, with its own sequence discipline |
+| 7 | The synchronous answer returns to the client: accepted and forwarded, or rejected with a mapped reason |
+| 8 | The acknowledgement arrives asynchronously and reconciles against the outbox entry |
+
+<Aside type="caution" title="Margin blocks before the send, and the window that creates">
+Blocking margin before the message leaves means that a message which is then rejected by the venue has blocked capacity that must be released on the rejection event. That release is a reverse-path obligation, and **a lost release is a silent capacity leak** — the client's capacity is consumed by an order that does not exist. It is invisible because nothing fails; the client simply has less capacity than they should and nobody can say why.
+
+The control is the daily reconciliation of margin blocks against live orders and positions, listed as a check in [the limit impact matrix](/broking-kyc/finix-broking-setup/rms/10-limit-impact-matrix/). Run it intraday as well as at close on any day with elevated rejection rates, because a configuration error that rejects a high proportion of orders will leak capacity across the whole client base within minutes.
+</Aside>
+
+## 5. The event model's guarantees
+
+| Guarantee | Position |
+|---|---|
+| **Ordering** | **Per order, strictly.** An acknowledgement cannot be processed after a fill on the same order. **Global ordering is not required** and buying it costs throughput |
+| Partitioning | By order identity, which gives per-order ordering. Partitioning by client gives per-client ordering as well, which several consumers want |
+| **Delivery** | **At-least-once.** Exactly-once delivery does not exist; **exactly-once effect** is achieved by idempotent consumers and a deduplication store |
+| **Idempotency key** | On every event: venue, session, sequence, order identity, event type. A consumer that has seen the key ignores the repeat |
+| Durability | The log is the record. See section 9 |
+| **Replay** | The order book must be rebuildable from the log. This is the crash-recovery path and it must be exercised, not assumed |
+| Schema evolution | Additive only on a stream that is replayed, because a replay runs old events through new code |
+| Clock | **Venue timestamps are authoritative for sequence and for the audit trail**; the firm's own clock is for latency measurement. Do not order events by local arrival time |
+
+### The reverse-path fan-out
+
+One venue message feeds several consumers with different needs.
+
+| Consumer | Criticality | Ordering need | Note |
+|---|---|---|---|
+| **Order state** | Highest | Strict per order | The projection the client sees derives from this |
+| **Risk — margin release or conversion** | Highest | Strict per order | **A missed release is a capacity leak; a missed conversion understates exposure** |
+| Position keeping | High | Per client per instrument | — |
+| **Client notification** | High | After state and risk | So a client told "cancelled" can immediately re-place |
+| Back office capture | Medium | Eventual | Reconciled against the venue trade file regardless |
+| Surveillance | Medium | Eventual | Pattern detection tolerates lag |
+| Analytics and metrics | Low | None | Must never back-pressure the path |
+
+**The ordering constraint between risk and notification is a real one** and it is the most common fan-out mistake: notify first and the client sees a terminal state before their capacity returns, which generates a support contact every single time.
+
+## 6. Back-pressure
+
+What happens when a downstream stage is slower than the inbound rate. The answer must be chosen deliberately, because the default is always wrong.
+
+| Option | Verdict |
+|---|---|
+| **Drop events** | **Never.** A dropped fill is a position the firm does not know about |
+| **Reorder to make progress** | **Never.** Breaks the per-order guarantee |
+| Queue without bound | **No.** Latency grows until the state is useless and the client is acting on fiction |
+| **Queue with a bounded latency budget, and shed at the channel beyond it** | **Correct.** Reject new orders with a clear reason while the backlog drains. A client told "not accepting orders" is in a far better position than one whose order is in an unbounded queue |
+| Scale the slow stage | Correct where possible, and not available within the incident |
+
+**Shedding belongs at the channel, not in the middle.** Rejecting at the gateway produces a clean, explainable rejection; dropping in the middle produces an order in an unknown state, which is the worst state in section 3.
+
+The corresponding risk-desk intervention is the entry freeze, R-59 and O-59 in [the <abbr title="Risk Management System">RMS</abbr>](/broking-kyc/finix-broking-setup/rms/11-operations-catalogue/) and [<abbr title="Order Management System">OMS</abbr>](/broking-kyc/finix-broking-setup/oms/11-operations-catalogue/) operations catalogues.
+
+## 7. The one message that must never be retried
+
+<Aside type="danger" title="An unacknowledged order send is not a retryable operation">
+Every other integration in this stack benefits from a retry with backoff. **Order placement does not.** If an order message was sent and no acknowledgement arrived, the exchange may already hold that order. Sending it again does not recover from a failure; it **places a second order**, and the client ends up with twice the position they asked for, at prices they did not choose, with a firm that cannot explain how it happened.
+
+The correct sequence is:
+
+1. **Do not resend.**
+2. **Query** — use the venue's order-state retrieval or the independent verification stream, and establish whether the order exists.
+3. **If it exists**, reconcile the local record toward it.
+4. **If it does not exist**, and the session is healthy, the order may be placed — once, as a new placement with a new identity, recorded as such.
+5. **If state cannot be established**, **freeze order entry for the affected scope** and escalate. Accepting orders into uncertainty compounds the problem across every client on that session.
+
+This generalises: in the forward path, **a timeout is a reconciliation trigger, not a retry trigger.** The same logic applies to modify and cancel, where a retried cancel is usually harmless and a retried modify is not. Build the client library so that retry is not available on these operations — a comment is not a control.
+</Aside>
+
+## 8. Sequence discipline and independent verification
+
+| Element | Position |
+|---|---|
+| Sequence continuity | Monitored continuously, per venue and per session. **Divergence means state has already diverged**, not that it is about to |
+| On a gap | **Freeze entry, recover state, then resume.** Continuing to send across a gap produces orders whose outcome cannot be attributed |
+| Per-session scope | Sequence numbers are **per session**, so a firm with several sessions — including a venue requiring a session per segment — has several independent sequence spaces and must not conflate them |
+| **An independent verification stream** | Where the venue provides a parallel copy of the firm's own activity, it is the strongest available cross-check on the primary path, because it is produced by the venue rather than inferred by the firm. Availability and naming differ by venue — see [exchange connectivity protocols](/broking-kyc/finix-broking-setup/oms/02-exchange-connectivity-protocols/) |
+| Divergence metric | A continuously computed count of orders whose local state disagrees with the venue's. **Target zero, alert on one** |
+
+## 9. The log is a regulatory record
+
+This constrains the technology more than any performance requirement.
+
+| Requirement | Consequence |
+|---|---|
+| **Append-only** | No in-place correction of a recorded event. Corrections are new events referencing the old |
+| **Non-tamperable** | Required explicitly for order, trade and terminal-login records |
+| **Retention of years** | Identifier and terminal records for at least five years; the general broker books obligation is eight. A log compacted at thirty days is not a record |
+| Reconstructable | The order and trade trail must be answerable without a database restore |
+| Includes the full field set | Order identifier, timestamp, type, instrument, action, quantity, price, validity, and the terminal address |
+| **Attribution** | Every event traceable to a channel, an identity and, where assisted, an instruction record |
+
+The practical consequence: an event substrate chosen purely for throughput, with short retention and compaction, cannot be the system of record. Either it is configured to be one, or the record is written durably alongside it — and the second option introduces the possibility of the two disagreeing, which must then itself be reconciled.
+
+## 10. Multi-venue and multi-channel particulars
+
+| Particular | Handling |
+|---|---|
+| A logical order routes to one venue | The event stream is per venue and per session; **never merge sequence spaces** |
+| A venue requiring a session per segment | Several sessions under one participant identity — see [<abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> cash and derivatives](/broking-kyc/finix-broking-setup/exchanges/03-bse-cash-fno/) |
+| Smart routing | A routing decision creates a parent and child orders with their own lifecycles; the client sees the parent |
+| Dealer and client orders | Same decision path, different attribution, and the instruction record on assisted orders |
+| Programmatic access | Rate limiting and tagging at the channel, with a **daily session logout** |
+| Algorithmic strategies | A kill capability that stops generation, paired with a bulk cancel for orders already in flight |
+| The commodity evening session | A second operating window on the same substrate, with its own named owner |
+
+## 11. Observability
+
+| Signal | Why |
+|---|---|
+| Per-stage latency, at percentiles | Degradation precedes outage, and the budget is allocated per stage |
+| **Queue depth and age per partition** | The back-pressure decision depends on it |
+| **Unacknowledged order count and age** | The section 7 trigger |
+| **State divergence count** | The strongest single health signal |
+| Sequence continuity per session | — |
+| Rejection rate and reason distribution | A spike is configuration or parameters, not clients |
+| **Margin block total against live orders and positions** | The capacity-leak detector |
+| Consumer lag per stream | Which consumer is falling behind, and whether it matters |
+| Deduplication hit rate | A rising rate means something upstream is redelivering |
+| Replay duration | How long recovery actually takes, measured rather than assumed |
+
+## 12. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.stack.bff.evaluates_risk` | **D** | **false** | The gateway is an adapter |
+| `finix.stack.bff.caches_risk_state` | **D** | **false** | A cached capacity is a stale capacity |
+| `finix.stack.bff.shows_order_before_ack` | **D** | **false** | Do not show a state that may never be true |
+| `finix.stack.event.partition_key` | **D** | Order identity, and client | Gives the ordering needed |
+| `finix.stack.event.delivery` | **D** | At-least-once, idempotent consumers | Exactly-once effect, not delivery |
+| `finix.stack.event.idempotency_key_components` | **D** | Venue, session, sequence, order, event type | — |
+| `finix.stack.event.order_by_venue_timestamp` | **D** | **true** | Not local arrival |
+| `finix.stack.event.outbox_atomic_with_send` | **D** | **true** | Intent and message together |
+| `finix.stack.event.margin_block_before_send` | **D** | **true** | With release on rejection |
+| `finix.stack.event.fanout_order` | **D** | State, risk, then notification | The client-experience constraint |
+| `finix.stack.event.backpressure` | **D** | Bounded budget, shed at the channel | **Never drop, never reorder** |
+| `finix.stack.event.latency_budget_ms` | **D** | Defined per stage | Shed beyond the total |
+| `finix.stack.order.retry_on_unacked` | **D** | **false — not available in the client library** | The section 7 rule |
+| `finix.stack.order.timeout_triggers_reconcile` | **D** | **true** | Not a retry |
+| `finix.stack.order.unknown_state_freezes_entry` | **D** | **true** | Scoped to the affected session |
+| `finix.stack.event.sequence_space_per_session` | **D** | true | Never merged |
+| `finix.stack.event.log_is_system_of_record` | **R** interpretation | true | Append-only, non-tamperable |
+| `finix.stack.event.log_retention_years` | **R** | 8, with identifier records at least 5 | No compaction below it |
+| `finix.stack.event.replay_rebuilds_order_book` | **D** | true | Exercised, not assumed |
+| `finix.stack.event.divergence_alert_threshold` | **D** | **1** | Target zero |
+
+## 13. What to rehearse
+
+An architecture of this kind has failure modes that only appear under fault, so they have to be induced deliberately.
+
+| Drill | What it proves |
+|---|---|
+| Kill the venue session mid-flight with orders outstanding | That entry freezes, state is recovered, and nothing is retried |
+| Introduce a sequence gap | That the gap is detected and entry freezes |
+| Slow the risk stage below the inbound rate | That back-pressure sheds at the channel rather than queueing unboundedly |
+| Redeliver a batch of events | That consumers are idempotent and positions do not double |
+| Crash a consumer and restart it | That it resumes from its offset without loss or duplication |
+| **Replay the log into an empty order book** | That the book is reconstructable, and how long it takes |
+| Fail the record band | That the order path stays available |
+| Fail the gateway for one channel | That other channels are unaffected and risk posture is unchanged |
+
+## Practical notes
+
+- **Make retry unavailable on order placement in the client library.** This is the single highest-value line of code on this page.
+- **Measure state divergence continuously and alert on one.** It is the earliest signal of the failures that matter most.
+- **Reconcile margin blocks against live orders daily, and intraday on high-rejection days.** Capacity leaks are silent and cumulative.
+- **Put the guarantees in the adapters.** Vendor products will not provide idempotency, ordering or replay, and assuming otherwise is how a firm discovers it has none.
+- **Exercise replay.** An unexercised recovery path is a plan, and recovery time is a number you should know rather than discover.
+- **Order by venue timestamp.** Local arrival ordering is subtly wrong in exactly the cases that matter.
+
+## Where this connects
+
+The logical paths this substrate carries are [the order forward path](/broking-kyc/finix-broking-setup/oms/06-order-forward-path/) and [the order return path](/broking-kyc/finix-broking-setup/oms/07-order-return-path/), with the decision in [the pre-trade check ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/) and the edge cases in [the order return path](/broking-kyc/finix-broking-setup/oms/07-order-return-path/). The interface inventory is [the integration contract matrix](/broking-kyc/finix-broking-setup/stack/integration-contract-matrix/) and the boundaries are in [the stack overview](/broking-kyc/finix-broking-setup/stack/). Recovery architecture is [mock trading and drills](/broking-kyc/finix-broking-setup/certification/05-mock-trading-and-drills/), the file side is [the file register](/broking-kyc/finix-broking-setup/files/01-file-register-architecture/), and the operator interventions are in [the OMS operations catalogue](/broking-kyc/finix-broking-setup/oms/11-operations-catalogue/).

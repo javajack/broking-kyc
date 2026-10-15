@@ -1,0 +1,181 @@
+---
+title: "Money 9: real-time limit updates"
+description: How a payment becomes trading capacity and how fast it can honestly be — the event chain from rail to client view, why a batch extract alone cannot do it, the delta-plus-extract design that can, the drift reconciliation that keeps it honest, and the attribution step that bounds the whole thing.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** [The limit impact matrix](/broking-kyc/finix-broking-setup/rms/10-limit-impact-matrix/) says *what* each money event does to capacity and when. This page says *how* the "when" is achieved, because the timing is an architectural outcome rather than a policy choice. The page leads with the event chain so the latency is visible hop by hop, then states plainly why the default vendor-stack design cannot deliver a real-time experience, then gives the design that can — and the reconciliation without which that design silently drifts.
+
+## TL;DR
+
+- **Capacity is computed inside the firm from facts that originate outside it.** Every hop between the rail and the client's screen adds latency, and the chain is longer than it looks.
+- **A periodic back-office extract alone cannot give a real-time experience.** It is the authoritative path and it is the wrong latency. The answer is not to speed it up.
+- **The design that works is delta-plus-extract**: an intraday event stream applies credits and debits to capacity between cycles, and the authoritative extract reconciles it at each boundary.
+- **Without drift reconciliation that design fails silently.** Delta-applied capacity must equal extract-derived capacity at every boundary, and a mismatch must alert.
+- **Attribution bounds everything.** Capacity cannot be credited to a client who cannot be identified, which is why a virtual account per client is an architectural decision rather than a convenience.
+- **Pay-out blocks at request, not at instruction** — and that block must also flow through the same event path, or the client trades against money already promised away.
+
+## Conceptual overview
+
+The uncomfortable fact about this problem is that the firm is not the source of any of the inputs. A credit exists when a bank says so, in a statement or a notification whose timing the firm does not control. A gateway's confirmation and its settlement to the firm are different events on different days. A collateral value exists when a clearing corporation says so. A charge exists when a trade executes but is quantified when a rate master is applied. Capacity is a computation over facts the firm learns about, and its freshness is bounded by the slowest input it depends on — which means the honest engineering question is not "can we make this real-time" but "which inputs can be made fast, and what do we show the client about the ones that cannot".
+
+The second idea is that there are two legitimate paths with different properties, and the mistake is choosing one. The **authoritative path** runs through the ledger: a receipt is attributed, posted, included in a balance, extracted and loaded into the risk engine. It is correct, it is auditable, it is the basis of every regulatory computation, and it is slow. The **fast path** applies a delta directly to capacity on an event: a receipt arrives, capacity rises. It is quick, it is what the client expects, and on its own it drifts away from the truth. Running both, with the authoritative path periodically correcting the fast one, gives a system that is responsive and does not lie — provided the correction is measured rather than assumed.
+
+The third point is about where the real limit sits. In almost every deployment the binding constraint on "funds reflected" is not the risk engine or the ledger but **attribution**: a credit landing in a pooled account with an unusable reference cannot be allocated to a client, and no amount of event-driven architecture downstream helps. A firm that invests in low-latency propagation while leaving attribution to reference-string parsing has optimised the fast part of a chain that is gated by the slow part. Virtual accounts move the bound; nothing else does.
+
+## 1. The event chain
+
+Each hop has its own latency and its own failure mode.
+
+| Hop | What happens | Typical latency source | Failure mode |
+|---|---|---|---|
+| 1 | Client initiates on a rail | The rail | Client error, wrong destination |
+| 2 | **Money arrives** at the firm's client account | **The rail's settlement behaviour** — instant on some, deferred on others | Returned, reversed, delayed |
+| 3 | **The firm learns of it** — a gateway notification, an intraday statement line, a virtual-account receipt report | **The notification mechanism.** A notification is far faster than a statement | Notification missed; statement not yet available |
+| 4 | **Attribution** to a client | **The reference, or the virtual account** | **Unattributable — the hard stop** |
+| 5 | Policy gate | Is this rail eligible to create capacity? Is the client in shortfall? | Policy not applied |
+| 6 | **Capacity updated** | The fast path, or the next extract | Not applied; applied twice |
+| 7 | **Client view updated** | Projection refresh or push | Client sees stale capacity |
+| 8 | Ledger posting | The back-office cycle | — |
+| 9 | Authoritative extract into risk | The extract cycle | **Drift between fast path and extract** |
+
+**The published promise to the client should describe hop 7**, and the firm should measure hops 3, 4 and 6 separately, because they fail for different reasons and only one of them is an engineering problem.
+
+## 2. Why the default design cannot do it
+
+A named vendor stack wires this the obvious way: the back office owns the ledger, produces an extract, and the risk engine loads it. That design is correct and insufficient.
+
+| Property | Consequence |
+|---|---|
+| The extract is periodic | Capacity changes only at extract boundaries |
+| The extract is whole-state | It is expensive, so it runs less often |
+| The ledger posts on its own cycle | A receipt may be attributed but not yet posted |
+| The risk engine trusts the extract | So it cannot know about anything newer |
+| **Net effect** | **A client who pays between extracts has no capacity until the next one**, however fast the money arrived |
+
+Speeding up the extract is the instinctive fix and it is the wrong one: a whole-state extract run frequently is expensive, still discrete, and a heavier load on the back office exactly when it is busiest. The begin-of-day gate already depends on that extract being correct and current — see item C-0.08 in [the master trading-day checklist](/broking-kyc/finix-broking-setup/daily-ops/10-master-trading-day-checklist/) — and making it more frequent puts that dependency under more strain, not less.
+
+## 3. The design that works
+
+| Element | Design |
+|---|---|
+| **Authoritative path** | Unchanged: attribution, ledger posting, periodic whole-state extract into the risk engine. **This remains the basis of every regulatory computation** |
+| **Fast path** | An **intraday delta stream** of capacity-affecting events: attributed receipt, pay-out request, pay-out rejection, reversal, collateral confirmation, collateral revaluation, charge accrual, penalty debit |
+| Application | The risk engine holds the extract-derived baseline **plus** the applied deltas since the extract |
+| **Reconciliation at each boundary** | When the next extract lands, **the baseline-plus-deltas figure must equal the new extract figure**. A difference is drift and must alert |
+| Idempotency | Every delta event carries a key; a replay must not apply twice |
+| Ordering | Per client, so a credit and a subsequent debit apply in order |
+| Reset | The extract **replaces** the baseline and the delta set is cleared, rather than the deltas being carried forward |
+| **Direction asymmetry** | **Debits apply immediately and unconditionally. Credits apply subject to the policy gate.** When in doubt, reduce |
+
+<Aside type="danger" title="Drift reconciliation is the control, not the nicety">
+The delta-plus-extract design has one failure mode and it is silent: a delta applied that the ledger never posts, or a ledger posting that no delta represented, leaves the fast path and the authoritative path permanently disagreeing. Nothing errors. Clients simply have slightly wrong capacity, in one direction for some and the other for others, and the discrepancy compounds across extracts.
+
+So the reconciliation is not a health check, it is the control that makes the design legitimate: **at every extract boundary, compare baseline-plus-deltas against the new extract, per client, and alert on any non-zero difference.** Expect it to be exactly zero, not approximately zero — a tolerance band here hides exactly the defects it exists to find. When it is non-zero, the extract wins and the delta path has a bug, because the ledger is the authoritative record. Keep the per-client differences, because the pattern of which clients drift identifies the defective event type immediately.
+</Aside>
+
+## 4. Pay-out, which flows the other way
+
+| Event | Capacity effect | Timing | Note |
+|---|---|---|---|
+| **Pay-out requested** | **Reduce by the requested amount** | **On request** | **The commonly missed one.** Otherwise the client trades against money already promised to their bank |
+| Pay-out approved and instructed | No further reduction | — | Already reduced at request |
+| Pay-out rejected by the firm | **Restore** | On rejection | Promptly, or it is a complaint |
+| Pay-out failed or returned by the bank | Restore | On the return | **Re-attribution risk** |
+| Running-account settlement | Reduce | On the run | Expected and dated; clients should be told |
+
+The pay-out request is a firm-internal event, so it is the easiest thing on this page to propagate in real time — and it is nonetheless the one most often left to the extract, because the pay-out queue and the risk engine are different systems updated by different triggers. It is the clearest example of the general rule: **an event that originates inside the firm has no excuse for propagating slowly.**
+
+## 5. The interaction that causes complaints
+
+| Element | Position |
+|---|---|
+| The scenario | A client receives a margin call, pays immediately on a fast rail, and is squared off before the credit reaches capacity |
+| Every step is correct | The call was valid, the payment was made, the square-off followed policy |
+| **The outcome is indefensible** | — |
+| Control one | **A short, measured, published attribution interval** |
+| Control two | **An evidenced-but-unattributed payment suspends the square-off clock** for a bounded period |
+| Control three | A reference mechanism that lets the desk find the payment |
+| **Control four** | **The square-off checklist requires the operator to check pending receipts for that client before executing** — ten seconds, and it prevents the complaint |
+| The metric | **Square-offs where a receipt for that client existed in the pending queue.** Target zero; any occurrence is a process failure rather than bad luck |
+
+This is R-32 and the receipt-grace configuration in [the <abbr title="Risk Management System">RMS</abbr> operations catalogue](/broking-kyc/finix-broking-setup/rms/11-operations-catalogue/).
+
+## 6. The other capacity-affecting event streams
+
+The same delta mechanism carries these, and all of them are commonly left to the extract.
+
+| Stream | Event | Note |
+|---|---|---|
+| **Collateral** | Pledge **confirmation** — not the request | The confirmation is the fact |
+| Collateral | Intraday revaluation on a sharp move | A policy choice with real consequences on volatile days |
+| Collateral | Haircut or eligibility change on applying a new file | Can be large and sudden |
+| **Charges** | **Accrual** per executed trade | The accrual block; without it, capacity overstates all day and the client is surprised at close |
+| Charges | Actual posting replacing the estimate | At end of day |
+| Penalties | Debit on the penalty file | After allocation |
+| Positions | Margin block, conversion on fill, release on terminal state | From the order event stream, not the money one |
+| Marking | Adverse daily settlement | **Reduce immediately** |
+| Corporate actions | Dividend and other credits on posting | — |
+
+**One rule governs all of them:** anything that **reduces** capacity propagates immediately and unconditionally; anything that **increases** it passes the policy gate first.
+
+## 7. How fast can this honestly be
+
+| Bound | Reality |
+|---|---|
+| **The rail** | Instant on some rails, deferred on others, and the client does not distinguish. **The firm must** |
+| **The notification** | A gateway or virtual-account notification is far faster than waiting for a statement line. Where an intraday statement exists, use it; where it does not, the statement is a reconciliation input rather than a detection one |
+| **Attribution** | **The binding constraint in most deployments.** A virtual account per client removes it; reference parsing does not |
+| Policy | Instant, if the rail-eligibility policy is configured rather than decided per case |
+| The delta application | Milliseconds |
+| The client view | A push, or a short poll |
+| **The honest answer** | **For an instant rail with a virtual account, seconds. For a deferred rail, as fast as the bank tells you. For an unattributable receipt, not at all until a human intervenes** |
+| What to publish | The expectation for the common case, and a clear message for the others. **A client told "funds reflect within N minutes" is patient; one told nothing calls after two** |
+
+## 8. Monitoring
+
+| Metric | Why |
+|---|---|
+| **Attribution lag**, percentiles | The client-experience metric |
+| **Unattributed receipts: count and age** | The structural problem, not a queue |
+| **Credit-to-capacity latency**, percentiles | The engineering metric, measured separately from attribution |
+| **Drift at each extract boundary, per client** | **The correctness control** |
+| Delta events applied against ledger postings | Both directions |
+| Deduplication hit rate on delta events | A rise means something is redelivering |
+| **Square-offs with a pending receipt** | Target zero |
+| Pay-out requests not yet reflected in capacity | Should be empty |
+| Capacity shown to client against capacity computed | The projection's own lag |
+
+## 9. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.money.rt.delta_stream_enabled` | **D** | **true** | Alongside the authoritative extract |
+| `finix.money.rt.extract_remains_authoritative` | **D** | **true** | The regulatory basis |
+| `finix.money.rt.drift_tolerance` | **D** | **Zero** | **A tolerance band hides the defect it should find** |
+| `finix.money.rt.drift_alert_per_client` | **D** | true | The pattern identifies the event type |
+| `finix.money.rt.baseline_reset_on_extract` | **D** | true | Deltas cleared, not carried |
+| `finix.money.rt.debits_apply_unconditionally` | **D** | **true** | Reduce first, ask later |
+| `finix.money.rt.credits_pass_policy_gate` | **D** | true | Rail eligibility, shortfall status |
+| `finix.money.rt.payout_blocks_at_request` | **D** | **true** | On the same delta path |
+| `finix.money.rt.idempotency_on_delta_events` | **D** | true | Replays must not double |
+| `finix.money.rt.ordering_per_client` | **D** | true | Credit then debit, in order |
+| `finix.money.rt.attribution_interval_published` | **D** | true | And measured |
+| `finix.money.rt.virtual_account_per_client` | **D** | **Preferred** | Removes the binding constraint |
+| `finix.money.rt.receipt_suspends_squareoff_clock` | **D** | true | Bounded, on evidence |
+| `finix.money.rt.accrual_block_on_delta_path` | **D** | true | So charges reduce capacity intraday |
+| `finix.money.rt.intraday_collateral_revaluation` | **D** | Above a move threshold | A deliberate decision |
+
+## Practical notes
+
+- **Reconcile drift at every boundary with zero tolerance, per client.** It is the only thing that makes the fast path trustworthy.
+- **Put the pay-out request on the delta path first.** It is internal, it is easy, and it closes a real exposure.
+- **Fix attribution before optimising propagation.** A virtual account per client is worth more than any amount of event-stream engineering.
+- **Measure attribution lag and credit-to-capacity latency separately.** They have different owners and different fixes.
+- **Apply the accrual block on the same path**, or intraday capacity overstates for exactly the clients who trade most.
+- **Publish the expectation and handle the exceptions explicitly.** Most complaints here are about silence rather than speed.
+
+## Where this connects
+
+What each event does to the ledger and the limit is in [the limit impact matrix](/broking-kyc/finix-broking-setup/rms/10-limit-impact-matrix/); the operator actions in [the money operations catalogue](/broking-kyc/finix-broking-setup/money/08-money-operations-catalogue/) and [the RMS operations catalogue](/broking-kyc/finix-broking-setup/rms/11-operations-catalogue/). The rails are in [pay-in rails](/broking-kyc/finix-broking-setup/money/02-payin-rails/) and [the pay-out engine](/broking-kyc/finix-broking-setup/money/03-payout-engine/), the reconciliation in [bank and gateway reconciliation](/broking-kyc/finix-broking-setup/money/04-bank-recon/), and the files in [bank and payment files](/broking-kyc/finix-broking-setup/files/09-bank-payment-files/). The event substrate is [the front-end gateway and the event architecture](/broking-kyc/finix-broking-setup/stack/bff-and-event-architecture/), the timing clash is [money and trade in sync](/broking-kyc/finix-broking-setup/money/07-money-trade-sync/), and the capacity computation is [the margin engine](/broking-kyc/finix-broking-setup/rms/02-margin-engine/).
