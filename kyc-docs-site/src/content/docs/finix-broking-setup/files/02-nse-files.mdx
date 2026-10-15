@@ -1,0 +1,426 @@
+---
+title: "Files 2: NSE and NSE Clearing files"
+description: The NSE and NSE Clearing file register — collection mechanisms and extranet paths, the masters, the bhavcopy family and its October 2026 retirements, risk and surveillance files, the SPAN and value-at-risk cadence, the penalty-critical margin reporting exchange, obligation and settlement files, collateral, and the naming inconsistencies that cause integration bugs.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** This is the largest file surface a broker integrates with, and it is organised by the eight families defined in [the file register architecture](/broking-kyc/finix-broking-setup/files/01-file-register-architecture/) rather than by portal, because a reader arrives knowing which business process is broken rather than which server the file came from. Two sections exist purely to prevent known defects: section 3 records a format retirement that happened three days before this page was written, and section 13 collects the date-format and naming inconsistencies that have caused real integration bugs. Filenames are reproduced exactly, including the ones that look like typographical errors in the source, because reproducing them exactly is what makes the integration work.
+
+<Aside type="caution" title="How to use the filenames on this page, and what was verified when">
+The governing documents are the **annually reissued consolidated circulars** — currently [NCL/CMPT/67751](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt67751) for the cash segment, [NCL/CMPT/61801](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt61801) for futures and options, and [NCL/CMPT/67763](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt67763) for securities lending — together with the file-format standardisation circular [NCL/CMPT/55103](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt55103) and, on the trading side, [NSE/CMTR/57270](/broking-kyc/reference/circulars/nse/#nsecmtr57270) and [NSE/FAOP/57264](/broking-kyc/reference/circulars/nse/#nsefaop57264).
+
+The detailed nomenclature below was established from the consolidated circulars of the 2023 and 2024 editions and from **direct observation of the venue's own published daily file lists on 15 October 2026**. Names confirmed by live observation are solid. Names taken only from a circular edition that has since been reissued should be re-checked against the current edition before coding, because **the consolidated circulars are replaced every financial year and the earlier editions used here are superseded as documents even where the file names they describe have not changed**. Where this page says a name is unverified, it means exactly that, and the name has not been guessed.
+</Aside>
+
+## TL;DR
+
+- **Nothing arrives from one place.** Member-specific files come from the member portal extranet, common files from the public archive, margin reporting through a dedicated clearing application, collateral through another, and compliance submissions through a third. The register records the mechanism per file because the credentials, the network path and the failure mode all differ.
+- **The bhavcopy family changed in October 2026.** The legacy `.MS` and `.MD` extranet formats and the broadcast bhavcopy were discontinued on 12 October 2026, and the `.DAT` reports were added to the extranet from July 2026. A greenfield broker must build on the standardised bhavcopy archives plus the `.DAT` files.
+- **The margin files are the penalty surface.** Six value-at-risk batches and six or more risk-parameter snapshots per day drive what the broker must collect; the reporting upload and its response file determine whether the broker is treated as having reported at all.
+- **The response file is not optional reading.** An upload that was rejected looks identical to one that succeeded unless the response is read. A broker that does not read response files will believe it has reported for weeks.
+- **The obligation is not final when you first receive it.** A revised final obligation is published the next day where a custodian did not confirm an institutional trade, under a different filename, and settling on the first version is a pay-in shortfall.
+- **Several names contain inconsistencies that must be reproduced, not corrected.** Differing date formats within one family, a delivering-versus-receiving flag whose meaning inverts between two report families, and placeholders with the wrong number of year digits. Section 13 lists them.
+
+## 1. Framework
+
+- **[NCL/CMPT/67751](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt67751)** (29 April 2025) — consolidated circular for the cash segment, current edition. Settlement framework, margin framework, early pay-in, voluntary auction, collateral allocation and release, client-funds upstreaming, file-format standardisation.
+- **[NCL/CMPT/61801](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt61801)** (29 April 2024) — consolidated circular for the futures and options segment.
+- **[NCL/CMPT/67763](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt67763)** (30 April 2025) — consolidated circular for the securities lending and borrowing scheme.
+- **[NCL/CMPT/55103](/broking-kyc/reference/circulars/clearing-corps/#nclcmpt55103)** (2 January 2023) — standardisation of clearing and settlement file formats. The source of the standardised naming convention that runs `NCL_<segment>_<report>_<member>_<date>`.
+- **[NSE/CMTR/57270](/broking-kyc/reference/circulars/nse/#nsecmtr57270)** (26 June 2023) — consolidated trading circular, cash segment. Part D carries the structures of the security master, bhavcopy, trade and order logs.
+- **[NSE/FAOP/57264](/broking-kyc/reference/circulars/nse/#nsefaop57264)** (23 June 2023) — consolidated trading circular, futures and options. Part D carries the contract master and spread master structures.
+- **NSE/MSD/74764** (18 June 2026) — the bhavcopy dissemination change in section 3. `[not yet in index]`
+- **NSE/MSD/60556** (5 February 2024) — standard timings for trade file dissemination. `[not yet in index]`
+- Segment consolidated trading circulars for currency and commodity, and the clearing-side currency and commodity consolidated circulars. `[not yet in index]`
+
+## 2. Collection mechanisms
+
+| Mechanism | What it serves | Notes |
+|---|---|---|
+| **Member portal extranet, over web** | All member-specific and common extranet files | Separate common and member-specific trees |
+| **Extranet application interface over the internet** | Programmatic back-office collection | Parameterised by segment, folder path, date and filename |
+| **Extranet application interface over leased line** | The same, for leased-line members | Requires the venue's proxy component |
+| **Public archive and the all-reports listing** | Masters, bhavcopy, margin parameters, surveillance and limit files | No credentials; the authoritative live list of public daily files |
+| **Clearing interface** | Obligations, custodial confirmation | — |
+| **Clearing margin application** | Client margin reporting upload and its response; custodial report download; cash collateral allocation | The margin reporting exchange happens here |
+| **Collateral interface for members** | Collateral release and transfer, early pay-in of securities | Upload, response and data-export functions |
+| **Electronic member interface for trading members** | Compliance and regulatory submissions, trade annulment | Web forms, not files, for several functions |
+| **Trader workstation** | Intraday order and trade backup files written locally | The broadcast bhavcopy that formerly landed here is retired — see section 3 |
+
+**Extranet layout.** Segment roots are distinct per segment, and each has a common folder and a member-specific folder keyed by a segment-prefixed member code. The practical consequence is that a file's full path is a function of segment and member code, so the register stores the path template rather than a literal path, and a member-code change at any point requires a register update rather than a code change.
+
+<Aside type="caution" title="Member-specific and common files fail differently">
+A common file that is missing is missing for everybody, which means the venue knows, the problem is usually announced, and waiting is often correct. A member-specific file that is missing is missing only for this broker, which means nobody else will report it and waiting is rarely correct — the usual causes are a credential expiry, a permission change, a member-code mapping error, or a genuine non-generation that needs a call to the venue. Distinguishing the two cases automatically, by checking whether a common file from the same window arrived, turns a twenty-minute diagnosis into an immediate one.
+</Aside>
+
+## 3. The October 2026 bhavcopy change
+
+This is the most consequential recent change in the file layer and a greenfield broker must not build on the retired formats.
+
+| Change | Detail | Effective |
+|---|---|---|
+| **Added** | The `.DAT` bhavcopy reports were added to the extranet, under a bhavcopy folder within each segment's common tree | From July 2026, segment-wise |
+| **Discontinued** | Extranet bhavcopy in the legacy `.MS` and `.MD` formats, across cash, futures and options, currency and commodity, including the spread variants | **12 October 2026** |
+| **Discontinued** | Bhavcopy delivered over the non-neat broadcast interface, and with it the `.ms`, `.md`, `.yms` and `.ymd` files that the broadcast dropped into the trader workstation report directories | **12 October 2026** |
+
+**What to build on instead:** the standardised bhavcopy archives, which are the primary end-of-day valuation source, plus the `.DAT` interim and final files for early end-of-day processing. Source: NSE/MSD/74764 dated 18 June 2026. `[not yet in index]`
+
+<Aside type="danger" title="This retirement will break back offices that were built before 2026">
+Any integration that parses `.MS` or `.MD` extranet bhavcopy, or that depends on the broadcast dropping report files into the trader workstation directories, stopped receiving data on 12 October 2026. For a new broker the lesson is narrower than the change itself: the bhavcopy family has several parallel representations of the same data, maintained for backward compatibility, and parallel representations get retired. Prefer the standardised format that the market-infrastructure data standards drive, treat the legacy and convenience formats as temporary, and record in the register which representation each consumer uses so that the next retirement is a lookup rather than an investigation.
+</Aside>
+
+## 4. Masters
+
+### Trading-side masters, loaded before the open
+
+| Business name | Filename or pattern | Segment | Consumed by | If missing |
+|---|---|---|---|---|
+| Security master | `security.txt` in `security.zip`; non-neat variant `nnf_security.dat` in `nnf_security.zip`; also `security.gz` | Cash | Trading system symbol setup, tick size, board lot, price band, pre-open eligibility | **Trading system cannot start**; stale symbols; wrong lot and tick; orders rejected |
+| Participant master | `participant.txt` in `participant.zip`; non-neat `nnf_participant.dat` | Cash | Custodial and participant code validation at order entry | Custodial and institutional orders rejected |
+| Free float file | `Free_float.txt` | Cash | Index weight computation; market-wide limit inputs | Index-linked limits misstated |
+| Contract master | `contract.txt`; also `contract.gz` | Equity F&O | Contract setup, strike, expiry, lot, corporate action level, option daily price range | New strikes and expiries missing, so orders reject; wrong corporate action level after an adjustment |
+| Spread contract master | `spd_contract.txt`; `spd_contract.gz` | Equity F&O | Spread order book setup | Spread orders unavailable |
+| Participant master, derivatives | `fo_participant.txt`; `fo_participant.gz` | Equity F&O | Participant code validation | Participant-coded orders rejected |
+| Currency contract master | `cd_contract.txt` | Currency | Contract setup | Orders rejected |
+| Currency spread master | `cd_spd_contract.txt` | Currency | Spread setup | — |
+| Currency participant master | `cd_participant.txt` | Currency | Participant validation | — |
+| Commodity contract master | `co_contract.txt` | Commodity | Contract setup | — |
+| Commodity participant master | `co_participant.txt` | Commodity | Participant validation | — |
+| Listed capital file | `bulkddmmyyyy.xls` | Cash | Ascertaining listed equity shares for limit computation | Limit computations wrong |
+
+**Mandatory re-upload.** The derivatives contract master must be refreshed on expiry, on a symbol change and after a corporate action, because the corporate action level increments and contracts at the old level are replaced. A broker that does not refresh will send orders against retired contracts.
+
+A legacy dated contract file in comma-separated form was discontinued in 2020 and should not be built on.
+
+### Standardised masters
+
+These are the market-infrastructure data-standard files that replaced several venue-proprietary masters. They are compressed comma-separated files with tagged columns.
+
+| Business name | Filename or pattern | Segment | Notes |
+|---|---|---|---|
+| Security master, standardised | `NSE_CM_security_ddmmyyyy.csv.gz` | Cash | Back-office and risk security master; identifier, board lot, series |
+| Security master, interoperable | the same filename, under an interoperability path | Cash | Includes securities exclusive to the other exchange, enabling interoperable clearing |
+| Contract master, standardised | `NSE_FO_contract_ddmmyyyy.csv.gz` | Equity F&O | Back-office contract master |
+| Contract master, interoperable | the same filename, under an interoperability path | Equity F&O | — |
+| Spread contract master, standardised | `NSE_FO_spdcontract_ddmmyyyy.csv.gz` | Equity F&O | — |
+| Currency contract master, standardised | `NSE_CD_contract_ddmmyyyy.csv.gz` | Currency | — |
+| Currency spread master, standardised | `NSE_CD_spdcontract_ddmmyyyy.csv.gz` | Currency | — |
+| Commodity contract master, standardised | `NSE_COM_contract_ddmmyyyy.csv.gz` | Commodity | — |
+
+### Clearing-side reference files
+
+| Business name | Filename or pattern | Purpose |
+|---|---|---|
+| Clearing security master | `C_SEC_DDMMYYYY_<exchange code>.csv` | Settlement type and series on the clearing side |
+| Applicable symbol file | `NCL_APPLICABLE_SYMBOL_DDMMYYYY.csv` | Which symbols are clearable across exchanges |
+| Cross-exchange scrip mapping | `BSE_Scrip_Series_Mapping_DDMMYYYY.csv` | Mapping the other exchange's scrip codes for interoperability |
+| Cross-exchange contract mapping | `Applicable_Contract_FO_DDMMYYY.csv` | Mapping the same contract across exchanges for interoperable clearing. **Note the three-digit year placeholder as published** |
+| Clearing contracts report | `F_CN01_<exchange name>_DDMMYYYY.CSV.gz` | Settlement price, underlying price, corporate action level |
+| Securities category file | `C_CATG_<MONYYYY>.Tnn` | Security categorisation driving margin rates and collateral eligibility |
+| Listed equity universe | `EQUITY_L.csv` | Identifier, face value, listing date. Overwritten daily |
+| Series change file | `series_change.csv` | Series migrations, which is how trade-for-trade moves are carried |
+| Settlement calendar mapping | `Settlement_Mapping_MONTHYYYY.csv` | Maps settlement type and number to dates |
+
+**Trade-for-trade.** There is no dedicated trade-for-trade list file; the treatment is carried through the **series** and through the settlement type on the clearing side. The authoritative daily feed is the series change file plus the series field in the standardised security master. Any integration looking for a standalone list is looking for something that does not exist.
+
+## 5. Bhavcopy and valuation
+
+| Business name | Filename or pattern | Segment | Consumed by |
+|---|---|---|---|
+| Standardised bhavcopy, final | `BhavCopy_NSE_CM_0_0_0_<YYYYMMDD>_F_0000.csv.zip` | Cash | End-of-day valuation, holding valuation, mark-to-market, contract notes |
+| Standardised bhavcopy, final | `BhavCopy_NSE_FO_0_0_0_<YYYYMMDD>_F_0000.csv.zip` | Equity F&O | Settlement prices, open interest, mark-to-market |
+| Standardised bhavcopy, final | `BhavCopy_NSE_CD_0_0_0_<YYYYMMDD>_F_0000.csv.zip` | Currency | Valuation |
+| Standardised bhavcopy, final | `BhavCopy_NSE_CO_0_0_0_<YYYYMMDD>_F_0000.csv.zip` | Commodity | Valuation |
+| Interim bhavcopy | `FCM_INTRM_BCDDMMYYYY.DAT` | Cash | Early end-of-day processing before the final file |
+| Bhavcopy, fixed-width | `FNO_BCDDMMYYYY.DAT` | Equity F&O | End-of-day processing |
+| Bhavcopy, fixed-width | `CD_BCDDMMYYYY.DAT` | Currency | — |
+| Bhavcopy, fixed-width | `CO_BCDDMMYYYY.DAT` | Commodity | — |
+| Legacy bundle | `PRDDMMYY.zip` | Cash | Historic and validation feed; some back offices still parse it |
+| Full bhavcopy with deliverable data | `sec_bhavdata_full_DDMMYYYY.csv` | Cash | Delivery percentage and deliverable quantity |
+| Lending bhavcopy | `SLBM_BC_DDMMYYYY.DAT` | Securities lending | Lending fee valuation |
+| Small and medium enterprise bhavcopy | `smeDDMMYYYY.csv` | Cash, that board | Valuation |
+
+**Why the interim file matters.** The end-of-day pipeline's chokepoint is trade reconciliation, and the valuation steps that follow need closing prices. The interim file is available materially before the final one, so a pipeline that can start on the interim and re-verify on the final finishes substantially earlier. The design cost is that every valuation step must be idempotent and re-runnable, which it should be anyway.
+
+## 6. Risk, surveillance and limit files
+
+| Business name | Filename or pattern | Segment | Consumed by | If missing |
+|---|---|---|---|---|
+| Price band, complete list | `sec_list_DDMMYYYY.csv`; an undated `sec_list.csv` is also served | Cash | Order-level band validation | Orders rejected at the venue, or clients permitted outside the band |
+| Price band changes for the next trade date | `eq_band_changes_DDMMYYYY.csv` | Cash | Next-day band refresh | Next-day bands wrong |
+| Small and medium enterprise price bands | `sme_bands_complete_DDMMYYYY.csv` | Cash, that board | Band validation | — |
+| Circuit breaker update | `circuit_DDMMYYYY.csv` | Cash | Index circuit filter and halt configuration | — |
+| **Surveillance and regulatory indicator** | `REG_INDDDMMYY.CSV` | Cash | **The surveillance flag file.** Carries graded surveillance stage, long-term and short-term additional surveillance, enhanced surveillance, insolvency, default, pledge and add-on band flags. Drives client-level blocks, hundred-per-cent-margin treatment and trade-for-trade handling | **Clients permitted to trade flagged securities without the required margin or restriction — a regulatory breach** |
+| Surveillance indicator, new version | `REG1_INDDDMMYY.csv` | Cash | A successor or parallel version — **a format version bump. Run both during cutover** | — |
+| **Securities in ban period** | `fo_secban_DDMMYYYY.csv`, **dated for the next trade date**; also served undated as `fo_secban.csv` | Equity F&O | Block fresh positions in banned underlyings; permit only offsetting | **A client takes a fresh position in a banned security and the venue penalises the broker** |
+| Client-wise position limits | `oi_cli_limit_DD-MON-YYYY.lst` | Equity F&O | Client-level open-interest limit monitoring | Client breaches a position limit |
+| Currency client-wise limits | `x_oi_cli_limit_DD-MON-YYYY.lst` | Currency | Limit monitoring | — |
+| Currency member-wise limits | `x_oi_tm_limit_DD-MON-YYYY.lst` | Currency | Member-level limits | — |
+| Currency proprietary limits | `x_oi_pro_limit_DD-MON-YYYY.lst`; a single-currency variant as a comma-separated file | Currency | Proprietary limits | — |
+| Commodity client and member limits | `CO_oi_cli_limit_DD-MON-YYYY.lst`, `CO_oi_tm_limit_DD-MON-YYYY.lst` | Commodity | Limit monitoring | — |
+| Index derivatives position limit | `Index_deriv_pos_limit_DDMMYYYY.csv` | Equity F&O | Index-level position limit monitoring | — |
+| Open interest | `ncloi_DDMMYYYY.zip` | Equity F&O | Open interest against the market-wide limit | Cannot anticipate entry into a ban |
+| Combined open interest across exchanges | `combineoi_DDMMYYYY.zip` | Equity F&O | Market-wide position limit across exchanges | A market-wide breach goes undetected |
+| **Combined delta-equivalent open interest** | `combineoi_deleq_DDMMYYYY.csv` | Equity F&O | Delta-equivalent limit monitoring under the current index limit regime | Delta-basis monitoring impossible |
+| Contract delta | `Contract_Delta_DDMMYYYY.csv` | Equity F&O | Delta-equivalent computation | — |
+| Clients above a threshold of the market-wide limit | `mwpl_cli_DDMMYYYY.xls` | Equity F&O | Monitoring large client positions | — |
+| Security-wise market-wide limit utilisation | `SEC_OL_ddmmmyyyy.csv` | Collateral and limits | Collateral concentration | Over-concentration undetected |
+| Fund-scheme and corporate-bond limit utilisation | `MF_OL_ddmmmyyyy.csv`, `CB_OL_ddmmmyyyy.csv` | Collateral | Collateral limits by instrument class | — |
+| Daily volatility | `CMVOLT_DDMMYYYY.CSV`, `FOVOLT_DDMMYYYY.csv`, `X_VOLT_DDMMYYYY.csv`, `CO_VOLT_DDMMYYYY.csv` | Per segment | Value-at-risk margin inputs | Margin misstated |
+| Index constituents | one file per index, for example `ind_nifty50list.csv` | Cash and index | Index baskets, index-linked limits | Composition stale after reconstitution |
+| All index closing values | `ind_close_all_DDMMYYYY.csv` | Cash and index | Index valuation and circuit filters | — |
+| Lending eligible securities | `SLB_ELG_SEC_DDMMYYYY.csv` | Securities lending | Product eligibility | — |
+
+**Quantity freeze.** Quantity-freeze limits are published and revised monthly and additionally on an ex-date for a bonus, split or rights issue. The path and the revision cadence are established; the **filename is unverified** and must be confirmed before coding.
+
+<Aside type="caution" title="The ban-period file is dated for the next trading day">
+The securities-in-ban file published after the close carries the **next** trade date in its name and in its header line, because it tells the broker what will be banned tomorrow. An integration that treats the date in the filename as the file's own business date will apply yesterday's ban list today, which means permitting fresh positions in a security that entered a ban and blocking one that left it. Both directions produce a problem: the first is a penalty, the second is a client complaint. This is the clearest example on this page of why the register separates the *business date* a file is about from the date it arrived.
+</Aside>
+
+## 7. Margin parameter files
+
+These drive the broker's own margin engine. They are the inputs without which no margin can be computed, and therefore no margin collected.
+
+| Business name | Filename or pattern | Cadence | Notes |
+|---|---|---|---|
+| **Risk parameter file, end of day** | `nsccl.<YYYYMMDD>.s.spn.gz`; published on the website as a compressed archive | Daily | The standard end-of-day parameter set |
+| **Risk parameter file, begin of day and intraday** | `nsccl.<YYYYMMDD>.i<nn>.spn.gz` | **Six files a day**, generated on prices at **11:00, 12:30, 14:00, 15:30, end of day and begin of day** | Intraday margin recomputation; the basis of continuous margin sufficiency |
+| Risk parameter file, scaled variant | end of day `nsccl.<YYYYMMDD>.s_1.spn.gz`; intraday `nsccl.<YYYYMMDD>.i<nn>_1.spn.gz` | Same cadence | **Only** for clearing members who opted for same-day mark-to-market settlement. The default uses a different look-ahead. **Using the wrong variant over- or under-margins every client** |
+| Risk parameter file, currency | `nsccl_x.<YYYYMMDD>.s.spn.gz` and `nsccl_x.<YYYYMMDD>.i<nn>.spn.gz` | Begin of day, five intraday, end of day | — |
+| Risk parameter file, commodity | `nsccl_o.<YYYYMMDD>.{i1..i9,s}` archives | **Begin of day, eight intraday, end of day** | More snapshots because the evening session is long |
+| Risk parameter file, debt | `nsccl_d.<YYYYMMDD>.{i1..i5,s}` archives | Begin of day, four intraday, end of day | — |
+| **Value-at-risk margin file** | `C_VAR1_DDMMYYYY_N.DAT` where `N` is the batch | **Six batches a day**: batch one at begin of day, batches two to five intraday, batch six at end of day | Value-at-risk plus extreme loss margin for every cash client. Fixed-width with a control record carrying the date and total record count |
+| Value-at-risk, lending | `C_VAR1_SLB_DDMMYYYY_1.DAT` | Begin of day | — |
+| Applicable exposure limit file | `ael_DDMMYYYY.csv` | Daily | Exposure margin rates per underlying |
+| Contract-wise exposure limit | `F_AEL_OPT_CONTRACTS_DDMMYYYY.csv.gz` | Daily | Contract-level exposure margin for options |
+| Cash mark-to-market prices | `CM_MTM_Prices_DDMMYYYY.csv` | Daily | Cash mark-to-market and valuation debit |
+| Daily settlement prices | `FOSett_prce_DDMMYYYY.csv` | Daily | **Daily mark-to-market settlement of futures.** Without it the mark cannot be settled, client ledgers are wrong and the pay-in amount is wrong |
+| Daily settlement prices, currency | `CDSett_prce_DDMMYYYY.csv`; cross-currency `CCRSett_prce_DDMMYYYY.csv` | Daily | — |
+| Daily settlement prices, commodity | `CO_sett_prce_DDMMYYYY.csv` | Daily | — |
+
+<Aside type="danger" title="The intraday snapshot cadence is the whole peak-margin mechanism">
+Six parameter snapshots a day exist because margin must be sufficient *continuously*, not at day boundaries, and the venue verifies this by comparing what the broker collected against the requirement computed at randomly selected intraday moments. A broker that applies only the end-of-day parameter file is not merely slightly stale — it is computing a different quantity from the one it will be measured against, and the difference becomes a short-collection penalty on every affected client. The applied-state assertion for these files must therefore record *which snapshot* is live, and the begin-of-day checklist must confirm the current one rather than any one. The corresponding operator intervention when a snapshot does not arrive is R-52 in [the RMS operations catalogue](/broking-kyc/finix-broking-setup/rms/11-operations-catalogue/).
+</Aside>
+
+## 8. Margin reporting — the penalty-critical exchange
+
+This is a two-way exchange and the only family on this page where the broker's own upload determines whether it is treated as compliant.
+
+### What the clearing corporation sends
+
+| Report | Standardised filename | Legacy filename | Content |
+|---|---|---|---|
+| Detailed end-of-day margin, trading member | `NCL_CM_MGTM_<memcode>_DDMMYYYY.csv.gz`; provisional `NCL_CM_MGTM_P_<memcode>_DDMMYYYY.csv.gz` | `C_MG13_<MEMBER CODE>_DDMMYYYY.lis.gz` | **The file the broker must answer.** Per client: value-at-risk and extreme loss margin, minimum margin, additional margin, mark-to-market loss, end-of-day total actual margin, end-of-day total margin to be collected, and the **peak of intraday margin** |
+| Intraday margin, trading member | `NCL_CM_Intraday_MGTM_<memcode>_DDMMYYYY_nn.csv.gz` | `C_MG13_P_<MEMBER CODE>_DDMMYYYY_inn.lis.gz` | **A minimum of four snapshots a day, taken at random within pre-defined windows.** The basis of peak margin |
+| Detailed end-of-day margin, clearing member | `NCL_CM_MGCM_<memcode>_DDMMYYYY.csv.gz` | `C_MG12_<MEMBER CODE>_DDMMYYYY.lis.gz` | Member-wise and participant-wise margin payable |
+| Intraday margin, clearing member | `NCL_CM_Intraday_MGCM_<memcode>_DDMMYYYY_nn.csv.gz` | `C_MG12_P_...` | — |
+| Additional detailed margin | `NCL_CM_MG18_<MEMBER CODE>_DDMMYYYY.csv.gz`; intraday `NCL_CM_MG18_P_..._nn.csv.gz` | `C_MG18_...` | Further clearing-member-level detail |
+| Derivatives equivalents | `NCL_FO_MGTM_...`, `NCL_FO_Intraday_MGTM_..._nn.csv.gz`, `NCL_FO_MGCM_...`, `NCL_FO_MG18_...` | `F_MG12_...`, `F_MG13_...`, `F_MG18_...` | As cash |
+| Currency and commodity equivalents | `NCL_BFX_MGTM_...`, `NCL_CUR_MG12/13_...`, `NCL_IRF_MG12/13_...`, `NCL_COM_MGTM_...` and their intraday forms | `X_MG12/13_...`, `O_MG12/13/18_...` | Note the **four separate product streams** on the currency side |
+| Margin statements | `F_MG09_<MEMBER CODE>_DDMMYYYY.LIS.gz`, `F_MG10_...`, `F_MG11_...` | — | Clearing-member statement, trading-member statement, and margin payable. Feeds treasury |
+| Cross-margin benefit | `F_MG14_...`, `F_MG15_...`; offset positions `F_XM_01_...`, `F_XM_02_...`; cash segment `C_XM01_T_...` | — | Benefit on offsetting cash and derivative positions. **If unused, clients are over-collected** |
+| **Delivery margin** | `F_DLMG01_<MEMBER CODE>_DDMMYYYY.csv.gz` (clearing member), `F_DLMG02_...` (trading member) | — | Delivery margin on physically settled stock derivatives, staggered through expiry week |
+| Option value and cash collection | `F_OPTCSHSUMM01_...`, `F_OPTCSHSUMM02_...`, `F_OPTCSHDTLS01_...`, `F_OPTCSHDTLS02_...` | — | Net option value and premium collection |
+| Portfolio file | `<MEMBER CODE>_<DDMMYYYY>_2.pos` | — | Feed into a margin calculator to **reproduce the clearing corporation's own margin number**, which is how a margin dispute is settled |
+
+### What the broker uploads, and the response
+
+| Direction | Business name | Filename or pattern |
+|---|---|---|
+| broker → clearing corporation | Client margin reporting, trading member | `NCL_CM_MGTM_DDMMYYYY.Mnn`; legacy `C_MRG_TM_<DDMMYYYY>_nn.CSV`; derivatives `NCL_FO_MGTM_DDMMYYYY.Mnn` |
+| broker → clearing corporation | Client margin reporting, clearing member | `NCL_CM_MGCM_DDMMYYYY.Mnn`; legacy `C_MRG_CM_<DDMMYYYY>_nn.CSV` |
+| clearing corporation → broker | Response, success | `NCL_CM_MGTM_<memcode>_DDMMYYYY.Snn` |
+| clearing corporation → broker | Response, rejected records | `NCL_CM_MGTM_<memcode>_DDMMYYYY.Rnn` |
+| clearing corporation → broker | Legacy responses | `C_MRG_TMR_<MEMBER CODE>_ddmmyyyy_nn.csv` for processed records; `C_MRG_TMF_<MEMBERCODE>_ddmmyyyy_nn.csv` where the whole file was rejected |
+
+**The upload rules that cause real failures:**
+
+| Rule | Consequence of breaking it |
+|---|---|
+| Reporting may be submitted during the day and up to a defined number of working days after the trade date, which is the sign-off date | Reporting after sign-off does not count |
+| The batch number runs sequentially from the first batch | **An out-of-sequence batch is rejected** |
+| The filename must be exactly right | **A wrong filename is silently ignored**, and on the extranet the file is renamed to mark it failed |
+| A zero-byte file is rejected | Silent non-reporting |
+| The file must end with a newline | **A missing trailing newline breaks processing** |
+| The response file always carries a header, whether or not the upload did | Parsers that assume symmetry fail |
+| The response must be read and short-reported clients corrected before sign-off | **The broker believes it reported; the penalty says otherwise** |
+
+<Aside type="danger" title="The four silent failure modes in margin reporting">
+Margin reporting has the unusual property that every failure mode is silent. A wrong filename is ignored rather than rejected. A zero-byte upload is rejected without anything else happening. An out-of-sequence batch is rejected. A missing trailing newline stops processing partway. In all four cases the broker's own systems record a successful upload, and the only way to learn the truth is to read the response file and reconcile the accepted record count against the submitted one. This is the single strongest argument for the response-file monitoring rule in [file handling exceptions](/broking-kyc/finix-broking-setup/files/08-file-handling-exceptions/): treat an unread response as an unmade submission, alert on it immediately rather than in a daily digest, and reconcile counts rather than trusting a status.
+</Aside>
+
+### Shortfall and penalty files
+
+| Business name | Filename or pattern | Notes |
+|---|---|---|
+| Short allocation, trading member, intraday | `C_SA01_P_<<member code>>_DDMMYYYY_i<<nn>>.lis.gz` | **Based on margins and collateral at the moment of the peak snapshot.** Fields include client code, minimum margin required, total cash collateral, total non-cash collateral |
+| Short allocation, trading member, end of day | `C_SA01_<<member code>>_DDMMYYYY.lis.gz` | End-of-day client collateral shortfall |
+| Short allocation, clearing member views | `C_SA02_...`, `C_SA03_...` with intraday `_P` variants | Clearing-member level, and the clearing member's view of each trading member |
+| Short allocation, second family | `C_SA04_...`, `C_SA05_...`, `C_SA06_...` | Alternative views |
+| Derivatives equivalents | `F_SA01_P_...`, `F_SA01_...` through `F_SA06_...` | As cash |
+| **Penalty, trading member** | `C_PNL01_<MEMBER CODE>_DDMMYYYY.CSV` | **The penalty bill for margin short-reporting or non-reporting.** Must be allocated to the responsible client or absorbed, and the decision recorded |
+| Penalty, clearing member | `C_PNL02_<MEMBER CODE>_DDMMYYYY.CSV.gz` | — |
+| Penalty for affiliated trading members | `C_PNL03_<MEMBER CODE>_DDMMYYYY.CSV` | The clearing member's view |
+| Derivatives penalties | `F_PNL01_...`, `F_PNL02_...`, `F_PNL03_...` | As cash |
+| Short allocation reporting upload | `C_SA_TM_<DDMMYYYY>_nn.CSV`, `C_SA_CM_<DDMMYYYY>_nn.CSV`; derivatives `F_SA_TM_...`, `F_SA_CM_...` | **Verify the exact separator before coding** — the source text splits the token across a line break |
+| Short allocation responses | whole-file rejection `C_SA_TMF_<MEMBERCODE>_nn.CSV`; record-level `C_SA_TMR_<MEMBER CODE>_<DDMMYYYY>_nn.CSV` | — |
+
+## 9. Obligation and settlement files
+
+| Business name | Filename or pattern | Timing | Notes |
+|---|---|---|---|
+| **Daily provisional obligation, trading member** | `NCL_CM_memcode_DOBG01_<Market>_DDMMYYYY.csv` where market is one of the normal, trade-for-trade, institutional or auction markets | Trade date, evening | **The securities and funds the broker must deliver and receive.** Drives client pay-in calls, early pay-in decisions and short-delivery prediction |
+| Daily obligation, clearing member | `NCL_CM_memcode_DOBG02_<Market>_DDMMYYYY.csv` | Trade date | — |
+| Detailed daily obligation, clearing member | `NCL_CM_memcode_DDOBG_<Market>_DDMMYYYY.csv` | Trade date | A clearing member's view of each clearing trading member's provisional obligation |
+| **Final obligation, trading member** | On trade date `NCL_CM_memcode_FOBG01_<Market>_DDMMYYYY.csv`. **On the next day, where custodial rejection changed the obligation, `NCL_CM_memcode_FOBG01_F_<Market>_DDMMYYYY.csv`** | Trade date, revised next day | See the caution below |
+| Final obligation, clearing member | `NCL_CM_memcode_FOBG02_<Market>_DDMMYYYY.csv` and the `_F_` next-day variant | — | — |
+| Detailed final obligation | `NCL_CM_memcode_DFOBG_<Market>_DDMMYYYY.csv` | — | Trading-member-wise final obligation |
+| **Finality flag** | a flag inside the final obligation file | — | `Y` means the obligation is final; `N` means it still awaits custodial confirmation. **Treating `N` as final causes a pay-in shortfall** |
+| Derivatives final obligation | `NCL_FO_FOBG01_<MEMBER CODE>_DDMMYYYY.csv.gz`, `NCL_FO_FOBG02_...` | Daily | Funds and delivery obligation |
+| Commodity final obligation | `NCL_COM_FOBG01_...`, `NCL_COM_FOBG02_...` | Daily | A provisional commodity obligation report exists but its **filename is unverified** |
+| Daily funds statement | `C_memcode_DFND_DDMMYYYYY.csv` | Daily | Funds pay-in and pay-out amounts and bank debits. **The source prints five year digits; verify before coding** |
+| Bank summary | `C_memcode_DFNS_DDMMYYYY.csv` | Daily | Bank-wise funds summary |
+| Next-day obligation bank report | `F_BK01_<MEMBER CODE>_DDMMYYYY_DD.CSV.gz` | Daily | **Next-day funds requirement, which is the treasury input.** Without it funds are not arranged by the cut-off |
+| Bank summary and transactions | `F_BK02_...`, `F_BK03_...` | Daily | Bank reconciliation |
+| Deliveries report | `C_memcode_DLVR_SETTYPNO_DDMMYYYY.csv`; derivatives `F_<MEMBER CODE>_DLVR_SETTYPNO_DDMMYYYY.csv.gz` | Per settlement | Delivery and receipt instructions, delivery numbers, objection numbers. **For trade-for-trade settlement deliveries are gross and the delivery trade number is blank** |
+| Demat delivery statement | `C_DFDS_memcode_DDMMYYYY.csv`; provisional `_P` variant | Per settlement | Reconciling what the clearing corporation says was delivered against the depository |
+| Demat receipt statement | `C_DFRS_memcode_DDMMYYYY.csv`; provisional `_P` variant | Per settlement | Receipts from the clearing corporation |
+| **Client allocation details** | `C_CADT_memcode_DD-MMM-YYYY.csv`; provisional `_P` variant; derivatives `F_CADT_<MEMBER CODE>_DD-MMM-YYYY.csv.gz` | Per settlement | Two record types: security-wise client allocation, and **direct payout to beneficiary with quantity required against quantity actually credited**. That comparison is the direct-payout exception report |
+| **Security shortages** | receiving member `NCL_CM_memcode_SHRT_R_DDMMYYYY.csv`; delivering member `NCL_CM_memcode_SHRT_D_DDMMYYYY.csv` | Next day for securities; **the date in the filename is the trade date** | Short delivery handling: client debit, auction exposure, valuation debit |
+| **Auction square-off** | `NCL_CM_memcode_ASQR_D_DDMMYYYY.CSV` and `NCL_CM_memcode_ASQR_R_DDMMYYYY.CSV` | Post-auction; **date is the trade date** | Close-out debit or credit per client. **The delivering and receiving flag convention is the opposite of the shortages family — see section 13** |
+| Auction difference | `NCL_CM_memcode_ADIF_DDMMYYYY.csv` | Post-auction; date is the trade date | The auction price difference recovered from the defaulting client |
+| Securities for auction | `AUB_<YYYYNNN>_DDMMYYYY.csv` | Per auction | Which securities go to auction |
+| Close-out prices | `CSQR_M<YYYYNNN>_DDMMYYYY.csv` | Per settlement | The close-out rate where the auction did not clear |
+| Voluntary auction report | `<Primary Member Code>_CM_SA_DTLS_<DDMMYYYY>.csv` | Per event | Voluntary auction outcome |
+| **Settlement calendar** | `C_STC_MONYYYY_DDMMYYYY.csv` | Monthly | Settlement numbers, pay-in and pay-out dates, no-delivery periods. **Every downstream date depends on it** |
+| Security-wise delivery positions | `MTO_DDMMYYYY.DAT` | Daily | Market-wide delivery-to-trade ratio |
+| Client-wise depository delivery details | `<N>_<Primary Member Code>_DEPO_DEL_DTLS_<DDMMYYYY>.csv` | Per settlement | — |
+| **Exercise and assignment** | `F_EX01_<MEMBER CODE>_DDMMYYYY.CSV.gz` and `F_EX02_...` for exercise; `F_AS01_<MEMBER CODE>_DDMMYYYY.csv.gz` and `F_AS02_...` for assignment | Expiry day | **An assigned short option that is not recognised means the client is not told they must deliver, which is a delivery default** |
+| Position files | `F_PS03_<MEMBER CODE>_DDMMYYYY.CSV`, `F_PS04_...`; standardised `NCL_FO_PS03_...`; exchange-wise `F_PS05_...`, `F_PS06_...`; currency and commodity equivalents | Daily | **Open position reconciliation against the broker's own books.** A position break means wrong margin, wrong mark-to-market and wrong expiry handling |
+| Transaction tax and stamp duty | cash `NCL_CM_STT01_<memcode>_DDMMYYYY.csv`, `NCL_CM_STT02_...`, stamp duty `NCL_CM_SD01_...`, `NCL_CM_SD02_...`; derivatives `NCL_FO_STT01` to `STT04` and `NCL_FO_SD01` to `SD05`; commodity transaction tax `NCL_COM_CTT01/CTT02_...` | Daily | **Contract-note tax lines. These must match the contract note exactly** |
+| Transaction tax non-applicability | `C_STT_DDMMYYYY.csv` for securities where the tax does not apply; `C_STT_IND_DDMMYYYY.csv` for equity-oriented funds at a prescribed rate | Daily | Correct rate selection per security |
+| Tender offer and buyback set | several files including `memtype_memcode_offer_acceptance_<symbol>_ddmmyyyy.csv` and `T_CADT_<memcode>_DD-MMM-YYYYY.csv` | Per offer | Buyback, open offer and delisting tender settlement. **Several are printed with five year digits; reproduce from the circular and verify** |
+| **Early pay-in reversal** | pool account `<memcode>_EPIREV_C_DDMMYYY.nn`; client account `C_<MemberCode>_EPIREV_C_DDMMYYY.nn` and `C_<MemberCode>_EPIREV_T_DDMMYYY.nn` | Per event | **An early pay-in that was reversed, so the margin benefit is withdrawn.** A broker still counting the benefit has a margin shortfall. Printed with three year digits |
+
+<Aside type="danger" title="The final obligation is published twice and the second one has a different name">
+The obligation file received on the trade date is final only if every institutional trade was confirmed by its custodian. Where a custodian rejected or did not confirm, the obligation changes, and the revised file is published the next day under a name carrying an extra infix. A broker that funds and instructs settlement from the trade-date file, and does not collect the revised version, will be short on pay-in day for exactly the amount of the rejected institutional trades — and will discover it at the worst possible moment, because pay-in failure is a default event with penalty and reporting consequences. Two controls: the finality flag inside the file must be checked and an `N` must block settlement instruction, and the revised filename must be a separate register entry with its own expectation on the following day rather than being treated as a re-publication of the first.
+</Aside>
+
+## 10. Collateral files
+
+| Business name | Filename or pattern | Notes |
+|---|---|---|
+| **Haircut and valuation for approved securities** | `APPSEC_COLLVAL_ddmmyyyy.csv` | **Closing price and applicable haircut per security — the basis for valuing every pledged share.** A current-day file is published |
+| Haircut for all approved securities | `APPSEC_ALL_DDMMYYYY.CSV` | A wider approved universe than the valuation file |
+| Haircut for fund units | `MF_VAR_DDMMYYYY.csv` | Fund-unit collateral valuation |
+| Corporate bond valuation and haircut | `CB_Bhavcopyddmmyyyy.csv`, `CB_Haircut_ddmmyyyy.csv` | Corporate bond collateral |
+| **Collateral submitted by the clearing member** | `C_COLLDTLS_<MEMBER CODE>_DDMMYYYY_NN.CSV`; derivatives `F_COLLDTLS_<MEMBER CODE>_DDMMYYYY_NN.LIS.gz` | **The collateral statement: what the clearing corporation holds, by instrument and type.** Divergence from the broker's own ledger means wrong available margin all day |
+| **Client collateral, trading member** | `C_CC01_<MEMBER CODE>_<DDMMYYYY>.csv.gz`; derivatives `F_CC01<Member Code>_<DDMMYYYY>.csv.gz` | **Client-wise collateral as the clearing corporation records it**: cash component allocated, value of government and fund securities repledged, value of non-cash repledged, total, margins |
+| Client collateral, clearing member | `C_CC02_<MEMBER CODE>_<DDMMYYYY>.csv.gz`; derivatives `F_CC02<Member Code>_<DDMMYYYY>.csv.gz` | — |
+| Security pledge details | `C_<MEMBER CODE>_SEC_PLEDGE_DDMMYYYY.CSV`; derivatives `F_<MEMBER CODE>_SECPLEDGE_DDMMYYYY.CSV` | Securities pledged to the clearing corporation. **Note the underscore inconsistency between the two segments — reproduce exactly** |
+| Security release | business name established, path and non-sequential batch behaviour established, **filename unverified** | Confirms securities released from pledge. The batch number is **not** sequential because a member may have no release in a given batch |
+| Security transfer | `C_<Primary member code>_SEC_TRF_DDMMYYYY.CSV` | Inter-segment collateral transfer confirmation |
+| **Collateral release request, gross** | `NCL_CM_RRQ_DDMMYYYY_NN.CSV`; derivatives `NCL_FO_RRQ_...`; commodity `O_RRQ_...` | **Releasing pledged collateral back to the client — the mechanism behind running-account settlement.** Failure means client securities not released on the due date, which is a breach |
+| Collateral release response, gross | `NCL_CM_RRR_<Mem code>_DDMMYYYY_NN.CSV` | Header always present |
+| Collateral release request, transaction-wise | `NCL_CM_RRT_DDMMYYYY_NN.CSV` | Instruction-level release |
+| Collateral release response, transaction-wise | `NCL_CM_RTR_<Mem code>_DDMMYYYY_NN.CSV` | — |
+| **Collateral transfer request, gross** | `NCL_CM_TRG_DDMMYYYY_NN.CSV`; derivatives `NCL_FO_TRG_...` | Moving collateral between segments. **Collateral stranded in the wrong segment is a false shortfall in the other** |
+| Collateral transfer response, gross | `NCL_CM_TGR_<Mem code>_DDMMYYYY_NN.CSV` | The derivatives response is printed reusing the request token, which is **probably a circular typographical error; verify** |
+| Collateral transfer, transaction-wise | request `NCL_CM_TRT_DDMMYYYY_NN.CSV`; response `NCL_CM_TTR_<Mem code>_DDMMYYYY_NN.CSV` | — |
+| Collateral data export | `NCL_RRQ_CM_<Instrument>_GROSSLIST_<COLL TYPE>_<TM CODE>.csv` and a transaction-list variant | **Pre-populating a release request from what the clearing corporation actually holds**, which is how mismatched pledge references are avoided |
+| **Cash collateral allocation upload** | `<MEMCODE>_ALLOC_<DDMMYYYY>.T<batchno>` | Allocating cash collateral to a trading member, participant or client. **The batch number is a unique four-digit sequential number across all segments for the day.** Fifteen fields with an upward or downward action, and **all downward records must precede all upward records in the file** |
+| Cash collateral allocation response | `<MEMCODE>_ALLOC_<DDMMYYYY>.S<BATCHNO>` | Final status |
+| Government security reallocation | `<MEMCODE>_GSEALLOC_<DDMMYYYY>.T<batchno>` | Subject to a margin check |
+| **Guarantee and deposit renewal reminder** | `BG<BG ID>_ABC/BC_<TM CODE>_DDMMYYYY.DAT`; derivatives `F_REMINDERS_<MEMBER CODE>_DDMMYYYY.LIS` | Monthly, for items due next month. **A lapsed bank guarantee silently removes collateral and produces a sudden margin shortfall** |
+| Capital cushion letters | partial release `C_CPC_PRL_<MEMCODE>_DDMMYYYY.TXT`, full release `C_CPC_FRL_...`, additional required `C_CPC_REQ_...`, report `P_C_CPC_...` | Capital cushion requirement and release |
+| **Early pay-in of securities, client allocation** | `NCL_CLNTEPI_YYYYMMDD.Tnn` | Allocating an early pay-in to specific clients for the margin exemption. **A header is not applicable to this file.** Failure means no margin benefit, so clients are blocked or short-collected |
+| Early pay-in response | `NCL_<memcode>_CLNTEPI_YYYYMMDD.Snn` for success or `.Rnn` for rejections | — |
+
+**Timing change to verify.** Early pay-in and collateral release timings were changed to support the settlement-of-running-account regime, through a set of circulars dated 29 December 2022 effective in early January 2023. The fact of the change is established; **the current clock times were not verified and must be confirmed** against the present consolidated circular before they are configured.
+
+## 11. Corporate action files
+
+| Business name | Filename or pattern | Notes |
+|---|---|---|
+| **Corporate action report** | `C_CORPACT_DDMMYYYY.csv` | Ex-dates, ratios, no-delivery periods. **Without it holdings and derivative positions are not adjusted on the ex-date, so profit and loss, margin and entitlement are all wrong** |
+| Corporate action weekly report | `CPR_YYYYMMDD.txt` | The forward-looking calendar. **Note the year-first date order, unlike most files in this family** |
+| Corporate action level | a field inside the contract master and the clearing contracts report | After a corporate action the level increments and contracts at the old level are replaced, so the master must be re-uploaded |
+| No-delivery indicator | a flag on each trade in the clearing trade report | Identifies trades struck in a no-delivery period, which settle on a different date |
+| No-delivery period source | carried in the settlement calendar and the corporate action reports | **There is no standalone no-delivery list file** |
+
+## 12. Other broker uploads
+
+| Business name | Filename or pattern | Purpose |
+|---|---|---|
+| Custodial participant code application | `C_<MEMBERCODE>_CPCODE_YYYYMMDD.Tnn`; derivatives `F_<MEMBERCODE>_CPCODE_YYYYMMDD.Tnn` | Registering a new custodial participant code |
+| Custodial participant code modification | cash `XXXXX_YYYYMMDD.Tnn`; derivatives `XXXXX_NNN_S_YYYYMMDD.Tnn` | Post-trade correction, up to the trade-modification cut-off. **Failure leaves the trade with the wrong participant, the custodian rejects, and the final obligation changes the next day** |
+| Code modification response | success `XXXXX_YYYYMMDD,DDMONYYYY,HH-MM-SS.Snn` | **Note the commas inside the filename** — unusual and easy to get wrong |
+| Post-trade allocation | `C_PTA_DDMMYYYY_nn.csv` | Allocating institutional trades post-trade |
+| Post-trade allocation response | `C_PTA_DDMMYYYY_Rnn.csv` for rejections, `C_PTA_DDMMYYYY_Snn.csv` for success | — |
+| Cross-margin client details | `CMPYYYYMMDD.Tnn` | Claiming the cross-margin benefit. **If not uploaded, clients are over-collected** |
+| Cross-margin response | `<XXXXX>_CMPYYYYMMDD.Snn` | — |
+| **Position limit reporting** | `F_RPT_<DDMMYYYY_NN>.csv` | Reporting client positions against index-product position limits. **The member code must be the five-digit form, not a prefixed code** |
+| Position limit reporting response | `F_<MEMBER CODE>_RPTR_<DDMMYYYY_NN>.csv` | — |
+| Related foreign investor information | `FPI_DDMMYYYY.csv` | Declaring related investors for position-limit aggregation. One record per client code of the same participant |
+| Related foreign investor response | `<Member Code>_RET_FPI_DDMMYYYY_TIMESTAMP.csv.gz` | Rejection codes per record |
+| Voluntary auction participation | `CM_SA_<DDMMYYYY>_nn.csv` | Curing a short delivery by auction rather than close-out. **Every file must contain all records and reuse the same batch number** |
+| Voluntary auction response | `<Primary Member Code>_CM_SA_<R/S>_DDMMYYYY_nn.csv` | — |
+| **Short selling disclosure** | generated at the member end from the trading front end as `Shortselling.DAT`, carrying quantity and client code | The short-sale disclosure obligation |
+| Trade annulment request | **a web form, not a file**, submitted through the electronic member interface | Annulling an erroneous trade. The counterparty must consent within a defined window after the request or the close, whichever is later |
+| Market-maker blackout declaration | a web form through the same interface | Market-making obligations |
+| **Client code registration** | **unverified.** Order-entry validation of the client code and the permanent account number demonstrably exists, so the venue holds a client-code master, but the upload filename, portal path, format and response file **could not be established and have not been guessed** | Registering client codes so orders are accepted. **Until resolved, treat this as a known gap: a new client whose code is not registered cannot trade, and orders reject at entry** |
+
+## 13. Naming and format inconsistencies to reproduce exactly
+
+These have each caused a real integration defect. They are not errors to correct; they are the published behaviour.
+
+| # | Inconsistency | Where | Handling |
+|---|---|---|---|
+| 1 | **Date format varies within one family.** Most files use day-month-year with no separators; the client allocation details file uses day-month-name-year with hyphens; the corporate action weekly report uses year-month-day | Client allocation, corporate action weekly | Store the date format per register entry, never globally |
+| 2 | **The delivering and receiving flag convention inverts** between the shortages family and the auction square-off family | Shortages, auction square-off | Map per family from the circular, and write a test that asserts the mapping |
+| 3 | **Year placeholders with the wrong digit count** — five year digits in the daily funds statement and several tender files, three in the early pay-in reversal and the cross-exchange contract mapping | Several | Reproduce exactly; do not normalise |
+| 4 | **Underscore inconsistency** between segments for the security pledge report | Pledge details | Two register entries, not one parameterised entry |
+| 5 | **The derivatives collateral transfer response reuses the request token**, which is probably a typographical error in the source | Collateral transfer | Verify against the current edition before coding |
+| 6 | **The affiliated-member penalty file's path is printed as another file's path**, likely a typographical error | Penalty files | Verify |
+| 7 | **The filename date is the trade date, not the file's own date**, in the shortages, auction square-off and auction difference families | Settlement files | The business-date column in the register exists for this |
+| 8 | **The ban-period file's date is the next trading day** | Ban period | As above, in the other direction |
+| 9 | **Commas inside a filename** in the code modification response | Code modification | Quote paths; do not split on commas |
+| 10 | **A header is present in responses but optional or inapplicable in uploads**, and differs per file | Margin reporting, early pay-in | Per-entry header rule |
+| 11 | **Batch numbers are sequential in some families and deliberately non-sequential in others** | Margin reporting versus security release | Per-entry sequencing rule; do not assume a gap is a missing file |
+| 12 | **Downward records must precede upward records** within the cash collateral allocation file | Collateral allocation | A file-construction rule, not a validation rule |
+
+## 14. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.files.nse.extranet.path_template_per_segment` | **E** | Venue-set | Segment root plus prefixed member code |
+| `finix.files.nse.collection.mechanism_per_file` | **D** | In the register | Portal, archive, clearing application, collateral interface, member interface |
+| `finix.files.nse.bhavcopy.source` | **D** | Standardised archive plus the fixed-width files | **Never the retired legacy or broadcast formats** |
+| `finix.files.nse.bhavcopy.use_interim_to_start_eod` | **D** | true | With idempotent re-run on the final file |
+| `finix.files.nse.span.snapshot_expected_count` | **E** | Six for equity derivatives; more for commodity | Per segment |
+| `finix.files.nse.span.variant` | **E** | Standard, unless the firm opted for same-day mark-to-market | **The wrong variant mis-margins every client** |
+| `finix.files.nse.var.batch_expected_count` | **E** | Six | Batch six is the end-of-day file |
+| `finix.files.nse.margin_report.upload_batch_sequential` | **E** | true | Out-of-sequence is rejected |
+| `finix.files.nse.margin_report.trailing_newline_required` | **E** | true | Absence breaks processing |
+| `finix.files.nse.margin_report.response_reconcile_counts` | **D** | true | Accepted against submitted; not a status check |
+| `finix.files.nse.margin_report.signoff_days` | **E** | Venue-set | Reporting after sign-off does not count |
+| `finix.files.nse.obligation.require_finality_flag` | **D** | true | `N` blocks settlement instruction |
+| `finix.files.nse.obligation.expect_revised_next_day` | **D** | true | A separate register entry |
+| `finix.files.nse.secban.business_date_is_next_trading_day` | **D** | true | The section 13 item 8 control |
+| `finix.files.nse.date_format_per_entry` | **D** | true | Never a global date format |
+| `finix.files.nse.contract_master.refresh_on_ca_and_expiry` | **E** | true | Mandatory re-upload |
+| `finix.files.nse.response_file.unread_is_unsubmitted` | **D** | true | Immediate alert |
+
+## Practical notes
+
+- **Build the register from the venue's own published file list, not from your back office's job list.** The live all-reports listing is the authoritative enumeration of what is available, and it is the only way to find the files nobody is reading.
+- **Re-verify against the current consolidated circular each financial year.** They are reissued annually; a register built against an old edition decays silently.
+- **Reconcile counts on every response file.** Status fields lie by omission; counts do not.
+- **Keep the margin reporting path on its own monitoring.** It is the one family where a silent failure converts directly into a penalty on every affected client.
+- **Treat the position file as a daily reconciliation, not a report.** It is the venue's statement of the firm's open positions, and a break in it invalidates margin, mark-to-market and expiry handling simultaneously.
+- **Expect the legacy formats to keep retiring.** The October 2026 bhavcopy change is the pattern, not the exception.
+
+## Where this connects
+
+The register's structure, validation order and applied-state model are in [the file register and its architecture](/broking-kyc/finix-broking-setup/files/01-file-register-architecture/), and the handling when any of these files is late, short, revised or rejected is in [file handling exceptions](/broking-kyc/finix-broking-setup/files/08-file-handling-exceptions/). The other venues are in [BSE files](/broking-kyc/finix-broking-setup/files/03-bse-files/) and [MCX files](/broking-kyc/finix-broking-setup/files/04-mcx-files/), the depositories in [depository files](/broking-kyc/finix-broking-setup/files/06-depository-files/), and what the firm submits in [outbound submissions](/broking-kyc/finix-broking-setup/files/07-outbound-submissions/). The margin parameters feed [the margin engine](/broking-kyc/finix-broking-setup/rms/02-margin-engine/) and the reporting exchange is the file-level view of [margin reporting and penalties](/broking-kyc/finix-broking-setup/rms/08-margin-reporting-penalties/). Obligation and settlement files drive [settlement obligations](/broking-kyc/finix-broking-setup/backoffice/05-settlement-obligations/) and [settlement day operations](/broking-kyc/finix-broking-setup/daily-ops/06-settlement-day-ops/). The exchange-by-exchange behavioural differences are in [NSE cash market](/broking-kyc/finix-broking-setup/exchanges/01-nse-cash/) and [NSE equity derivatives](/broking-kyc/finix-broking-setup/exchanges/02-nse-fno/).

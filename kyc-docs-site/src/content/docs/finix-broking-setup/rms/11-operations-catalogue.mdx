@@ -1,0 +1,166 @@
+---
+title: "RMS 11: the operations catalogue"
+description: Every action a risk operator takes — the daily limit cycle, the intraday monitoring loop, the margin-call and square-off decisions, and the thirty-odd unusual interventions from suspending a check to running a manual margin computation when the parameter file never arrives.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** The risk function is the only one in a broking operation whose routine work is watching and whose consequential work is interrupting. That asymmetry shapes the catalogue: section 2 is a short list of things done every day on a clock, section 3 is a monitoring loop rather than a task list, and section 4 — the interventions — is the longest, because interrupting is where the judgement, the authority questions and the damage all live. The page also separates *deciding* from *executing*, because the most common governance failure in a risk desk is that the person who decides a square-off is the person who places it, and nobody later can tell whether the decision preceded the trade.
+
+## TL;DR
+
+- **The daily cycle is short; the monitoring loop is the job.** Loading parameters, resolving limits and baselining utilisation takes an hour. The remaining six hours are a loop of observation against thresholds, and the quality of the desk is the quality of its thresholds.
+- **Separate the decision from the execution.** The square-off decision is a risk action; placing the square-off order is a dealing action. Recording them separately, in that order, is what makes the decision defensible afterwards.
+- **Loosening is safe, tightening is not.** Raising a limit cannot make an existing position non-compliant. Lowering one can, instantly, across a client group — so intraday tightening is scoped, announced and applied at a boundary unless it is an emergency.
+- **A suspended check must expire by itself.** The only safe way to switch off a malfunctioning pre-trade check is with a timer attached, because the alternative is a check that has been off since a Tuesday in March.
+- **The manual margin computation is the intervention nobody plans for.** When a risk parameter file does not arrive, the choice is between trading on yesterday's parameters, trading on a conservative manual uplift, or not trading. Decide which, in advance, per segment.
+- **Count the interventions.** Rising override counts are a limit-setting defect; rising manual-margin events are a file-pipeline defect; rising square-offs at the same time each day are a margin-call process defect. The catalogue is a diagnostic instrument.
+
+## Conceptual overview
+
+A risk desk does three things that look similar and are not. It *computes* — margin requirements, available capacity, utilisation, shortfall. It *constrains* — limits, blocks, check configuration. And it *intervenes* — margin calls, square-offs, overrides, suspensions. Computation should be entirely automatic and is a technology responsibility when it breaks. Constraint is a policy responsibility exercised on a slow cycle with approvals. Intervention is the only part that is genuinely operational and time-pressured. Most risk-desk dysfunction comes from the three being performed by the same person on the same screen with the same permission, so that a computation problem gets solved by relaxing a constraint, which is the worst available response.
+
+The second idea is that the risk desk's authority is almost entirely negative. It cannot make a client richer, cannot make a position smaller by wishing, and cannot create collateral. What it can do is refuse, reduce and stop. This matters for how the catalogue is written: every intervention below is a refusal or a reduction, and the ones that look like permissions — raising a limit, overriding a rejection — are better understood as the withdrawal of a refusal. Framing them that way makes the approval question obvious, because withdrawing a refusal is exactly the action that needs a second pair of eyes.
+
+The third idea concerns time. Risk decisions have a natural latency problem: the information arrives continuously, the authority to act is concentrated in a few people, and the cost of acting late compounds. The standard resolution is to pre-decide as much as possible — thresholds that trigger automatic action, square-off rules that execute without a human, blocks that apply themselves on a shortfall — and reserve human judgement for the cases the rules explicitly route to a human. A desk where every square-off is a human decision is a desk that will be late on the day it matters, because that is the day there are four hundred of them.
+
+## 1. How to read the catalogue
+
+Columns and frequency bands follow [the OMS operations catalogue](/broking-kyc/finix-broking-setup/oms/11-operations-catalogue/). The **authority** markers are the same three: pre-authorised, authorise-then-act, dual control. Risk-specific addition: a **decision or execution** marker, separating the act of deciding from the act of carrying out.
+
+## 2. The daily cycle
+
+| ID | Action | Role | Time | Precondition | Assertion | Consequence of failure |
+|---|---|---|---|---|---|---|
+| R-01 | Ingest risk parameter files and apply | Risk, with technology | Pre-open | Files received, validated | Applied version and timestamp recorded; values plausible | Derivatives margin wrong all day |
+| R-02 | Apply value-at-risk and extreme loss margin rates | Risk | Pre-open | File current | Current-day rates live | Cash margin wrong all day |
+| R-03 | Apply the acceptable-collateral and haircut lists | Risk | Pre-open | File current | Diff against yesterday reviewed | Collateral over- or under-valued |
+| R-04 | Apply the ban-period list | Risk | Pre-open | File current | Membership diff reviewed and alerted | Fresh positions taken in banned underlyings; penalty |
+| R-05 | Apply surveillance-measure lists | Risk | Pre-open | Files current | Additions alerted to dealing | Clients trade flagged scrips at normal margin |
+| R-06 | Load collateral and ledger balances | Risk, operations | Pre-open | Back-office extract complete, as-of today | Counts reconcile to the client master | Capacity computed on stale money |
+| R-07 | Resolve limits and compute available exposure per client | Risk | Pre-open | Steps above complete | Every active client has a resolved limit | Clients resolve to the global default |
+| R-08 | Baseline firm-level utilisation | Risk | Pre-open | Firm ceilings current | Ceilings loaded | No aggregate control |
+| R-09 | Review the overnight shortfall and ageing-debit list | Risk | Pre-open | Back office closed | Action decided per client before the open | Square-offs begin unprepared |
+| R-10 | Set today's square-off schedule and scope | Risk | Pre-open | R-09 complete | Named clients, times, order of liquidation | Ad hoc liquidation under pressure |
+| R-11 | Confirm the margin-call list and dispatch calls | Risk | Pre-open and intraday | Shortfall computed | Calls sent through a recorded channel | No evidence the client was told |
+| R-12 | Verify peak-margin snapshot handling is live | Risk | Pre-open | Snapshot windows configured | Snapshot capture confirmed | Reporting and penalty exposure |
+| R-13 | End-of-day margin obligation computation | Risk, with back office | Post-close | Trade file reconciled | Obligation per client computed | Margin reporting wrong |
+| R-14 | Prepare and validate the margin-reporting file | Risk, compliance | Post-close | R-13 complete | Validation clean before submission | Penalty, and a wrong public record |
+| R-15 | Collateral revaluation at close | Risk | Post-close | Closing prices available | Revalued; shortfalls identified for tomorrow | Tomorrow opens with wrong capacity |
+| R-16 | Release surplus capacity and recompute for tomorrow | Risk | Post-close | Positions and obligations final | Tomorrow's baseline set | Clients blocked or over-permitted at open |
+
+## 3. The intraday monitoring loop
+
+Not a task list — a set of standing observations, each with a threshold and a first response. The desk's competence is in the thresholds, not the watching.
+
+| ID | Observation | Threshold basis | First response | Escalation |
+|---|---|---|---|---|
+| R-20 | Client margin utilisation distribution | Percentage bands | Call at the first band; block at the second | Head of risk when a client group clusters |
+| R-21 | Clients in shortfall, and the ageing of each | Shortfall amount and hours | Margin call, then scheduled square-off | Head of risk above an amount |
+| R-22 | Firm-level segment utilisation against ceiling | Percentage of ceiling | Stop granting increases; review largest users | Risk committee near the ceiling |
+| R-23 | Concentration in one underlying across all clients | Percentage of firm capacity | Investigate; consider an instrument-level limit | Head of risk |
+| R-24 | Proximity to market-wide position limits | Percentage published by the exchange | Warn dealing; prepare to refuse fresh positions | Immediate on entering a ban |
+| R-25 | Client-level and member-level position limit utilisation | Exchange-set | Refuse increases; reduce if breached | Compliance, because a breach is reportable |
+| R-26 | Rejection-code distribution | Stable profile | Investigate a spike — usually a configuration or parameter error | Technology if it is systemic |
+| R-27 | Override count by client and by check | Count per day | Fix the limit rather than approve again | Weekly review by head of risk |
+| R-28 | Unusual order or trade patterns at client level | Surveillance rules | Examine; document the conclusion | Compliance, where it may be reportable |
+| R-29 | Algorithmic strategy behaviour: order rate, cancel ratio, position | Per-strategy profile | Throttle, then kill | Pre-authorised kill, then inform |
+| R-30 | Collateral value movement intraday | Percentage fall | Recompute capacity; call affected clients | Head of risk on a broad fall |
+| R-31 | Price-band and halt events in held instruments | Exchange events | Assess square-off feasibility before deciding to square off | Head of risk during a market-wide halt |
+| R-32 | Intraday pay-in receipts against outstanding margin calls | Attribution lag | Credit promptly; do not square off a client who has paid | Finance on an attribution backlog |
+
+<Aside type="caution" title="R-32 is the commonest source of a justified client complaint">
+A client receives a margin call, pays immediately by a fast rail, and is squared off twenty minutes later because the credit had not been attributed in the risk system. Every element of that sequence is individually correct and the outcome is indefensible. The controls are: a short, measured attribution lag; a rule that an unattributed-but-evidenced payment suspends the square-off clock for a bounded period; a reference-number mechanism that lets the desk find the payment; and a square-off checklist step that requires the operator to check pending receipts for that client before executing. The last one costs ten seconds and prevents the complaint.
+</Aside>
+
+## 4. The interventions
+
+| ID | Intervention | Role | Authority | Decision or execution | Precondition | Known hazard |
+|---|---|---|---|---|---|---|
+| R-40 | **Issue a margin call** | Risk | Pre-authorised | Decision | Shortfall computed | Must go through a channel that evidences receipt |
+| R-41 | **Block a client from fresh exposure** | Risk | Pre-authorised | Decision | Shortfall, flag, or instruction | Blocks hedging; prefer close-only |
+| R-42 | **Set a client to close-only** | Risk | Pre-authorised | Decision | Risk reduction wanted without trapping the client | The better default than a full block |
+| R-43 | **Decide a square-off** | Risk | Pre-authorised within policy | **Decision** | Policy trigger met; receipts checked | Record the decision *before* the order exists |
+| R-44 | **Execute a square-off** | Dealing, on risk instruction | Pre-authorised | **Execution** | A recorded decision | Liquidating an illiquid position moves the price against the client |
+| R-45 | **Defer a square-off** | Head of risk | Authorise-then-act | Decision | Payment evidenced, or market conditions make liquidation destructive | Deferral must be time-boxed and recorded, or it becomes forbearance |
+| R-46 | **Select the liquidation order within a portfolio** | Risk | Pre-authorised | Decision | Square-off decided | Liquidating the hedge first increases risk; sequence matters |
+| R-47 | **Raise a limit intraday** | Risk | Authorise-then-act | Decision | Collateral or cleared funds actually received | "Funds in transit" is not collateral |
+| R-48 | **Lower a limit intraday** | Head of risk | Authorise-then-act | Decision | Deterioration in client or market | Can instantly put existing positions in breach; scope it |
+| R-49 | **Override a single pre-trade rejection** | Risk | Authorise-then-act | Decision | The check is misconfigured, not merely binding | Per-order only; never standing |
+| R-50 | **Suspend a pre-trade check firm-wide** | Head of risk | **Dual control** | Decision | The check is malfunctioning | **Must carry an automatic expiry** |
+| R-51 | **Change a haircut or collateral eligibility manually** | Head of risk | **Dual control** | Decision | File error, or a security's status changed mid-session | Diverges from the exchange's valuation; reconcile at close |
+| R-52 | **Run a manual margin computation** | Risk with technology | Authorise-then-act | Execution | Parameter file absent or rejected | See the caution below |
+| R-53 | **Apply a conservative blanket margin uplift** | Head of risk | Authorise-then-act | Decision | Computation unreliable | Over-collects; client communication needed |
+| R-54 | **Block an instrument firm-wide** | Risk | Pre-authorised | Decision | Ban, surveillance, feed failure | Decide explicitly whether holders may reduce |
+| R-55 | **Refuse fresh positions in a banned underlying** | Risk | Pre-authorised, and effectively mandatory | Decision | Ban-period list | Must distinguish fresh from offsetting positions correctly |
+| R-56 | **Impose an instrument-level or group-level concentration cap mid-session** | Head of risk | Authorise-then-act | Decision | Concentration observed | Clients mid-trade are affected; announce |
+| R-57 | **Kill an algorithmic strategy** | Risk | Pre-authorised | Execution | Behaviour outside profile | In-flight orders still arrive; pair with a bulk cancel |
+| R-58 | **Disable a client's algorithmic or API access** | Risk | Pre-authorised | Decision | Misbehaviour or breach | The client may have open positions dependent on the strategy |
+| R-59 | **Escalate a surveillance observation to compliance** | Risk | Pre-authorised | Decision | Pattern meets a rule | Under-escalation is the risk, not over-escalation |
+| R-60 | **Invoke pledged collateral** | Head of risk with operations | **Dual control** | Decision | Policy grounds met; notice given | Legal and client-communication consequences; see the pledge lifecycle |
+| R-61 | **Stop granting all limit increases firm-wide** | Head of risk | Pre-authorised | Decision | Approaching a firm ceiling or a funding constraint | A quiet, cheap, under-used intervention |
+| R-62 | **Freeze the risk engine's automatic actions** | Head of risk | **Dual control** | Decision | The engine is acting on bad data | Removes automation precisely when volume is high; staff accordingly |
+| R-63 | **Accept a position breach and report it** | Compliance with head of risk | **Dual control** | Decision | Breach already occurred and cannot be unwound | Reporting is not optional; the decision is only about remediation |
+| R-64 | **Recompute capacity after an intraday corporate action adjustment** | Risk | Authorise-then-act | Execution | Adjustment applied to contracts or holdings | Stale multipliers produce wrong margin on adjusted contracts |
+| R-65 | **Switch to the previous day's parameters knowingly** | Head of risk | **Dual control** | Decision | Today's file unavailable and manual uplift not feasible | Document it; the gap is a known, accepted, time-boxed risk |
+
+<Aside type="danger" title="R-52: what to do when the risk parameter file does not arrive">
+This is the intervention that most desks have not pre-decided, and the decision has to be made at eight in the morning with the market opening in an hour. There are only three options and each is defensible if chosen deliberately: trade on the previous day's parameters, with a stated uplift to cover the parameter staleness; compute manually from the published methodology for the affected segment, accepting slower and coarser numbers; or do not open the affected segment. What is not defensible is opening with whatever happens to be loaded, without noticing which option was taken. Write the choice down per segment now, give the decision a named owner, and include "parameter file absent" in the begin-of-day drill so that the first time it happens is not the first time it is considered. Note also that this is reportable in substance if it affects margin collection, so compliance should learn about it the same morning.
+</Aside>
+
+## 5. Actions that must not exist
+
+| Prohibited | Why | Instead |
+|---|---|---|
+| A risk operator placing a client's ordinary orders | Collapses the separation between constraining and dealing | Risk decides; dealing executes |
+| A dealer changing a limit | Removes the constraint from the constrained | Risk administration owns limits |
+| A standing override | A limit change made without approval | Fix the limit through change control |
+| An open-ended check suspension | The check is off and nobody knows | Automatic expiry, always |
+| Squaring off without a recorded prior decision | The decision cannot be shown to have preceded the trade | Decision record, then execution |
+| Deleting or editing a margin-shortfall record | It is a regulatory reporting input | Append corrections |
+| Granting capacity against funds not received | Credit risk disguised as a limit | Capacity follows cleared money or collateral |
+| Treating a client's promise of payment as collateral | The same thing, said more politely | A time-boxed deferral, recorded as such |
+
+## 6. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.rms.ops.margin_call.channels` | **D** | Recorded electronic channel plus telephony | Evidence of dispatch retained |
+| `finix.rms.ops.squareoff.decision_before_execution` | **D** | true | Enforced, not conventional |
+| `finix.rms.ops.squareoff.check_pending_receipts` | **D** | true | The R-32 control |
+| `finix.rms.ops.squareoff.receipt_grace_minutes` | **D** | Short, defined | Suspends the clock on evidenced payment |
+| `finix.rms.ops.squareoff.liquidation_sequence_policy` | **D** | Most liquid first, hedges last | Documented and reviewable |
+| `finix.rms.ops.check_suspend.auto_expiry_minutes` | **D** | 30 | Renewal is a new dual-control decision |
+| `finix.rms.ops.override.standing_prohibited` | **D** | true | Per-order only |
+| `finix.rms.ops.override.weekly_review` | **D** | true | By client and by check |
+| `finix.rms.ops.limit_tighten.effective` | **D** | Next boundary, unless emergency | Prevents instant mass breach |
+| `finix.rms.ops.parameter_absent.policy_per_segment` | **D** | Explicit per segment | The R-52 pre-decision |
+| `finix.rms.ops.manual_haircut.reconcile_at_close` | **D** | true | Divergence from the exchange must be closed daily |
+| `finix.rms.ops.intervention_log.retention_years` | **R** | 8 | Record-retention obligation |
+| `finix.rms.ops.collateral_invocation.notice_required` | **R** interpretation | true | Per policy and client agreement |
+
+## 7. Intervention metrics worth counting
+
+| Metric | Rising means | Owner of the fix |
+|---|---|---|
+| Override count per check | The limit is set wrong | Risk administration |
+| Override count per client | That client's limit is set wrong | Risk administration |
+| Manual margin computations | The parameter file pipeline is unreliable | Technology |
+| Manual haircut changes | Collateral file quality is poor | Technology and operations |
+| Square-offs per day | Margin calls are too late, or limits too generous | Risk |
+| Square-offs clustering at one time | The call-to-square-off interval is mis-set | Risk |
+| Complaints following square-off | Attribution lag or notice failure | Finance and risk jointly |
+| Check suspensions | A check is genuinely defective | Technology |
+| Deferrals granted | Forbearance is becoming policy by accident | Head of risk |
+
+## Practical notes
+
+- **The square-off checklist is worth more than the square-off policy.** The policy says when; the checklist stops the four avoidable mistakes — unattributed payment, liquidating the hedge, liquidating into a halt, and squaring off a client who was already blocked and therefore not accumulating further risk.
+- **Pre-authorise generously for reductions and stringently for increases.** Nobody should need approval to make the firm's risk smaller.
+- **Review the thresholds quarterly against what actually happened.** A threshold that never fired is either well-chosen or useless, and only the incident record distinguishes them.
+- **Staff the desk for the bad day, not the median day.** The interventions cluster: a sharp market move produces margin calls, square-offs, collateral falls and client calls simultaneously, and the automation you froze in R-62 was doing most of the work.
+- **Keep a written record of deferrals.** A deferral is the only intervention in the catalogue whose *absence* of a record looks exactly like a failure to act.
+
+## Where this connects
+
+This catalogue operationalises [the limit framework](/broking-kyc/finix-broking-setup/rms/04-limit-framework/), [the square-off engine](/broking-kyc/finix-broking-setup/rms/06-squareoff-engine/) and [intraday surveillance](/broking-kyc/finix-broking-setup/rms/07-intraday-surveillance/), and the capacity effects of each intervention are tabulated in [the limit impact matrix](/broking-kyc/finix-broking-setup/rms/10-limit-impact-matrix/). Role boundaries come from [the role register](/broking-kyc/finix-broking-setup/roles/01-role-register/) and [segregation and access control](/broking-kyc/finix-broking-setup/roles/04-segregation-access-control/). Parallel catalogues: [OMS](/broking-kyc/finix-broking-setup/oms/11-operations-catalogue/), [back office](/broking-kyc/finix-broking-setup/backoffice/12-operations-catalogue/), [money](/broking-kyc/finix-broking-setup/money/08-money-operations-catalogue/).

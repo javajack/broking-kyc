@@ -1,0 +1,140 @@
+---
+title: "Certification 1: the software approval regime"
+description: Which trading software needs exchange approval, which needs vendor empanelment, which needs only reporting and which needs nothing — across dealer terminals, internet and mobile applications, programmatic client access, direct market access, smart order routing and algorithmic strategies, with the vendor-product, in-house and hosted routes distinguished.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** "Does this need exchange approval?" is the question a broker asks most often about its own software and gets wrong most expensively, because the answer depends on three independent things at once — the channel, the development route, and whether anything material changed. So the page separates them: section 3 is the channel matrix, section 4 is the development route, and [change and version control](/broking-kyc/finix-broking-setup/certification/04-change-version-control/) handles change. Section 6 states plainly where a universal rule does not exist, because the most common failure here is a firm inferring an exemption from the absence of a prohibition.
+
+## TL;DR
+
+- **Software used in trading or real-time risk management needs the applicable testing and approval before deployment.** The baseline expressly covers internet trading, direct market access, wireless trading, smart order routing and algorithmic trading.
+- **Each channel is a separate permission.** Owning an approved web application does not permit a mobile application; having a web and mobile product does not permit programmatic client access; none of them permits algorithmic strategies.
+- **A vendor's empanelment is not your approval.** Verify the vendor's empanelment, the product's registration, and the segment, facility and version — then register your own implementation and certify your own testing and controls.
+- **Buying or hosting the software does not move the responsibility.** The firm remains answerable for its orders and its service regardless of who wrote or runs the code.
+- **"Intimation sent" and "vendor certified" are not evidence of approval.** They are different artefacts answering different questions.
+- **Decision timelines exist and differ by route** — notably a short decision period for internet trading on a complete application, and different periods for general software and for algorithmic routes.
+
+## Conceptual overview
+
+There are three layers of permission and they are routinely collapsed into one. The first is **product-level**: a software product may need to be registered, and in some cases its vendor empanelled, before any member may deploy it. The second is **member-deployment-level**: this member, with this product, at this version, for these segments and facilities, must be registered and certified. The third is **channel-level**: the facility through which clients reach the system — internet, mobile, programmatic access, direct market access, routing — is itself a permission with its own conditions. A firm can hold a valid layer-one and layer-two position and still be offering an unapproved facility, which is a named contravention with a per-instance penalty attached.
+
+The second idea is that the approval attaches to a *described thing*, and the description is what the auditor certifies. The certificate records the member, the product, the segment, the version, the vendor where applicable, the strategy details where relevant, and the dates of user-acceptance testing, exchange testing and mock participation. That specificity is what makes the approval meaningful and also what makes it fragile: ship a different version, enable a different segment, add a facility, and the approval no longer describes what is in production. This is why the version register in [change and version control](/broking-kyc/finix-broking-setup/certification/04-change-version-control/) is not documentation hygiene but the thing that establishes whether production is approved.
+
+The third point concerns the distinction between the exchange's own interface and a product a broker offers its clients. The exchange publishes interface specifications describing how a member's software connects to the trading system. A broker may separately offer clients programmatic access to its own systems. These are different things with different obligations, and calling the second one an interface does not bring it under the first one's approval or remove the software approval gate. The same confusion appears with direct market access, which is a specific regulated facility for eligible clients rather than a general label for any programmatic route.
+
+## 1. Framework
+
+- **Regulator circular of 19 August 2013** — the baseline on testing of software used in trading and risk management and the requirement of exchange approval before deployment, expressly covering internet-based trading, direct market access, wireless trading, smart order routing and algorithmic trading. `[not yet in index]`
+- **Regulator clarification of 7 February 2014** — the expedited and relaxed treatment for look-and-feel changes, bug fixes and exchange-driven changes. `[not yet in index]`
+- **Regulator circular of 30 May 2024** — a **seven-calendar-day** decision period on a complete internet-trading application, replacing a longer period. Addressed to recognised exchanges **other than commodity derivatives exchanges**. `[not yet in index]`
+- **Retail algorithmic trading framework**, notified 4 February 2025, with implementation extended so that it applies to all brokers from **1 April 2026** — algorithm-level permission, provider empanelment, broker due diligence, access controls and tagging. `[not yet in index]`
+- **Exchange consolidated circulars of April 2026** — the current operational baselines for the own-front-end facility, user identifiers, test market and simulation, read with later form amendments. `[not yet in index]`
+- **Exchange notification of 15 May 2026, effective 18 May 2026** — revised registration formats including the member auditor certificate. `[not yet in index]`
+- **Exchange notification of 2 September 2026** — a product-security and functional certification requirement on empanelled vendors, with its own forward deadlines. `[not yet in index]`
+- **The other exchange's unified approval portal**, introduced by a notice of 13 March 2026. `[not yet in index]`
+- **The commodity exchange's consolidated terminal-connectivity master of 30 April 2026.** `[not yet in index]`
+
+## 2. Vocabulary, stated correctly
+
+| Term | What it actually means |
+|---|---|
+| **Own front end** | The facility to use the member's own trading front end rather than the exchange's terminal. The abbreviation expands to **non-exchange-terminal front end**, not to any "on-net" formulation |
+| **Terminal-connectivity link** | The long-standing term for direct programmatic connectivity for a member's trading systems |
+| Terminal identifier | The member's own structured identifier for a terminal |
+| Exchange user identifier | The identifier the exchange issues and enables |
+| Order-origin field | A structured field populated on every order identifying terminal, channel, purpose and development route |
+| Algorithm identifier | A separate registration identifier for an approved strategy |
+| Client code | The client's unique code, a different field again |
+
+These serve different purposes and are not interchangeable. An integration that conflates the order-origin field with the client code, or the algorithm identifier with the terminal identifier, produces orders the exchange cannot attribute — which is the first thing asked about after any incident.
+
+## 3. The channel matrix
+
+| Software or channel | Requirement |
+|---|---|
+| **Exchange-supplied dealer terminal** | Distribution and access are exchange-controlled. Member user-identifier and location permissions still apply, and the recurring system-audit treatment differs from a member-operated own front end. **Whether every unmodified exchange-terminal release needs a separate member software filing was not established across all three venues** — confirm per venue |
+| **Dealer terminal-connected software, custom front end, order or risk system** | **Prior product and member deployment registration.** A vendor licence does not itself enable the member's exchange connection |
+| **Internet-based trading, web** | **Facility approval before offering client trading.** A member-specific application and audit evidence are required **even for empanelled software** |
+| **Mobile application or wireless trading** | **An additional permission category.** Not covered by holding a web approval; eligibility typically builds on the internet-trading permission |
+| **Algorithmic trading** | Permission attaches to **the algorithm** and the approved software or strategy, with an exchange identifier, and approval for modifications. Under the retail framework, providers are empanelled and the broker performs due diligence — **a provider's empanelment does not approve a deployment** |
+| **Client programmatic access offered by the broker** | A **separate regulated access channel** with its own facility, identification, authentication, risk-control and algorithmic requirements. Calling it an interface does not remove the software approval gate |
+| Lower-rate client-generated strategies | A published order-rate threshold provides a route without individual client-strategy registration below it, but still requires **tagging or generic identification, broker risk controls and rate limiting**. **It is not an exemption for the broker's own access product** |
+| Programmatic access security | Controlled access, vendor- and client-specific keys, address whitelisting, token-based authentication and second-factor authentication; providers empanelled; and **a daily session logout before the next trading day** |
+| **Direct market access** | Exchange permission for the member's facility and software, **distinct** from onboarding an eligible client and reporting its mapped identifier and client code. Additional algorithm approval applies where the flow uses algorithms |
+| **Smart order routing** | Exchange permission plus routing and risk-control compliance. At one venue the process specifies a **physical application** with supporting documents rather than the ordinary online workflow. **A commodity-venue route was not verified — do not transfer the securities process** |
+
+<Aside type="caution" title="The order-rate threshold is the most misread provision in this area">
+A published threshold expressed in orders per second — measured on the broker's server clock — provides a route for client-generated strategies below it without individual strategy registration. Three things it does not do. It does not exempt the broker's own programmatic access product from approval. It does not remove the obligation to tag or generically identify the orders. And it does not remove the broker's risk-control and rate-limiting duties. There is also an internal inconsistency in the published text about registration of generic identifiers, so **the exact boundary should be confirmed in writing with the exchange before implementation** rather than inferred from the threshold alone.
+</Aside>
+
+## 4. The development route
+
+| Route | What it requires |
+|---|---|
+| **Empanelled vendor product** | Verify **vendor empanelment, product registration, segment, facility and version**. Then register your own implementation and certify your testing and controls. **Vendor marketing claims, or another member's approval, are not evidence for your deployment** |
+| **In-house, custom, or built through a non-empanelled developer** | Treated as the in-house route. Requires product and risk-system write-ups plus **member-specific audit and testing**. At the commodity venue, in-house software additionally undergoes a **demonstration** after test and mock participation |
+| **Hosted by an application service provider** | Provider empanelment and the member's enrolment are **separate layers**, with their own enrolment form, agreement, undertaking and identifier application. Auditor and provider responsibilities must be checked against the actual architecture |
+| **What the member certifies regardless of route** | The actual product, version, segment and facility; member acceptance testing; exchange test and mock participation; order handling; pre-trade risk controls; access, network and security controls; and configuration and deployment. **The member remains responsible for its orders and its service even when the software is bought or hosted** |
+
+### A product-security certification requirement on vendors, from 2026
+
+A September 2026 notification requires prospective and existing empanelled vendors to obtain **independent application-security and functional certification** under the cyber framework's process, with scope covering terminal-connected, internet, wireless, programmatic-access and back-office products. Key dates: existing registered latest versions carry a certificate deadline of **28 February 2027**, with an annual submission cycle beginning with the period ending **31 March 2028**; new products and versions require certification. Provisional routes exist pending certification, with specified laboratory acknowledgements.
+
+**This is a vendor-product obligation that sits alongside, and does not replace, the broker's own deployment duties.** Its deadlines are in the future as at October 2026 and should not be described as overdue. The other exchange is reported to have adopted a corresponding requirement in September 2026, though the primary notice could not be authenticated directly; the commodity venue's position was not established.
+
+## 5. Decision timelines
+
+| Route | Period |
+|---|---|
+| **Internet-based trading** | **Seven calendar days from receipt of a complete application.** Note the addressee exclusion: the circular is addressed to exchanges **other than commodity derivatives exchanges** |
+| General software approval | **Fifteen working days** for a decision on a complete software application |
+| Retail algorithmic registration | Normally **ten working days**, and **seven working days** for execution algorithms, subject to complete information |
+| Wireless trading, and the commodity venue's internet turnaround | **Not established.** Do not assume the internet-trading period applies |
+
+<Aside type="danger" title="What the seven-day period is not">
+It is a decision period on a *complete* application. It is not a seven-day path from idea to live product: it excludes building, member acceptance testing, obtaining exchange test access, participating in a mock, procuring the deployment-specific auditor certificate, remedying deficiencies, and publishing a mobile application to a store. A launch plan built on the decision period alone will be wrong by weeks, and the failure mode is a marketing date that forces either a launch without approval — a named contravention attracting a penalty and a direction to stop — or a visible slip. Build the plan backwards from the audit and mock dependencies, and treat the decision period as the last step rather than the whole of it.
+</Aside>
+
+## 6. Approval, reporting, or nothing — and where no universal rule exists
+
+| Category | Position |
+|---|---|
+| New facility, new product, substantive change | **Approval or registration routes** |
+| Terminal additions, changes and deactivations | **Prescribed reporting and activation workflows** — see [terminal and user-identifier registration](/broking-kyc/finix-broking-setup/certification/03-ctcl-nnf-terminal-registration/) |
+| Mock evidence, incident reports | **Reporting obligations** |
+| Parameter-only risk-limit maintenance | **Do not equate a permitted operational limit setting with a software or logic change.** Preserve authorisation and an audit trail for settings; the software must still enforce the prescribed checks. **No universal exemption of parameter changes from filing was established** |
+| Marketing copy or help content outside the trading software | **No source establishes a filing for every unrelated content edit.** The boundary is architecture-dependent: document your classification rather than claiming a general exemption |
+| **A single four-way taxonomy of cosmetic, functional, risk and protocol mapping cleanly to no action, intimation, re-certification and approval** | **Does not exist across exchanges.** The rules establish particular reporting routes and reduced-document approval routes. **Obtain written classification for a doubtful release** |
+
+## 7. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.cert.facility_register` | **R** | Per exchange, per segment, per facility, per version | The authoritative statement of what is approved |
+| `finix.cert.production_must_match_register` | **D** | **true** | A deployment not described by an approval is unapproved |
+| `finix.cert.vendor_empanelment_verified` | **D** | true | Vendor, product, segment, facility and version |
+| `finix.cert.member_deployment_registered` | **R** | true | Separate from the vendor's position |
+| `finix.cert.channel_permissions` | **R** | Explicit per channel | Web, mobile, programmatic, direct access, routing, algorithmic |
+| `finix.cert.api_session_daily_logout` | **E** | true | Sessions must not persist across days |
+| `finix.cert.api_2fa_per_login` | **E** | true | Each web and mobile login |
+| `finix.cert.api_ip_whitelist` | **E** | true | With vendor- and client-specific keys |
+| `finix.cert.algo_rate_threshold_orders_per_second` | **E** | Exchange-published | Measured on the broker's server clock |
+| `finix.cert.algo_tagging_mandatory` | **R** | true | Including below the threshold |
+| `finix.cert.order_origin_field_populated` | **E** | true | Every order from an own front end |
+| `finix.cert.doubtful_release_written_classification` | **D** | true | Ask rather than infer |
+| `finix.cert.decision_period_tracking` | **D** | Per route | Seven days, fifteen working days, ten or seven working days |
+
+## 8. Practical notes
+
+- **Keep one register of what is approved**, by exchange, segment, facility, product and version, and reconcile it against production on a schedule. It is the single artefact that answers an inspection question in this area.
+- **Treat each channel as a project.** The commonest avoidable failure is building a mobile application on the assumption that the web approval covers it.
+- **Collect vendor evidence at procurement, not at filing.** Empanelment status, product registration, segment and version coverage, and the vendor's own certification position are procurement questions.
+- **Never infer an exemption.** Where a release's classification is uncertain, ask the exchange in writing and keep the answer; it is cheaper than a penalty and a direction to stop offering a facility.
+- **Plan launches backwards from the audit and mock dependencies**, not forwards from the decision period.
+- **Watch the vendor certification deadlines.** A vendor that fails to obtain its product certification on time becomes a constraint on the broker's own ability to deploy new versions.
+
+## Where this connects
+
+The submission pack for client-facing channels is in [mobile and web application submission](/broking-kyc/finix-broking-setup/certification/02-mobile-web-app-submission/), identifiers in [terminal and user-identifier registration](/broking-kyc/finix-broking-setup/certification/03-ctcl-nnf-terminal-registration/), change handling in [change and version control](/broking-kyc/finix-broking-setup/certification/04-change-version-control/), and testing in [mock trading and drills](/broking-kyc/finix-broking-setup/certification/05-mock-trading-and-drills/). The identifier mechanics in the order path are in [user identifiers, terminal-connected software and the unique order identifier](/broking-kyc/finix-broking-setup/oms/03-user-id-ctcl-nnf/), the algorithmic and programmatic channels in [algo, programmatic access, direct market access and smart order routing](/broking-kyc/finix-broking-setup/oms/09-algo-api-dma-sor/), and the go-live sequence in [certification, mock trading and go-live](/broking-kyc/finix-broking-setup/setup/10-certification-mock-golive/). The vendor-neutral view is [the retail algorithmic framework](/broking-kyc/deep-dives/trading-day/retail-algo-framework/).

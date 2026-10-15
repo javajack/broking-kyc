@@ -1,0 +1,187 @@
+---
+title: "OMS 11: the operations catalogue"
+description: Every action a human can take in the order management system — the routine ones, the periodic ones, and the forty-odd unusual interventions that only happen under pressure — with who may do each, what must be true first, what it touches downstream, and what evidence it leaves.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Most order management documentation describes what the system does. This page describes what *people do to the system*, which is a different and less documented thing. The routine actions are easy and everyone knows them. The dangerous ones are the interventions that happen four times a year under time pressure — cancelling another dealer's open orders, forcing a session reconnect, replaying a dropped acknowledgement, overriding a rejected order — and those are precisely the ones nobody has written down, rehearsed, or scoped to a role. So the catalogue is split by frequency rather than by module, because frequency predicts competence: the rarer the action, the more it needs a written precondition, a named authoriser, and a recorded reason.
+
+## TL;DR
+
+- **The catalogue is the authority model.** Every action below maps to a role and a permission; if an action is not in the catalogue, nobody should be able to perform it, and the permission audit is the check that this is true.
+- **Routine actions are safe because they are reversible and observed.** Placing, modifying and cancelling an order is a dozen keystrokes with an immediate confirmation and a client who notices. These need usability, not control.
+- **The unusual actions are the risk surface.** Bulk cancellation, session restart, acknowledgement replay, manual state correction and rejection override are rare, high-consequence, and performed by whoever happens to be on shift. Each needs a precondition, an authoriser and a recorded reason.
+- **Two actions must never exist**: silently editing an order's recorded state, and placing an order under another person's identifier. The first destroys the audit trail, the second destroys attribution — and attribution is what an exchange asks for first.
+- **Every intervention is a reportable fact to somebody.** A bulk cancellation affects clients; a session restart may be a technical glitch; a manual state correction is an audit observation waiting to happen. The catalogue names who learns about each one.
+- **Rehearse the rare ones.** The interventions in section 4 should be exercised in the mock environment on a schedule, because the first time someone performs a bulk cancellation should not be during a runaway algorithm.
+
+## Conceptual overview
+
+An order management system is operated by four distinct populations, and conflating them is the commonest design error. There are dealers, who place and manage orders for clients and whose actions are commercial. There are risk operators, who do not place orders but constrain who may; their actions are covered in [the RMS operations catalogue](/broking-kyc/finix-broking-setup/rms/11-operations-catalogue/). There are system administrators, who create identifiers, map entitlements and manage sessions, and whose actions are structural and mostly irreversible in their consequences. And there is the technology operations function, which restarts things. The same screen often serves several of these, which is how a dealer ends up with the ability to change a limit, or an administrator ends up with the ability to place an order — the two most common findings in an access-control review.
+
+The second structural point is that order state lives in three places that must agree: the exchange, the order management system, and the client's view. Almost every unusual intervention is an attempt to restore agreement between these three after something broke the normal synchronisation. That framing is useful because it tells you what the goal of an intervention is. The goal is never "make the screen look right"; it is "make the record match the exchange, and then make the client's view match the record". Interventions that go straight to the client's view, or that correct the record without reference to the exchange, are the ones that produce an unexplainable position two days later.
+
+The third point is about pressure. The actions in section 4 happen on the worst days — a connectivity failure, a runaway strategy, an exchange halt, a parameter error that is rejecting every order. On those days the operator is being asked questions by three people, the client is calling, and the decision window is a minute or less. A catalogue entry that reads "escalate to the head of risk for approval" is useless at that moment unless the escalation path is a phone number that is answered. So each unusual action below carries a **pre-authorised** or **authorise-then-act** marker, and the pre-authorised ones are deliberately generous: it is better that a competent operator cancel orders without permission than that a runaway strategy continue while they look for someone.
+
+## 1. How to read the catalogue
+
+| Column | Meaning |
+|---|---|
+| **ID** | Stable reference used in the permission matrix and in [the trading-day RACI](/broking-kyc/finix-broking-setup/roles/02-raci-trading-day/) |
+| **Action** | What the human does |
+| **Role** | The role entitled to it. Dealer, risk, administrator, technology, compliance |
+| **Frequency** | Per order, daily, weekly, monthly, rare |
+| **Precondition** | What must be true before the action is legitimate |
+| **Touches** | What changes downstream |
+| **Evidence** | What the action must leave behind |
+| **Authority** | Pre-authorised, authorise-then-act, or dual control |
+
+Frequency bands used throughout: **continuous** many times per session; **daily** once or a few times each day; **periodic** weekly to annually; **rare** a handful of times a year or less.
+
+## 2. Routine actions — the continuous set
+
+These are the actions that constitute ordinary dealing. They are safe because they are immediately confirmed, immediately visible to the client, and bounded by the pre-trade checks.
+
+| ID | Action | Role | Frequency | Precondition | Touches | Evidence |
+|---|---|---|---|---|---|---|
+| O-01 | Place a fresh order | Dealer, or client via channel | Continuous | Client active; segment enabled; within limits | Order book; margin blocked | Order log with identifier, timestamp, channel |
+| O-02 | Place an order with a validity qualifier | Dealer, client | Continuous | Validity supported by the segment | Order book; day-end expiry handling | As above plus validity recorded |
+| O-03 | Place a stop-loss or trigger order | Dealer, client | Continuous | Trigger on the correct side of the market | Pending trigger store | Trigger price and condition |
+| O-04 | Place a basket or multi-leg order | Dealer, client | Continuous | Each leg independently valid | Order book, several entries | Basket identifier linking legs |
+| O-05 | Modify price | Dealer, client | Continuous | Order live and modifiable; within band | Queue priority lost | Before and after values |
+| O-06 | Modify quantity upward | Dealer, client | Continuous | Incremental margin available | Queue priority lost; margin increased | Before and after values |
+| O-07 | Modify quantity downward | Dealer, client | Continuous | Order live; unexecuted portion sufficient | Margin released on confirmation | Before and after values |
+| O-08 | Cancel a single order | Dealer, client | Continuous | Order live | Margin released on confirmation | Cancellation acknowledgement |
+| O-09 | Cancel all own open orders | Dealer | Daily or rare | — | Multiple margin releases | Count cancelled, reason |
+| O-10 | Convert product type intraday to delivery | Dealer, client | Continuous | Margin for the target product available; before the cut-off | Margin recomputed; obligation changes | Conversion record, both product values |
+| O-11 | Convert delivery to intraday | Dealer, client | Continuous | Before the cut-off; position eligible | Margin released; square-off scope changes | As above |
+| O-12 | Square off a position deliberately | Dealer, client | Continuous | Position exists | New order; position reduces | Ordinary order trail, marked as closing |
+| O-13 | Place an after-market order | Client, dealer | Daily | Within the accepted window | Queue for release at open | Queue entry with intended release time |
+| O-14 | Cancel a queued after-market order | Client, dealer | Daily | Before release | Queue entry removed | Removal record |
+| O-15 | View another client's order book | Dealer with mapping | Continuous | Client mapped to this dealer | Nothing | **Read access logged** — mapping is the control |
+| O-16 | Place an order for a mapped client on instruction | Dealer | Continuous | Instruction recorded; client mapped | Order book | **The instruction record** — this is the one that gets asked about |
+
+<Aside type="caution" title="O-16 is the single most inspected action in dealing">
+A dealer placing an order on a client's verbal instruction is entirely legitimate and entirely routine. What makes it defensible is the contemporaneous record of the instruction — a recorded line, a logged chat, a written note timestamped before the order. What makes it indefensible is the absence of one, because the client's later claim that they never instructed the trade is then uncontradicted. Treat the instruction record as part of the order, not as a separate compliance chore: no record, no order. This is also why dealing-desk telephony recording and retention is an operational dependency of the dealing function rather than a nice-to-have.
+</Aside>
+
+## 3. Daily and periodic administrative actions
+
+| ID | Action | Role | Frequency | Precondition | Touches | Evidence |
+|---|---|---|---|---|---|---|
+| O-20 | Establish exchange sessions at start of day | Technology | Daily | Gate checks passed | Connectivity; order acceptance | Session start log per exchange and segment |
+| O-21 | Verify sequence continuity after session establishment | Technology | Daily | Session up | Nothing, if clean | Sequence numbers recorded |
+| O-22 | Load and apply the instrument master | Technology | Daily | File received and validated | Tradeable universe | Applied version and record counts |
+| O-23 | Release the after-market order queue | Technology | Daily | Session established; queue reconciled | Many orders enter the book | Released count against queued count |
+| O-24 | Close sessions at end of day | Technology | Daily | Market closed; order book quiesced | Connectivity down | Session end log; unacknowledged order count |
+| O-25 | Expire day-validity orders | System, verified by operations | Daily | Session closed | Order book cleared; margin released | Expired count |
+| O-26 | Extract the order and trade log for the back office | Technology | Daily | Session closed | Back-office import | Record counts both sides |
+| O-27 | Create a dealer identifier | Administrator | Periodic | Certification valid; approval recorded; exchange registration done | Entitlements; exchange identifier register | **Approval record and certification evidence** |
+| O-28 | Map a client to a dealer | Administrator | Periodic | Client active; mapping approved | Dealer's addressable client set | Mapping change log |
+| O-29 | Change a dealer's entitlements | Administrator | Periodic | Approval recorded | What that dealer may do | Before and after entitlement set |
+| O-30 | Disable a dealer identifier | Administrator | Periodic | Instruction from compliance or human resources | Dealer cannot act | Disablement record and trigger |
+| O-31 | Enable a segment for a client | Administrator | Periodic | Product activation complete; documents in place | Client's tradeable segments | Activation evidence |
+| O-32 | Configure an order-type availability per channel | Administrator | Periodic | Risk approval | What clients may place | Configuration change record |
+| O-33 | Update a channel rate limit | Administrator | Periodic | Risk approval | Throughput per channel | Change record, before and after |
+| O-34 | Reconcile the identifier register against the exchange | Compliance | Periodic | — | Nothing, if clean | Reconciliation statement and exceptions |
+| O-35 | Certify a software version with the exchange | Technology, compliance | Periodic | Exchange-mandated version window | Permitted software version | Certification correspondence |
+| O-36 | Apply a vendor software upgrade | Technology | Periodic | Tested; change window; rollback ready | Everything | Change record with rollback plan |
+
+## 4. The unusual interventions
+
+This is the section worth rehearsing. Each entry assumes the operator is under pressure and has incomplete information.
+
+| ID | Intervention | Role | Authority | Precondition | What it does | Known hazard |
+|---|---|---|---|---|---|---|
+| O-40 | **Cancel all open orders for one client** | Risk or dealer | **Pre-authorised** | A reason exists and is stated | Removes that client's live orders | A stop-loss order is also an open order; cancelling it leaves the position unprotected |
+| O-41 | **Cancel all open orders firm-wide** | Risk | **Pre-authorised** | Runaway behaviour or a parameter error | Removes every live order | Mass client impact; immediate communication required |
+| O-42 | **Kill an algorithmic strategy** | Risk or technology | **Pre-authorised** | Order rate, position or rejection rate outside profile | Strategy stops generating | Orders already in flight still arrive; pair with O-40 |
+| O-43 | **Block a client from fresh orders** | Risk | Pre-authorised | Shortfall, surveillance flag, or instruction | Client may reduce only | Blocks hedging too; consider close-only instead of full block |
+| O-44 | **Block an instrument firm-wide** | Risk | Pre-authorised | Ban period, surveillance, or price-feed failure | No orders in that instrument | Clients holding positions cannot exit; decide explicitly whether to allow reduction |
+| O-45 | **Block a channel** | Risk or technology | Pre-authorised | Channel-specific malfunction | That channel stops accepting | Clients migrate to telephony; dealing desk must be warned first |
+| O-46 | **Force a session disconnect and reconnect** | Technology | Pre-authorised | Session degraded or sequence diverged | Connectivity restored; **order state must be re-synchronised** | **The window between disconnect and re-sync is when state diverges**; do not accept orders during it |
+| O-47 | **Re-synchronise the order book against the exchange** | Technology | Authorise-then-act | Suspected divergence | Record corrected toward the exchange | Must be exchange-authoritative, never the reverse |
+| O-48 | **Replay a dropped acknowledgement** | Technology | Authorise-then-act | A trade or ack confirmed at the exchange but absent locally | Local state advances | Risk of double application; idempotency key mandatory |
+| O-49 | **Manually record an exchange-confirmed trade absent locally** | Technology with operations | **Dual control** | Exchange confirmation in hand | Position and margin change | The most dangerous action in the catalogue; see the caution below |
+| O-50 | **Reverse a locally recorded trade not confirmed by the exchange** | Technology with operations | **Dual control** | Exchange trade file does not contain it | Position and margin reduce | Must reconcile to the trade file, not to a screen |
+| O-51 | **Override a pre-trade rejection for one order** | Risk | Authorise-then-act | The rejecting check is known to be misconfigured | One order passes | A standing override is a configuration change made without approval |
+| O-52 | **Suspend a pre-trade check firm-wide** | Head of risk | **Dual control** | The check is malfunctioning, not merely inconvenient | Every order skips that check | Must carry an automatic expiry; never open-ended |
+| O-53 | **Raise a limit intraday for one client** | Risk | Authorise-then-act | Collateral or cash supports it | That client's capacity | Loosening is safe; verify the collateral is actually received, not merely promised |
+| O-54 | **Switch to the disaster recovery site** | Technology, with business sign-off | Authorise-then-act | Primary unrecoverable within the tolerance | Everything moves | Order state at the moment of switch is the hard part; exchange must be informed |
+| O-55 | **Operate through the exchange-provided fallback terminal** | Dealing with technology | Authorise-then-act | Member connectivity lost, exchange reachable | Orders can be placed outside the normal path | **These orders bypass the internal risk checks** — manual risk control required |
+| O-56 | **Place a risk-reducing order outside normal controls** | Head of risk | Authorise-then-act | Controls are the obstacle to reducing risk | A position reduces | Must be logged as an exception with the reasoning |
+| O-57 | **Extend a session or accept orders after a halt is lifted late** | Technology | Pre-authorised | Exchange has extended | Session timing changes | Internal cut-offs, square-off timers and end-of-day jobs all keyed to the old time |
+| O-58 | **Cancel orders on behalf of a client who cannot reach the desk** | Dealer | Authorise-then-act | Instruction received through a verified channel | Orders removed | Verification of identity is the whole control |
+| O-59 | **Freeze all order entry but keep sessions alive** | Risk | Pre-authorised | Internal uncertainty about state | No new orders; existing manageable | Preferred over O-46 when the problem is internal, not connectivity |
+| O-60 | **Reject an incoming client order type en masse** | Risk | Pre-authorised | A specific order type is behaving badly | That type unavailable | Clients with pending orders of that type are unaffected; be explicit about which |
+| O-61 | **Reconstruct the order book from logs after a crash** | Technology | **Dual control** | Primary store lost | Record rebuilt | Must be reconciled against the exchange order log before trusting |
+| O-62 | **Correct a client code on an executed trade** | Operations with compliance | **Dual control** | Genuine error, within the exchange's permitted window and reason codes | Trade attribution changes | **Scrutinised heavily** — modification volume is itself monitored; see the caution |
+| O-63 | **Mark an order as entered under the wrong identifier** | Compliance | Authorise-then-act | Discovered mis-attribution | Attribution record corrected | Cannot be silent; it is a reportable control failure |
+
+<Aside type="danger" title="O-49 and O-50 destroy reconciliation if used casually">
+Manually adding or reversing a trade in the order management system is sometimes genuinely necessary — an acknowledgement is lost, a session dies mid-trade, a gateway drops a message. It is also the single easiest way to create a position that no external record supports. Two rules make it survivable. First, the exchange trade file is the only acceptable authority: not a screen, not a counterparty's word, not a dealer's recollection. Second, the correction is made once, with an idempotency key, by two people, and is immediately re-reconciled. If the manual correction is still needed after the official trade file arrives, the file is the thing to reconcile to — and if the file disagrees with the correction, the file wins and the correction is reversed.
+</Aside>
+
+<Aside type="caution" title="O-62: client code modification is a monitored metric, not just an operation">
+Exchanges permit correction of a client code on an executed trade within a window and for specified reasons, precisely because genuine punching errors happen. They also monitor the volume and pattern of such modifications, because the mechanism is the classic route for shifting a profitable trade to a favoured account and a loss to another. The operational consequences: modifications need a reason code that is true, a record of who authorised it, a monthly report of modification volume by dealer reviewed by compliance, and an internal threshold that triggers investigation well before the exchange's does. A dealer whose modification rate is an outlier is a supervision matter whether or not any individual modification was improper.
+</Aside>
+
+## 5. Actions that must not exist
+
+| Prohibited | Why | What to do instead |
+|---|---|---|
+| Edit an order's recorded history | Destroys the audit trail irrecoverably | Append a correction record; never mutate |
+| Place an order under another person's identifier | Destroys attribution, which is the first thing an exchange asks | Each person has their own identifier; cover arrangements use mapped clients, not shared logins |
+| Share a dealer login | Same as above, plus a certification question | Role-based entitlements on individual identifiers |
+| Delete an order log entry | Retention obligation breached | Logs are append-only with defined retention |
+| Grant a dealer the ability to change their own limit | Removes the control entirely | Risk sets limits; dealing consumes them |
+| Suppress a rejection from the client's view | Client acts on a false belief about their order | Surface every terminal state |
+| Keep a permanently open override | A configuration change without approval | Overrides expire; fix the configuration |
+| Accept orders while order state is known to be divergent | Produces trades nobody can explain | Freeze entry until re-synchronised |
+
+## 6. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.oms.ops.bulk_cancel.preauthorised_roles` | **D** | Risk, senior dealer | Deliberately wide |
+| `finix.oms.ops.bulk_cancel.notify` | **D** | Head of risk, head of dealing, compliance | Immediate, automatic |
+| `finix.oms.ops.check_suspend.max_duration_minutes` | **D** | 30 | Automatic expiry; renewal is a fresh decision |
+| `finix.oms.ops.override.standing_prohibited` | **D** | true | Per-order only |
+| `finix.oms.ops.manual_trade.dual_control` | **D** | true | Never false |
+| `finix.oms.ops.manual_trade.requires_trade_file_reference` | **D** | true | The authority is the file |
+| `finix.oms.ops.client_code_modification.internal_threshold_per_dealer_month` | **D** | Set below the exchange's monitoring threshold | Triggers compliance review |
+| `finix.oms.ops.session_restart.freeze_entry` | **D** | true | No order entry during re-synchronisation |
+| `finix.oms.ops.fallback_terminal.manual_risk_signoff` | **D** | true | Orders bypassing internal checks need a human check |
+| `finix.oms.ops.permission_audit.frequency` | **R** interpretation | Quarterly | Entitlements against the catalogue |
+| `finix.oms.ops.intervention_log.retention_years` | **R** | 8 | Matches the broker record-retention obligation |
+| `finix.oms.ops.rare_action_drill.frequency` | **D** | Half-yearly | Section 4 exercised in the mock environment |
+
+## 7. The intervention log
+
+Every action in section 4 writes one record. This log is a small, high-value artefact that inspectors and post-incident reviews both want, and it is usually absent.
+
+| Field | Content |
+|---|---|
+| Intervention ID | O-40 to O-63 |
+| Timestamp | To the second |
+| Operator | Individual, never a shared account |
+| Authoriser | Where authority is not pre-authorised |
+| Scope | Client, instrument, channel, firm-wide |
+| Stated reason | Free text, written at the time, not reconstructed |
+| Counts | Orders cancelled, records corrected, clients affected |
+| Reversal | Whether and when the intervention was unwound |
+| Downstream notifications | Who was told, and when |
+| Linked incident | The incident record, where one exists |
+
+## Practical notes
+
+- **Keep the catalogue on one page and keep it current.** Its value is that an operator under pressure can find the entry. A catalogue spread across a vendor manual, a wiki and three emails is not a control.
+- **Audit entitlements against the catalogue, not against themselves.** The question is not "is this permission set internally consistent" but "does anyone hold a permission with no catalogue entry". Those are the interesting ones.
+- **The pre-authorised list should make you slightly uncomfortable.** If it does not, it is too narrow, and the consequence of too narrow is a runaway strategy that ran for nine extra minutes while someone looked for an approver.
+- **Count interventions monthly.** A rising count of O-48 and O-49 is not an operations problem; it is a connectivity or integration defect expressing itself as manual work.
+- **New joiners learn section 2 and are explicitly excluded from section 4** until they have been through a drill. The entitlement should enforce that, not a convention.
+
+## Where this connects
+
+The permission model here is the implementation of the roles in [the role register](/broking-kyc/finix-broking-setup/roles/01-role-register/) and the duty separations in [segregation and access control](/broking-kyc/finix-broking-setup/roles/04-segregation-access-control/). The interventions in section 4 are the operator-side view of [the incident playbooks](/broking-kyc/finix-broking-setup/daily-ops/07-incident-playbooks/), and the state-divergence interventions presuppose the mechanics in [the order return path](/broking-kyc/finix-broking-setup/oms/07-order-return-path/) and [modification and cancellation](/broking-kyc/finix-broking-setup/oms/08-modify-cancel-rules/). Equivalent catalogues exist for [RMS](/broking-kyc/finix-broking-setup/rms/11-operations-catalogue/), [the back office](/broking-kyc/finix-broking-setup/backoffice/12-operations-catalogue/) and [money movement](/broking-kyc/finix-broking-setup/money/08-money-operations-catalogue/).

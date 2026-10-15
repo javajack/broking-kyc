@@ -1,0 +1,238 @@
+---
+title: "Files 1: the file register and its architecture"
+description: How to design the file layer that every Indian broking operation actually runs on — the register itself, the per-day-type expected-file manifest, transport and collection, naming and versioning, idempotency, the applied-state assertion, and why the file layer deserves to be treated as a system rather than a set of cron jobs.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** An Indian broking operation is, mechanically, a file-processing business. Orders and trades flow over sessions, but almost everything else — the tradeable universe, the margin parameters, the obligations, the collateral values, the penalties, the client reporting — arrives as a file on a schedule, and the day works only if the right files arrived, were recognised, were applied, and were seen to have been applied. Most firms discover this the hard way, having built the file layer as a drawer of scripts. So this page defines the file layer as a system with its own register, manifest, state model and failure semantics, before the following pages enumerate the actual files exchange by exchange.
+
+## TL;DR
+
+- **The register is the artefact.** One authoritative list of every file, with source, schedule, consumer, criticality and failure behaviour, is worth more than any individual integration. Without it nobody can answer "what have we not received today".
+- **The manifest is per day type, not per day.** What you expect on an ordinary Tuesday, a settlement day, an expiry day, a commodity tender day, a post-holiday day and a month end are different sets. A single flat checklist produces both false alarms and real misses.
+- **Assert applied state, not job success.** The question is never "did the ingestion job exit zero" but "what version is the risk engine actually using, and is it today's". These diverge more often than anyone expects.
+- **Count, then value, then diff.** A truncated file is the dangerous failure because it succeeds. Record counts catch truncation, value checks catch garbage, and a diff against yesterday catches the plausible-but-wrong.
+- **Every ingestion must be idempotent and every file version-aware.** Files get re-published, revised and sent twice. A pipeline that cannot safely reprocess is a pipeline that will double-count.
+- **Criticality is a gate, not a label.** For each file, decide in advance what the operation refuses to do without it — open a segment, release orders, compute margin, submit a report — and wire that refusal.
+
+## Conceptual overview
+
+There are four distinct things a file can be, and conflating them is the root of most file-layer design error. A *reference file* defines the world: the instrument master, the contract master, the eligible-collateral list, the ban list, the price bands. These must be applied before trading and their staleness is dangerous precisely because the system keeps working with yesterday's version. A *parameter file* sets computation inputs: margin rates, haircuts, volatility figures. These have the same staleness property and additionally arrive several times a day. A *transaction file* records what happened: trades, obligations, deliveries, receipts, penalties. These are authoritative facts and the firm's own records must be reconciled toward them, never the reverse. And a *response file* is the counterparty's answer to something the firm sent: an upload acknowledgement, a rejection report, a confirmation. These are the easiest to ignore and the most expensive to ignore, because an unread rejection report means the submission silently did not happen.
+
+The second observation is about who the authority is. For a transaction file, the issuer is authoritative and the broker's job is to reconcile to it — a trade in the exchange file that the firm does not have is a trade the firm has, and the firm's record is what is wrong. For a reference or parameter file, the issuer is authoritative but *application* is the firm's responsibility, so the failure mode is not disagreement but staleness. For a response file, the issuer is reporting on the firm's own action, which means an unexamined response file is an unverified submission. These three different authority relationships imply three different monitoring questions, and a file layer that monitors all files identically answers none of them well.
+
+The third point is that file timing is a dependency graph, not a schedule. The risk parameter file gates derivatives margin, which gates the open. The trade file gates reconciliation, which gates charges, contract notes, the ledger and every downstream report. The obligation file gates funding. The collateral file gates tomorrow's capacity. Expressing these as a graph rather than as cron entries has a practical payoff: when a file is late, the system can say what is now at risk and by when, rather than leaving an operator to work it out under pressure. That is the difference between a file layer and a drawer of scripts.
+
+## 1. What the register holds
+
+One row per file. The columns below are the ones that get used; anything else is documentation nobody reads.
+
+| Column | Purpose |
+|---|---|
+| Register ID | Stable reference, used in the manifest, the monitoring board and the runbooks |
+| Business name | What operators call it |
+| Source | Exchange, clearing corporation, depository, bank, gateway, vendor, registrar |
+| Segment and scope | Which segment, which exchange, which entity |
+| Direction | Inbound or outbound |
+| Class | Reference, parameter, transaction, response |
+| Collection mechanism | Member portal, extranet, secure file transfer, interactive interface download, web service, electronic mail |
+| Credentials and path | Referenced by secret identifier, never inline |
+| Schedule | Expected availability, with a window not a point |
+| Day types | Which day types expect this file |
+| Format | Delimited, fixed-width, archive container, structured markup |
+| Expected volume | Approximate record count, to detect truncation |
+| Consumer | Which system and which process |
+| Criticality | What the operation refuses to do without it |
+| Blocking gate | The named gate in the begin-of-day or end-of-day sequence |
+| Idempotency key | How a reprocess is made safe |
+| Revision behaviour | Whether revised versions are published, and how they are identified |
+| Retention | How long the raw file is kept |
+| Owner | A named role, not a team mailbox |
+
+<Aside type="caution" title="The register must include files nobody currently reads">
+Every operation has files it downloads and does not process — a report that was once useful, a response file that is assumed to be always clean, a reconciliation statement that gets filed. These are the ones that bite, because the day the response file contains a rejection is the day the submission did not happen and nobody knew for a week. When building the register, enumerate from the *source's* list of available files rather than from the firm's own job list, and for each one that is not consumed, record an explicit decision: not required, or required and currently unmonitored. The second category is the finding.
+</Aside>
+
+## 2. Day types and the manifest
+
+The expected-file manifest is a function of the day type. A day can carry several types at once.
+
+| Day type | Determined by | Adds to the manifest |
+|---|---|---|
+| Ordinary trading day | Exchange calendar | The base set |
+| Settlement day | Settlement calendar | Obligation, pay-in and pay-out files for the settling cycle |
+| Post-holiday day | Calendar | Multiple days of accumulated files; higher volumes; a longer begin-of-day |
+| Pre-holiday day | Calendar | Extended settlement implications; funding across the gap |
+| Equity derivatives expiry day | Contract calendar | Settlement price, exercise, assignment and expiry-processing files |
+| Stock derivatives physical settlement | Expiry cycle | Delivery obligation files arising from derivatives |
+| Commodity tender or delivery day | Commodity contract calendar | Delivery intention, allocation and warehouse files |
+| Month end | Calendar | Periodic client reporting, charge cycles, statement runs |
+| Quarter or year end | Calendar | Periodic reporting, statements, tax artefacts |
+| Corporate action record date | Corporate action calendar | Entitlement and adjustment files |
+| No-delivery period | Corporate action calendar | Altered settlement handling |
+| Daylight-saving changeover | International calendar | Commodity evening session timing changes |
+| Mock or drill day | Exchange notification | A parallel non-production manifest |
+
+<Aside type="danger" title="The post-holiday manifest is where operations most often breaks">
+After a long weekend, several days of parameter and reference files have been published, some of which supersede each other and some of which must each be applied in order. Volumes on transaction files are larger. The settlement calendar has shifted. And the begin-of-day window is the same length as always. The two failures are applying the oldest available file because it was the first one found, and applying only the newest when the intermediate ones carried corporate-action or eligibility changes that matter. The register's *revision behaviour* column is what resolves this: for each file, state explicitly whether versions supersede or accumulate. Then make the post-holiday manifest a distinct, rehearsed, longer runbook rather than the ordinary one run in a hurry.
+</Aside>
+
+## 3. Collection
+
+| Concern | Design position |
+|---|---|
+| Mechanism diversity | Accept it; wrap each mechanism behind one internal interface so the pipeline is uniform |
+| Credentials | Held in the secret store, rotated on a schedule, never in scripts or the register |
+| Access from a fixed address | Several sources restrict by network address; the register records which |
+| Polling versus event | Most sources are poll-only; poll within a window with backoff, do not poll continuously |
+| Availability window, not a time | A file "available at 18:00" is available between 17:45 and 19:30 in practice; alert on the end of the window |
+| Partial publication | A file can appear while still being written; require a completion signal, a stable size, or a checksum before taking it |
+| Archive containers | Unpack, then validate each member; a valid archive can contain an empty member |
+| Manual collection fallback | For each file, a documented human path, because the automation will fail during an incident |
+| Separation of collection from processing | Land the raw file immutably first, then process from the landed copy; never process from the source |
+
+The last row is the one that earns its keep. An immutable landing zone means a reprocess never re-downloads, a dispute can be settled by looking at exactly what arrived, and a source that republishes cannot silently change what the firm processed.
+
+## 4. Naming and versioning
+
+Source naming is whatever the source chooses and cannot be changed. Internal naming is the firm's and should be strict.
+
+| Element | Convention |
+|---|---|
+| Internal path | `<source>/<segment>/<register-id>/<business-date>/<sequence>` |
+| Business date | The date the file is *about*, which is often not the date it arrived |
+| Sequence | Monotonic within a business date, so revisions order unambiguously |
+| Original name | Preserved verbatim as metadata; never the primary key |
+| Checksum | Computed on landing, stored, and compared on any re-collection |
+| Supersession flag | Set when a later sequence replaces rather than supplements an earlier one |
+
+The business date distinction matters more than it appears. A file collected on Monday morning about Friday's trading is Friday's file, and processing it as Monday's is a whole class of reconciliation failure that is very hard to diagnose afterwards.
+
+## 5. Validation, in order
+
+Validation is cheap and runs in a fixed order, failing fast.
+
+| Step | Check | Catches |
+|---|---|---|
+| 1 | File present within the window | Non-publication, collection failure, credential expiry |
+| 2 | Non-zero size, completion signalled | Partial publication |
+| 3 | Checksum matches, where published | Corruption in transit |
+| 4 | Container unpacks; every member present | Empty or partial archives |
+| 5 | Header or trailer parses; declared counts read | Structural change by the source |
+| 6 | **Record count within expected range** | **Truncation — the dangerous silent failure** |
+| 7 | Declared trailer count equals actual record count | Partial write |
+| 8 | Business date in the file equals the expected business date | Stale or wrong-day file |
+| 9 | Schema conforms; mandatory fields present | An unannounced format change |
+| 10 | Values plausible — ranges, signs, magnitudes | Garbage that parses |
+| 11 | **Diff against the previous version** | Plausible but wrong; large unexplained movements |
+| 12 | Cross-file consistency where applicable | One file of a set missing or mismatched |
+
+<Aside type="caution" title="Step 6 and step 11 are the two that are usually missing">
+Steps 1 to 5 are what most pipelines implement, and they catch the failures that announce themselves. Truncation does not announce itself: a file with eighty per cent of yesterday's records parses perfectly, applies cleanly, and leaves a fifth of the firm's clients or instruments silently mishandled. Nor does a plausible-but-wrong parameter file: margin rates that are all a factor of ten out will pass every structural check. The record-count range and the diff-against-yesterday are therefore the highest-value checks in the list, and both are easy — they need a stored expectation and a stored previous version, which the landing zone already provides. Alert on the diff rather than block on it, because legitimate large movements do happen, and an operator who sees "haircuts moved by more than N per cent on M securities" before the open is an operator who makes a good decision.
+</Aside>
+
+## 6. Application and the applied-state assertion
+
+Ingesting a file is not the same as the consuming system using it. The gap between the two is a recurring source of incidents, so the state model is explicit.
+
+| State | Meaning |
+|---|---|
+| Expected | In today's manifest, not yet collected |
+| Collected | Landed immutably, not yet validated |
+| Validated | Passed the checks in section 5 |
+| Rejected | Failed validation; exception raised with the reason |
+| Applied | The consuming system is using it, and says so |
+| Superseded | A later version has replaced it |
+| Not required today | Explicitly excluded by the day type |
+
+The **applied** state is asserted by querying the consumer, not by the ingestion job reporting success. The risk engine states which parameter version and timestamp it is using. The order management system states its instrument master date and record count. The back office states the trade file it reconciled against. These assertions are what the begin-of-day gates test, and they are what makes "we loaded it" into "it is in use".
+
+## 7. Idempotency and reprocessing
+
+| Rule | Reason |
+|---|---|
+| Every ingestion carries an idempotency key — source, register ID, business date, sequence, checksum | A file delivered twice must apply once |
+| Reprocessing a file version produces the same result as the first processing | Otherwise no correction is safe |
+| A revised version is processed as a **diff against the applied version**, not as a fresh load | Replacing wholesale double-counts or drops |
+| Supersession is explicit per file, recorded in the register | Some sources supersede, some accumulate; guessing is wrong half the time |
+| Downstream effects of a reprocess are enumerated before it runs | A reprocessed trade file touches charges, notes, the ledger and reporting |
+| A reprocess after a downstream deadline is an exception with a named approver | The same correction has different consequences on either side of a submission |
+
+## 8. Criticality and gates
+
+Criticality is operationalised as a refusal. For each file the register states what the firm will not do without it.
+
+| Criticality | Meaning | Example refusal |
+|---|---|---|
+| **Blocking — open** | The market cannot be entered without it | Instrument master absent: do not open |
+| **Blocking — segment** | One segment cannot be entered | Derivatives parameter file absent: that segment stays closed, or opens on the pre-decided fallback |
+| **Blocking — computation** | A computation cannot be trusted | Collateral file absent: capacity frozen at the last good value, no increases |
+| **Blocking — downstream** | An end-of-day step cannot proceed | Trade file absent: no reconciliation, no contract notes |
+| **Blocking — submission** | A regulatory submission cannot be made | Penalty or obligation file absent: reporting at risk; escalate early |
+| **Degrading** | The operation continues with a stated reduction | Surveillance list absent: apply the most restrictive prior treatment |
+| **Informational** | Nothing refuses, but absence is still logged | A statistical report |
+
+Every blocking file must have a pre-decided fallback, written in the register, approved once, and rehearsed. The decision at eight in the morning should be a lookup, not a debate.
+
+## 9. Monitoring
+
+| View | Audience | Content |
+|---|---|---|
+| Manifest board | Operations, from start of day | Every expected file for today's day type, with its state and window |
+| Window-breach alerts | Operations | Fired at the *end* of the availability window, not the start |
+| Applied-state panel | Operations and risk | What each consuming system says it is using, with versions and dates |
+| Dependency impact | Operations lead | Given what is late, what is now at risk and by when |
+| Response-file exceptions | Compliance and operations | Rejections and non-acknowledgements on anything the firm submitted |
+| Diff alerts | Risk and operations | Significant movements in parameter and reference files |
+| Reprocess log | Operations lead, audit | Every reprocess, with reason, approver and downstream effects |
+
+## 10. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.files.landing.immutable` | **D** | true | Process from the landed copy only |
+| `finix.files.landing.retention_years` | **R** interpretation | 8 | Raw files are part of the record |
+| `finix.files.collection.window_alert_on_end` | **D** | true | Not on the expected time |
+| `finix.files.collection.completion_signal_required` | **D** | true | Stable size, checksum, or marker |
+| `finix.files.validation.record_count_range_enforced` | **D** | true | The truncation control |
+| `finix.files.validation.diff_alert_threshold` | **D** | Per file, in the register | Alert, not block |
+| `finix.files.validation.business_date_must_match` | **D** | true | The wrong-day control |
+| `finix.files.apply.assert_consumer_state` | **D** | true | Query the consumer, not the job |
+| `finix.files.idempotency.key_components` | **D** | Source, register ID, business date, sequence, checksum | — |
+| `finix.files.revision.default_behaviour` | **D** | Diff, never wholesale replace | Per-file override in the register |
+| `finix.files.manifest.day_type_resolution` | **D** | Automatic from calendars, confirmed by an operator | Both |
+| `finix.files.criticality.fallback_required_for_blocking` | **D** | true | No blocking file without a written fallback |
+| `finix.files.response_files.exception_monitoring` | **D** | true | Unread rejections are unmade submissions |
+| `finix.files.reprocess.approval_required_after_deadline` | **D** | true | Named approver |
+| `finix.files.manual_collection_runbook_required` | **D** | true | Per file; automation fails during incidents |
+
+## 11. Building the register for a new broker
+
+| Order | Step | Output |
+|---|---|---|
+| 1 | Enumerate from each source's own published list of member downloads and uploads | A candidate list that is not biased by what you already built |
+| 2 | Classify each as reference, parameter, transaction or response | The authority relationship for each |
+| 3 | Map each to its consuming process | The consumer column, and the orphans |
+| 4 | Decide criticality and the refusal | The gates |
+| 5 | Decide the fallback for every blocking file | The pre-decided decisions |
+| 6 | Build the day-type manifests | Six to ten distinct manifests |
+| 7 | Record expected volumes from the first weeks of live data | The truncation ranges |
+| 8 | Wire the applied-state assertions | The gates become testable |
+| 9 | Drill the absence of each blocking file in the mock environment | Confidence that the fallback works |
+| 10 | Review the register quarterly against the sources' current lists | New files, retired files, changed formats |
+
+Step 10 is not optional. Sources add, retire and re-version files continuously, and a register that is not reconciled against the source's current list decays into a description of last year's operation.
+
+## Practical notes
+
+- **The register is a configuration artefact under change control**, not a wiki page. A new file or a changed criticality is a reviewed change.
+- **Make the manifest board the first screen of the operations day.** It replaces the question "is everything in" with an answer.
+- **Alert on windows ending, and route to a human who can act.** An alert at the expected time trains people to ignore alerts.
+- **Treat an unexplained diff as a reason to pause, not to proceed carefully.** The cost of a late open is small; the cost of a day run on wrong margin parameters is not.
+- **Keep the manual collection path current.** It is used precisely when everything else is broken, which is when a stale runbook is most expensive.
+- **Count reprocesses by cause monthly.** This is the same diagnostic as the back office's manual-journal count, one layer upstream.
+
+## Where this connects
+
+The files themselves are enumerated in [NSE files](/broking-kyc/finix-broking-setup/files/02-nse-files/), [BSE files](/broking-kyc/finix-broking-setup/files/03-bse-files/), [MCX files](/broking-kyc/finix-broking-setup/files/04-mcx-files/), [clearing corporation files](/broking-kyc/finix-broking-setup/files/05-clearing-corporation-files/), [depository files](/broking-kyc/finix-broking-setup/files/06-depository-files/) and [bank and payment files](/broking-kyc/finix-broking-setup/files/09-bank-payment-files/); what the firm sends is in [outbound submissions](/broking-kyc/finix-broking-setup/files/07-outbound-submissions/) and the failure handling in [file handling exceptions](/broking-kyc/finix-broking-setup/files/08-file-handling-exceptions/). The gates referenced here are the ones in [the begin-of-day runbook](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/) and [the end-of-day runbook](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/), consolidated in [the master trading-day checklist](/broking-kyc/finix-broking-setup/daily-ops/10-master-trading-day-checklist/). The interface-level view of the same boundaries is [the integration contract matrix](/broking-kyc/finix-broking-setup/stack/integration-contract-matrix/), and the batch-processing view from the vendor-neutral part of the site is [batch pipeline](/broking-kyc/operations/batch-pipeline/).

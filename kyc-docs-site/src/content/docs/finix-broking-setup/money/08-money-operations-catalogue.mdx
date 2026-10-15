@@ -1,0 +1,198 @@
+---
+title: "Money 8: the operations catalogue"
+description: Every action the funds, treasury and banking desk takes — the daily funding and pay-out cycle, the reconciliation set, and the thirty unusual interventions from a reversed pay-out to funding an exchange shortfall after the bank's cut-off — with authority, maker-checker boundaries and the segregation rules that constrain all of them.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** The funds desk is the only plane where an operator's mistake moves real money irreversibly out of the firm, and the only one where a single prohibited action — using one client's money for another purpose — is a regulatory breach rather than an error. So the catalogue leads with the constraints rather than the tasks: section 2 states the four rules that bound every action below, and every entry thereafter is implicitly subject to them. The interventions are then grouped by what they touch — a client's balance, the firm's balance, or the exchange's balance — because those three have completely different authority requirements and completely different consequences for getting it wrong.
+
+## TL;DR
+
+- **Four constraints bound everything.** Client money is segregated; client money funds only that client's obligations; cash from clients is prohibited; and the computed upstreaming position must be instructed daily. No operational convenience overrides any of them.
+- **The hard deadline is the bank's, not the exchange's.** The clearing corporation's pay-in time is met only if the bank's instruction cut-off was met, which is earlier — and the bank's cut-off, not the exchange's, is the one the desk actually works to.
+- **Maker-checker on pay-outs is the control that matters most.** It is the only thing standing between a compromised credential and money leaving the firm.
+- **A reversal is not the opposite of a payment.** A failed or returned pay-out creates a credit that must be re-attributed to the right client, and the attribution is where it goes wrong.
+- **Treasury decisions are decisions, not deadlines.** How much to fund, from where, and whether to borrow are judgements with a window, and they need a named decision-maker and a recorded rationale, not a cut-off time.
+- **Every unidentified receipt is still client money.** Parking it in suspense does not change its character for segregation or upstreaming, and the ageing report is the only control that forces it to be resolved.
+
+## Conceptual overview
+
+Money in a broking operation sits in a small number of places and the whole discipline consists of knowing, at every moment, which pot each rupee belongs to. There is the firm's own money. There is client money held for clients. There is client money that has been placed with the clearing corporation as margin or collateral, which is still client money but is no longer under the firm's control. There is money in transit — instructed but not settled, received but not attributed. And there are the exchange and clearing balances, which are the firm's obligations expressed as cash. Almost every serious failure in this plane is a confusion between two of these pots, and almost every control exists to make the boundary between them visible and enforced.
+
+The second structural fact is that money and trading run on different clocks and the desk lives in the gap. A client's trade creates an obligation instantly; the funding of that obligation settles on a cycle. A client's payment is irrevocable in some rails and reversible in others, arrives with a reference that may or may not identify them, and creates trading capacity at a moment the desk chooses. The exchange's pay-in demands certainty at a fixed time from a process that is inherently uncertain until the bank confirms. The desk's job is to absorb that mismatch without ever resolving it in a way that uses one party's money to cover another's — which is precisely the tempting resolution when a shortfall appears at ten past the cut-off.
+
+The third point is about irreversibility and therefore about authority. An order can be cancelled; a ledger entry can be reversed; a payment, once it has left on a real-time rail, is gone. That asymmetry is why this plane's authority model is the strictest in the manual: maker-checker on every outbound instruction, dual control on anything involving the firm's own funds covering a client obligation, and a hard separation between the person who can create a beneficiary and the person who can pay one. The last of those is the control that defeats the commonest fraud pattern, which is not a fabricated payment but a legitimate payment to an altered destination.
+
+## 1. How to read the catalogue
+
+Columns follow [the OMS operations catalogue](/broking-kyc/finix-broking-setup/oms/11-operations-catalogue/). Money-specific markers:
+
+| Marker | Meaning |
+|---|---|
+| **Pot** | Whose money moves: client, firm, exchange, or in-transit |
+| **Reversibility** | Irreversible, reversible, or conditional |
+| **Maker-checker** | Whether two individuals are required in the system |
+
+## 2. The four constraints
+
+Every action in this catalogue is subject to all four. They are stated once here rather than repeated on each row.
+
+| # | Constraint | Practical form | Classification |
+|---|---|---|---|
+| 1 | **Segregation** | Client money sits in designated client accounts, separate from the firm's own and identified as such | **R** |
+| 2 | **No cross-use** | A client's money may fund that client's obligations and nothing else — not another client's, not the firm's | **R** |
+| 3 | **No cash** | Cash receipts from clients are prohibited by statute; there is no threshold and no exception | **R** |
+| 4 | **Upstreaming** | The computed client-funds position is upstreamed to the clearing corporation daily, on the prescribed basis | **R** |
+
+<Aside type="danger" title="Constraint 2 is the one that gets broken under time pressure">
+The scenario is specific and recurrent: the exchange pay-in is short, the shortfall is caused by one client's unpaid obligation, the bank cut-off is minutes away, and the client-money account has a comfortable aggregate balance because other clients have credit balances. Using that balance covers the shortfall, meets the pay-in, and breaches the segregation obligation — it funds one client's obligation with another's money. The permitted responses are to fund from the firm's own account, to draw on a pre-arranged firm facility, or to fail the pay-in and manage the consequence. The first two must be arranged *before* the day they are needed, which is the entire point of holding a firm liquidity buffer and a committed line. A desk without those arrangements will eventually face a choice between a breach and a default, and that choice should never be an operator's to make at four in the afternoon.
+</Aside>
+
+## 3. The daily cycle
+
+| ID | Action | Role | Timing | Pot | Notes |
+|---|---|---|---|---|---|
+| M-01 | Open the day's bank position across all accounts | Finance | Pre-open | All | Reconciled to yesterday's close |
+| M-02 | Receive and attribute overnight and early pay-ins | Operations | Pre-open and continuous | Client, in-transit | Attribution lag drives client experience |
+| M-03 | Release trading capacity on attributed receipts | Operations, risk | Continuous | — | The link to [the limit impact matrix](/broking-kyc/finix-broking-setup/rms/10-limit-impact-matrix/) |
+| M-04 | Monitor the intraday pay-in queue and exceptions | Operations | Continuous | In-transit | Failed, pending and mismatched receipts |
+| M-05 | Compute the expected exchange funding requirement | Finance | Intraday, revised | Exchange | Estimated early, firmed as obligations crystallise |
+| M-06 | Decide the funding source and amount | Head of finance | **Decision point** | Firm, client | Own funds, client funds as permitted, or facility |
+| M-07 | Instruct transfers to the clearing corporation or clearing member | Finance | Before the bank cut-off | Exchange | Maker-checker; the cut-off is the bank's |
+| M-08 | Confirm receipt at the clearing corporation | Finance | After instruction | Exchange | Instruction sent is not money received |
+| M-09 | Process the pay-out batch | Operations, finance | Daily | Client | Against free credit only; maker-checker |
+| M-10 | Handle pay-out failures and returns | Operations | Daily | In-transit | Re-attribution is the risk |
+| M-11 | Compute and instruct the upstreaming position | Finance | End of day | Client | Prescribed basis; evidence retained |
+| M-12 | Reconcile bank statements to the ledger | Finance | Daily | All | Every line, both directions |
+| M-13 | Reconcile the payment gateway settlement to receipts | Operations | Daily | In-transit | Gateway settlement lags the client's payment |
+| M-14 | Reconcile the clearing-corporation and clearing-member balances | Finance | Daily | Exchange | Against their statements, not your expectation |
+| M-15 | Age and review suspense and unidentified receipts | Operations | Daily | Client | The report is the control |
+| M-16 | Close the day's bank position and report liquidity | Finance | End of day | All | Tomorrow's funding view starts here |
+
+## 4. Periodic actions
+
+| ID | Action | Role | Frequency |
+|---|---|---|---|
+| M-20 | Running-account settlement to clients on the prescribed cycle | Operations, finance | Periodic |
+| M-21 | Review and renew banking facilities and limits | Head of finance | Annual, or as required |
+| M-22 | Review collateral placed with the clearing corporation for efficiency | Head of finance, risk | Periodic |
+| M-23 | Reconcile the client-funds and securities reporting to the ledger | Compliance, finance | On the reporting cycle |
+| M-24 | Review and attest the segregation of client accounts | Compliance | Periodic |
+| M-25 | Test the firm liquidity buffer and facility drawdown | Head of finance | Periodic |
+| M-26 | Review and update the beneficiary and mandate masters | Finance | Periodic |
+| M-27 | Review bank charges, rail costs and gateway fees | Finance | Periodic |
+| M-28 | Verify the authorised-signatory and system-entitlement registers against each other | Compliance, finance | Periodic |
+
+## 5. The unusual interventions
+
+### Touching a client's balance
+
+| ID | Intervention | Role | Authority | Reversibility | Hazard |
+|---|---|---|---|---|---|
+| M-40 | **Manually attribute an unidentified receipt** | Operations | **Dual control** | Reversible | Attributing to the wrong client gives them someone else's capacity |
+| M-41 | **Reverse a wrongly attributed receipt** | Operations | **Dual control** | Reversible | The client may already have traded against it |
+| M-42 | **Release capacity before the receipt has cleared** | Head of risk with finance | **Dual control** | — | Credit risk disguised as service; see the caution |
+| M-43 | **Reject and return a third-party receipt** | Operations | Pre-authorised | — | Mandatory, not discretionary; return to source, not to the client |
+| M-44 | **Hold a pay-out against an unmet obligation** | Risk with operations | Authorise-then-act | — | Must be a genuine obligation, not a commercial preference |
+| M-45 | **Process an out-of-cycle urgent pay-out** | Head of operations | **Dual control** | Irreversible | The approval shortcut is the fraud vector |
+| M-46 | **Re-issue a failed pay-out to a corrected account** | Operations | **Dual control** | Irreversible | Account change plus payment in one step is exactly the pattern to be suspicious of |
+| M-47 | **Process a pay-out to a closed or changed bank account** | Operations with compliance | **Dual control** | Irreversible | Re-verification required before payment, not after |
+| M-48 | **Apply a cheque dishonour reversal and recover the capacity given** | Operations with risk | Authorise-then-act | — | The client may have traded on the strength of it |
+| M-49 | **Refund a receipt at the client's request** | Operations | **Dual control** | Irreversible | Return to the originating account only |
+| M-50 | **Transfer a balance between a client's segment accounts** | Operations | Authorise-then-act | Reversible | Only within the same client; never across clients |
+| M-51 | **Apply a deceased or frozen-account hold on funds** | Compliance | Pre-authorised | — | Immediate on notice; releasing requires documentary sufficiency |
+
+### Touching the firm's balance
+
+| ID | Intervention | Role | Authority | Reversibility | Hazard |
+|---|---|---|---|---|---|
+| M-55 | **Fund a client-obligation shortfall from firm funds** | Head of finance | **Dual control** | Reversible | The permitted answer to the constraint-2 trap; must be pre-arranged |
+| M-56 | **Draw on a committed facility** | Head of finance | Authorise-then-act | — | Document the reason; repeated draws are a liquidity-planning failure |
+| M-57 | **Move firm funds into a client account** | Head of finance | **Dual control** | Reversible | Permitted direction; the reverse is not |
+| M-58 | **Withdraw firm surplus from a client account** | Head of finance | **Dual control** | Reversible | Only genuine firm surplus, computed and evidenced |
+| M-59 | **Absorb a penalty or charge rather than pass it on** | Head of finance | Authorise-then-act | — | A commercial decision; must be consistent and recorded |
+| M-60 | **Pay a penalty or fine** | Head of finance | **Dual control** | Irreversible | Compliance must know; it may be reportable |
+
+### Touching exchange and clearing balances
+
+| ID | Intervention | Role | Authority | Reversibility | Hazard |
+|---|---|---|---|---|---|
+| M-65 | **Make an emergency top-up after the ordinary instruction** | Head of finance | Authorise-then-act | Irreversible | The bank's late-window rail may differ and cost more |
+| M-66 | **Instruct a transfer through an alternative rail after a rail failure** | Finance | Authorise-then-act | Irreversible | **Duplicate-payment risk**; confirm the first instruction's status first |
+| M-67 | **Withdraw excess margin or collateral intraday** | Head of finance with risk | **Dual control** | Reversible | Reduces capacity immediately; risk must agree |
+| M-68 | **Substitute collateral form — cash for securities or the reverse** | Head of finance with risk | Authorise-then-act | Reversible | Changes the cash-equivalent ratio and therefore client capacity |
+| M-69 | **Accept and manage a pay-in failure** | Head of finance with head of operations | **Dual control** | — | A default event with reporting and penalty consequences |
+| M-70 | **Reconcile and claim an excess transferred to the clearing corporation** | Finance | Authorise-then-act | — | Easily forgotten; it is the firm's or a client's money sitting idle |
+
+<Aside type="caution" title="M-42: giving capacity against uncleared funds">
+Releasing trading capacity before money has cleared is a service decision that is also a credit decision, and firms routinely make it without noticing the second part. The exposure is real: the client trades, the payment fails, and the firm holds the obligation. Where it is done at all, it needs the discipline of any credit facility — a defined per-client cap, a defined rail eligibility (an irrevocable real-time rail is a different proposition from a cheque), an aggregate firm cap so the practice cannot grow silently, a daily report of outstanding uncleared capacity, and a rule that it never applies to a client already in shortfall. It also needs a clear answer to the question of whose money funded the resulting obligation, because the answer must be the firm's.
+</Aside>
+
+<Aside type="caution" title="M-66: the duplicate payment is the most expensive routine mistake in this plane">
+A transfer instruction appears to fail — the rail times out, the status is unknown, the deadline is minutes away — and the desk instructs again through another rail. Then both settle. The firm has sent twice, the recovery takes days, and in the meantime its own liquidity is impaired at exactly the moment it was already tight. The protection is procedural and cheap: never re-instruct on an unknown status, only on a confirmed failure; require a positive confirmation from the bank or the rail before the second instruction; hold a single register of instructions for the day with status, so two people cannot independently instruct the same transfer; and keep a reconciliation step immediately after any alternative-rail payment rather than at end of day.
+</Aside>
+
+## 6. Actions that must not exist
+
+| Prohibited | Why |
+|---|---|
+| Use one client's funds for another client's obligation | Breaches the segregation obligation; the central prohibition of this plane |
+| Use client funds for firm purposes | The same, and more serious |
+| Accept cash from a client | Prohibited by statute, without threshold |
+| Pay out to a third-party account | Client money must return to the client's verified account |
+| Accept a receipt from a third-party account and credit the client | Same principle, inbound |
+| One person creating a beneficiary and paying it | The dominant payment-fraud pattern |
+| Pay out against unrealised or unsettled credit as if it were free | Creates a payment the firm may not be able to fund |
+| Re-instruct a payment on an unknown status | Duplicate payment |
+| Hold an unidentified receipt indefinitely | Client money held without attribution |
+| Net a client's credit against another client's debit | Segregation, again |
+| Leave the upstreaming computation unperformed for a day | A standing regulatory obligation with no grace |
+
+## 7. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.money.ops.payout.maker_checker` | **R** interpretation | true | Separate individuals, enforced in the system |
+| `finix.money.ops.beneficiary.create_pay_separation` | **D** | true | Distinct entitlements |
+| `finix.money.ops.beneficiary.cooling_period_hours` | **D** | Defined, non-zero | Between creation or change and first payment |
+| `finix.money.ops.payout.third_party_block` | **R** | true | Hard block |
+| `finix.money.ops.payin.third_party_reject` | **R** | true | Return to source |
+| `finix.money.ops.cash.accept` | **R** | false | Immutable |
+| `finix.money.ops.uncleared_capacity.enabled` | **D** | false | If true, caps and rail eligibility mandatory |
+| `finix.money.ops.uncleared_capacity.client_cap` | **D** | — | Required when enabled |
+| `finix.money.ops.uncleared_capacity.firm_cap` | **D** | — | Required when enabled |
+| `finix.money.ops.instruction_register.single_source` | **D** | true | Prevents double instruction |
+| `finix.money.ops.reinstruct.requires_confirmed_failure` | **D** | true | Never on unknown status |
+| `finix.money.ops.bank_cutoff_times` | **E** bank-set | Per account and rail | The real deadline |
+| `finix.money.ops.internal_funding_deadline` | **D** | Before the earliest bank cut-off | With a buffer |
+| `finix.money.ops.firm_liquidity_buffer` | **D** | Defined amount | The constraint-2 answer |
+| `finix.money.ops.suspense.ageing_escalation_days` | **D** | Short, defined | Daily report |
+| `finix.money.ops.upstreaming.daily_mandatory` | **R** | true | No exceptions |
+| `finix.money.ops.intervention_log.retention_years` | **R** | 8 | Record-retention obligation |
+
+## 8. Metrics
+
+| Metric | Rising means | Fix owner |
+|---|---|---|
+| Unattributed receipts, count and age | Payment references are unusable | Finance, with the rail or gateway |
+| Attribution lag, minutes | Client complaints and avoidable square-offs ahead | Operations |
+| Pay-out failures | Bank-account data quality | Onboarding operations |
+| Out-of-cycle pay-outs | The ordinary cycle does not meet client needs | Head of operations |
+| Emergency exchange top-ups | Funding estimation is poor | Finance |
+| Facility draws | Liquidity planning is inadequate | Head of finance |
+| Firm-funded client shortfalls | Credit policy is too loose, or margin calls too late | Risk and finance jointly |
+| Reconciliation breaks by source | A specific rail or interface is defective | Technology |
+| Duplicate payments | The instruction register or the re-instruct rule is not being followed | Head of finance |
+
+## Practical notes
+
+- **Work to the bank's cut-off minus a buffer, and publish that time internally as the deadline.** Everyone downstream — risk, operations, dealing — should be working to the same number.
+- **Keep one register of outbound instructions for the day.** Two people with two spreadsheets is how a transfer gets sent twice.
+- **Arrange the firm liquidity buffer and the committed facility before go-live.** They are the only lawful answers to a late shortfall, and they cannot be arranged on the afternoon they are needed.
+- **Treat the beneficiary master as a security asset.** Changes to it deserve more scrutiny than payments from it, because a payment to an altered beneficiary passes every other control.
+- **Age everything.** Unidentified receipts, reconciliation breaks, held pay-outs, excess at the clearing corporation. Age reports are the only mechanism that converts a forgotten item into an action.
+
+## Where this connects
+
+This catalogue is the operator-side view of [the pay-out engine](/broking-kyc/finix-broking-setup/money/03-payout-engine/), [treasury and exchange funding](/broking-kyc/finix-broking-setup/money/05-treasury-exchange-funding/) and [money and trade in sync](/broking-kyc/finix-broking-setup/money/07-money-trade-sync/), and the capacity consequences of each action are tabulated in [the limit impact matrix](/broking-kyc/finix-broking-setup/rms/10-limit-impact-matrix/). The reconciliation set is detailed in [bank and gateway reconciliation](/broking-kyc/finix-broking-setup/money/04-bank-recon/) and the files it depends on in [bank and payment files](/broking-kyc/finix-broking-setup/files/09-bank-payment-files/). Parallel catalogues: [OMS](/broking-kyc/finix-broking-setup/oms/11-operations-catalogue/), [RMS](/broking-kyc/finix-broking-setup/rms/11-operations-catalogue/), [back office](/broking-kyc/finix-broking-setup/backoffice/12-operations-catalogue/).

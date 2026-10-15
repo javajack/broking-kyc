@@ -1,0 +1,257 @@
+---
+title: "Roles 2: the trading-day responsibility matrix"
+description: Who is responsible, accountable, consulted and informed for every activity on a trading day — mapped item by item onto the master checklist, with the single-accountable-owner rule, the decision rights that cannot be delegated, the handover points, and the seven activities that most often end up owned by nobody.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** A responsibility matrix is only useful if it maps onto something real, so this one maps directly onto the numbered items in [the master trading-day checklist](/broking-kyc/finix-broking-setup/daily-ops/10-master-trading-day-checklist/) rather than onto abstract process areas. It also deliberately separates *doing* from *deciding*: most operational failures are not confusion about who performs a task but confusion about who may authorise a departure from it. Section 5 therefore lists decision rights separately, and section 7 lists the activities that characteristically fall between desks — which is where the matrix earns its keep, because a well-staffed operation still fails at its seams.
+
+## TL;DR
+
+- **One accountable owner per activity, always.** Responsibility can be shared; accountability cannot. Where two names appear in the accountable column, the activity will be unowned on the day it matters.
+- **Separate the decision from the execution.** The risk desk decides a square-off; the dealing desk places the order. Recording them separately, in that order, is what makes the decision defensible later.
+- **The go-or-no-go owner is a named individual on a rota**, not a role. On an amber morning somebody has to say the word, and "operations" cannot.
+- **Seven activities habitually have no owner**: the overnight circular review, the market-view window, the response-file check, the suspense ageing review, the commodity evening session, the tomorrow-manifest handover, and terminal-message capture. Each is listed with a proposed owner.
+- **Handovers are written, at four points in the day.** The items that get dropped are always the open ones at a shift boundary.
+- **Certification and entitlement gate the matrix.** A person cannot be responsible for an activity their certificate or entitlement does not permit, which makes the certification register an input to the roster rather than a quarterly review.
+
+## Conceptual overview
+
+The useful distinction in a broking operation is not between departments but between four kinds of act: *performing* a step, *asserting* that a step produced the right state, *deciding* to depart from the step, and *being answerable* for the outcome. A great deal of operational confusion comes from a matrix that only captures the first. The begin-of-day instrument master is loaded by technology, asserted by technology against the consuming system, departed from only by the named go-or-no-go owner, and answered for by the head of operations. Four different relationships to one checklist line. Writing only "technology" against it loses three of them, and the three that are lost are the ones that matter when the file does not arrive.
+
+The second idea is that accountability must be singular and responsibility need not be. Several people can be responsible for reconciling the day's breaks; exactly one person must be accountable for whether the reconciliation happened. The failure mode of shared accountability is specific and predictable: on an ordinary day both parties act, on a difficult day each reasonably assumes the other is handling it, and the gap is discovered at end of day. This is why the matrix below permits multiple entries in the responsible column and exactly one in the accountable column, and why that rule is worth enforcing mechanically when the roster is generated.
+
+The third idea concerns the boundary between a role and a person. The matrix assigns roles; the day needs people. Resolving one to the other is the rota's job, and the resolution has constraints the matrix cannot express — a certificate, an entitlement, a segregation rule that stops the same person being maker and checker, and simple availability. A matrix that is never resolved to named individuals is a diagram; one that is resolved every morning, against the certification and entitlement registers, is a control. The begin-of-day item that confirms every gate owner is covered exists for exactly this reason.
+
+## 1. The conventions used
+
+| Letter | Meaning |
+|---|---|
+| **R** | **Responsible** — performs the work. More than one is permitted |
+| **A** | **Accountable** — answers for the outcome. **Exactly one, always** |
+| **C** | **Consulted** — their view is sought before the activity completes |
+| **I** | **Informed** — told the outcome, without a say in it |
+
+Roles, as defined in [the role register](/broking-kyc/finix-broking-setup/roles/01-role-register/): **OPS** operations · **TECH** technology · **RISK** risk management · **DEAL** dealing · **FIN** funds and treasury · **DP** depository operations · **KYC** client onboarding · **COMP** compliance · **CS** client service · **LEAD** the operations lead or named go-or-no-go owner · **HOR** head of risk · **HOO** head of operations · **CO** compliance officer.
+
+## 2. Phase 0 and phase 1 — overnight carry-over and begin of day
+
+| Checklist item | Activity | R | A | C | I |
+|---|---|---|---|---|---|
+| C-0.01 | Determine the day type | OPS | **LEAD** | RISK, FIN | All desks |
+| C-0.02 | Generate the expected-file manifest | OPS | **LEAD** | TECH | — |
+| C-0.03 | Confirm the overnight batch completed | TECH | **TECH lead** | OPS | LEAD |
+| C-0.04 | Confirm the commodity evening session closed | OPS | **HOO** | RISK | LEAD |
+| C-0.05 | Review overnight alerts and incidents | TECH | **TECH lead** | RISK | LEAD |
+| C-0.06 | Confirm yesterday's pipeline completed | OPS | **HOO** | — | LEAD |
+| C-0.07 | Confirm yesterday's submissions acknowledged | COMP | **CO** | OPS | LEAD |
+| C-0.08 | Confirm the risk extract carries today's as-of date | OPS | **HOO** | RISK | LEAD |
+| C-0.09 | Confirm the upstreaming instruction settled | FIN | **Head of finance** | COMP | LEAD |
+| C-0.10 | Confirm pay-outs reached a terminal status | FIN | **Head of finance** | OPS | CS |
+| C-0.11 | Confirm the rota covers every gate owner | LEAD | **LEAD** | All desk heads | All |
+| **C-0.12** | **Review overnight circulars and notifications** | COMP | **CO** | RISK, TECH, OPS | All desks |
+| C-0.13 | Confirm no maintenance or notice affects today | TECH | **TECH lead** | OPS | DEAL |
+| C-0.14 | Confirm archive and backup completed | TECH | **TECH lead** | — | COMP |
+| C-0.15 | Confirm recovery replication is current | TECH | **TECH lead** | — | LEAD |
+| C-1.03 | Calendar confirmation per exchange and segment | OPS | **LEAD** | — | DEAL, RISK |
+| C-1.04 | Instrument and contract master applied — **gate** | TECH | **TECH lead** | OPS | LEAD, DEAL |
+| C-1.05 | Review contract master changes against circulars | OPS | **HOO** | COMP | RISK |
+| C-1.06 | Lot and tick refresh | TECH | **TECH lead** | OPS | DEAL |
+| C-1.07 | Apply corporate action adjustments | OPS | **HOO** | RISK, DP | DEAL |
+| C-1.08 | Risk parameter files applied — **gate** | RISK | **HOR** | TECH | LEAD, DEAL |
+| C-1.09 | Value-at-risk and loss-margin rates applied | RISK | **HOR** | TECH | — |
+| C-1.10 | Collateral and haircut lists applied, diff reviewed | RISK | **HOR** | OPS | DEAL |
+| C-1.11 | Identify clients losing collateral value | RISK | **HOR** | CS | CS |
+| C-1.12 | Ban-period list applied — **gate** | RISK | **HOR** | — | DEAL, COMP |
+| C-1.13 | Surveillance lists applied — **gate** | RISK | **HOR** | COMP | DEAL |
+| C-1.14 | Settlement-type changes applied | OPS | **HOO** | RISK | — |
+| C-1.15 | Price bands loaded | TECH | **TECH lead** | RISK | DEAL |
+| C-1.16 | Market-wide limit data loaded | RISK | **HOR** | — | COMP |
+| C-1.17 | Confirm today's settling cycles | OPS | **HOO** | FIN | — |
+| C-1.18 | Collateral and ledger balances loaded — **gate** | OPS, RISK | **HOO** | — | LEAD |
+| C-1.19 | Three-way pledge reconciliation | DP, OPS | **HOO** | RISK | — |
+| C-1.20 | Review overnight shortfall and ageing debits | RISK | **HOR** | CS | CS |
+| C-1.21 | Set today's square-off schedule and scope | RISK | **HOR** | DEAL, CS | CS |
+| C-1.22 | Resolve limits and compute available exposure | RISK | **HOR** | — | DEAL |
+| C-1.23 | Reset the accrual block baseline | RISK | **HOR** | OPS | — |
+| C-1.24 | Baseline firm utilisation against ceilings | RISK | **HOR** | — | LEAD |
+| C-1.25 | Confirm the opening bank position | FIN | **Head of finance** | — | LEAD |
+| C-1.26 | **Confirm the segregation position holds** | FIN | **Head of finance** | COMP | **CO**, LEAD |
+| C-1.27 | Exchange sessions established — **gate** | TECH | **TECH lead** | — | DEAL, LEAD |
+| C-1.28 | Market data feeds verified | TECH | **TECH lead** | RISK | DEAL |
+| C-1.29 | End-to-end connectivity verified | TECH | **TECH lead** | DEAL | LEAD |
+| C-1.30 | Client master three-way reconciliation | OPS, KYC | **HOO** | TECH | DEAL |
+| C-1.31 | Apply yesterday's activations and deactivations | KYC | **KYC lead** | OPS | DEAL, CS |
+| C-1.32 | **Certification and identifier register check** | COMP | **CO** | DEAL | TECH |
+| C-1.33 | Apply employee and proprietary restrictions | COMP | **CO** | DEAL | — |
+| C-1.34 | Verify algorithmic strategies and approvals | RISK, COMP | **HOR** | TECH | DEAL |
+| C-1.35 | Release the after-market queue | TECH | **TECH lead** | OPS | DEAL, CS |
+| **C-1.36** | **Go or no-go decision** | **LEAD** | **LEAD (named individual)** | HOR, HOO, TECH lead | All desks, CS |
+| C-1.37 | Communicate the scope of refusal | LEAD | **LEAD** | COMP | All desks, CS, clients |
+
+<Aside type="caution" title="C-1.36 cannot be owned by a role">
+Every other line in this matrix can be assigned to a function, because the work is the same whoever does it. The go-or-no-go decision cannot: it requires someone with the authority to stop the firm trading, the standing to override a desk head who wants to open, and the willingness to carry the consequence of a delayed open. That is a person, named on a rota, reachable, and briefed. Two further requirements are easy to miss. The rota must name a **deputy**, because the decision is time-bound and cannot wait for one individual. And the named owner must be **senior enough to be unpopular** — a junior owner facing three desk heads who want to open will approve an amber board, which is exactly the outcome the default is designed to prevent.
+</Aside>
+
+## 3. Phase 2 and phase 3 — pre-open and the continuous session
+
+| Checklist item | Activity | R | A | C | I |
+|---|---|---|---|---|---|
+| C-2.01–C-2.04 | Monitor the pre-open window and price discovery | DEAL | **Head of dealing** | RISK | LEAD |
+| C-2.05–C-2.06 | Capture pre-open trades and reflect margin | OPS, RISK | **HOR** | TECH | DEAL |
+| C-2.08 | Confirm the continuous session open | TECH | **TECH lead** | — | All |
+| C-3.01–C-3.05 | Session state, sequence, heartbeats, latency, data staleness | TECH | **TECH lead** | RISK | DEAL, LEAD |
+| C-3.06–C-3.08 | Order rate, rejection distribution, unacknowledged orders | RISK, TECH | **HOR** | DEAL | LEAD |
+| C-3.09–C-3.10 | Utilisation distribution and shortfall ageing | RISK | **HOR** | CS | CS |
+| **C-3.11** | **Pending receipts against outstanding margin calls** | OPS, RISK | **HOR** | FIN | CS |
+| C-3.12–C-3.13 | Firm utilisation and single-underlying concentration | RISK | **HOR** | — | LEAD |
+| C-3.14–C-3.15 | Market-wide and entity position limit proximity | RISK | **HOR** | COMP, DEAL | LEAD |
+| C-3.16 | Intraday collateral value movement | RISK | **HOR** | CS | CS |
+| C-3.17 | Apply intraday risk parameter updates | RISK | **HOR** | TECH | DEAL |
+| C-3.18–C-3.19 | Band, halt and circuit-breaker events | TECH, DEAL | **LEAD** | HOR | All desks |
+| C-3.20–C-3.21 | Strategy behaviour and order-to-trade ratio | RISK | **HOR** | TECH, COMP | DEAL |
+| C-3.22 | Unusual client patterns | RISK | **CO** | — | HOR |
+| C-3.23 | Exchange and depository alerts received | COMP | **CO** | RISK | LEAD |
+| C-3.24 | Pay-in attribution queue and lag | OPS | **HOO** | FIN | RISK, CS |
+| C-3.25 | Pay-out queue and approvals | OPS, FIN | **Head of finance** | RISK | CS |
+| C-3.26 | **Estimate the exchange funding requirement** | FIN | **Head of finance** | OPS, RISK | LEAD |
+| **C-3.27** | **Issue the funding instruction before the bank cut-off** | FIN | **Head of finance** | — | LEAD, HOO |
+| C-3.28 | Confirm funding receipt at the clearing corporation | FIN | **Head of finance** | — | RISK |
+| C-3.29 | Intraday collateral or margin adjustments | FIN, RISK | **Head of finance** | HOR | — |
+| C-3.30–C-3.31 | Pledge, unpledge and early pay-in within windows | DP | **DP lead** | OPS, RISK | CS |
+| C-3.32–C-3.33 | Activations and client modifications | KYC | **KYC lead** | COMP | CS, DEAL |
+| C-3.34 | Capture the dealer instruction record per assisted order | DEAL | **Head of dealing** | COMP | — |
+| C-3.35 | Log and route client complaints | CS | **CS lead** | COMP | CO |
+| C-3.36 | **Write the shift handover** | Outgoing shift | **Each desk head** | — | Incoming shift |
+| C-3.37 | **Record the square-off decision** | RISK | **HOR** | — | DEAL, CS |
+| C-3.38 | **Execute the square-off** | DEAL | **Head of dealing** | RISK | CS, client |
+| C-3.39 | Write intervention log entries at the time | Acting desk | **Each desk head** | — | LEAD, COMP |
+| C-3.40 | Verify the snapshot capture is operating | RISK | **HOR** | TECH | COMP |
+
+<Aside type="danger" title="C-3.37 and C-3.38 are deliberately split, and the order is the point">
+The square-off decision belongs to risk and the square-off order belongs to dealing, and the decision must be recorded *before* the order exists. This is not bureaucratic sequencing. When a client disputes a square-off months later — and they will — the question is whether the firm decided to liquidate on stated grounds and then acted, or acted and then constructed grounds. A timestamped decision record naming the trigger, the policy basis, the clients in scope and the liquidation sequence, created before the first order, answers that. A pile of order confirmations does not. The same split is why a single person holding both roles is a problem the matrix should not permit: not because they would behave badly, but because the record they produce cannot distinguish the two orders of events.
+</Aside>
+
+## 4. Phase 4 to phase 7 — close, the pipeline, the evening session, overnight
+
+| Checklist item | Activity | R | A | C | I |
+|---|---|---|---|---|---|
+| C-4.01–C-4.03 | Session close, order validity handling, margin release | TECH, RISK | **TECH lead** | OPS | DEAL |
+| C-4.04–C-4.05 | Closing session and closing price capture | DEAL, OPS | **HOO** | RISK | — |
+| C-4.06 | Open the after-market collection window | TECH | **TECH lead** | OPS | CS |
+| C-4.07 | Confirm sessions closed cleanly | TECH | **TECH lead** | — | LEAD |
+| C-4.08–C-4.09 | Final snapshot and collateral revaluation | RISK | **HOR** | OPS | — |
+| C-4.10 | Call clients expected to be short tomorrow | RISK, CS | **HOR** | — | CS |
+| C-4.11 | Identify delivery obligations arising today | OPS | **HOO** | DP, RISK | CS |
+| C-4.12 | Close the bank position and report liquidity | FIN | **Head of finance** | — | LEAD |
+| C-5.01–C-5.02 | Collect and validate end-of-day files | TECH, OPS | **HOO** | — | LEAD |
+| **C-5.03** | **Import and reconcile trades — the chokepoint** | OPS | **HOO** | TECH | LEAD, all downstream |
+| C-5.04 | Apply custodial and institutional confirmations | OPS | **HOO** | DEAL | RISK |
+| C-5.05 | Complete client code modifications in the window | OPS | **CO** | DEAL | HOO |
+| C-5.06–C-5.07 | Compute charges; replace the accrual block | OPS, RISK | **HOO** | — | CS |
+| **C-5.08–C-5.09** | **Generate and dispatch contract notes** | OPS | **HOO** | COMP | CO, CS |
+| C-5.10 | Post the ledger | OPS | **HOO** | FIN | — |
+| C-5.11–C-5.12 | Compute obligations; identify short deliveries | OPS | **HOO** | FIN, DP | RISK |
+| C-5.13 | Compute the margin obligation and the reporting file | RISK, OPS | **HOR** | COMP | — |
+| **C-5.14** | **Submit margin reporting and check the response** | COMP | **CO** | RISK | HOR, LEAD |
+| C-5.15–C-5.16 | Unpaid-securities treatment and excess release | OPS, DP | **HOO** | COMP | CS |
+| **C-5.17** | **Compute and instruct upstreaming** | FIN | **Head of finance** | COMP | CO, LEAD |
+| C-5.18 | Produce the risk extract with today's as-of date | OPS | **HOO** | RISK | LEAD |
+| C-5.19–C-5.23 | The reconciliation set — bank, gateway, depository, clearing, pledge | FIN, OPS, DP | **HOO** | — | LEAD |
+| **C-5.24** | **Review suspense and unidentified-receipt ageing** | OPS, FIN | **Head of finance** | COMP | CO |
+| C-5.25 | Process corporate action entitlements | OPS | **HOO** | DP | CS |
+| C-5.26–C-5.27 | Post charges and allocate exchange penalties | OPS | **HOO** | COMP, FIN | CS |
+| C-5.28 | File daily regulatory submissions | COMP | **CO** | OPS | LEAD |
+| C-5.29 | Disposition surveillance alerts | COMP | **CO** | RISK | — |
+| C-5.30 | Dispatch statements and confirmations due | OPS | **HOO** | — | CS |
+| C-5.31 | **Generate tomorrow's manifest** | OPS | **LEAD** | TECH | All desks |
+| C-5.32 | Prepare tomorrow's square-off and call list | RISK | **HOR** | CS | CS |
+| C-5.33 | Close the intervention and exception logs | Each desk | **LEAD** | — | COMP |
+| C-5.34 | Archive and verify | TECH | **TECH lead** | COMP | — |
+| C-5.35 | **Mark the day closed** | OPS | **HOO** | — | LEAD |
+| C-6.01–C-6.02 | Evening session state and seasonal close time | TECH | **TECH lead** | OPS | DEAL |
+| **C-6.03** | **Evening risk monitoring with a named owner** | RISK | **HOR** | — | LEAD |
+| C-6.04–C-6.06 | Evening parameters, cross-segment capacity, funding | RISK, FIN | **HOR** | — | — |
+| C-6.07 | Meet tender and delivery deadlines | OPS | **HOO** | DP, FIN | LEAD |
+| C-6.08–C-6.09 | Close the evening session; feed trades onward | TECH, OPS | **TECH lead** | — | HOO |
+| C-7.01–C-7.08 | Overnight batch, accruals, roll-forward, backups, handover | TECH, OPS | **TECH lead** | — | LEAD, HOO |
+
+## 5. Decision rights that cannot be delegated downward
+
+Performing work can be delegated. These decisions cannot be taken by anyone below the stated role.
+
+| Decision | Minimum authority | Why |
+|---|---|---|
+| Open, delay or scope the trading day | **Named go-or-no-go owner** | It binds the whole firm |
+| Suspend a pre-trade check firm-wide | **Head of risk**, dual control | It removes a control for every client |
+| Lower a limit intraday across a client group | **Head of risk** | It can put existing positions in breach instantly |
+| Decide a square-off | **Head of risk**, within policy | It is the firm acting against a client's position |
+| Defer a square-off | **Head of risk** | Deferral without a record looks like failure to act |
+| Invoke pledged collateral | **Head of risk** with operations, dual control | Legal and client consequences |
+| Fund a client shortfall from firm funds | **Head of finance**, dual control | The only lawful answer to a segregation trap |
+| Instruct a payment outside the ordinary cycle | **Head of finance**, dual control | The dominant payment-fraud vector |
+| Make a back-dated entry or re-run a closed day | **Head of operations**, dual control | It changes what the firm has already stated |
+| Issue a revised contract note | **Head of operations** with compliance | The client holds the original |
+| Accept and report a position or margin breach | **Compliance officer** with head of risk | Reporting is not optional |
+| Switch to the recovery site | **Technology lead** with business sign-off | Everything moves |
+| Report a cyber or technical incident to the exchange | **Compliance officer** | A hard clock and a formal record |
+| Submit any regulatory filing | **Compliance officer** | Personal accountability attaches |
+
+## 6. Handover points
+
+| Boundary | Handed over | From | To |
+|---|---|---|---|
+| Overnight to morning | Batch outcome, unresolved alerts, replication state | Technology on-call | Technology and operations morning shift |
+| Pre-open to session | Gate status, accepted exceptions, scope of refusal, square-off schedule | Begin-of-day owner | Dealing, risk, client service |
+| Session to post-close | Open interventions, unresolved breaks, clients called, pending receipts | Session desks | Pipeline desks |
+| Pipeline to evening and overnight | Pipeline position, blocked steps, deadlines at risk, tomorrow's manifest | Operations | Evening risk owner and technology on-call |
+
+Each handover is **written**. The reason is narrow and empirical: open items at a boundary are the ones that get dropped, and a verbal handover leaves no way to establish afterwards whether an item was passed on or forgotten.
+
+## 7. The activities that habitually have no owner
+
+The real value of a responsibility matrix is here. Each of these is a genuine obligation that falls between desks, and each proposes an owner.
+
+| # | Activity | Why it goes unowned | Proposed owner |
+|---|---|---|---|
+| 1 | **The overnight circular and notification review** | It belongs to compliance by subject and to operations by timing, so neither claims it; and nothing fails visibly when it is skipped | **Compliance officer**, with a daily written record of what was reviewed and actioned |
+| 2 | **The exchange's market-view window** | It is not an alert, has no queue and no reminder, and only applies on days the index moves sharply | **Compliance**, raised automatically by the day-type logic on qualifying days |
+| 3 | **Response-file checking after any submission** | The submission felt like the work; the response is assumed clean | **Compliance officer**, with count reconciliation rather than a status check |
+| 4 | **Suspense and unidentified-receipt ageing** | It sits between operations, which creates the entries, and finance, which owns the money | **Head of finance**, on a daily report with a hard escalation threshold |
+| 5 | **The commodity evening session** | The equity day has ended and the organisation has gone home | **Head of risk**, through a named evening owner whose absence stops the segment |
+| 6 | **Tomorrow's expected-file manifest** | Produced by the day that ends, needed by the day that begins | **Operations lead**, as the last item before the day is closed |
+| 7 | **Capturing terminal messages** | They are ephemeral, arrive on a dealer's screen, and no system claims them — yet they are the primary notice for automatic trade cancellation and limit-utilisation broadcasts | **Technology**, capturing into the surveillance response register |
+
+<Aside type="caution" title="An eighth, which is structural rather than operational">
+Nobody owns **the matrix itself**. Roles change, desks reorganise, people leave, and a responsibility matrix that is not revised becomes a description of a firm that no longer exists — while continuing to be cited in policies and shown to inspectors. Assign the matrix to the operations lead with a quarterly review against the actual rota, and treat any activity whose accountable role no longer exists as an incident rather than a documentation defect. The same applies to the decision-rights table in section 5: a decision right vested in a role the firm has abolished is a decision nobody can lawfully take, and that is discovered at the worst moment.
+</Aside>
+
+## 8. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.roles.raci.single_accountable_enforced` | **D** | **true** | Exactly one accountable role per activity |
+| `finix.roles.raci.resolve_to_named_individual_daily` | **D** | true | Against the rota at begin of day |
+| `finix.roles.raci.gate_owner_coverage_required` | **D** | true | An uncovered gate owner blocks the open |
+| `finix.roles.raci.deputy_required_for_decision_rights` | **D** | true | Every section 5 role has a named deputy |
+| `finix.roles.raci.certification_gates_assignment` | **R** interpretation | true | A lapsed certificate removes eligibility |
+| `finix.roles.raci.entitlement_gates_assignment` | **D** | true | Entitlement and roster must agree |
+| `finix.roles.raci.decision_before_execution_enforced` | **D** | true | The square-off split, and others like it |
+| `finix.roles.raci.handover_written` | **D** | true | At all four boundaries |
+| `finix.roles.raci.unowned_activity_alert` | **D** | true | Any activity with no resolvable owner |
+| `finix.roles.raci.review_frequency` | **D** | Quarterly | Against the actual organisation |
+| `finix.roles.raci.orphan_role_is_incident` | **D** | true | An accountable role that no longer exists |
+
+## Practical notes
+
+- **Generate the day's matrix, do not print this page.** Its value is in the resolution to named individuals against certification, entitlement and availability.
+- **Enforce the single-accountable rule mechanically.** It is the one convention that reliably prevents the "I thought you had it" failure.
+- **Name deputies for every decision right.** A decision right with one holder is unavailable whenever that person is.
+- **Check the seven seams explicitly, weekly.** They do not fail loudly, which is why they need a scheduled look rather than an alert.
+- **Keep the evening session's owner on the same footing as the morning's.** If the segment cannot be covered, the honest response is not to trade it.
+- **Review the matrix when the organisation changes, not on the quarterly cycle alone.** A reorganisation silently orphans accountabilities.
+
+## Where this connects
+
+The activities are defined in [the master trading-day checklist](/broking-kyc/finix-broking-setup/daily-ops/10-master-trading-day-checklist/) and expanded in the phase runbooks under [daily operations](/broking-kyc/finix-broking-setup/daily-ops/). The roles and their certification constraints are in [the role register](/broking-kyc/finix-broking-setup/roles/01-role-register/), the separations in [segregation and access control](/broking-kyc/finix-broking-setup/roles/04-segregation-access-control/), and the out-of-hours arrangements in [escalation and on-call](/broking-kyc/finix-broking-setup/roles/05-escalation-oncall/). Longer-cycle responsibilities are in [the periodic and compliance matrix](/broking-kyc/finix-broking-setup/roles/03-raci-periodic-compliance/). The specific actions each desk may take are catalogued for [OMS](/broking-kyc/finix-broking-setup/oms/11-operations-catalogue/), [RMS](/broking-kyc/finix-broking-setup/rms/11-operations-catalogue/), [back office](/broking-kyc/finix-broking-setup/backoffice/12-operations-catalogue/) and [money](/broking-kyc/finix-broking-setup/money/08-money-operations-catalogue/), and the failure paths in [incident playbooks](/broking-kyc/finix-broking-setup/daily-ops/07-incident-playbooks/).

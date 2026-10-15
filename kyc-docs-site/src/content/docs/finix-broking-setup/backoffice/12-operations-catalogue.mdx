@@ -1,0 +1,187 @@
+---
+title: "Back office 12: the operations catalogue"
+description: Every action a back-office operator takes — the end-of-day pipeline, the daily and periodic desk work, and the forty unusual interventions from a back-dated entry to re-running a closed settlement day — with authority, preconditions, downstream effects and the audit trail each one owes.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** The back office is where every mistake made anywhere else in the firm eventually surfaces as a number that does not reconcile, which means its catalogue of unusual actions is longer than any other plane's and almost entirely corrective. It is also the plane whose records are the firm's legal position: the ledger is what a court, an inspector and a client all read. So the catalogue is organised around what each action does to the record — append, adjust, reverse, or regenerate — because that distinction, and not the business reason, determines the authority required and the evidence owed.
+
+## TL;DR
+
+- **The back office appends; it does not overwrite.** Every correction is a new entry that references the old one. A ledger where a wrong entry was edited rather than reversed cannot be audited, and the inability is permanent.
+- **The end-of-day pipeline blocks forward.** Trade import gates reconciliation, which gates charges, which gates contract notes, which gate the ledger, which gates everything else. An intervention early in the pipeline is cheap; the same correction after contract notes have gone out is a client-facing event.
+- **Four corrective actions carry real consequence**: a back-dated entry, a charge reversal, a manual journal entry, and a re-run of a closed day. Each changes a record a client or regulator may already have seen.
+- **A manual journal entry is a confession that a process failed.** They are necessary and they should be counted, categorised and driven toward zero, because each one is a reconciliation that a system could not do.
+- **Regenerating a contract note is not a correction.** If the original was wrong and was dispatched, the client has a wrong document; the fix is a revised note with an explicit reference, not a silent replacement.
+- **Most back-office interventions have a deadline, not just a procedure.** Corrections that land after the margin-reporting submission, the settlement pay-in, or the statement dispatch have a regulatory or client consequence that the same correction made an hour earlier does not.
+
+## Conceptual overview
+
+The back office holds four kinds of record and they behave differently under correction. There are *event records* — trades, receipts, payments, deliveries — which are facts about the world and can only be corrected by discovering that the fact was recorded wrongly. There are *derived records* — charges, obligations, margin computations — which are functions of event records and parameters, and which should be corrected by fixing the input and recomputing rather than by editing the output. There are *communicated records* — contract notes, statements, confirmations — which have left the building and therefore cannot be corrected at all, only superseded. And there is the *ledger*, which is an append-only chain whose integrity is the point. Knowing which kind of record an intervention touches tells you almost everything about how to do it safely.
+
+The second observation is about the pipeline's shape. Back-office work is not a set of independent tasks but a dependency chain with a regulatory deadline inside it, and the chain has one chokepoint: reconciliation of the trade file. Nothing downstream is trustworthy until the trade file reconciles, and almost every unusual intervention is either an attempt to get past that chokepoint or a consequence of having got past it on bad data. This is why the catalogue marks, for each corrective action, whether it is being performed before or after the pipeline has run — the same action has a different risk profile on each side of that line.
+
+The third point is cultural. A back office that performs many manual interventions is usually not a badly run back office; it is a well-run back office compensating for defects elsewhere — a flaky file feed, an onboarding process that creates incomplete masters, a payment rail with poor references, a corporate-action source that arrives late. The operators absorb the defect silently because absorbing it is their job. The management failure is to let that absorption remain invisible, because the intervention count is the only signal that the upstream defect exists. Hence section 7: every manual action is categorised by the upstream cause, and the categories are reported.
+
+## 1. How to read the catalogue
+
+Columns follow [the OMS operations catalogue](/broking-kyc/finix-broking-setup/oms/11-operations-catalogue/). Back-office-specific additions:
+
+| Marker | Meaning |
+|---|---|
+| **Record class** | Event, derived, communicated, or ledger |
+| **Effect** | Append, adjust, reverse, regenerate |
+| **Pipeline position** | Before or after the end-of-day pipeline has completed |
+| **Deadline sensitivity** | Whether the correction's value depends on when it is made |
+
+## 2. The end-of-day pipeline
+
+The ordinary sequence. Each step gates the next; the gate is the point.
+
+| ID | Step | Role | Gates | Assertion | Failure consequence |
+|---|---|---|---|---|---|
+| B-01 | Receive and validate exchange trade files | Operations | B-02 | All expected files present; counts and checksums | Nothing downstream is trustworthy |
+| B-02 | **Import and reconcile trades** against the order management system | Operations | Everything | Two-way reconciliation clean, or every difference identified | **The chokepoint** |
+| B-03 | Apply custodial and institutional confirmations | Operations | B-04 | Confirmed trades allocated; unconfirmed flagged | Wrong party bears the obligation |
+| B-04 | Compute brokerage and statutory charges | Operations | B-05 | Rate versions recorded; totals reconcile to exchange levies | Wrong bills, wrong ledger, wrong tax |
+| B-05 | Generate contract notes | Operations | B-06 | One per client per segment with trades; digitally signed | Regulatory breach within 24 hours |
+| B-06 | Dispatch contract notes and capture delivery status | Operations | — | Dispatch evidence; bounces identified | Non-delivery is the broker's problem, not the client's |
+| B-07 | Post the ledger | Operations | B-08 | Debits equal credits; client-wise trial balance | The firm's books are wrong |
+| B-08 | Compute settlement obligations | Operations | B-09, B-10 | Obligation matches the clearing corporation's file | Pay-in shortfall or excess |
+| B-09 | Compute the margin obligation and prepare the reporting file | Operations, risk | Reporting | Validation clean | Penalty and a wrong public record |
+| B-10 | Identify unpaid securities and apply the pledgee-account treatment | Operations | — | Within the prescribed window | Client securities wrongly retained or released |
+| B-11 | Compute the upstreaming position and instruct | Finance | — | Computed basis reconciles to the ledger | Under-upstreamed client funds overnight |
+| B-12 | Produce the extract for the risk system | Operations | Tomorrow's open | As-of today; counts reconcile | Tomorrow's limits computed on stale balances |
+| B-13 | Run the daily reconciliation set: bank, depository, exchange, gateway | Operations, finance | — | Each reconciled or exceptions listed with owners | Differences compound daily |
+| B-14 | Generate and file the daily regulatory submissions | Compliance | — | Submitted within the deadline; acknowledgement stored | Penalty |
+| B-15 | Close the day | Operations | — | Day marked closed; no further ordinary postings | An open day invites back-dated drift |
+
+## 3. Daily and periodic desk work
+
+| ID | Action | Role | Frequency | Notes |
+|---|---|---|---|---|
+| B-20 | Create or amend a client master record | Operations | Daily | Must propagate to the order and risk systems the same day |
+| B-21 | Map a client's bank account and verify it | Operations | Daily | Third-party accounts rejected; verification evidence retained |
+| B-22 | Map a client's demat account | Operations | Daily | Depository and back office must agree |
+| B-23 | Activate or deactivate a segment on a client | Operations | Daily | Depends on product-activation evidence |
+| B-24 | Process a pay-out request | Operations, finance | Daily | Against free credit only; see the money catalogue |
+| B-25 | Apply running-account settlement | Operations, finance | Periodic | On the prescribed cycle and per the client's preference |
+| B-26 | Process corporate action entitlements | Operations | Event-driven | Record date, ex-date and the client's position as at the right date |
+| B-27 | Handle a short delivery and the auction or close-out consequence | Operations | Event-driven | Client debit computed on the settlement outcome |
+| B-28 | Reconcile pledge positions three ways | Operations | Daily | Depository, back office, risk |
+| B-29 | Issue periodic statements of accounts and holdings | Operations | Periodic | Dispatch evidence retained |
+| B-30 | Produce the periodic client funds and securities reporting | Compliance | Periodic | To the exchange on the prescribed cycle |
+| B-31 | Produce tax statements and capital-gains reports | Operations | Annual and on demand | Computation basis documented |
+| B-32 | Compute and post interest on debit balances | Operations | Periodic | Rate must match the disclosed tariff |
+| B-33 | Compute distributor, branch and authorised-person payouts | Operations | Monthly | Commission basis auditable |
+| B-34 | Close a client account | Operations | Event-driven | Nil balance, nil position, nil obligation, documents retained |
+| B-35 | Archive and verify retained records | Technology, compliance | Periodic | Restorable, not merely stored |
+| B-36 | Reconcile the client master across onboarding, order and back-office systems | Operations | Daily | Three-way; mismatched clients blocked |
+
+## 4. The unusual interventions
+
+| ID | Intervention | Role | Authority | Record class | Effect | Hazard |
+|---|---|---|---|---|---|---|
+| B-40 | **Post a manual journal entry** | Operations | **Dual control** | Ledger | Append | Each one is a process failure; categorise and count |
+| B-41 | **Reverse a posted entry** | Operations | **Dual control** | Ledger | Reverse | Reverse and repost; never edit |
+| B-42 | **Make a back-dated entry into a closed day** | Head of operations | **Dual control** | Ledger | Append with effective date | Changes a period a client or auditor may have seen; see the caution |
+| B-43 | **Re-run a completed pipeline step** | Operations with technology | Authorise-then-act | Derived | Regenerate | Idempotency is essential; a second run must not double-post |
+| B-44 | **Re-run a closed settlement day** | Head of operations with technology | **Dual control** | Derived and ledger | Regenerate | The highest-consequence action in this plane |
+| B-45 | **Import a revised exchange file over an already-processed one** | Operations | Authorise-then-act | Event | Adjust | Must diff, not replace; see the file-handling exceptions page |
+| B-46 | **Correct a trade's client attribution** | Operations with compliance | **Dual control** | Event | Adjust | Within the exchange's window and reason codes; monitored metric |
+| B-47 | **Add a trade confirmed by the exchange but absent from the file** | Operations with technology | **Dual control** | Event | Append | Authority is the exchange file, never a screen |
+| B-48 | **Remove a trade present locally but absent at the exchange** | Operations with technology | **Dual control** | Event | Reverse | Same authority rule |
+| B-49 | **Waive or reverse a charge** | Head of operations | Authorise-then-act | Derived | Reverse | Statutory levies generally cannot be waived, only corrected |
+| B-50 | **Correct a charge computed at the wrong rate** | Operations | Authorise-then-act | Derived | Adjust | Fix the rate master, then recompute; do not hand-adjust each client |
+| B-51 | **Issue a revised contract note** | Operations with compliance | Authorise-then-act | Communicated | Regenerate as revision | Must reference the original explicitly; never silently replace |
+| B-52 | **Re-dispatch a bounced contract note or statement** | Operations | Pre-authorised | Communicated | — | A persistent bounce is a client-data defect to fix, not to retry |
+| B-53 | **Suppress a contract note for a client** | Compliance | **Dual control** | Communicated | — | Almost never legitimate; a dormant or deceased client is the rare case |
+| B-54 | **Adjust a settlement obligation to match the clearing corporation** | Operations | Authorise-then-act | Derived | Adjust | The clearing corporation is authoritative; investigate why you differed |
+| B-55 | **Fund a pay-in shortfall from firm funds** | Finance with head of operations | **Dual control** | Ledger | Append | Must not be funded from other clients' money; the segregation rule is absolute |
+| B-56 | **Apply a close-out or auction debit to a client** | Operations | Authorise-then-act | Derived | Append | Basis must be the exchange's settlement outcome, not an estimate |
+| B-57 | **Write off an unrecoverable client debit** | Board or delegated authority | **Dual control** | Ledger | Append | An accounting and a recovery decision; document both |
+| B-58 | **Release securities held against an unpaid obligation** | Operations with risk | **Dual control** | Event | Append | Prescribed windows govern; early or late release both breach |
+| B-59 | **Apply a corporate action manually** | Operations | **Dual control** | Event | Append | Entitlement computed on the position at the correct record date |
+| B-60 | **Correct a corporate action applied wrongly** | Operations | **Dual control** | Event | Reverse and repost | Affects holdings, ledger, and possibly margin retrospectively |
+| B-61 | **Rebuild a client's ledger from source** | Technology with operations | **Dual control** | Ledger | Regenerate | Only with a reconciled closing balance to land on |
+| B-62 | **Unlock a closed accounting period** | Head of finance | **Dual control** | Ledger | — | Logged, time-boxed, and reported to the auditor |
+| B-63 | **Override a reconciliation break to proceed** | Head of operations | **Dual control** | Derived | — | The break does not disappear; it must carry an owner and a date |
+| B-64 | **Process a transmission or nomination claim** | Operations with compliance | Authorise-then-act | Event | Append | Documentary sufficiency is the control |
+| B-65 | **Reactivate a dormant or frozen account** | Operations with compliance | Authorise-then-act | Event | — | Re-verification before reactivation, not after |
+| B-66 | **Correct a client's permanent account number or identity field** | Compliance | **Dual control** | Event | Adjust | Propagates to the registration agency, the central registry and the exchanges |
+| B-67 | **Restore records from archive for an inspection** | Technology | Authorise-then-act | — | — | Restoration must be rehearsed; an unrestorable archive is not retention |
+| B-68 | **Post an entry to a suspense or unidentified-receipt account** | Operations | Pre-authorised | Ledger | Append | Legitimate as a parking place, dangerous as a destination; age and clear it |
+| B-69 | **Clear an aged suspense balance** | Head of finance | **Dual control** | Ledger | Append | The ageing report is the control that forces this to happen |
+
+<Aside type="danger" title="B-42 and B-44: the two interventions that rewrite history">
+A back-dated entry and a re-run of a closed day are the only back-office actions that change what the firm has already said about a past date. Both are sometimes unavoidable — a revised exchange file, a corporate action notified late, a reconciliation break found a week later. Four controls make them survivable. The *effective date* and the *posting date* are both recorded, and reports can be run on either basis, so that the version an auditor saw last month remains reproducible. The change is dual-controlled with a written reason. Anyone who received a document covering the affected period is identified, and a decision is explicitly taken and recorded about whether to issue a revision. And the intervention is reported to the statutory and internal auditors as a matter of course, rather than being something they discover. A firm that cannot reproduce last month's trial balance as it stood last month has lost the ability to explain itself.
+</Aside>
+
+<Aside type="caution" title="B-68: the suspense account is where unreconciled money goes to be forgotten">
+Every back office needs somewhere to put a receipt it cannot yet attribute. The danger is not the parking but the duration. An unidentified receipt that sits for a week is an operational nuisance; one that sits for a year is a client whose money the firm is holding without knowing it, which is a client-asset-protection problem and an inspection finding of a serious kind. The controls are mechanical: an ageing report on every suspense and unidentified-receipt account, produced daily and reviewed weekly; a hard escalation threshold in days; a named owner per balance rather than per account; and a monthly report to finance of anything aged beyond the threshold. Note also that unattributed client money still counts as client money for segregation and upstreaming purposes — parking it does not make it the firm's.
+</Aside>
+
+## 5. Actions that must not exist
+
+| Prohibited | Why | Instead |
+|---|---|---|
+| Edit a posted ledger entry in place | Audit trail destroyed permanently | Reverse and repost |
+| Delete a ledger entry | Same, plus a retention breach | Reverse |
+| Change a dispatched contract note | The client holds the original | Issue a revision referencing it |
+| Fund one client's shortfall from another client's balance | Breaches the segregation obligation outright | Firm funds, dual-controlled |
+| Use client funds for firm purposes | The same prohibition, more seriously | Separate accounts, separate money |
+| Alter a charge on a dispatched note without a revision | Misstates what the client was billed | Revised note |
+| Post to a closed period without unlocking it | Hides the fact that history changed | Unlock, log, post, relock, report |
+| Clear a reconciliation break by writing a plug entry | Destroys the only signal that something is wrong | Owner, date, root cause |
+| Hold an unidentified receipt indefinitely | Client money held without attribution | Ageing and escalation |
+| Let the same person create and approve a payout | The classic fraud vector | Maker-checker, enforced |
+
+## 6. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.bo.ops.journal.dual_control` | **D** | true | Never false |
+| `finix.bo.ops.journal.reason_code_mandatory` | **D** | true | Categorised for the section 7 report |
+| `finix.bo.ops.backdated_entry.authority` | **D** | Head of operations | With a written reason |
+| `finix.bo.ops.backdated_entry.max_age_days` | **D** | Defined, short | Beyond it, a period unlock is required |
+| `finix.bo.ops.dual_date_reporting` | **D** | true | Effective date and posting date both retained |
+| `finix.bo.ops.period_unlock.notify_auditor` | **D** | true | Automatic |
+| `finix.bo.ops.pipeline_rerun.idempotent` | **D** | true | A second run must not double-post |
+| `finix.bo.ops.revised_contract_note.references_original` | **R** interpretation | true | Mandatory in the document |
+| `finix.bo.ops.charge_correction.fix_master_first` | **D** | true | Never per-client hand adjustment |
+| `finix.bo.ops.suspense.ageing_escalation_days` | **D** | Short, defined | Daily report, weekly review |
+| `finix.bo.ops.suspense.counts_as_client_money` | **R** | true | For segregation and upstreaming |
+| `finix.bo.ops.recon_break.owner_mandatory` | **D** | true | No ownerless breaks |
+| `finix.bo.ops.payout.maker_checker` | **R** interpretation | true | Separate individuals, enforced |
+| `finix.bo.ops.archive_restore_drill.frequency` | **D** | Half-yearly | Retention means restorable |
+| `finix.bo.ops.intervention_log.retention_years` | **R** | 8 | Record-retention obligation |
+
+## 7. Manual intervention reporting
+
+Each manual action is tagged with its upstream cause. The monthly report is by cause, not by operator, because the operator is not the problem.
+
+| Cause category | Typical manual action | Fix owner |
+|---|---|---|
+| Exchange or depository file late, partial or revised | B-43, B-45, B-54 | Technology, file pipeline |
+| Order-management and back-office trade mismatch | B-47, B-48 | Technology, integration |
+| Client master incomplete or inconsistent | B-20, B-36, B-66 | Onboarding operations |
+| Payment reference missing or unusable | B-68 | Finance, payment rails |
+| Charge or rate master wrong | B-50 | Operations, reference data |
+| Corporate action source late or wrong | B-59, B-60 | Operations, data vendor |
+| Reconciliation logic gap | B-40, B-63 | Technology |
+| Genuine one-off external event | Various | Nobody; this is the irreducible residue |
+
+A healthy report shows the last category growing as a share of a shrinking total. A report dominated by the first two categories describes an integration problem that the back office is paying for with overtime.
+
+## Practical notes
+
+- **Count manual journal entries weekly and publish the count.** It is the single best health metric for the whole operation, because everything broken upstream ends up as one.
+- **Rehearse B-44 before you need it.** Re-running a closed settlement day for the first time, in anger, on a revised file, with contract notes already out, is how firms create a second problem larger than the first.
+- **Keep the ageing reports short enough to read.** A suspense ageing report with four hundred lines is not reviewed; one with four is acted on. If it has four hundred lines, that is the finding.
+- **Separate the pay-out maker from the checker in the system, not in the procedure.** A procedural separation is defeated by one person being on leave.
+- **Tell the auditors about interventions before they find them.** A back-dated entry disclosed is a process note; the same entry discovered is a control finding.
+
+## Where this connects
+
+This catalogue is the operator-side view of [the end-of-day runbook](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/) and the correction mechanics behind [the ledger and accounting](/broking-kyc/finix-broking-setup/backoffice/04-ledger-accounting/), [contract notes](/broking-kyc/finix-broking-setup/backoffice/03-contract-notes/) and [settlement obligations](/broking-kyc/finix-broking-setup/backoffice/05-settlement-obligations/). The revised-file problem in B-45 is treated in full in [file handling exceptions](/broking-kyc/finix-broking-setup/files/08-file-handling-exceptions/), the charge corrections in B-49 and B-50 in [the charges and billing engine](/broking-kyc/finix-broking-setup/backoffice/11-charges-billing-engine/), and the authority model in [segregation and access control](/broking-kyc/finix-broking-setup/roles/04-segregation-access-control/). Parallel catalogues: [OMS](/broking-kyc/finix-broking-setup/oms/11-operations-catalogue/), [RMS](/broking-kyc/finix-broking-setup/rms/11-operations-catalogue/), [money](/broking-kyc/finix-broking-setup/money/08-money-operations-catalogue/).

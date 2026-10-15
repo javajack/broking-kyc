@@ -367,6 +367,7 @@ export default defineConfig({
                 { label: "8. Modify & Cancel", slug: "finix-broking-setup/oms/08-modify-cancel-rules" },
                 { label: "9. Algo, API, DMA & SOR", slug: "finix-broking-setup/oms/09-algo-api-dma-sor" },
                 { label: "10. Config Reference", slug: "finix-broking-setup/oms/10-oms-config-reference" },
+                { label: "11. Operations Catalogue", slug: "finix-broking-setup/oms/11-operations-catalogue" },
               ],
             },
             {
@@ -383,6 +384,8 @@ export default defineConfig({
                 { label: "7. Intraday Surveillance", slug: "finix-broking-setup/rms/07-intraday-surveillance" },
                 { label: "8. Margin Reporting & Penalties", slug: "finix-broking-setup/rms/08-margin-reporting-penalties" },
                 { label: "9. Config Reference", slug: "finix-broking-setup/rms/09-rms-config-reference" },
+                { label: "10. Limit Impact Matrix", slug: "finix-broking-setup/rms/10-limit-impact-matrix" },
+                { label: "11. Operations Catalogue", slug: "finix-broking-setup/rms/11-operations-catalogue" },
               ],
             },
             {
@@ -400,6 +403,7 @@ export default defineConfig({
                 { label: "8. Statements & Retention", slug: "finix-broking-setup/backoffice/08-statements-retention" },
                 { label: "9. Regulatory Reporting", slug: "finix-broking-setup/backoffice/09-regulatory-reporting" },
                 { label: "10. Config Reference", slug: "finix-broking-setup/backoffice/10-backoffice-config-reference" },
+                { label: "12. Operations Catalogue", slug: "finix-broking-setup/backoffice/12-operations-catalogue" },
               ],
             },
             {
@@ -414,6 +418,7 @@ export default defineConfig({
                 { label: "5. Treasury & Exchange Funding", slug: "finix-broking-setup/money/05-treasury-exchange-funding" },
                 { label: "6. Upstreaming & Downstreaming", slug: "finix-broking-setup/money/06-upstreaming-downstreaming" },
                 { label: "7. Money & Trade in Sync", slug: "finix-broking-setup/money/07-money-trade-sync" },
+                { label: "8. Operations Catalogue", slug: "finix-broking-setup/money/08-money-operations-catalogue" },
               ],
             },
             {
@@ -445,6 +450,7 @@ export default defineConfig({
                 { label: "7. Incident Playbooks", slug: "finix-broking-setup/daily-ops/07-incident-playbooks" },
                 { label: "8. Expiry Operations", slug: "finix-broking-setup/daily-ops/08-expiry-ops" },
                 { label: "9. Periodic Calendar", slug: "finix-broking-setup/daily-ops/09-periodic-calendar" },
+                { label: "10. Master Trading-Day Checklist", slug: "finix-broking-setup/daily-ops/10-master-trading-day-checklist" },
               ],
             },
             {
@@ -456,6 +462,53 @@ export default defineConfig({
                 { label: "2. Reporting Pipeline", slug: "finix-broking-setup/compliance/02-reporting-pipeline" },
                 { label: "3. Inspection Readiness", slug: "finix-broking-setup/compliance/03-inspection-readiness" },
                 { label: "4. Cyber Resilience Config", slug: "finix-broking-setup/compliance/04-cyber-cscrf-config" },
+              ],
+            },
+            {
+              label: "Files & Data Interchange",
+              collapsed: true,
+              items: [
+                { label: "Overview", slug: "finix-broking-setup/files" },
+                { label: "1. File Register & Architecture", slug: "finix-broking-setup/files/01-file-register-architecture" },
+                { label: "2. NSE & NSE Clearing Files", slug: "finix-broking-setup/files/02-nse-files" },
+                { label: "8. Handling Exceptions", slug: "finix-broking-setup/files/08-file-handling-exceptions" },
+              ],
+            },
+            {
+              label: "Monitoring & Data Sharing",
+              collapsed: true,
+              items: [
+                { label: "Overview", slug: "finix-broking-setup/monitoring" },
+                { label: "4. Alerts & Response", slug: "finix-broking-setup/monitoring/04-alerts-received-and-response" },
+              ],
+            },
+            {
+              label: "Product Operations",
+              collapsed: true,
+              items: [
+                { label: "Overview", slug: "finix-broking-setup/products" },
+                { label: "1. MTF Operations", slug: "finix-broking-setup/products/01-mtf-operations" },
+              ],
+            },
+            {
+              label: "People & Accountability",
+              collapsed: true,
+              items: [
+                { label: "Overview", slug: "finix-broking-setup/roles" },
+                { label: "1. Role Register", slug: "finix-broking-setup/roles/01-role-register" },
+                { label: "2. Trading-Day RACI", slug: "finix-broking-setup/roles/02-raci-trading-day" },
+              ],
+            },
+            {
+              label: "Certification & Change Control",
+              collapsed: true,
+              items: [
+                { label: "Overview", slug: "finix-broking-setup/certification" },
+                { label: "1. Software Approval Regime", slug: "finix-broking-setup/certification/01-software-approval-regime" },
+                { label: "2. Mobile & Web Submission", slug: "finix-broking-setup/certification/02-mobile-web-app-submission" },
+                { label: "3. Terminal & User-ID Registration", slug: "finix-broking-setup/certification/03-ctcl-nnf-terminal-registration" },
+                { label: "4. Change & Version Control", slug: "finix-broking-setup/certification/04-change-version-control" },
+                { label: "5. Mock Trading & Drills", slug: "finix-broking-setup/certification/05-mock-trading-and-drills" },
               ],
             },
           ],

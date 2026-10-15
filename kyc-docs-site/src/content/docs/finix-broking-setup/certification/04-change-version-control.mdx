@@ -1,0 +1,170 @@
+---
+title: "Certification 4: change and version control with the exchange"
+description: What happens with the exchange when the order or risk system changes — the change classification matrix and the filing each class attracts, why a cosmetic change is not a no-action change, re-registration triggers for algorithms, mandated interface versions and forced upgrades, the version register the system audit examines, and change-freeze discipline.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** The question a release manager asks is "what do we have to file for this change", and the honest answer is a matrix rather than a rule — the filing depends on the development route, on what part of the system changed, and on whether risk or order logic is touched. So section 3 is that matrix, organised by route and by what changed. Section 5 covers mandated interface versions, which is the one area where the exchange rather than the firm controls the release calendar. Section 7 records, explicitly, that the tidy four-way taxonomy people expect does not exist — because inferring it is the main way firms ship unapproved changes.
+
+## TL;DR
+
+- **The filing depends on the route and on what changed**, not on how big the change feels. A server-only change on a vendor product and a risk-logic change on an in-house build attract different packs.
+- **"Cosmetic" does not mean "no action".** Mock testing and the consequent audit may be waived for look-and-feel changes that affect neither risk nor connectivity, but a documented no-change route still applies.
+- **A change with no functional change still has a filing** — a certificate plus a declaration naming the unchanged functions and identifying the previous request, product and version.
+- **Algorithm changes re-register rather than modify.** Changed strategy logic, order or risk code affecting a strategy, segment or version changes, login policy and provider endpoints are all re-registration triggers, and a changed opaque strategy needs **fresh** registration.
+- **Interface versions are mandated and upgrade windows are enforced.** The exchange decides when a version stops being accepted, which means part of the release calendar is not the firm's to choose.
+- **The version register is an audit artefact.** The system audit examines change management specifically, including vendor-supplied order and risk systems.
+
+## Conceptual overview
+
+An approval describes a deployment. A change either keeps the description true or makes it false, and the filing regime is an attempt to classify changes by how much of the description they disturb. That framing explains the matrix's shape: a change to the server but not the software disturbs the environment; a change to the software but not to order or risk functionality disturbs the build; a change to risk logic disturbs the thing the approval most cares about; and a change to an interface version disturbs the connection itself. It also explains why the in-house route has more steps than the vendor route — on the vendor route, part of the description is maintained by the vendor's own registration.
+
+The second observation is that the regime distinguishes *filing relief* from *permission*. The clarifications that allow an expedited process for bug fixes, exchange-driven changes and previously tested vendor products reduce paperwork at the exchange's discretion; they do not authorise releasing a changed product that has not been approved. The distinction is easy to lose in a release meeting, where "we were told bug fixes are expedited" becomes "bug fixes do not need anything". The safe formulation is that every change has a classification, some classifications have light filings, and none has no classification.
+
+The third point is about who owns the calendar. For most changes the firm chooses when to release. For a mandated interface version, the exchange sets the window in which the old version stops working, and a firm that has not upgraded by then simply cannot connect. That inverts the usual planning relationship: the upgrade is not a project the firm schedules against its own priorities but a deadline it must meet, and it interacts with every other dependency — the audit, the mock, the vendor's own certification, and any change freeze. This is the single most common cause of a rushed, under-tested release in a broking technology function.
+
+## 1. Framework
+
+- **Regulator baseline of 19 August 2013** — testing of software used in trading and risk management, and exchange approval before deployment. `[not yet in index]`
+- **Regulator clarification of 7 February 2014** — exchanges may not insist on mock testing and the consequent system audit for look-and-feel changes that affect neither risk management nor exchange connectivity, and may permit an expedited process for bug fixes, exchange-driven changes and previously tested vendor products. `[not yet in index]`
+- **Exchange consolidated own-front-end master of April 2026** — the registration and modification routes and their annexures, read with the form revisions effective 18 May 2026. `[not yet in index]`
+- **Retail algorithmic framework** and the exchange's provider regime — the re-registration triggers. `[not yet in index]`
+- **Exchange system-audit circulars of April 2026** — the audit scope including change management and version compliance. `[not yet in index]`
+- **Vendor product-certification notification of 2 September 2026** — major-change triggers and delta-testing expectations on the vendor side. `[not yet in index]`
+
+## 2. What "changed" means
+
+| Layer | Examples |
+|---|---|
+| **Environment** | Server replacement or relocation, operating-system or runtime change, hosting change |
+| **Build** | A new version of the same product with no change to order or risk behaviour |
+| **Function** | New or changed order types, validity handling, product features, workflows |
+| **Order or risk logic** | Pre-trade checks, limit evaluation, margin computation, square-off behaviour |
+| **Interface** | Protocol or specification version, message fields and formats |
+| **Strategy** | Algorithmic logic, parameters that are logic, provider endpoints |
+| **Parameter** | A risk limit value set through an approved interface |
+| **Content** | Material outside the registered trading application |
+
+## 3. The classification matrix
+
+### Vendor-product route
+
+| What changed | Filing |
+|---|---|
+| **New product, or a new trading application or facility** | New product and member registration, the audit report and certificate, test, acceptance and mock evidence, and **approval before deployment**. Existing membership and a vendor contract do not substitute |
+| **Software and server, or server only** | The modified-registration route: **the audit report and certificate**, applicable vendor confirmation, and the additional auditor declaration for the relevant facilities |
+| **Software only** | **The certificate**, applicable strategy-vendor confirmation, and the additional auditor declaration. Reduced paperwork is **not** a no-filing exemption |
+| **Change outside order and risk systems, features and functionality** | Still **the certificate**, applicable vendor confirmation and the additional declaration |
+
+### In-house route
+
+| What changed | Filing |
+|---|---|
+| **Server** | **Report and certificate**, product and risk-system write-up, change description, and the applicable additional declaration |
+| **Software, function, or risk logic** | **The certificate**, product and risk-system write-up, change description, and the applicable additional declaration. Test the affected functionality **and its regressions**, and record the **actual** order and risk changes rather than only a front-end version number |
+| **No change to order or risk systems, features or functionality** | **The certificate plus a no-change declaration**, naming the unchanged functions and logic and identifying the previous request and the product and version, with a change description and the applicable additional declaration |
+
+### Other classes
+
+| Class | Treatment |
+|---|---|
+| **Look and feel only** | Mock testing and the consequent system audit **may be waived** where risk management and exchange connectivity are unaffected — **but the documented no-change route still applies.** "Cosmetic equals no exchange action" is **not established** |
+| **Bug fix, exchange-driven change, previously tested vendor product** | An **expedited process at the exchange's discretion**. **Not unconditional authority to release an unapproved changed product** |
+| **Algorithm logic; order or risk code affecting an algorithm; segment or version; login policy; provider endpoint or member interface** | **Re-registration triggers** |
+| **Opaque strategy logic** | **Fresh registration** of the changed algorithm. Not a modification of the registered one |
+| Commodity-venue major functional or risk version change | Documents, then test environment, then mock or simulation, then the auditor certificate, then in-house demonstration where applicable, then approval |
+| **Parameter-only risk-limit maintenance** | **Do not equate a permitted limit setting with a code or logic change.** Preserve authorisation and an audit trail; the software must still enforce the prescribed checks. **No universal exemption from filing was established** |
+| **Content outside the registered application** | **No source establishes a filing for every unrelated content edit.** The boundary is architecture-dependent — **document your classification** rather than claiming a general exemption |
+
+<Aside type="danger" title="The no-change filing is the one people skip, and it is the cheapest one">
+Of all the entries above, the route that attracts the least paperwork — a certificate plus a declaration that nothing in the named functions changed, referencing the previous request and version — is the one most often omitted entirely, because a release with no functional change feels like a non-event. The consequence is a production version the exchange has never been told about, which means the version register and the exchange's record diverge, which is precisely what the system audit's change-management review looks for. Filing it costs an afternoon; not filing it converts a routine audit into a finding about change control, and findings about change control invite scrutiny of every other release.
+</Aside>
+
+## 4. The version register
+
+The system audit examines change management specifically, which makes this register an audit artefact rather than internal documentation.
+
+| Field | Purpose |
+|---|---|
+| Product and the version in production, per exchange, segment and facility | What is live |
+| The approval or registration that describes it | Whether what is live is approved |
+| Development route | Vendor, in-house, or hosted |
+| The vendor's registration and certification position, where applicable | A vendor constraint becomes the firm's constraint |
+| Change classification for each release | The filing decision, recorded at the time |
+| The filing made, and its acknowledgement | Evidence |
+| Audit report and certificate references, with their dates | The deployment-specific evidence |
+| Test, acceptance and mock dates | The dates named on the certificate |
+| Interface or protocol version in use, and the exchange's mandated version | The forced-upgrade exposure |
+| Rollback position | What the firm would return to, and whether that version is approved |
+| Change-freeze windows observed | — |
+
+**The rollback row matters more than it looks.** Rolling back to a previous version is only safe if that version is itself approved and registered, which it usually is — but rolling back to a build that was never filed, or forward to a hotfix that was not classified, creates an unapproved production state during an incident, when nobody is thinking about filings.
+
+## 5. Mandated interface versions and forced upgrades
+
+| Element | Position |
+|---|---|
+| Who decides | **The exchange.** Interface and protocol versions are specified, and the window in which an older version stops being accepted is set by the venue |
+| Consequence of missing it | The software cannot connect. There is no degraded mode |
+| What to test | **Changed message fields and formats, supported order types, new products and exchange-mandated controls when named in the release** — against the release-specific specification, **not a previous vendor certificate** |
+| Interaction with other dependencies | The upgrade needs test access, a mock, an audit and a filing, and may collide with a change freeze or a vendor's own certification timetable |
+| Planning position | Treat the published version roadmap as a **commitment calendar**, and schedule the audit and mock slots as soon as a window is announced rather than when the work is ready |
+| One venue's platform interfaces | A September 2026 reproduction distinguishes current production interface versions from forthcoming ones with tentative simulation months; **the production cutover was not verified** |
+
+## 6. Change-freeze discipline
+
+No universal prescribed freeze calendar was established, so this is risk policy rather than a rule — but the reasoning is specific.
+
+| Period | Why a freeze is appropriate |
+|---|---|
+| Expiry week, and expiry day in particular | Position and margin behaviour is already under stress; physical settlement obligations crystallise |
+| Settlement days | The obligation and funding path is time-critical |
+| The day after a long holiday | Begin-of-day is already longer and file handling is already abnormal |
+| Month, quarter and year end | Periodic reporting and statement runs compete for the same windows |
+| Around a mandated interface cutover | One change at a time, so a failure is attributable |
+| Immediately before an audit or inspection | The evidence should describe a stable system |
+
+The corollary is that a freeze pushes work into the remaining windows, so the calendar has to be planned a quarter ahead rather than release by release.
+
+## 7. What does not exist
+
+| Expectation | Reality |
+|---|---|
+| A single four-way taxonomy — cosmetic, functional, risk, protocol — mapping cleanly to nothing, intimation, re-certification and approval, across all exchanges | **Not established.** The rules provide particular reporting routes and reduced-document approval routes |
+| A universal exemption for parameter changes | **Not established** |
+| A general exemption for content changes | **Not established**; architecture-dependent |
+| A common cosmetic, functional and server-change matrix at every venue | **Not obtained** for one of them |
+| "Intimation sent" or "vendor certified" as evidence of approval | **Neither is** |
+
+**For a doubtful release, obtain written classification from the exchange.** The cost is an email and a wait; the alternative is a release whose status is a matter of opinion.
+
+## 8. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.cert.change.classification_required_per_release` | **D** | **true** | Including releases believed to change nothing |
+| `finix.cert.change.classification_recorded_at_time` | **D** | true | Not reconstructed at audit |
+| `finix.cert.change.no_change_filing_enforced` | **D** | **true** | The most-skipped route |
+| `finix.cert.change.risk_logic_change_requires_write_up` | **R** | true | In-house route |
+| `finix.cert.change.regression_scope_documented` | **D** | true | Affected functionality and its dependencies |
+| `finix.cert.change.algo_logic_change_is_reregistration` | **R** | true | Opaque strategies need fresh registration |
+| `finix.cert.change.version_register_maintained` | **R** interpretation | true | An audit artefact |
+| `finix.cert.change.rollback_target_must_be_approved` | **D** | **true** | Checked before an incident, not during |
+| `finix.cert.change.protocol_version_roadmap_tracked` | **D** | true | Per exchange and segment |
+| `finix.cert.change.freeze_calendar` | **D** | Expiry, settlement, post-holiday, period end, cutover, pre-audit | Planned a quarter ahead |
+| `finix.cert.change.doubtful_release_written_classification` | **D** | true | Retained with the filing |
+| `finix.cert.change.vendor_certification_position_tracked` | **D** | true | A vendor deadline becomes a firm constraint |
+
+## Practical notes
+
+- **Classify every release, including the ones that change nothing.** The classification is the artefact; the filing follows from it.
+- **Record the classification at the time, with a name against it.** Reconstructing a year of decisions during an audit is where change-control findings come from.
+- **Check the rollback target's approval status now.** During an incident nobody will.
+- **Schedule audit and mock slots when an interface window is announced**, not when development finishes.
+- **Keep one quarter-ahead release calendar that includes freezes, audits, mocks and mandated cutovers.** These four compete for the same weeks and only a single calendar makes the collision visible.
+- **Track your vendor's certification deadlines as your own risk.** A vendor that misses one can block your releases.
+
+## Where this connects
+
+What needs approval in the first place is in [the software approval regime](/broking-kyc/finix-broking-setup/certification/01-software-approval-regime/), the client-facing pack in [mobile and web application submission](/broking-kyc/finix-broking-setup/certification/02-mobile-web-app-submission/), identifiers in [terminal and user-identifier registration](/broking-kyc/finix-broking-setup/certification/03-ctcl-nnf-terminal-registration/), and testing in [mock trading and drills](/broking-kyc/finix-broking-setup/certification/05-mock-trading-and-drills/). Configuration change control generally is in [environments and configuration baseline](/broking-kyc/finix-broking-setup/stack/environments-config-baseline/), the vendor relationship in [vendor onboarding and contracts](/broking-kyc/finix-broking-setup/setup/09-vendor-onboarding-contracts/), and the operator action O-36 in [the OMS operations catalogue](/broking-kyc/finix-broking-setup/oms/11-operations-catalogue/). The protocol detail is in [exchange connectivity protocols](/broking-kyc/finix-broking-setup/oms/02-exchange-connectivity-protocols/).

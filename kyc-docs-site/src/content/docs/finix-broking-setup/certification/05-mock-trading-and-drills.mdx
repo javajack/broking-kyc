@@ -1,0 +1,167 @@
+---
+title: "Certification 5: mock trading and drills"
+description: How the test environments differ and why they are not interchangeable, how mock sessions are scheduled and who must participate, the monthly obligation on algorithmic members, what to do and retain during a session, the consequence of non-participation, and the separate regime of the firm's own disaster-recovery drills with its thresholds and penalties.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** "Mock trading" is used loosely to mean five different things — the firm's own acceptance testing, exchange conformance testing, a simulation environment, an exchange-wide mock session, and the firm's own recovery drill — and each has a different purpose, a different access route and a different legal effect. Conflating them produces the specific and common failure of a firm believing it has discharged a recovery-drill obligation by attending a Saturday mock the exchange ran from the exchange's own recovery site. So section 2 separates them before anything else, and section 7 treats the firm's own drills as the distinct regime they are.
+
+## TL;DR
+
+- **Five environments, not one.** Member acceptance testing, exchange conformance testing, simulation, exchange-wide mock, and the firm's own recovery drill each do different work. **Attending an exchange mock does not discharge a recovery-drill obligation.**
+- **Exchanges run mocks at least monthly**, and algorithmic members participate through the applicable strategy identifiers **even when the software has not changed**.
+- **One venue requires participation on at least one trading day each calendar month**; another requires every approved algorithm — **enabled or not, changed or not** — to participate for **at least an hour** monthly, with simulation as an alternative on intimation.
+- **Non-participation with an unsatisfactory explanation can suspend proprietary trading rights for at least a trading day.** It is not an automatic suspension of client trading, and there is no uniform cash fine.
+- **Participation is not approval.** A mock supports an approval file; it does not confer permission.
+- **The firm's own recovery regime has its own thresholds** — a client-count threshold for establishing a recovery site, a separate designation for the largest firms with a half-yearly full-day drill, and a quarterly full-day drill for designated large brokers that must not coincide with exchange drills.
+
+## Conceptual overview
+
+Testing in this domain serves two different masters. For the firm, testing establishes that its release works — functionally, under its own risk controls, against its own requirements. For the exchange, testing establishes that the member's system behaves correctly against the exchange's interfaces and will not harm the market. These overlap but are not the same, which is why the environments are distinct and why evidence from one does not substitute for the other. A firm that tests thoroughly in its own environment and skips conformance testing has established the first and not the second; a firm that attends every mock and does not test its own workflows has done the reverse.
+
+The second idea is that participation generates *evidence*, and the evidence is what the approval file consumes. The auditor certificate records the dates of acceptance testing, exchange testing and mock participation, which means those dates are load-bearing and cannot be back-filled. It also means a mock has a documentation output as well as a technical one: the build tested, the cases exercised, the results, the defects and their remediation. Firms that treat a mock as an attendance exercise discover at filing that they cannot evidence what they tested.
+
+The third point concerns recovery, where the distinction matters most. An exchange sometimes runs a mock from its own recovery site, to test the exchange's resilience. A member's obligation is to run **its own** operations from **its own** recovery site, for a defined period, demonstrating that its people, systems, network, capacity and data replication all work and that it can return to primary operations. These are different exercises with different thresholds, frequencies and evidence, and the penalty column for failing to conduct a required drill is specific and escalating. Treating the first as satisfying the second is the most expensive confusion available on this page.
+
+## 1. Framework
+
+- **Regulator baseline of 19 August 2013** — exchanges conduct mock trading at least monthly; algorithmic brokers participate with the applicable strategy identifiers even where software has not changed; exchanges review reasons for non-participation; and where reasons are unsatisfactory, **proprietary trading rights are suspended for at least one trading day**. `[not yet in index]`
+- **Regulator clarification of 7 February 2014** — mock testing and the consequent system audit need not be insisted on for look-and-feel changes unaffecting risk management and connectivity. `[not yet in index]`
+- **Exchange test-market and simulation masters of April 2026**, with their application formats for existing members, vendors and prospective members. `[not yet in index]`
+- **Exchange own-front-end master of April 2026** — the monthly algorithmic participation requirement. `[not yet in index]`
+- **Commodity venue circular of 13 April 2026** — every approved algorithm, enabled or not, changed or unchanged, participating for at least an hour monthly, or at least an hour of simulation with intimation. `[not yet in index]`
+- **Revised technical-glitch framework effective 9 January 2026** — incident reporting clocks, and the coverage threshold. `[not yet in index]`
+- **Common exchange business-continuity guidelines** — the recovery-site threshold, the designation of the largest firms, drill frequency, recovery objectives, site separation and the penalty column. `[not yet in index]`
+- **Exchange designated-large-broker operating guidelines** — the quarterly drill overlay and its reporting deadlines. `[not yet in index]`
+
+## 2. The five environments
+
+| Environment | Purpose, access and legal effect |
+|---|---|
+| **Member acceptance testing** | The firm satisfies itself that its new or changed implementation works, **including its risk controls**. Results are retained for the auditor's certification |
+| **Exchange test market, or conformance testing** | Tests **protocol and functional behaviour against the exchange's interfaces** before live use. Separate application formats exist for existing members, for vendors and providers, and for prospective members. **Approval of test access is not production software approval** |
+| **Simulation** | A **production-like configuration** with mapped access, to exercise functionality. Its stated purpose is **functional testing, not exchange-capacity benchmarking** |
+| **Exchange-wide mock** | An exchange-announced session to exercise releases, market conditions, product functionality, contingency or **the exchange's own** recovery site. It may use production connectivity with mock data, followed by a **live re-login window** |
+| **The firm's own recovery drill** | Moves the firm's **actual operations** to **its own** recovery site under its continuity obligations. **Not discharged because an exchange ran a Saturday mock from the exchange's recovery site** |
+
+**On production readiness:** a readiness exercise verifies the approved build, the live endpoints and identifiers, and operational recovery; the formal test, mock and auditor evidence supports the approval file. A live re-login confirms access after restoration — **it does not permit unapproved client trading**. A separately named universal "production readiness certificate" common to all three venues was **not established**.
+
+## 3. Scheduling and participation
+
+| Question | Position |
+|---|---|
+| Cadence | Exchanges conduct mocks **at least monthly** |
+| Calendars and notices | A yearly contingency and mock calendar is published, with **individual segment notices** carrying the actual times, release files, testing scope and restoration instructions. **A calendar date alone does not replace the session notice** |
+| **Monthly algorithmic duty, one venue** | Participation in a mock or simulation on **at least one trading day in each calendar month**, through the relevant strategy identifiers, **including where software is unchanged**. An exception exists for strategies developed by individual technically-capable clients — **do not extend it to provider or broker algorithms** |
+| **Monthly algorithmic duty, commodity venue** | **All approved algorithms, enabled or not, changed or unchanged**, participating for **at least one hour** in a monthly mock; alternatively at least an hour in simulation that month **with intimation to the exchange** |
+| Active participation | **Log in, place orders and execute trades** through the relevant identifiers. Holding a connection open does not establish tested behaviour |
+| Enrolment | Live-enabled segment members are typically **automatically eligible**, using existing identifiers, addresses and mappings, with specified enablement or reset requests going through the notice's support process. **This does not establish automatic eligibility for every new member or every venue** |
+| Session hours | Example sessions have run a mock market in the afternoon with a live re-login window in the evening, and simulation on regular trading days in defined evening windows with shorter support hours. **These are examples and later segment notices control** |
+| Private or holiday test access | One venue permits a holiday or Sunday test-market request **at least two working days beforehand**, subject to feasibility. **That is not a promise of a private exchange-wide mock** |
+| **Non-algorithmic members** | A new or changed application's required testing still applies. **No universal mandate was established that every member attends every mock** — but a particular release or recovery notice may impose its own participation requirement |
+
+### Non-participation
+
+| Position | Detail |
+|---|---|
+| Baseline | Where the exchange finds the member's reasons **unsatisfactory**, **proprietary trading rights are suspended for at least one trading day** |
+| Commodity venue | An unsatisfactory explanation **or a failure to respond** can result in a **minimum one-day suspension of proprietary trading rights** |
+| **What this is not** | **Not** an automatic suspension of all client trading, and **not** a uniform cash fine. Do not describe it as either |
+
+<Aside type="caution" title="The monthly algorithmic obligation catches firms with dormant strategies">
+The requirement at one venue reaches **every approved algorithm whether or not it is enabled**. A firm that registered three strategies, uses one, and left two disabled still owes monthly participation for all three — and the natural assumption that a disabled strategy is out of scope is exactly wrong. Two practical consequences. First, the approved-algorithm inventory needs to be a live list with an owner, because it determines a monthly obligation. Second, **deregistering a strategy the firm no longer uses is an operational saving**, not merely housekeeping: every registration retained is a monthly participation duty and a potential suspension exposure. Review the inventory quarterly and retire what is not used.
+</Aside>
+
+## 4. During the session
+
+| Stage | Activity |
+|---|---|
+| **Before** | Read the **exact segment notice**; install the prescribed test release and configuration; load the relevant contract and security files; set user, branch and risk limits; identify approved strategies and identifiers; and **record the tested build** |
+| Functional cases | Order entry; modification and cancellation; execution and rejection; the prescribed pre-trade limits; relevant strategy behaviour; and **exceptional scenarios and recovery relevant to the release** |
+| Protocol and release cases | Changed message fields and formats, supported order types, new products and exchange-mandated controls **when named in the release** — verified against the **release-specific** specification, not a previous vendor certificate |
+| Recovery and contingency cases | The announced exchange switchover, reconnection and data or order recovery — and, **separately**, the firm's own recovery infrastructure where required |
+| **After** | **Restore systems to production state, remove mock data and configuration**, and follow the live re-login and readiness instructions. Keep recovery and failed-test remediation evidence |
+
+### The evidence pack
+
+| Item |
+|---|
+| Member code and segment |
+| Product, version, strategy and identifiers used |
+| Date and environment |
+| Test cases and **actual results** |
+| Order and trade logs |
+| Defects found and their remediation |
+| The auditor certificate, and the exchange acknowledgement where required |
+
+Submission routes differ and are session-specific: one venue's transition circular requested mock and simulation details to a named mailbox; another's session notice requested feedback by a stated hour through the notice's contact routes; the commodity venue requires intimation where simulation is used as the monthly alternative. **A single identical mock-results schema across the three venues was not established**, and neither was a common pass-or-fail certificate or automatic approval based on attendance.
+
+**The final gate:** production permission, the approved product, version, segments and facilities, the enabled identifiers and the resolved required tests must all align. **Participation in a mock alone is not exchange approval.**
+
+## 5. The firm's own recovery regime
+
+This is a distinct regime with its own thresholds. The numbers below are the ones that most often get conflated.
+
+| Element | Position |
+|---|---|
+| **Technical-glitch framework coverage** | The revised framework effective **9 January 2026** covers internet and wireless-trading brokers with **more than ten thousand registered clients**, excluding closed accounts, measured at the previous financial year end |
+| **Recovery-site establishment threshold** | A continuity and recovery setup is required for members with a **minimum of fifty thousand clients across exchanges**. **This is a separate and higher threshold — do not equate it with the ten-thousand-client framework coverage** |
+| **Designated firms** | Defined by each exchange's **top twenty** internet and wireless-trading client bases, published at the start of each financial year. Combined membership can yield more than twenty distinct firms, so **use the actual designation lists** |
+| **Designated-firm drill** | **Half-yearly**, running **all operations from the recovery site for at least one full trading day** |
+| Phase-in for newly in-scope firms | A staged client-coverage progression across quarters, each with a full trading day at the recovery site. **Its interaction with the fifty-thousand threshold and the half-yearly designated-firm rule needs exchange confirmation — do not apply it indiscriminately** |
+| **Designated-large-broker overlay** | **Quarterly** drills with live trading, **at least one full trading day**, **all operations**, and **not coinciding with exchange drills**; plus half-yearly continuity policy review and monthly security-officer review |
+| Its reporting | Drill details and observations **within thirty days of quarter end**; the continuity policy within **forty-five days of half-year end**; relevant board minutes within **forty-five days of quarter end** |
+| Smaller firms | The reviewed material **does not establish** the designated-firm full-day half-yearly obligation for every small member. General continuity, cyber, software-audit and membership obligations still apply. **No single universal drill frequency for all remaining categories was established** |
+
+### Objectives and demonstration
+
+| Element | Position |
+|---|---|
+| Disaster trigger | A **forty-five-minute** critical-system disruption, plus board-defined additional criteria |
+| **Recovery objectives** | **Recovery time two hours after declaration**; **recovery point fifteen minutes**. **Do not substitute an exchange's own targets for the firm's** |
+| Site separation | Preferably different seismic zones; where that is not feasible, **at least two hundred and fifty kilometres** between primary and recovery sites |
+| What the drill demonstrates | A responsible invocation team; correspondence of hardware, software, application, network and security between sites; sufficient capacity; data replication; recovery within objectives; continuity; and **return to primary operations** |
+| Policy and evidence | A board-approved continuity policy, reviewed at least annually and after major critical-system changes or glitches, with quarterly board review of implementation. The auditor examines preparedness and the documented drill results and observations |
+| Ordinary drill reporting | Document timing, operations and client coverage, recovery achieved, failures, corrective actions and audit evidence. **No universal non-designated filing form or deadline across the venues was established** |
+| **Penalty for failing to conduct a required drill** | For the designated and large-broker categories, a substantial amount **plus a monthly amount for every month the failure continues**, subject to a per-instance cap, with possible additional disciplinary action. The column for other brokers is **not applicable** for this row — **apply the stated category, and do not generalise this tariff to all missed mocks** |
+
+**Actual glitch reporting is separate from drills.** The framework requires informing the exchanges and clients within **two hours**, a preliminary report by the next day subject to the circular's holiday treatment, and a root-cause analysis within **fourteen working days**, through the prescribed reporting platform. These are incident obligations, not a deadline for a successful scheduled drill.
+
+A **September 2026 consultation** on strengthening continuity and recovery at market infrastructure institutions is a **proposal concerning those institutions**, not evidence of a new broker drill frequency.
+
+## 6. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.cert.mock.environments_distinguished` | **D** | **true** | Acceptance, conformance, simulation, exchange mock, own drill |
+| `finix.cert.mock.algo_monthly_participation` | **R** | true | Including unchanged and **disabled** strategies at one venue |
+| `finix.cert.mock.approved_algo_inventory_reviewed` | **D** | Quarterly | Each registration is a monthly duty |
+| `finix.cert.mock.read_session_notice_each_time` | **D** | true | The calendar is not the notice |
+| `finix.cert.mock.record_tested_build` | **D** | true | The certificate names dates |
+| `finix.cert.mock.evidence_pack_retained` | **D** | true | Cases, results, logs, defects, remediation |
+| `finix.cert.mock.restore_production_state_after` | **D** | true | Remove mock data and configuration |
+| `finix.cert.mock.participation_is_not_approval` | **D** | true | Recorded so nobody relies on it |
+| `finix.cert.dr.site_required_client_threshold` | **E** | Fifty thousand across exchanges | **Not** the glitch-framework threshold |
+| `finix.cert.dr.designated_firm_drill_frequency` | **E** | Half-yearly, full trading day, all operations | Per the designation list |
+| `finix.cert.dr.qsb_drill_frequency` | **E** | Quarterly, full trading day, all operations | **Not coinciding with exchange drills** |
+| `finix.cert.dr.rto_hours` | **E** | 2 after declaration | The firm's target |
+| `finix.cert.dr.rpo_minutes` | **E** | 15 | The firm's target |
+| `finix.cert.dr.site_separation_km_min` | **E** | 250 where seismic separation is not feasible | — |
+| `finix.cert.dr.disaster_trigger_minutes` | **E** | 45 of critical-system disruption | Plus board criteria |
+| `finix.cert.dr.failback_demonstrated` | **E** | true | Return to primary is part of the drill |
+| `finix.cert.glitch.inform_within_hours` | **R** | 2 | Exchanges and clients |
+| `finix.cert.glitch.rca_working_days` | **R** | 14 | Through the prescribed platform |
+
+## Practical notes
+
+- **Keep the five environments separate in your own vocabulary.** The conflation that costs money is treating an exchange mock as the firm's recovery drill.
+- **Review the approved-algorithm inventory quarterly and retire what you do not use.** Each retained registration is a recurring monthly obligation.
+- **Read the session notice every time.** Times, scope, release files and restoration instructions change session to session.
+- **Produce the evidence pack during the session, not afterwards.** The certificate needs dates and the file needs results.
+- **Diarise the recovery drill against the right regime.** Check whether you are over the recovery-site threshold, whether you are on a designation list, and whether the large-broker overlay applies — the three have different frequencies.
+- **Schedule the firm's drill so it does not coincide with an exchange drill** where the overlay requires that, and keep the failback in scope.
+
+## Where this connects
+
+The approval these tests support is in [the software approval regime](/broking-kyc/finix-broking-setup/certification/01-software-approval-regime/) and [mobile and web application submission](/broking-kyc/finix-broking-setup/certification/02-mobile-web-app-submission/); change classification is in [change and version control](/broking-kyc/finix-broking-setup/certification/04-change-version-control/). The go-live sequence is [certification, mock trading and go-live](/broking-kyc/finix-broking-setup/setup/10-certification-mock-golive/), the infrastructure in [infrastructure and connectivity](/broking-kyc/finix-broking-setup/setup/08-infrastructure-connectivity/), and incident handling in [incident playbooks](/broking-kyc/finix-broking-setup/daily-ops/07-incident-playbooks/) and [incident and breach reporting](/broking-kyc/finix-broking-setup/monitoring/05-incident-breach-reporting/). The operator action O-54 in [the OMS operations catalogue](/broking-kyc/finix-broking-setup/oms/11-operations-catalogue/) is the recovery switch itself, and the vendor-neutral treatment is [the business continuity and recovery drill procedure](/broking-kyc/deep-dives/specialty/bcp-dr-drill/).

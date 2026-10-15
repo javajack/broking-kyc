@@ -1,0 +1,194 @@
+---
+title: "Files 8: handling exceptions"
+description: What to do when a file is late, missing, truncated, corrupt, duplicated, revised after processing, or structurally changed without notice — the twenty-two exception classes, the decision each one forces, and the downstream blast radius of getting the decision wrong.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** The ordinary case needs no documentation: the file arrives, validates and applies. Everything that matters is in the exceptions, and the exceptions are not a single category — a late file, a truncated file and a revised file demand completely different responses, and the response that is correct for one is harmful for another. So this page enumerates the exception classes, gives each one a decision rather than a procedure, and states the blast radius, because what makes a file exception expensive is almost never the file itself but what has already been computed from it.
+
+## TL;DR
+
+- **Late and missing are different decisions.** Late means wait with a deadline and a fallback; missing means execute the fallback now. Confusing them produces an operation that waits until it is too late to do anything else.
+- **Truncation is the dangerous one** because it passes every structural check. Record-count ranges are the only defence, and they must be enforced rather than logged.
+- **A revised file is a diff, never a replacement.** Reloading wholesale over an applied version double-counts or drops, depending on the pipeline, and both outcomes are discovered days later.
+- **The blast radius is the real cost.** The same revised trade file is a small correction before contract notes and a client-facing event after them. Every exception decision therefore depends on what has already consumed the file.
+- **An unread response file is an unmade submission.** The quietest and most expensive exception class: the firm believes it has reported, and it has not.
+- **Every exception ends in a written decision with a named owner.** Not a retry, not an escalation; a decision, recorded, including the decision to accept a known gap.
+
+## Conceptual overview
+
+File exceptions are decisions under time pressure with incomplete information, and the decisive variable is almost always *what has already been computed from the data in question*. A margin parameter file that is wrong before the open is a delay; the same file wrong after three hours of trading is a population of positions margined incorrectly, a reporting exposure, and a question about whether to recompute. A trade file revised before reconciliation is a routine reload; revised after contract notes have been dispatched it is a revised-document event with client and regulatory consequences. This is why the register records a dependency graph: the first question in any file exception is not "what is wrong with the file" but "what has already consumed it, and what have those consumers already told the outside world".
+
+The second idea is that waiting is a decision and needs a deadline. The natural response to a late file is to wait, because it usually arrives. The failure mode is waiting past the point where the alternatives are still available — past the open, past the bank cut-off, past the submission deadline. So every blocking file carries not just a fallback but a *fallback trigger time*, computed backwards from the deadline it would otherwise breach, and reaching that time executes the fallback automatically rather than prompting a conversation. The conversation, if it is needed, happens afterwards.
+
+The third idea is that the firm's own records must move toward the authoritative source, and only in that direction. When a transaction file disagrees with the firm's books, the file is right and the books are wrong — not because files are reliable but because the clearing corporation's or exchange's view is the one that determines what the firm owes and owns. Every exception handler must be written so that the correction flows that way. The temptation during an incident is to adjust the file to match a reconciled position, because it is less work; the result is a set of books that agree with themselves and with nothing else.
+
+## 1. The exception classes
+
+| # | Class | Recognised by | Decision forced |
+|---|---|---|---|
+| F-01 | **Late** — not yet available, window still open | Clock within the window | Wait, with the fallback trigger set |
+| F-02 | **Missing** — window closed, not available | Window end reached | Execute the pre-decided fallback |
+| F-03 | **Never published** — source confirms it will not come | Source notification | Fallback becomes the day's state; inform downstream |
+| F-04 | **Partial publication** — file present but still being written | Size unstable, no completion marker | Do not collect; re-poll |
+| F-05 | **Truncated** — complete-looking, short | Record count below range | **Reject; do not apply**; treat as missing |
+| F-06 | **Trailer mismatch** — declared count differs from actual | Validation step 7 | Reject; re-collect once, then treat as missing |
+| F-07 | **Corrupt** — fails checksum or will not parse | Validation steps 3 to 5 | Re-collect once; then treat as missing |
+| F-08 | **Empty but valid** — zero records, structurally fine | Record count zero | **Decide whether zero is legitimate today** — often it is |
+| F-09 | **Wrong business date** | Validation step 8 | Reject; the expected file is still missing |
+| F-10 | **Duplicate delivery** — same version arrives twice | Idempotency key matches | Discard silently; log |
+| F-11 | **Revised version, not yet applied** | Later sequence, original not applied | Apply the revision; discard the original |
+| F-12 | **Revised version, original already applied** | Later sequence, original applied | **Diff and adjust**; assess blast radius |
+| F-13 | **Out-of-order arrival** | Sequence lower than applied | Do not apply; investigate whether the higher sequence was legitimate |
+| F-14 | **Schema changed without notice** | Validation step 9 | Reject; escalate to the source; manual handling for the day |
+| F-15 | **Plausible but wrong values** | Diff alert, step 11 | **Pause and verify before applying** |
+| F-16 | **Partial set** — one file of a dependent group missing | Cross-file check, step 12 | Do not apply the set partially |
+| F-17 | **Collection failure** — credentials, address, or transport | Collection layer error | Manual collection path; fix the cause separately |
+| F-18 | **Source portal unavailable** | Repeated collection failure | Manual path; alternative channel; inform operations lead |
+| F-19 | **Response file shows rejections** | Response content | **The submission did not fully happen**; remediate and resubmit |
+| F-20 | **Response file absent** | Expected response not received | Treat the submission as unconfirmed; chase before the deadline |
+| F-21 | **Unrecognised extra file** | Present in source, not in register | Classify and add to the register; do not ignore |
+| F-22 | **Retired file still expected** | Persistent absence, source confirms retirement | Remove from the manifest through change control |
+
+<Aside type="danger" title="F-05 and F-08 look identical and demand opposite responses">
+A truncated file and a legitimately empty file both arrive structurally valid with fewer records than usual, and the operator sees the same thing. Applying a truncated file silently mishandles whatever it omitted; rejecting a legitimately empty file blocks the day for no reason. The distinction cannot be made from the file, only from context: a ban-period file with zero records on a day when no security is in a ban is correct and common; a trade file with zero records on a day the firm traded is not; an obligation file with zero records on a non-settlement day is expected. The register must therefore record, per file, whether zero is a legitimate value and under what condition — a single boolean plus a note, and one of the highest-value columns in the whole register.
+</Aside>
+
+## 2. The fallback decision, per criticality
+
+Every blocking file has a fallback decided in advance and a trigger time computed backwards from the deadline it protects.
+
+| Criticality | Fallback shape | Trigger time derived from |
+|---|---|---|
+| Blocking — open | Delay the open, or open with a stated scope of refusal | Market open, minus the time needed to communicate |
+| Blocking — segment | Keep that segment closed, or open on previous-day parameters with a stated uplift | Segment open |
+| Blocking — computation | Freeze the computation at its last good value; permit reductions only | The first decision that depends on it |
+| Blocking — downstream | Delay the downstream step; assess which deadlines it threatens | The earliest threatened deadline |
+| Blocking — submission | Submit on the best available basis with a disclosed qualification, or seek an extension | The submission deadline, minus preparation |
+| Degrading | Apply the most restrictive prior treatment | None; applies immediately |
+
+<Aside type="caution" title="The parameter-file fallback is the one to decide today">
+For a risk parameter file, the three options are: previous day's parameters with a stated conservative uplift; manual computation from the published methodology; or do not open the segment. All three are defensible; choosing none of them in advance is not. Write the choice down per segment, name the owner, set the trigger time, and rehearse it — and note that running on stale parameters has a margin-collection consequence that compliance should learn about the same morning, not at month end. The corresponding risk-desk intervention is R-52 in [the RMS operations catalogue](/broking-kyc/finix-broking-setup/rms/11-operations-catalogue/).
+</Aside>
+
+## 3. Blast radius
+
+Before any reprocess or correction, enumerate what has already consumed the data. This table is the standing answer for the commonest files.
+
+| File | Consumers, in order | Points of no easy return |
+|---|---|---|
+| Instrument or contract master | Order management system, risk engine, back office reference data | Orders already placed against a wrong specification |
+| Risk parameter file | Risk engine, every capacity computation, margin reporting | Positions already taken on wrong margin; snapshots already captured |
+| Collateral and haircut file | Risk engine, capacity, client-facing margin display | Capacity already granted; orders already accepted |
+| Ban-period and surveillance lists | Risk engine, pre-trade checks | Fresh positions already taken in a banned underlying — a reportable breach |
+| Trade file | Reconciliation, charges, contract notes, ledger, obligations, margin reporting, client statements | **Contract notes dispatched**; ledger posted; reporting submitted |
+| Obligation file | Settlement, funding, treasury instruction | **Funds already instructed**; pay-in already made |
+| Collateral statement | Capacity, client reporting | Capacity granted |
+| Penalty file | Client debits, charge posting, client statements | Client already billed |
+| Corporate action file | Holdings, entitlements, contract adjustments, margin | Entitlements already credited; adjusted contracts already traded |
+| Client upload response | Client activation status | **Client already trading, or wrongly blocked** |
+| Margin reporting response | Compliance record | Submission believed complete when it was not |
+
+## 4. Procedures for the consequential classes
+
+### F-12: a revised file whose original was applied
+
+| Step | Action |
+|---|---|
+| 1 | Freeze downstream processing for the affected scope |
+| 2 | Compute the **diff** between the applied version and the revision — added, removed, changed records |
+| 3 | Enumerate consumers from the blast-radius table; identify what has already been communicated externally |
+| 4 | Decide the correction path: adjust forward, or reverse and reprocess. Adjust forward where the diff is small and traceable; reverse and reprocess where it is broad |
+| 5 | Obtain the named approval. After a downstream deadline, this is an exception with a written reason |
+| 6 | Apply, with idempotency, and re-run the dependent reconciliations immediately |
+| 7 | Decide explicitly whether revised client documents are required, and record the decision either way |
+| 8 | Notify compliance if a submission already made is now wrong |
+| 9 | Record the whole sequence in the reprocess log |
+
+### F-19: a response file containing rejections
+
+| Step | Action |
+|---|---|
+| 1 | Treat the submission as **partially unmade**, not as submitted-with-errors |
+| 2 | Extract the rejected records and the reason codes |
+| 3 | Determine whether the deadline for the original submission has passed |
+| 4 | Correct the underlying data — not the file — so the error does not recur |
+| 5 | Resubmit and obtain a clean response |
+| 6 | Where the deadline has passed, treat it as a late submission: inform compliance, record it, expect the consequence |
+| 7 | Review whether the rejection reason indicates a systematic data-quality defect |
+
+### F-14: an unannounced schema change
+
+| Step | Action |
+|---|---|
+| 1 | Reject the file; do not attempt a lenient parse |
+| 2 | Check the source's circulars and notifications — the change was probably announced and missed |
+| 3 | Handle the day manually if the file is blocking |
+| 4 | Fix the parser as a change, with a test against both the old and new shapes |
+| 5 | Review why the notification was missed; this is usually a circular-monitoring gap rather than a technology gap |
+
+A lenient parser is worth avoiding as a matter of policy. Parsers that tolerate unexpected structure succeed on files they have misread, which converts an obvious failure into a silent one.
+
+## 5. What not to do
+
+| Anti-pattern | Why it is harmful |
+|---|---|
+| Retry indefinitely without a fallback trigger | The operation waits past the point where alternatives existed |
+| Apply a short file because it validated structurally | Silent partial processing |
+| Reload a revised file wholesale over an applied version | Double-counts or drops |
+| Adjust a file to match the firm's books | Correction flows the wrong way; books then agree with nothing |
+| Parse leniently to get past a schema change | Converts a loud failure into a quiet one |
+| Treat an empty file as an error by default | Blocks legitimate quiet days |
+| Treat an empty file as fine by default | Hides a real failure |
+| Ignore a response file because it is usually clean | Unmade submissions |
+| Reprocess without enumerating consumers | Downstream inconsistency discovered days later |
+| Let an operator decide a fallback during the incident | The decision needed thinking time it does not have |
+| Clear an exception without a recorded decision | No record that anyone chose anything |
+
+## 6. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.files.exception.fallback_trigger_auto` | **D** | true | Fires the fallback at the trigger time |
+| `finix.files.exception.fallback_trigger_offsets` | **D** | Per file, derived from the protected deadline | In the register |
+| `finix.files.exception.zero_records_legitimate` | **D** | Per file, explicit | The F-05 versus F-08 control |
+| `finix.files.exception.recollect_attempts` | **D** | 1 before declaring missing | Prevents retry loops |
+| `finix.files.exception.lenient_parse` | **D** | **false** | Never |
+| `finix.files.exception.revision_requires_diff` | **D** | true | Wholesale reload prohibited |
+| `finix.files.exception.reprocess_enumerates_consumers` | **D** | true | Blast radius before action |
+| `finix.files.exception.post_deadline_reprocess_approval` | **D** | Named role | Written reason |
+| `finix.files.exception.response_file_rejection_alert` | **D** | Immediate, to compliance and operations | Not a daily digest |
+| `finix.files.exception.decision_record_mandatory` | **D** | true | Including a decision to accept a gap |
+| `finix.files.exception.unknown_file_alert` | **D** | true | The F-21 control |
+| `finix.files.exception.drill_frequency` | **D** | Half-yearly, per blocking file | Absence rehearsed in the mock environment |
+
+## 7. The exception record
+
+| Field | Content |
+|---|---|
+| Register ID and business date | Which file, for which day |
+| Exception class | F-01 to F-22 |
+| Detected by | Which validation step or monitor |
+| Detected at | Timestamp |
+| Decision taken | Wait, fallback, reject, diff-and-adjust, accept-the-gap |
+| Decided by | Named individual |
+| Fallback executed | Which one, and at what time |
+| Blast radius assessed | Consumers enumerated, external communications identified |
+| Downstream actions | Reprocesses, revised documents, notifications |
+| Deadlines affected | Which, and whether any were breached |
+| Compliance informed | Yes or no, and when |
+| Root cause and fix owner | For the monthly review |
+| Closed at | Timestamp |
+
+## Practical notes
+
+- **Derive trigger times arithmetically from deadlines and keep them in the register.** A trigger time that is a round number someone liked is a trigger time that will be wrong when the deadline moves.
+- **Drill the absence of every blocking file.** A fallback that has never been executed is a plan, not a control.
+- **Review exceptions monthly by class and by source.** A single source generating most of the classes is a vendor conversation; a single class spread across sources is a pipeline defect.
+- **Make "accept the gap" an available, recorded decision.** Sometimes the right answer is to run the day with a known deficiency, and a system that does not permit that answer gets a worse one made informally.
+- **Watch the response files hardest.** They are the only class where the firm's belief about its own compliance can be wrong for an extended period without any other symptom.
+
+## Where this connects
+
+The register, manifest and validation steps referenced throughout are defined in [the file register and its architecture](/broking-kyc/finix-broking-setup/files/01-file-register-architecture/); what the firm submits, and therefore what generates response files, is in [outbound submissions](/broking-kyc/finix-broking-setup/files/07-outbound-submissions/) and [periodic submissions](/broking-kyc/finix-broking-setup/monitoring/03-periodic-submissions/). The operator-side corrections are B-43 to B-48 in [the back-office operations catalogue](/broking-kyc/finix-broking-setup/backoffice/12-operations-catalogue/) and R-52 and R-65 in [the RMS operations catalogue](/broking-kyc/finix-broking-setup/rms/11-operations-catalogue/). The gates these exceptions block are in [the begin-of-day runbook](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/) and the incident handling in [incident playbooks](/broking-kyc/finix-broking-setup/daily-ops/07-incident-playbooks/). The general error-handling patterns for the vendor-neutral part of the site are in [error handling](/broking-kyc/operations/error-handling/).

@@ -1,0 +1,160 @@
+---
+title: "Certification 2: mobile and web application submission"
+description: Getting a client-facing web or mobile trading application approved — the submission pack and its annexures, the three different audits people confuse, the security and penetration-testing scope, hosting and authentication requirements, the client-facing disclosures the application itself must carry, and the decision timeline.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** A client-facing application approval is the one place where a software filing reaches into product design, because several of the conditions are things the application must *display* rather than things the firm must *do*. So the page covers the pack, then the audits, then the controls, then — at the same level of detail — the disclosures the interface itself has to carry, which is the part product teams discover late. Section 7 states the timeline honestly, because the published decision period describes the last step of a much longer path.
+
+## TL;DR
+
+- **Three different audits are routinely confused**: the pre-approval audit of the proposed system, the recurring periodic system audit, and the cyber audit with its penetration testing. Passing one does not discharge the others.
+- **The auditor certificate is deployment-specific.** It names the member, product, segment, version, vendor where applicable, and the dates of acceptance testing, exchange testing and mock participation — which is what makes it meaningful and what makes it stale the moment any of those changes.
+- **Penetration testing scope must include the mobile application and the interfaces**, not just infrastructure. An infrastructure-only scan does not establish application testing, and omitted scope is a recorded inspection observation.
+- **Second-factor authentication is required at each login**, with sessions terminated at day end so that an authenticated session does not persist across days.
+- **The order-routing server must be in India**, per the auditor declaration. This is not the same as a blanket prohibition on every foreign content-delivery or analytics service, and the full data-residency position needs its own assessment.
+- **The application must display specific things** — the registered identity, charges at order entry before placement, cross-exchange prices, and a prescribed derivatives risk disclosure occupying a substantial share of the screen.
+- **A store authenticity label is not exchange approval.** It identifies the regulated entity; it permits nothing.
+
+## Conceptual overview
+
+An application approval answers a narrow question: may this member offer this described software, at this version, for these segments, through this channel. Everything in the pack exists to let the exchange answer it, which is why the pack is specific to a deployment rather than to a product. The auditor is the mechanism: rather than the exchange testing every member's build, an appropriately qualified independent auditor examines the actual system, the actual tests and the actual controls, and certifies them. That makes the auditor's scope and independence the load-bearing elements of the whole regime, and it explains why auditor qualification norms and conflict checks are specified rather than left to the member.
+
+The second idea is that this approval is where regulation becomes user interface. A material part of what is certified is what the client sees: the firm's registered identity rather than a group brand, the charges before the order is placed, prices across the exchanges where the member is active, order and trade status, a reconfirmation on a large order, and a prescribed risk disclosure for derivatives that must be acknowledged and must be prominent. Product teams that treat the approval as a back-office formality will design an interface that then has to be rebuilt, because several of these are layout requirements rather than content requirements.
+
+The third point concerns the gap between approval and launch. The decision period is short and is measured from a *complete* application, and completeness presupposes the audit, the testing, the mock participation and the documentation. The practical path therefore runs: design, build, obtain test access, test, participate in a mock, commission the deployment-specific audit, assemble the pack, file, answer queries, then enable. A plan that treats the decision period as the lead time will either slip visibly or create pressure to launch before approval, which is a named contravention carrying a penalty and a direction to stop offering the facility.
+
+## 1. The submission pack
+
+Form names and annexure codes differ by venue and change; the **categories** below are stable.
+
+| Element | Content |
+|---|---|
+| **Initial undertaking** | For first-time access to the own-front-end facility: a prescribed undertaking, appropriately stamped or notarised and signed, with the constitutional documents and a network diagram or checklist as applicable. The initial undertaking is typically physical even where later requests are online |
+| **Application details** | Facility, segment, product, version, vendor or in-house route |
+| **Auditor's report** | On the proposed system and its testing |
+| **Auditor's certificate** | The deployment-specific certification described in section 3 |
+| **Additional auditor declaration** | The control-by-control declaration covering hosting, availability, authentication, logging, encryption and the client-facing items in section 6 |
+| **Product and risk-system write-up** | Required on the in-house route; describes the actual implementation rather than a marketing summary |
+| **Vendor confirmation** | On the vendor route, and algorithm-specific confirmations where strategies are included |
+| **No-change letter** | Where a request accompanies a release with no change to the described functions — see [change and version control](/broking-kyc/finix-broking-setup/certification/04-change-version-control/) |
+| Channel | The exchange's compliance or approval interface. One venue introduced a unified approval portal in March 2026; another uses its integrated portal with existing member credentials |
+
+**Use the current forms.** One exchange revised its member certificate and enrolment formats with effect from 18 May 2026 while leaving the April process master in place, so the process document and the forms have different dates and both are current. **Do not file one exchange's annexures at another** — the codes and the checklists differ, and the full current pack for one of the venues could not be obtained and should be taken from its own workflow.
+
+## 2. The three audits
+
+| Audit | Purpose | Cadence |
+|---|---|---|
+| **Pre-approval system audit** | Assesses the **proposed** trading system and its tests | Per approval request |
+| **Recurring system audit** | The member's periodic system audit | Risk-tiered: for a trading-member-only firm on an own front end, **once in two years** where it is within both a location count and a terminal count threshold, and **annual** once either is exceeded. **Half-yearly** for algorithmic users irrespective of size. Firms also acting as depository participants or offering other financial services have different minimum coverage |
+| **Cyber audit and penetration testing** | The cyber framework's audit cycle | Per the framework, by an **empanelled auditing organisation** |
+
+**Passing one does not establish the others.** The periodic classification also does not remove the pre-approval requirement: a firm whose periodic audit is due in two years still needs a deployment audit for each approval request.
+
+### Auditor qualification and independence
+
+| Audit | Requirement |
+|---|---|
+| System auditor for the facility | Recognised information-systems audit or security credentials, with independence and conflict checks. **An ordinary financial-audit qualification alone does not suffice** |
+| Periodic system audit report | Must be certified by an **exchange-empanelled** auditor from the half-year ending 30 September 2025 onward, with audit-plan and location details, geolocation and visit capture through the exchange's member portal, and audit-team and working-paper evidence retained for **at least three years** |
+| Cyber auditor | An **empanelled auditing organisation** — a different criterion from an individual holding a personal credential |
+
+## 3. The auditor certificate, and why it ages
+
+The certificate records the member identity and code, whether the request is new or a modification, the product, the segment, the version, the vendor, strategy details where relevant, the application type, and the **dates of member acceptance testing, exchange testing and mock or simulation participation**. It certifies the order system, the systems and network, access, cyber security and pre-trade controls.
+
+Every one of those fields is a thing that can change. A new version, an added segment, an enabled facility or a changed strategy makes the certificate describe something other than production — which is the mechanism by which a firm becomes unapproved without any decision to do so.
+
+## 4. Security and penetration-testing scope
+
+| Control | Requirement |
+|---|---|
+| **Application security for in-house and customised software** | The cyber audit scope checks **static analysis, dynamic analysis, functional audit and penetration testing after every major release** for critical in-house or customised software, performed through an empanelled auditing organisation |
+| **Penetration-testing scope** | **Infrastructure, web and mobile applications, the interfaces, and relevant cloud deployments.** An infrastructure-only scan does **not** establish mobile-application or interface testing. Reports should identify the tested asset or build, and the exclusions |
+| Known observation | **Omitted interface, mobile and web scope is a recorded inspection observation** — this is a live finding pattern, not a theoretical risk |
+| Filing versus detail | The prescribed submission is the report summary, declarations, and remediation and revalidation material. A 2025 clarification says **explicit vulnerability detail should not be submitted unless asked** — retain the detailed report |
+| **Not established** | A single universal pre-approval upload field, or a maximum report age, across the venues |
+
+## 5. Hosting, availability and authentication
+
+| Control | Requirement |
+|---|---|
+| **Order-routing server location** | **In India**, per the auditor declaration |
+| What that does not establish | It is **not** evidence of a blanket prohibition on every foreign content-delivery network, analytics tool or app-store service. **The complete permitted architecture needs a separate cyber-framework and cloud assessment** |
+| Availability | Redundancy with no single point of failure, onsite and offsite backup, confidentiality and integrity, access control, and **an alternative order-placement route during an internet failure** |
+| **Second-factor authentication** | Required **for each web and mobile login**, with active sessions terminated at day end or a defined time so that sessions do not persist across days. **An already-authenticated multi-day session is not a substitute for the required next login** |
+| Other authentication controls | Initial password change, a password policy, inactivity logout, valid-user access, transaction logs, encryption and firewall controls |
+| **Not established** | A universal fixed idle timeout or password-expiry interval across the venues. **Do not invent one from wording that does not supply it** |
+
+## 6. What the application itself must display
+
+This is the section product teams need earliest.
+
+| Item | Requirement |
+|---|---|
+| **Identity** | Prominent **registered broker name**, own logo if any, registration number, full address and telephone, and the compliance officer's name, contact and electronic mail address, on the site and in specified client materials. **A group brand must not displace the registered identity** |
+| Investor information | Relevant investor protections, rules and dispute-resolution information and links. Quotes carry a source and time indication. Handheld interfaces may show minimum information **with access to the full information** |
+| **Charges at order entry** | Applicable brokerage and statutory and regulatory charges shown **at order entry, before placement** |
+| Order handling | Order and trade status and confirmations; risk limits; **reconfirmation on a large order**; modification, cancellation and history; and access to orders across web and mobile |
+| **Cross-exchange prices** | **Non-display at order entry of the selected instrument's prices across the exchanges where the member is active is a recorded non-compliance**, as is the availability of products across the member's segments and exchanges |
+| **Derivatives risk disclosure** | The prescribed disclosure on the website and **at trading-account login**, with acknowledgement before proceeding, and prominence covering **at least half the screen**. **Use the current prescribed text, not self-written loss statistics** |
+| Technology risk | Client awareness of trading-system and internet risks and the alternative order arrangements, with the prescribed acceptance recorded. **An application download is not consent to trading terms** |
+| Algorithmic and provider charges | Prominent, complete disclosure of subscription charges and brokerage where a broker and provider share them, with conflicts managed |
+| Surveillance-measure confirmation | The prescribed pre-order message naming the measure, with the order sent only on confirmation — see [alerts received](/broking-kyc/finix-broking-setup/monitoring/04-alerts-received-and-response/) |
+
+<Aside type="danger" title="The half-screen disclosure and the charges-before-placement rule reshape the interface">
+Two of these are layout constraints rather than content. A derivatives risk disclosure that must occupy at least half the screen at login, and be acknowledged before proceeding, is not a footer link or a dismissible banner — it is a blocking screen with a minimum size, and designing it late means reworking the login flow. Showing brokerage and all statutory charges at order entry **before** placement requires the charge computation to be available synchronously in the order path, which for a firm that computes charges at end of day is an architectural change, not a display change. Both belong in the first design conversation about a trading application, and both are checked by the auditor who signs the certificate, so discovering them at audit means discovering them after the build.
+</Aside>
+
+## 7. Timeline, honestly stated
+
+| Step | Note |
+|---|---|
+| Design, build, internal testing | The firm's own |
+| Obtain exchange test access | A separate application route |
+| Exchange testing and member acceptance testing | Dates are recorded on the certificate |
+| Mock or simulation participation | Dates recorded on the certificate — see [mock trading and drills](/broking-kyc/finix-broking-setup/certification/05-mock-trading-and-drills/) |
+| Deployment-specific audit | The pre-approval audit, by an appropriately qualified auditor |
+| Assemble and file the pack | Completeness is what starts the clock |
+| **Exchange decision** | **Seven calendar days from a complete internet-trading application.** Note the addressee exclusion for commodity derivatives exchanges |
+| Queries and deficiencies | Reset practical completeness |
+| Enable approved identifiers and facilities; release only the approved deployment | — |
+| **Not established** | End-to-end practical lead time, a separate wireless-trading service level, or the commodity venue's internet turnaround |
+
+### Store publication
+
+A platform **authenticity label for trading applications associated with registered entities** was launched on 25 March 2026. It identifies the regulated-entity association; **it is not a replacement for exchange software approval**. The equivalent on the other major platform, store review times, a compulsory publisher-account name, and whether publication should precede or follow exchange approval were **not established**. Exchanges also publish lists of recognised trading applications, and a firm should reconcile its production application with the applicable listing process.
+
+## 8. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.cert.app.channel_approved` | **R** | Per channel, per exchange | Web and mobile are separate |
+| `finix.cert.app.certificate_fields_match_production` | **D** | **true** | Product, version, segment, facility, strategy |
+| `finix.cert.app.vapt_scope_includes_mobile_and_api` | **R** | **true** | Infrastructure-only is insufficient |
+| `finix.cert.app.vapt_after_major_release` | **R** | true | For critical in-house or customised software |
+| `finix.cert.app.vulnerability_detail_retained_not_filed` | **D** | true | Unless asked |
+| `finix.cert.app.order_routing_server_in_india` | **R** | true | Per the auditor declaration |
+| `finix.cert.app.2fa_each_login` | **R** | true | Web and mobile |
+| `finix.cert.app.session_terminated_at_day_end` | **R** | true | No multi-day sessions |
+| `finix.cert.app.charges_shown_before_placement` | **R** | **true** | Synchronous in the order path |
+| `finix.cert.app.cross_exchange_prices_shown` | **R** | true | Where the member is active on both |
+| `finix.cert.app.derivatives_disclosure_screen_share_min` | **R** | At least half the screen | At login, acknowledged |
+| `finix.cert.app.registered_identity_prominent` | **R** | true | Not displaced by a group brand |
+| `finix.cert.app.alternative_order_route_documented` | **R** | true | For an internet failure |
+| `finix.cert.app.store_label_is_not_approval` | **D** | true | Recorded so nobody relies on it |
+
+## Practical notes
+
+- **Bring the display requirements into the first design review.** The half-screen disclosure and charges-before-placement are the two that force rework.
+- **Commission the penetration test with the mobile application and the interfaces named in scope**, and keep the report that says what was tested and what was excluded.
+- **Re-read the certificate's fields before every release.** If a field no longer describes production, the approval does not either.
+- **Do not file one exchange's forms at another**, and take each venue's pack from its own workflow rather than from a compilation.
+- **Treat the store label as marketing, not permission.**
+- **Plan backwards from the audit and mock dates**, which are recorded on the certificate and therefore cannot be back-dated.
+
+## Where this connects
+
+What needs approval at all is in [the software approval regime](/broking-kyc/finix-broking-setup/certification/01-software-approval-regime/); identifiers in [terminal and user-identifier registration](/broking-kyc/finix-broking-setup/certification/03-ctcl-nnf-terminal-registration/); changes in [change and version control](/broking-kyc/finix-broking-setup/certification/04-change-version-control/); and testing in [mock trading and drills](/broking-kyc/finix-broking-setup/certification/05-mock-trading-and-drills/). The cyber audit cycle is in [cyber resilience configuration](/broking-kyc/finix-broking-setup/compliance/04-cyber-cscrf-config/) and the audit register in [the audit machinery](/broking-kyc/finix-broking-setup/compliance/05-audit-machinery/). The client-facing surface is [the client channels in the OMS architecture](/broking-kyc/finix-broking-setup/oms/01-oms-architecture/), and the vendor-neutral cyber treatment is [the cyber security and resilience framework deep dive](/broking-kyc/deep-dives/compliance-audit/cscrf-deep-dive/).

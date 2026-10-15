@@ -1,0 +1,541 @@
+---
+title: "Monitoring 4: alerts received, and the obligation to respond"
+description: Every alert and notice the exchange, clearing corporation and depository pushes to a broker that demands a documented response — the twelve downloaded transactional alerts, the member surveillance dashboard, the forty-five-day disposal clock, the quarterly surveillance return, margin and ban-period notices, the surveillance-measure indicator set, client-code and registration-agency rejection files, and the penalties for not answering.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** A broker's surveillance obligation is usually described as "monitor your clients", which is both true and useless operationally. What actually arrives is a set of distinct, named streams — a dashboard with alerts that must be dispositioned on a clock, files that silently mark clients as unable to trade, terminal messages that are the only notice of a breach, and penalty advices with an appeal window measured in working days. Each stream has its own channel, its own deadline and its own consequence for silence. So this page is organised by stream, and each section answers the same four questions: what arrives, through which channel, what response is owed, and what happens if it is not given.
+
+<Aside type="caution" title="Source basis and what is not covered">
+The material below is drawn from the exchange's own consolidated surveillance circular and the circulars it consolidates, the clearing corporation's consolidated circulars, the client-code master circular and the penalty-standardisation circular, read directly. **The commodity exchange's own alert set, portal, file names and penalty mechanics could not be verified** and are therefore not asserted here — only the regulator-level commodity position-limit penalty, which binds all commodity exchanges, is stated. The other exchange's equivalent arrangements are noted where the text is demonstrably common and marked as unverified where only the structure, not the detail, could be established. Treat every figure as requiring re-verification against the current circular before it is configured.
+</Aside>
+
+## TL;DR
+
+- **Twelve transactional alerts are downloaded to the member** and must be dispositioned within **forty-five days**, with the status recorded on the exchange's member surveillance dashboard. The member's own generated alerts carry the same clock, but only adverse observations are reported onward.
+- **The dashboard is a two-way channel, not a report.** It carries intraday alert categories, an exchange communication thread in which officials demand client documentation, and the window through which the member escalates. Live data refreshes several times a day.
+- **The quarterly surveillance return is due within fifteen days of quarter end, and a nil return is mandatory.** Non-submission now escalates to a prohibition on registering new clients and then to disablement across every segment — and the disablement notice is shared with all exchanges.
+- **Margin reporting failure is treated as one-hundred-per-cent short reporting.** The penalty escalates per day beyond three consecutive days or five days in a month, which is materially different from the flat repeat rate often quoted.
+- **Ban-period monitoring has a specific action window.** The base position is frozen and pushed as a file; the computation uses an afternoon delta snapshot, which deliberately leaves the member time to act before the close.
+- **Several streams silently disable clients.** Registration-agency status files, client-code compliance batches and the mobile-number revocation list each mark clients unable to trade, with no event other than a file appearing.
+- **Appeals are short and channel-specific.** Clearing-corporation penalty reviews run on a working-day clock through a portal, and requests sent by electronic mail are explicitly not considered.
+
+## Conceptual overview
+
+There are four distinct kinds of inbound stream and they fail in different ways. A *dashboard alert* is visible, has a clock, and the failure mode is letting the clock run out — it is a workload problem. A *file that changes client state* is invisible unless somebody reads it, and the failure mode is that a client cannot trade tomorrow and nobody knows why — it is a monitoring problem. A *terminal message* is ephemeral: it appears on a dealer's screen, nobody logs it, and it is frequently the only notice that a limit threshold has been crossed — it is an instrumentation problem. And a *penalty advice* has an appeal window that starts when the advice is published rather than when it is read — it is a process problem. A firm that treats all four as "alerts to be reviewed" will handle the first adequately and the other three badly.
+
+The second idea is that the obligation is to *dispose*, not to *receive*. Every alert stream carries an expectation that the member forms a view, obtains evidence, records a conclusion and either closes the item or escalates it. The evidence standard is explicit — bank and depository statements covering a window around the transactions, and the client's trading rationale — and it must be obtained *before* the item is closed rather than reconstructed if the exchange asks later. The internal auditor is separately required to review the surveillance policy, its implementation and the alerts generated in the period, which means the quality of disposals is itself audited. A desk that closes alerts quickly with thin reasoning is building an audit finding rather than clearing a queue.
+
+The third idea concerns tipping off. Alerts, and the fact that a client's transactions are under scrutiny, must not be communicated to the investor unless the exchange or the regulator explicitly says so. This cuts against the natural instinct of a client-facing team, which is to ask the client what they were doing. Asking for a trading rationale and supporting statements is permitted and expected; explaining that the exchange has flagged them is not. The practical resolution is a scripted request for documentation that does not reveal its origin, and a rule that only the surveillance function communicates with clients about these items.
+
+## 1. Framework
+
+- **[NSE/SURV/74008](/broking-kyc/reference/circulars/nse/#nsesurv74008)** (30 April 2026) — the surveillance and investigation consolidated circular, which consolidates the live surveillance and investigation circulars into one indexed document and is the current authority. Its clearing-corporation and client-code counterparts were issued the same day.
+- **[NSE/INVG/65921](/broking-kyc/reference/circulars/nse/#nseinvg65921)** (31 December 2024) — the institutional mechanism for prevention and detection of fraud or market abuse, carrying the industry-standards implementation standards. Parent regulator circular dated 4 July 2024. Phased by active client count, with the smallest band in scope from **1 April 2026**, so a greenfield member is in scope on day one.
+- **[NSE/INVG/46662](/broking-kyc/reference/circulars/nse/#nseinvg46662)** (16 December 2020) — penalty on abnormal and non-genuine transactions.
+- **NSE/SURV/48818** (1 July 2021) — the operative surveillance obligations circular for trading members, reproduced in the 2026 consolidation. `[not yet in index]`
+- **NSE/SURV/44477** (27 May 2020) — the member surveillance dashboard. `[not yet in index]`
+- **NSE/SURV/49765** (29 September 2021) — quarterly surveillance reporting. `[not yet in index]`
+- **NSE/INSP/73792** (17 April 2026) — rationalisation and standardisation of penalties levied on trading members, which **supersedes the earlier per-day penalty figures**. Predecessor dated 10 October 2025. `[not yet in index]`
+- **NSE/ISC/73973** (30 April 2026) — the client code master circular, with its operational guidelines of 17 July 2026. `[not yet in index]`
+- Clearing-corporation consolidated circulars for the derivatives and cash segments dated 30 April 2026, and the penalty-file format circular of 25 July 2022. `[not yet in index]`
+- **Regulator circular on intraday monitoring of market-wide limit utilisation** dated 29 May 2025, implemented by the exchange on 31 October 2025. `[not yet in index]`
+- **Regulator circular on review of commodity position limits and penalties** dated 9 September 2026, in force with immediate effect. `[not yet in index]`
+- **Regulator circular on review, appeal and waiver against member-committee actions** dated 5 August 2025, applicable from the forty-fifth day of issuance. `[not yet in index]`
+
+## 2. The downloaded transactional alerts
+
+These are generated by the exchange and pushed to the member. The list has been stable since 2021.
+
+| # | Alert, in the exchange's own terms | Segment |
+|---|---|---|
+| 1 | Significant increase in client activity | Cash |
+| 2 | Sudden trading activity in a dormant account | Cash |
+| 3 | Clients or a group of clients dealing in common securities | Cash |
+| 4 | Clients or a group of clients concentrated in a few illiquid securities | Cash |
+| 5 | Clients or a group of clients dealing in a security in minimum lot size | Cash |
+| 6 | Client or group concentration in a security | Cash |
+| 7 | Circular trading | Cash |
+| 8 | Pump and dump | Cash |
+| 9 | Reversal of trades | Cash **and** derivatives |
+| 10 | Front running | Cash |
+| 11 | Concentrated position in open interest, or high turnover concentration | Derivatives |
+| 12 | Order book spoofing, meaning large orders away from the market | Cash |
+
+**A drafting note worth keeping.** The original 2013 list carried thirteen alerts and included **wash sales** across cash and derivatives; that item was dropped when the list was revised in 2021, and reversal of trades moved position. A firm whose alert configuration was inherited from an older implementation may still carry a wash-sales alert, which is not wrong to run but is not the published obligation.
+
+**The commodity segment has a different and smaller published list** with stated periodicities — significant increase in client activity and sudden activity in a dormant account monthly; concentrated open-interest position, large trade and order spoofing daily. Commodity alerts are delivered through the member interface rather than the dashboard.
+
+## 3. The member surveillance dashboard
+
+| Aspect | Detail |
+|---|---|
+| Access | A dedicated exchange-hosted dashboard; credentials delivered through the member's own extranet folder; login requires a password and a one-time code |
+| Activation | The login must be validated within a defined period or it is deactivated |
+| Structure | Four parts: an information dashboard, an alert and monitoring dashboard, an exchange communication channel, and a transactional escalation route from member to exchange |
+| Refresh | Live data refreshes several times during and after the session |
+| Expected response | **Same day** for intraday alerts; an item needing deeper analysis may be parked under watch for a bounded period |
+| The other exchange | Operates an equivalent system under its own name; the forty-five-day disposal and status-update obligation is worded identically |
+
+### Intraday alert categories inside the dashboard
+
+Distinct from the twelve downloaded alerts, and the stream most often missed because it is neither a file nor a circular.
+
+| Dashboard | Alert |
+|---|---|
+| Information | Concentrated trading activity |
+| Information | Clients trading in securities with unsolicited message circulation |
+| Information | Illiquid securities |
+| Information | Foreign and non-resident investor monitoring |
+| Information | High order-to-trade ratio |
+| Alert and monitoring | Large matched trades |
+| Alert and monitoring | Last traded price variation |
+| Alert and monitoring | Large unexecuted orders |
+| Alert and monitoring | Large cancelled orders |
+| Alert and monitoring | Terminal identity verification, for self-trades |
+
+**The exchange communication channel** is a thread in which exchange officials request client documentation — identity records, bank statements, depository statements — with notification by electronic mail, and members are expected to close the communication within the stated timeframe. It is a correspondence obligation, not an alert, and it needs a named owner because it has no queue of its own.
+
+<Aside type="caution" title="There is also a market-view obligation nobody staffs">
+The dashboard carries a window for the member's own view on the market, required when the benchmark index moves beyond a threshold in a day. It is a small obligation, it is not an alert, it has no reminder, and it is therefore the item most reliably forgotten — typically discovered during an inspection. Put it in the day-type overlay logic: a large index move is a determinable condition, and the checklist can raise the item automatically on the days it applies rather than relying on somebody noticing.
+</Aside>
+
+## 4. The disposal clock and what disposal requires
+
+| Element | Requirement |
+|---|---|
+| **Disposal period** | **Forty-five days** from the date the alert is downloaded, and equally for alerts generated at the member's end |
+| Status values | Verified and closed, or verified and sent to the exchange — recorded on the dashboard |
+| Member-generated alerts | Only **adverse observations** are reported onward, with details of the action taken, within the same period |
+| Extension | The member **may seek an extension** from the exchange where required — an explicit right, and under-used |
+| Evidence standard | Bank and depository statements covering a window of **at least a fortnight either side** of the transactions, plus the client's trading rationale, obtained **before** disposal |
+| Recording | Observations recorded in writing |
+| Re-review cadence | Every open internal or exchange alert reviewed **at least every thirty days** until closed |
+| Tipping off | The alert, and the fact of scrutiny, **must not be passed to the investor** unless the exchange or regulator explicitly states otherwise |
+
+### Internal governance the obligation forces
+
+| Requirement | Detail |
+|---|---|
+| Surveillance policy | Approved by the board, partners or proprietor, and periodically reviewed |
+| Quarterly management information | To the designated director, partners or proprietor: alerts opened, generated, processed and pending, reasons for pendency and a closure plan |
+| Internal audit | The auditor must review the policy, its implementation, its effectiveness and the alerts generated in the period, and record observations |
+| Accountability matrix | Who reviews whose conduct — senior management and key personnel to the board or audit committee; promoters to the board or audit committee; employees to senior management, the designated director and the chief executive; **clients and authorised persons to the official heading trade surveillance, under the supervision of senior management, the compliance officer, the designated director and the chief executive** |
+
+The accountability matrix is specifically asked for during inspection, and its absence is a named contravention.
+
+## 5. The broker's own mandated alerts
+
+Beyond disposing of what arrives, the member must generate its own alerts. Thresholds are **broker-set**, which is a genuine design responsibility rather than a gap.
+
+| Theme | Applies to |
+|---|---|
+| Client or group accounting for a significant share of activity in a security against the market | All members |
+| A new account, or one dealing after a significant gap, accounting for significant value or share | All members |
+| Dealing frequently in small quantities or the minimum market lot | All members |
+| **Trading activity disproportionate to reported income or net worth** | All members |
+| Frequent changes to client identity records | All members |
+| Suspicious trading ahead of a price-sensitive announcement by a connected listed company | All members |
+| Significant selling concentration in securities on the unsolicited-message information or watch lists | All members |
+| Consistency of profit or loss at client or group level | All members |
+| Significant trading in a security by a client who has pledged shares of the same security | All members |
+| Whether orders are placed by the client or a representative, and address consistency | All members |
+| **Trading activity of accounts of relatives of the entity, to identify coordinated trading** | All members, and new in the 2024 standards |
+| Address-level monitoring including multiple client codes from one location | Internet-based trading |
+
+### The income and net-worth family, stated precisely
+
+This is the one the brief most often gets wrong. There is no "income range mismatch" alert; there is **disproportionality**, in four distinct forms:
+
+| Form | Basis |
+|---|---|
+| Trading activity against reported income or net worth | All members |
+| **Margin obligations** disproportionate to declared income or net worth, measured at the monthly peak | All members |
+| **Net funds pay-in or pay-out** over a month disproportionate to declared income or net worth | All members |
+| Net profit or loss over a period significant against income or net worth, beyond a threshold | All members |
+| Pay-in obligation significantly higher than declared income or uploaded net worth | Designated large brokers, monthly |
+
+Thresholds are set by the member according to its business size, decided by the principal officer, designated director and compliance function with a documented rationale, reviewed by the apex body at least annually, and recalibrated at least annually.
+
+<Aside type="danger" title="Three alerts commonly believed to be mandated, which are not">
+Research against the consolidated surveillance circular, the implementation standards, the large-broker operating guidelines, the dashboard manual and the full circular subject index found **no reference** to any of the following as a regulatory alert: **client age or date of birth as a risk factor** — including the widely repeated idea of an alert on derivatives trading by clients above a particular age; **occupation mismatch**; and a **dealer identity-mismatch file**. The nearest genuine items are a product-suitability interaction obligation for designated large brokers with retail clients trading only in options, a dashboard alert on terminal identity verification for self-trades, and circulars on the same identity being mapped against multiple algorithmic terminals. A firm is free to run age-based or occupation-based suitability controls, and there are good commercial and conduct reasons to, but it should not record them as regulatory alerts in its compliance register, because mislabelling a voluntary control as a mandated one produces a false sense of coverage and an inspection conversation about a policy that does not exist.
+</Aside>
+
+### Additional alerts for designated large brokers
+
+Monthly: pay-in obligation against declared income or net worth; unrelated clients sharing mobile numbers or electronic mail addresses; **unrelated clients using common devices**, using device-identifier data; client activity in deep out-of-the-money contracts where clients incur losses; campaigns against credential sharing; repeated delivery default beyond a count in a rolling period.
+
+Daily: onboarding monitoring for clients from the same location who then do not trade; **product-suitability interaction with retail clients trading only in options**; artificial price boosting; large orders placed and cancelled; order spoofing; concentration against exchange volumes; circular trading and reversal patterns; a watchlist from historically observed manipulations; front running of the member's own large trades by dealers or clients; error-trade preventive controls; long-dated option contracts; trading in securities under surveillance measures; market-abuse typologies; and linked clients on the same side controlling a substantial share of open interest.
+
+### Surveillance tooling is now an empanelment gate
+
+A December 2025 circular governs the empanelment of vendors for surveillance software **and** the registration of in-house developed surveillance software, with prescribed application, undertaking, auditor's report and certificate formats. The standards set a tiered expectation: a small member may run a manual process, a larger one must have an alert-generation system, in-house or from a vendor. **For a greenfield broker this is a build-or-buy decision that must clear an exchange gate**, not merely an internal choice. `[not yet in index]`
+
+## 6. The quarterly surveillance return
+
+| Element | Detail |
+|---|---|
+| Deadline | **Within fifteen days of quarter end** |
+| Channel | Uploaded on the member surveillance dashboard |
+| **Nil return** | **Mandatory** where there is nothing to report |
+| Table A | Status of alerts generated by the member: alert name, under process at the beginning, new in the quarter, verified and closed, referred to the exchange, pending at the end |
+| Table B | Details of alerts referred to the exchange: date, type, brief observation and action taken, date referred |
+| Table C | Any major surveillance action taken other than alerts referred |
+| Mechanics | Export a prefilled file from the dashboard's reports tab, edit, upload through the submission tab, or tick the nil option. **If the prefilled counts are edited, the system-generated flag must be switched** |
+| Validations | Cross-field checks are enforced — referrals cannot exceed opening plus new, and closing must equal opening plus new less closed |
+
+### Non-submission consequences, as revised in April 2026
+
+The widely quoted per-day figures of ten and twenty thousand rupees are **superseded**. The current ladder:
+
+| Stage after the deadline | Action |
+|---|---|
+| Days sixteen to twenty | **Advice** |
+| Days twenty-one to twenty-five, or submission if earlier | A modest per-day penalty, higher for designated large brokers |
+| Not submitted by day twenty-five | **New client registration prohibited**, plus notice of disablement of the trading facility. **The disablement notice is shared with all exchanges** |
+| Not submitted by day thirty | **Member disabled in all segments** until submission |
+| Second instance onwards | Monetary penalty escalated by half, same disablement ladder |
+
+### Inspection-level contraventions in this area
+
+| Contravention | First instance | Repeat |
+|---|---|---|
+| No transactional alert facility, or failure to monitor alerts as specified | Advice, with compliance within thirty days | Escalating monetary penalty |
+| Management information on alerts not placed before the board, partner or proprietor quarterly | Advice | Warning, then a monetary penalty |
+| Non-adherence to the guidance on best practices, market-abuse typologies and the accountability matrix | Advice, with thirty days | Warning, then referral to the relevant authority |
+
+## 7. Margin and collateral notices
+
+### What arrives
+
+| Stream | Content |
+|---|---|
+| Detailed end-of-day margin files, member and clearing-member level | Per client: the margin required, collected, and the **peak across intraday snapshots** |
+| Intraday margin files | **A minimum of four snapshots a day, taken at random within pre-defined windows**, computed on fixed begin-of-day parameters |
+| Short allocation reports | Which clients are short of collateral, intraday and at end of day |
+| Penalty files | The penalty bill, at client level, with the shortfall basis and the tax component |
+| Penalty letters | Delivered to a letters folder on the extranet and through the clearing application |
+| Base position files for banned securities | See section 8 |
+| Message alerts | An optional subscription, capped at a few mobile numbers per member |
+
+<Aside type="caution" title="Do not build a control that depends on the message alert">
+The clearing corporation's message-alert facility is explicitly a convenience: it disclaims liability and states that the member remains bound whether or not the alert was received. Any control whose trigger is "we will get a message" is therefore not a control. The file and the portal are the authoritative channels, and the monitoring must be built on their arrival rather than on a notification about them.
+</Aside>
+
+### The reporting response codes
+
+The response file to a margin reporting upload carries per-record reason codes. Where a record has several errors, the **lowest-numbered** code is reported, which means a record can be corrected for one defect and immediately fail on another.
+
+| Code | Meaning |
+|---|---|
+| 01 | Record size does not match, for example an extra separator |
+| 02 | Date in the record does not match the file date |
+| 03 | Record altered — **no matching record in the margin file**, meaning a wrong date, client code or amount |
+| 04 | Record pertains to a proprietary position of the trading member |
+| 05 | Record pertains to a proprietary position of the clearing member |
+| 06 | Margin collected is negative or not numeric |
+| 07 | **Insufficient margin**, with the difference shown |
+| 08 | **Sufficient margin**, with the difference shown |
+
+### The sign-off date and the penalty grid
+
+| Element | Detail |
+|---|---|
+| **Sign-off date** | The last day on which client margin details may be reported: **five working days after the trade date** |
+| Corrections | By re-uploading with an incremental batch number, any time before sign-off |
+| After sign-off | The file is rejected with an explicit message, and **all non-reporting is treated as one-hundred-per-cent short reporting** |
+
+| Short collection per client | Penalty, per instance |
+|---|---|
+| Below a threshold amount **and** below a threshold proportion of the applicable margin | The lower rate |
+| At or above the threshold amount **or** at or above the threshold proportion | The higher rate |
+
+| Escalation | Trigger |
+|---|---|
+| **A materially higher rate, per day** | Short or non-collection continuing **more than three consecutive days**, applied for each day beyond the third |
+| **The same higher rate, per day** | Short or non-collection on **more than five days in a month**, applied for each day beyond the fifth |
+| Relief | Where the shortfall is caused by a large single-day fall in the benchmark index, the penalty applies only if the shortfall persists for a further defined period |
+
+**The correction worth making explicitly:** the escalated rate is a **per-day rate on the shortfall** once either trigger is met, not a flat second-offence rate. Documentation that states it as a single repeat rate understates the exposure substantially, because the exposure compounds daily while the shortfall persists.
+
+**Shortage computation** takes the **higher** of the end-of-day position, the peak across snapshots, and the short allocation after excess collateral across segments and valid reason codes. Collection is by debit to the settlement account **monthly**, by a defined working day of the following month.
+
+### Margin violation and disablement
+
+A margin liability exceeding the available deposit less the minimum liquid net worth, **at any time including during trading hours**, is a violation, and the clearing corporation may advise withdrawal of trading facilities **without notice** and close out positions by placing counter orders. A risk-reduction mode engages at a high utilisation threshold. The disablement penalty is a per-day rate on the amount plus a fixed sum per instance, escalating by instance count within a calendar month, with referral to the member committee beyond a count.
+
+## 8. Ban period and position-limit notices
+
+### How the ban is declared and what arrives
+
+| Element | Detail |
+|---|---|
+| Trigger | At end of day, where market-wide **future-equivalent open interest** exceeds a high proportion of the applicable market-wide limit, the security enters a ban from the next day |
+| Resumption | Only once combined future-equivalent open interest across all exchanges falls to a lower proportion |
+| Dissemination | **Securities placed under ban for the next trading day are published on the clearing corporation's website**, along with daily end-of-day utilisation |
+| **Base position file** | On ban entry each entity's position is frozen as a base position and pushed to the member as a named file in a letters folder |
+| Delta snapshot | On subsequent days the computation uses an **afternoon intraday delta snapshot**, published as a dated intraday file in a limit-files folder |
+| Base position update | Updates at end of day only if the entity traded to **decrease** future-equivalent open interest, or open interest is unchanged while actual positions changed. Corporate-action adjustments are applied |
+
+<Aside type="danger" title="The afternoon snapshot exists to give the member an action window — use it">
+The clearing corporation states the reason for taking the delta snapshot in the afternoon rather than at the close: it gives members an interval in which to check client positions and, where future-equivalent positions have increased or changed sign, to act before the end of day and avoid the penalty. That interval between the snapshot and the close is therefore not incidental — it is the designed remediation window, and it belongs in the session runbook as a timed item with a named owner on every day any held security is in a ban. A firm that computes its ban-period exposure only at end of day has discarded the one opportunity the rules deliberately provide.
+</Aside>
+
+**Ban-period violation penalty.** The violated quantity is the difference between the future-equivalent open interest of the base position and that of the end-of-day position, or the absolute end-of-day figure where the sign flipped. The penalty is a proportion of the violation value with a floor and a cap, **per entity, per security, per day** — and because a violation **does not reset the base position**, the penalty recurs daily while the violated quantity persists and the security remains banned.
+
+### Intraday utilisation broadcast — new since late 2025
+
+Market-wide limit utilisation is monitored on **several random snapshots a day**, counting both futures and options, and the exchange **broadcasts a utilisation message on the trading terminal** once future-equivalent open interest in a security exceeds a defined proportion of its market-wide limit. The delta methodology is published, using the standard option-delta formulation with the policy rate as the risk-free input and a prorated time to expiry.
+
+This is a genuinely new inbound stream and it is a **terminal broadcast, not a file** — which means it is ephemeral unless the firm captures it. Capturing terminal messages into the surveillance record is a small piece of engineering with disproportionate value, because this stream and the trade-cancellation stream in section 11 are both delivered this way.
+
+### Position-limit breach at client level
+
+Where a client's, non-resident's, qualifying foreign investor's or fund scheme's end-of-day open position exceeds the limit, the penalty **per day of violation** is a proportion of the value of the excess quantity **or a fixed ceiling, whichever is lower**, subject to a floor, per entity per security — and it is recoverable from the client. Note the direction: the fixed figure is a **cap, not a floor**, which is frequently reported the wrong way round.
+
+### Index derivatives — intraday monitoring without intraday penalty
+
+| Element | Position |
+|---|---|
+| Monitoring | Index derivatives position limits monitored **intraday on a minimum of four random snapshots** in pre-defined windows |
+| **Penalty** | **No penalty for an intraday breach**, and intraday breaches are not treated as violations, until further direction |
+| Obligation | The exchange must still **intimate such breaches to clients and members for their own risk monitoring** |
+| Passive breaches | Where market open interest falls and an unchanged position therefore exceeds the limit, this is **not penalised and need not be unwound** |
+
+This is a pure notification stream today and a trap for anyone who assumes notification implies penalty. The **end-of-day** index position-limit penalty is separate and does escalate by instance count within a month, with the first instance attracting none.
+
+### Commodity position limits — revised September 2026
+
+A regulator circular of 9 September 2026, in force immediately, revised client-level commodity position limits and the penalty provisions. The penalty is computed on the excess, the closing price and the number of days at a stated proportion, **or a fixed ceiling, whichever is lower**, with a lower ceiling for smaller breaches. Operationally the important parts are that the member must bring the position within limits **by the next trading day**, failing which **the exchange squares off the excess without further notice** by placing orders in the client code; that repeated instances in a month put the member into square-off mode for a day in that commodity; that further repetition attracts an additional penalty equal to the penalty already charged, with an exemption where the violation arises **exclusively from the clubbing of positions**; and that the penalty is credited to the investor protection fund. `[not yet in index]`
+
+## 9. Surveillance measures and the client-notification duty
+
+### How the member learns
+
+| Channel | Detail |
+|---|---|
+| Daily circulars and notices with annexures | Separate streams for the graded measure, short-term and long-term additional measures, and the enhanced measure, issued by both exchanges on the same day |
+| **The surveillance indicator field in the security master** | A security-wise indicator carried in the master files. **This is the machine-readable channel the risk system must consume** |
+| Terminal alert at order entry | A message for any security under a surveillance measure |
+
+### The client-notification obligation — concrete and enforceable
+
+Members must build a function into every non-exchange front end, including internet, mobile and terminal-connected software, so that a person placing an order in a security under any surveillance measure receives, **before the order is placed**, a message naming the measure and asking whether to continue — and **the order is sent only if the person confirms**. The wording is prescribed and must be included verbatim, the feature is **mandatory for members with retail clients**, and a compliance confirmation in a prescribed form is required.
+
+This is one of the few places where a surveillance obligation lands directly in the client-facing application, and it has a design consequence: the front end must know the indicator per security, which means the indicator must flow from the master file through to the order-entry path rather than living only in the risk engine.
+
+### The indicator set
+
+The indicator is a numeric code with a short form. The set covers the graded measure's stages, short-term and long-term additional measure stages, insolvency-related categories, creditor-agreement stages, high promoter and non-promoter encumbrance, the unsolicited-message information and watch lists, unsolicited video circulation, the enhanced measure's stages, and a large family of **combination codes** where a security is simultaneously in two frameworks.
+
+| Family | What it covers |
+|---|---|
+| Graded measure | A base shortlisting code plus stage codes |
+| Short-term additional measure | Two stage codes |
+| Long-term additional measure | Four stage codes |
+| Insolvency | Receipt of disclosure or a recommenced security, plus two stage codes |
+| Creditor agreement | Two stage codes |
+| Encumbrance | Promoter, and promoter-with-non-promoter |
+| Unsolicited messaging | Information list, current watch list, and video circulation |
+| Enhanced measure | Two stage codes |
+| **Combinations** | Each of the above in combination with the graded measure's base code, and several cross-combinations |
+
+**A caution on stages.** The indicator set carries codes for graded-measure stages beyond those the published framework currently defines. Describe the indicator list as carrying those codes; do not assert that the framework currently operates them.
+
+### What each measure imposes
+
+| Measure | Stage | Action |
+|---|---|---|
+| **Graded** | Base | Shortlisted and monitored; no trading restriction |
+| | I | Full margin and a narrow price band |
+| | II | Trade-for-trade with a narrow band, plus an **additional surveillance deposit from buyers** |
+| | III | As II, plus **trading permitted only once a week**, with a higher deposit |
+| | IV | As III, plus **no upward price movement** |
+| **Short-term additional** | I | Margin at the higher of a stated proportion or the existing rate |
+| | II | Margin at the higher of full margin or the existing rate |
+| **Long-term additional** | I | Full margin from a lagged date |
+| | II | Price band reduced one level, plus full margin |
+| | III | Band reduced a further level, plus full margin |
+| | IV | **Gross settlement with full margin for all clients and a narrow band** |
+| **Enhanced** | I | Full margin from a lagged date **and** trade-for-trade with a narrow band |
+| | II | Trade-for-trade with a narrower band, full margin, and trading only **under periodic call auction** |
+
+**Scope and review.** The graded measure's shortlisting criteria turn on net worth, net fixed assets and valuation ratios against a broad index, with separate thresholds for the smaller-company board; reviews are quarterly on a published calendar, which is itself an inbound date to diarise. The enhanced measure applies to companies below a market-capitalisation threshold — **it is not confined to the smaller-company board**, having been extended to main-board companies under that cap in 2024 — with weekly stage review, a minimum period in the framework before exit, and a minimum holding period at the higher stage.
+
+**Two tightening changes worth noting.** A 2024 circular **removed the exclusion for public-sector companies from all four frameworks**. A May 2026 update to the graded measure narrowed the index-constituent exclusion to a broad index and **removed the exclusions for consistent dividend payers, for high institutional holding with stable pricing, and for securities listed through a scheme of arrangement** — replacing the last with explicit inheritance rules, so that a demerged entity attracts the measure where the parent was under it, and a merged entity continues under it where any constituent was.
+
+## 10. Client-code and registration-agency streams that silently disable clients
+
+These are the quietest and most operationally damaging streams: nothing happens except that a file appears, and the next day a client cannot trade.
+
+### Files the exchange pushes
+
+| File or report | Cadence |
+|---|---|
+| **Trading status report** — codes permitted to trade | Daily, in **two batches**, reflecting status at an afternoon and a late-evening cut |
+| **Not-permitted-to-trade report** | Daily, at two intervals |
+| **Mobile number revocation list** | **Daily**, from the telecommunications intelligence platform |
+| **Demat and bank account validation status** | End of day daily, covering active codes and bank validation for clients using the blocked-amount mechanism |
+| Permanent account number status report | On demand, over a bounded window |
+| **Mandatory field report** — blanks, invalid and incomplete, including identity-seeding status | **Weekly** |
+| Full file report | On demand, with a daily request cap and a bounded period |
+
+**The operative rule** is that codes identified as compliant at the **late-evening cut on the previous day** are permitted to trade the next trading day. A non-compliant code that is fixed is permitted **only on the following trading day** — so a fix made during the session does not restore trading that session.
+
+### What makes a client code permitted to trade
+
+Six identity attributes — name as per the tax identifier, complete address including postal code for domestic addresses, the tax identifier, a valid mobile number, a valid electronic mail address, and income details; plus custodian details where applicable; plus the tax identifier verification status approved; plus the code active; plus the tax identifier compliant with a registration agency; plus a valid primary depository account where applicable.
+
+**Identifier verification is now three-part**: the tax identifier, the client name and the date of birth or incorporation must **all** match the verifying authority's records. Corrections to name or date can only be made through an unfreeze request, after which the details are re-verified.
+
+<Aside type="caution" title="Two operational traps in the client-code stream">
+First, **do not resubmit unchanged depository account details** in a modification file. Doing so triggers re-verification by the depository and can itself suspend the client's permitted-to-trade status — a self-inflicted outage caused by sending correct data. Include depository details only when they have actually changed.
+
+Second, the client-status module **no longer permits a transition from inactive back to active** as of mid-2026; that transition must now go through a query, a bulk upload or the application interface. A reactivation workflow built on the module will silently stop working, and the symptom will be a client who cannot be reactivated with no error that names the cause.
+</Aside>
+
+### The monthly registration-agency rejection cycle
+
+The exchange issues a circular **every month** carrying the registration-agency status files. This is the stream that disables the most clients and the one least often instrumented.
+
+| Status | File |
+|---|---|
+| On hold | A per-member file of non-validated clients |
+| Not available — records never uploaded by the member | A per-member file |
+| Demise | A per-member file of deceased clients |
+
+| Element | Detail |
+|---|---|
+| Channel | The member portal's log and downloads area |
+| Consequence of on-hold | Clients **not permitted to trade or even to square off open positions** from a stated date the following month |
+| Consequence of demise | The member must mark the codes closed in the exchange database before a stated date, after due diligence, and **block all debit transactions** in the deceased investor's account |
+| **Correction timeline** | Clients that become compliant are permitted to trade **the next day**, based on information the exchange receives from the agency that day |
+| Demise data | Shared by the agencies **daily**, under a centralised reporting mechanism |
+| Eligibility | Only clients in a registered or validated state may trade |
+
+**The consequence worth dwelling on**: an on-hold client cannot square off. A client with open derivative positions who goes on hold is frozen into those positions while they continue to move, and the member carries the risk with no client-side remedy. That makes the monthly file a **risk input, not just a compliance input**, and it belongs on the risk desk's board as well as in the compliance queue.
+
+## 11. Trade cancellation and abnormal-transaction streams
+
+### The reversal-trade cancellation mechanism
+
+A mechanism that monitors reversal trades between a pair of tax identifiers and **cancels trades automatically, intraday**, when several thresholds are simultaneously breached — reversal quantity against market gross traded quantity, a reversal ratio across a multi-day window, aggregated square-off difference, and per-identifier reversal quantity against that identifier's total.
+
+| What arrives | Channel |
+|---|---|
+| **A terminal message** naming the cancelled trade and the cancelling user | The trading terminal |
+| A daily derivatives eligibility file | An extranet surveillance folder |
+| A monthly cash eligibility file | An extranet surveillance folder |
+
+Key operational points: a **client-code modification during market hours that results in a reversal is also cancelled**; the checks run from mid-morning, with the early session accumulated, until shortly before the close; the cash scope covers all series excluding approved securities, broad-index constituents and exchange-traded funds; and the mechanism **does not absolve** the member of its obligations on abnormal transactions or its general surveillance obligations. The extended multi-day layer was announced with its implementation date to be intimated separately, so it may not be live.
+
+**Why this matters more than its frequency suggests:** a cancelled trade changes a client's position after the fact, which means the margin, the obligation and the client's own view all move. The terminal message is the primary notice. If terminal messages are not captured, the first the firm knows of a cancellation is a reconciliation break in the end-of-day pipeline.
+
+### Abnormal and non-genuine transactions
+
+The exchange sends an **advice or caution letter** and may levy a penalty of **the full traded value, or the profit made, or the loss incurred**, on both profit-making and loss-making abnormal or non-genuine transactions, after due process and an opportunity to clarify. The determination is the exchange's and is stated to be final and binding, and it applies across cash, equity derivatives, currency and commodity segments. Indicative scenarios include fresh positions very close to or on expiry and large quantities in the closing half hour without a change in beneficial ownership, with heightened attention where surveillance measures or trade-for-trade apply.
+
+### Order-to-trade ratio
+
+Charged per algorithmic order on an incremental scale by the daily ratio, with the upper bands revised upward in 2026 and two new higher bands added. Beyond the charge:
+
+| Trigger | Consequence |
+|---|---|
+| A very high ratio on three occasions in a rolling thirty-trading-day window | **No orders for the first fifteen minutes** of the next trading day |
+| Penalised on more than ten occasions in a rolling thirty-trading-day window | **Proprietary trading rights suspended for the first trading hour** of the next day |
+| Either | **Disablement or suspension applies across all exchanges** |
+
+Orders close to the last traded price are excluded from the ratio, as are several security categories and several session types. Ratio data is provided daily in member-portal folders. A further 2026 circular adjusts the ratio treatment for the new closing auction session.
+
+## 12. Penalty advices and the appeal window
+
+### How penalties reach the member
+
+| Channel | What arrives |
+|---|---|
+| Extranet letters folder | Client-margin penalty letters |
+| Extranet reports folder, per penalty family | Daily penalty detail files at client level, carrying the end-of-day shortfall, the peak shortfall, the short allocation, the resulting shortfall as the maximum of the three, the penalty and the tax |
+| The clearing application | Penalty letters and margin files |
+| A dedicated penalties area on the member portal | Non-submission penalties, modification and delayed-submission penalties, and client margin or short-allocation penalties, viewable at member and client level |
+| The monthly bill | Surveillance return penalties |
+| Settlement account debit | Margin short-reporting penalties, monthly |
+
+The clearing corporation warns that the portal view **may not be the final penalty** and that members must refer to official communication — so the portal is for working, and the communication is the record.
+
+### The exchange-side enforcement chain
+
+A letter of observations, then an intimation of observation, then a show-cause notice, then an opportunity of personal hearing before the relevant authority, then an action letter or order. **Failure to respond within the stated timeline is construed as "no additional information is available"** and the exchange proceeds on what it has; persistent failure may be treated as non-cooperation and draw separate proceedings.
+
+Three 2026 rules worth configuring against: a penalty below a modest threshold results in an **advice rather than a levy**; where cumulative inspection-driven penalty in a financial year exceeds the lower of a stated amount or a proportion of reported net worth, the matter goes to the relevant authority; and un-prescribed procedural violations run **advice, then warning, then a modest penalty** across the first three instances.
+
+### The appeal window
+
+| Against | Window and channel |
+|---|---|
+| **Clearing-corporation penalties** — margin, short allocation, segregation, non-submission | **A short working-day window from the date the penalty is made available on the portal.** Beyond it, the delay must be justified in the request and is taken up case by case |
+| Channel | **Only through the portal. Requests sent by electronic mail are explicitly not considered** |
+| Mechanics | A penalty review request with the penalty type, amount, contact details and an attachment; the request is valid only when its status reads success; the clearing corporation adds document requests as comments against a case identifier |
+| Upload naming | A member-code, penalty-type, date and sequence pattern where **the date is the upload date, not the trade date** |
+| **Against an internal committee's action, or an action under a pre-approved policy** | Placed before the member committee |
+| **Against the member committee's own action** | A **separate mechanism** constituted by the governing board, using public-interest directors or independent external professionals who are not on the committee, with a published procedure |
+| Beyond that | Members may approach the appropriate authority under applicable law |
+
+The two-tier structure dates from an August 2025 regulator circular applicable from the forty-fifth day of its issuance. **The working-day window figure is specific to one clearing corporation** and should not be assumed for the other.
+
+## 13. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.monitoring.alerts.disposal_days` | **E** | 45 | From download or generation |
+| `finix.monitoring.alerts.internal_target_days` | **D** | Materially below the obligation | Queue managed to the internal target |
+| `finix.monitoring.alerts.reopen_review_days` | **E** | 30 | Every open alert re-reviewed |
+| `finix.monitoring.alerts.evidence_window_days` | **E** | At least a fortnight either side | Bank and depository statements |
+| `finix.monitoring.alerts.evidence_before_closure` | **E** | true | Not reconstructed later |
+| `finix.monitoring.alerts.tipping_off_prohibited` | **R** | true | No client communication about the alert's origin |
+| `finix.monitoring.alerts.extension_request_enabled` | **D** | true | An available and under-used right |
+| `finix.monitoring.own_alerts.thresholds` | **D** | Broker-set, documented | Reviewed and recalibrated at least annually |
+| `finix.monitoring.own_alerts.threshold_approvers` | **D** | Principal officer, designated director, compliance | With a recorded rationale |
+| `finix.monitoring.quarterly_return.deadline_days` | **E** | 15 after quarter end | Nil return mandatory |
+| `finix.monitoring.quarterly_return.nil_mandatory` | **E** | true | — |
+| `finix.monitoring.terminal_messages.captured` | **D** | **true** | The ban-utilisation broadcast and trade cancellations arrive this way |
+| `finix.monitoring.surveillance_indicator.to_order_entry` | **R** | true | The front-end confirmation obligation depends on it |
+| `finix.monitoring.surveillance_indicator.popup_verbatim` | **R** | true | Prescribed wording, mandatory for retail |
+| `finix.monitoring.ban_period.afternoon_snapshot_action_window` | **D** | true | A timed runbook item with an owner |
+| `finix.monitoring.margin_report.signoff_working_days` | **E** | 5 after trade date | Non-reporting is full short reporting |
+| `finix.monitoring.kra_status_file.treated_as_risk_input` | **D** | **true** | An on-hold client cannot square off |
+| `finix.monitoring.ucc.resubmit_unchanged_demat` | **D** | **false** | Resubmission triggers re-verification |
+| `finix.monitoring.penalty_review.window_working_days` | **E** | Clearing-corporation set | Portal only; electronic mail not considered |
+| `finix.monitoring.penalty_review.owner` | **D** | Compliance, with finance | A named owner, because the clock starts on publication |
+| `finix.monitoring.alert_mis.frequency` | **E** | Quarterly to the board | Opened, generated, processed, pending, with reasons |
+
+## 14. The response register
+
+One record per inbound item, across every stream. This register is what an inspection asks for, and assembling it afterwards is not possible.
+
+| Field | Content |
+|---|---|
+| Stream | Downloaded alert, dashboard intraday alert, own-generated alert, exchange communication, margin notice, ban-period file, surveillance-measure change, client-code file, registration-agency file, trade cancellation, penalty advice |
+| Identifier | The exchange's reference, or the internal alert identifier |
+| Received at | Timestamp, and the channel it arrived through |
+| Clock | The applicable deadline, computed, not remembered |
+| Owner | A named individual |
+| Evidence obtained | What was requested, from whom, when received |
+| Conclusion | The view formed, in writing |
+| Disposition | Closed, escalated to the exchange, referred to compliance, reported |
+| Client impact | Whether any client was blocked, squared off or notified, and when |
+| Onward reporting | Whether it fed the quarterly return, a suspicious transaction report, or a penalty representation |
+| Closed at | Timestamp |
+
+## Practical notes
+
+- **Instrument the terminal.** Two of the most consequential streams — the market-wide utilisation broadcast and automatic trade cancellation — arrive only as terminal messages. Capturing them into the response register is small work with large value.
+- **Put the registration-agency monthly file on the risk board.** A client who cannot square off is a risk position, not a compliance ticket.
+- **Manage the alert queue to an internal target well inside forty-five days.** The obligation is the deadline, not the plan, and the extension right exists for genuine complexity rather than for backlog.
+- **Make the surveillance indicator flow to the front end**, not just to the risk engine, because the client-confirmation obligation lives in the order-entry path.
+- **Give the penalty-review clock an owner.** It starts when the penalty is published on the portal, which is before anyone reads it, and the channel is exclusively the portal.
+- **Keep an eye on what has been removed from exclusions.** The surveillance frameworks have been tightened twice recently by deleting exclusions rather than by adding criteria, which means securities a firm previously treated as out of scope quietly came into it.
+
+## Where this connects
+
+The obligations here are the inbound half of [the monitoring obligation map](/broking-kyc/finix-broking-setup/monitoring/01-monitoring-obligation-map/); the real-time and periodic outbound halves are in [real-time and near-real-time monitoring](/broking-kyc/finix-broking-setup/monitoring/02-realtime-near-realtime/) and [periodic submissions](/broking-kyc/finix-broking-setup/monitoring/03-periodic-submissions/), with suspicious-transaction reporting in [anti-money-laundering monitoring](/broking-kyc/finix-broking-setup/monitoring/06-aml-monitoring-reporting/). The files named throughout are registered in [NSE and NSE Clearing files](/broking-kyc/finix-broking-setup/files/02-nse-files/) and their failure handling in [file handling exceptions](/broking-kyc/finix-broking-setup/files/08-file-handling-exceptions/). The desk-side handling of these alerts is R-28 and R-59 in [the RMS operations catalogue](/broking-kyc/finix-broking-setup/rms/11-operations-catalogue/) and the session items in [the master trading-day checklist](/broking-kyc/finix-broking-setup/daily-ops/10-master-trading-day-checklist/). The vendor-neutral treatments of the same frameworks are [surveillance norms, graded and additional measures](/broking-kyc/deep-dives/trading-day/surveillance-norms-gsm-asm/), [market manipulation typologies](/broking-kyc/deep-dives/foundational/market-manipulation-typologies/) and [position limits and open interest](/broking-kyc/trading-risk/position-limits-oi/).

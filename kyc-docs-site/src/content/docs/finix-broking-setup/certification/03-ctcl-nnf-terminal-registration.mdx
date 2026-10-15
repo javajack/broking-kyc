@@ -1,0 +1,125 @@
+---
+title: "Certification 3: terminal and user-identifier registration"
+description: The identifier scheme and its lifecycle — the structured terminal identifier, the channel markers, the order-origin field, the rule that activation precedes any order, the register the firm must maintain, relocation and deactivation, retention, and the penalties attached to unreported and mismatched terminals.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Identifier registration looks like administration and behaves like a trading control: an order from an unreported terminal is a contravention with a per-location penalty, and an identifier whose holder's certification has lapsed is disabled at end of day by the exchange itself. The page therefore leads with the structure of the identifiers, then the one rule that matters most — report before routing — then the register, then the lifecycle events where firms actually go wrong, which are relocation and deactivation rather than creation.
+
+## TL;DR
+
+- **Report before routing.** Activation must be reported before any order is routed, and activation or deactivation before the identifier is enabled or disabled on the member's own server. This covers trading, testing, view and administrative identifiers.
+- **The scheduling window is not a reporting grace period.** An activation date may be set between today and a week ahead; that is forward scheduling, **not permission to report an already-active terminal retrospectively**.
+- **The structured identifier encodes location.** It combines a location code, a branch code and a terminal code, with leading zeros preserved, unique within the segment — and it is not the exchange order number.
+- **Channel markers are reserved identifiers**, distinguishing internet, direct market access, wireless and client programmatic channels.
+- **Every order from an own front end carries a populated structured order-origin field** identifying terminal, channel, purpose and development route. Algorithm identifiers and client codes are separate fields.
+- **The penalties are per location and per terminal per day**, and in aggravated cases involving multiple unreported terminals and unregistered intermediaries, suspension can be considered.
+
+## Conceptual overview
+
+The identifier scheme exists to make every order attributable — to a person, at a place, through a channel, using a described piece of software. That is why it is structured rather than arbitrary: embedding location in the identifier means an order's origin is derivable from the order itself, which is what allows an exchange to ask why orders were placed from somewhere a member had not reported. Understanding this purpose makes the rules predictable. Anything that breaks attribution is prohibited or penalised: an unreported terminal, a mismatched register, a shared login, a dealer credential in a client's hands, a terminal physically absent from its reported location.
+
+The second observation is that the register is the firm's, and the exchange's copy is derived from it. The firm maintains the mapping of identifier to dealer login, with segment, exchange identifier mapping, tax identifier, person and status, office location and status, purpose, certification and lifecycle details. The exchange holds what the firm reported. A mismatch between the two is a specific contravention with its own penalty, separate from the penalty for the underlying unreported terminal — and a provisional mismatch report is provided to help reconcile, which explicitly does not waive the duty to report correctly in advance.
+
+The third point is about certification as an operating dependency, treated more fully in [the role register](/broking-kyc/finix-broking-setup/roles/01-role-register/). Identifiers must be deactivated when required certification expires, and the exchange performs its own end-of-day disablement for expired or non-compliant certification. For the firm this means the certification register and the identifier register are joined: a lapse in one disables the other, with no warning other than an identifier that stops working. That is why the begin-of-day sequence includes a certification-and-identifier check as a gate rather than a monthly review.
+
+## 1. The identifier structure
+
+| Element | Detail |
+|---|---|
+| **Structured terminal identifier** | A twelve-digit identifier combining a **six-digit location code, a three-digit branch code and a three-digit terminal code**. Leading zeros must be preserved, allocation is sequential, and the identifier is unique within the segment. **It is not the exchange order number** |
+| **Channel markers** | Reserved repeated-digit identifiers distinguish the **internet**, **direct market access**, **wireless** and **client programmatic access** channels. These identify the enabled exchange-user channel — the internet marker is not every customer's individual application login |
+| **Order-origin field** | A **fifteen-digit** field populated on every order from an own front end, carrying terminal and channel identification plus order purpose and a vendor-or-in-house indicator, per the published mapping |
+| Algorithm identifier | A separate registration identifier for an approved strategy |
+| Client code | A separate field again |
+| Exchange user identifier | Applied for through the exchange's interface after software registration, with corporate, branch and dealer classifications and differing certification conditions. Requests are digitally signed and supporting records stay with the firm |
+
+## 2. The lifecycle
+
+| Event | Rule |
+|---|---|
+| **Activation** | **Report before routing any order.** Trading may begin on the activation date after a successful upload |
+| Scheduling window | The activation or deactivation date must fall between the system date and **seven days ahead**. **This is forward scheduling, not seven days to report retrospectively** |
+| Which identifiers must be reported | Trading, **testing, view and administrative** identifiers alike. A testing, view or administrative identifier **cannot place live trading orders** |
+| **Modification** | A modification route exists and permitted changes take effect the **next day**. **An address change cannot alter the encoded location, city or state, nor the identifier itself, through that route** |
+| **Relocation across the encoded location** | Requires retiring and replacing the affected identifier through the activation and deactivation process. **The precise portal workflow should be confirmed** — this is an operational inference from the modification restriction, not a stated rule |
+| **Deactivation** | Through the prescribed workflow, with the member's own server reconciled. Identifiers must be deactivated when required certification expires |
+| Exchange-side disablement | The exchange performs end-of-day disablement for expired or non-compliant certification |
+| Mismatch reconciliation | A provisional mismatch report assists reconciliation and **does not waive** the duty to report correctly in advance |
+| Direct market access clients | After reporting the access identifier, client details must be reported — segment, mapped exchange identifier, client code and client name — through the dedicated process |
+| **Retention** | Order and trade logs, **all created identifiers whether enabled or disabled**, and terminal login records, in a **non-tamperable** form for at least **five years** |
+
+## 3. Location rules
+
+| Rule | Detail |
+|---|---|
+| Permitted locations | The member's main or branch offices, or registered authorised-person offices |
+| Operation | By approved persons |
+| **Prohibited** | Handing dealer credentials to customers or unregistered intermediaries |
+| Physical presence | A terminal **absent from its reported location** results in trading from that terminal being disallowed, in addition to penalties |
+| Proprietary terminals | Subject to the separate one-location rule and its undertaking process for additional locations |
+
+## 4. The register the firm maintains
+
+| Field | Why |
+|---|---|
+| Structured identifier to dealer login mapping | The core attribution record |
+| Segment | Identifiers are unique within a segment |
+| Exchange user identifier mapping | Links the firm's identifier to the exchange's |
+| Tax identifier of the holder | Reported, and changes reported on a clock |
+| Person and status | Who holds it, and whether active |
+| Office location and status | Must match the encoded location and the reported place |
+| Purpose | Trading, testing, view, administrative |
+| Certification held and expiry | The joint dependency with the certification register |
+| Lifecycle dates | Activation, modification, deactivation, with reasons |
+
+**No single mandatory register layout common to all three exchanges was established**, so the layout above is the set of fields needed to reconcile against what each venue holds, rather than a prescribed form.
+
+## 5. Penalties
+
+The figures below were established for one exchange's current framework. **They must not be transplanted to the other venues**, whose current rates were not verified.
+
+| Contravention | Action |
+|---|---|
+| **Unauthorised extension or non-upload of terminals, or an unreported prohibited location** | **A substantial penalty per location** at first instance; half again at second; double at third onwards. In aggravated cases involving **more than five unreported terminals** together with unregistered intermediaries or illegal trading, **membership suspension may be considered** |
+| **Delayed reporting of trading from an inactive or unreported terminal** | A **per-terminal, per-trading-day** amount until reported, subject to a per-terminal cap. A separately described contravention — **not automatically added to every location fine** |
+| **Reported details differing from the member's own trading-system records** | A **per-instance** amount with a cap; non-trading identifiers excluded for this one; escalating on repetition |
+| Non-upload of identifiers incapable of trading | Advice, then warning, then a modest per-instance amount. **Reporting remains required even where the first action is only advice** |
+| Terminal absent at the reported location | Trading from that terminal disallowed, plus applicable penalties |
+| **Offering internet-based trading without specific approval** | A substantial penalty **plus a direction to stop within a short period or until compliance, whichever is earlier**. The wording does **not** grant an initial permission period |
+
+Note the effective-date treatment: the standardised framework applies immediately to pending and newly determined cases where penalties are **reduced**, and otherwise to violations after its effective date and to submission obligations falling due after it.
+
+<Aside type="danger" title="Three ways firms create unreported terminals without meaning to">
+First, **a developer or support engineer installing the front end on their own machine to reproduce a problem.** It is a terminal, it needs an identifier of the appropriate purpose, and a view or testing identifier cannot place live orders. Second, **a dealer working from a location the firm has not reported** — the encoded location in the identifier is the control, and a relocation cannot be handled by editing an address. Third, **a disaster-recovery or alternative site brought up during an incident**, where terminals exist at a location nobody reported because the recovery plan addressed connectivity and not registration. All three are avoidable by treating identifier registration as part of the change and incident procedures rather than as an onboarding task, and by reconciling the register against the exchange's copy on a schedule rather than only when something looks wrong.
+</Aside>
+
+## 6. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.cert.terminal.report_before_route` | **R** | **true** | Enforced, not procedural |
+| `finix.cert.terminal.schedule_window_days` | **E** | 7 ahead | Forward scheduling only |
+| `finix.cert.terminal.report_non_trading_ids` | **R** | true | Testing, view, administrative |
+| `finix.cert.terminal.test_id_cannot_trade` | **R** | true | Hard separation |
+| `finix.cert.terminal.identifier_preserves_leading_zeros` | **E** | true | A classic integration defect |
+| `finix.cert.terminal.register_reconcile_frequency` | **D** | Monthly, and after any change or incident | Against the exchange's copy |
+| `finix.cert.terminal.certification_expiry_deactivates` | **R** | true | Joined to the certification register |
+| `finix.cert.terminal.relocation_requires_reissue` | **D** | true | Where the encoded location changes |
+| `finix.cert.terminal.log_retention_years` | **R** | 5 | Non-tamperable |
+| `finix.cert.terminal.dr_site_identifiers_pre_registered` | **D** | **true** | So an incident does not create unreported terminals |
+| `finix.cert.terminal.dma_client_details_reported` | **R** | true | After the access identifier |
+
+## Practical notes
+
+- **Pre-register recovery-site identifiers.** The alternative is discovering during an incident that you cannot lawfully trade from the site you just moved to.
+- **Reconcile the register monthly and after every change.** The mismatch penalty is separate from the unreported-terminal penalty, so a stale register costs twice.
+- **Join the certification and identifier registers in one view.** A lapse in the first silently disables the second.
+- **Give testing and view identifiers a distinct, visible purpose marker** in your own register, so nobody assumes one can be used to place an order "just this once".
+- **Handle relocation as retire-and-reissue** unless the exchange confirms otherwise in writing for your case.
+- **Preserve leading zeros everywhere.** Spreadsheets and loosely typed interfaces strip them, and the resulting identifier is a different, invalid one.
+
+## Where this connects
+
+The approval that must precede registration is in [the software approval regime](/broking-kyc/finix-broking-setup/certification/01-software-approval-regime/), and the change treatment in [change and version control](/broking-kyc/finix-broking-setup/certification/04-change-version-control/). The order-path mechanics are in [user identifiers, terminal-connected software and the unique order identifier](/broking-kyc/finix-broking-setup/oms/03-user-id-ctcl-nnf/), the certification dependency in [the role register](/broking-kyc/finix-broking-setup/roles/01-role-register/), and the daily gate in [the master trading-day checklist](/broking-kyc/finix-broking-setup/daily-ops/10-master-trading-day-checklist/). Administrative actions O-27 to O-36 in [the OMS operations catalogue](/broking-kyc/finix-broking-setup/oms/11-operations-catalogue/) are the operator-side view.

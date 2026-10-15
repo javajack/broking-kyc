@@ -1,0 +1,229 @@
+---
+title: "RMS 10: the limit impact matrix"
+description: What every credit, debit, charge, collateral movement, corporate action and settlement event does to a client's ledger balance and to their trading capacity — and crucially when, because the gap between the ledger effect and the limit effect is where most client disputes and most unintended leverage live.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** "How much can this client trade right now" is computed from a dozen inputs, each of which arrives on its own clock. A client's payment hits the bank in seconds, the ledger in minutes and the limit in whatever interval the extract runs. A charge hits the ledger at end of day and the limit tomorrow morning. A collateral revaluation hits the limit before it hits the ledger at all. Documentation that treats these as one event cannot explain why a client who paid an hour ago still cannot trade, which is the single most common support question in a broking operation. So this page is built as one large matrix with *timing* as a first-class column, followed by the general principles that decide which credits may create capacity at all.
+
+## TL;DR
+
+- **Ledger effect and limit effect are different events with different timings.** Every row below states both. The gap between them is a design choice, and an undocumented gap is a complaint generator.
+- **Not every credit creates capacity.** Cleared cash does; an unrealised gain may, partially; a cheque does not until it clears; a non-cash collateral credit does only within the cash-equivalent ratio.
+- **Charges reduce capacity in two different ways.** A charge debited reduces the ledger balance and hence capacity. A charge *accrued but not yet debited* should reduce capacity immediately, and frequently does not — which is how a client ends a day with a debit balance they could not see coming.
+- **The cash component rule bounds everything.** A prescribed minimum proportion of the margin must be in cash or cash equivalent, so a client with abundant securities collateral and no cash still hits a wall. This is the most-misunderstood limit constraint by clients and by sales teams.
+- **Pay-outs reduce capacity at request, not at payment.** The moment a pay-out is accepted, that money is committed; capacity must drop then, or the client can trade against money already promised to their bank.
+- **Debits age into forced action.** An unmet debit balance does not simply sit there: it becomes a square-off trigger on a defined clock, and the clock is the thing clients are not told about clearly enough.
+
+## Conceptual overview
+
+Trading capacity is a computed quantity, and it is worth writing the computation down explicitly because almost every dispute is really a disagreement about one of its terms. In the form used throughout this manual, capacity is the sum of clear cash and the haircut-adjusted value of eligible collateral, less margin already utilised by open positions and pending orders, less amounts blocked for obligations and accrued charges, bounded by the applicable limit at the resolved level, and bounded again by the cash-component requirement and by any exchange-set position limit. Six terms, each with its own update cadence. A client asking "where did my limit go" is asking which term moved.
+
+The second idea is that there are two legitimate philosophies about when a credit becomes capacity, and a firm must pick one per rail and write it down. The *conservative* rule gives capacity when the money is irrevocably the firm's to apply — cleared, settled, non-reversible. The *service* rule gives capacity when the firm is confident enough, which for an irrevocable real-time rail can be within seconds and for a cheque is never. The service rule is a credit decision and belongs under the discipline of one, with caps and reporting, as set out in [the money operations catalogue](/broking-kyc/finix-broking-setup/money/08-money-operations-catalogue/). What is indefensible is having no rule, because then the answer depends on which system happened to run last.
+
+The third idea concerns accrual. Positions generate obligations continuously: brokerage on every executed trade, statutory levies on the same, interest on debit balances, exchange charges, and the mark-to-market on open derivatives. The ledger recognises most of these at end of day because that is when the computation is complete and the files have arrived. But the client's capacity is affected the moment the obligation exists, not when it is posted. A risk system that only reduces capacity on posted debits systematically over-permits trading during the session by the amount of the day's accruals — small for most clients, material for an active one, and the gap is exactly the amount by which the client is surprised at end of day. The remedy is an accrual block: a running estimate of the day's charges held against capacity and released when the actual posting replaces it.
+
+## 1. Framework
+
+- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — margin collection, client funds, running-account settlement, and the disclosure of charges.
+- **[SEBI/HO/MRD2/DCAP/CIR/P/2020/127](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2dcapcirp2020127)** (20 July 2020) — the peak-margin framework. Margin must be sufficient continuously, verified by intraday snapshots, which is why capacity cannot be computed only at day boundaries.
+- **[SEBI/HO/MIRSD/POD-1/P/CIR/2024/118](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir2024118)** (9 August 2024) — upfront margin obligations.
+- **Cash component requirement** — the prescribed minimum proportion of margin to be met in cash or cash equivalent, set by the clearing corporations within the SEBI framework. `[not yet in index]`
+- **Client funds upstreaming** — the daily upstreaming obligation, which constrains what the firm may hold and therefore what it may lend against. See [upstreaming and downstreaming](/broking-kyc/finix-broking-setup/money/06-upstreaming-downstreaming/).
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — Chapter III, segregation of client money, which bounds every capacity decision. `[not yet in index]`
+
+## 2. The capacity computation
+
+| Term | Sign | Updated when | Owner of the number |
+|---|---|---|---|
+| Clear cash balance | + | On attributed receipt; on ledger posting | Back office, via the extract |
+| Eligible collateral, after haircut | + | On pledge confirmation; on revaluation | Risk, from the collateral file |
+| Unrealised gain on open positions | + or 0 | Continuously, if recognised at all | Risk policy decision |
+| Margin utilised by open positions | − | Continuously | Risk engine |
+| Margin blocked by pending orders | − | On order acceptance; released on cancel or fill | Risk engine |
+| Obligations blocked — pay-outs requested, settlement dues | − | On request or crystallisation | Back office and finance |
+| **Accrued but unposted charges** | − | Continuously, by estimate | Risk engine |
+| Applicable limit at the resolved level | Cap | On the limit cycle, or intraday on intervention | Risk administration |
+| Cash-component requirement | Cap | Continuously | Risk engine |
+| Exchange position limits | Cap | Continuously against published data | Risk engine |
+
+## 3. The matrix — money in
+
+| # | Event | Ledger effect | Ledger timing | Limit effect | Limit timing | Notes |
+|---|---|---|---|---|---|---|
+| L-01 | Pay-in by an instant, irrevocable rail with a usable reference | Credit | On attribution | Capacity increases by the full amount | **Within the attribution interval** | The best case; make the interval short and publish it |
+| L-02 | Pay-in by the same rail with an unusable or absent reference | Credit to suspense | On receipt | **No capacity** until attributed | On manual attribution | The reference is the whole problem; see M-40 |
+| L-03 | Pay-in by a deferred rail during banking hours | Credit | On bank confirmation | Capacity on confirmation | On confirmation | Client perception is "instant"; it is not |
+| L-04 | Pay-in by a deferred rail outside banking hours | Credit | Next banking cycle | No capacity until then | Next cycle | A common Friday-evening complaint |
+| L-05 | Pay-in by cheque | Credit on realisation | On clearing | **No capacity before clearing** unless an explicit uncleared-capacity policy applies | On clearing | Default must be no capacity |
+| L-06 | Pay-in from a third-party account | **None — rejected** | On identification | None | — | Mandatory rejection; returned to source |
+| L-07 | Pay-in in excess of any obligation | Credit | On attribution | Capacity increases; may become a pay-out candidate | On attribution | Running-account rules then apply |
+| L-08 | Pay-in received after the internal funding deadline | Credit | On attribution | Capacity today; **does not help today's exchange pay-in** | On attribution | Two different deadlines, often confused |
+| L-09 | Payment-gateway receipt, before gateway settlement to the broker | Credit | On gateway confirmation | Capacity on gateway confirmation | On confirmation | The firm is briefly exposed to the gateway, not the client |
+| L-10 | Gateway settlement file received | No new client effect | — | None | — | Reconciliation event only; capacity was already given |
+| L-11 | Pay-in reversed or charged back | Debit | On notification | **Capacity reduces immediately**; may create a shortfall | Immediate | The client may already have traded |
+| L-12 | Cheque dishonoured after capacity was given | Debit, plus a dishonour charge | On notification | Capacity reduces; shortfall and square-off clock start | Immediate | The reason the default for L-05 is no capacity |
+
+## 4. The matrix — money out
+
+| # | Event | Ledger effect | Ledger timing | Limit effect | Limit timing | Notes |
+|---|---|---|---|---|---|---|
+| L-20 | Pay-out requested by the client | None yet | — | **Capacity reduces by the requested amount** | **On request** | Otherwise the client trades against committed money |
+| L-21 | Pay-out approved and instructed | Debit | On instruction | Already reduced at L-20 | — | No double reduction |
+| L-22 | Pay-out settled at the bank | — | — | — | — | Confirmation only |
+| L-23 | Pay-out rejected by the firm | None | — | **Capacity restored** | On rejection | Must be prompt; a stale block is a complaint |
+| L-24 | Pay-out failed or returned by the bank | Credit back | On return | Capacity restored | On return | Re-attribution risk; see M-10 |
+| L-25 | Running-account settlement to the client | Debit | On the settlement run | Capacity reduces | On the run | Expected and periodic; clients should be told the date |
+| L-26 | Pay-out request exceeding free credit | None | — | **Rejected or part-processed** | — | Free credit, not ledger balance, is the test |
+
+<Aside type="caution" title="L-20 is the row most often implemented wrongly">
+If capacity only drops when the pay-out is *instructed* rather than when it is *requested*, there is a window in which the client can take a fresh position using money the firm has already committed to send to their bank. On a normal day the window is short and nothing happens. On a day when the client requests a large pay-out in the morning and takes a large position at noon, the firm funds both. The fix is trivial — block at request, release on rejection — and the reason it is often missing is that the pay-out queue and the risk engine are different systems updated by different events. This is precisely the kind of boundary enumerated in [the integration contract matrix](/broking-kyc/finix-broking-setup/stack/integration-contract-matrix/).
+</Aside>
+
+## 5. The matrix — collateral
+
+| # | Event | Ledger effect | Ledger timing | Limit effect | Limit timing | Notes |
+|---|---|---|---|---|---|---|
+| L-30 | Securities pledged, pledge confirmed | None — the client still owns them | — | Capacity increases by value less haircut | On confirmation reaching risk | The confirmation, not the request, is the trigger |
+| L-31 | Pledge request made but not yet confirmed | None | — | **None** | — | A pending pledge is not collateral |
+| L-32 | Collateral revalued downward at close | None | — | Capacity reduces | **Next computation** | Overnight shortfalls are born here |
+| L-33 | Collateral revalued downward intraday after a sharp fall | None | — | Capacity reduces | On revaluation, if intraday revaluation is enabled | A policy choice with real consequences on volatile days |
+| L-34 | Haircut increased by the exchange | None | — | Capacity reduces | On applying the new file | Can be large and sudden; diff the file and alert |
+| L-35 | A pledged security becomes ineligible as collateral | None | — | **Capacity reduces to zero for that holding** | On applying the list | Watch the eligibility-list diff at begin of day |
+| L-36 | Unpledge requested and confirmed | None | — | Capacity reduces | On confirmation | Must not be permitted if it creates a shortfall |
+| L-37 | Collateral invoked | Debit extinguished, securities sold | On settlement | Capacity recomputed on the outcome | On settlement | Notice and policy grounds required first |
+| L-38 | Cash collateral placed with the clearing corporation | Reclassified, not reduced | On transfer | Capacity unchanged or improved by the cash component | On confirmation | Changes *where* the money is, not whose it is |
+| L-39 | Collateral form substituted, securities for cash | Reclassification | On substitution | **Cash component falls; capacity may fall even though total value is unchanged** | On substitution | The counter-intuitive row; see the caution |
+
+<Aside type="danger" title="L-39 and the cash component: why a richer client can have less capacity">
+A prescribed minimum proportion of margin must be met in cash or cash equivalent. A client holding a large portfolio of eligible shares and no cash therefore cannot use the full haircut-adjusted value of that portfolio — beyond the point where the cash component binds, additional securities add nothing. Substituting cash collateral for securities of identical value reduces capacity for the same reason. This is counter-intuitive to clients, routinely mis-sold by sales teams who quote the gross collateral value as buying power, and a recurring source of disputes that are entirely avoidable by displaying the binding constraint. The client-facing margin screen should show not just the number but *which term is binding* — limit, cash component, position limit, or available collateral — and the support desk should be trained to read it.
+</Aside>
+
+## 6. The matrix — trading and settlement
+
+| # | Event | Ledger effect | Ledger timing | Limit effect | Limit timing | Notes |
+|---|---|---|---|---|---|---|
+| L-40 | Order accepted | None | — | Margin blocked | **Immediate** | Released on cancellation, expiry or fill |
+| L-41 | Order rejected after acceptance by the exchange | None | — | Block released | On the rejection reaching risk | A lost release is a silent capacity leak |
+| L-42 | Trade executed, intraday | None | — | Block converts to position margin | Immediate | The amount usually changes at this point |
+| L-43 | Intraday position squared off in profit | Credit at settlement | On settlement | Margin released immediately; **profit may or may not create capacity today** | Policy-dependent | Unrealised and unsettled gains are a policy decision |
+| L-44 | Intraday position squared off at a loss | Debit at settlement | On settlement | Margin released; **loss should reduce capacity immediately** | Immediate | Recognising the loss late over-permits trading |
+| L-45 | Delivery purchase executed | Obligation created | At end of day | Capacity reduced by the full obligation | Immediate | The obligation is the client's, due at pay-in |
+| L-46 | Delivery sale executed | Receivable created | At end of day | Capacity effect depends on whether sale proceeds are recognised pre-settlement | Policy-dependent | Common and legitimate to recognise, with a haircut |
+| L-47 | Early pay-in of securities for a sale | None | — | **Margin benefit on the sale** | On depository confirmation | The main reason clients early-pay-in |
+| L-48 | Settlement pay-in of funds by the client | Debit applied | On settlement day | Already blocked at L-45 | — | No new reduction |
+| L-49 | Settlement pay-out of funds to the client | Credit applied | On settlement day | Capacity increases if not already recognised | On settlement | Depends on the L-46 policy |
+| L-50 | Securities received in pay-out to demat | Holding appears | On pay-out | Can become collateral once pledged | On pledge confirmation | Not automatic |
+| L-51 | Short delivery, auction or close-out | Debit for the difference | On settlement outcome | Capacity reduces | On the outcome | Cannot be estimated reliably in advance |
+| L-52 | Futures mark-to-market, adverse | Debit | Daily settlement | **Capacity reduces immediately on the mark** | Immediate | Daily settlement is a cash event, not a bookkeeping one |
+| L-53 | Futures mark-to-market, favourable | Credit | Daily settlement | Capacity increases on settlement credit | On settlement | Treat the intraday mark conservatively |
+| L-54 | Option premium paid on a buy | Debit | On settlement | Capacity reduces immediately by the premium | Immediate | A full-value debit, not a margin block |
+| L-55 | Option premium received on a write | Credit | On settlement | Margin blocked exceeds the premium received | Immediate | Net capacity falls |
+| L-56 | Option expires worthless | Position closes | On expiry | Margin released | On expiry processing | Timing of the release matters for next-day capacity |
+| L-57 | Option exercised or assigned | Obligation or delivery created | On expiry settlement | Capacity recomputed on the resulting position | On processing | Physical settlement can be far larger than the margin held |
+| L-58 | Entering an expiry-week physically settled stock position | None | — | **Margin escalates through the week** | On each escalation | Clients must be warned in advance, not on the day |
+| L-59 | A held underlying enters the ban period | None | — | No fresh positions; existing may be reduced | On applying the list | Capacity for that underlying effectively goes to zero for increases |
+| L-60 | Corporate action adjustment to a derivative contract | None | — | Capacity recomputed on adjusted multipliers | On applying the adjustment | Stale multipliers give wrong margin |
+
+## 7. The matrix — charges, interest and penalties
+
+This is the section the user of a broking system most often finds surprising, because almost all of it hits the ledger at end of day and the limit the following morning, unless an accrual block is implemented.
+
+| # | Event | Ledger effect | Ledger timing | Limit effect | Limit timing | Notes |
+|---|---|---|---|---|---|---|
+| L-70 | Brokerage on an executed trade | Debit | End of day | Should reduce capacity on execution via accrual | **Immediate if accrued; next day if not** | The largest accrual component for an active client |
+| L-71 | Securities or commodities transaction tax | Debit | End of day | Same as above | Same | Statutory, computed per trade |
+| L-72 | Exchange transaction charges | Debit | End of day | Same | Same | Per segment, per exchange |
+| L-73 | Clearing charges | Debit | End of day | Same | Same | Often bundled in display |
+| L-74 | Regulator turnover fee | Debit | End of day | Same | Same | Small but non-zero |
+| L-75 | Stamp duty | Debit | End of day | Same | Same | Collected by the broker, remitted onward |
+| L-76 | Goods and services tax on the chargeable components | Debit | End of day | Same | Same | Applies to brokerage and certain charges, not to statutory levies generally |
+| L-77 | Depository transaction charge on a delivery sale | Debit | On the depository debit | Reduces capacity when posted | Next computation | Per-debit, not per-value, in the usual tariff |
+| L-78 | Annual maintenance charge on the demat account | Debit | On the billing cycle | Reduces capacity when posted | Next computation | A recurring small surprise for dormant clients |
+| L-79 | Pledge creation or closure charge | Debit | On the event | Reduces capacity when posted | Next computation | Per-instruction; pledging many scrips costs more than one |
+| L-80 | Interest on a debit balance | Debit | On the accrual cycle | Reduces capacity when posted | Next computation | Rate must match the disclosed tariff exactly |
+| L-81 | Margin-shortfall penalty levied by the exchange | Debit, if passed to the client | On the penalty file | Reduces capacity when posted | Next computation | Whether it may be passed on depends on cause and policy |
+| L-82 | Auction or close-out difference | Debit | On the settlement outcome | Reduces capacity | On posting | Can be large and is not predictable |
+| L-83 | Cheque dishonour charge | Debit | On the event | Reduces capacity | On posting | Accompanies L-12 |
+| L-84 | Call-and-trade or assisted-dealing charge | Debit | End of day | Reduces capacity | Next computation | Must be disclosed in the tariff |
+| L-85 | Auto square-off charge | Debit | End of day | Reduces capacity | Next computation | Levied per square-off order in the common model |
+| L-86 | Delayed payment charge on an unmet obligation | Debit | On the accrual cycle | Reduces capacity | Next computation | Distinct from interest on a running debit |
+| L-87 | Subscription charges — data, platform, application access | Debit | On the billing cycle | Reduces capacity | Next computation | Recurring, and a frequent dispute when undisclosed |
+| L-88 | A charge reversed or waived | Credit | On the reversal | Capacity restored | Next computation | Statutory levies are corrected, not waived |
+
+<Aside type="caution" title="The accrual block is the fix for the whole of section 7">
+Without an accrual block, every row in this section follows the same bad pattern: the client's capacity is unaffected during the session, so they trade up to a limit computed as though the day's charges did not exist, and at end of day the charges post and a client who was exactly at their limit is now in debit. For a delivery investor the amount is trivial. For a high-frequency intraday client paying per-order brokerage and per-trade levies, the day's accrual can be a material fraction of their capital, and they end the day in a shortfall that triggers a margin call they find incomprehensible. Implementing the block is straightforward — estimate conservatively per executed trade, hold the estimate against capacity, replace the estimate with the actual at end-of-day posting — and the main design decision is whether to display it to the client as a separate line, which is strongly worth doing because it makes the arithmetic self-explanatory.
+</Aside>
+
+## 8. The matrix — corporate actions and other credits
+
+| # | Event | Ledger effect | Ledger timing | Limit effect | Limit timing | Notes |
+|---|---|---|---|---|---|---|
+| L-90 | Dividend received | Credit | On the payment date | Capacity increases | On posting | Often later than the client expects |
+| L-91 | Bonus or split applied | Holding changes, value unchanged | On the ex-date processing | Collateral quantity changes; value broadly neutral | On processing | A quantity-only change that must not double-count |
+| L-92 | Rights entitlement | Separate entitlement appears | On processing | Not collateral unless eligible and pledged | — | Needs an explicit client decision |
+| L-93 | Buyback or open-offer proceeds | Credit | On receipt | Capacity increases | On posting | Securities tendered leave the collateral pool earlier |
+| L-94 | Merger or demerger | Holdings replaced | On processing | Collateral eligibility of the new security must be re-checked | On processing | The replacement may not be an eligible collateral security |
+| L-95 | Interest or maturity on a debt holding | Credit | On receipt | Capacity increases | On posting | — |
+| L-96 | Securities lending fee received | Credit | On the lending settlement | Capacity increases | On posting | Lent securities are unavailable as collateral meanwhile |
+| L-97 | A security suspended from trading | None | — | **Collateral value becomes unrealisable; treat as zero for new capacity** | On the event | Policy must be explicit; the file may still carry a price |
+
+## 9. Debit ageing and forced action
+
+A debit balance is not a static state. It moves through a defined clock, and the clock should be as transparent to the client as the balance is.
+
+| Stage | Trigger | Capacity effect | Client communication | Action |
+|---|---|---|---|---|
+| Fresh debit | Obligation posted | Capacity reduced | Statement and alert | None |
+| Margin call | Shortfall computed | No fresh exposure | **Recorded call** | Client to fund |
+| Call unmet | Defined interval elapsed | Close-only | Second recorded call | Square-off scheduled |
+| Scheduled square-off | Policy trigger | Positions reduce | Notice before, confirmation after | Risk decides, dealing executes |
+| Ageing debit | Regulatory and policy clock | Liquidation of collateral permitted | Notice | Collateral invocation considered |
+| Prolonged debit | Policy threshold | Account restricted | Formal notice | Recovery process |
+
+The intervals in this table are discretionary within the regulatory constraints on margin collection and on the liquidation of client collateral; what is not discretionary is that they are written down, applied consistently and disclosed to the client in the agreement and the risk disclosure.
+
+## 10. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.rms.capacity.attribution_interval_seconds` | **D** | Short, measured, published | The L-01 interval |
+| `finix.rms.capacity.rail_eligibility` | **D** | Per rail, explicit | Which rails create capacity on receipt |
+| `finix.rms.capacity.cheque_creates_capacity` | **D** | false | Default must be false |
+| `finix.rms.capacity.uncleared_capacity_enabled` | **D** | false | Caps mandatory when true |
+| `finix.rms.capacity.recognise_unrealised_gain` | **D** | false, or with a haircut | A deliberate leverage decision |
+| `finix.rms.capacity.recognise_sale_proceeds_presettlement` | **D** | With a haircut | Common and defensible |
+| `finix.rms.capacity.accrual_block_enabled` | **D** | **true** | The section 7 fix |
+| `finix.rms.capacity.accrual_block_basis` | **D** | Conservative per-trade estimate | Replaced by actuals at posting |
+| `finix.rms.capacity.accrual_block_display_to_client` | **D** | true | Makes the arithmetic self-explanatory |
+| `finix.rms.capacity.payout_blocks_at_request` | **D** | **true** | The L-20 fix |
+| `finix.rms.capacity.intraday_collateral_revaluation` | **D** | Enabled above a move threshold | The L-33 decision |
+| `finix.rms.capacity.cash_component_minimum` | **E** | Clearing-corporation set | Not discretionary |
+| `finix.rms.capacity.binding_constraint_displayed` | **D** | true | Which term is binding, shown to the client |
+| `finix.rms.capacity.suspended_security_collateral_value` | **D** | Zero | Despite any price in the file |
+| `finix.rms.capacity.loss_recognition` | **D** | Immediate | Never deferred to posting |
+| `finix.rms.capacity.order_block_release_reconciliation` | **D** | Daily | Catches capacity leaks from lost releases |
+
+## 11. Reconciling capacity
+
+Capacity is computed from inputs owned by other systems, so it drifts. Three checks catch almost all of it.
+
+| Check | Frequency | Catches |
+|---|---|---|
+| Sum of margin blocks against open orders and positions | Intraday and at close | Lost releases — the silent leak from L-41 |
+| Capacity recomputed from first principles for a sample of clients | Daily | Logic drift between the engine and the stated formula |
+| Ledger balance in risk against the back-office ledger | Daily, at the extract | Stale or partial extracts — the L-06 class of problem in [begin of day](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/) |
+
+## Practical notes
+
+- **Display the binding constraint, not just the number.** "Available margin ₹X — limited by cash component" prevents more support calls than any other single change to a margin screen.
+- **Publish the attribution interval.** A client told "funds reflect within N minutes" is patient; a client told nothing calls after two.
+- **Implement the accrual block before launching an intraday product.** The clients who most need it are exactly the ones a new broker most wants.
+- **Reconcile block releases daily.** Capacity leaks from lost releases are invisible, cumulative, and show up as clients mysteriously unable to trade.
+- **Write down the pre-settlement recognition policy and apply it uniformly.** Recognising sale proceeds for some clients and not others is a fairness problem before it is a risk problem.
+- **Never let the same event reduce capacity twice.** The L-20 and L-21 pairing, and the L-45 and L-48 pairing, are the two places this happens.
+
+## Where this connects
+
+The terms of the computation are defined in [the margin engine](/broking-kyc/finix-broking-setup/rms/02-margin-engine/) and bounded by [the limit framework](/broking-kyc/finix-broking-setup/rms/04-limit-framework/); the checks that consume capacity are in [the pre-trade check ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/). The money-side timing of every credit and debit is in [money and trade in sync](/broking-kyc/finix-broking-setup/money/07-money-trade-sync/) and [the money operations catalogue](/broking-kyc/finix-broking-setup/money/08-money-operations-catalogue/). The charge amounts behind section 7 are in [the charges and billing engine](/broking-kyc/finix-broking-setup/backoffice/11-charges-billing-engine/) and, from the client's perspective, [brokerage and charges](/broking-kyc/funds-tax/brokerage-and-charges/) and [delayed payment charges](/broking-kyc/funds-tax/delayed-payment-charges/). Collateral mechanics are in [collateral and pledge](/broking-kyc/finix-broking-setup/rms/05-collateral-pledge/) and [the pledge lifecycle](/broking-kyc/finix-broking-setup/products/02-pledge-lifecycle/).

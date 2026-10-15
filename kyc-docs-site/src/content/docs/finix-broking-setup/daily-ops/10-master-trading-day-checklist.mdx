@@ -1,0 +1,357 @@
+---
+title: "Daily ops 10: the master trading-day checklist"
+description: The single consolidated checklist of every activity that must happen on every trading day, in order, with owner, timing, assertion, evidence and abort behaviour — spanning overnight carry-over, begin-of-day gates, pre-open, the continuous session, close, the end-of-day pipeline, the commodity evening session and the overnight batch, plus the day-type overlays that add to it.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** The rest of this plane splits the day into runbooks because each phase has its own logic and its own reader. But nobody actually operates a broking business one runbook at a time: the operations lead needs one surface that says what must happen today, who owns it, whether it has happened, and what to do when it has not. That surface is this page. It is deliberately a superset rather than a summary — every item from every runbook appears here, plus the items that fall between runbooks and are therefore owned by nobody, which is where real operations fail. The ordering is chronological because that is how the day is lived, and the day-type overlays are separate because the commonest operational failure in an Indian broking operation is running an ordinary-day checklist on an extraordinary day.
+
+## TL;DR
+
+- **This is the clockwork.** Roughly two hundred and sixty discrete activities on an ordinary trading day, before any day-type overlay. An operation that cannot enumerate them is relying on individual memory, which fails on leave days and during incidents.
+- **Six gates stop the day.** Instrument master, risk parameters, ban list, surveillance lists, collateral and ledger load, and exchange sessions. Red on the master or the collateral load means do not open; red on the others means open with a stated scope of refusal.
+- **The default on amber is no-go.** A delayed open costs reputation; a day run on wrong parameters costs money, penalties and an inspection finding. The asymmetry should be built into the decision, not re-argued each morning.
+- **Every item has a named owner and leaves evidence.** "Operations" is not an owner. The gate status board, retained, is the record that the day opened properly, and it is the first artefact an inspector asks for after an incident.
+- **The items between phases are the ones that fail.** Nothing in the begin-of-day runbook owns the overnight batch result; nothing in the end-of-day runbook owns tomorrow's expectation. Those seams are explicit here.
+- **Day type is determined before the day starts, not discovered during it.** Settlement, expiry, tender, physical-settlement, post-holiday, month-end and daylight-saving overlays each add mandatory items, and several can coincide.
+
+## Conceptual overview
+
+A trading day is not one process but five concurrent ones with different clocks, and the checklist's job is to keep them visible simultaneously. There is the *market* process, which runs from session establishment to close and is bounded by exchange timings. There is the *money* process, which runs on banking hours and settlement cycles and whose deadlines mostly fall before the market's. There is the *record* process, which starts when the market closes and runs into the night. There is the *obligation* process, which operates on a settlement cycle and therefore concerns trades from previous days while today's are still being made. And there is the *compliance* process, whose deadlines are measured in days and weeks but whose inputs are produced today. Any checklist organised purely by clock time will interleave these confusingly; this one marks each item with its process so that an operator can read a single thread when they need to.
+
+The second idea is that a checklist item is only useful if it states an *assertion* rather than an action. "Load the instrument master" can be marked complete by someone who ran a job that failed. "The order management system reports today's business date and a record count within range" cannot. Every item below therefore has a testable assertion, and where the assertion is about another system's state it is phrased as a query to that system rather than a report from the job that fed it. This distinction is what separates a checklist that catches problems from one that merely documents intentions, and it is the single most valuable design decision on this page.
+
+The third idea concerns abort behaviour. Each item's failure has a defined consequence, and those consequences are of four kinds: *stop the day*, *reduce the scope of the day*, *continue degraded with a stated compensating control*, or *continue and raise an exception for later*. The point of writing these down in advance is that the decision at eight in the morning becomes a lookup instead of a debate, and the person on shift does not need the authority to invent a policy. Where the correct response genuinely requires judgement, the item names the role whose judgement it is, and that role is reachable by phone — a checklist whose escalation path is an unanswered email is a checklist with a gap at its most important point.
+
+## 1. How to use this page
+
+| Element | Meaning |
+|---|---|
+| **ID** | `C-` plus phase number plus sequence. Stable; referenced by the RACI and the evidence pack |
+| **Process** | M market · $ money · R record · O obligation · C compliance |
+| **Owner** | The accountable role. Named individuals come from the rota, not from this page |
+| **Assertion** | The testable condition. Phrased as a query to the system that holds the truth |
+| **Evidence** | What is retained to show the item was done |
+| **On failure** | **STOP** the day · **SCOPE** reduce and state · **DEGRADE** with a compensating control · **EXCEPT** record and continue |
+| **Gate** | G1–G6 where the item is a blocking gate for the open |
+
+Owner abbreviations used throughout: **OPS** operations · **TECH** technology · **RISK** risk · **FIN** finance and treasury · **COMP** compliance · **DEAL** dealing · **DP** depository operations · **KYC** onboarding operations · **LEAD** operations lead or named go/no-go owner.
+
+<Aside type="caution" title="Read the day-type overlay before starting phase 1">
+Section 11 lists the overlays. Determining the day type is item C-0.01 and it is first for a reason: a settlement day, an expiry day, a commodity tender day, a post-holiday day and a month end each add mandatory items, and two or three frequently coincide. The checklist is generated for today's day type, not selected from a drawer. An operation that runs the ordinary-day list on a physical-settlement expiry during a no-delivery period has not made a small error.
+</Aside>
+
+## 2. Phase 0 — overnight carry-over and day setup
+
+Runs from the previous evening's close-out to the start of begin-of-day. These items are the seam that neither the end-of-day nor the begin-of-day runbook naturally owns.
+
+| ID | Process | Activity | Owner | Assertion | On failure |
+|---|---|---|---|---|---|
+| C-0.01 | O | **Determine today's day type** from every relevant calendar | OPS | Day type set and confirmed: trading, settlement, expiry, physical settlement, tender, no-delivery, post-holiday, pre-holiday, month end, quarter end, daylight-saving change, mock | **STOP** until resolved |
+| C-0.02 | O | Generate today's expected-file manifest from the day type | OPS | Manifest loaded; item count matches the day type | STOP |
+| C-0.03 | R | Confirm last night's batch completed in full | TECH | Every scheduled job reports success and its output is present | STOP |
+| C-0.04 | R | Confirm the commodity evening session closed cleanly | OPS | Close completed; positions and trades captured | SCOPE |
+| C-0.05 | M | Review overnight alerts and incidents | TECH | No unresolved severity-one item, or each has an owner and an assessment | EXCEPT |
+| C-0.06 | R | Confirm yesterday's end-of-day pipeline completed through its final step | OPS | Day marked closed; no step left pending | STOP |
+| C-0.07 | C | Confirm yesterday's regulatory submissions were acknowledged | COMP | Acknowledgement stored for each; no rejection pending | EXCEPT, escalate same day |
+| C-0.08 | R | Confirm the extract to the risk system completed with today's as-of date | OPS | As-of date is today's business date; counts reconcile | **STOP — gate G5 depends on it** |
+| C-0.09 | $ | Confirm yesterday's upstreaming instruction settled | FIN | Confirmation received | EXCEPT, escalate immediately |
+| C-0.10 | $ | Confirm yesterday's pay-outs settled or are accounted as failed | FIN | Every instruction has a terminal status | EXCEPT |
+| C-0.11 | M | Verify the rota: dealing, risk, operations, treasury, technology on-call all covered | LEAD | Every role has a named person reachable | STOP if a gate owner is uncovered |
+| C-0.12 | C | Check overnight circulars and notifications from exchanges, depositories and the regulator | COMP | Reviewed; anything effective today identified and actioned | **EXCEPT, but this is the commonest miss** |
+| C-0.13 | M | Confirm no planned maintenance or exchange notification affects today | TECH | Exchange notices reviewed | SCOPE |
+| C-0.14 | R | Confirm archive and backup of yesterday's records completed | TECH | Backup verified, not merely reported | EXCEPT |
+| C-0.15 | M | Confirm disaster-recovery replication is current | TECH | Replication lag within tolerance | EXCEPT, escalate |
+
+<Aside type="danger" title="C-0.12 is the item most often skipped and most expensive to skip">
+Exchanges, clearing corporations and depositories publish circulars continuously, and a meaningful fraction take effect the next trading day — a changed margin rate, a new file format, a security moving into a surveillance category, a revised cut-off, a lot size change. There is no mechanism that pushes these into an operation's systems; somebody has to read them and decide what changes. When this item is skipped, the firm discovers the change through a rejection, a penalty or a reconciliation break, typically several days later, by which time the cause is hard to find. The control is mundane: a named person, every morning, with a written record of what was reviewed and what was actioned, and a monthly check that the review happened on every trading day. This is also the mechanism that catches an unannounced file format change before it arrives rather than after.
+</Aside>
+
+## 3. Phase 1 — begin of day
+
+The gated sequence. Indicative times are for an ordinary day; the post-holiday variant needs a longer window, which is why C-0.01 precedes it.
+
+| ID | Time | Process | Activity | Owner | Assertion | Gate | On failure |
+|---|---|---|---|---|---|---|---|
+| C-1.01 | 07:30 | R | Overnight verification complete | OPS | Phase 0 items closed | — | STOP |
+| C-1.02 | 07:35 | M | Expected-file collection begins | TECH | Collection running against the manifest | — | DEGRADE, manual path |
+| C-1.03 | 07:40 | O | **Calendar confirmation** per exchange and segment | OPS | Today is a trading day in each segment the firm operates | — | **STOP on mismatch** |
+| C-1.04 | 07:45 | M | **Instrument and contract master ingested and applied** | TECH | Order management system reports today's business date; record count in range; new and delisted instruments reviewed | **G1** | **STOP** |
+| C-1.05 | 07:48 | M | Contract master changes reviewed against circulars | OPS | New contracts, expiries and adjustments explained | — | EXCEPT |
+| C-1.06 | 07:50 | M | Lot sizes and tick sizes refreshed | TECH | Changes traced to a circular | — | EXCEPT, escalate |
+| C-1.07 | 07:52 | M | Corporate action adjustments applied to contracts and holdings | OPS | Adjustment factors applied; adjusted contracts identified | — | SCOPE those underlyings |
+| C-1.08 | 07:55 | R | **Risk parameter files ingested and applied** | RISK | Risk engine reports applied version and timestamp; values plausible; diff reviewed | **G2** | **SCOPE — block new derivatives orders in scope** |
+| C-1.09 | 08:00 | R | Value-at-risk and extreme loss margin rates applied | RISK | Current-day rates live in the engine | — | SCOPE cash segment |
+| C-1.10 | 08:05 | R | **Acceptable collateral and haircut lists applied** | RISK | Current-day; **diff against yesterday reported and reviewed** | — | DEGRADE, exclude unlisted collateral |
+| C-1.11 | 08:08 | R | Collateral eligibility removals identified and client impact computed | RISK | Clients losing collateral value identified before the open | — | EXCEPT |
+| C-1.12 | 08:10 | R | **Ban-period list applied** | RISK | Current-day list live; membership diff reviewed | **G3** | **SCOPE — block fresh derivative positions in listed underlyings** |
+| C-1.13 | 08:15 | R | **Surveillance measure lists applied** | RISK | Current-day; additions alerted to dealing and risk | **G4** | DEGRADE — apply the most restrictive prior treatment |
+| C-1.14 | 08:18 | R | Trade-for-trade and settlement-type changes applied | OPS | Settlement type correct per security | — | EXCEPT |
+| C-1.15 | 08:20 | M | Price bands and operating ranges loaded | TECH | Current bands live | — | DEGRADE — reject outside last-known band |
+| C-1.16 | 08:22 | R | Market-wide position limit data loaded | RISK | Current data; utilisation computable | — | DEGRADE, monitoring reduced |
+| C-1.17 | 08:25 | O | Settlement calendar and obligations for today confirmed | OPS | Today's settling cycles identified | — | STOP for settlement activity |
+| C-1.18 | 08:30 | R | **Collateral and ledger balances loaded into the risk system** | OPS, RISK | **As-of date is today's**; client count reconciles to the client master | **G5** | **STOP** |
+| C-1.19 | 08:33 | R | Pledge positions reconciled three ways: depository, back office, risk | DP, OPS | Clean, or exceptions identified per client | — | SCOPE affected clients |
+| C-1.20 | 08:35 | R | Overnight shortfall and ageing-debit list reviewed | RISK | Action decided per client before the open | — | EXCEPT |
+| C-1.21 | 08:37 | R | Today's square-off schedule and scope set | RISK | Named clients, times, liquidation sequence | — | EXCEPT |
+| C-1.22 | 08:40 | R | Limits resolved; available exposure computed per client | RISK | Every active client has a resolved limit; none resolving to the global default unexpectedly | — | STOP for affected clients |
+| C-1.23 | 08:42 | R | Accrual block baseline reset for the new day | RISK | Yesterday's estimates replaced by actuals; today's block zeroed | — | EXCEPT |
+| C-1.24 | 08:45 | R | **Firm-level utilisation baselined** against ceilings | RISK | Firm ceilings loaded and current | — | EXCEPT, escalate |
+| C-1.25 | 08:47 | $ | Opening bank position across all accounts confirmed | FIN | Reconciled to yesterday's close | — | EXCEPT |
+| C-1.26 | 08:48 | $ | Client-money versus firm-money segregation position confirmed | FIN | Segregation holds; computed position matches the ledger | — | **STOP — escalate to compliance** |
+| C-1.27 | 08:50 | M | **Exchange sessions established** per exchange and per segment | TECH | Session up for each; sequence continuous; heartbeats healthy | **G6** | **SCOPE — block that exchange and segment** |
+| C-1.28 | 08:52 | M | Market data feeds verified | TECH | Per-instrument staleness within threshold once feeds start | — | SCOPE price-dependent decisions |
+| C-1.29 | 08:53 | M | Order management and risk connectivity verified end to end | TECH | A test order traverses the full path in the certification environment or per the exchange's permitted method | — | STOP |
+| C-1.30 | 08:55 | KYC | **Client master three-way reconciliation**: onboarding, order system, back office | OPS | Clean, or mismatched clients identified and blocked | — | SCOPE mismatched clients |
+| C-1.31 | 08:56 | KYC | New activations and deactivations from yesterday applied in every system | KYC | Counts match across systems | — | SCOPE |
+| C-1.32 | 08:57 | C | Certification and identifier register checks | COMP | No lapsed certificate on an active identifier; no unreported identifier enabled | — | **SCOPE — disable affected identifiers** |
+| C-1.33 | 08:58 | C | Employee and proprietary account restrictions applied | COMP | Restricted list current; closed-period restrictions live | — | SCOPE |
+| C-1.34 | 08:58 | M | Algorithmic strategies and their approvals verified | RISK, COMP | Only approved strategies enabled; tagging correct | — | SCOPE that strategy |
+| C-1.35 | 09:00 | M | **After-market order queue released** | TECH | Release verified with counts matching the queue | — | **EXCEPT — incident; inform clients** |
+| C-1.36 | 09:00 | M | **Go or no-go decision** | LEAD | All gates green, or exceptions explicitly accepted with a stated scope | — | **No-go is the default on amber** |
+| C-1.37 | 09:00 | M | Scope of refusal communicated internally and, where client-facing, externally | LEAD, COMP | Dealing, risk and client service all know what is restricted | — | STOP |
+
+## 4. Phase 2 — pre-open
+
+| ID | Time | Process | Activity | Owner | Assertion | On failure |
+|---|---|---|---|---|---|---|
+| C-2.01 | 09:00 | M | Pre-open session state confirmed per exchange | TECH | Expected state observed | EXCEPT |
+| C-2.02 | 09:00 | M | Order entry in the pre-open window monitored | DEAL | Orders accepted and acknowledged as expected | EXCEPT |
+| C-2.03 | 09:08 | M | Order modification and cancellation window behaviour verified | DEAL | Behaviour matches the published session schedule | EXCEPT |
+| C-2.04 | 09:10 | M | Price discovery and equilibrium price observed | DEAL, RISK | Equilibrium prices received for scrips in scope | EXCEPT |
+| C-2.05 | 09:12 | R | Pre-open trades and resulting positions captured | OPS, RISK | Trades present in both order system and risk | STOP continuous trading for affected clients |
+| C-2.06 | 09:13 | R | Margin impact of pre-open trades reflected in capacity | RISK | Capacity recomputed | EXCEPT |
+| C-2.07 | 09:14 | M | Unmatched pre-open orders handled per the session rules | DEAL | Carried or cancelled as the exchange specifies | EXCEPT |
+| C-2.08 | 09:15 | M | Continuous session open confirmed per exchange and segment | TECH | Session state continuous; first trades flowing | **STOP that segment** |
+
+## 5. Phase 3 — the continuous session
+
+A standing monitoring loop rather than a sequence. Each item is observed continuously with a defined threshold and first response. The commodity segment runs the same loop on its own timetable.
+
+| ID | Process | Observation or activity | Owner | Threshold or cadence | First response |
+|---|---|---|---|---|---|
+| C-3.01 | M | Session state per exchange and segment | TECH | Continuous | Investigate halt, extension or unexpected state |
+| C-3.02 | M | Sequence continuity | TECH | Continuous | **Divergence already exists** — freeze entry, re-synchronise |
+| C-3.03 | M | Heartbeats and connection health | TECH | Continuous | Investigate before failure |
+| C-3.04 | M | Round-trip latency percentiles | TECH | Continuous | Degradation precedes outage |
+| C-3.05 | M | **Per-instrument market-data staleness** | TECH | Continuous | Block price-dependent decisions in scope |
+| C-3.06 | M | Order rate by channel and by client | RISK | Against profile | Throttle; investigate runaway automation |
+| C-3.07 | M | **Rejection rate and reason-code distribution** | RISK, TECH | Against profile | A spike is usually configuration or parameters |
+| C-3.08 | M | Unacknowledged order count and age | TECH | Continuous | Investigate; never accept new orders into uncertainty |
+| C-3.09 | R | Client margin utilisation distribution | RISK | Bands | Call at the first band, block at the second |
+| C-3.10 | R | Clients in shortfall and the ageing of each | RISK | Continuous | Margin call, then scheduled square-off |
+| C-3.11 | R | **Pending pay-in receipts against outstanding margin calls** | OPS, RISK | Continuous | Credit promptly; suspend the square-off clock on evidenced payment |
+| C-3.12 | R | Firm-level segment utilisation against ceiling | RISK | Percentage | Stop granting increases; review largest users |
+| C-3.13 | R | Concentration in a single underlying across all clients | RISK | Percentage | Consider an instrument-level limit |
+| C-3.14 | R | Proximity to market-wide position limits and ban thresholds | RISK | Published data | Warn dealing; prepare to refuse fresh positions |
+| C-3.15 | R | Client and member position limit utilisation | RISK, COMP | Exchange-set | Refuse increases; a breach is reportable |
+| C-3.16 | R | Collateral value movement intraday | RISK | Percentage fall | Recompute capacity; call affected clients |
+| C-3.17 | R | Intraday risk parameter file updates applied | RISK | On each publication | Apply and verify; margin changes mid-session |
+| C-3.18 | M | Price band, halt and surveillance events in held instruments | RISK, DEAL | Event-driven | Assess square-off feasibility before deciding |
+| C-3.19 | M | Market-wide circuit breaker state | TECH, LEAD | Event-driven | Invoke the halt playbook |
+| C-3.20 | M | Algorithmic strategy behaviour: order rate, cancel ratio, position | RISK | Per-strategy profile | Throttle, then kill |
+| C-3.21 | M | Order-to-trade ratio against the applicable norm | RISK, COMP | Continuous | Throttle before the penalty threshold |
+| C-3.22 | C | Unusual client trading patterns | RISK, COMP | Surveillance rules | Examine and document the conclusion |
+| C-3.23 | C | Exchange and depository alerts received | COMP | On receipt | Acknowledge; begin the response within the required window |
+| C-3.24 | $ | Pay-in attribution queue and lag | OPS | Continuous | Attribute promptly; chase unusable references |
+| C-3.25 | $ | Pay-out queue and approvals | OPS, FIN | Per cycle | Maker-checker; free credit only |
+| C-3.26 | $ | **Exchange funding requirement estimated and revised** | FIN | Intraday, firming | Decide source and amount before the internal deadline |
+| C-3.27 | $ | **Funding instruction issued before the bank cut-off** | FIN | Hard deadline | **The bank's cut-off, not the exchange's** |
+| C-3.28 | $ | Funding receipt confirmed at the clearing corporation | FIN | After instruction | Instruction sent is not money received |
+| C-3.29 | $ | Intraday collateral or margin adjustments to the clearing corporation | FIN, RISK | As needed | Dual control |
+| C-3.30 | DP | Pledge and unpledge requests processed within depository windows | DP | Per window | Missed window delays client capacity |
+| C-3.31 | DP | Early pay-in instructions processed | DP, OPS | Per cut-off | Margin benefit lost if missed |
+| C-3.32 | KYC | New account activations processed and propagated | KYC | Continuous | Client cannot trade until all systems agree |
+| C-3.33 | KYC | Client modification requests processed | KYC | Continuous | Bank and demat changes need re-verification |
+| C-3.34 | M | Dealer instruction records captured for every assisted order | DEAL, COMP | Per order | No record, no order |
+| C-3.35 | M | Client complaints and queries logged and routed | OPS | Continuous | Grievance clock starts on receipt |
+| C-3.36 | M | Shift handover written at each boundary | OPS, DEAL, RISK | Per shift | Open items are the ones that get dropped |
+| C-3.37 | R | Square-off decisions recorded before execution | RISK | Per decision | Decision must precede the order |
+| C-3.38 | R | Square-off executions and their outcomes recorded | DEAL | Per execution | Client notified |
+| C-3.39 | M | Intervention log entries written at the time | All | Per intervention | Reconstructed reasons are not evidence |
+| C-3.40 | C | Peak-margin snapshot capture verified as operating | RISK | Per window | Reporting and penalty exposure if absent |
+
+<Aside type="caution" title="C-3.27 is the hardest deadline in the day and the least visible">
+Everything about the market's rhythm points at the exchange's pay-in time, but the firm's actual deadline is the bank's instruction cut-off for the relevant rail, which is earlier and differs by account and by rail. An operation that works to the exchange time will eventually discover that the bank stopped accepting instructions twenty minutes ago. The fix is to publish, internally, a single internal funding deadline derived from the earliest applicable bank cut-off minus a buffer, and to have risk, dealing and operations all working to that number rather than to the exchange's. The corresponding treasury decision point is C-3.26, which must therefore sit comfortably before it.
+</Aside>
+
+## 6. Phase 4 — close and post-close
+
+| ID | Time | Process | Activity | Owner | Assertion | On failure |
+|---|---|---|---|---|---|---|
+| C-4.01 | 15:30 | M | Continuous session close confirmed per exchange | TECH | Expected state | EXCEPT |
+| C-4.02 | 15:30 | M | Open orders at close handled per validity rules | TECH | Day orders expired; others carried correctly | EXCEPT |
+| C-4.03 | 15:30 | R | Margin released on expired orders | RISK | Blocks released; no orphan blocks | EXCEPT, reconcile |
+| C-4.04 | 15:40 | M | Closing session or post-close window monitored where applicable | DEAL | Behaviour per the session schedule | EXCEPT |
+| C-4.05 | 15:40 | M | Closing price determination observed | OPS | Closing prices received for instruments in scope | STOP valuation-dependent steps |
+| C-4.06 | 15:45 | M | After-market order collection for tomorrow begins | TECH | Queue accepting; window per policy | EXCEPT |
+| C-4.07 | 16:00 | M | Exchange sessions closed cleanly | TECH | Session end logged; unacknowledged order count zero or explained | **EXCEPT — investigate before the batch** |
+| C-4.08 | 16:00 | R | Final intraday position and margin snapshot taken | RISK | Snapshot stored | EXCEPT |
+| C-4.09 | 16:05 | R | Collateral revalued at closing prices | RISK | Revalued; tomorrow's shortfalls identified | STOP capacity computation |
+| C-4.10 | 16:10 | R | Clients expected to be in shortfall tomorrow identified and called | RISK | Calls dispatched with evidence | EXCEPT |
+| C-4.11 | 16:15 | O | Physical settlement and delivery obligations arising today identified | OPS | Obligations listed per client | **STOP on an expiry or settlement day** |
+| C-4.12 | 16:20 | $ | Day's bank position closed and liquidity reported | FIN | Position reconciled | EXCEPT |
+
+## 7. Phase 5 — the end-of-day pipeline
+
+Each step gates the next. The chokepoint is C-5.03.
+
+| ID | Process | Step | Owner | Gates | Assertion | On failure |
+|---|---|---|---|---|---|---|
+| C-5.01 | R | All expected end-of-day files collected | TECH | Everything | Manifest complete for the day type | **STOP, execute per-file fallbacks** |
+| C-5.02 | R | Exchange trade files validated | OPS | C-5.03 | Counts, checksums, business date | STOP |
+| C-5.03 | R | **Trades imported and reconciled** against the order management system | OPS | **Everything downstream** | Two-way reconciliation clean, or every difference identified with an owner | **STOP — the chokepoint** |
+| C-5.04 | R | Custodial and institutional confirmations applied | OPS | C-5.05 | Confirmed trades allocated; unconfirmed flagged | SCOPE those clients |
+| C-5.05 | R | Client code modifications completed within the permitted window | OPS, COMP | — | Reason codes valid; volume within the internal threshold | EXCEPT, compliance review |
+| C-5.06 | R | Brokerage and statutory charges computed | OPS | C-5.07 | Rate versions recorded; totals reconcile to exchange levies | STOP |
+| C-5.07 | R | Accrual block replaced by actual charges | RISK | — | Estimates cleared; actuals posted | EXCEPT |
+| C-5.08 | R | **Contract notes generated** | OPS | C-5.09 | One per client per segment with trades; digitally signed | **STOP — regulatory deadline** |
+| C-5.09 | R | **Contract notes dispatched and delivery status captured** | OPS | — | Dispatch evidence; bounces identified and queued for action | **EXCEPT — escalate; the 24-hour obligation is absolute** |
+| C-5.10 | R | Ledger posted | OPS | C-5.11 | Debits equal credits; client-wise trial balance produced | STOP |
+| C-5.11 | O | Settlement obligations computed | OPS | C-5.12, C-5.13 | Obligation matches the clearing corporation's file | STOP |
+| C-5.12 | O | Delivery obligations and short deliveries identified | OPS | — | Shorts listed; auction or close-out exposure computed | EXCEPT |
+| C-5.13 | R | **Margin obligation computed and the reporting file prepared** | RISK, OPS | Reporting | Validation clean before submission | STOP submission |
+| C-5.14 | C | Margin reporting submitted and acknowledged | COMP | — | Acknowledgement stored; **response file checked for rejections** | **EXCEPT — escalate; penalty exposure** |
+| C-5.15 | R | Unpaid securities identified and the pledgee-account treatment applied | OPS, DP | — | Within the prescribed window | **EXCEPT — client securities wrongly held or released** |
+| C-5.16 | R | Excess in the unpaid-securities account released | OPS, DP | — | Released by the prescribed time | EXCEPT |
+| C-5.17 | $ | **Upstreaming position computed and instructed** | FIN | — | Computed basis reconciles to the ledger; instruction issued | **EXCEPT — escalate immediately** |
+| C-5.18 | R | **Extract to the risk system produced with today's as-of date** | OPS | Tomorrow's open | Counts reconcile to the client master | **STOP — blocks gate G5 tomorrow** |
+| C-5.19 | R | Bank reconciliation completed | FIN | — | Every line both directions, or exceptions owned | EXCEPT |
+| C-5.20 | R | Payment gateway settlement reconciled | OPS | — | Receipts matched to settlements | EXCEPT |
+| C-5.21 | R | Depository holdings and transactions reconciled | DP | — | Holdings agree with the back office | EXCEPT |
+| C-5.22 | R | Clearing corporation and clearing member balances reconciled | FIN | — | Against their statements | EXCEPT |
+| C-5.23 | R | Pledge positions reconciled three ways | DP, OPS | — | Clean, or exceptions listed | EXCEPT |
+| C-5.24 | R | Suspense and unidentified-receipt ageing reviewed | OPS, FIN | — | Nothing aged beyond the escalation threshold | EXCEPT, escalate |
+| C-5.25 | R | Corporate action entitlements processed for today's record dates | OPS | — | Entitlements computed on positions at the correct date | EXCEPT |
+| C-5.26 | R | Charges, interest and penalties posted | OPS | — | Rates match the disclosed tariff | EXCEPT |
+| C-5.27 | R | Penalty files from exchanges processed and allocated | OPS, COMP | — | Allocation decision recorded per penalty | EXCEPT |
+| C-5.28 | C | Daily regulatory submissions filed | COMP | — | Each submitted; acknowledgements stored; rejections actioned | EXCEPT, escalate |
+| C-5.29 | C | Surveillance alerts dispositioned | COMP | — | Each alert has a documented conclusion | EXCEPT |
+| C-5.30 | R | Client statements and confirmations dispatched where due | OPS | — | Dispatch evidence retained | EXCEPT |
+| C-5.31 | R | Tomorrow's expected-file manifest generated from tomorrow's day type | OPS | Tomorrow | Manifest produced and reviewed | **EXCEPT — the seam into phase 0** |
+| C-5.32 | R | Tomorrow's square-off and margin-call list prepared | RISK | Tomorrow | List produced from the closing position | EXCEPT |
+| C-5.33 | R | Intervention and exception logs for the day closed | All | — | Every entry has a decision and an owner | EXCEPT |
+| C-5.34 | R | Records archived and the archive verified | TECH | — | Restorable, not merely stored | EXCEPT |
+| C-5.35 | R | **Day marked closed** | OPS | — | No ordinary posting remains pending | EXCEPT |
+
+## 8. Phase 6 — the commodity evening session
+
+Runs concurrently with phase 5. It is a second operating mode, not an extension of the first, and the commonest failure is treating it as an afterthought once the equity team has gone home.
+
+| ID | Process | Activity | Owner | Assertion | On failure |
+|---|---|---|---|---|---|
+| C-6.01 | M | Evening session state confirmed; today's close time verified | TECH | Correct close time for the season and commodity class | SCOPE |
+| C-6.02 | M | Daylight-saving adjustment applied where the changeover has occurred | TECH, OPS | Close time matches the exchange notification | **EXCEPT — a recurring, predictable miss** |
+| C-6.03 | R | Risk monitoring continues through the evening with a named owner | RISK | Owner on duty and reachable | **STOP the segment if uncovered** |
+| C-6.04 | R | Commodity margin parameters current for the evening | RISK | Applied version correct | SCOPE |
+| C-6.05 | R | Client capacity for the evening reflects the day's equity activity | RISK | Single capacity view across segments | EXCEPT |
+| C-6.06 | $ | Evening funding and margin calls handled | FIN, RISK | Decisions made within the window | EXCEPT |
+| C-6.07 | O | Tender and delivery deadlines met where today is a tender day | OPS | Instruction submitted before the deadline | **STOP — a delivery consequence** |
+| C-6.08 | M | Evening session closed cleanly | TECH | Close completed; trades and positions captured | **EXCEPT — blocks phase 0 tomorrow** |
+| C-6.09 | R | Evening trades fed into the record pipeline | OPS | Trades present for tomorrow's reconciliation | EXCEPT |
+
+## 9. Phase 7 — the overnight batch
+
+| ID | Process | Activity | Owner | Assertion | On failure |
+|---|---|---|---|---|---|
+| C-7.01 | R | Overnight jobs run in dependency order | TECH | Each job's output present, not merely its exit code | EXCEPT, page on-call |
+| C-7.02 | R | Interest and charge accruals computed | OPS | Computation complete | EXCEPT |
+| C-7.03 | R | Client balances and positions rolled forward | OPS | Opening balances equal closing balances | **STOP — blocks G5** |
+| C-7.04 | R | Reports generated for the morning | OPS | Report set complete | EXCEPT |
+| C-7.05 | R | Data warehouse and analytics loads completed | TECH | Loads complete | EXCEPT |
+| C-7.06 | R | Backup and replication verified | TECH | Verified by restore test on a schedule | EXCEPT, escalate |
+| C-7.07 | M | System health checks and capacity review | TECH | Within thresholds for tomorrow's expected volume | EXCEPT |
+| C-7.08 | R | Overnight alert review and handover to the morning shift | TECH | Written handover produced | EXCEPT |
+
+## 10. The go or no-go decision
+
+| Element | Position |
+|---|---|
+| Owner | A named person on the rota with the authority to stop |
+| Input | The gate status board: G1 to G6, each green, amber or red |
+| **Default on amber** | **No-go**, or open in a reduced scope with the exception explicitly recorded |
+| Red on **G1** instrument master or **G5** collateral and ledger load | **Do not open** |
+| Red on **G2** parameters, **G3** ban list, **G4** surveillance or **G6** sessions | Open with the stated scope of refusal applied |
+| Recording | Decision, time, owner, gate status, accepted exceptions, scope communicated |
+| Communication | Clients and the exchange informed promptly where the open is delayed or scoped |
+| Escalation | Head of operations and head of risk; both reachable by phone |
+| Review | Every no-go and every scoped open reviewed within the week for root cause |
+
+## 11. Day-type overlays
+
+Each overlay adds mandatory items to the base checklist. Two or more frequently coincide.
+
+| Overlay | Adds |
+|---|---|
+| **Settlement day** | Obligation files for the settling cycle; funds and securities pay-in before the cut-off; pay-out processing; short-delivery identification; auction participation where applicable; close-out computation |
+| **Pre-holiday** | Funding across the holiday gap; extended settlement implications; client communication on altered cut-offs; larger treasury buffer |
+| **Post-holiday** | Multiple days of accumulated parameter and reference files applied in the correct order; higher transaction volumes; a longer begin-of-day window; explicit supersede-or-accumulate decisions per file |
+| **Equity derivatives expiry** | Settlement price capture; exercise and assignment processing; expiry margin treatment; position squaring reminders to clients in advance; the evening expiry-processing sequence |
+| **Stock derivatives physical settlement** | Delivery obligation computation from derivatives; the escalating delivery margin through expiry week; advance client warning and forced square-off for clients unable to deliver or take delivery; netting against the cash segment |
+| **Commodity tender or delivery day** | Delivery intention marking before the deadline; allocation processing; warehouse and receipt handling; delivery-period margin |
+| **No-delivery period** | Altered settlement handling for the affected security; client communication |
+| **Corporate action record date** | Entitlement computation; contract adjustment; collateral re-eligibility check on the resulting security |
+| **Month end** | Periodic client reporting; charge and interest cycles; statement runs; running-account settlement where it falls due |
+| **Quarter or year end** | Periodic regulatory reporting; net worth computation; statements; tax artefacts; audit support |
+| **Daylight-saving changeover** | Commodity evening session close-time change applied and verified |
+| **Mock trading or drill day** | A parallel non-production manifest; no production impact; results recorded as evidence |
+
+<Aside type="caution" title="Two overlays that interact badly">
+A physically settled stock derivatives expiry that falls in a month-end week during a no-delivery period on one of the underlyings is not a hypothetical; it happens. The failure mode is that each overlay's items are individually remembered and their interaction is not — the delivery obligation is computed, the month-end statement run is scheduled, and nobody notices that the no-delivery period changes the settlement treatment of one of the deliveries. The practical defence is that the day-type determination at C-0.01 produces a single combined checklist rather than several lists, and that an operations lead reviews the combined list for interactions before the day starts rather than during it.
+</Aside>
+
+## 12. Beyond the trading day
+
+This page covers the daily clockwork. The cadences that are not daily are in [the periodic calendar](/broking-kyc/finix-broking-setup/daily-ops/09-periodic-calendar/) and the submission deadlines in [periodic submissions](/broking-kyc/finix-broking-setup/monitoring/03-periodic-submissions/). The items whose inputs are produced daily but whose deadlines are weekly or longer — margin reporting, client funds and securities reporting, position limit reporting — appear in both: here as the daily production step, there as the submission.
+
+## 13. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.ops.checklist.generated_per_day_type` | **D** | true | Not selected from a static set |
+| `finix.ops.checklist.owner_must_be_named_individual` | **D** | true | Role plus rota, resolved each day |
+| `finix.ops.checklist.assertion_queries_consumer` | **D** | true | Not the feeding job |
+| `finix.ops.checklist.gate_board_retained_years` | **R** interpretation | 8 | It is the record the day opened properly |
+| `finix.ops.checklist.amber_default` | **D** | No-go | Changing this is a risk-committee decision |
+| `finix.ops.checklist.stop_gates` | **D** | G1, G5 | Instrument master, collateral and ledger load |
+| `finix.ops.checklist.internal_funding_deadline` | **D** | Earliest bank cut-off minus buffer | Published internally as *the* deadline |
+| `finix.ops.checklist.circular_review_daily_mandatory` | **D** | true | The C-0.12 control |
+| `finix.ops.checklist.handover_written` | **D** | true | At every shift boundary |
+| `finix.ops.checklist.evening_session_named_owner` | **D** | true | Segment stops if uncovered |
+| `finix.ops.checklist.completion_review` | **D** | Daily, by the operations lead | Incomplete items carried with owners |
+| `finix.ops.checklist.drill_frequency` | **D** | Half-yearly per blocking gate | Absence of each gated input rehearsed |
+
+## 14. The daily evidence pack
+
+What the day leaves behind. This set, retained, answers almost every question an inspector, auditor or post-incident review asks.
+
+| Artefact | Produced by | Shows |
+|---|---|---|
+| Day-type determination and the generated manifest | C-0.01, C-0.02 | The firm knew what kind of day it was |
+| File manifest board, final state | Phase 1, 5 | What arrived, what did not, and what was decided |
+| Gate status board and the go/no-go record | C-1.36 | The day opened properly, or the scope was deliberate |
+| Applied-version record for parameters and masters | C-1.04, C-1.08 | Computation used current inputs |
+| Limit resolution and firm utilisation baseline | C-1.22, C-1.24 | Capacity was computed and bounded |
+| Margin call dispatch evidence | C-3.10, C-4.10 | Clients were told |
+| Square-off decision and execution records | C-3.37, C-3.38 | The decision preceded the trade |
+| Intervention log | C-3.39 | Every unusual action, with a reason written at the time |
+| Reconciliation statements and exception registers | Phase 5 | Differences were found and owned |
+| Contract note generation and dispatch evidence | C-5.08, C-5.09 | The 24-hour obligation was met |
+| Submission acknowledgements and response-file checks | C-5.14, C-5.28 | Reports were actually received, not merely sent |
+| Upstreaming computation and instruction | C-5.17 | The daily obligation was met |
+| Shift handovers | C-3.36 | Nothing was dropped at a boundary |
+| Circular review record | C-0.12 | Changes effective today were identified |
+
+## Practical notes
+
+- **Generate the day's list; do not print this page.** The value is in the day-type overlay and the named-owner resolution, both of which are computed.
+- **Review completion daily, not weekly.** An item that was not done is a decision someone made implicitly; the review makes it explicit and gives it an owner.
+- **The seams are C-0.08, C-5.18 and C-5.31.** Each hands something from one day to the next, each is owned by the day that produces it rather than the day that needs it, and each is therefore the kind of item that gets dropped. Watch them.
+- **Drill the gates.** For each blocking gate, rehearse the absence of its input in the mock environment at least twice a year, and keep the fallback decision current.
+- **Resist shortening the list.** The pressure to trim comes from operators who know the routine, and the list exists for the days when the person who knows the routine is not there.
+- **Count scoped opens and no-gos.** A rising count is a file-pipeline or vendor problem expressing itself as operational drag, not an operations problem.
+
+## Where this connects
+
+Each phase expands into its own runbook: [begin of day](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/), [pre-open](/broking-kyc/finix-broking-setup/daily-ops/02-pre-open-ops/), [the continuous session](/broking-kyc/finix-broking-setup/daily-ops/03-continuous-session-ops/), [close and post-close](/broking-kyc/finix-broking-setup/daily-ops/04-close-post-close-ops/), [end of day](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/), [settlement day](/broking-kyc/finix-broking-setup/daily-ops/06-settlement-day-ops/) and [expiry](/broking-kyc/finix-broking-setup/daily-ops/08-expiry-ops/). Failures route to [incident playbooks](/broking-kyc/finix-broking-setup/daily-ops/07-incident-playbooks/). Owners resolve through [the trading-day RACI](/broking-kyc/finix-broking-setup/roles/02-raci-trading-day/) and [the role register](/broking-kyc/finix-broking-setup/roles/01-role-register/); escalation through [escalation and on-call](/broking-kyc/finix-broking-setup/roles/05-escalation-oncall/). The file items are specified in [the file register](/broking-kyc/finix-broking-setup/files/01-file-register-architecture/) and their failure handling in [file handling exceptions](/broking-kyc/finix-broking-setup/files/08-file-handling-exceptions/). The unusual actions referenced throughout are catalogued for [OMS](/broking-kyc/finix-broking-setup/oms/11-operations-catalogue/), [RMS](/broking-kyc/finix-broking-setup/rms/11-operations-catalogue/), [back office](/broking-kyc/finix-broking-setup/backoffice/12-operations-catalogue/) and [money](/broking-kyc/finix-broking-setup/money/08-money-operations-catalogue/).

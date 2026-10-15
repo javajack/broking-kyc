@@ -1,0 +1,266 @@
+---
+title: "Products 1: margin trading facility operations"
+description: Running a margin trading facility at configuration level — the permission process, what may be funded, the exact borrowing and exposure arithmetic, the variable initial margin, where funded stock actually sits, the daily operating sequence, the two separate half-yearly certificates, and a clear separation of what is in force from what is only proposed.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Margin trading is the one product where a broker lends its own balance sheet against client positions, so the binding constraints are arithmetic rather than procedural, and getting the arithmetic wrong is a solvency question before it is a compliance question. The page therefore leads with the limits and their exact formulation, then the margin computation, then where the securities physically sit — because those three determine everything else. Section 11 exists because a June 2026 consultation proposed substantial changes that are widely reported as though they were already rules, and a manual that blurs the two would have a broker operating outside the framework while believing it was ahead of it.
+
+<Aside type="danger" title="In force versus proposed — read this before anything else">
+A **consultation paper of 18 June 2026** proposed a materially different margin trading framework: a higher net worth threshold, eligibility for limited liability partnerships, non-convertible debentures as a funding source, a reformulated exposure basis, a cure mechanism for passive client-limit breaches, broader collateral, and a thirty-day rebalancing clock on a security leaving eligibility. **No final adopting instrument was located as at 15 October 2026.** Everything in sections 2 to 10 is the framework in force. Section 11 lists the proposals separately. Do not configure a proposal because a consultation has closed.
+</Aside>
+
+## TL;DR
+
+- **Permission is prior and per exchange.** It is an application with a board resolution and an auditor's net worth certificate, not an intimation, and approval at one exchange is not approval at another.
+- **Two limits, and the famous multiple is a derived ceiling, not an allowance.** Borrowing may not exceed five times net worth; exposure may not exceed actual borrowing plus half of net worth. The often-quoted five-and-a-half times figure is only the outer ceiling reached when borrowing is already at its own maximum.
+- **Exposure is net of that same client's cash actually used for their pay-in** — not of cash merely received, and not twice.
+- **Initial margin is variable, not a fixed percentage.** It is value-at-risk plus three times extreme loss margin for derivative-eligible Group I shares, and plus five times for other Group I shares and eligible exchange-traded funds, subject to an exchange floor.
+- **Funded stock sits in the client's own demat account**, pledged to a designated funding account, and after direct payout it is **auto-pledged without a client instruction** — which removes the client-acceptance step that older descriptions assume.
+- **Two different half-yearly certificates exist** and are routinely conflated: a net worth certificate and a separate compliance audit certificate, with different deadlines.
+- **A pledge cannot span the two depositories.** Pledgor and pledgee must be in the same depository, which is a real constraint on account architecture rather than a technicality.
+
+## Conceptual overview
+
+Margin trading is structurally a secured lending business wearing a broking interface. The client buys a security, the broker funds part of the purchase, the security is pledged back to the broker as security for that funding, and the broker charges interest until the client repays. Everything distinctive about the regulation follows from that: the limits exist because a broker's own capital is at risk, the eligibility list exists because the collateral must be liquid enough to realise, the daily valuation exists because the loan-to-value moves continuously, and the separate books exist because a funded position and an ordinary position look identical on a screen and are entirely different in substance.
+
+The second observation is that there are two distinct pools of securities in a margin trading arrangement and they are governed differently. There is **funded stock** — the shares the broker financed — which must stay in the funding arrangement and may not be onward-pledged to a bank or a non-bank lender. And there is **margin collateral** — what the client posts to support the facility — which may be re-pledged onward to the clearing member and clearing corporation in the ordinary way. Treating the two as one pool is the most consequential design error available here, because it leads either to pledging funded stock onward, which is not permitted, or to failing to use collateral that legitimately could support margin, which is simply expensive.
+
+The third point concerns leverage and appreciation, which clients consistently misunderstand and documentation should not. An increase in the value of *collateral* can support additional exposure once haircuts are applied. An increase in the value of *funded stock* cannot. The economic intuition that a rising funded position creates borrowing capacity is wrong as a matter of rule, and a system that computes capacity from a combined mark-to-market will over-extend precisely during a rally — which is exactly when a correction is most likely to find the book over-extended.
+
+## 1. Framework
+
+- **Comprehensive framework circular of 13 June 2017**, as amended — the foundational framework, the limits, the funding sources, the margin-call period and the permission requirement. `[not yet in index]`
+- **Clarification of 1 August 2017** — commercial paper and unsecured long-term promoter or director loans added to the permitted funding sources. `[not yet in index]`
+- **Circular of 30 November 2022** — Group I equity exchange-traded funds admitted as funded securities and as collateral. `[not yet in index]`
+- **Amendment of 11 September 2024, effective 1 October 2024** — the cash-funded maintenance-margin mechanism, the value-at-risk plus five times extreme loss margin overlay, and exposure reporting by the following day at a fixed hour. `[not yet in index]`
+- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — margin trading at paragraph 39, pledge at 42, client collateral segregation at 43, unpaid securities at 46.
+- **Market-infrastructure master circular of 30 December 2024** — Chapter 1 paragraph 4 carries the margin trading provisions, and the regulator's own consultation paper treats this as the governing text. `[not yet in index]`
+- **Amendment of 26 August 2025** — revised half-yearly net worth certificate submission dates. `[not yet in index]`
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — notified 7 January 2026, repealing the 1992 regulations with savings. `[not yet in index]`
+- **Revised bank credit directions of 30 March 2026, effective 1 July 2026** — where a bank funds the facility, the security and cash-proportion conditions in section 6. `[not yet in index]`
+
+<Aside type="caution" title="The same rules live in two master circulars under different numbering">
+The margin trading provisions appear both in the broker master circular and in the market-infrastructure master circular, and the regulator's own 2026 consultation paper treats the latter's Chapter 1 paragraph 4 as the governing text. A June 2025 pledge circular amends a paragraph number from a superseded vintage of the broker master. The practical consequence for documentation and for a compliance register is that a reference by paragraph number alone is ambiguous and ages badly: **cite the instrument and the subject, not just the paragraph**. There are also at least three places where the currently published texts disagree with each other, listed in section 9.
+</Aside>
+
+## 2. Permission and eligibility
+
+| Question | Position |
+|---|---|
+| Who may offer it | A **corporate** stockbroker, with a margin trading net worth of **three crore rupees**. This is the facility threshold and does not replace membership or clearing capital requirements |
+| Net worth basis | The regulatory net worth definition, not paid-up capital or a cash balance. Older texts still reference the 1992 regulations; the 2026 recast is real, and the current exchange certification computation should be confirmed against the applicable membership category |
+| Permission or intimation | **Prior exchange permission**, for each exchange where the facility is offered. The application requires a certified board resolution and an auditor's net worth certificate, submitted through the exchange's compliance interface. An informal commencement intimation is not sufficient |
+| Across exchanges | Approval must be obtained **per venue**. Approval at one is not evidence of approval at another |
+| Client eligibility | Due diligence before extending credit; **written or irrefutable electronic consent**; the rights and obligations and the terms communicated. One client code per client per member, with separate facility and ordinary books |
+| Withdrawal of the facility | An application including a board resolution; open positions must be liquidated and reported first, and reporting continues until withdrawal is effective |
+
+### What may be funded
+
+| Element | Position |
+|---|---|
+| Eligible instruments | **Group I equity shares and Group I equity exchange-traded funds** |
+| Not eligible | The framework does not authorise funding equity derivative, currency or commodity positions. Securities margin pledges may separately support permitted derivative collateral, which is a different thing |
+| The eligibility list | The exchange's current **monthly** classification, published in a security-category report carrying symbol, series, identifier, next-month category and impact cost |
+| Eligibility is not collateral acceptance | Group I eligibility for funding and a clearing corporation's approved collateral list are **separate tests**. Passing one does not establish the other |
+| Collateral leaving Group I | Replace it with eligible collateral from the applicable month. Do not continue assigning its former value indefinitely |
+| **Funded stock moving to trade-for-trade** | No fresh funding, and existing funded positions liquidated **within thirty days** |
+| **Funded stock facing suspension** | Begin liquidation on the suspension notice and complete before suspension takes effect |
+| Simple removal from Group I, without trade-for-trade or suspension | **A universal clock was not verified.** The exchange guidance refers such positions to the provision that addresses trade-for-trade and suspension specifically. The thirty-day rebalance on any removal is a 2026 **proposal** |
+
+## 3. The limits, stated exactly
+
+| Measure | Limit | Caution |
+|---|---|---|
+| **Indebtedness** | Outstanding facility borrowing **≤ five times net worth**, aggregating all permitted sources | — |
+| **Exposure** | Facility exposure **≤ actual borrowing plus half of net worth**, and subject to any lower self-imposed prudential limit | **Borrowing means actual borrowing, not sanctioned lines** |
+| The derived ceiling | **Five and a half times net worth** is the outer ceiling reached only when borrowing is already at five times net worth | It is **not** a standing allowance, and reporting it as a newly granted limit is wrong |
+| **Exposure definition** | Aggregate outstanding facility amount **less the client's own cash actually used for that same client's pay-in** | Receiving cash does not create the deduction, and it must not be deducted twice |
+| **Per-client exposure** | **Not more than a tenth of the broker's maximum allowable exposure** | The denominator is **maximum allowable** exposure, not the deployed book |
+| Single-security concentration | **No fixed percentage** in the diversification provision. Funded securities and collateral must be well diversified under a **board-approved policy** | A universal numeric issuer cap was not established |
+| Issuer-group or client-group cap | **No separate fixed percentage or aggregation formula verified** | Do not relabel the single-client tenth as a group cap. Set internal connected-client limits as risk policy |
+| Clearing-corporation concentration limits | Apply independently to collateral accepted at the clearing corporation | They do not become loan-book caps. A clearing corporation cannot accept specified collateral issued by the member itself or its group |
+
+**A worked illustration.** With net worth of ten crore rupees and actual borrowing of twenty crore: the exposure ceiling is twenty-five crore, the single-client ceiling is two and a half crore, and the borrowing ceiling is fifty crore. Arithmetic only, assuming no tighter internal cap.
+
+<Aside type="caution" title="Why the borrowing-versus-lines distinction matters operationally">
+Because exposure capacity depends on *actual* borrowing rather than sanctioned facilities, a broker's capacity to fund rises and falls with its own drawdown. A treasury team that repays a facility to save interest reduces the firm's permitted exposure at the same moment, potentially putting an existing book over the ceiling without a single client doing anything. The exposure computation must therefore be a live function of the current borrowing position, recomputed when treasury acts and not only when clients trade — and the treasury decision to repay needs the facility exposure as an input. This is a genuine cross-desk dependency that is easy to miss because the two numbers live in different systems.
+</Aside>
+
+## 4. Margin, valuation and reuse
+
+| Topic | Position |
+|---|---|
+| **Initial margin, derivative-eligible Group I shares** | **Value-at-risk plus three times extreme loss margin**, using the applicable cash-segment rates |
+| **Initial margin, other Group I shares and equity exchange-traded funds** | **Value-at-risk plus five times extreme loss margin** |
+| Exchange floor | The higher of the applicable facility margin and **a fifth of transaction value**; stricter exchange or broker requirements may apply |
+| Acceptable margin forms | The broker master circular permits cash, cash equivalents, Group I equity shares and Group I equity exchange-traded funds, with appropriate haircuts. The market-infrastructure master circular words this differently — see section 9 |
+| Haircut source | Equity exchange-traded fund collateral follows the treatment of liquid Group I equities. Use the applicable risk framework and the dated security files, not a general assumption |
+| Daily valuation | Mark **both** collateral and funded stock to market daily; maintain the required margin continuously and call shortfalls. Keep funded and collateral securities separately identifiable |
+| Maintenance computation | The maintenance percentage applies to the **lower of funded cost or market value**, with mark-to-market loss separately required where market value falls below cost |
+| Cash-funded maintenance exception | Where the client's own cash was actually used for that client's pay-in, the corresponding received and pledged funded securities may represent the maintenance margin, at **value-at-risk plus five times extreme loss margin even for derivative-eligible shares**. This does not make the funded book free collateral |
+| **Appreciation** | Increased **collateral** value may support additional exposure after haircuts. **Appreciation of funded stock may not** |
+| Re-pledging **margin collateral** | **Permitted** onward to the clearing member and clearing corporation. Keep separate facility allocation and books even where the same margin pledge account also serves ordinary trades |
+| Re-using **funded shares** | **Not available for onward pledge to banks or non-bank lenders.** The permission for margin collateral does not extend to funded stock |
+| Cross-use between a client's facility and ordinary accounts | Client collateral is attributable to that client. Excess facility collateral may not be counted toward that client's non-facility margin; moving genuinely free ordinary collateral into the facility is conditional, not unrestricted |
+| Margin-call period | Liquidation on agreed terms with a margin-call period **not exceeding five working days**; a broker may set and disclose a shorter one. **Five days is a maximum, not a guaranteed client credit period** |
+
+## 5. Accounts and where the securities sit
+
+| Element | Position |
+|---|---|
+| **Funded-stock account name** | **Client Securities under Margin Funding Account**. The commonly used "client securities margin funded account" is **not** the prescribed name, although the clearing corporation abbreviates the funding account that way |
+| **Margin collateral account** | **Client Securities Margin Pledge Account**, which is a **separate** account from the funding pledgee account |
+| Where funded shares reside | In the **client's own demat account**, pledged in favour of the designated funding account |
+| **Auto-pledge** | After direct payout, funded securities are **auto-pledged without a specific client instruction** |
+| Must the client's demat be with the broker's own participant? | **No such universal rule was found.** Pledgor and pledgee may be at different participants **within the same depository**. Direct payout uses the verified primary demat account mapped to the client code |
+| **The two-depository constraint** | **A pledge cannot bridge the two depositories.** Pledgee accounts must exist in the relevant depository, which means a broker serving clients across both needs the corresponding accounts in both |
+
+<Aside type="danger" title="The client-acceptance step that older descriptions assume has largely gone">
+Descriptions of this product written before the direct-payout regime commonly state that the client must accept the funding pledge by a fixed day and hour, failing which the broker must square off on the following day. **No universal acceptance-and-square-off clock of that kind was verified.** What is established is that normal direct-payout funded stock is **auto-pledged** without a client instruction, and that the separate *manual* pledge path has its own short authentication deadline within the execution day, after which an unauthenticated request simply expires. Several brokers publish their own conversion and liquidation clocks, and those are commercial policies, not regulatory deadlines — a manual that presents one firm's published clock as the rule will mislead both operators and clients. State your own policy as your policy, and be precise that it is.
+</Aside>
+
+## 6. Funding the book
+
+| Source | Position |
+|---|---|
+| Own funds | Permitted |
+| Scheduled commercial banks | Permitted, subject also to bank lending directions and facility conditions |
+| Regulated non-bank finance companies | Permitted as a borrowing source. **Do not transfer or onward-pledge clients' funded securities to the lender** |
+| Commercial paper | Permitted subject to the central bank's requirements. This is express permission for commercial paper, not for every debt instrument |
+| Promoters and directors | **Unsecured long-term loans**, subject to company law |
+| Non-convertible debentures and other debt | **Not in the permitted list in force.** Their addition is a 2026 **proposal** |
+| **Client funds** | **May not finance another client's facility, even with the first client's consent.** The same-client cash mechanism in section 4 is a specific permitted treatment, not a client-funding pool |
+| Bank funding conditions | Where a bank funds the facility, revised directions effective 1 July 2026 require the facility to be **fully secured by cash, cash equivalents and government securities**, with **at least half the collateral in cash**. This is distinct from the clearing cash-equivalent ratio |
+| Bank transition | New and renewed facilities after implementation follow the revised directions; qualifying existing facilities continue on earlier terms until maturity |
+| Treasury control | Maintain **separate records of funds used and their sources**, and aggregate borrowing and exposure **continuously** rather than at month end |
+
+## 7. The daily operating sequence
+
+| Step | Activity | Owner |
+|---|---|---|
+| 1 | Refresh the monthly eligibility classification and diff it against the current book | Risk |
+| 2 | Recompute net worth, actual borrowing, the exposure ceiling and the per-client ceiling | Finance with risk |
+| 3 | Check the book against both ceilings **before** accepting fresh facility orders | Risk |
+| 4 | Collect applicable initial margin at the variable rate per security | Risk |
+| 5 | Execute, then book funded and collateral ledgers **separately** | Back office |
+| 6 | Report funded quantity for direct payout within the clearing window | Operations |
+| 7 | Confirm the auto-pledge actually happened, against the depository record | Depository operations |
+| 8 | Mark collateral and funded stock to market; compute maintenance margin on the lower of cost or market | Risk |
+| 9 | Call shortfalls; run the disclosed margin-call period | Risk |
+| 10 | Accrue and post interest | Back office |
+| 11 | Submit the daily exposure report | Compliance |
+| 12 | Settle excess facility cash on the client's elected running-account cycle | Finance |
+
+### Conversion and exit
+
+| Movement | Position |
+|---|---|
+| Ordinary purchase into the facility | Identification is permitted **by the following day**, and the facility margin must exist on the identification date. Ordinary upfront margin applies on the trade date. **This is not authority to refinance arbitrary older holdings retrospectively** |
+| Facility into ordinary, on repayment | The client repays the funded liability and dues; the member releases funded shares **proportionately within one working day of payment**. Multi-security selection follows the client's instruction or a previously disclosed policy |
+| Client sells funded shares | Use the release-and-early-pay-in mechanism and match the delivery obligation; reconcile proceeds against the funded debit and charges. The mechanics are in [the pledge lifecycle](/broking-kyc/finix-broking-setup/products/02-pledge-lifecycle/) |
+| Excess cash | Settled **monthly or quarterly per the client's election** on the notified running-settlement date, alongside the client's ordinary account |
+
+## 8. Reporting
+
+| Report | Content, route and timing |
+|---|---|
+| **Unpaid and funded payout identification to the clearing corporation** | A request-and-response facility in the clearing margin application identifying unpaid and funded payout quantities. Upload from **mid-afternoon on the trade day to mid-morning on the settlement day**, with a different cut for a second settlement on a multiple-settlement day. **Check the current dated settlement schedule; do not generalise an exceptional calendar** |
+| Its flags | Distinct flags identify funded positions, a trading member's unpaid client, and the clearing member's unpaid cases including a member's failure to pay. **Allocation follows a defined precedence**, and the residual payout is free of pledge |
+| **A request is not a confirmation** | Reconcile the uploaded request, the processing response, the actual client payout and the depository pledge. The clearing corporation's payout report distinguishes awaiting-confirmation from confirmed states |
+| Implementation detail | The logical file label is established; the **full current filename grammar, field order, transport path and complete rejection dictionary were not obtained** and must be taken from the clearing corporation's own package |
+| The other clearing corporation | **A current equivalent filename, format, flag mapping and cut-off were not retrieved. Do not transplant one clearing corporation's filename or deadline to the other** |
+| **Daily exposure report to the exchange** | Client and identifier, promoter category, collateral and funded securities with quantities and values, gross funded exposure, lenders and borrowing. Due **by a fixed early-evening hour on the following day**. Submitted through the exchange's compliance interface, and **daily reporting continues on nil days** until withdrawal |
+| Corporate actions in the report | Map old and new identifiers appropriately. Bonus and split quantity movements are **corporate-action adjustments, not fabricated purchases or sales** |
+| Exchange to public | The exchange publishes security-wise gross outstanding facility exposure across brokers after trading hours on the following day |
+| **Half-yearly net worth certificate** | As at the end of March and September, with operative revised submission dates in **late May and mid-November** |
+| **Half-yearly compliance audit certificate** | A **separate** certificate, normally within one month of the half-year end. A 2026 exchange circular required the March certificate by end-April with an accountant's certification, including a prescribed non-commencement certification where the facility was not offered |
+| Collateral segregation reporting | A separate, additional obligation. The exposure report **does not replace** client-level collateral reporting |
+
+<Aside type="caution" title="The two half-yearly certificates are routinely conflated">
+There are two distinct half-yearly artefacts with different purposes and different deadlines: a **net worth certificate**, whose submission dates were revised in August 2025, and a **compliance audit certificate**, which is a separate accountant's certification due within a month of the half-year end. Documentation that merges them produces a single wrong date and a missed filing. Note also that the revising circular itself describes the net worth timing both as a number of days and as named dates, and the two counts do not agree — use the named operative dates and confirm holiday treatment with the exchange. And note that a broker who holds permission but has **not commenced** the facility still owes a certification saying so.
+</Aside>
+
+## 9. Known conflicts in the published texts
+
+These are real disagreements between currently published instruments. Documenting them is more useful than silently picking one.
+
+| # | Conflict | Resolution to adopt |
+|---|---|---|
+| 1 | **Exposure reporting deadline.** The operative provision and the September 2024 amendment say an early-evening hour on the following day; a reporting annexure in the other master circular still prints **midday** | Use the amended operative deadline, and **retain evidence of the conflict** in case a filing is questioned |
+| 2 | **Acceptable margin forms.** The broker master circular lists cash, cash equivalents, Group I shares and Group I exchange-traded funds; the market-infrastructure master circular says cash, cash equivalents or equity shares and cross-refers the liquid-assets framework | Accept only the clearly supported overlap pending resolution. **Do not infer that every clearing-eligible bond or fund unit is eligible facility collateral** |
+| 3 | **Mark-to-market support form.** Exchange guidance in one place allows cash or non-cash for mark-to-market and in another describes it as maintained in cash | Obtain written exchange clarification before permitting non-cash operationally. Do not equate client mark-to-market support with cash settlement obligations to a clearing corporation |
+| 4 | **Net worth certificate counting.** The revising circular gives both a day count and named dates, which do not agree | Use the named dates |
+
+## 10. Interest
+
+| Element | Position |
+|---|---|
+| Rate and basis | **No uniform rate, day-count denominator, accrual start day or compounding rule was established.** Do not invent an annual cap, and do not assume every broker accrues from the day after the trade |
+| Disclosure | The rate schedule must be disclosed in the account-opening material and in the firm's published tariff, and policy amendments take effect only after communication |
+| Computation design | A simple-interest engine summing the daily funded principal at the applicable rate over a contractual day-count basis, or the contracted daily rate applied directly. **This is a design recommendation, not a regulatory formula** |
+| What must be configured explicitly | Rate versions; start-day and end-day inclusion; holiday treatment; repayment allocation across securities; rounding; posting frequency; and whether unpaid interest capitalises |
+| Evidence to retain | The opt-in, the delivered terms, the tariff version in force on each day, the margin and liquidation policy, and the communications. **Product opt-in and depository transaction authorisation are separate events** |
+| Disputes | Facility disputes enter the exchange grievance and arbitration machinery. **Financing losses are not covered by the investor protection fund merely because the purchase was exchange-traded** |
+
+## 11. Proposed, not in force
+
+Every item here comes from the June 2026 consultation. **None of it is operative.**
+
+| Proposal | Note |
+|---|---|
+| Net worth threshold raised to five crore rupees | Current threshold is three crore |
+| Eligibility extended to limited liability partnerships | Currently corporate brokers only |
+| Non-convertible debentures and other debt as funding sources | Currently not in the permitted list |
+| Exposure reformulated on borrowing plus available net worth after ring-fencing, with an overall five-and-a-half-times ceiling | **Must not replace the current borrowing-plus-half-of-net-worth computation** |
+| A cure mechanism for passive client-limit breaches | No such mechanism currently |
+| Broader clearing-aligned collateral, and revised treatment of eligible sales credit | — |
+| A thirty-day rebalance on removal from eligibility, trade-for-trade or suspension | Currently only the trade-for-trade and suspension cases have a verified clock |
+| Uniform exchange rights and obligations, ledger treatment, auto-pledge quantity refinements, and reporting before clearing pay-in | **The current following-day early-evening reporting deadline remains operative** |
+
+Note also that the consultation proposes periodic settlement of excess facility cash — which **already exists** as an exchange requirement. A proposal restating an existing obligation is not evidence that the obligation is absent today.
+
+## 12. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.products.mtf.enabled_per_exchange` | **R** | Per venue, on permission | Approval at one is not approval at another |
+| `finix.products.mtf.networth_min_crore` | **R** | 3 | Facility threshold, not membership capital |
+| `finix.products.mtf.borrowing_multiple_max` | **R** | 5 × net worth | All permitted sources aggregated |
+| `finix.products.mtf.exposure_formula` | **R** | Actual borrowing + 0.5 × net worth | **Actual, not sanctioned** |
+| `finix.products.mtf.exposure_recompute_on_treasury_action` | **D** | **true** | Repaying a facility reduces capacity |
+| `finix.products.mtf.client_exposure_max_share` | **R** | A tenth of **maximum allowable** exposure | Not of the deployed book |
+| `finix.products.mtf.diversification_policy_board_approved` | **R** | true | No universal numeric issuer cap exists |
+| `finix.products.mtf.group_cap_internal` | **D** | Set by risk policy | Not a regulatory percentage |
+| `finix.products.mtf.initial_margin_fo_eligible` | **E** | VaR + 3 × ELM | Cash-segment rates |
+| `finix.products.mtf.initial_margin_other_group1` | **E** | VaR + 5 × ELM | Including eligible exchange-traded funds |
+| `finix.products.mtf.margin_floor_share_of_value` | **E** | A fifth of transaction value | Exchange floor |
+| `finix.products.mtf.maintenance_basis` | **E** | Lower of funded cost or market value | Plus separate mark-to-market loss |
+| `finix.products.mtf.funded_stock_appreciation_creates_capacity` | **R** | **false** | Collateral appreciation may; funded may not |
+| `finix.products.mtf.funded_stock_onward_pledge` | **R** | **false** | Never to a bank or non-bank lender |
+| `finix.products.mtf.margin_collateral_repledge` | **R** | true | With separate facility books |
+| `finix.products.mtf.margin_call_period_days_max` | **R** | 5 working days | A maximum; a shorter disclosed period is permitted |
+| `finix.products.mtf.funded_account_name` | **R** | Client Securities under Margin Funding Account | The prescribed name |
+| `finix.products.mtf.pledge_cross_depository` | **E** | **false** | Pledgee accounts needed in each depository |
+| `finix.products.mtf.auto_pledge_confirmation_reconciled` | **D** | true | A request is not a confirmation |
+| `finix.products.mtf.client_funds_as_source` | **R** | **false** | Absolute |
+| `finix.products.mtf.bank_facility_cash_share_min` | **R** | Half of collateral in cash | Where a bank funds, from 1 July 2026 |
+| `finix.products.mtf.exposure_report_deadline` | **R** | Following day, fixed early-evening hour | Nil reporting continues |
+| `finix.products.mtf.networth_certificate_dates` | **R** | Late May and mid-November | Named operative dates |
+| `finix.products.mtf.compliance_audit_certificate` | **R** | Separate, within a month of half-year end | Including non-commencement certification |
+| `finix.products.mtf.interest_rate_versioned` | **D** | true | With start-day, rounding and capitalisation rules explicit |
+| `finix.products.mtf.proposals_not_configured` | **D** | true | Section 11 items remain off |
+
+## Practical notes
+
+- **Compute both ceilings continuously and display which one binds.** A book stopped by the per-client ceiling needs a different response from one stopped by the firm exposure ceiling.
+- **Reconcile the auto-pledge every day against the depository record.** Reporting a funded quantity is a request; the pledge is the fact.
+- **Keep funded and collateral securities in separate books from day one.** Retrofitting the distinction after launch is painful and the limits cannot be computed without it.
+- **State your own margin-call and liquidation clocks as policy, clearly labelled.** Presenting them as regulatory deadlines is both inaccurate and, in a dispute, unhelpful.
+- **Diarise both half-yearly certificates separately**, including the non-commencement certification if permission is held but unused.
+- **Re-read the eligibility file monthly and act on removals.** The verified clocks attach to trade-for-trade and suspension; a security simply dropping out of Group I needs a policy because the rule does not supply one.
+
+## Where this connects
+
+The pledge mechanics underlying everything here are in [the pledge lifecycle](/broking-kyc/finix-broking-setup/products/02-pledge-lifecycle/); the capacity effects are tabulated in [the limit impact matrix](/broking-kyc/finix-broking-setup/rms/10-limit-impact-matrix/) and the collateral treatment in [collateral and pledge](/broking-kyc/finix-broking-setup/rms/05-collateral-pledge/). Interest and charge posting is in [the charges and billing engine](/broking-kyc/finix-broking-setup/backoffice/11-charges-billing-engine/), the reporting route in [periodic submissions](/broking-kyc/finix-broking-setup/monitoring/03-periodic-submissions/), and the files in [clearing corporation files](/broking-kyc/finix-broking-setup/files/05-clearing-corporation-files/). Client-side activation is [margin trading facility activation](/broking-kyc/product-activation/mtf-activation/) and the vendor-neutral walkthrough is [the margin trading operational deep dive](/broking-kyc/deep-dives/settlement/mtf-operational/).
