@@ -42,12 +42,11 @@ those gaps are reproduced as on-page cautions in the docs rather than smoothed o
 | `RESEARCH_roles_audit.md` | Statutory roles, certification, segregation, the audit register |
 | `RESEARCH_certification.md` | Exchange software approval, change control, mock trading, recovery drills |
 | `RESEARCH_2026_changes.md` | Chronological regulatory change register for 2025–2026, with proposals fenced separately |
+| `RESEARCH_dr.md` | Disaster recovery: thresholds, drills, recovery objectives, and the architecture and connectivity questions |
 
 `BUILD_PLAN_subproject12.md` and `BUILD_PLAN_subproject13.md` carry the page
 inventories, the conventions and the close-out notes including open items.
 
-## Not yet produced
+| `RESEARCH_dr.md` | Disaster-recovery site architecture, exchange connectivity from a recovery site, order-state recovery and the drill regime |
 
-`RESEARCH_dr.md` — disaster-recovery site architecture and exchange connectivity from a
-recovery site. The research thread did not complete. The open questions are listed in
-`BUILD_PLAN_subproject13.md`.
+All 17 research files are present.

@@ -310,3 +310,54 @@ died; the work was redone with Claude agents. When codex became available again 
 given two *different* topics to avoid duplicating the running agents. The research
 corpus is now committed under `research/finix/` precisely because it keeps being
 expensive to regenerate.
+
+### RESEARCH_dr.md — LANDED, page not yet written
+
+The thread completed after the commit above. 658 lines, 324 tagged facts (269 verified).
+Key findings captured here so the page can be written without re-reading the file.
+
+**Thresholds and the drill regime — all confirmed:**
+- Recovery-site requirement: **50,000 clients across all exchanges**. **Not** the
+  10,000-client figure that governs glitch-framework applicability — guard the distinction.
+- "Specified stock brokers" = **top 20 per exchange** by internet/wireless clients, published annually.
+- Drills: **half-yearly** full-trading-day for Specified members; **quarterly** for
+  designated large brokers, with the literal requirement that they **"shall not coincide
+  with drills conducted by Exchange"**.
+- Recovery time objective **2 hours**, recovery point objective **15 minutes**.
+- Different seismic zones, else **at least 250 km**.
+- Missed drill: a first amount **plus a monthly amount while it continues, capped per
+  instance** — and that penalty row is **"NA" for non-Specified brokers**.
+
+**A real regulatory conflict to document rather than resolve:** the cyber framework's
+recovery control, tagged mandatory for **all** regulated entities, requires declaring a
+Disaster **within 30 minutes**, while the glitch guidelines define a disaster as a
+**45-minute** disruption. Recovery objectives agree; the declaration clock does not, and
+nothing reconciles them. **Run internal procedures to 30 minutes.**
+
+**The architectural answers, which resolved sharply:**
+- Exchange-terminal and terminal-converted identifiers are **legally pinned to one office
+  address** — the undertaking says so in terms. **Only non-exchange-terminal identifiers
+  may be mapped across cities**, and exchange-terminal login is **barred from colocation
+  and third-party data centres**. Therefore **a remote recovery site must be
+  own-front-end only.** This is the single most important design consequence.
+- Connectivity: **no recovery-site tariff exists**; a recovery link is an ordinary
+  connectivity scenario with ordinary processing fees and last-mile arrangements.
+- Order-state recovery: the exchange's **per-stream download-request facility** is the
+  recovery mechanism. Three hazards to design against: exception handling means the
+  exchange **cancels outstanding orders and sends no cancellation messages**; a
+  cancel-on-logout setting **can empty the order book at failover**; and orders are only
+  cancellable from the **originating terminal mapping**.
+- **No pre-failover notice obligation exists.** Disclosure is retrospective, through the
+  next-day preliminary incident report, which asks whether operations moved to the
+  recovery site and what the recovery time was — **a self-reported number that is the
+  basis for the recovery-time-breach penalty**.
+- **"Active-active" and "active-passive" appear zero times** across all eight primary
+  documents examined. The regulator's own description of broker practice is
+  **"independent cold sites"** — so the page should not frame this as a regulated choice.
+- The investor risk reduction platform was discontinued 7 May 2026; the fallback is now
+  **contingency pool trading from exchange premises**.
+
+**Its own gaps:** the other two venues' identifier, charging and order-recovery mechanics
+are unknown; one penalty annexure was read from a third-party mirror and **its figures
+need re-verification**; and a 2024 market-infrastructure modification circular was not
+retrievable, so the institution-side numbers may not be current.
