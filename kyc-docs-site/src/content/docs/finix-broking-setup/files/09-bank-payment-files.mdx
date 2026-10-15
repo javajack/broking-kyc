@@ -1,0 +1,132 @@
+---
+title: "Files 9: bank and payment files"
+description: The money-side file layer — bank statements and their reference problem, gateway settlement files and the lag they describe, payout instruction and status files, mandate files, the clearing-corporation funds and bank reports that drive treasury, and the reconciliations that keep client money attributable.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** The money-side files are the least standardised in the whole stack — every bank formats differently, every gateway settles on its own cycle, and none of it is governed by a market-wide data standard. So the page is organised around the reconciliations these files exist to serve rather than around the files themselves, because the reconciliation is the obligation and the file is only its input. Section 3 is given to the reference problem, which is the single cause of most unattributed client money.
+
+## TL;DR
+
+- **This layer has no market-wide standard.** Formats are per bank and per provider, which makes the register's per-entry format and parsing rules unusually important.
+- **The reference is the whole problem.** A receipt whose reference cannot be parsed becomes unattributed client money, which still counts as client money for segregation and upstreaming.
+- **Gateway settlement describes a lag, not a receipt.** The client's payment and the provider's settlement to the firm are different events on different days, and conflating them misstates both the bank reconciliation and the client's capacity.
+- **Payout status files have more than two states.** Instructed, settled, returned, reversed and unknown each need different handling, and **unknown must never trigger re-instruction**.
+- **The clearing corporation's own funds and next-day bank reports are the treasury input**, and without them funding is estimated rather than computed.
+- **Every reconciliation here protects a regulatory position**, not just an accounting one — segregation, upstreaming and the funds-monitoring principle all depend on these files.
+
+## 1. What arrives, and from whom
+
+| Source | Files |
+|---|---|
+| **Banks** | Account statements, per account and per day; intraday statements where available; credit and debit advices; return and reversal advices; dishonour advices; interest and charge statements; balance confirmations |
+| **Payment gateways and rails** | Transaction reports; **settlement files** describing what the provider has paid to the firm and against which transactions; refund and chargeback advices; failure reports |
+| **Virtual-account facilities** | Receipt reports keyed to the virtual account allocated to a client — the main structural answer to the reference problem |
+| **Payout and disbursement services** | Instruction acknowledgements; status files; failure and return files; beneficiary validation responses |
+| **Mandate services** | Mandate registration and amendment responses; presentation and collection results; cancellation confirmations |
+| **The clearing corporation** | Daily funds statements; bank summary reports; **next-day obligation bank reports**; collateral and allocation statements |
+| Depositories | Charge statements at participant level |
+
+## 2. The reconciliations these files serve
+
+| Reconciliation | What it protects |
+|---|---|
+| **Bank statement against the ledger**, every line, both directions | The firm's books, and the segregation position |
+| **Gateway settlement against receipts** | That capacity granted on a receipt was granted against money that arrived |
+| **Receipts against client attribution** | That client money is attributable — **unattributed receipts are still client money** |
+| **Payout instructions against bank debits** | That every instruction reached a terminal state, and **that none was sent twice** |
+| **The segregation computation** | Client money separated from the firm's own and from other clients' |
+| **The upstreaming computation against the ledger** | The daily obligation |
+| **The funds-monitoring principle** | That available funds always equal or exceed client ledger balances — **three consecutive upload misses is an early-warning trigger** |
+| Clearing balances against the clearing corporation's statements | That funding arrived and that excess is not left idle |
+| Charges against tariffs | That rail and provider costs match contracts |
+| Mandate results against expected collections | Collection failures and their client impact |
+
+## 3. The reference problem
+
+The structural cause of unattributed money, and the thing worth engineering against.
+
+| Element | Position |
+|---|---|
+| The problem | A credit arrives in a pooled client account with a reference the firm cannot resolve to a client — truncated, overwritten by an intermediary, entered by the client, or absent |
+| **Consequence** | It lands in suspense. **It is still client money** for segregation and upstreaming, and the client has paid and cannot trade |
+| **The structural answer** | **A virtual account per client**, so the destination identifies the payer and no reference parsing is needed |
+| The partial answer | A reference convention the firm issues and the rail preserves — effective where the rail preserves it, which is not every rail |
+| The operational answer | A short, measured attribution interval; a published expectation to clients; and a rule that an **evidenced-but-unattributed payment suspends the square-off clock** for a bounded period |
+| **The control that must exist** | **Ageing on every suspense and unidentified-receipt balance**, produced daily, reviewed weekly, with a named owner per balance and a hard escalation threshold in days |
+| Why ageing matters more than volume | An unidentified receipt for a day is a nuisance; **for a year it is client money the firm holds without knowing it**, which is a client-asset finding of a serious kind |
+
+## 4. Payout status, precisely
+
+More than two states, and the distinctions matter.
+
+| State | Handling |
+|---|---|
+| **Instructed** | The debit may not yet appear. Capacity was already reduced at request |
+| **Settled** | Confirmed at the bank; reconcile to the statement |
+| **Returned** | Credited back; **re-attribution is the risk**, and a corrected destination plus a payment in one step is the pattern to scrutinise |
+| **Reversed** | Similar, with its own advice |
+| Failed | Capacity restored; the cause investigated — commonly client bank-account data quality |
+| **Unknown** | **Never re-instruct on an unknown status.** Require a **confirmed failure** from the bank or the rail first |
+| The register | **A single register of outbound instructions for the day**, so two people cannot independently instruct the same transfer |
+
+## 5. The treasury input
+
+| File | What it drives |
+|---|---|
+| **Next-day obligation bank report** | The next day's funds requirement — **the treasury input.** Without it, funding is estimated |
+| Daily funds statement | Pay-in and pay-out amounts and the bank debits |
+| Bank summary | Bank-wise funds position |
+| Collateral and allocation statements | What is placed and what is free |
+| Opening and closing bank positions | The day's liquidity picture |
+
+**The deadline that governs is the bank's instruction cut-off, not the exchange's pay-in time** — see [the money operations catalogue](/broking-kyc/finix-broking-setup/money/08-money-operations-catalogue/).
+
+## 6. Register particulars for this layer
+
+Because there is no standard, these fields do more work here than elsewhere.
+
+| Field | Why |
+|---|---|
+| **Format and parsing rules per entry** | Every bank and provider differs; there is no common convention |
+| Collection mechanism | Secure transfer, portal download, interface, or electronic mail |
+| **Reference semantics** | Which field carries the payer identity, and whether the rail preserves it |
+| Business date against value date against arrival date | **Three different dates** in this layer, and they diverge |
+| Expected volumes | For truncation detection on statements |
+| Intraday availability | Where an intraday statement exists, attribution can be faster |
+| **Duplicate semantics** | Whether a re-published statement supersedes or accumulates |
+| Retention | Statements are part of the record and are requested in inspections |
+| Owner | Finance for bank files; operations for gateway and receipt files |
+
+## 7. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.files.bank.format_per_entry` | **D** | **true** | No market standard exists |
+| `finix.files.bank.virtual_account_per_client` | **D** | **Preferred** | The structural answer to references |
+| `finix.files.bank.attribution_interval_published` | **D** | true | Clients are patient when told |
+| `finix.files.bank.suspense_ageing_daily` | **D** | **true** | With a named owner per balance |
+| `finix.files.bank.suspense_escalation_days` | **D** | Short, defined | Hard threshold |
+| `finix.files.bank.unattributed_is_client_money` | **R** | **true** | For segregation and upstreaming |
+| `finix.files.bank.gateway_settlement_distinct_from_receipt` | **D** | **true** | Different events, different days |
+| `finix.files.bank.payout_states_enumerated` | **D** | Six states | Including unknown |
+| `finix.files.bank.no_reinstruct_on_unknown` | **D** | **true** | Confirmed failure required |
+| `finix.files.bank.single_instruction_register` | **D** | **true** | Prevents double instruction |
+| `finix.files.bank.three_dates_tracked` | **D** | Business, value, arrival | They diverge here |
+| `finix.files.bank.statement_line_level_reconciliation` | **D** | true | Every line, both directions |
+| `finix.files.bank.next_day_obligation_report_ingested` | **D** | true | The treasury input |
+| `finix.files.bank.excess_at_cc_monitored` | **D** | true | Idle money |
+
+## 8. Practical notes
+
+- **Use a virtual account per client if the facility is available.** It eliminates the reference problem rather than mitigating it.
+- **Age every suspense balance daily and give each one an owner.** Volume is tolerable; age is not.
+- **Keep the gateway settlement and the client receipt as separate events** in both the ledger and the capacity computation.
+- **Keep one instruction register for the day** and never re-instruct on an unknown status.
+- **Reconcile statements line by line.** Summary-level reconciliation hides exactly the offsetting errors that matter.
+- **Ingest the next-day obligation report** rather than estimating the funding requirement.
+
+## Where this connects
+
+The operator actions are in [the money operations catalogue](/broking-kyc/finix-broking-setup/money/08-money-operations-catalogue/), the reconciliation design in [bank and gateway reconciliation](/broking-kyc/finix-broking-setup/money/04-bank-recon/), and the rails in [pay-in rails](/broking-kyc/finix-broking-setup/money/02-payin-rails/) and [the pay-out engine](/broking-kyc/finix-broking-setup/money/03-payout-engine/). The capacity consequences are in [the limit impact matrix](/broking-kyc/finix-broking-setup/rms/10-limit-impact-matrix/), the treasury decisions in [treasury and exchange funding](/broking-kyc/finix-broking-setup/money/05-treasury-exchange-funding/), the daily obligation in [upstreaming and downstreaming](/broking-kyc/finix-broking-setup/money/06-upstreaming-downstreaming/), and the register discipline in [the file register and its architecture](/broking-kyc/finix-broking-setup/files/01-file-register-architecture/).

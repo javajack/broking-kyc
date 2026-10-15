@@ -1,0 +1,141 @@
+---
+title: "Products 5: commodity delivery operations"
+description: Physically settled commodity contracts as an operations problem — the tender and delivery lifecycle, the receipt systems and why there are two of them, the margin families that escalate toward expiry, the evening session, and how a broker that does not want to handle delivery actually operates.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Most brokers offering commodity derivatives do not want to handle physical delivery, and the operationally honest position is to design for *avoiding* it while being able to handle it when avoidance fails. So the page covers the lifecycle first, so the deadlines are visible, then the receipt systems, then the margin escalation — and then section 6 treats the avoidance strategy as a first-class design rather than an omission, because that is what most firms actually implement.
+
+## TL;DR
+
+- **The receipt system is ComRIS** — the commodity receipts information system — at the commodity clearing corporation. **COMTRACK belongs to a different exchange** and must not be substituted.
+- **There are two receipt types**: electronic warehouse receipts through the receipt system for relevant bullion and base-metal deliveries, and **electronic negotiable warehouse receipts** through a separate repository for agricultural deliveries. "Electronic receipt" alone does not establish which.
+- **Tender is staggered across the last trading days** including expiry, so the delivery decision window opens before expiry rather than on it.
+- **Margin escalates through several named families** — tender-period, delivery-period, pre-expiry, lean-period, concentration — each with its own trigger.
+- **A short option minimum margin genuinely exists here**, unlike in equity derivatives.
+- **The avoidance strategy needs a published internal cut-off**, enforced before the tender window, plus the ability to handle the residue when a position cannot be closed.
+
+## 1. The lifecycle
+
+| Stage | What happens |
+|---|---|
+| Contract life | Trades normally; margin is initial plus the applicable additions |
+| **Pre-expiry window** | **Pre-expiry margin begins**, escalating toward expiry |
+| **The staggered tender period** | Begins a defined number of trading days before expiry **including expiry day** — for example the last five trading days for a verified contract. **Delivery intentions can be marked from its start** |
+| Intention marking | A seller marks an intention to deliver; a buyer may be allocated against it |
+| **Tender-period margin** | Additional margin on outstanding positions during the window, over and above initial, special and additional margin |
+| Allocation | Deliverers matched to receivers |
+| **Delivery-period margin** | Imposed on allocated positions, materially higher — for a verified contract, the higher of a defined percentage plus a value-at-risk measure of spot volatility, or a floor percentage |
+| Pay-in and pay-out | Funds against receipts |
+| Receipt transfer | The electronic receipt moves to the buyer |
+| Storage and charges | Accrue while goods are held, with insurance |
+| Failure | Delivery default with its penalty and close-out consequences |
+
+**The consequence of staggering is the one to design around:** the decision window opens days before expiry, so a broker's own forced-closure cut-off must sit **before the tender period starts**, not before expiry.
+
+## 2. The receipt systems — there are two
+
+| System | Scope |
+|---|---|
+| **ComRIS — the commodity receipts information system** | The clearing corporation's own portal and interface. **Electronic warehouse receipts** for relevant bullion and base-metal deliveries. A member interface framework exists |
+| **A separate repository's electronic negotiable warehouse receipts** | **Agricultural** deliveries, under the warehousing regulator's negotiable-receipt regime |
+| **COMTRACK** | **A different exchange's system.** **Must not be substituted** in this stack's runbooks or integrations |
+| The distinction that matters | **"Electronic receipt" alone does not establish that it is a regulator-negotiable receipt.** The two regimes differ in their legal character and their transfer mechanics |
+
+## 3. Warehousing
+
+| Element | Position |
+|---|---|
+| Regulation | Warehouses are accredited under the warehousing regulator's regime; the clearing corporation **does not itself operate a warehouse** |
+| Accreditation and inspection | With published disclosures |
+| Assaying and quality certification | Where the contract specifies, with certification by approved agencies |
+| Storage and insurance | Charged while goods are held, by location and commodity |
+| **How a client's holding appears in the broker's books** | As an entitlement to an electronic receipt rather than as a security. **It is not a demat holding**, which is why a demat account is not required for the commodity segment except where delivery routes through one |
+| Delivery expenses | Warehouse, assaying, transport, insurance and processing charges, plus tax on the goods. **Derivative taxes are not an all-inclusive delivery invoice** — see [the charges and billing engine](/broking-kyc/finix-broking-setup/backoffice/11-charges-billing-engine/) |
+
+## 4. The margin families
+
+A separate vocabulary from equity derivatives.
+
+| Family | Trigger |
+|---|---|
+| Initial margin | Always, from the parameter file |
+| **Short option minimum margin** | **Genuinely exists here** — a parameter per commodity category. **It does not exist in Indian equity derivatives** |
+| Margin period of risk | A parameter in the framework |
+| **Volatility scan range** | Reviewed and notified periodically, commodity-category-specific, applicable from a stated month |
+| Special and additional margin | On specific commodities or conditions |
+| **Pre-expiry margin** | As expiry approaches |
+| **Tender-period margin** | During the staggered tender window |
+| **Delivery-period margin** | On allocated positions |
+| **Lean-period margin** | On agricultural contracts expiring in a lean period |
+| **Concentration margin** | With client and member aggregation and a **hedge-code exclusion** |
+| Alternative near-zero-price framework | Absolute margin floors, **applicable for a stated month but activated only on a separate decision** |
+| Margin shortfall block amount | An official term in the framework |
+
+**Collateral ratio:** a **one-to-one** cash-and-cash-equivalent to non-cash requirement at the clearing corporation, with effective-collateral allocation at several levels — different from the equity clearing ratio.
+
+## 5. The sessions
+
+| Element | Position |
+|---|---|
+| Morning session | Opens with the equity market |
+| **Evening session** | Runs late, with a close time that **depends on international market hours** |
+| **Daylight-saving shifts** | The evening close changes with international changeovers |
+| **Seasonal hours** | **Winter hours** notified for a defined period |
+| The operational consequence | **The close time is a daily verification item**, and the session is a **second operating mode** with its own named risk owner — see [escalation and on-call](/broking-kyc/finix-broking-setup/roles/05-escalation-oncall/) |
+| File timing | Clearing and trade files arrive **late, in one verified case on the next calendar day** — see [<abbr title="Multi Commodity Exchange of India">MCX</abbr> and its clearing corporation](/broking-kyc/finix-broking-setup/files/04-mcx-files/) |
+
+## 6. Operating without handling delivery
+
+The design most firms actually implement, treated as a first-class strategy.
+
+| Element | Position |
+|---|---|
+| The client agreement position | States that the firm does not offer physical delivery, and that positions in compulsory-delivery contracts **will be closed** by a stated point |
+| **The internal cut-off** | Published, and set **before the tender period begins** — not before expiry |
+| Enforcement | Positions in compulsory-delivery contracts closed at the cut-off, with the **decision recorded before the orders** |
+| Client communication | In advance of the cut-off, repeatedly, with the consequence stated |
+| **Cash-settled against compulsory-delivery contracts** | The product-enablement decision should distinguish them explicitly; offering only cash-settled contracts removes the problem entirely for those commodities |
+| **The residue** | Where a position **cannot** be closed — illiquidity, a price limit, an absent bid — the firm **has a delivery obligation**. It must be able to fund it, take the receipt, arrange storage and liquidate the goods |
+| What that requires | A clearing arrangement that supports delivery, warehouse and receipt capability or a counterparty who has it, funding for the full contract value, and a liquidation route |
+| **Option devolvement** | A commodity option **devolves into a futures position** on exercise, and positions may **exceed futures limits on devolvement** and must be brought back **within a defined number of trading days of option expiry** — so an option position can become a delivery problem |
+| The honest position | **A firm that cannot handle the residue should not enable compulsory-delivery contracts.** Enabling them and relying on closure is a strategy with a known failure mode |
+
+<Aside type="danger" title="Why the cut-off must precede the tender period, and what option devolvement does to the plan">
+Two timing facts defeat the intuitive plan of "close everything before expiry". First, **tender is staggered across the last trading days including expiry**, so a seller can mark a delivery intention — and a buyer can be allocated against it — **days before expiry**. A cut-off set for the day before expiry is already too late for the earlier tender days. Second, **a commodity option devolves into a futures position**, so a client holding options that nobody treated as a delivery risk can arrive in the futures contract inside the tender window, with limits that may themselves be breached on devolvement and must be cured within a few days.
+
+Both mean the avoidance design must work backwards from the **start of the tender period** and must include option positions in its scope. The practical shape is: identify every client with a position in a compulsory-delivery contract **or options over one** at the start of the expiry month; communicate; and enforce the cut-off before tender opens. Everything after that is residue handling, which needs funding and a liquidation route rather than another closing order.
+</Aside>
+
+## 7. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.products.comm.receipt_system` | **E** | **ComRIS** | **Not the other exchange's system** |
+| `finix.products.comm.receipt_type_distinguished` | **E** | Warehouse receipt against negotiable receipt | Different regimes |
+| `finix.products.comm.compulsory_delivery_enabled` | **D** | **false unless the residue can be handled** | An explicit decision |
+| `finix.products.comm.internal_closure_cutoff` | **D** | **Before the tender period opens** | Not before expiry |
+| `finix.products.comm.options_in_cutoff_scope` | **D** | **true** | Devolvement is a delivery path |
+| `finix.products.comm.closure_decision_recorded_first` | **D** | true | Before the orders |
+| `finix.products.comm.margin_families_configured` | **E** | All of section 4 | Separate vocabulary |
+| `finix.products.comm.short_option_minimum` | **E** | **Exists here** | Unlike equity |
+| `finix.products.comm.collateral_ratio` | **E** | One-to-one | Not the equity ratio |
+| `finix.products.comm.close_time_verified_daily` | **E** | true | International and seasonal shifts |
+| `finix.products.comm.evening_risk_owner_named` | **D** | **true** | Segment does not open if uncovered |
+| `finix.products.comm.conditional_parameters_gated` | **E** | true | Activated on a separate decision |
+| `finix.products.comm.devolvement_limit_cure_days` | **E** | Per the rules | Positions may exceed on devolvement |
+| `finix.products.comm.delivery_expense_schedule` | **D** | Obtained per contract and location | Not inferable from taxes |
+
+## Practical notes
+
+- **Use the correct receipt system name.** Substituting another exchange's system name into a runbook or an integration is a real defect, not a terminology quibble.
+- **Set the closure cut-off before the tender period and include options in scope.** Those two facts cause most unintended delivery obligations.
+- **Decide compulsory-delivery enablement deliberately**, and record the residue-handling capability that justifies it.
+- **Verify the evening close time daily.** It moves with international hours and with the seasonal notification.
+- **Keep the commodity margin vocabulary separate** from equity. A shared parameter name will apply the wrong one.
+- **Get the delivery expense schedule per contract and location** before quoting a client a cost of taking delivery.
+
+## Where this connects
+
+The venue's file surface is [MCX and its clearing corporation](/broking-kyc/finix-broking-setup/files/04-mcx-files/) and its trading behaviour [MCX commodity derivatives](/broking-kyc/finix-broking-setup/exchanges/04-mcx-commodity/). The evening session is phase 6 of [the master trading-day checklist](/broking-kyc/finix-broking-setup/daily-ops/10-master-trading-day-checklist/), the enablement decision is in [the product enablement matrix](/broking-kyc/finix-broking-setup/products/09-product-enablement-matrix/), and the client-side activation is [commodity derivatives activation](/broking-kyc/product-activation/commodity-activation/). The delivery costs are in [the charges and billing engine](/broking-kyc/finix-broking-setup/backoffice/11-charges-billing-engine/) and the segment comparison in [the segment rules comparison](/broking-kyc/deep-dives/foundational/segment-rules-comparison/).

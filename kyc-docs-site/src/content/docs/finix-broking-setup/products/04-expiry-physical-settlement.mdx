@@ -1,0 +1,169 @@
+---
+title: "Products 4: expiry and physical settlement"
+description: What happens on and after an expiry — how the settlement price is now determined and what replaced the closing-window method, exercise and assignment and the instruction that no longer exists, the escalating delivery margin through expiry week, netting across segments, the failure consequences, and the hour-by-hour operating sequence on expiry afternoon and evening.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Expiry is the day a derivatives book turns into a delivery obligation, and the obligation can be far larger than the margin held against it. The sequence matters more than the concepts, so the page is built around the clock: what must be true before expiry week, what happens through the week as the delivery margin escalates, what happens on the afternoon, and what happens in the evening when exercise and assignment files arrive. Section 2 leads because the settlement-price method changed in 2026 and the change is not yet widely reflected.
+
+## TL;DR
+
+- **The settlement-price method changed.** A closing auction session replaced the previous closing-window method with effect from August 2026, and a regulator decision on reversing it was pending at the time of research — so this is the one figure to re-verify first.
+- **Single-stock derivatives settle by delivery of shares**, not cash. Index derivatives are unaffected, because there is no basket to deliver.
+- **The delivery margin escalates across the last four sessions of expiry week** on a published ladder — not on expiry day. The client warning must precede the escalation.
+- **"Do not exercise" no longer exists.** It was discontinued from the March 2023 expiry, and the withdrawal is buried in a clause of a circular about net settlement.
+- **Direction depends on the leg, not the profit.** A long future and an exercised long call receive shares; a short future, an assigned short call and an exercised long put deliver.
+- **Derivative delivery obligations net against cash-segment obligations** for the same clearing member, trading member and client — but **transaction tax and stamp duty remain segment-wise**.
+- **A failed square-off is not an exit.** If illiquidity or a price band blocks the closing trade, the residual quantity stays in the delivery queue.
+
+## Conceptual overview
+
+Physical settlement exists to make single-stock derivatives behave like claims on shares rather than bets on prices, and it changes the risk profile of a position in a way clients systematically underestimate. A client holding one lot of a stock future has, through most of the contract's life, an exposure measured by its margin. In the final week that position becomes an obligation to pay for or deliver the full value of the underlying, and the margin escalates toward that reality on a published ladder. The broker's problem is that the client's perception has not changed: they still think of the position as a leveraged trade, and a meaningful fraction of them have neither the cash to take delivery nor the shares to give it.
+
+The second idea is that the broker's exposure here is operational rather than analytical. Computing the delivery obligation is arithmetic, and the clearing corporation publishes it. The difficulty is that the remedies are all time-bound and all require the client to act: fund the delivery, deliver the shares, or close the position while it is still closeable. Each of those becomes harder as expiry approaches — liquidity in the expiring contract thins, the delivery margin consumes the client's remaining capacity, and on the final afternoon a price band or an absent bid can make closing impossible. Which is why the operational discipline is to begin the process early, in the week before expiry week, rather than to manage it on the day.
+
+The third point is that expiry is a reconciliation event as much as a trading one. The evening brings exercise and assignment files, position files, delivery obligations netted across segments, and tax computations on several bases. A firm that does not reconcile its own view against each of those files discovers discrepancies after the delivery obligation has crystallised, when the only remaining options are expensive. The sequence in section 8 is therefore a reconciliation sequence with trading steps embedded, rather than the reverse.
+
+## 1. Framework
+
+- **Regulator circular of 31 December 2018**, phased across the 2019 expiries — single-stock derivatives settled by **delivery**. Index derivatives unaffected. `[not yet in index]`
+- **Clearing-corporation circular of January 2020** — the **staggered delivery-margin ladder** across the last four sessions of expiry week. `[not yet in index]`
+- **Clearing-corporation circulars of January and March 2023** — netting of derivative delivery obligations against cash-segment obligations for the same clearing member, trading member and client, with **tax and stamp duty remaining segment-wise**. `[not yet in index]`
+- **Clearing-corporation circular on net settlement** — the clause that **discontinued the "do not exercise" facility** from the **March 2023** expiry. `[not yet in index]`
+- **Exchange and regulator circulars of 2026** — the **closing auction session**, effective **3 August 2026**, replacing the previous closing-window settlement-price method, with a reversal decision pending at the time of research. `[not yet in index]`
+- **Finance Act 2026** — the transaction-tax rates effective 1 April 2026, including the **intrinsic-value base** for an exercised option. See [the charges and billing engine](/broking-kyc/finix-broking-setup/backoffice/11-charges-billing-engine/).
+- **Clearing-corporation consolidated derivatives circular of 30 April 2026** — the operational statement of exercise, assignment, delivery and the associated reports. `[not yet in index]`
+
+## 2. Settlement price determination
+
+<Aside type="danger" title="This is the figure to re-verify before anything else on this page">
+The method of determining the closing and settlement price **changed with effect from 3 August 2026**, when a **closing auction session** replaced the previous method of averaging prices over a window at the end of the session. At the time this research was conducted, a **regulator decision on reversing that change was pending before its advisory committee**, which means the position may have moved again. Three consequences follow. The **settlement price** for expiring contracts depends on it. The **time-to-expiry input** in option pricing depends on the derivatives close time, which the auction changed. And the **intraday snapshot regime** was altered to accommodate it, including an additional snapshot window and the removal of the cure interval for late snapshots. Anyone configuring expiry processing should establish the current position from the exchange's own notices before relying on any description, including this one, and should expect the surrounding mechanics — snapshot windows, close times, order-to-trade exclusions — to move with it.
+</Aside>
+
+| Element | Position |
+|---|---|
+| Index derivatives | Cash settled against the index's determined closing value |
+| Single-stock futures and options | Settled by **delivery** of the underlying, with the settlement price determining the obligation |
+| The determination method | **Changed in August 2026** to a closing auction mechanism — see the caution above |
+| The derivatives close time | **Changed with the auction**, and feeds the option-pricing time input |
+| What to reconcile against | The clearing corporation's published **settlement price file** rather than any internally computed figure |
+
+## 3. Exercise and assignment
+
+| Element | Position |
+|---|---|
+| In-the-money options | Exercised automatically at expiry |
+| **"Do not exercise"** | **Discontinued from the March 2023 expiry.** A client cannot elect not to exercise an in-the-money option. The withdrawal sits in a clause of a circular about net settlement, which is why it is often missed |
+| Out-of-the-money options | Expire worthless; no delivery |
+| **Direction depends on the leg, not on profit** | A **long future** and an **exercised long call** *receive* shares. A **short future**, an **assigned short call** and an **exercised long put** *deliver* shares |
+| Assignment | Allocated to writers; the writer learns of it from the **assignment file** |
+| **The tax stack** | An exercised option attracts the transaction tax on **intrinsic value**; the regulator's turnover fee on the **notional** of the exercised contract; and, where the underlying is physically settled, a **delivery tax on both sides** on settlement value. Four bases, one event |
+| The files | Exercise and assignment reports for both member levels arrive on expiry day; **an assigned short option that is not recognised means the client is not told they must deliver, which is a delivery default** |
+
+## 4. The delivery margin ladder
+
+The margin escalates across the **last four sessions** of expiry week, not on expiry day.
+
+| Session | Proportion of the computed delivery margin staged |
+|---|---|
+| Four sessions before expiry, at end of day | The smallest tranche |
+| Three sessions before | A larger tranche |
+| Two sessions before | A larger tranche again |
+| One session before | The largest tranche, short of the full amount |
+
+The published ladder rises steeply across the four sessions. Two operational consequences follow. First, **a client's available capacity falls through expiry week** even if they do nothing, which can trigger shortfalls in unrelated positions — the interaction is row L-58 in [the limit impact matrix](/broking-kyc/finix-broking-setup/rms/10-limit-impact-matrix/). Second, **the warning must precede the first escalation**, which means client communication begins in the week *before* expiry week, not during it.
+
+| Element | Position |
+|---|---|
+| Who it applies to | Clients holding physically settled positions into expiry week |
+| The files | Delivery margin reports for both member levels, daily through expiry week |
+| Interaction with square-off | A client squared off early avoids the later tranches; a client squared off late has already paid them |
+
+## 5. Netting across segments
+
+| Element | Position |
+|---|---|
+| **What nets** | Derivative delivery obligations net against **cash-segment** obligations, for the **same clearing member, trading member and client code** |
+| Also nets | Futures and option positions in the same underlying net against each other in the delivery computation |
+| **What does not net** | **Transaction tax and stamp duty remain segment-wise** |
+| Why it matters | A client long a future and short the cash position may have a much smaller net delivery obligation than either leg suggests — and a firm that does not apply the netting will over-call the client and over-fund the obligation |
+| The identifier dependency | Netting is keyed on the client code, so **a client-code mismatch defeats it** — the same mismatch that causes depository instruction rejection and therefore short delivery |
+
+## 6. Failure and its consequences
+
+| Failure | Consequence |
+|---|---|
+| **Failed square-off** | **Not an exit.** If illiquidity or a price band blocks the closing trade, the **residual quantity stays in the delivery queue** |
+| Client cannot fund a delivery obligation | The firm must fund the obligation and recover from the client; the shortfall becomes a debit with its ageing clock |
+| Client cannot deliver shares | **Short delivery**, with the auction or close-out consequence |
+| Close-out where the auction fails | The **higher** of the highest price across exchanges from the trade through the auction, and a **premium over the auction-day settlement price** — see [the charges and billing engine](/broking-kyc/finix-broking-setup/backoffice/11-charges-billing-engine/) |
+| Auction cleared cheaper | The difference can still be collected from the short-delivering member; **not automatically client profit** |
+| Instruction rejected on a mismatch | A client-code, member or identifier mismatch between the depository instruction and the clearing obligation causes **rejection and therefore short delivery** |
+| Corporate action accelerating an expiry | A corporate action can **bring an expiry forward** and change the contract set, with named reports. **A month-end filter on a published calendar misses these** |
+
+## 7. Before expiry week — the preparation
+
+| Step | Activity | Owner |
+|---|---|---|
+| 1 | Identify every client holding a physically settled position with an expiry in the coming cycle | Risk |
+| 2 | Compute each client's prospective delivery obligation, **net of segment netting** | Risk with back office |
+| 3 | Compare the obligation against the client's cash and holdings | Risk |
+| 4 | **Classify each client**: can take or give delivery; cannot and must close; intends to close | Risk with client service |
+| 5 | **Communicate, before the first margin escalation** — the obligation, the escalating margin, the firm's cut-off for forcing closure, and the consequences | Client service |
+| 6 | Set and publish the firm's internal **forced-closure cut-off**, ahead of expiry | Head of risk |
+| 7 | Verify client codes and depository mappings for everyone expected to deliver | Depository operations |
+| 8 | Arrange firm funding for the obligations the firm will have to meet | Finance |
+
+## 8. The expiry-day sequence
+
+| Phase | Activity |
+|---|---|
+| Morning | Confirm the day type is an expiry and apply the expiry overlay to the checklist. Verify the derivatives close time in force |
+| Morning | Review the final delivery-margin tranche and the clients it affects |
+| Through the session | Monitor the clients classified as must-close; escalate as the firm's cut-off approaches |
+| **The firm's cut-off** | Force closure of positions for clients who cannot deliver or take delivery, per the disclosed policy. **Record the decision before the orders** |
+| Late session | Watch for **failed square-offs** — illiquidity, price bands, absent bids — and treat each as a delivery obligation rather than a trading failure |
+| Close and auction session | Observe the settlement-price determination; capture the published figure |
+| Evening | Ingest **exercise and assignment** files; reconcile against the firm's own option positions |
+| Evening | Ingest **position files**; reconcile open positions, because a break invalidates margin, marking and expiry handling simultaneously |
+| Evening | Compute **delivery obligations**, apply segment netting, and reconcile to the clearing corporation's obligation files |
+| Evening | Identify clients with obligations they cannot meet; begin the funding and recovery process |
+| Evening | Compute the **tax stack** on each basis and reconcile to the clearing tax reports |
+| Evening | Raise depository instructions for deliveries, with codes verified |
+| Evening | Notify clients of exercise, assignment, delivery obligations and debits |
+| Next day | Monitor delivery pay-in; handle shortages into the auction process |
+| Next day | Post auction and close-out outcomes to client ledgers on the **actual** settlement outcome |
+
+## 9. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.products.expiry.settlement_price_source` | **E** | The clearing corporation's published file | **Never internally computed** |
+| `finix.products.expiry.close_time_verified_daily` | **E** | true | Changed with the auction session |
+| `finix.products.expiry.do_not_exercise_available` | **E** | **false** | Discontinued from the March 2023 expiry |
+| `finix.products.expiry.delivery_margin_ladder` | **E** | The published four-session ladder | Staged at end of day |
+| `finix.products.expiry.client_warning_before_first_tranche` | **D** | **true** | In the week before expiry week |
+| `finix.products.expiry.firm_forced_closure_cutoff` | **D** | Defined, disclosed, ahead of expiry | Policy, not regulation |
+| `finix.products.expiry.failed_squareoff_is_delivery_obligation` | **D** | **true** | Not a trading failure |
+| `finix.products.expiry.segment_netting_applied` | **E** | true | Same clearing member, member and client code |
+| `finix.products.expiry.tax_segment_wise` | **R** | true | Tax and stamp do **not** net |
+| `finix.products.expiry.exercise_assignment_reconciled` | **D** | true | Against the firm's own positions |
+| `finix.products.expiry.position_file_reconciled` | **D** | true | A break invalidates margin and marking |
+| `finix.products.expiry.ca_accelerated_expiry_monitored` | **D** | **true** | A month-end calendar filter misses these |
+| `finix.products.expiry.client_code_verified_before_delivery` | **D** | true | A mismatch causes short delivery |
+| `finix.products.expiry.two_expiry_days_per_week` | **D** | Where active on both exchanges | Each with a full sequence |
+
+## 10. Practical notes
+
+- **Re-verify the settlement-price method first.** It changed in 2026 and a reversal was pending; everything downstream depends on it.
+- **Begin client communication in the week before expiry week.** The first margin tranche is the point at which a client's capacity starts falling, and a warning after it has already happened is a complaint.
+- **Treat a failed square-off as a delivery obligation immediately.** The temptation is to retry the closing order; the discipline is to start funding the delivery in parallel.
+- **Apply the segment netting.** Not doing so over-calls clients and over-funds the obligation, and the key is the client code.
+- **Watch for corporate actions that accelerate an expiry.** They do not appear where a month-end calendar filter looks.
+- **Reconcile the exercise, assignment and position files the same evening.** Discovering a break the next morning means discovering it after the obligation has crystallised.
+- **Remember there may be two expiry days a week** if the firm is active on both exchanges, each needing the full sequence.
+
+## Where this connects
+
+The contract calendar and the limits are in [the derivatives contract lifecycle](/broking-kyc/finix-broking-setup/products/03-fno-contract-lifecycle/); the day-type overlay and the sequence are in [expiry operations](/broking-kyc/finix-broking-setup/daily-ops/08-expiry-ops/) and [the master trading-day checklist](/broking-kyc/finix-broking-setup/daily-ops/10-master-trading-day-checklist/). The margin escalation's capacity effect is row L-58 in [the limit impact matrix](/broking-kyc/finix-broking-setup/rms/10-limit-impact-matrix/), the tax stack in [the charges and billing engine](/broking-kyc/finix-broking-setup/backoffice/11-charges-billing-engine/), and the files in [<abbr title="National Stock Exchange of India">NSE</abbr> and NSE Clearing files](/broking-kyc/finix-broking-setup/files/02-nse-files/). Obligation handling is in [settlement obligations](/broking-kyc/finix-broking-setup/backoffice/05-settlement-obligations/). The vendor-neutral treatments are [exercise, assignment and physical settlement](/broking-kyc/trading-risk/exercise-assignment-physical/), [expiry-day operations](/broking-kyc/trading-risk/expiry-day-operations/) and [short delivery and the auction](/broking-kyc/deep-dives/trading-day/short-delivery-auction/).

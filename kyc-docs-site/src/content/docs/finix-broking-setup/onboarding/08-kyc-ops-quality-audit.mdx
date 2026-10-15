@@ -1,0 +1,134 @@
+---
+title: "Onboarding 8: client-records operations, quality and audit"
+description: How the onboarding desk actually runs — the daily and monthly cycles including the status cohorts that silently stop clients trading, the defect classes and their remediation, the sampling and quality programme, the three-part identifier verification, the traps that cause self-inflicted outages, and how a records quality check is conducted.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** The onboarding desk is usually documented as a journey — the steps to open an account — and operated as a queue. What it actually runs is a set of recurring cycles against files that arrive whether or not anyone is waiting for them, and its most consequential output is not new accounts but the continuing permitted-to-trade status of existing ones. So this page covers the cycles first, then the defects, then the quality programme, and gives a section to the traps that cause a firm to disable its own clients.
+
+## TL;DR
+
+- **The desk's main risk is existing clients, not new ones.** Status cohorts and compliance batches silently stop clients trading, and an affected client **cannot even square off**.
+- **A fix during the session does not restore trading that session.** Compliance is assessed at a late-evening cut and governs the next trading day.
+- **Identifier verification is three-part** — identifier, name and date — and all three must match; corrections to name or date need an unfreeze request and re-verification.
+- **Do not resubmit unchanged depository details.** It triggers re-verification and can suspend the client's own trading status — a self-inflicted outage.
+- **The status module no longer reverses an inactive status**, so a reactivation workflow built on it stops working silently.
+- **Defect rates by source and channel are the real quality metric.** A concentrated rate is an onboarding-process defect, not a records problem.
+
+## 1. The cycles
+
+| Cadence | Activity |
+|---|---|
+| **Continuous** | New account processing; modification requests; the three-way client-master reconciliation feeding the begin-of-day gate |
+| **Daily** | **Trading-status and not-permitted-to-trade files, in two batches**; the **mobile-number revocation list**; the depository and bank validation status file; **daily deceased-client data** |
+| **Weekly** | **The mandatory-field report** — blanks, invalid and incomplete fields including identifier-seeding status |
+| **Monthly** | **The identity-agency status cohorts** — on hold, never uploaded, deceased — with their stated cut-offs; client-code particulars |
+| On demand | Identifier status reports; the full-file reconciliation, subject to a daily request cap |
+| Periodic | Re-verification on the risk-tiered schedule; rescreening; risk-category review |
+| Event-driven | Modifications, reactivations, closures, transmission, nomination changes |
+
+## 2. What makes a client permitted to trade
+
+| Requirement |
+|---|
+| Six identity attributes: **name as per the tax identifier, complete address including postal code for domestic addresses, the tax identifier, a valid mobile number, a valid electronic mail address, and income details** |
+| Custodian details where the client uses custodial services |
+| **Identifier verification status approved** |
+| The client code **active** |
+| The tax identifier **compliant with a registration agency** |
+| A **valid primary depository account** where applicable |
+| Any other field mandatory for the file format and client category |
+
+| Timing rule | Position |
+|---|---|
+| **The governing cut** | Codes identified as compliant at the **late-evening cut on the previous day** are permitted the next trading day |
+| **A fix during the session** | Permits trading **only on the following trading day** |
+| Registration-agency compliance | A client becoming compliant is permitted **the next day**, based on the information the exchange receives that day |
+
+## 3. The status cohorts, and why they are a risk item
+
+| Cohort | Consequence |
+|---|---|
+| **On hold** | **Not permitted to trade — or even to square off — from a stated date.** A client with open derivative positions is **frozen into them** while they move |
+| Never uploaded | Not permitted to trade |
+| **Deceased** | The code must be marked closed after due diligence, and **all debit transactions blocked** |
+| Revoked mobile number | Contact detail invalid, affecting the valid-mobile requirement |
+
+**This is why the cohort files belong on the risk desk's board as well as in the onboarding queue** — see [the periodic and compliance matrix](/broking-kyc/finix-broking-setup/roles/03-raci-periodic-compliance/). The population must be worked before the cut-off, and the risk desk needs to know which clients with open positions are in it.
+
+## 4. The traps
+
+| Trap | Consequence |
+|---|---|
+| **Resubmitting unchanged depository details** in a modification file | **Triggers re-verification by the depository and can suspend the client's permitted-to-trade status.** A self-inflicted outage caused by sending correct data. **Include depository details only when they have changed** |
+| **Using the status module to reactivate** | **Inactive to active is no longer available** there; the transition must go through a query, a bulk upload or the application interface. A workflow built on the module **stops working with no error naming the cause** |
+| Treating the two daily batches as one | The afternoon and late-evening batches reflect different states; the late one governs the next day |
+| Assuming a session fix restores session trading | It does not |
+| Sharing contact details across unrelated clients | A monitored condition with a penalty basis; the family and authorised-person exception requires a **specific written request** |
+| **Capturing the firm's own, employees' or authorised persons' contact details as client details** | Explicitly to be avoided, with a penalty basis |
+| Modifying name or date through an ordinary modification | These need an **unfreeze request** and re-verification |
+
+## 5. Defect classes and remediation
+
+| Defect | Remediation |
+|---|---|
+| Missing document | Obtain; the account cannot be activated meanwhile |
+| Unverified document | Complete the verification and record the evidence |
+| **Identifier mismatch on any of the three parts** | Unfreeze request, correction, re-verification |
+| Inconsistent data across the agency record, the central registry and the firm's master | Determine the correct value, correct at source, propagate |
+| Incomplete mandatory field | From the weekly report; correct and re-upload |
+| Invalid contact detail | Including a revoked mobile number; obtain and update |
+| Depository or bank validation failure | From the daily status file; correct and re-verify |
+| Stale periodic re-verification | Complete on the risk-tiered schedule |
+| Absent consent or acknowledgement | Obtain; a product may need to be suspended meanwhile |
+| **Agency status on hold** | Work with the agency; the client cannot trade or square off meanwhile |
+| Screening match | Enhanced due diligence, senior approval or exit per policy, recorded |
+
+## 6. The quality programme
+
+| Element | Position |
+|---|---|
+| **Sampling** | A defined sample per period, weighted toward new clients, new channels and any source with a raised defect rate |
+| Checks | Documentary sufficiency; verification evidence; consistency across the three records; the three-part identifier verification; mandatory-field completeness; consent and acknowledgement capture; risk categorisation and its basis |
+| **Metrics that matter** | **Defect rate by source and by channel**, first-time-right rate, time to activation, the status-cohort population and its ageing, and the **count of self-inflicted suspensions** |
+| **The diagnostic** | **A concentrated defect rate is an onboarding-process defect, not a records problem.** Fix the journey, not the queue |
+| Independent review | The internal audit examines the arrangements; a records quality check is conducted as described in [the audit machinery](/broking-kyc/finix-broking-setup/compliance/05-audit-machinery/) |
+| Reporting | Defect rates and the cohort position to the compliance officer monthly, with the cohort position also to the risk desk |
+
+<Aside type="caution" title="The metric that tells you the most">
+Count the **self-inflicted suspensions** — clients whose trading status was interrupted by something the firm did, rather than by a defect in the client's records. Resubmitting unchanged depository details is the clearest case; using a retired reactivation path is another; a modification routed through the wrong channel is a third.
+
+This number is small, it is entirely within the firm's control, and it is invisible unless counted — the symptom is a client complaint that looks identical to a records defect. A firm that tracks it will find the handful of workflow errors causing most of its onboarding complaints, and each one has a single fix. A firm that does not will keep resolving the same complaint individually, and will attribute it to the agency or the depository rather than to itself.
+</Aside>
+
+## 7. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.onboarding.ops.status_files_daily_both_batches` | **E** | true | The late one governs |
+| `finix.onboarding.ops.cohort_files_to_risk_desk` | **D** | **true** | On-hold clients cannot square off |
+| `finix.onboarding.ops.resubmit_unchanged_demat` | **D** | **false** | The self-inflicted-outage control |
+| `finix.onboarding.ops.reactivation_path` | **E** | Query, bulk upload or interface | **Not the status module** |
+| `finix.onboarding.ops.three_part_verification` | **R** | true | Identifier, name, date |
+| `finix.onboarding.ops.name_date_change_via_unfreeze` | **E** | true | With re-verification |
+| `finix.onboarding.ops.shared_contact_requires_written_request` | **R** | true | The stated exception only |
+| `finix.onboarding.ops.firm_contacts_never_client_details` | **R** | **true** | Penalty basis |
+| `finix.onboarding.ops.weekly_mandatory_report_worked` | **D** | true | — |
+| `finix.onboarding.ops.deceased_blocks_debits` | **R** | true | On notice, daily data |
+| `finix.onboarding.ops.defect_rate_by_source_and_channel` | **D** | **true** | The real quality metric |
+| `finix.onboarding.ops.self_inflicted_suspensions_counted` | **D** | **true** | Small, controllable, invisible otherwise |
+| `finix.onboarding.ops.sampling_programme` | **D** | Defined and weighted | Toward new sources |
+
+## Practical notes
+
+- **Work the cohort before its cut-off and tell the risk desk who is in it.** A frozen client with open positions is the firm's exposure.
+- **Never resubmit unchanged depository details.** It is the clearest avoidable outage in the plane.
+- **Check your reactivation path still works.** The module route was withdrawn and fails silently.
+- **Measure defect rate by source and channel.** It converts a queue problem into a journey fix.
+- **Count self-inflicted suspensions.** It is the highest-yield metric on this page.
+- **Treat the weekly mandatory-field report as work, not information.** It is the cheapest way to prevent next month's cohort.
+
+## Where this connects
+
+The onboarding integrations are in [the preceding pages of this plane](/broking-kyc/finix-broking-setup/onboarding/), the status and cohort streams in [alerts received](/broking-kyc/finix-broking-setup/monitoring/04-alerts-received-and-response/), and the audit view in [the audit machinery](/broking-kyc/finix-broking-setup/compliance/05-audit-machinery/). The begin-of-day reconciliation gate is in [the master trading-day checklist](/broking-kyc/finix-broking-setup/daily-ops/10-master-trading-day-checklist/), the modification and closure operations in [modification and closure operations](/broking-kyc/finix-broking-setup/onboarding/07-account-modification-closure/), and the screening obligations in [anti-money-laundering monitoring](/broking-kyc/finix-broking-setup/monitoring/06-aml-monitoring-reporting/). The lifecycle scenarios are under [lifecycle](/broking-kyc/lifecycle/).

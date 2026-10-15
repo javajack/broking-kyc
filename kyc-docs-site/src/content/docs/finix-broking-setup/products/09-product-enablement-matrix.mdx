@@ -1,0 +1,98 @@
+---
+title: "Products 9: the product enablement matrix"
+description: What must be true before each product is switched on — the permission, the client documentation, the system capability, the people and certification, the reporting and the residual risk the firm is accepting — consolidated so that an enablement decision is a checklist rather than a conversation.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Enabling a product is usually treated as a commercial decision with a technical dependency, and it is better understood as accepting a set of obligations. Each product in this plane adds permissions to obtain, documents to collect, systems to build, people to certify, reports to file and a residual risk to carry. So this page is one matrix across all of them, with the residual risk stated explicitly — because the residual risk is the part that gets discovered after launch rather than decided before it.
+
+## TL;DR
+
+- **Enabling a product enables an obligation.** The matrix lists the six things that must be true, and the sixth — the residual risk — is the one firms do not decide deliberately.
+- **Several products need permission per exchange**, and approval at one venue is not approval at another.
+- **Some products cannot be safely offered without a capability the firm may not have** — handling a commodity delivery residue, or funding a physical settlement obligation.
+- **Certification is per function**, so a product can be blocked by a person rather than by a system.
+- **Reporting obligations begin at enablement, not at first trade** — including nil reporting in at least two products.
+- **The honest answer is sometimes not to enable.** A product whose residual risk the firm cannot carry should not be switched on because the demand exists.
+
+## 1. The six tests
+
+| Test | Question |
+|---|---|
+| **Permission** | Does the firm hold the regulatory and exchange permission, per venue? |
+| **Client documentation** | What must be collected, disclosed and acknowledged before a client can use it? |
+| **System capability** | What must the order, risk, back-office and money systems be able to do? |
+| **People and certification** | Which functions need which certification, and who is accountable? |
+| **Reporting** | What begins to be owed from enablement — including nil reporting? |
+| **Residual risk** | What is the firm accepting that it cannot fully control, and can it carry it? |
+
+## 2. The matrix
+
+| Product | Permission | Client documentation | System capability | People | Reporting from enablement | **Residual risk accepted** |
+|---|---|---|---|---|---|---|
+| **Cash delivery and intraday** | Membership and clearing per segment | Account opening, rights and obligations, tariff, risk disclosure | Order path, margin, settlement, unpaid-securities handling | Dealing certification; operations and risk certification where client assets are touched | The standard daily and periodic set | Client default on a settlement obligation |
+| **Equity derivatives** | Segment membership and clearing | Derivatives activation with income or means evidence; the prescribed risk disclosure at login occupying a substantial share of the screen | Contract master churn, delta-adjusted limits, expiry and assignment processing, delivery margin | Equity derivatives certification for approved users and sales staff | Position-limit enforcement; margin reporting | **Physical settlement obligations far larger than margin held** |
+| **Physically settled stock derivatives** | As above | Advance warning of the margin escalation and the firm's forced-closure policy | Delivery obligation computation, segment netting, failed-square-off handling | As above | As above | **Funding a client's delivery obligation and recovering it** |
+| **Margin trading facility** | **Prior exchange permission per venue**, with a board resolution and a net worth certificate | Opt-in with written or irrefutable electronic consent; rights and obligations; interest and liquidation policy | Separate funded and collateral books; the two ceilings computed continuously; auto-pledge reconciliation; interest accrual | Risk and operations; no distinct certification located | **Daily exposure report including nil days**; half-yearly net worth **and** compliance certificates including **non-commencement** | **A loan book against client positions, funded by the firm's own balance sheet** |
+| **Margin pledge** | None beyond segment membership | Pledge authorisation flow; charges disclosure | Pledge state machine, onward re-pledge, release chain, invocation with notice | Depository operations certification | Collateral reporting to client level | Invocation disputes and the notice obligation |
+| **Commodity derivatives, cash settled** | Segment membership and clearing | Commodity activation; the segment's risk disclosure | The commodity margin vocabulary; the evening session; late file handling | **Commodity derivatives certification** | Position monitoring with order-entry prevention | Evening-session exposure without the day organisation |
+| **Commodity, compulsory delivery** | As above | Statement that delivery is not offered and positions will be closed, with the cut-off | Tender-window identification, the pre-tender cut-off including options, residue handling | As above | As above | **A delivery obligation the firm must fund, store and liquidate** |
+| **Currency and rate derivatives** | Segment membership and clearing | **A contracted-exposure declaration recording the nature of the exposure** — not a threshold tick-box; documentation where required | Monitoring against declared exposure; the large-position reporting file; the early-warning notification; reference-rate ingestion | **Currency, or the consolidated derivatives, certification; rate derivatives certification** | Large-position reporting with a dealer or custodian confirmation | **Positions that do not satisfy the hedging rule, if the declaration framework is weak** |
+| **Securities lending** | Separate enrolment | Lending activation; the capacity effect disclosed **before** the instruction | Two-leg tracking, reverse-leg monitoring, foreclosure ingestion, collateral exclusion of lent holdings | Operations | Segment obligations | **Reverse-leg failure as a short delivery** |
+| **Public issue applications** | Exchange and registrar connectivity | Application authorisation; bank account for the block | Application integrity, the block instruction, registrar reconciliation, direct credit | Operations | Issue-level obligations | Application errors and their client consequences |
+| **Fund platforms** | Platform access, and distributor registration where applicable | Platform terms; where advising, the applicable adviser framework | Platform cycle handling, standing instructions, registrar reconciliation, demat-held units | Operations; **research or adviser certification where advice is given** | Distributor and platform obligations | Settlement timing outside the firm's control |
+| **Bond platform** | **A separate regulated activity with its own framework** | Platform-specific disclosure, and the risk-disclosure meter after its commencement | Platform operation; permitted-product controls | **The framework's staff certification** | The framework's obligations | Operating a regulated platform rather than intermediating |
+| **Programmatic client access** | **Facility approval; provider empanelment where applicable** | Access terms; rate and control disclosure | Keys, address whitelisting, token authentication, second-factor authentication, **daily session logout**, rate limiting, tagging | Risk and technology | Algorithmic reporting where applicable | **Client-generated order flow at machine rate** |
+| **Algorithmic trading** | **Permission attaches to the algorithm**, with an identifier; provider empanelment; approval for modifications | Strategy disclosure; charge disclosure where shared with a provider | Strategy registration, tagging, kill capability, order-to-trade control, **half-yearly system audit** | Risk, technology and compliance | **Monthly mock participation for every approved algorithm, enabled or not** | **A strategy behaving unexpectedly at scale** |
+| **Direct market access** | **A distinct facility permission** | Eligibility establishment; access terms | Client identifier mapping and reporting, risk controls on the flow | Risk | Client detail reporting | Flow the firm does not originate |
+| **Smart order routing** | **Permission, with a physical application at one venue** | Routing disclosure | Routing logic and its risk controls | Risk and technology | — | Routing decisions the client did not make |
+| **Mobile and web access** | **Facility approval per channel** | The channel's disclosures, charges before placement, cross-exchange prices | **Pre-approval audit; penetration testing naming the application and interfaces; second-factor at each login** | Technology and compliance | — | A client-facing surface under continuous attack |
+
+## 3. Enablement sequence
+
+| Step | Activity |
+|---|---|
+| 1 | **Decide the residual risk is acceptable** — explicitly, at the level that can accept it |
+| 2 | Obtain the permission, **per venue** |
+| 3 | Build and test the system capability, including the **reporting** |
+| 4 | Certify the people, and confirm the identifier entitlements |
+| 5 | Prepare the client documentation and the interface disclosures |
+| 6 | Obtain the software approval where the product needs one — see [the certification plane](/broking-kyc/finix-broking-setup/certification/) |
+| 7 | **Register the new reporting obligations in the calendar, including nil reporting** |
+| 8 | Add the product's files to the file register and its day types to the manifest |
+| 9 | Add the product's actions to the operations catalogues and its owners to the matrices |
+| 10 | Enable for a controlled population first, with the monitoring in place |
+| 11 | Review after a defined period against the residual-risk assumptions |
+
+<Aside type="danger" title="Two products should not be enabled on demand alone">
+**Compulsory-delivery commodity contracts** and **physically settled stock derivatives** share a structure: the firm's avoidance strategy works almost always, and when it fails the firm holds an obligation measured in the full value of the underlying rather than in margin. Enabling either without the ability to fund, take, store where relevant, and liquidate that residue is a strategy with a known failure mode and no mitigation.
+
+The honest test is not "can we close client positions before the deadline" — that is the plan, and plans fail on illiquidity, price limits and absent bids, which are correlated with exactly the conditions that make the position dangerous. The test is **"if a residue of a realistic size survives our cut-off, can we carry it"**. A firm that cannot should offer cash-settled contracts in those commodities and should not enable the compulsory-delivery ones, and should record that decision rather than leaving it to be discovered in an expiry week.
+</Aside>
+
+## 4. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.products.enable.residual_risk_accepted_explicitly` | **D** | **true** | At the level that can accept it |
+| `finix.products.enable.permission_per_venue` | **R** | true | One venue is not another |
+| `finix.products.enable.reporting_registered_at_enablement` | **D** | **true** | **Including nil reporting** |
+| `finix.products.enable.files_added_to_register` | **D** | true | And day types to the manifest |
+| `finix.products.enable.actions_added_to_catalogues` | **D** | true | And owners to the matrices |
+| `finix.products.enable.certification_verified` | **R** | true | Per function |
+| `finix.products.enable.controlled_population_first` | **D** | true | With monitoring live |
+| `finix.products.enable.post_launch_review` | **D** | Defined period | Against the residual-risk assumptions |
+| `finix.products.enable.delivery_residue_capability_required` | **D** | **true** | For compulsory-delivery and physical settlement |
+
+## Practical notes
+
+- **Decide the residual risk first.** Everything else is execution; this is the decision.
+- **Register the reporting at enablement.** Two products owe nil reporting from the day permission is held, and a firm that waits for a first trade is already late.
+- **Treat enablement as a change to five registers** — files, manifest, catalogues, matrices and the submissions calendar. A product enabled in the trading system and nowhere else is a product nobody is operating.
+- **Enable for a controlled population and review.** The residual-risk assumptions are assumptions until some volume has tested them.
+- **Record a decision not to enable.** It is as much a decision as enabling, and it prevents the question being reopened informally.
+
+## Where this connects
+
+Each product's operations are in the preceding pages of this plane. Client-side activation is under [product activation](/broking-kyc/product-activation/), the approvals in [the software approval regime](/broking-kyc/finix-broking-setup/certification/01-software-approval-regime/), the reporting in [periodic submissions](/broking-kyc/finix-broking-setup/monitoring/03-periodic-submissions/), the files in [the file register](/broking-kyc/finix-broking-setup/files/01-file-register-architecture/), the actions in the four operations catalogues and the owners in [the roles plane](/broking-kyc/finix-broking-setup/roles/).

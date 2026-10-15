@@ -16,7 +16,7 @@ import { Aside } from '@astrojs/starlight/components';
 - **Segment-specific SGFs**: each CC maintains a separate SGF per segment — Capital Market (CM), Futures & Options (F&O), Currency Derivatives (CD), Commodity Derivatives, Tri-party Repo and others. A draw in one segment does not consume the SGF of another segment.
 - **Replenishment** of any drawn-down member contribution is mandatory within a SEBI-prescribed window (typically T+3 working days); failure to replenish triggers member-default consequences in its own right.
 - **CCs in scope**: <abbr title="National Stock Exchange of India">NSE</abbr> Clearing (<abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr> / <abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NSCCL</abbr>), Indian Clearing Corporation (<abbr title="Indian Clearing Corporation Limited">ICCL</abbr> — <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> group), Multi Commodity Exchange Clearing Corporation (<abbr title="Multi Commodity Exchange Clearing Corporation Limited">MCXCCL</abbr>), Metropolitan Clearing Corporation of India (MCCIL — limited segments), NSE <abbr title="Indian Financial System Code.">IFSC</abbr> Clearing Corporation (NICCL — GIFT IFSC).
-- **Disclosure and transparency**: Core SGF corpus, monthly stress-test results, and broad waterfall description are published periodically — quarterly disclosures by NSCCL/ICCL/MCXCCL on Core SGF size, MPOR assumptions, and stress test outcomes.
+- **Disclosure and transparency**: Core SGF corpus, monthly stress-test results, and broad waterfall description are published periodically — quarterly disclosures by NSCCL/ICCL/MCXCCL on Core SGF size, <abbr title="Margin Period of Risk">MPOR</abbr> assumptions, and stress test outcomes.
 
 ## Conceptual overview
 
@@ -133,7 +133,7 @@ NSCCL's consolidated annual master circular for the Capital Market segment (NCL/
 
 ### MCX CDS segment (MCXCCL) — illustrative
 
-MCXCCL's annual master circular for the commodity-derivatives segment (referenced by MCXCCL/RISK/045/2025 dated March 5, 2025 and successor MCXCCL/RISK/184/2025 dated September 4, 2025 on margin framework, both implementing SEBI Master Circular SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/MRD/MRD-PoD-1/P/CIR/2023/136 (Aug 4, 2023) for commodity derivatives), describes the segment-specific Core SGF, member margin / SOMM (Self-Originated Member Margin) collection, and the commodity-category-specific (agri / base metals / bullion / energy) volatility-scan-range calibration that feeds the stress test.
+MCXCCL's annual master circular for the commodity-derivatives segment (referenced by MCXCCL/RISK/045/2025 dated March 5, 2025 and successor MCXCCL/RISK/184/2025 dated September 4, 2025 on margin framework, both implementing SEBI Master Circular SEBI/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/MRD/MRD-PoD-1/P/CIR/2023/136 (Aug 4, 2023) for commodity derivatives), describes the segment-specific Core SGF, member margin / <abbr title="Short Option Minimum Margin">SOMM</abbr> (Self-Originated Member Margin) collection, and the commodity-category-specific (agri / base metals / bullion / energy) volatility-scan-range calibration that feeds the stress test.
 
 ## The draw side: the mandatory sequence during a member default
 
@@ -230,7 +230,7 @@ The mutualisation feature of the SGF / Core SGF means surviving members are expo
 
 ### Commodity Derivatives SGFs
 
-- **MCXCCL Core SGF**: primary commodity-derivatives SGF. Calibration covers agri, base metals, bullion, energy with category-specific volatility-scan-range (VSR) parameters (per MCXCCL/RISK/187/2025 dated September 5, 2025 — "Revision in Volatility Scan Range (VSR) Parameters for various Commodities").
+- **MCXCCL Core SGF**: primary commodity-derivatives SGF. Calibration covers agri, base metals, bullion, energy with category-specific volatility-scan-range (<abbr title="Volatility Scan Range">VSR</abbr>) parameters (per MCXCCL/RISK/187/2025 dated September 5, 2025 — "Revision in Volatility Scan Range (VSR) Parameters for various Commodities").
 - Physical-delivery contracts (gold, silver, base metals, agri) introduce additional stress factors — delivery default, warehouse-receipt failure, quality-discrepancy reconciliation — that affect SGF sizing.
 - **NCL/ICCL commodity-derivatives Core SGF**: separate, smaller corpus for commodity derivatives at NSE / BSE.
 
@@ -240,7 +240,7 @@ The mutualisation feature of the SGF / Core SGF means surviving members are expo
 
 ### MCXCCL specifics
 
-The MCXCCL Master Circular for FY 2023-24 (referenced in the project's circular index as the annual master circular consolidating all circulars in force as of June 30, 2023) consolidates the segment-specific Core SGF framework, contribution methodology, stress-test methodology, and member-margining (including <abbr title="Standard Portfolio Analysis of Risk">SPAN</abbr>, SOMM, MSBA) into a single operational baseline.
+The MCXCCL Master Circular for FY 2023-24 (referenced in the project's circular index as the annual master circular consolidating all circulars in force as of June 30, 2023) consolidates the segment-specific Core SGF framework, contribution methodology, stress-test methodology, and member-margining (including <abbr title="Standard Portfolio Analysis of Risk">SPAN</abbr>, SOMM, <abbr title="Margin Shortfall Block Amount">MSBA</abbr>) into a single operational baseline.
 
 ## Inter-clearing-corp arrangements
 

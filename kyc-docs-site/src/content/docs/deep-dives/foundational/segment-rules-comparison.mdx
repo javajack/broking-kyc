@@ -25,7 +25,7 @@ import { Aside } from '@astrojs/starlight/components';
 | Clearing corp | NSCCL, ICCL | NSCCL, ICCL | NSCCL, ICCL | NSCCL | MCXCCL, <abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr>, ICCL | NSCCL, ICCL |
 | Trading hours (IST) | 09:00-15:40 (incl. pre-open / closing) | 09:15-15:30 | 09:00-17:00 | 09:00-17:00 (varies by contract) | 09:00-23:30/55 (split session) | 10:00-17:00 (NDS-OM); retail platforms per market hours |
 | Settlement cycle | T+1 default; T+0 optional for top 500 | T+1 cash settle; physical delivery on stock expiry | <abbr title="Trade-date Plus N settlement">T+2</abbr> cash settle | T+2 cash settle | T+1 to T+5+ per contract; physical delivery for many | T+1 / T+2 |
-| Margin framework | VaR-based + Peak margin + <abbr title="Unified Payments Interface">UPI</abbr> block / 3-in-1 for <abbr title="Qualified Stock Broker">QSB</abbr> | SPAN + ELM + premium upfront + intraday position-limit monitoring | SPAN + ELM | SPAN + ELM | SPAN + SOMM + commodity-specific Volatility Scan Range | <abbr title="Reserve Bank of India">RBI</abbr>-driven; haircut on G-Sec collateral |
+| Margin framework | VaR-based + Peak margin + <abbr title="Unified Payments Interface">UPI</abbr> block / 3-in-1 for <abbr title="Qualified Stock Broker">QSB</abbr> | SPAN + ELM + premium upfront + intraday position-limit monitoring | SPAN + ELM | SPAN + ELM | SPAN + <abbr title="Short Option Minimum Margin">SOMM</abbr> + commodity-specific Volatility Scan Range | <abbr title="Reserve Bank of India">RBI</abbr>-driven; haircut on G-Sec collateral |
 | Position limits | Per-scrip ceilings; client / member / aggregate; surveillance-triggered | Per-instrument <abbr title="Market Wide Position Limit">MWPL</abbr>; client / member / aggregate; intraday monitoring | Per-pair limits; member / participant / client | Per-instrument limits | Per-commodity / category limits | Mostly institutional; retail limits per scheme |
 | Lot size | 1 share (unit) | Min Rs 15 lakh contract notional (post Oct 2024) | Standard pair-specific (USD/INR = 1000 USD) | Standard contract size | Commodity-specific (Gold 1 kg, Silver Micro 1 kg, Crude Oil Mini 10 bbl, Gold Ten 10 g, etc.) | Standard face value Rs 1000 |
 | Expiry conventions | N/A (cash) | Monthly + weekly index; monthly stock; rationalised to one benchmark weekly per exchange | Monthly | Quarterly (mostly) | Monthly + special quarterly contracts; tender period for delivery | N/A (open-ended for most) |
@@ -287,10 +287,10 @@ Commodity Derivatives covers four broad categories on **MCX** (the primary commo
 
 ### Margin framework
 
-- **SPAN methodology** with VaR over MPOR (Margin Period of Risk) per **MCXCCL/RISK/045/2025** dated 2025-03-05 / superseding circulars.
+- **SPAN methodology** with VaR over <abbr title="Margin Period of Risk">MPOR</abbr> (Margin Period of Risk) per **MCXCCL/RISK/045/2025** dated 2025-03-05 / superseding circulars.
 - **SOMM** (Short Option Minimum Margin) — the minimum margin charged on short option positions, a SPAN parameter set per commodity category alongside initial margin, margin period of risk and volatility scan range.
-- **MSBA** (Margin Shortfall Block Amount).
-- **Volatility Scan Range (VSR)** — commodity-category-specific parameters per **MCXCCL/RISK/187/2025** dated 2025-09-05 (Copper VSR 5, Crude Oil 33, Gold 4, Natural Gas 6, Silver 6, Zinc 6 — illustrative). Three categories of commodities based on realised volatility.
+- **<abbr title="Margin Shortfall Block Amount">MSBA</abbr>** (Margin Shortfall Block Amount).
+- **Volatility Scan Range (<abbr title="Volatility Scan Range">VSR</abbr>)** — commodity-category-specific parameters per **MCXCCL/RISK/187/2025** dated 2025-09-05 (Copper VSR 5, Crude Oil 33, Gold 4, Natural Gas 6, Silver 6, Zinc 6 — illustrative). Three categories of commodities based on realised volatility.
 - **Agri-commodity additional lean-period margin**: 2% on contracts expiring during lean period (lead Exchange website lists).
 - **Staggered tender-period margin**: 5% additional on outstanding positions over IM / special / additional, during the tender period.
 

@@ -446,7 +446,7 @@ Reminds trading members to submit the internal audit report for the half year en
 - **impact_areas:** surveillance, reporting, file-format
 - **primary_url:** https://nsearchives.nseindia.com/content/circulars/SURV74008.pdf
 
-Latest Master consolidated Surveillance and Investigation circular compiling departmental circulars up to April 30, 2026. Supersedes NSE/SURV/61848 (Apr 30, 2024) and NSE/SURV/67801 (Apr 30, 2025). Single reference for all current surveillance and investigation policies including Cautionary Messages, RTCM, <abbr title="Enhanced Surveillance Measure">ESM</abbr>, <abbr title="Graded Surveillance Measure">GSM</abbr>, <abbr title="Additional Surveillance Measure">ASM</abbr>, <abbr title="Order-to-Trade Ratio">OTR</abbr>, OBSM-PNC, Position Limits.
+Latest Master consolidated Surveillance and Investigation circular compiling departmental circulars up to April 30, 2026. Supersedes NSE/SURV/61848 (Apr 30, 2024) and NSE/SURV/67801 (Apr 30, 2025). Single reference for all current surveillance and investigation policies including Cautionary Messages, <abbr title="Reversal Trade Cancellation Mechanism">RTCM</abbr>, <abbr title="Enhanced Surveillance Measure">ESM</abbr>, <abbr title="Graded Surveillance Measure">GSM</abbr>, <abbr title="Additional Surveillance Measure">ASM</abbr>, <abbr title="Order-to-Trade Ratio">OTR</abbr>, OBSM-PNC, Position Limits.
 
 ### NSE/INSP/73849
 

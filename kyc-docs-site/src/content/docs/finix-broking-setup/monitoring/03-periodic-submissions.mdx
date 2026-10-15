@@ -1,0 +1,213 @@
+---
+title: "Monitoring 3: the periodic submission calendar"
+description: Everything a broker files on a cycle — the daily holding statement, the weekly client-funds monitoring and statements of account, the monthly client balance upload, the floating settlement-details deadline, half-yearly certificates and annual returns — plus the single-filing reform across exchanges, the obligations that were abolished, and three live deadline conflicts.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** A submissions calendar is only useful if it is current, and this one is not static: during 2025 and 2026 one obligation moved from weekly to daily, another was abolished outright, a third was centralised so that filing at one exchange counts as filing at all, and three separate live documents give three different deadlines for the same certificate. So the page is organised by cycle, with a change register in section 8 and the conflicts stated plainly in section 9 rather than resolved silently. Section 7 lists what is *no longer* owed, because filing an abolished return is a cost and quoting one in a manual is a defect.
+
+## TL;DR
+
+- **Filing at one exchange now counts as filing at all of them** for a defined list of common submissions, where the member is registered at several venues. Processing and supervision stay with each exchange — only the filing is centralised.
+- **The holding statement is daily, not weekly.** It moved from weekly to daily, and the daily nil declaration was replaced by a one-time nil declaration.
+- **Client-level cash and cash-equivalent balance reporting was discontinued**, and **demat-account reporting to exchanges was abolished** from April 2026 — depositories now feed that data to exchanges directly.
+- **The settlement-details filing has no fixed dates.** It is due within ten trading days of each running-account settlement date, against a calendar jointly issued at the start of each financial year. Publishing fixed dates for it is wrong and ages badly.
+- **Three live documents give three different deadlines for the half-yearly net worth certificate.** Confirm before configuring one.
+- **A nil return is still a return** for several obligations, and non-submission escalates to a new-client-registration ban and then disablement across all segments.
+
+## Conceptual overview
+
+Periodic reporting in this regime does three different jobs, and knowing which job a report does tells you how seriously a deadline is enforced. Some reports are **asset-protection monitoring**: the holding statement, the client-funds monitoring, the monthly client balance upload. These exist so that a regulator can detect misuse of client assets, which is why their failure modes feed an early-warning mechanism rather than just a penalty. Some are **capital and governance attestations**: net worth certificates, audit reports, compliance declarations. These are periodic proofs that the firm remains fit. And some are **data-quality maintenance**: client-code uploads, bank-account reporting, identifier registers. These keep the venue's view of the firm accurate.
+
+The second observation is that this calendar has been actively pruned. A regulator initiative on ease of doing business removed a demat-reporting obligation entirely, shifted the source of that data to the depositories, widened carve-outs for banks and primary dealers, and centralised common filings across exchanges. The practical lesson for anyone maintaining a compliance calendar is that **obligations are removed as well as added**, and a calendar that only ever grows will eventually have a firm producing returns nobody wants — which costs staff time and, worse, lends false confidence that the calendar is being maintained.
+
+The third point concerns the difference between a deadline and a clock. Several obligations here are fixed-date; several are relative to an event that itself moves. The settlement-details filing is relative to a settlement date published annually. The bank-account reporting is relative to an account opening or closure. The incident reports are relative to detection. A calendar that converts all of these into fixed dates will be wrong for the relative ones, and the failure is silent because the date in the calendar looks authoritative. The correct design stores the **rule**, and derives dates from the governing calendar each year.
+
+## 1. Framework
+
+- **[Master Circular for Stock Brokers <abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — the consolidated reporting requirements, the monthly client balance upload, the client-funds monitoring principle, the early-warning mechanism, and the running-account settlement calendar obligation.
+- **Regulator circular of 12 January 2024** — the client-funds monitoring principle that available funds must always equal or exceed client ledger balances. `[not yet in index]`
+- **Regulator circular of 23 March 2026, effective 17 April 2026** — ease-of-doing-business relaxations: **demat-account reporting abolished**, bank-account reporting retained on a seven-working-day clock, carve-outs widened, and depositories feeding demat data to exchanges directly. `[not yet in index]`
+- **Exchange circulars of 18 July 2025 and 29 September 2025** — the **single-filing reform** and the common-submissions list. `[not yet in index]`
+- **Exchange inspection and membership-compliance masters of April 2026** — the current consolidated statements of the submission obligations and their exhibits. `[not yet in index]`
+- **Exchange circulars of 25 January 2023 and 29 December 2023** — the move of the holding statement to daily, and the one-time nil declaration. `[not yet in index]`
+- **Exchange circular of 13 March 2024** — **discontinuation** of client-level cash and cash-equivalent balance reporting. `[not yet in index]`
+
+## 2. The single-filing reform
+
+| Element | Position |
+|---|---|
+| What it does | A member registered at several venues submits the listed compliance reports **to one exchange only**, and is **not required** to submit them to the others |
+| Effect | The receiving exchange **shares the submissions, including data and documents**, and **submission to it is treated as submission to the others** |
+| Scope | A defined list of common submissions — in the order of **seventy** reports in the current exhibit |
+| **What is not centralised** | **Processing, monitoring and supervision of compliance remain with each exchange.** Only the filing is centralised |
+| **A known gap** | The **authorised-person inspection report does not appear in the common list** — only a declaration about authorised-person supervision does, and that is an obligation of designated large brokers. **The inference is that the inspection report is filed with each exchange separately**, which is consistent with per-exchange authorised-person approval and with two venues issuing parallel circulars on it the same day. **Worth confirming before relying on it** |
+
+<Aside type="caution" title="Check which list you are on before using the single-filing route">
+The common-submissions list mixes two populations. A substantial block of its items trace to the enhanced obligations of **designated large brokers**, and a greenfield firm will not be in scope for those. The remainder are general. Two practical consequences: a new firm should not assume every item on the list applies to it, and it should not assume that an item *absent* from the list is therefore not owed — the authorised-person inspection report is exactly that case. Build the firm's own calendar from the obligations that apply to its category, then use the list to decide **where** each one is filed rather than **whether** it is owed.
+</Aside>
+
+## 3. Daily
+
+| Obligation | Deadline | Notes |
+|---|---|---|
+| **Holding statement** | **Next day**, through an application interface | Moved from weekly to daily. **A one-time nil holding declaration** replaces a daily nil declaration, and stands valid until the next statement submission. **Non-submission within the due date is treated as non-submission of the statement itself.** When holdings resume after a nil period, a **bulk nil submission** for the earlier dates is required first |
+| Margin reporting | Through the clearing margin exchange, correctable up to the sign-off date | See [<abbr title="National Stock Exchange of India">NSE</abbr> and NSE Clearing files](/broking-kyc/finix-broking-setup/files/02-nse-files/) |
+| Client-level collateral allocation reporting | Daily, disaggregated to client level, member to clearing member to venue | Including the member's proprietary collateral, per segment |
+| Upstreaming computation and instruction | End of day | See [upstreaming and downstreaming](/broking-kyc/finix-broking-setup/money/06-upstreaming-downstreaming/) |
+| Margin trading exposure report | **A fixed early-evening hour the following day**, with **nil reporting continuing** until withdrawal | See [margin trading facility operations](/broking-kyc/finix-broking-setup/products/01-mtf-operations/) |
+| Unpaid and funded securities identification | Within the clearing window | — |
+| Technical-glitch monitoring parameters | Real time | Per the glitch framework |
+
+## 4. Weekly
+
+| Obligation | Deadline | Notes |
+|---|---|---|
+| **Client-funds monitoring** | Weekly | The principle: **total available funds with the broker and with the clearing corporation must always equal or exceed client ledger balances**. Venues run alert-based monitoring on it. **Not applicable to firms doing only proprietary or only institutional business.** **Failure to upload for three consecutive weeks is an early-warning event** for diversion of client securities |
+| **Statement of accounts to clients** | For a week, **on or before the next four trading days of the following week** | Not required for clients with nil funds, nil securities, nil commodities **and** flagged inactive in the venue's client database. Clients should raise disputes **preferably within seven working days** of receipt |
+| Clients mapped to authorised persons | **On or before the next two trading days of the following week** | **Details must match the venue's client-code records** |
+| Client-code mandatory-field report | Weekly, pushed to the member | Blanks, invalid and incomplete fields including identifier-seeding status |
+
+## 5. Monthly
+
+| Obligation | Deadline | Notes |
+|---|---|---|
+| **Client fund and securities balance upload** | **Within seven calendar days of the last trading day of the month** | Per client, per exchange: end-of-day fund balance per the client ledger consolidated across segments plus net funds across exchanges; **end-of-day securities balances by identifier** and consolidated; and **securities pledged by identifier with funds raised from pledging**, and the consolidated equivalents. **Excludes** custodian-settled clients and clients with nil funds and nil securities who have **not traded in twelve months**. The venue then forwards the detail to clients by electronic mail and a summary by message |
+| Client-code particulars | A month's information reaching the venue **within seven working days of the following month** | The venue preserves historical submissions for a defined period |
+| Complaint disclosure | **By the seventh** | Public disclosure of complaints |
+| Investor-service-centre details | Within seven days | A designated-large-broker obligation |
+| The commodity venue's equivalent balance submission | **Discontinued** | See section 7 |
+
+## 6. The floating, half-yearly and annual obligations
+
+### The settlement-details filing — a rule, not a date
+
+| Element | Position |
+|---|---|
+| Obligation | Submit **client-code-wise settlement details** of client funds |
+| **Deadline** | **Within ten trading days of the settlement date** |
+| Purpose | To monitor timely settlement of running accounts and verify that **excess client funds are not retained as at the settlement date** |
+| The governing calendar | A **running-account settlement calendar jointly issued at the start of each financial year**, with monthly and quarterly settlement dates |
+| Exclusions | Firms doing **only proprietary and/or only institutional-client** business give a **one-time declaration**; firms serving both must submit for all non-institutional clients |
+| **Why not to publish fixed dates** | The dates move every year with the calendar. **Compilations circulate fixed date sets that do not reconcile with the current year's calendar.** State the rule and derive the dates |
+| Format | A prescribed exhibit whose **field list could not be retrieved** — obtain it from the venue |
+
+### Half-yearly
+
+| Obligation | Notes |
+|---|---|
+| **Internal audit report** | With the asset inventory submitted alongside the first-half report. By an empanelled auditor |
+| **Net worth certificate** | **See the conflict in section 9** |
+| **Margin trading compliance audit certificate** | A separate certificate from the net worth certificate, normally within a month of the half-year end, including a **non-commencement certification** where permission is held but unused |
+| Cyber audit and penetration-testing reports | With differing requirements for designated large brokers and others |
+| Continuity policy and procedures | Within forty-five days of the half-year end, for designated large brokers |
+| Institutional-mechanism summary | A half-yearly summary analysis and action report to the exchange |
+| System audit, for algorithmic members | Half-yearly irrespective of size |
+
+### Quarterly
+
+| Obligation | Deadline |
+|---|---|
+| **Surveillance return** | **Within fifteen days of quarter end**, **nil return mandatory** |
+| **Authorised-person inspection report** | **Within one month of quarter end**, with nil declarations |
+| **Authorised-person disciplinary action** | **Within two months of quarter end** |
+| **Authorised-person action-taken report** | **Within three months of quarter end** — and **within seven days** of the inspection report where the applicable circular prescribes termination. Introduced for quarters from July–September 2026, with the submission mechanism **to be communicated separately** |
+| Alert management information to the board | Quarterly |
+| Continuity drill details and observations | Within thirty days of quarter end, for designated large brokers |
+| Board minutes | Within forty-five days of quarter end, for designated large brokers |
+| Institutional-mechanism control review | Quarterly |
+
+### Annual and event-based
+
+| Obligation | Deadline |
+|---|---|
+| **Annual return** | **By the end of October** |
+| Signed statement of funds and securities to all clients | Annually, as at the financial year end |
+| Tax statements and capital-gains reports | Annual and on demand |
+| System review of the institutional mechanism | At least once a calendar year |
+| **Bank account opening or closure** | **Within seven working days** |
+| Director and key personnel identifier changes | **Within seven days** |
+| Event-based changes | Directors, shareholding and share capital, advertisements, change in control, constitution, compliance-officer appointment or change, addresses, name change |
+| Hosted-software reporting | Within thirty days |
+
+## 7. What is no longer owed
+
+| Obligation | Status |
+|---|---|
+| **Demat-account reporting to exchanges** | **Abolished** from 17 April 2026. Depositories now provide details of accounts opened and closed **directly to the exchanges** |
+| **Client-level cash and cash-equivalent balance reporting** | **Discontinued** from March 2024 |
+| Weekly holding statement, cash-equivalent and bank-balance submission | **Superseded** by the daily holding statement |
+| Daily nil holding declaration | **Replaced** by a one-time nil declaration |
+| The commodity venue's monthly client-wise fund and securities balance submission | **Discontinued** from December 2020 |
+| Tagging requirement for certain accounts of primary dealers | **Carve-out widened** in 2026 |
+
+**One live staleness to be aware of:** the current common-submissions exhibit still lists demat-account reporting, because the exhibit was published before the abolition took effect. **An exhibit entry is not proof an obligation survives.**
+
+## 8. Change register, 2024 to 2026
+
+| Date | Change |
+|---|---|
+| March 2024 | Client-level cash and cash-equivalent balance reporting **discontinued** |
+| December 2023 | Daily nil holding declaration replaced by a **one-time** declaration |
+| July and September 2025 | **Single-filing reform** across exchanges |
+| 23 March 2026, effective 17 April 2026 | **Demat reporting abolished**; bank reporting on a seven-working-day clock; carve-outs widened; depositories feed exchanges directly |
+| April 2026 | Fresh annual **master and consolidated circulars** across membership compliance, inspection, client codes, surveillance and clearing |
+| April 2026 | **Index position limits removed from the clearing consolidated circular**, now living in the surveillance stream |
+| July 2026 | **General operational guidelines on client codes** — immediate updation, the rule against resubmitting unchanged depository details, and the compliance cut-off |
+| 21 August 2026 | **Authorised-person action-taken report** introduced, with its submission mechanism still awaited |
+| September 2026 | **Client-code field validations enhanced**, with revised upload formats and interface specification |
+| October 2026 | Position-limit file contents being split, with index limits moving to a new dedicated file |
+
+## 9. Live deadline conflicts
+
+These are genuine disagreements between currently published documents. **Confirm before configuring a date.**
+
+| # | Conflict |
+|---|---|
+| 1 | **The half-yearly net worth certificate has three formulations in three live documents**: the consolidated regulator circular gives one pair of dates; an exchange membership master gives a two-month rule producing a different pair; and the common-submissions exhibit gives a day count that produces a third. **Marked uncertain — confirm with the exchange** |
+| 2 | **The cash-and-cash-equivalent report timing** carries a sentence prefaced by a date that has passed, reproduced unchanged in the current consolidation, while a later circular confirms the framework continues. **The post-transition timing is therefore unclear** |
+| 3 | The **margin trading exposure deadline** differs between an operative provision and an annexure in another master circular. **Use the amended operative deadline and retain evidence of the conflict** — see [margin trading facility operations](/broking-kyc/finix-broking-setup/products/01-mtf-operations/) |
+
+## 10. Non-submission consequences
+
+| Element | Position |
+|---|---|
+| Below a modest threshold | The exchange **advises** rather than levying |
+| The surveillance-return ladder | Advice, then a per-day amount, then a **prohibition on registering new clients**, then **disablement in all segments** — and the **disablement notice is shared with all exchanges** |
+| Un-prescribed procedural violations | **Advice, then warning, then a modest amount** across the first three instances |
+| Cumulative cap triggering escalation | Where the financial year's inspection-driven penalty exceeds the lower of a stated amount or a proportion of reported net worth, the matter goes to the relevant authority |
+| Early-warning events | Failure to upload client-funds monitoring data for **three consecutive weeks**; non-recovery of significant dues; significant dues to credit-balance clients; **pledging credit-balance clients' securities and using the funds for own purposes or to fund debit-balance clients**; **mis-reporting about client funds or securities**; a significant rise in the risk-based supervision score; terminals disabled for a number of days in the previous quarter |
+| Where the exchange prints no tariff | Several defaults route to a penalty dashboard rather than a published table. **Do not quote amounts that were not published** |
+
+## 11. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.monitoring.sub.calendar_stores_rule_not_date` | **D** | **true** | Dates derived from governing calendars |
+| `finix.monitoring.sub.single_filing_venue` | **D** | The designated exchange | For listed common submissions only |
+| `finix.monitoring.sub.ap_inspection_filed_per_exchange` | **D** | true, pending confirmation | Absent from the common list |
+| `finix.monitoring.sub.holding_statement_daily` | **R** | true | Next day, through the interface |
+| `finix.monitoring.sub.nil_declaration_one_time` | **R** | true | Valid until the next submission |
+| `finix.monitoring.sub.client_funds_weekly_upload` | **R** | true | **Three consecutive misses is an early-warning event** |
+| `finix.monitoring.sub.monthly_balance_days` | **R** | 7 calendar days after month end | With the stated exclusions |
+| `finix.monitoring.sub.settlement_details_trading_days` | **R** | 10 after each settlement date | Against the annual calendar |
+| `finix.monitoring.sub.nil_return_required` | **R** | true for the surveillance and authorised-person returns | A nil return is a return |
+| `finix.monitoring.sub.bank_account_report_working_days` | **R** | 7 of opening or closure | Demat reporting **abolished** |
+| `finix.monitoring.sub.demat_reporting_abolished` | **R** | true | Do not file it |
+| `finix.monitoring.sub.abolished_register_maintained` | **D** | true | So a removed obligation is not revived |
+| `finix.monitoring.sub.conflicting_deadline_register` | **D** | true | With the chosen reading and its evidence |
+| `finix.monitoring.sub.acknowledgement_required` | **D** | true | And the response file checked |
+
+## Practical notes
+
+- **Store the rule and derive the date.** Fixed-date calendars are wrong for every relative obligation, and the error is invisible.
+- **Keep a register of abolished obligations alongside the live calendar.** It stops a removed return being revived by a diligent new joiner reading an old exhibit.
+- **Build the calendar from your category, then use the common list to decide where to file.** The list answers "where", not "whether".
+- **Treat three consecutive client-funds upload misses as a severe internal incident**, because externally it is an early-warning trigger about client-asset diversion rather than a late filing.
+- **Record the chosen reading for each conflicting deadline, with the document that supports it.** If a filing is questioned, the contemporaneous reasoning is the defence.
+- **Chase acknowledgements, and read response files.** A submission believed complete and actually rejected is the worst state to be in.
+
+## Where this connects
+
+The real-time obligations are in [real-time and near-real-time obligations](/broking-kyc/finix-broking-setup/monitoring/02-realtime-near-realtime/), the inbound streams in [alerts received](/broking-kyc/finix-broking-setup/monitoring/04-alerts-received-and-response/), and incident clocks in [incident and breach reporting](/broking-kyc/finix-broking-setup/monitoring/05-incident-breach-reporting/). The files and their response handling are in [outbound submissions](/broking-kyc/finix-broking-setup/files/07-outbound-submissions/) and [handling exceptions](/broking-kyc/finix-broking-setup/files/08-file-handling-exceptions/). Ownership is in [the periodic and compliance matrix](/broking-kyc/finix-broking-setup/roles/03-raci-periodic-compliance/), the longer cadences in [the periodic calendar](/broking-kyc/finix-broking-setup/daily-ops/09-periodic-calendar/), and the pipeline in [the regulatory reporting pipeline](/broking-kyc/finix-broking-setup/compliance/02-reporting-pipeline/).

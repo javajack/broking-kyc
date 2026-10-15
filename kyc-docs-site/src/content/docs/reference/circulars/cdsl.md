@@ -270,7 +270,7 @@ Requires transmission maker and checker activities to finish on the same day (po
 
 - **date_issued:** 2026-07-30
 - **issuer:** CDSL
-- **title:** "VERIFICATION OF MOBILE NUMBER REVOCATION LIST (MNRL) PUBLISHED BY TRAI"
+- **title:** "VERIFICATION OF MOBILE NUMBER REVOCATION LIST (<abbr title="Mobile Number Revocation List">MNRL</abbr>) PUBLISHED BY TRAI"
 - **applies_to:** depository, broker
 - **in_force_date:** [unknown — verify]
 - **status:** in-force

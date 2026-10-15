@@ -12,7 +12,7 @@ import { Aside } from '@astrojs/starlight/components';
 - **Ledger effect and limit effect are different events with different timings.** Every row below states both. The gap between them is a design choice, and an undocumented gap is a complaint generator.
 - **Not every credit creates capacity.** Cleared cash does; an unrealised gain may, partially; a cheque does not until it clears; a non-cash collateral credit does only within the cash-equivalent ratio.
 - **Charges reduce capacity in two different ways.** A charge debited reduces the ledger balance and hence capacity. A charge *accrued but not yet debited* should reduce capacity immediately, and frequently does not — which is how a client ends a day with a debit balance they could not see coming.
-- **The cash component rule bounds everything.** A prescribed minimum proportion of the margin must be in cash or cash equivalent, so a client with abundant securities collateral and no cash still hits a wall. This is the most-misunderstood limit constraint by clients and by sales teams.
+- **The cash-component rule bites, but not where people think.** The prescribed minimum proportion of cash and cash equivalents applies at **clearing-member level**, and the regulator expressly says there need be no minimum at each individual client level. What stops a securities-rich, cash-poor client is usually the **firm's own** cash policy — which is legitimate, and must be disclosed as policy rather than as regulation.
 - **Pay-outs reduce capacity at request, not at payment.** The moment a pay-out is accepted, that money is committed; capacity must drop then, or the client can trade against money already promised to their bank.
 - **Debits age into forced action.** An unmet debit balance does not simply sit there: it becomes a square-off trigger on a defined clock, and the clock is the thing clients are not told about clearly enough.
 
@@ -26,12 +26,12 @@ The third idea concerns accrual. Positions generate obligations continuously: br
 
 ## 1. Framework
 
-- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — margin collection, client funds, running-account settlement, and the disclosure of charges.
+- **[Master Circular for Stock Brokers <abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — margin collection, client funds, running-account settlement, and the disclosure of charges.
 - **[SEBI/HO/MRD2/DCAP/CIR/P/2020/127](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2dcapcirp2020127)** (20 July 2020) — the peak-margin framework. Margin must be sufficient continuously, verified by intraday snapshots, which is why capacity cannot be computed only at day boundaries.
 - **[SEBI/HO/MIRSD/POD-1/P/CIR/2024/118](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdpod-1pcir2024118)** (9 August 2024) — upfront margin obligations.
 - **Cash component requirement** — the prescribed minimum proportion of margin to be met in cash or cash equivalent, set by the clearing corporations within the SEBI framework. `[not yet in index]`
 - **Client funds upstreaming** — the daily upstreaming obligation, which constrains what the firm may hold and therefore what it may lend against. See [upstreaming and downstreaming](/broking-kyc/finix-broking-setup/money/06-upstreaming-downstreaming/).
-- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — Chapter III, segregation of client money, which bounds every capacity decision. `[not yet in index]`
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — Chapter <abbr title="—">III</abbr>, segregation of client money, which bounds every capacity decision. `[not yet in index]`
 
 ## 2. The capacity computation
 
@@ -94,10 +94,14 @@ If capacity only drops when the pay-out is *instructed* rather than when it is *
 | L-36 | Unpledge requested and confirmed | None | — | Capacity reduces | On confirmation | Must not be permitted if it creates a shortfall |
 | L-37 | Collateral invoked | Debit extinguished, securities sold | On settlement | Capacity recomputed on the outcome | On settlement | Notice and policy grounds required first |
 | L-38 | Cash collateral placed with the clearing corporation | Reclassified, not reduced | On transfer | Capacity unchanged or improved by the cash component | On confirmation | Changes *where* the money is, not whose it is |
-| L-39 | Collateral form substituted, securities for cash | Reclassification | On substitution | **Cash component falls; capacity may fall even though total value is unchanged** | On substitution | The counter-intuitive row; see the caution |
+| L-39 | Collateral form substituted, securities for cash | Reclassification | On substitution | **Capacity may fall even though total value is unchanged**, where the firm's cash policy or the member-level cash ratio binds | On substitution | The counter-intuitive row; see the caution |
 
 <Aside type="danger" title="L-39 and the cash component: why a richer client can have less capacity">
-A prescribed minimum proportion of margin must be met in cash or cash equivalent. A client holding a large portfolio of eligible shares and no cash therefore cannot use the full haircut-adjusted value of that portfolio — beyond the point where the cash component binds, additional securities add nothing. Substituting cash collateral for securities of identical value reduces capacity for the same reason. This is counter-intuitive to clients, routinely mis-sold by sales teams who quote the gross collateral value as buying power, and a recurring source of disputes that are entirely avoidable by displaying the binding constraint. The client-facing margin screen should show not just the number but *which term is binding* — limit, cash component, position limit, or available collateral — and the support desk should be trained to read it.
+A prescribed minimum proportion of collateral must be held in cash and cash equivalents — but **that test applies at clearing-member level, and the regulator has expressly stated that there need not be a minimum cash-equivalent percentage at each individual client level**. Excess cash of one client may not support another, while a member's own proprietary cash may support clients within the allocation framework. So the statement that "every client must always hold half their margin in cash" **overstates the rule**.
+
+What does bind a securities-rich, cash-poor client is usually one of three things: the **firm's own** client-level cash policy, which is a legitimate commercial and risk choice; the member's aggregate cash availability and the clearing corporation's allocation computation, which can limit the benefit actually passed through; or the haircut and eligibility treatment of the particular securities. All three are real. Only the second is regulatory, and it operates at the member rather than the client level.
+
+The operational consequence is the same either way, and it is the reason this row matters: the client-facing margin screen should display **which term is binding** — the limit, the firm's cash policy, the allocation outcome, the position limit, or available collateral — rather than a bare number. And the support desk should be trained to say "our policy requires" where that is the truth, instead of attributing a commercial choice to a regulation, which is both inaccurate and the kind of statement a client later quotes back.
 </Aside>
 
 ## 6. The matrix — trading and settlement
@@ -199,7 +203,8 @@ The intervals in this table are discretionary within the regulatory constraints 
 | `finix.rms.capacity.accrual_block_display_to_client` | **D** | true | Makes the arithmetic self-explanatory |
 | `finix.rms.capacity.payout_blocks_at_request` | **D** | **true** | The L-20 fix |
 | `finix.rms.capacity.intraday_collateral_revaluation` | **D** | Enabled above a move threshold | The L-33 decision |
-| `finix.rms.capacity.cash_component_minimum` | **E** | Clearing-corporation set | Not discretionary |
+| `finix.rms.capacity.cash_component_minimum_member_level` | **E** | Clearing-corporation set | **Applies at member level, not per client** |
+| `finix.rms.capacity.client_cash_policy` | **D** | Firm's own choice, disclosed as policy | Must not be presented to clients as a regulatory requirement |
 | `finix.rms.capacity.binding_constraint_displayed` | **D** | true | Which term is binding, shown to the client |
 | `finix.rms.capacity.suspended_security_collateral_value` | **D** | Zero | Despite any price in the file |
 | `finix.rms.capacity.loss_recognition` | **D** | Immediate | Never deferred to posting |

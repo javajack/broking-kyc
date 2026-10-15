@@ -43,7 +43,7 @@ Lists common errors in daily client collateral segregation reporting, which has 
 - **impact_areas:** commodities, margin, rms
 - **primary_url:** https://www.icclindia.com/downloads/UploadDocs/Notices/20260909-1/20260909-1.pdf
 
-Recategorises commodities under SEBI's 2020 and 2021 commodity risk circulars, modifying BSECL circular 20260310-8 (opening paragraph). Minimum IM/SOMM/MPOR/VSR are 10%/10%/3 days/6% for Crude Oil, Brent Crude and Silver, and 8%/8%/2 days/5% for Gold. Following the lead exchange, Crude Oil and Brent carry 30% IM, SOMM and VSR, and Silver 11.50% IM and SOMM (table and footnotes). IM is not scaled up by MPOR, option MPOR is at least two days, and option sellers pay the higher of SOMM or MPOR-scaled VaR, from beginning of day October 1, 2026 (notes 1–4 and closing paragraph).
+Recategorises commodities under SEBI's 2020 and 2021 commodity risk circulars, modifying BSECL circular 20260310-8 (opening paragraph). Minimum IM/<abbr title="Short Option Minimum Margin">SOMM</abbr>/<abbr title="Margin Period of Risk">MPOR</abbr>/<abbr title="Volatility Scan Range">VSR</abbr> are 10%/10%/3 days/6% for Crude Oil, Brent Crude and Silver, and 8%/8%/2 days/5% for Gold. Following the lead exchange, Crude Oil and Brent carry 30% IM, SOMM and VSR, and Silver 11.50% IM and SOMM (table and footnotes). IM is not scaled up by MPOR, option MPOR is at least two days, and option sellers pay the higher of SOMM or MPOR-scaled VaR, from beginning of day October 1, 2026 (notes 1–4 and closing paragraph).
 
 ### MCXCCL/RISK/196/2026
 
@@ -1267,7 +1267,7 @@ Revises EPI cut-offs for October 6, 2023 running-account-settlement date. Funds 
 - **impact_areas:** settlement, margin, file-format, client-funds, commodities, rms
 - **primary_url:** https://siddharthacommodities.com/test/admin/data/img/Consolidated%20Master%20Circular%20%20MCXCCL.pdf
 
-Annual MCXCCL master circular consolidating all circulars in force as of June 30, 2023. Forms operational baseline for FY 2023-24 covering risk management framework, margining (SPAN methodology with VaR over MPOR), client margin/peak-margin reporting, MSBA (Margin Shortfall Block Amount), Core <abbr title="Settlement Guarantee Fund">SGF</abbr>, collateral segregation, delivery and settlement procedures, member admission, annual returns. [unknown — verify] direct URL (canonical hosting on mcxccl.com returned 403/403; third-party mirror used).
+Annual MCXCCL master circular consolidating all circulars in force as of June 30, 2023. Forms operational baseline for FY 2023-24 covering risk management framework, margining (SPAN methodology with VaR over MPOR), client margin/peak-margin reporting, <abbr title="Margin Shortfall Block Amount">MSBA</abbr> (Margin Shortfall Block Amount), Core <abbr title="Settlement Guarantee Fund">SGF</abbr>, collateral segregation, delivery and settlement procedures, member admission, annual returns. [unknown — verify] direct URL (canonical hosting on mcxccl.com returned 403/403; third-party mirror used).
 
 ### NCL/CMPT/57223
 

@@ -1,0 +1,171 @@
+---
+title: "Roles 4: segregation of duties and access control"
+description: What must actually be separated and on whose authority — the separations the rulebook names explicitly, the four-eyes controls it requires only in substance, identifier and credential discipline, privileged access and the rule that privileged users cannot reach their own audit trail, and what must be logged and for how long.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Compliance manuals in this area routinely assert separations that no rule requires, which is worse than useless: an inspector tests the assertion, finds no basis for it, and the credibility of the surrounding document falls with it. So this page is split precisely — section 2 lists separations that are **named** in the rules, section 3 lists the four-eyes controls that are required **in substance** through the internal-control and fraud-prevention obligations, and section 4 states plainly which two widely-assumed separations fall into the second category rather than the first. All three sections lead to the same controls; only the justification differs, and getting the justification right is what makes the control defensible.
+
+## TL;DR
+
+- **Client assets must be segregated** from the firm's own and from other clients', with accounts named and tagged by purpose and reported to the exchanges. This is explicit and it is the central obligation.
+- **Collateral must be disaggregated to client level daily**, member to clearing member to venue, including the member's proprietary collateral.
+- **Two separations everyone assumes are named rules are not** — dealing from risk management, and the payout maker from the payout approver. They are required in substance, and should be documented that way.
+- **The institutional mechanism is the closest thing to a codified four-eyes regime**: documented roles and thresholds, mule-account detection, immediate internal escalation, prompt exchange notification, a protected whistle-blower channel, quarterly reviews and a half-yearly report.
+- **Auditor independence and rotation are explicit and mechanical** — term limits, cooling-off, and a bar on firms sharing a partner with an outgoing firm.
+- **A privileged user must not be able to reach the logs recording their own activity.** This is stated explicitly and is the control most often absent in practice.
+
+## Conceptual overview
+
+Segregation in a broking firm serves three distinct purposes, and the strength of the rule tracks the purpose. Where the risk is **misappropriation of client assets**, the separation is explicit, statutory and absolute: client money and securities are separated from the firm's own and from each other's, in accounts named for the purpose. Where the risk is **conflict of interest** — proprietary activity against client activity, an authorised person's operations against the member's — the rules are specific but narrower, regulating terminals, documents and the flow of funds. And where the risk is **ordinary operational error or internal fraud**, the rules stop prescribing structure and instead require effective internal control, leaving the firm to design the four-eyes arrangements and the auditor to test them.
+
+The second idea is that the third category is not a weaker obligation, merely a differently expressed one. The internal audit must examine the "existence, scope and efficiency of the internal control system", and the institutional mechanism for prevention and detection of fraud requires documented roles, responsibilities and thresholds, internal controls, escalation and a whistle-blower policy. A firm with no separation between the person who creates a beneficiary and the person who pays it has an internal-control deficiency, and it will be found as one. The correct formulation in a policy is therefore "the firm maintains this separation as an internal control, because the internal-control and fraud-prevention obligations require effective controls, and the internal auditor tests it" — accurate, defensible, and producing the same control.
+
+The third point concerns access as the implementation of all of it. A separation that exists in an organisation chart and not in an entitlement set does not exist. The identifier regime makes this concrete: identifiers are personal, registered before use, tied to certification, located at reported places, and logged non-tamperably. Every separation in sections 2 and 3 ultimately resolves to who holds which entitlement, which is why the quarterly entitlement audit in section 6 is the mechanism that makes the rest of the page real rather than aspirational.
+
+## 1. Framework
+
+- **[Master Circular for Stock Brokers <abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — client-asset segregation as an enumerated inspection violation, account naming and tagging and their reporting, daily client-level collateral reporting, the proprietary terminal, proprietary-trading disclosure, funded-book separation, internal and statutory auditor independence and rotation, the privileged-user log rule, and the internal-control audit scope.
+- **[SEBI/HO/MRD2_DCAP/CIR/2021/0598](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2_dcapcir20210598)** (20 July 2021) — client-level collateral segregation and the disaggregated client collateral portal.
+- **Chapter IVA of the SEBI (Stock Brokers) (Amendment) Regulations, 2024**, and the implementing circular of 4 July 2024 — the **institutional mechanism**, phased by active client count with the smallest band in scope from **1 April 2026**. `[not yet in index]`
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — segregation of client funds and securities, restriction of proprietary accounts to proprietary trades, and the institutional mechanism carried forward with documented policies, mule-account detection, a whistle-blower channel and periodic review. Regulation numbers from commentary. `[not yet in index]`
+- **Exchange circular on authorised-person supervision** — the authorised person's separation from the member's own operations. `[not yet in index]`
+- **Exchange user-identifier master of April 2026** — identifier discipline, location reporting and log retention. `[not yet in index]`
+- **Depository circular of July 2026** — participant maker-and-checker separation, approved procedures and resource adequacy. `[not yet in index]`
+
+## 2. Separations the rules name explicitly
+
+| Separation | Requirement |
+|---|---|
+| **Client funds and securities from the firm's own** | Not having separate client accounts, **or having them but not segregating client assets from the firm's own**, is an **enumerated inspection violation** |
+| **Client money from the firm's and from other clients'** | Strict separation, with client money and securities used **only for permitted purposes** |
+| **Bank and depository accounts by purpose** | Appropriate **nomenclature and tagging** to reflect purpose, with all existing and new **bank** accounts reported to the exchanges in prescribed formats. Failure to tag, or to report, are **event-based monitoring triggers**. Demat-account reporting was **abolished** in 2026 — see [periodic submissions](/broking-kyc/finix-broking-setup/monitoring/03-periodic-submissions/) |
+| **Collateral at client level** | **Daily disaggregated** collateral reporting to client level, member to clearing member, and clearing member to the venue, **including the member's proprietary collateral**, per segment |
+| **Proprietary from client trading** | The proprietary terminal is **separately regulated** and permitted at **one location** unless an undertaking is given and the exchange agrees; proprietary accounts are **restricted to proprietary trades**; and proprietary trading **must be disclosed to clients** |
+| **The funded book from the rest** | **Separate client-wise ledgers** for funds and securities of clients using the funding facility, and a **separate record of funds used and their sources** |
+| **An authorised person from the member's operations** | Authorised persons **must not** generate or issue contract notes, statements of funds or margin statements — administrative assistance only. **No movement of funds or securities between clients and the authorised person.** Where an authorised person sits in a member branch, the space must be **physically segregated** with its own display |
+| **Internal auditor from the firm** | An independent practising professional with **no interest in or relation to** the firm beyond the engagement, with a **written declaration**; **term limits for an individual and for a firm, a cooling-off period, and a bar on appointing a firm sharing a partner with an outgoing firm** |
+| **Statutory auditor from the firm** | The **same rotation architecture** |
+| **System and cyber auditor from the firm** | The system auditor: no conflict, partners unrelated to any broker or its directors or promoters, and a **maximum number of successive audits**. The cyber auditor: empanelled, independent, **no consulting engagement in the preceding two years**, a maximum number of consecutive years then a cooling-off |
+| **Privileged users from their own audit trail** | **Privileged users must be disallowed from accessing the system logs in which their own activities are captured** |
+| **Depository maker and checker** | Participants must implement approved procedures, **maker-and-checker separation**, resource adequacy and alert-parameter review |
+
+## 3. The institutional mechanism
+
+The closest thing to a codified internal-control regime, and the correct basis for the controls in section 4.
+
+| Component | Requirement |
+|---|---|
+| Surveillance and **internal controls** | Systems for surveillance of trading activities **and internal controls** |
+| Obligations | Of the firm **and its employees** |
+| Escalation | Defined escalation and reporting mechanisms; employees inform senior management **without delay**; the firm notifies the exchange **promptly** on detection |
+| **Whistle-blower policy** | **Documented**, with a **confidential channel** and **protection against retaliation** |
+| Documented policies | Defining **roles, responsibilities and alert thresholds** |
+| Detection | Processes to detect **mule accounts** and suspicious activity |
+| Review | **Quarterly** compliance and control reviews; a **half-yearly** summary analysis and action report to the exchange; and **at least annual** system review |
+| Scope today | Phased by active client count, with the **smallest band in scope from 1 April 2026** — so **every firm, including a greenfield one, is in scope** |
+| Accountability matrix | Who reviews whose conduct, through to clients and authorised persons — set out in [alerts received](/broking-kyc/finix-broking-setup/monitoring/04-alerts-received-and-response/) |
+
+## 4. The four-eyes controls — required in substance
+
+<Aside type="danger" title="State these as internal controls, not as named regulatory requirements">
+**No rule was located that states in terms that "the dealing function must be segregated from risk management" or that "the person who creates a payout must differ from the person who approves it".** They are nonetheless real obligations, reached in substance: the half-yearly internal audit tests the **existence, scope and efficiency of the internal control system**, and the institutional mechanism requires **documented roles and responsibilities and internal controls**.
+
+The practical difference matters. A manual asserting a named rule invites an inspector to ask which rule — and the answer, that there is not one, damages confidence in everything around it. A manual stating that the firm maintains the separation as an internal control, required in substance by the internal-control and fraud-prevention obligations and tested by the internal auditor, is accurate, is defensible, and produces exactly the same control. Write it the second way.
+</Aside>
+
+| Control | Why the firm maintains it |
+|---|---|
+| **Dealing separated from risk management** | A desk that both constrains and consumes capacity cannot be constrained. Required in substance through internal control |
+| **Payout maker separated from payout approver** | The classic payment-fraud vector. Required in substance |
+| **Beneficiary creation separated from payment** | The dominant real-world pattern is not a fabricated payment but a legitimate payment to an **altered destination** |
+| Risk decision separated from its execution | So the record shows the decision preceded the trade — see [the trading-day responsibility matrix](/broking-kyc/finix-broking-setup/roles/02-raci-trading-day/) |
+| Journal entry maker separated from approver | Every manual journal is a correction to the firm's own books |
+| Client-code modification separated from dealing | The mechanism's abuse pattern is shifting a profitable trade between accounts |
+| Client-master change separated from limit setting | Otherwise one person can create a client and grant it capacity |
+| Reconciliation separated from the activity reconciled | A desk reconciling its own output will not find its own error |
+| Access granting separated from access using | An administrator who can grant themselves a dealing entitlement is unconstrained |
+| Compliance reporting independent of the activity reported | The compliance officer's independent reporting channel exists for this |
+
+## 5. Identifier, credential and access discipline
+
+| Control | Requirement |
+|---|---|
+| Identifiers are **personal** | One person, one identifier. **Sharing a dealer login destroys attribution**, which is the first thing an exchange asks about |
+| Registered before use | Reported before any order is routed; see [terminal and user-identifier registration](/broking-kyc/finix-broking-setup/certification/03-ctcl-nnf-terminal-registration/) |
+| Tied to certification | **Deactivate on certification expiry**; the exchange also disables at end of day for expired certification |
+| Located at reported places | Terminals at the member's offices or registered authorised-person offices, operated by approved persons. **Credentials must not be given to customers or unregistered intermediaries** |
+| Non-trading identifiers | Testing, view and administrative identifiers are reported and **cannot place live orders** |
+| **Authentication** | **Second-factor authentication at each web and mobile login**, with sessions terminated at day end so none persists across days |
+| Password discipline | Initial password change, a password policy, inactivity logout, valid-user access. **No universal timeout or expiry interval was established — do not invent one** |
+| Programmatic access | Vendor- and client-specific keys, address whitelisting, token-based authentication, second-factor authentication, and a **daily session logout** |
+| **Privileged access** | Least privilege, named accounts rather than shared ones, and **no privileged access to the logs capturing that user's own activity** |
+| Entitlement to catalogue mapping | Every entitlement maps to a catalogued action — see the operations catalogues for [<abbr title="Order Management System">OMS</abbr>](/broking-kyc/finix-broking-setup/oms/11-operations-catalogue/), [<abbr title="Risk Management System">RMS</abbr>](/broking-kyc/finix-broking-setup/rms/11-operations-catalogue/), [back office](/broking-kyc/finix-broking-setup/backoffice/12-operations-catalogue/) and [money](/broking-kyc/finix-broking-setup/money/08-money-operations-catalogue/) |
+
+## 6. What must be logged, and for how long
+
+| Record | Retention |
+|---|---|
+| Order and trade logs, with unique order and trade numbering | **At least five years** in a non-tamperable form for identifier and terminal records; the general broker record-retention obligation is **eight years** |
+| **All created identifiers, whether enabled or disabled** | With the terminal login records |
+| Order-entry terminal addresses | Part of the system-audit scope |
+| Order details — identifier, timestamp, type, instrument, action, quantity, price, validity | Part of the audit scope |
+| Electronic contract-note dispatch logs | **Their absence is an enumerated deficiency** |
+| Messaging and chat usage logs | Treated as records |
+| **Logging and monitoring parameters** under the technical-glitch framework | Preserved for the prescribed period |
+| Privileged-user activity | Retained for **periodic review** |
+| Security logs of internet-exposed systems, applications and network devices | **Monitored for anomalies** |
+| Capacity utilisation of critical internet-exposed systems | Monitored |
+| Penetration-test records and proofs of concept | **At least three years** |
+| The firm's own intervention and exception logs | Per the catalogues, aligned to the record-retention obligation |
+
+## 7. The entitlement audit
+
+The mechanism that makes this page real.
+
+| Element | Position |
+|---|---|
+| Frequency | **Quarterly**, and after any reorganisation |
+| **The question to ask** | Not "is this entitlement set internally consistent" but **"does anyone hold an entitlement with no catalogue entry"**, and **"does anyone hold two entitlements that are meant to check each other"** |
+| Inputs | The entitlement extract, the operations catalogues, the responsibility matrices, the certification register and the rota |
+| Findings to expect | Leavers still entitled; movers holding both old and new entitlements; administrators with dealing rights; dealers with limit rights; shared or service accounts with human-level entitlements; and privileged accounts with log access |
+| Output | A remediation list with owners and dates, and a report to the compliance officer |
+| **Enforce in the system, not the procedure** | A procedural separation is defeated by one person being on leave. If the system permits a single person to complete a dual-control action, the control does not exist |
+
+## 8. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.roles.sod.client_assets_segregated` | **R** | **true** | The central obligation |
+| `finix.roles.sod.account_nomenclature_by_purpose` | **R** | true | And reported for bank accounts |
+| `finix.roles.sod.collateral_disaggregated_daily` | **R** | true | Including proprietary collateral |
+| `finix.roles.sod.prop_terminal_single_location` | **R** | true | Unless an undertaking is accepted |
+| `finix.roles.sod.prop_accounts_prop_trades_only` | **R** | true | — |
+| `finix.roles.sod.funded_book_separate_ledgers` | **R** | true | With sources of funds recorded |
+| `finix.roles.sod.ap_cannot_issue_documents` | **R** | true | And no fund or securities movement |
+| `finix.roles.sod.auditor_rotation_enforced` | **R** | true | Including the common-partner bar |
+| `finix.roles.sod.privileged_no_own_log_access` | **R** | **true** | Explicit, and often absent |
+| `finix.roles.sod.maker_checker_enforced_in_system` | **D** | **true** | Not procedural |
+| `finix.roles.sod.beneficiary_create_pay_separated` | **D** | true | The dominant fraud pattern |
+| `finix.roles.sod.dealing_separated_from_risk` | **D** | true | **Documented as an internal control** |
+| `finix.roles.sod.identifier_personal_no_sharing` | **R** | true | Attribution depends on it |
+| `finix.roles.sod.certification_expiry_disables` | **R** | true | Automatic |
+| `finix.roles.sod.2fa_each_login` | **R** | true | Sessions not persisting across days |
+| `finix.roles.sod.entitlement_maps_to_catalogue` | **D** | true | No uncatalogued entitlements |
+| `finix.roles.sod.entitlement_audit_frequency` | **D** | Quarterly, and after reorganisations | — |
+| `finix.roles.sod.log_retention_identifier_years` | **R** | 5, non-tamperable | General records 8 |
+| `finix.roles.sod.vapt_records_years` | **R** | 3 | With proofs of concept |
+
+## Practical notes
+
+- **Enforce dual control in the system.** A procedure that two people must act is defeated by one person being on leave and the other being helpful.
+- **Audit entitlements against the catalogues, not against themselves.** Uncatalogued entitlements and mutually-checking pairs held by one person are the findings that matter.
+- **Check the privileged-log rule specifically.** It is explicit, it is commonly unimplemented, and it is easy for an auditor to test.
+- **Watch movers more than leavers.** Leaver processes usually work; a person who changes desk and keeps both entitlement sets is the commoner gap.
+- **Write the substance-based controls as substance-based controls.** The justification is part of the control's defensibility.
+- **Treat an authorised person's physical space as part of the segregation.** It is an explicit requirement and a visible one during an inspection.
+
+## Where this connects
+
+The roles and their accountability are in [the role register](/broking-kyc/finix-broking-setup/roles/01-role-register/), the day-to-day ownership in [the trading-day responsibility matrix](/broking-kyc/finix-broking-setup/roles/02-raci-trading-day/) and [the periodic and compliance matrix](/broking-kyc/finix-broking-setup/roles/03-raci-periodic-compliance/), and the out-of-hours arrangements in [escalation and on-call](/broking-kyc/finix-broking-setup/roles/05-escalation-oncall/). The actions entitlements map to are in the four operations catalogues, identifier mechanics in [terminal and user-identifier registration](/broking-kyc/finix-broking-setup/certification/03-ctcl-nnf-terminal-registration/), and the audits that test all of it in [the audit machinery](/broking-kyc/finix-broking-setup/compliance/05-audit-machinery/). The cyber controls are in [cyber resilience configuration](/broking-kyc/finix-broking-setup/compliance/04-cyber-cscrf-config/), and the vendor-neutral view is [security and compliance](/broking-kyc/architecture/security-compliance/).

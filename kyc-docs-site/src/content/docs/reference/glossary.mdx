@@ -79,6 +79,12 @@ The same entries appear once below in alphabetical order. This grouping is a nav
 **Meaning:** Capital that exchanges require a Trading Member to maintain *on top of* the Base Minimum Capital (BMC) when the member chooses to take exposure exceeding the entitlement supported by BMC alone. Each exchange (NSE, BSE, MCX) publishes a methodology that translates required gross / net exposure into ABC obligation; the member tops up cash, FDR, bank guarantee, or approved securities into the exchange-prescribed segregated account. Shortfall in ABC triggers proportional cuts in turnover allowed, deactivation in extreme cases, and a half-yearly compliance reporting flag.
 **See also:** [BMC and ABC deep-dive](/broking-kyc/deep-dives/member-compliance/bmc-abc/)
 
+### ADDV
+
+**Full form:** Average Daily Delivery Value
+**Meaning:** The market-wide average value of deliveries in a security, used as one input to the market-wide position limit formula. Since October 2025 that limit is the lower of a proportion of free float and a multiple of average daily delivery value, subject to a floor, recalculated quarterly on a rolling average.
+**See also:** [The derivatives contract lifecycle](/broking-kyc/finix-broking-setup/products/03-fno-contract-lifecycle/)
+
 ### AePS
 
 **Full form:** Aadhaar enabled Payment System
@@ -287,6 +293,12 @@ Both create market-disclosure obligations; brokers run automated trade-pattern d
 **Meaning:** The cash penalty applied when a member fails to deliver securities by pay-in deadline and the exchange's auction process cannot find sellers (or the auction price exceeds the cap). The defaulting member is charged a close-out at the higher of (auction price, last traded price on T+2) plus a percentage close-out factor — historically up to 20% above the higher of those references. The amount is debited from the member's settlement account and paid to the buyer who was short-received.
 **See also:** [Short delivery / auction deep dive](/broking-kyc/deep-dives/trading-day/short-delivery-auction/)
 
+### ComRIS
+
+**Full form:** Commodity Receipts Information System
+**Meaning:** MCX Clearing Corporation's system and portal for electronic commodity warehouse receipts, used for the delivery leg of physically settled commodity contracts and exposed to members through its own interface. It is distinct from COMTRACK, which belongs to a different commodity exchange and must not be substituted for it.
+**See also:** [Commodity delivery operations](/broking-kyc/finix-broking-setup/products/05-commodity-delivery-operations/)
+
 ### Concurrent audit
 
 **Full form:** —
@@ -459,6 +471,12 @@ See [TRAI DLT](#trai-dlt) for SMS-pre-registration framework. Note: SEBI uses "D
 **Meaning:** The order-routing and -execution layer that sits between an OMS (or a trader's workstation) and the exchange / market gateway. Specializes in best-execution logic, smart order routing across venues (SOR), iceberg / TWAP / VWAP order slicing, FIX protocol session management with exchanges, and post-trade execution reports. Larger brokers, particularly institutional and algorithmic desks, layer an EMS on top of their OMS; retail-only brokers often fold EMS functionality into a single OMS-EMS combined platform.
 **See also:** [OMS internals](/broking-kyc/deep-dives/trading-day/oms-internals/)
 
+### eNWR
+
+**Full form:** Electronic Negotiable Warehouse Receipt
+**Meaning:** A negotiable receipt for goods stored in a warehouse accredited under the warehousing regulator's regime, held electronically in a repository and used for agricultural commodity deliveries. It is legally distinct from the electronic warehouse receipts used for relevant bullion and base-metal deliveries, so "electronic receipt" alone does not establish which regime applies.
+**See also:** [Commodity delivery operations](/broking-kyc/finix-broking-setup/products/05-commodity-delivery-operations/)
+
 ### EOD
 
 **Full form:** End Of Day
@@ -547,6 +565,12 @@ See [TRAI DLT](#trai-dlt) for SMS-pre-registration framework. Note: SEBI uses "D
 **Full form:** Foreign Portfolio Investor
 **Meaning:** A non-resident investor registered under the SEBI (Foreign Portfolio Investors) Regulations, 2019, in Category I or Category II, through a Designated Depository Participant.
 **See also:** [Account variants: FPI / FVCI](/broking-kyc/account-variants/fpi-fvci/), [DDP](#ddp), [CP code](#cp-code)
+
+### FutEq
+
+**Full form:** Future Equivalent (open interest)
+**Meaning:** Open interest measured on a net delta-adjusted basis at portfolio level across futures and options for an underlying, introduced for index option position limits from 2025. Index futures limits and trading-member-level index limits deliberately remained on a gross notional basis, so the measurement basis must be applied per instrument and per level rather than uniformly.
+**See also:** [Real-time and near-real-time obligations](/broking-kyc/finix-broking-setup/monitoring/02-realtime-near-realtime/)
 
 ### FVCI
 
@@ -801,17 +825,35 @@ The CSCRF circular explicitly references Type-I/II/III in the audit-cycle obliga
 **Meaning:** A short-form disclosure of the key terms of the broker-client relationship that stock brokers must give clients at onboarding, alongside the rights and obligations and risk disclosure documents.
 **See also:** [Client protection frameworks](/broking-kyc/trading-risk/client-protection-frameworks/)
 
+### MNRL
+
+**Full form:** Mobile Number Revocation List
+**Meaning:** A daily list, originating from the telecommunications authorities' intelligence platform, of mobile numbers that have been disconnected or revoked. Exchanges disseminate it to members, who must act on it because a valid mobile number is one of the attributes that makes a client code permitted to trade.
+**See also:** [Alerts received, and the obligation to respond](/broking-kyc/finix-broking-setup/monitoring/04-alerts-received-and-response/)
+
 ### Modification request
 
 **Full form:** —
 **Meaning:** Lifecycle event where a customer asks to update one or more fields in their KYC / trading-account master — address, mobile, email, bank account, nominee, segment, brokerage plan, DDPI authorization, FATCA declaration. The modification flows from the broker UI / form, through identity-proof checks (often a second eSign / OTP), through to KRA / CKYC / depository / exchange-UCC updates. Each downstream system has its own modification SLA and acknowledgment file; the broker reconciles all of them before considering the modification complete.
 **See also:** [Lifecycle: Modifications](/broking-kyc/lifecycle/modifications/), [CDSL modifications](/broking-kyc/vendors/depositories/cdsl-modifications/)
 
+### MPOR
+
+**Full form:** Margin Period of Risk
+**Meaning:** The assumed holding period over which a position's risk is measured in the commodity derivatives margin framework, set per commodity category alongside initial margin, the short option minimum margin and the volatility scan range. It is a commodity-segment parameter and has no equity-derivatives equivalent of the same name.
+**See also:** [Segment rules comparison](/broking-kyc/deep-dives/foundational/segment-rules-comparison/)
+
 ### MRD
 
 **Full form:** Market Regulation Department (SEBI)
 **Meaning:** SEBI's department for stock exchanges, clearing corporations, depositories — the MII-facing supervision. Operates the rule-base for exchange operations: trading hours, T+0 / T+1 settlement rollout, SPAN methodology approval, surveillance frameworks (GSM / ASM / ESM), short-delivery / auction rules, peak-margin, expansion of segments. Circulars: `SEBI/HO/MRD/MRD-PoD-3/P/CIR/...`. The T+0 / T+1 settlement circular (`SEBI/HO/MRD/MRD-PoD-3/P/CIR/2024/20`, 21 Mar 2024) is the canonical example.
 **See also:** [SEBI-other circulars](/broking-kyc/reference/circulars/sebi-other/)
+
+### MSBA
+
+**Full form:** Margin Shortfall Block Amount
+**Meaning:** An MCX Clearing Corporation term for an amount blocked against a member in respect of a margin shortfall, forming part of the commodity segment's own margin and penalty vocabulary.
+**See also:** [MCX commodity derivatives](/broking-kyc/finix-broking-setup/exchanges/04-mcx-commodity/)
 
 ### MSEI
 
@@ -990,6 +1032,12 @@ The CSCRF circular explicitly references Type-I/II/III in the audit-cycle obliga
 **Meaning:** Income-Tax Department-issued 10-character alphanumeric identifier (format: `AAAAA9999A`). Mandatory for every Indian broking account; verified at onboarding against the Income-Tax PAN-validation API (returns name + DOB + status) or against NSDL's PAN-detail web service. PAN-Aadhaar linkage is a separate mandatory check (since the linkage deadline in 2023, PAN becomes inoperative if not Aadhaar-linked, blocking KYC). Brokers also validate that PAN is not on the Income-Tax department's list of suspended / surrendered / fake PANs.
 **See also:** [PAN-DOB journey step](/broking-kyc/journey/02-pan-dob/), [Personal-identity section](/broking-kyc/reference/field-atlas/sections/a-personal-identity/), [Six attribute matching](/broking-kyc/operations/six-attribute-matching/)
 
+### PaRRVA
+
+**Full form:** Past Risk and Return Verification Agency
+**Meaning:** The framework, operationalised from May 2026, under which claims about past risk and return performance are verified. Enrolment applies to those communicating certified past performance, with a timeline extended during 2026; it does not extend to execution-only brokerage.
+**See also:** [The 2026 regulatory change register](/broking-kyc/finix-broking-setup/compliance/06-regulatory-change-2026/)
+
 ### Partnership, LLP, Corporate broker
 
 **Full form:** —
@@ -1116,6 +1164,12 @@ The CSCRF circular explicitly references Type-I/II/III in the audit-cycle obliga
 **Meaning:** Income-Tax Act 1961 intermediate residency category — applies to a returning NRI (or someone meeting the 60-/120-day Indian-stay threshold but not the 729-day-over-7-years test). RNOR keeps NRI-tax-treatment benefits on foreign-sourced income for the transition period (typically 2 years post-return). For broking, RNOR doesn't directly change the trading-account setup (the client is residentially "Indian" but tax-wise "RNOR"), but appears in the FATCA-CRS self-certification and in tax-deducted-at-source classification.
 **See also:** [NRI conversion lifecycle](/broking-kyc/lifecycle/nri-conversion/)
 
+### RTCM
+
+**Full form:** Reversal Trade Cancellation Mechanism
+**Meaning:** An exchange mechanism that monitors reversal trades between a pair of identifiers and cancels trades automatically and intraday when several thresholds are breached together. Notice reaches the member as a terminal message, with daily and monthly eligibility files, so a member that does not capture terminal output learns of a cancellation only through a reconciliation break.
+**See also:** [Alerts received, and the obligation to respond](/broking-kyc/finix-broking-setup/monitoring/04-alerts-received-and-response/)
+
 ### RTGS
 
 **Full form:** Real Time Gross Settlement
@@ -1185,6 +1239,12 @@ The CSCRF circular explicitly references Type-I/II/III in the audit-cycle obliga
 ### SMS
 **Full form:** Short Message Service.
 **Meaning:** Used heavily in broking for transactional communication: order-execution confirmations, margin-call alerts, contract-note dispatch notifications, OTP delivery, AMC reminders, dormancy alerts. Subject to [TRAI DLT](#trai-dlt) registration (header registration, content-template pre-approval, consent capture). SEBI mandates SMS dispatch for specific events (e.g., margin-shortfall, contract-note ready) — see operations/messaging-and-dispatch.
+### SOMM
+
+**Full form:** Short Option Minimum Margin
+**Meaning:** The minimum margin charged on short option positions in the commodity derivatives framework, set per commodity category as a SPAN parameter alongside initial margin, the margin period of risk and the volatility scan range. It does **not** exist in Indian equity derivatives, where it was abolished with effect from 1 June 2020 — so a margin engine carrying a non-zero value for equity options over-collects from every option writer.
+**See also:** [The derivatives contract lifecycle](/broking-kyc/finix-broking-setup/products/03-fno-contract-lifecycle/)
+
 ### SOR
 
 **Full form:** Smart Order Routing
@@ -1214,6 +1274,12 @@ The CSCRF circular explicitly references Type-I/II/III in the audit-cycle obliga
 **Full form:** Short-term capital gains
 **Meaning:** Gains on assets sold within the statutory holding period. For listed equity shares on which STT is paid, taxed at the special rate applicable to such gains.
 **See also:** [Tax reporting](/broking-kyc/funds-tax/tax-reporting/), [LTCG](#ltcg), [STT](#stt)
+
+### STQC
+
+**Full form:** Standardisation Testing and Quality Certification
+**Meaning:** The certification route through which, from a September 2026 notification, exchange-empanelled trading-software vendors must obtain application-security and functional certification covering terminal-connected, internet, wireless, programmatic-access and back-office products. It is a vendor-product obligation that sits alongside, rather than replacing, the broker's own deployment approval, and its deadlines fall in 2027 and 2028.
+**See also:** [The software approval regime](/broking-kyc/finix-broking-setup/certification/01-software-approval-regime/)
 
 ### STR
 
@@ -1287,6 +1353,12 @@ The CSCRF circular explicitly references Type-I/II/III in the audit-cycle obliga
 **Meaning:** The exchange-mandated unique identifier for each client of each Trading Member — assigned by the broker, registered with each exchange the client trades on (NSE UCC, BSE UCC, MCX UCC are separate registrations even for the same client). UCC carries the client's PAN, KYC reference, segment authorizations. Every order routed to the exchange carries the UCC tag, so the exchange can attribute the order to the right end-client for surveillance, position limits, and reporting.
 **See also:** [NSE UCC destination](/broking-kyc/reference/field-atlas/destinations/nse-ucc/), [BSE UCC destination](/broking-kyc/reference/field-atlas/destinations/bse-ucc/), [MCX UCC destination](/broking-kyc/reference/field-atlas/destinations/mcx-ucc/), [Exchange registration](/broking-kyc/operations/exchange-registration/)
 
+### UDiFF
+
+**Full form:** Unified Distilled File Formats
+**Meaning:** The standardised file-format programme spanning exchanges, clearing corporations and depositories, under which masters, bhavcopy, margin and depository files follow common conventions with tagged columns. It is the layer a greenfield broker should build on, because the legacy venue-proprietary formats are progressively retired — as the October 2026 withdrawal of the legacy extranet and broadcast bhavcopy demonstrated.
+**See also:** [NSE and NSE Clearing files](/broking-kyc/finix-broking-setup/files/02-nse-files/)
+
 ### UPI
 
 **Full form:** Unified Payments Interface
@@ -1340,3 +1412,10 @@ This documentation was generated using **Claude Code**, an AI-powered LLM (Large
 :::
 
 *Verified through 2026-05-15.*
+
+### VSR
+
+**Full form:** Volatility Scan Range
+**Meaning:** The price-move range used to scan a commodity portfolio for margin purposes, reviewed and notified periodically per commodity category and applicable from a stated month. Loading a revised range before its applicable month, or missing the revision, both misstate commodity margin.
+**See also:** [MCX commodity derivatives](/broking-kyc/finix-broking-setup/exchanges/04-mcx-commodity/)
+

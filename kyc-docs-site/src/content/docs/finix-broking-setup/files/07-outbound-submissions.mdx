@@ -1,0 +1,172 @@
+---
+title: "Files 7: outbound submissions"
+description: Everything the firm sends — the uploads whose rejection is silent, the submissions that are web forms rather than files, the response files that are the only proof anything arrived, the construction rules that produce partial results, and the register that tracks every submission from production to acknowledgement.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Inbound files fail loudly — something is missing and a gate blocks. Outbound submissions fail **quietly**, because the firm's own systems record a successful send regardless of what happened at the other end. That asymmetry is the whole subject of this page, so it is organised around proof rather than around transmission: what was sent, what came back, whether the counts agree, and who looked. Section 6 is the register that makes it auditable.
+
+## TL;DR
+
+- **An unread response file is an unmade submission.** This is the single most important sentence in the plane.
+- **Reconcile counts, not statuses.** Accepted records against submitted records is the only check that detects the silent failures.
+- **Several failures are invisible by design**: a wrong filename ignored rather than rejected, a zero-byte file rejected, an out-of-sequence batch rejected, a missing trailing newline halting processing partway.
+- **Some submissions are web forms, not files** — a trade annulment and a market-maker declaration among them — so the register must accommodate a submission with no filename.
+- **Construction rules matter as much as content rules**: record ordering within a file, batch-number semantics that differ by family, and headers that are required in one direction and inapplicable in the other.
+- **Filing at one exchange now counts as filing at all** for a defined list — but that list has notable absences.
+
+## 1. Why outbound is different
+
+| Property | Consequence |
+|---|---|
+| The firm initiates | There is no expectation at the far end that something should have arrived, so **nothing is missing from anyone else's perspective** |
+| The firm's systems record success | A send that was ignored looks identical to one that was processed |
+| **The only evidence is the response** | Which means the response is part of the submission, not a confirmation of it |
+| Deadlines are the firm's to meet | A rejected submission discovered after the deadline is a **late** submission, not a corrected one |
+| Rejections are often **per record** | So a file can be substantially accepted and partially not, with no overall failure signal |
+
+## 2. What the firm sends
+
+| Submission | Direction | Notes |
+|---|---|---|
+| **Margin reporting**, member and clearing-member level | To the clearing corporation | **The penalty surface.** See [clearing corporation files](/broking-kyc/finix-broking-setup/files/05-clearing-corporation-files/) |
+| Short-allocation reporting | To the clearing corporation | With its own responses |
+| **Collateral release and transfer requests**, gross and transaction-wise | To the clearing corporation | **The mechanism behind running-account settlement** |
+| **Cash collateral allocation** | To the clearing corporation | With the ordering construction rule |
+| Government-security reallocation | To the clearing corporation | Subject to a margin check |
+| **Early pay-in allocation** | To the clearing corporation | **No header applicable.** Failure means no margin benefit |
+| Participant-code application and modification | To the clearing corporation | Modification up to the trade-modification cut-off |
+| Post-trade allocation | To the clearing corporation | Institutional allocation |
+| Cross-margin client details | To the clearing corporation | **If not sent, clients are over-collected** |
+| **Position-limit reporting** | To the clearing corporation | Member code in a specific form |
+| Related-investor information | To the clearing corporation | One record per client code of the same participant |
+| Voluntary auction participation | To the clearing corporation | **All records, same batch number, every time** |
+| **Unpaid and funded securities identification** | To the clearing corporation | Within the dated window |
+| **Client-code registration and modification** | To the exchange | Bulk upload, bulk modification, unfreeze requests, and an application interface |
+| Client status changes | To the exchange | **Inactive to active no longer available through the status module** |
+| **Holding statement** | To the exchange | Daily, next day, through an interface, with a one-time nil declaration |
+| **Client funds and securities balance upload** | To the exchange | Monthly |
+| Client-funds monitoring upload | To the exchange | Weekly; **three consecutive misses is an early-warning trigger** |
+| Settlement-details filing | To the exchange | Within ten trading days of each settlement date |
+| **Funding-facility exposure report** | To the exchange | Daily, with nil reporting continuing |
+| Authorised-person registration, cancellation and client mapping | To the exchange | Including a bulk cancellation route for non-disciplinary grounds |
+| Authorised-person inspection reporting and the action-taken report | To the exchange | **With nil declarations** |
+| Surveillance return | To the exchange | **Nil return mandatory**, with cross-field validations |
+| Alert dispositions | To the exchange dashboard | Status updates within the disposal period |
+| Audit reports and action-taken reports | To the exchange | Internal, system, cyber |
+| Net worth and compliance certificates | To the exchange | Including non-commencement certification |
+| Software approval and re-certification packs | To the exchange | See [the certification plane](/broking-kyc/finix-broking-setup/certification/) |
+| Identifier activation, deactivation and modification | To the exchange | **Before routing any order** |
+| **Short-selling disclosure** | To the exchange | Generated at the member end |
+| Bank account opening and closure | To the exchange | Within the working-day clock |
+| Personnel and event-based changes | To the exchange | Within their clocks |
+| Transaction reports | To the financial intelligence unit | Through its platform, signed by the principal officer |
+| Incident reports | To the exchanges, the regulator and the response team | Within hours |
+| **The cash and cash-equivalent report** | To the clearing corporation, by electronic mail | **Earns the exposure benefit; correctness is the firm's** |
+| **The concert-party disclosure** | To the exchange, by electronic mail | **Failure is a violation** |
+
+## 3. Submissions that are not files
+
+The register must handle these, because a submission with no filename still has a deadline and still needs evidence.
+
+| Submission | Form |
+|---|---|
+| **Trade annulment request** | A web form, with the counterparty's consent required within a defined window after the request or the close, whichever is later |
+| Market-maker blackout declaration | A web form |
+| **The cash and cash-equivalent report** | Electronic mail to a named clearing address |
+| **The concert-party disclosure** | Electronic mail to a named address |
+| Breach self-reporting by certain participant categories | Electronic mail to the same address |
+| Penalty review request | A portal submission — **requests by electronic mail are explicitly not considered** |
+| Alert disposition | A dashboard status update |
+| Various applications | Portal workflows with attachments |
+
+**For each, the register records the channel, the recipient, the evidence of submission, and what constitutes acknowledgement** — which for an electronic-mail submission may be nothing, in which case the sent record and the retained working papers are the evidence.
+
+## 4. The silent failure modes
+
+| Failure | Behaviour | Detection |
+|---|---|---|
+| **Wrong filename** | **Ignored**, not rejected; on the extranet renamed to mark it failed | The expected response never arrives |
+| **Zero-byte file** | Rejected | No accepted records |
+| **Out-of-sequence batch** | Rejected | No accepted records |
+| **Missing trailing newline** | **Processing breaks partway** | Accepted count below submitted count |
+| Per-record rejection | The file is accepted, records are not | **Count reconciliation** |
+| Multiple errors in one record | **Only the lowest-numbered reason code is reported** | A corrected record can fail again immediately |
+| Submission after the sign-off date | Rejected with an explicit message | **Treated as non-reporting** |
+| A response file nobody reads | Nothing happens at all | **The response-file monitor** |
+
+## 5. Construction rules
+
+| Rule | Family |
+|---|---|
+| Downward records before upward records | Cash collateral allocation |
+| Batch unique and sequential across segments for the day | Cash collateral allocation |
+| Batch sequential from the first | Margin reporting |
+| **Batch deliberately non-sequential** | Security release — **a gap is not a missing file** |
+| All records, same batch number, every file | Voluntary auction |
+| **No header** | Early pay-in allocation |
+| Header always present in the response | Margin reporting |
+| Specific member-code form | Position-limit reporting |
+| One record per client code of the same participant | Related-investor information |
+| Commas inside a filename | A code-modification response — **quote paths, do not split on commas** |
+| Pre-populate from a data export | Collateral release — avoids reference mismatches |
+
+## 6. The submission register
+
+One row per submission type, and one record per instance.
+
+| Field | Content |
+|---|---|
+| Submission identifier and business name | — |
+| Recipient and channel | Portal, interface, extranet, electronic mail, web form, dashboard |
+| Cadence and deadline rule | **The rule, not a fixed date**, where it is relative |
+| Where filed | The designated exchange where single filing applies |
+| Producing desk | Responsible for accuracy |
+| **Accountable role** | Compliance officer for filing in most cases |
+| Construction rules | From section 5 |
+| **Expected response**, and by when | The absence of a response is itself a finding |
+| **Count reconciliation performed** | Accepted against submitted |
+| Rejections and their remediation | With the resubmission |
+| Acknowledgement stored | Where one exists |
+| Sign-off or correction window | Where applicable |
+| Escalation on rejection or absence | **Immediate, not a daily digest** |
+
+## 7. Single filing, and its absences
+
+| Element | Position |
+|---|---|
+| The reform | For a defined list of common submissions, filing at **one** exchange counts as filing at all, where the member is registered at several |
+| What stays local | **Processing, monitoring and supervision remain with each exchange** |
+| The list's composition | A substantial block traces to designated-large-broker obligations; the remainder are general |
+| **A notable absence** | **The authorised-person inspection report is not on the list** — only a declaration about authorised-person supervision is, and that is a designated-large-broker obligation. **The inference is per-exchange filing, consistent with per-exchange authorised-person approval. Confirm it** |
+| The rule for the register | The list answers **where** to file, not **whether** something is owed |
+
+## 8. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.files.out.unread_response_is_unsubmitted` | **D** | **true** | The governing principle |
+| `finix.files.out.count_reconciliation_mandatory` | **D** | **true** | Accepted against submitted |
+| `finix.files.out.response_absence_alerts` | **D** | **Immediate** | Not a digest |
+| `finix.files.out.rejection_alerts_to_compliance` | **D** | Immediate | And to the producing desk |
+| `finix.files.out.construction_rules_per_entry` | **D** | true | Ordering, batching, headers |
+| `finix.files.out.batch_semantics_per_family` | **E** | Per family | Sequential or deliberately not |
+| `finix.files.out.non_file_submissions_registered` | **D** | **true** | Forms, mail, dashboard updates |
+| `finix.files.out.deadline_stored_as_rule` | **D** | true | Where relative to a calendar |
+| `finix.files.out.single_filing_venue_recorded` | **D** | Per submission | Where the reform applies |
+| `finix.files.out.not_on_list_still_owed` | **D** | **true** | The list answers where, not whether |
+| `finix.files.out.post_deadline_resubmission_flagged` | **D** | true | A late submission, not a correction |
+
+## Practical notes
+
+- **Monitor response files as a first-class operational stream**, with immediate alerting. It is the only control that catches the silent failures.
+- **Reconcile counts every time.** A status field is not evidence.
+- **Register the non-file submissions.** A form or an electronic mail with a deadline is a submission, and it will otherwise be tracked nowhere.
+- **Store deadlines as rules.** Several are relative to annually published calendars.
+- **Check what is not on the single-filing list.** The absence of the authorised-person inspection report is the known case; there may be others.
+- **Treat a post-deadline resubmission as a late submission** in the record, because that is what it is, and say so to compliance at the time.
+
+## Where this connects
+
+The handling when a submission fails is in [handling exceptions](/broking-kyc/finix-broking-setup/files/08-file-handling-exceptions/), the calendar in [periodic submissions](/broking-kyc/finix-broking-setup/monitoring/03-periodic-submissions/), and the ownership in [the periodic and compliance matrix](/broking-kyc/finix-broking-setup/roles/03-raci-periodic-compliance/). The per-venue detail is in [<abbr title="National Stock Exchange of India">NSE</abbr> and NSE Clearing files](/broking-kyc/finix-broking-setup/files/02-nse-files/) and [clearing corporation files](/broking-kyc/finix-broking-setup/files/05-clearing-corporation-files/); the pipeline that produces most of it is [the end-of-day runbook](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/), and the reporting machinery is [the regulatory reporting pipeline](/broking-kyc/finix-broking-setup/compliance/02-reporting-pipeline/).

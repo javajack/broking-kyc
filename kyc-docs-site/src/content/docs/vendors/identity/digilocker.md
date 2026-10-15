@@ -86,7 +86,7 @@ Become a **Requester Entity (RE)** by partnering directly with MeitY/NeGD.
 | 2 | BDM (Business Development Manager) reviews use cases and entity credentials | 1-2 weeks |
 | 3 | Committee approval by MeitY/NeGD | 2-4 weeks |
 | 4 | Technical integration documentation and OAuth 2.0 client credentials issued | 1 week |
-| 5 | Security audit and compliance review (STQC or equivalent) | 2-4 weeks |
+| 5 | Security audit and compliance review (<abbr title="Standardisation Testing and Quality Certification">STQC</abbr> or equivalent) | 2-4 weeks |
 | 6 | Integration development and testing against sandbox environment | 2-3 weeks |
 | 7 | UAT sign-off and production go-live | 1 week |
 

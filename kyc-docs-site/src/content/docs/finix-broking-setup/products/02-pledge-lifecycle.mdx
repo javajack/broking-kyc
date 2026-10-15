@@ -1,0 +1,197 @@
+---
+title: "Products 2: the pledge lifecycle"
+description: The four distinct pledge arrangements and why conflating them causes real failures, the full state machine from free balance to closure, the differences between the two depositories, the rejection reason codes, the separate clocks, collateral valuation and the cash-equivalent rule at the right level, and invocation with its 2026 notice obligation.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Pledging looks like one mechanism and is four, each with a different pledgee account, a different authorisation route, different permitted handling and a different exit. Almost every operational failure here is a consequence of treating them as one — onward-pledging funded stock, expecting a client authorisation on an auto-pledge, applying one depository's timings to the other. So the page separates the arrangements first, then gives a single state machine that all four traverse with marked divergences, then treats the depositories separately because their interfaces genuinely differ and their codes are not translatable.
+
+## TL;DR
+
+- **Four arrangements, not one**: margin pledge, funded-stock pledge, unpaid-securities pledge and ordinary loan-against-shares. Different pledgee accounts, different authorisation, different reuse rights.
+- **A request is not a pledge, and a pledge is not collateral credit.** The chain runs request, authorisation, confirmation, onward re-pledge, acceptance, valuation and allocation — and value can be recognised at none of the earlier steps.
+- **Margin collateral may be re-pledged onward; funded stock may not** be pledged to a bank or non-bank lender. This is the single most consequential distinction.
+- **Auto-pledge bypasses the client authorisation step** for direct-payout funded and unpaid securities — so a procedure that waits for a client one-time code will wait forever.
+- **A pledge cannot bridge the two depositories.** Pledgor and pledgee must be in the same one.
+- **The cash-equivalent proportion is a member-level test**, and the regulator has said expressly that there need be no minimum at each client level.
+- **Invocation now carries a notice obligation**, aligned with the pawnor-notice principle, implemented from April 2026 with a signed client undertaking and intimation to both parties.
+
+## Conceptual overview
+
+A pledge is an encumbrance, not a transfer. The securities stay in the client's account and the beneficial interest stays with the client; what changes is that a pledgee's interest is recorded against a quantity, which the client can no longer freely move. That is why the post-2020 regime replaced title-transfer collateral with pledging: the earlier arrangement put client securities into a broker's own account, where they were indistinguishable from the broker's property and could be misused. Understanding that the point of the mechanism is *attribution* explains most of its rules — the chain preserves the original client's identity through every onward re-pledge, a healthy client's collateral cannot cover another party's default, and a power of attorney does not convert unpledged holdings into collected margin.
+
+The second idea is that value is recognised late and released early, and the asymmetry is deliberate. Collateral credit appears only once the clearing corporation has accepted the re-pledge and applied eligibility, price, haircut and concentration rules — so a confirmed client pledge is not yet capacity. But the release chain runs in dependency order from the clearing corporation back down, and an intermediate acknowledgement does not free the client's balance. A system that credits capacity on a client-side confirmation will over-permit trading; one that frees a balance on an intermediate release acknowledgement will let a client sell securities that are still encumbered upstream. Both errors are common and both are avoided by treating the chain as a chain.
+
+The third point is about clocks. There are at least six distinct deadlines in this area and they govern different things: a one-time-code lifetime, an authorisation deadline within the execution day, a longer window before an unaccepted setup is system-rejected, a repayment-release obligation, a margin-call maximum, and separate early-pay-in cut-offs. They are not interchangeable, and a manual that presents a single "pledge deadline" will be wrong about five of them. Section 6 keeps them separate, and marks the ones that could not be verified for the second depository rather than copying the first's.
+
+## 1. Framework
+
+- **Regulator circular of 25 February 2020** — [<abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/DOP/CIR/P/2020/28](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsddopcirp202028), the foundational margin pledge and re-pledge framework: collateral taken by pledge under the depositories legislation, **title transfer into the broker's own account prohibited**, and **a power of attorney not equivalent to collecting margin**. The client's acceptance is by one-time-code confirmation on the registered mobile number or electronic mail address, or another verifiable mechanism — which is why the flow leaves the broker's application.
+- **Regulator circular of 20 July 2021** — [SEBI/HO/MRD2_DCAP/CIR/2021/0598](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2_dcapcir20210598), client-level collateral segregation and the disaggregated client collateral portal, **and the statement that the cash-equivalent minimum need not apply at each individual client level**.
+- **[Master Circular for Stock Brokers SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — pledge at paragraph 42, client collateral segregation at 43, unpaid securities at 46.
+- **Regulator circular of 3 June 2025**, implementation moved to **10 October 2025** — pledge release for early pay-in, invocation for early pay-in, and invocation with redemption for untraded fund units. `[not yet in index]`
+- **Regulator circular of 5 February 2026** — aligning invocation with the pawnor-notice principle, implemented by **[<abbr title="Central Depository Services (India) Limited">CDSL</abbr>/OPS/<abbr title="Depository Participant">DP</abbr>/SETT/2026/180](/broking-kyc/reference/circulars/cdsl/#cdslopsdpsett2026180)** (13 March 2026) from **6 April 2026**, with a signed client undertaking and intimation to both pledgor and pledgee on invocation.
+- **Regulator circular of 3 July 2026** — the current unpaid-securities regime. `[not yet in index]`
+- **Depository operating instructions and circulars** — the participant systems, forms, reason codes, report identifiers and the 2026 loan-against-shares change. `[not yet in index]`
+- **Clearing-corporation collateral rules of 29 May 2024** — eligibility, haircuts and issuer concentration at the clearing corporation. `[not yet in index]`
+
+## 2. The four arrangements
+
+| Arrangement | Pledgee account and authorisation | Permitted handling and exit |
+|---|---|---|
+| **Margin pledge** | Client collateral for trading obligations, to the member's **client securities margin pledge account**; client authorisation through the depository process | **Re-pledge onward** through member to clearing member to clearing corporation for that client's obligations; release after risk checks; release with early pay-in on a client sale, or invocation with early pay-in on default |
+| **Funded-stock pledge** | Purchased funded stock, to the **client securities under margin funding account**. **Direct-payout auto-pledge is distinct from a manually initiated funding pledge** | Repayment releases the corresponding stock; sale or default uses the applicable early-pay-in route. **Onward pledge to a bank or non-bank lender is prohibited.** Do not treat funded stock as freely reusable trading collateral |
+| **Unpaid-securities pledge** | Non-funded unpaid purchases, to the **client unpaid securities pledgee account**; **auto-pledge without a specific client instruction** | A short lifecycle with prescribed communications and liquidation or release. **Not interchangeable with approved funding** |
+| **Ordinary pledge, or loan against shares** | The borrower pledges holdings to a lender's pledgee account under a credit agreement; ordinary depository pledge acceptance rather than the trading-margin chain | Release on discharge or consent; partial release and invocation supported; **invocation normally transfers the securities to the pledgee**. Lending eligibility, loan-to-value and end-use are lender- and regulation-specific |
+| **Off-market transfer, or a power of attorney** | **Neither is itself proof of a margin pledge.** Title-transfer collateral arrangements are prohibited for trading margin | A power of attorney or demat-debit authorisation **does not turn unpledged holdings into collected margin** |
+
+<Aside type="danger" title="The distinction that causes the most expensive mistakes">
+**Margin collateral may be re-pledged onward. Funded stock may not be pledged to a bank or a non-bank lender.** They sit in different pledgee accounts, they arise from different events, and a system that treats "securities pledged to us" as a single pool will eventually pledge funded stock onward to a lender financing the funding book — which is prohibited, is visible in the depository records, and is precisely the kind of finding that escalates. The structural defence is that the two accounts are separate by design: keep the books separate from day one, reconcile each pledgee account against its own source events, and never compute an onward-pledge candidate set from a combined holding view. The secondary defence is a hard configuration block on the funded account as an onward-pledge source.
+</Aside>
+
+## 3. The state machine
+
+All four arrangements traverse this; divergences are marked.
+
+| From, to | Trigger and validation | Result |
+|---|---|---|
+| Free balance → request prepared | Client instruction; the participant validates accounts, identifier, quantity, authority and pledge type, with maker-and-checker separation | **A submitted request is neither a confirmation nor usable collateral** |
+| Request prepared → awaiting authorisation | A **manual** margin pledge initiates the depository's link-and-code flow to the registered contact details | A pending instruction stays distinguishable from an accepted pledge |
+| Awaiting authorisation → authenticated | The client identifies itself, reviews security, quantity and pledgee details, and submits the code | **Authorisation permits further processing; it does not prove onward re-pledge or clearing credit** |
+| Awaiting authorisation → cancelled or rejected | Missing authentication, invalid details, or a balance or other validation failure | No confirmed credit. **Inspect the actual reason and retry only after correction** |
+| Authenticated, or an ordinary request → **pledge confirmed** | Pledgee confirmation, or supported standing acceptance, plus depository checks | Pledged quantity encumbered in the client's account; the pledgee's interest recorded; **beneficial interest remains with the pledgor until invocation** |
+| **Direct payout → auto-pledged** | A clearing-corporation request or flag plus the settlement credit produces the pledge **automatically** | **Bypasses the manual per-transaction client-instruction route.** Confirm the pledge was actually created |
+| Member pledge → re-pledged to clearing member | The member identifies the original client pledge and quantity; the clearing member accepts through the prescribed process. **No fresh client code for each onward step** | Original client attribution retained; **only the available pledge quantity can pass onward** |
+| Clearing member → re-pledged to clearing corporation | Onward re-pledge, with acceptance and eligibility checks | Recognised collateral attributed through the chain; **a pending request is not margin credit** |
+| Confirmed at the clearing corporation → **valued and allocated** | Eligibility, price, haircut, concentration and allocation rules | **Usable value may be materially less than pledged market value.** Revalue and reconcile allocations |
+| Any confirmed pledge → release requested | The pledgor asks, with pledgee consent and risk clearance, or the pledgee initiates | **The request alone does not free the quantity** |
+| Chain → downstream releases | The clearing corporation checks sufficiency or substitution; the clearing member and member perform their own checks before releasing the client's encumbrance | **Release runs in dependency order. Do not credit a free balance from an intermediate acknowledgement** |
+| Release approved → fully or partly unpledged | Pledgee release or an accepted request, full or partial | Released quantity returns to free balance, or to the appropriate locked balance where a lock-in persists; the remainder stays pledged |
+| Pledged → **release plus early pay-in** | A client sale; a single release-for-early-pay-in instruction; delivery-obligation validation | Quantity released from pledge and **blocked for pay-in** in the client's account. **This is not free, withdrawable balance** |
+| Pledged → invocation workflow | Contractual or regulatory default, appropriate notice, an entitled pledgee, releasable downstream quantities | **Ordinary invocation and trading-related invocation take different movement paths** |
+| Ordinary pledge → invoked | Pledgee instruction, whole or part; **no fresh pledgor consent at invocation** | Invoked quantity moves to the pledgee; both parties notified under the 2026 framework |
+| Margin, funded or unpaid → **invocation plus early pay-in** | Default-related invocation for exchange-traded securities, matched to the client's delivery obligation | An early-pay-in block in the client's account with a member audit trail, then the settlement debit. **Excess unvalidated quantity is not silently treated as delivered** |
+| Pledged untraded fund units → **invocation plus redemption** | A special route for fund units not traded on an exchange | Invoke to the pledgee and generate the redemption. **Do not route such units through an exchange sell-order and early-pay-in path** |
+| Early-pay-in block → settled, or exception | Match the actual obligation and the depository execution | **Settlement confirmation is distinct from pledge release.** Residual pledge balances stay separately tracked |
+| Remaining quantity → closed | Full release, full invocation, or a corporate-action or system closure | **Partial activity must not close the whole pledge.** The depository's active-pledge report retains partially unpledged or invoked positions |
+
+## 4. The two depositories
+
+Their interfaces differ materially and **their codes are not translatable**.
+
+| Area | One depository | The other |
+|---|---|---|
+| Participant and investor systems | Its web and core participant systems plus its investor portal, with maker-and-checker processing | Its participant system and investor portal, with a prescribed form for margin-pledge processes |
+| Client flow | Message or electronic-mail link, then identifier — or the account number for identifier-exempt clients — then select pending transactions, generate a code and submit | A confirmation link or a dedicated confirmation facility, then identification, then code and transaction confirmation, with mapping checks including client code, member and segment |
+| **Code lifetime** | **Fifteen minutes**, regeneration supported | **Not verified. Do not copy fifteen minutes across** |
+| Link and instruction lifetime | Until authentication or the end of the execution day; unauthenticated manual requests cancel at end of day. Future-dated instructions distinguish setup date from execution date | **Current link expiry and end-of-day clock not retrieved** |
+| Authorisation variants | Manual pledge needs its authorisation; direct-payout auto-pledge follows the clearing route | A physical form, the investor portal, and a member- or authority-initiated flow with a client code are documented; pledgee standing acceptance available |
+| **Authorisation link templates** | **Use the link the depository issues. Full tokenised grammar not established.** Broker screenshots are not an interface contract | **Same position** |
+| Interface capabilities | A published catalogue including loan-against-shares, electronic margin pledge, a re-pledge interface for clearing corporations, and a transaction upload | **Current production specification, authentication and callbacks not retrieved** |
+| Standardised-format change | An August 2025 change added **values to existing fields with no new columns**, under a published catalogue version | **Do not reuse the other's schemas or enumerated values** |
+| Pledge-type report identifiers | Distinct codes for margin pledge, margin re-pledge, unpaid securities and margin funding, with the settlement reference carried in the pledgor participant's internal reference field for auto-pledges | **No equivalent code is claimed** |
+| Forms | A set of pledge, unpledge and invocation request forms, with margin variants and a combined form | **A single prescribed form** for initiation, release and invocation, which must now include the 2026 undertakings |
+| Loan-against-shares, 2026 | A July 2026 change routes an investor request from the lender's platform to the participant's menu with same-day approve or reject and optional auto-approval, with named reports | **No equivalent 2026 change verified** |
+| Reconciliation | A **daily count of received, executed and pending instructions, and of maker-entered instructions, must reconcile**. Use persistent parent-pledge identifiers and residual quantities | Reconcile depository confirmations and holdings, **not only the broker's own interface state** |
+
+### Rejection reasons
+
+One depository publishes a numbered set covering: insufficient units; unacceptable closure date, pledged quantity, identifier or security details; a delisted identifier; a missing all-holder authority; holders unacceptable to the pledgee; an agreement-number mismatch; another reason; an unacceptable transfer quantity; a breached agreement; an unacceptable closure quantity; an unpaid pledged amount or margin; insufficient market value; **a pledge not verified or accepted within a defined period of creation**; **a client code not authenticated within the allowed time**; and insufficient balance on an overdue pledge. A valid reason is **mandatory** when rejecting a covered request.
+
+It also publishes historical maker, checker and pledgee transaction statuses for margin pledge and re-pledge. **These are historical statuses, not current standardised enumerations**, and they are **not substitutes for the reason codes**.
+
+**For the other depository, the current rejection dictionary, validation codes, response enumerations and retry semantics were not retrieved. Do not manufacture codes or translate the first depository's numbers.**
+
+## 5. Valuation and the cash-equivalent rule
+
+| Layer | Treatment |
+|---|---|
+| Basic collateral value | Eligible quantity times the applicable valuation price, reduced by the applicable haircut, then subject to concentration and eligibility caps. **This arithmetic does not itself prove accepted allocation** |
+| Price and haircut source | The clearing corporation's specified closing price and applicable haircuts, from **dated** files — with approved-security and haircut schedules changing over time |
+| Published files | Haircut files for approved securities and for fund units are published daily; see [<abbr title="National Stock Exchange of India">NSE</abbr> and NSE Clearing files](/broking-kyc/finix-broking-setup/files/02-nse-files/) |
+| Cash equivalents against non-cash | Classification is **instrument-specific**. Approved cash equivalents are not restricted to bank cash; **equity shares are non-cash**. Use the clearing corporation's definitions, not marketing labels like "liquid stock" |
+| **The proportion test** | The clearing member's total collateral must contain at least the prescribed proportion of cash and cash equivalents. **The regulator expressly states there need not be a minimum cash-equivalent percentage at each individual client level** |
+| Allocation restrictions | **Excess cash of one client cannot support another.** A member's own proprietary cash may support clients under the allocation framework. Accordingly, "every client must always deposit half in cash" **overstates the rule** |
+| Effective benefit | Clearing allocation computations and member cash availability can limit the benefit actually passed through. **A broker may impose a stricter client cash policy — that is commercial policy, not the regulatory level** |
+| The commodity clearing corporation | Specifies a one-to-one cash-and-cash-equivalent to non-cash ratio, with effective-collateral allocation at several levels. **A clearing-collateral rule, not permission to offer equity funding in commodity contracts** |
+| Bank lending to a funding book | A separate cash requirement with different assets and parties — see [margin trading facility operations](/broking-kyc/finix-broking-setup/products/01-mtf-operations/) |
+| **Haircut increased or security removed** | Recompute usable collateral and the resulting shortfall. **A quantity can remain pledged even when its collateral credit falls or disappears — pledge existence and collateral eligibility are different states** |
+| Issuer concentration at the clearing corporation | Caps combined collateral exposure to one issuer as a proportion of total liquid assets received, with corporate-bond sublimits by rating. **These are not funding-book single-stock caps** |
+| Exact percentages | **Use current schedules.** Never substitute a broker's haircut for a clearing acceptance rule without labelling it |
+
+## 6. The clocks, kept separate
+
+| Clock | Rule |
+|---|---|
+| Manual code lifetime, one depository | **Fifteen minutes**, regenerable |
+| Manual authorisation deadline, same depository | **By the end of the execution day**, otherwise cancelled. "End of day" is **not** evidence of a universal fixed hour |
+| Unaccepted setup, same depository | Covered pending setups must be verified, accepted, rejected or cancelled **within a defined number of days**, after which the system rejects. **Not a grace period overriding the manual code clock** |
+| Funded-stock repayment release | **Within one working day** of receipt, proportionate to the payment |
+| Margin-call default | The agreed window, **not exceeding five working days**. Distinct from the unpaid-securities window |
+| Unpaid-and-funded identification file | From mid-afternoon on the trade day to mid-morning on the settlement day, with a different cut for a second settlement |
+| Early pay-in cut-offs | Separate published cut-offs for securities early pay-in and for clients using the blocked-amount mechanism, **explicitly subject to change and to running-settlement dates**. **These are early-pay-in cut-offs, not pledge authorisation deadlines** |
+| Frozen or not-permitted client invocation | An exceptional transfer-and-sale route requires securities pay-in **on the invocation day** |
+| **Not established** | A universal unpledge cut-off, guaranteed instant release, the other depository's code lifetime, and the other clearing corporations' release-file cut-offs. **Configure only from contracted production schedules** |
+
+## 7. Invocation
+
+| Step | Position |
+|---|---|
+| Grounds | Default under the relevant pledge or credit terms; a funding margin default subject to agreed conditions. **The broker must identify liquidation situations in its terms and rights-and-obligations document** |
+| **Protecting non-defaulting clients** | **A member's default does not authorise using a healthy client's collateral to cover another client's or the member's obligation.** Client attribution is preserved throughout re-pledge and invocation |
+| **Notice, from 2026** | A February 2026 regulator circular aligned invocation with the **pawnor-notice principle**, implemented from **6 April 2026** with a **signed client undertaking** and **intimation to both pledgor and pledgee** on invocation |
+| Movement path | Ordinary invocation transfers to the pledgee. Trading-related invocation uses the **invocation-plus-early-pay-in** route matched to the delivery obligation, with an audit trail |
+| Untraded fund units | The **invocation-plus-redemption** route |
+| Automation | Pledge release for early pay-in, invocation for early pay-in and invocation with redemption were introduced in June 2025 with implementation moved to **10 October 2025**, permitting invocation **without a manual client unpledge** |
+| Evidence to retain | The default determination, the notice and its dispatch, the undertaking, the authorising decision, the quantities invoked, and the settlement outcome |
+
+## 8. Corporate actions and edge cases
+
+| Case | Position |
+|---|---|
+| **Corporate actions on pledged stock** | **Only the automatic corporate-action mechanism itself was verified.** The treatment of a bonus, split, dividend or merger on pledged collateral **is deliberately not stated here**, because it was not established and inferring it would be guessing. **Confirm with the depository and the clearing corporation before documenting it internally** |
+| A pledged security entering a ban period | The pledge persists; **fresh positions in the underlying are blocked** — a position constraint, not a pledge event |
+| A pledged security under a surveillance measure | Collateral eligibility and haircut may change; recompute |
+| A pledged security suspended | **Treat collateral value as unrealisable for new capacity even if a price remains in the file** |
+| **Across the two depositories** | **A pledge cannot bridge them.** Pledgee accounts are needed in each depository where clients hold accounts |
+| Must the client's account be with the broker's own participant? | **No such universal rule was found.** Pledgor and pledgee may be at different participants **within the same depository**. Direct payout uses the verified primary account mapped to the client code. **The same depository is not the same participant** |
+| Failed unpledge before pay-in | Enters settlement exception handling; **a client-code mismatch between the depository instruction and the clearing obligation causes rejection and therefore short delivery** |
+| Partial activity | Must not close the whole pledge; residual quantities remain tracked |
+| Pledge and unpledge charges | Depository-level charges apply per instruction, and the **funded-stock pledge is an ordinary pledge rather than a margin pledge**, which changes both the form used and the charge. Pledging many securities costs more than pledging one. See [the charges and billing engine](/broking-kyc/finix-broking-setup/backoffice/11-charges-billing-engine/) |
+
+## 9. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.products.pledge.accounts_separate_per_arrangement` | **R** | true | Margin, funding, unpaid |
+| `finix.products.pledge.funded_stock_onward_pledge_blocked` | **R** | **true** | Hard block, not a procedure |
+| `finix.products.pledge.onward_candidates_exclude_funded_account` | **D** | **true** | Never compute from a combined view |
+| `finix.products.pledge.credit_on_cc_acceptance_only` | **D** | **true** | Not on client confirmation |
+| `finix.products.pledge.release_chain_dependency_order` | **D** | true | No free balance on an intermediate acknowledgement |
+| `finix.products.pledge.auto_pledge_expects_no_client_otp` | **D** | true | So a procedure does not wait |
+| `finix.products.pledge.auto_pledge_creation_reconciled` | **D** | true | A request is not a pledge |
+| `finix.products.pledge.cross_depository_blocked` | **E** | true | Pledgee accounts per depository |
+| `finix.products.pledge.reason_code_dictionary_per_depository` | **D** | **Separate** | **Never translated** |
+| `finix.products.pledge.otp_ttl_minutes` | **E** | Per depository, from its own specification | **Not copied across** |
+| `finix.products.pledge.daily_instruction_reconciliation` | **E** | true | Received, executed, pending, maker-entered |
+| `finix.products.pledge.parent_pledge_identifier_persistent` | **D** | true | With residual quantities |
+| `finix.products.pledge.repayment_release_working_days` | **R** | 1 | Proportionate |
+| `finix.products.pledge.invocation_notice_required` | **R** | **true** | From 6 April 2026, with the undertaking |
+| `finix.products.pledge.invocation_notifies_both_parties` | **R** | true | Pledgor and pledgee |
+| `finix.products.pledge.untraded_fund_units_redemption_route` | **R** | true | Not an exchange sell order |
+| `finix.products.pledge.suspended_security_collateral_zero` | **D** | true | Despite a file price |
+| `finix.products.pledge.corporate_action_treatment` | **D** | **Unverified — confirm before configuring** | Deliberately not asserted |
+
+## Practical notes
+
+- **Keep the pledgee accounts and their books separate from the first day.** Retrofitting the distinction is painful and the prohibition on onward-pledging funded stock depends on it.
+- **Reconcile instructions daily by count**, in both directions, and reconcile to the depository's confirmations rather than to your own interface state.
+- **Carry a persistent parent-pledge identifier with residual quantities.** Partial releases and partial invocations otherwise lose their lineage.
+- **Do not copy one depository's timings, codes or schemas to the other.** Several are simply unknown, and a translated code is worse than a missing one.
+- **Confirm the corporate-action treatment in writing** before you document it. It is the one gap on this page that a plausible-sounding inference would fill wrongly.
+- **Display the binding constraint** when a client asks why their collateral gives less capacity than its value — eligibility, haircut, allocation, or your own cash policy.
+
+## Where this connects
+
+The funding arrangement that uses one of these pledges is [margin trading facility operations](/broking-kyc/finix-broking-setup/products/01-mtf-operations/); the unpaid-securities arrangement is [the unpaid-securities regime](/broking-kyc/finix-broking-setup/backoffice/06-cuspa-unpaid-securities/). Collateral mechanics and capacity are in [collateral and pledge](/broking-kyc/finix-broking-setup/rms/05-collateral-pledge/) and [the limit impact matrix](/broking-kyc/finix-broking-setup/rms/10-limit-impact-matrix/), the depository files in [depository files](/broking-kyc/finix-broking-setup/files/06-depository-files/), and the operator actions in [the back-office operations catalogue](/broking-kyc/finix-broking-setup/backoffice/12-operations-catalogue/). Client-side activation is [margin pledge](/broking-kyc/product-activation/margin-pledge/), and the depository-specific treatments are [the depository margin and funding pledge operations](/broking-kyc/vendors/depositories/cdsl-mtf-pledge/) and [direct payout to demat](/broking-kyc/deep-dives/settlement/direct-payout-to-demat/).

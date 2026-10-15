@@ -1,0 +1,176 @@
+---
+title: "Products 3: the derivatives contract lifecycle"
+description: Contract introduction and the fixed-weekday expiry regime with each exchange on a different day, the strike chain and how it widens intraday, the contract master's daily churn and the corporate-action level that forces a re-upload, the delta-adjusted basis for index option limits and what deliberately stayed on notional, and the margin components — including one that does not exist.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** The derivatives lifecycle is where a broking operation's reference data is most volatile — contracts appear and disappear daily, strikes extend intraday on a sharp move, and a corporate action silently replaces an entire contract series. So the page leads with the calendar and the master, because almost every derivatives operational failure is a reference-data failure rather than a trading failure. Section 5 then covers limits, where the measurement basis changed materially in 2025 and where the common mistake is to assume the change applied uniformly — it did not.
+
+## TL;DR
+
+- **Each exchange expires on its own fixed weekday.** The regulator set the menu — one weekly benchmark index option on a chosen weekday, everything else with a minimum one-month tenor expiring on the last chosen weekday — and the two main exchanges chose **different days**.
+- **The contract master churns daily and must be re-uploaded** on expiry, on a symbol change and after a corporate action, because the corporate-action level increments and contracts at the old level are **replaced**.
+- **Index option limits moved to a net delta-adjusted basis. Index futures deliberately did not**, and member-level limits remained on notional — a reform there was only a draft.
+- **The market-wide limit formula changed** to the lower of a proportion of free float and a multiple of average daily delivery value, with a floor, recalculated quarterly.
+- **The ban-period rule is now a delta test**: trading must *reduce* future-equivalent open interest, and a sign change of delta does not count as a reduction.
+- **There is no short option minimum margin in Indian equity derivatives.** It was abolished in 2020, and documentation that lists it is describing either the commodity segment or a foreign market.
+
+## Conceptual overview
+
+A derivative contract is a reference-data object with a short life, and that is the root of most operational difficulty. Unlike an equity, which persists, a contract is introduced, trades, expires and is gone, while its neighbours in the strike chain appear and disappear according to rules that depend on the underlying's movement. A broking system therefore cannot treat the tradeable universe as slowly varying: the master must be reloaded daily, changes must be explained against circulars, and the system must handle a contract existing at ten o'clock that did not exist at nine. Firms that model derivatives reference data the way they model equity reference data discover this through order rejections on strikes the exchange introduced that morning.
+
+The second observation is that corporate actions do something more drastic to derivatives than to equities. Where an equity's price and quantity are adjusted, a derivative contract carries a **corporate-action level**, and when that level increments the contracts at the previous level are replaced rather than amended. A position held in a replaced contract has to be mapped forward; an order routed to a retired contract is rejected; and a margin computation using the previous multiplier is wrong. This is why the master re-upload after a corporate action is mandatory rather than advisable, and why the begin-of-day sequence treats corporate-action adjustment as a distinct gated step.
+
+The third idea concerns the 2025 change in how limits are measured, which is more subtle than it is usually reported. Moving index option open interest to a net delta-adjusted basis makes economic sense: a long call and a long put are not the same exposure, and counting both at notional overstates risk. But the change was applied **selectively** — to index options, at entity level — while index futures stayed on gross notional and member-level limits stayed on notional. A firm that applies the delta basis uniformly will compute member-level utilisation wrongly and may believe it has headroom it does not have. The rule is to implement the basis the instrument and the level actually attract, and the two are independent.
+
+## 1. Framework
+
+- **Regulator circular of 26 May 2025** — the expiry framework: each exchange chooses **one weekday**, keeps **one weekly benchmark index option** expiring that day, and all other equity derivatives carry a **minimum one-month tenor** expiring on the **last chosen weekday**. The circular names no weekday itself. `[not yet in index]`
+- **Exchange circulars of mid-2025** — the principal exchange's chosen day was agreed as **Tuesday**, with a per-product transition table, for contracts expiring **on or after 1 September 2025**; a holiday moves expiry to the **previous** trading day. The other exchange's choice is **Thursday** on the available reading, which **could not be primary-verified** because its site was unreachable. `[not yet in index]`
+- **Regulator circular of 29 May 2025** — future-equivalent open interest, the new market-wide limit formula, the ban-period delta rule, and index and single-stock limits. `[not yet in index]`
+- **Regulator circular of 1 September 2025** — separate intraday future-equivalent limits for index options. `[not yet in index]`
+- **Regulator circulars of 1 and 15 October 2024 and 28 March 2025** — intraday monitoring, the previous-day open-interest base and the passive-breach carve-out. `[not yet in index]`
+- **Clearing-corporation consolidated derivatives circular of 30 April 2026** — the current operational statement of limits, the ban mechanics and the margin framework. `[not yet in index]`
+- **Exchange consolidated derivatives trading circular** — **<abbr title="National Stock Exchange of India">NSE</abbr>/FAOP/57264** `[not yet in index]`, whose Part D carries the contract master and spread master structures.
+
+<Aside type="danger" title="A superseded expiry proposal still ranks highly in search results">
+Before the fixed-weekday regime settled, the principal exchange published and then **abandoned** a proposal to move expiries to a different weekday. That abandoned proposal remains prominent in search results and in secondary commentary, and it names a different day from the one actually adopted. Anyone configuring an expiry calendar from a search result rather than from the exchange's own adopting circular has a material chance of configuring the abandoned day. Take the weekday from the exchange's circular and the actual published contract calendar, verify it against a live contract master, and record which source you used. The same caution applies in the other direction: the second exchange's day is stated here on secondary evidence only, and should be confirmed against its own notice before it is relied on.
+</Aside>
+
+## 2. The expiry regime
+
+| Element | Position |
+|---|---|
+| The regulator's structure | Each exchange chooses **one weekday**. **One weekly benchmark index option** expires on it. **All other equity derivatives** carry a **minimum one-month tenor** and expire on the **last chosen weekday** of their period |
+| Principal exchange | **Tuesday**, for contracts expiring on or after **1 September 2025**, with a published per-product transition |
+| The other exchange | **Thursday** on secondary evidence — **not primary-verified** |
+| Holiday treatment | Expiry moves to the **previous** trading day |
+| Operational consequence | **The two main exchanges expire on different days**, so a firm active on both has **two expiry days a week** in its operational calendar, each with its own settlement-price capture, exercise and assignment processing, physical-settlement consequences and client communications |
+| Single-stock derivatives | Fall under the minimum-tenor rule, expiring on the last chosen weekday |
+| **The derivatives close time** | Changed with the introduction of a **closing auction session** — relevant both to settlement-price determination and to the time-to-expiry input in option pricing. See [expiry and physical settlement](/broking-kyc/finix-broking-setup/products/04-expiry-physical-settlement/) |
+
+## 3. Contract introduction and the strike chain
+
+| Element | Position |
+|---|---|
+| Introduction | New contracts are introduced on a published cycle, and appear in the contract master |
+| **Strike chain widening** | The chain extends as the underlying moves, so **strikes can be introduced intraday** on a sharp move. A system that loads the master only at begin of day will reject orders on strikes the exchange has introduced since |
+| Practical response | Either reload the master intraday on a published refresh, or handle an unknown-contract rejection as a **reference-data event** that triggers a reload rather than as a client error |
+| Contract master files | A security or contract master, a spread contract master and a participant master, in both the trading-side and the standardised forms — see [NSE and NSE Clearing files](/broking-kyc/finix-broking-setup/files/02-nse-files/) |
+| **Mandatory re-upload** | On **expiry**, on a **symbol change**, and after a **corporate action** |
+| **The corporate-action level** | A field in the contract master and in the clearing contracts report. When a corporate action occurs the level **increments** and contracts at the **old level are replaced**. Orders on retired contracts are rejected, and positions must be mapped forward |
+| Quantity freeze | Freeze limits are published and revised **monthly**, and additionally on an ex-date for a bonus, split or rights issue. The **filename is unverified** |
+| Lot sizes | Change by circular; the change must be traced and explained rather than silently absorbed |
+| Spread contracts | Have their own master; spread orders are unavailable if it is missing |
+| A retired legacy file | A dated comma-separated contract file was discontinued in 2020 and should not be built on |
+
+## 4. Daily reference-data routine
+
+| Step | Activity |
+|---|---|
+| 1 | Ingest and apply the contract and spread masters; assert the consuming system reports **today's** business date |
+| 2 | **Diff against yesterday**: contracts added, contracts gone, lot or tick changes, corporate-action level changes |
+| 3 | **Explain every change against a circular.** An unexplained change is a reference-data incident |
+| 4 | Apply corporate-action adjustments to contracts and to positions; identify adjusted underlyings |
+| 5 | Recompute margin on adjusted contracts — **stale multipliers produce wrong margin** |
+| 6 | Load the ban-period list and apply the delta test rules |
+| 7 | Load position-limit files, including the **new dedicated index limit file** and the client file that now carries **stocks only** |
+| 8 | Load delta factors, both the end-of-day and the intraday batches |
+| 9 | Verify quantity-freeze limits are current |
+| 10 | Verify the derivatives close time in force, particularly around an auction-session change |
+
+## 5. Position limits and open interest
+
+### The measurement basis — applied selectively
+
+| Instrument and level | Basis |
+|---|---|
+| **Index options, entity level** | **Net delta-adjusted future-equivalent open interest**, at portfolio level per underlying per client, with separate **net** and **gross** ceilings and **higher intraday net** ceilings than end-of-day |
+| **Index futures, entity level** | **Gross notional** — the higher of a fixed amount or a proportion of market open interest, with the proportion differing by participant category |
+| **Member level, index futures and options** | **Gross notional** — the higher of a fixed amount or a proportion of market open interest. **A future-equivalent reform here was a draft only, restated as unchanged in October 2026** |
+| Single stocks, entity level | Proportions of the market-wide limit, differing by participant category |
+| Additional exposure against holdings | Short index exposure capped by **stock holdings**, sourced by the venue directly from the depositories. Long index exposure capped by **cash and cash equivalents, government securities and similar, excluding bank guarantees** — which the **clearing member must report** |
+| Commodity options on futures | Client and member numeric limits are a **multiple of the corresponding futures numbers**; positions may exceed futures limits **on devolvement** and must be brought back **within a defined number of trading days of option expiry** |
+
+### The market-wide limit
+
+| Element | Position |
+|---|---|
+| **Formula** | The **lower** of a proportion of **free float** and a **multiple of market-wide average daily delivery value**, subject to a **floor** expressed as a proportion of free float |
+| What it replaced | A flat proportion of non-promoter holding |
+| Recalculation | **Quarterly**, on a rolling average |
+| Publication | Disseminated on the clearing corporations' sites and by circular ahead of the quarter |
+| Corporate actions | Trigger an adjustment-factor revision on the ex-date |
+
+### The ban period, as a delta test
+
+| Element | Position |
+|---|---|
+| Entry | End-of-day market-wide **future-equivalent** open interest above a high proportion of the market-wide limit |
+| Exit | Combined future-equivalent open interest falling to a lower proportion |
+| **The test** | Trading after entry must **reduce the entity's future-equivalent open interest on an end-of-day basis** |
+| **A sign change of delta is not a reduction** | Explicitly |
+| A passive increase from price movement | **Not a breach** |
+| Worked shape | Holding a long future and adding a long put, or a short out-of-the-money call, can be permissible because it reduces net delta; increasing the future position while adding those legs is not |
+| The action window | The computation uses an **afternoon delta snapshot**, deliberately leaving the rest of the session to act — see [real-time and near-real-time obligations](/broking-kyc/finix-broking-setup/monitoring/02-realtime-near-realtime/) |
+| Penalty | A proportion of the violation value with a floor and a cap, **per entity, per security, per day**, recurring while the violated quantity persists |
+
+### Passive breaches
+
+Where market open interest falls and an unchanged position therefore exceeds a percentage-linked limit, this is **not a violation**: no penalty, no unwinding. **The relief applies only to percentage-linked legs**, and once penalised for an active breach an entity must thereafter stay within the **reduced** limit.
+
+## 6. Margin components
+
+| Component | Position |
+|---|---|
+| Initial margin | From the risk parameter file, on the portfolio basis the clearing corporation computes |
+| Exposure margin | Published per underlying, with a contract-level file for options |
+| **Calendar spreads** | A spread margin benefit applies; the spread contract master and the spread treatment must both be configured |
+| **Short option minimum margin** | **Does not exist in Indian equity derivatives.** It was **abolished with effect from 1 June 2020**. A brief or a vendor configuration that references it is describing either the **commodity** segment — where a short option minimum is a genuine parameter — or a foreign market |
+| Extreme loss margin | Published rates per underlying |
+| Additional and ad-hoc margins | Imposed by the exchange on specific underlyings or conditions |
+| Intraday snapshots | Several parameter snapshots per day drive continuous sufficiency |
+| **Delivery margin** | Escalates through expiry week for physically settled stock derivatives — see [expiry and physical settlement](/broking-kyc/finix-broking-setup/products/04-expiry-physical-settlement/) |
+| Cross-margin | Available between cash and derivative positions on offsetting positions, **claimed by uploading client details** — if not claimed, clients are **over-collected** |
+| Option premium | A full-value debit on a buy; on a write, the margin blocked exceeds the premium received |
+
+<Aside type="caution" title="The short-option-minimum confusion is worth stating plainly">
+Vendor configurations, older documentation and foreign-market material all reference a short option minimum margin, and it is a real parameter — in the **commodity** segment, where it appears alongside initial margin, the margin period of risk and the volatility scan range, and in several non-Indian markets. In **Indian equity derivatives it was abolished in 2020 and does not exist.** The practical risk is a margin engine configured with a non-zero short-option minimum for equity options, which over-collects from every option writer, produces client complaints that are entirely justified, and is difficult to diagnose because the number looks like a legitimate margin component. Check the equity-derivatives margin configuration explicitly for it, and record that it is deliberately zero rather than merely unset.
+</Aside>
+
+## 7. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.products.fno.expiry_weekday_per_exchange` | **E** | Per exchange, from its own circular | **The two main exchanges differ** |
+| `finix.products.fno.expiry_holiday_rule` | **E** | Previous trading day | — |
+| `finix.products.fno.two_expiry_days_per_week` | **D** | true where active on both | The operational calendar consequence |
+| `finix.products.fno.contract_master_reload_intraday` | **D** | **true** | Strikes are introduced intraday |
+| `finix.products.fno.unknown_contract_triggers_reload` | **D** | true | Not a client error |
+| `finix.products.fno.master_reupload_on_ca_expiry_symbol_change` | **E** | **true** | Mandatory |
+| `finix.products.fno.ca_level_tracked` | **E** | true | Old-level contracts are replaced |
+| `finix.products.fno.master_diff_explained_against_circular` | **D** | true | An unexplained change is an incident |
+| `finix.products.fno.index_option_limit_basis` | **E** | **Net delta-adjusted future-equivalent** | Entity level |
+| `finix.products.fno.index_future_limit_basis` | **E** | **Gross notional** | Deliberately unchanged |
+| `finix.products.fno.member_limit_basis` | **E** | **Gross notional** | A reform here was a draft only |
+| `finix.products.fno.mwpl_formula` | **E** | Lower of the free-float proportion and the delivery-value multiple, with a floor | Quarterly recalculation |
+| `finix.products.fno.ban_test_is_delta_reduction` | **E** | true | **A sign change is not a reduction** |
+| `finix.products.fno.ban_passive_increase_not_breach` | **E** | true | — |
+| `finix.products.fno.passive_breach_percentage_legs_only` | **E** | true | Not the fixed legs |
+| `finix.products.fno.short_option_minimum_equity` | **E** | **Zero — the component does not exist** | Recorded deliberately |
+| `finix.products.fno.cross_margin_claimed` | **D** | true | Otherwise clients are over-collected |
+| `finix.products.fno.spread_margin_configured` | **E** | true | With the spread master loaded |
+
+## Practical notes
+
+- **Take the expiry weekday from the exchange's own adopting circular and verify it against a live contract master.** A superseded proposal names a different day and ranks well in search.
+- **Build the master reload as a reference-data service, not a morning job.** Intraday strike introduction makes a once-a-day load insufficient.
+- **Diff the master daily and demand an explanation for every change.** This single practice catches corporate-action levels, lot changes and delisted contracts before they become rejections.
+- **Implement the limit basis per instrument and per level.** The delta reform was selective, and applying it uniformly produces wrong member-level utilisation.
+- **Explicitly set the equity short-option minimum to zero and document why**, so that a vendor default or a later configuration pass does not reintroduce it.
+- **Claim the cross-margin benefit.** It requires an upload, and not doing it over-collects from clients who are entitled to it.
+
+## Where this connects
+
+Expiry-day mechanics, settlement prices, exercise, assignment and physical delivery are in [expiry and physical settlement](/broking-kyc/finix-broking-setup/products/04-expiry-physical-settlement/). The continuous measurement regime is in [real-time and near-real-time obligations](/broking-kyc/finix-broking-setup/monitoring/02-realtime-near-realtime/), the margin computation in [the margin engine](/broking-kyc/finix-broking-setup/rms/02-margin-engine/), and the capacity effects in [the limit impact matrix](/broking-kyc/finix-broking-setup/rms/10-limit-impact-matrix/). The files are in [NSE and NSE Clearing files](/broking-kyc/finix-broking-setup/files/02-nse-files/), the exchange behaviour in [NSE equity derivatives](/broking-kyc/finix-broking-setup/exchanges/02-nse-fno/), and the daily sequence in [the master trading-day checklist](/broking-kyc/finix-broking-setup/daily-ops/10-master-trading-day-checklist/). The vendor-neutral treatments are [position limits and open interest](/broking-kyc/trading-risk/position-limits-oi/) and [the margin methodology and peak margin deep dive](/broking-kyc/deep-dives/trading-day/rms-span-methodology/).

@@ -1,0 +1,273 @@
+---
+title: "Back office 11: the charges and billing engine"
+description: Every charge a broker levies or bears, with its base, its liable side and its rounding — brokerage and its ceilings, the statutory levies and their 2026 rate changes, exchange and regulator fees, stamp duty, the tax treatment component by component, the firm's own service charges, the penalties it bears and the narrow cases in which it may pass them on, and the true-to-label rule that governs all of it.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** A charge is defined by four things — its rate, the base it applies to, which side pays, and how it rounds — and a billing engine that gets any one of the four wrong produces a wrong contract note, which is a regulatory document. So every table here carries all four columns rather than just a rate. The page also separates charges the firm **levies** from charges the firm **bears**, because the second category is where the money quietly goes and where the rules on passing costs to clients are narrow and specific. Section 9 states the true-to-label rule last, because it constrains everything above it.
+
+<Aside type="danger" title="Read this before using any rate on this page">
+Rates change, several changed during 2026, and some figures below could be established only from secondary sources. **Every rate must be re-verified against the current primary circular before it is configured.** Specifically: statutory transaction tax rates changed with effect from **1 April 2026**; the principal exchange's transaction-fee *allocation* changed with effect from **1 March 2026** while the totals stayed the same; and the regulator's turnover fees now sit in the 2026 broker regulations rather than where older summaries place them. The other exchange's and the commodity venue's current schedules could not be authenticated from primary sources in several cases and are marked accordingly. **A billing engine configured from a compilation, including this one, will eventually overcharge a client — which is both a refund and a finding.**
+</Aside>
+
+## TL;DR
+
+- **Brokerage is capped, and the cap is a formula not a number.** For options it is the higher of a proportion of premium or a per-lot amount, and the base is the **premium**, never the strike or notional.
+- **The statutory transaction tax rose on 1 April 2026** for futures sales, option sales and exercised options — and the exercised-option base is **intrinsic value**, not premium and not gross notional.
+- **The exchange-fee allocation changed in March 2026 while the totals did not.** Charging the new exchange component plus the old protection-fund component **overcharges the client**.
+- **The regulator's turnover fee on options uses premium plus the notional of exercised and assigned contracts** — a different base from the transaction tax on the same event.
+- **Tax treatment is component-level, not a blanket percentage.** Statutory levies are excluded only where the agency conditions are met, and interest on settlement or funding debits is not subject to it.
+- **The firm generally bears margin-shortfall penalties.** There are narrow, specific exceptions — a dishonoured cheque, and a client breaking a hedge — each conditional on a disclosed policy communicated in advance.
+- **Everything is bound by true-to-label**: what is charged to the client as a market-infrastructure levy must be what that institution actually received, and the firm's own remuneration cannot hide inside a levy label.
+
+## Conceptual overview
+
+There are three economically distinct things on a contract note and the rules treat them very differently. **The firm's own consideration** — brokerage and service fees — is negotiated, capped, taxable, and the firm's to set. **Pass-through levies** collected on behalf of someone else — the transaction taxes, stamp duty, exchange and clearing fees, the regulator's fee, the protection-fund contribution — must be recovered at actuals and labelled for what they are; the firm is a conduit and may not profit from the conduit. And **costs the firm bears** — most penalties, most of the consequences of its own operational failures — are its expense, passable to a client only where a rule specifically permits it. A billing engine that models all three the same way will eventually either overcharge on a pass-through or absorb something it could have recovered.
+
+The second idea is that the same event frequently attracts several levies on **different bases**, and this is the commonest source of a wrong contract note. An exercised equity option attracts a transaction tax on its **intrinsic value**, a regulator's turnover fee on the **notional of the exercised contract**, stamp duty on the **premium** for the original trade, and, where the underlying is physically settled, a further delivery tax on the **settlement value** from both sides. Four levies, four bases, one event. An engine that computes levies from a single "turnover" figure per trade cannot produce the right answer, and the error is invisible because the output looks plausible.
+
+The third point is about rounding and aggregation, which is where an otherwise correct engine diverges from the clearing records by small amounts that compound. The statutory taxes have prescribed rounding at prescribed aggregation levels — a weighted-average price to the nearest paisa, then value and tax to the nearest rupee. Applying that rounding per execution rather than at the statutory aggregation produces a different total, and the difference is a reconciliation break against the clearing corporation's own tax reports every single day. The rule is to compute at full precision, aggregate as the statute prescribes, round once, and reconcile to the venue's file.
+
+## 1. Framework
+
+- **[Master Circular for Stock Brokers <abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — the tariff at onboarding, the requirement that agreed terms govern and changes be intimated, the interest and penalty policy obligations, and the prohibition on disguising unlawful funding.
+- **[SEBI/HO/<abbr title="Market Regulation Department (SEBI)">MRD</abbr>/TPD-1/P/CIR/2024/92](/broking-kyc/reference/circulars/sebi-other/#sebihomrdtpd-1pcir202492)** (1 July 2024, effective 1 October 2024) — the **true-to-label** rule: what is charged to the end client as a market-infrastructure levy must be what that institution received, and those institutions' charge structures must be uniform rather than dependent on member volume.
+- **[SEBI (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — the regulator's turnover fees, at regulation 41 on the available reading. `[not yet in index]`
+- **The Finance Act 2026**, assented 30 March 2026, with the exchange's rate notification of 31 March — the transaction-tax changes effective **1 April 2026**. `[not yet in index]`
+- **Securities and commodities transaction tax rules** — the valuation and rounding rules. `[not yet in index]`
+- **The uniform stamp-duty regime**, effective 1 July 2020, and its collection rules. `[not yet in index]`
+- **Exchange fee notification effective 1 March 2026** — the transaction-fee and protection-fund allocation change. `[not yet in index]`
+- **Exchange instruction on recovery at actuals** (2022), predating and reinforced by the true-to-label circular. `[not yet in index]`
+- **Exchange requirement to display charges before order placement**, with a final implementation deadline of 31 January 2023. `[not yet in index]`
+- **Clearing-corporation and exchange penalty schedules**, and the clearing-corporation guidance on which penalties may be recovered from a client. `[not yet in index]`
+- **Tax authority sectoral guidance** on the treatment of broking services, levies and interest. `[not yet in index]`
+
+## 2. Brokerage and its ceilings
+
+| Element | Position |
+|---|---|
+| Structure | A negotiated proportion of executed consideration, a fixed amount per executed order, a per-lot amount, or a subscription — the firm's commercial choice |
+| Base | Futures normally on **contract turnover**; options on **premium** |
+| **Cash equity ceiling** | **A proportion of contract value excluding statutory levies**, with a **per-share exception for very low-priced shares** |
+| **Futures ceiling, including currency** | The same proportion of **contract value**. **Do not use margin deposited as the base** |
+| **Options ceiling** | **The higher of a proportion of premium or a per-lot amount.** The base is **premium, not strike or notional** |
+| **Commodity futures ceiling** | A **lower** proportion for non-delivery transactions, and a higher proportion **plus expenses** for delivery transactions. **Do not apply the equity headline to commodities** |
+| **Commodity options ceiling** | The higher of a proportion of premium and a **larger per-lot amount than the equity formula** |
+| The other exchange | **Its current rule text and product exceptions were not separately authenticated.** One venue's evidence is not a substitute for the other's rulebook |
+| A ceiling is not a price | Each figure above is a **maximum permitted**, not a recommended or minimum charge |
+| Agreed rates | **Do not charge above the agreed tariff.** Preserve the tariff version and the change intimation |
+| **Before-order disclosure** | Brokerage and other charges for each order must be **prominently displayed on the order-entry screen before placement** |
+| Rounding and aggregation | **No universal rule.** Define per-fill against per-order aggregation, and the minimum-charge treatment, in the tariff |
+
+## 3. Statutory transaction taxes
+
+### Securities
+
+| Event | Rate | **Base** | Liable side |
+|---|---|---|---|
+| Delivery purchase of an equity share or business-trust unit | A proportion | Delivery transaction value | **Buyer** |
+| Delivery sale of the same | The same proportion | Delivery transaction value | **Seller** |
+| Equity-oriented fund unit | **Purchase nil; sale at a much lower proportion** | Sale value | Seller only. **Do not apply ordinary share-delivery treatment to every exchange-traded fund** |
+| Non-delivery equity, fund unit or business-trust unit | A lower proportion | Sale value | Seller |
+| **Futures sale** | **Increased with effect from 1 April 2026** | **Traded price times quantity — not margin and not profit** | Seller |
+| **Option sale, writing, or sale to close** | **Increased from 1 April 2026** | **Option premium times quantity** | Seller |
+| **Exercised option** | **Increased from 1 April 2026** | **Intrinsic value — not premium, and not gross underlying notional** | The exercising long |
+| **Assigned short option** | Assignment **does not** make the writer the exercising purchaser. The writer's premium sale is taxed as above, and delivery obligations may add delivery tax | Separate events, separate bases | Each event's own liable side |
+| **Physically settled stock derivatives** | Delivery tax on **both** the receiver and the giver of the underlying, **in addition to** the derivative-trade and exercise taxes | Delivery settlement value | Both sides respectively |
+| Currency derivatives | **Nil** | — | — |
+| **Rounding** | **Weighted-average price to the nearest paisa; taxable value and tax to the nearest rupee, with half a rupee and above rounding up.** Apply at the **statutory aggregation**, and reconcile the client's tax to the clearing records. **Do not round every execution independently** |
+
+<Aside type="caution" title="Three option-tax errors that reach the contract note">
+First, **the exercised-option base is intrinsic value**. An engine using gross underlying notional overcharges enormously, and this is a known client complaint pattern. Note also that an exchange page can carry a current rate table alongside older explanatory prose implying a different base — use the rate circular and the intrinsic-value treatment, not the prose.
+
+Second, **assignment is not exercise for this purpose**. The writer of an assigned option is not the exercising purchaser; the writer's taxable event was the premium sale, and any physical delivery is a further, separate event with its own base and liable side.
+
+Third, **physical settlement stacks levies.** A physically settled stock derivative attracts the derivative-trade tax, possibly the exercise tax, *and* a delivery tax on both sides. An engine that treats physical settlement as merely a position closing will understate the client's charges and then post an unexplained difference when the clearing corporation's tax file arrives.
+</Aside>
+
+### Commodities
+
+| Event | Rate | Base | Liable side |
+|---|---|---|---|
+| Non-exempt commodity or commodity-index futures sale | A small proportion | Traded futures value | Seller |
+| Sale of an option on a commodity derivative | A higher proportion | Premium | Seller |
+| **Exercise of an option on a commodity derivative** | A very small proportion | **Settlement price times quantity — not intrinsic value** | Purchaser |
+| Sale of an option in goods | A proportion | Premium | Seller |
+| Exercise of an option in goods, with actual delivery | A very small proportion | Settlement value | Purchaser |
+| **Exercise of an option in goods, cash settled** | A materially higher proportion | **Intrinsic value** | Purchaser |
+| Exempt agricultural contracts | **Nil where covered by the notified exemption.** Check the legal contract classification — **do not infer exemption from a marketing category** |
+| Rounding | Nearest rupee, half a rupee and above upward, determined daily and collected on the following day |
+
+**Note the asymmetry:** commodity option *exercise* is taxed on settlement price, while equity option exercise is taxed on intrinsic value, and a cash-settled option in goods is taxed on intrinsic value. Three similar-sounding events, three different bases.
+
+## 4. Exchange, clearing and regulator fees
+
+| Levy | Position |
+|---|---|
+| **Exchange transaction charges** | A rate per crore of turnover, **each side**, differing by exchange and segment, with options charged on **premium turnover** |
+| **The March 2026 allocation change** | At the principal exchange the **totals for cash, futures and options were unchanged**, while the split between the exchange fee and the investor-protection contribution **changed**. **Charging the new exchange component together with the old protection component overcharges the client** |
+| Protection-fund contribution | **Its own market-infrastructure levy**, even where a contract note bundles it into exchange charges. **Prevent double counting** |
+| The other exchange | Rates by scrip group and by product, several of which **could not be authenticated from primary sources** and one of which is a **nil** transaction fee on a product — **not to be assumed permanent** |
+| Commodity venue | Rates per crore for futures and options; **the client-recoverable protection component was not established** |
+| Clearing-corporation fee against clearing-member service fee | **Separate from exchange trading fees.** No universal zero clearing fee was established, and a third-party clearing member's commercial schedule is its own |
+| Product waivers and new launches | **Obtain the product-specific circular and its expiry date.** Do not configure either zero or standard fees from a generic calculator |
+| **Regulator turnover fee** | A rate per crore on **both sides**, differing by segment: the same rate for cash, equity and currency derivatives and non-agricultural commodities; a **much lower** rate for agricultural commodities; an intermediate rate for interest-rate derivatives; and a **distinct, lower rate for the debt segment** that older summaries state differently |
+| **Its options base** | **Premium plus the notional value of exercised and assigned contracts** — **not** the transaction tax's intrinsic-value base |
+| Registration fees | An annual fee applies in specified clearing categories. **A member business expense, not automatically a per-trade client levy** |
+| Rounding | **No universal rule established.** Preserve decimal computation and reconcile to control totals |
+
+## 5. Stamp duty
+
+Uniform since July 2020, collected by the exchange, clearing corporation or depository as applicable.
+
+| Instrument or event | Rate | Base | Who pays |
+|---|---|---|---|
+| Delivery transfer of securities other than debentures | The highest of the securities rates | Consideration or market value under the collection rules | **Buyer** |
+| Non-delivery equity transfer | A lower rate | Transaction value | Buyer |
+| Equity futures | A lower rate again | Traded contract value | Buyer |
+| Equity options | A rate on **premium** | Premium | Buyer |
+| Currency and interest-rate futures and options | A very low rate | Traded value, or premium | Buyer |
+| Commodity futures and options | Distinct rates | Turnover, or premium | Buyer |
+| Transfer of debentures, bonds, commercial paper, certificates of deposit and securitised debt | A very low rate | Transfer consideration | Buyer for exchange trades; the collector depends on the route |
+| **Issue** of debentures, and of securities other than debentures | A higher rate than transfer | Issue value | **Issuer**; the depository collects for dematerialised issuance |
+| Off-market transfer for consideration | The instrument-class transfer rate | Declared consideration under the collection rules | **Transferor**; the depository collects |
+| Repurchase transactions on corporate bonds | A minimal rate | The specified consideration | The borrower or forward-leg buyer |
+| **Government securities** | **Nil** | — | — |
+| **Offer for sale, tender buyback, takeover and delisting** of non-debenture securities | The delivery rate | Transaction consideration | **The offeror or seller — an exception to the normal buy-side rule** |
+| Rounding | Nearest rupee, half a rupee and above upward, at the prescribed aggregate rather than per fill |
+
+## 6. Tax on the charges
+
+Component-level, not a blanket percentage on every ledger debit.
+
+| Component | Treatment |
+|---|---|
+| Brokerage | **Taxable** on the service consideration |
+| Exchange transaction and clearing service charges | **Taxable** on the service charges. **Do not tax the trade principal** |
+| Regulator turnover fee recovery | **Taxable** in the current charge formula. **Not exempt merely because the recipient is a regulator** |
+| Protection-fund contribution recovery | **Taxable**, and **counted once** if already inside the exchange charge |
+| **Statutory transaction taxes and stamp duty** | **Excluded from the taxable value only where the agency conditions are met.** Otherwise the ordinary valuation rules apply |
+| Depository debit, maintenance, pledge and other participant services | **Taxable** on the service fee, including recoveries forming its consideration |
+| Assisted dealing, automated square-off service, programmatic access and data subscriptions | **Taxable** on the separately priced service |
+| **Interest and delayed-payment charges** on brokerage, settlement obligations and funding | **Not leviable**, being in the nature of a loan or advance. **Do not add tax to interest by default** — but examine the substance and the invoice where a charge is described as an administrative or default fee rather than interest |
+| **A penalty recovered from a client** | **No universal answer** across a genuine reimbursement, a service charge and interest. **Classify it; do not copy "tax on all penalties" from a calculator** |
+| Practical computation | Taxable base equals brokerage plus taxable exchange and clearing fees plus taxable regulator and protection recoveries plus other taxable services, **each counted once**, excluding qualifying agency taxes and exempt interest. **Use component-level tax flags** |
+
+## 7. Depository and the firm's own service charges
+
+| Charge | Position |
+|---|---|
+| Depository charges against the participant's client tariff | **Two different things.** The depository's charge to the participant is not the participant's price to the client. A participant submits its tariff to its depository **annually** and informs changes as effected, and the depository publishes comparative tariff information |
+| Transaction or debit charge | Typically **per debit instruction rather than per value** in the common tariff — so selling five holdings costs more than selling one |
+| Maintenance charge | Recurring, with **prescribed limits for basic-services accounts** that override contract wording |
+| Pledge, unpledge, demat, remat, failed instruction, courier and additional statements | Per event, under an agreed permitted tariff |
+| **Pledge handling** | The venue permits recovery of **actual** pledge, unpledge and invocation charges under a written agreed tariff. **A separately labelled handling fee needs its own basis — do not inflate a depository recovery** |
+| **Funded-stock pledge against margin pledge** | Different form, different depository charge. **The funded-stock pledge is an ordinary pledge, not a margin pledge** — see [the pledge lifecycle](/broking-kyc/finix-broking-setup/products/02-pledge-lifecycle/) |
+| Debit-balance interest and delayed-payment charges | The policy must **disclose the rate and the period** and **cannot disguise unlawful funding**. **No universal regulatory cap was established**, and the day-count and compounding rules are the firm's to define and disclose |
+| Assisted dealing, automated square-off, physical contract note, dishonoured cheque, reactivation, alerts | Each per the firm's disclosed tariff. **Separate mandatory regulatory communications from optional services** — do not price a mandatory communication as a request service |
+| Programmatic access and data feeds | Subscription and licence-dependent. **A subscription confers no exchange approval or redistribution right** |
+| Funding interest | A separate funded ledger, with the rate, day count and rounding defined and disclosed |
+| Expiry, exercise, assignment, physical delivery and corporate-action service orders | May carry additional brokerage or service pricing under the disclosed tariff and the applicable ceiling. **Zero delivery brokerage is not a promise that every such service is free** |
+| Payment-rail convenience charges | Where a rail is chargeable, under the provider agreement |
+| **Commodity delivery expenses** | Warehouse, assaying, transport, insurance and processing fees, and tax on the underlying goods, by commodity and location. **Derivative taxes are not an all-inclusive physical-delivery invoice** |
+| Rounding | **No universal rule.** Disclose the rate, the unit, any minimum and the tax treatment. **Do not apply statutory tax rounding to service fees by analogy** |
+
+## 8. Penalties the firm bears, and the narrow pass-on
+
+### Margin shortfall
+
+| Condition | Penalty on the shortfall |
+|---|---|
+| Below both an amount threshold **and** a proportion-of-required-margin threshold | The lower rate |
+| At or above the amount threshold **or** at or above the proportion threshold | The higher rate. **Note "or" — not "and"** |
+| Continuing **more than three consecutive days** | A materially higher rate, **per day** from the fourth |
+| **More than five shortfall days in a month** at the principal exchange | The same higher rate beyond the fifth |
+| **The commodity venue differs** | Recurrence beyond **three** shortfall days in a month, not five. **Do not import one venue's threshold** |
+| Large-market-move relief | A published exception exists with conditions. **Do not auto-waive because a market moved sharply** |
+| Timing | **Upfront collection is before the trade.** Later settlement and reporting windows do not authorise absent upfront margin |
+
+### Whether it can be passed to the client
+
+| Case | Position |
+|---|---|
+| **Ordinary upfront-margin collection shortfall** | **The broker bears it.** A client tariff cannot override the prohibition |
+| **Shortfall caused by the client's dishonoured cheque** | **A specific permitted exception**, on conditions, from **1 November 2024** |
+| **Shortfall caused by the client breaking a hedge, or a hedge leg expiring** | **A specific permitted exception**, with client attribution, evidence, and a **disclosed policy communicated at least seven days before** it applies or is levied, whichever is later |
+| Other client margins | An **actual** exchange penalty may be passed where the client failed the applicable obligation, with supporting records and agreed disclosure. **Not permission for a discretionary additional charge** |
+| The firm's reporting, submission, proprietary or system failures | **No general authority to charge unrelated clients was established.** Book to firm expense unless a specific permitted client-caused recovery is evidenced |
+| Other venues' exceptions | **Not authenticated as matching.** Do not assume one exchange's permission applies at another |
+| A refunded or cancelled penalty | **Reverse the linked client recovery** and retain the allocation trail |
+
+### Other losses and penalties
+
+| Item | Position |
+|---|---|
+| Short delivery, normal auction | Debit the **actual** auction settlement consequences. **There is no fixed percentage penalty** |
+| **Close-out where the auction fails** | The **higher of the highest price across exchanges from the trade through the auction, and a premium over the auction-day settlement price**. **Do not generalise to funds, bonds, corporate-action cases or every trade type** |
+| Auction difference where the auction cleared cheaper | The difference can still be collected from the short-delivering member — **it is not automatically client profit** |
+| Timing | Auction on the following day and auction settlement the day after, under the current settlement description. **An older page describing a later auction day should not be used** |
+| Position-limit and ban-period breaches | Published schedules by segment, with floors, caps and instance-based escalation, and in some cases **additional margin blocked from proprietary collateral** rather than a permanent debit. **Assessed on the member; client recovery requires a cause and a rule, not a generic consent** |
+| Late submissions | Report-, segment- and recurrence-specific schedules. **Do not apply one report's rate to another** |
+| Penalty rounding | **No universal rule.** Use the assessing authority's advice and allocate actuals |
+
+## 9. True to label, and what may not be charged
+
+| Control | Requirement |
+|---|---|
+| **Actual recovery** | The amount charged to the end client as a market-infrastructure levy **must be the amount that institution received** — covering exchanges, clearing corporations and depositories. **No retaining a volume rebate while charging the client the undiscounted amount** |
+| **Uniform structures** | Those institutions' charge structures are to be uniform rather than dependent on member volume or activity. **Not a prohibition on an independently disclosed broker commercial plan** |
+| Statutory actuals predate it | An earlier exchange instruction already required statutory and regulatory levies to be recovered **at actuals** |
+| **Labelling** | **Do not hide the firm's own remuneration inside an "exchange", "regulator", "stamp" or "depository" label** |
+| Tariff at onboarding | Supply it; agreed terms govern; **changes must be intimated**, and a policy amendment takes effect only after communication |
+| Online disclosure | **Charges displayed before order placement** is an affirmative requirement, separate from the onboarding tariff |
+| Interest and penalty policy | Specify the rate and the period; **no unlawful funding**; and a client charge cannot override a regulatory prohibition |
+
+## 10. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.bo.charges.rate_master_versioned` | **D** | **true** | Effective-dated, with the source circular recorded |
+| `finix.bo.charges.rate_effective_dating` | **D** | true | A trade is charged at the rate in force on its date |
+| `finix.bo.charges.levy_base_per_levy` | **R** | **Explicit per levy** | Premium, intrinsic value, notional, settlement value, turnover |
+| `finix.bo.charges.option_exercise_tax_base` | **R** | **Intrinsic value** | Never gross notional |
+| `finix.bo.charges.regulator_fee_option_base` | **R** | Premium plus exercised and assigned notional | A different base from the tax |
+| `finix.bo.charges.exchange_fee_and_protection_split` | **E** | Current allocation only | **Never the new fee with the old protection component** |
+| `finix.bo.charges.protection_component_counted_once` | **D** | true | Whether bundled or separate |
+| `finix.bo.charges.rounding_at_statutory_aggregation` | **R** | true | Not per execution |
+| `finix.bo.charges.full_precision_then_round_once` | **D** | true | Reconcile to the venue's tax file |
+| `finix.bo.charges.tax_flag_per_component` | **R** | true | Not a blanket percentage |
+| `finix.bo.charges.no_tax_on_interest` | **R** | true | Examine substance where a fee is not interest |
+| `finix.bo.charges.brokerage_ceiling_enforced` | **R** | **true** | Per segment and per product formula |
+| `finix.bo.charges.pass_through_at_actuals` | **R** | **true** | True-to-label |
+| `finix.bo.charges.own_remuneration_labelled_separately` | **R** | true | Never inside a levy label |
+| `finix.bo.charges.penalty_passthrough_whitelist` | **R** | **Dishonoured cheque; client-broken hedge** | Everything else to firm expense unless evidenced |
+| `finix.bo.charges.penalty_policy_notice_days` | **R** | 7 before applicability or levy | For the permitted exceptions |
+| `finix.bo.charges.penalty_refund_reverses_recovery` | **D** | true | With the allocation trail |
+| `finix.bo.charges.charges_shown_before_order` | **R** | true | On the order-entry screen |
+| `finix.bo.charges.tariff_version_retained_per_client` | **R** | true | And the change intimation |
+| `finix.bo.charges.daily_levy_reconciliation` | **D** | true | Against the clearing tax and fee files |
+
+## 11. Reconciliation
+
+| Check | Catches |
+|---|---|
+| Each levy against the clearing corporation's own tax and stamp reports, **daily** | Rate, base, rounding and aggregation errors before they reach a client |
+| Exchange and protection components against the current allocation | The double-count described in section 4 |
+| Total charges on contract notes against the ledger postings | Posting and timing errors |
+| Pass-through recoveries against amounts actually paid to each institution | True-to-label exposure |
+| Penalty allocations against the whitelist | Impermissible pass-ons |
+| Accrual estimates against actual postings | The capacity effect in [the limit impact matrix](/broking-kyc/finix-broking-setup/rms/10-limit-impact-matrix/) |
+
+## Practical notes
+
+- **Model the base per levy, not a single turnover figure.** One event can carry four levies on four bases.
+- **Reconcile levies daily against the clearing files.** It is the only way to find a rounding or base error before a client does.
+- **Keep the rate master effective-dated with its source circular.** Mid-year rate changes are routine, and a trade must be charged at the rate in force on its date.
+- **Maintain a penalty pass-through whitelist.** The default is firm expense; the exceptions are narrow, conditional and require advance notice.
+- **Re-verify every rate before configuring it**, and treat secondary-sourced figures as placeholders that must not go live.
+- **Audit your own labels.** The fastest true-to-label failure is a service fee presented as a levy.
+
+## Where this connects
+
+The capacity consequences of all of this are in [the limit impact matrix](/broking-kyc/finix-broking-setup/rms/10-limit-impact-matrix/), the posting in [the ledger and accounting](/broking-kyc/finix-broking-setup/backoffice/04-ledger-accounting/), and the client document in [contract notes](/broking-kyc/finix-broking-setup/backoffice/03-contract-notes/). Corrections and waivers are B-49 and B-50 in [the back-office operations catalogue](/broking-kyc/finix-broking-setup/backoffice/12-operations-catalogue/). Penalty files arrive as described in [<abbr title="National Stock Exchange of India">NSE</abbr> and NSE Clearing files](/broking-kyc/finix-broking-setup/files/02-nse-files/), and the margin-penalty mechanics are in [margin reporting and penalties](/broking-kyc/finix-broking-setup/rms/08-margin-reporting-penalties/). The client-facing treatments are [brokerage and charges](/broking-kyc/funds-tax/brokerage-and-charges/), [delayed payment charges](/broking-kyc/funds-tax/delayed-payment-charges/) and [tax reporting](/broking-kyc/funds-tax/tax-reporting/).

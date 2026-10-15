@@ -1,0 +1,132 @@
+---
+title: "Files 4: MCX and its clearing corporation"
+description: The commodity venue's file surface — the margin parameter cadence that reflects a long evening session, the delivery and warehouse families that have no equity analogue, the margin and penalty mechanics that differ from the equity venues, what is established about its interfaces, and the gaps that must be closed from the venue itself.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** The commodity venue's file layer differs from the equity venues in two structural ways that matter more than any naming difference: its session runs late into the evening, so parameter and trade files arrive on a different and later cadence, and its contracts settle in physical goods, so there are whole file families — delivery intentions, allocations, warehouse receipts — with no equity analogue. The page leads with those two differences, then records what is established about the rest, then states the gaps.
+
+<Aside type="caution" title="What was and was not reachable">
+The venue's circular interface **was** reachable with a complete browser header set, and a substantial number of its 2026 circulars were read directly — the agricultural position limits, the trading-hours calendar, the margin-parameter reviews, the bank-guarantee tenor change, the collateral-release arrangements, the authorised-person billing changes and the cyber-audit cycle. Its **consolidated terminal-connectivity master could not be downloaded**, and its **member-facing file inventory, upload schemas and penalty tariffs for file defaults were not obtained**.
+
+So this page is firmer than the other unreachable venue's but is still **not a complete file register**. Build the register from the venue's own member downloads and its current consolidated circulars.
+</Aside>
+
+## TL;DR
+
+- **The evening session moves everything later.** Its clearing trade file arrives after midnight on the other side of the calendar day, so a firm whose end-of-day pipeline closes in the evening will miss it entirely.
+- **More parameter snapshots per day** than the equity segments — the long session needs them.
+- **Delivery creates file families with no equity analogue**: tender and delivery intentions, allocations, warehouse and receipt records, and delivery-period margin.
+- **Its margin vocabulary differs**, including a short option minimum that genuinely exists here and does not exist in equity derivatives.
+- **Several 2026 parameter changes activate on a separate decision**, not on their notice date — loading them on publication would apply them early.
+- **Its position-limit and penalty mechanics differ from the equity venues**, including a recurrence threshold set at a different number of days.
+
+## 1. The two structural differences
+
+| Difference | Consequence for the file layer |
+|---|---|
+| **A long evening session** | Clearing and trade files arrive **late — in one verified case after midnight, on the next calendar day**. The expected-file manifest must carry a business date distinct from the arrival date, and **the end-of-day pipeline cannot close before them** |
+| **More intraday parameter snapshots** | The risk-parameter file set carries **more intraday snapshots than the equity segments**, because the session is longer. The expected count is a configuration item per segment |
+| **Physical settlement** | Whole families exist with no equity analogue — see section 3 |
+| Seasonal session timing | **Winter hours** were notified for a defined period, and the evening close also shifts with international daylight-saving changes. The close time is a **daily verification item** |
+
+## 2. What is established
+
+| Item | Detail |
+|---|---|
+| Risk parameter files | A parameter set with **begin-of-day, multiple intraday and end-of-day** snapshots; the equity venue's commodity segment publishes a comparable set with a higher intraday count |
+| Settlement prices | Published daily for commodity contracts |
+| Trade files | Clearing-side trade reports at member levels, arriving on the **late** cadence |
+| Volatility and margin parameters | **Minimum volatility scan range** reviewed and notified with signed annexures, applicable from a stated month |
+| **Concentration margin** | Thresholds reviewed, with client and member aggregation and a **hedge-code exclusion**, effective at a stated beginning of day |
+| **Near-zero and negative-price framework** | Alternative risk parameters with absolute margin floors, **applicable for a stated month but activated only on a separate exchange decision** |
+| Position limits | Numeric client and member limits by commodity and unit, **including near-month limits for agricultural commodities**, with exchange-wide limits |
+| **Position-limit penalties** | Capped amounts with a lower cap for smaller breaches, **per day of violation**, with square-off by the exchange if not cured by the next trading day |
+| Margin short-collection penalties | The same base slabs as the equity venues, but **recurrence beyond a different number of shortfall days in a month** |
+| Collateral | A **one-to-one** cash-and-cash-equivalent to non-cash ratio, with effective-collateral allocation at several levels |
+| Bank guarantees | **Minimum tenor revised**, with **electronic and physical validity and claim periods validated separately** |
+| Collateral release for running-account settlement | Dated request windows with stated cut-off hours, where a rapid release is **an endeavour rather than a guarantee** |
+| Client-code interface | A **new file format and interface version**, with go-live **deferred until further communication** after several extensions |
+| Authorised-person data | A portal with client-detail and inspection functions; **billing moved to an annual basis per approved authorised person**, and the quarterly status update discontinued |
+| Cyber-audit cycle | Half-yearly, with report and action-taken deadlines, requiring an empanelled auditor and committee approval |
+| Hedge limits | Granted case by case on documented physical exposure, through **documentary submission** — **the policy names no portal**, and one must not be invented |
+| Communication controls | The revocation list integrated, a designated numbering series for service calls, and message variables pre-tagged |
+
+## 3. The delivery families
+
+No equity analogue. **Filenames and layouts were not obtained**; the families are certain.
+
+| Family | Purpose |
+|---|---|
+| **Tender and delivery intentions** | Marking an intention to deliver or receive within the staggered period |
+| **Delivery allocation** | Matching deliverers to receivers |
+| **Delivery-period and tender-period margin** | Additional margin during those windows |
+| **Warehouse and receipt records** | The electronic receipt representing the goods, with location and quality attributes |
+| Assaying and quality certification | Where the contract requires it |
+| Storage and insurance charges | Accruing while goods are held |
+| Delivery default and penalty | Where delivery or receipt fails |
+| **Pre-expiry margin** | Escalating as expiry approaches |
+| Option devolvement into futures | On option expiry, with the resulting futures position |
+
+See [commodity delivery operations](/broking-kyc/finix-broking-setup/products/05-commodity-delivery-operations/) for the process these files serve.
+
+## 4. The margin vocabulary difference
+
+| Term | Position |
+|---|---|
+| **Short option minimum margin** | **Genuinely exists here**, as a parameter set per commodity category alongside initial margin, the margin period of risk and the volatility scan range. **It does not exist in Indian equity derivatives**, where it was abolished in 2020 |
+| Margin period of risk | A parameter in the commodity framework |
+| **Volatility scan range** | Reviewed and notified periodically, commodity-category-specific |
+| Margin shortfall block amount | An official term in the commodity framework |
+| Tender-period and delivery-period margin | Additional margin in those windows |
+| Special and additional margin | Imposed on specific commodities or conditions |
+| Lean-period margin | Additional margin on agricultural contracts expiring in a lean period |
+| Concentration margin | With client and member aggregation and a hedge-code exclusion |
+
+A firm running both segments needs **two margin vocabularies**, and a configuration that shares a parameter name across them will apply the wrong one.
+
+## 5. What could not be verified
+
+| Item | Status |
+|---|---|
+| **Its complete member file inventory with names, paths, timings and layouts** | **Not obtained** — the primary gap |
+| Its consolidated terminal-connectivity master attachment | **Not downloadable**, though the controlling circular reference is known |
+| Its client-code upload schema in production | **Deferred**; keep tested and gate on the final notice |
+| Its risk parameter file naming | **Not obtained** |
+| Its penalty tariffs for file and reporting defaults | **Not obtained**; its authorised-person penalty schedule **is** verified |
+| A client-wise position reporting return | **Likely does not exist as a member return** — the model is exchange-computes and exchange-disseminates, with the member's duty being **intraday and end-of-day monitoring with internal controls preventing breaching order entry**. A historical client-wise balance submission was **discontinued** |
+| Its hedge-limit submission portal | **The policy names none.** Submission is documentary |
+| Its alert set, portal name and penalty mechanics for surveillance | **Not first-hand.** The regulator-level commodity position-limit penalty binds all commodity exchanges; the venue's own alert list is unverified |
+| Its smart-order-routing application route | **Not verified.** Do not transfer the securities process |
+| Its current product-security certification position | **Not established** |
+
+## 6. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.files.mcx.business_date_distinct_from_arrival` | **D** | **true** | Trade files arrive next calendar day |
+| `finix.files.mcx.eod_pipeline_waits_for_late_files` | **D** | **true** | A pipeline closing in the evening misses them |
+| `finix.files.mcx.parameter_snapshot_expected_count` | **E** | Higher than equity | Per segment |
+| `finix.files.mcx.close_time_verified_daily` | **E** | true | Winter hours and daylight-saving shifts |
+| `finix.files.mcx.margin_vocabulary_separate` | **D** | **true** | Short option minimum exists here only |
+| `finix.files.mcx.conditional_activations_gated` | **E** | **true** | Not applied on notice date |
+| `finix.files.mcx.shortfall_recurrence_threshold` | **E** | The venue's own, **not the equity figure** | Different day count |
+| `finix.files.mcx.collateral_ratio` | **E** | One-to-one cash-equivalent to non-cash | Clearing rule |
+| `finix.files.mcx.bg_validity_and_claim_separate` | **E** | true | Electronic and physical |
+| `finix.files.mcx.ucc_interface_gated_on_notice` | **E** | true | Go-live deferred |
+| `finix.files.mcx.no_invented_portal` | **D** | true | Hedge limits are documentary |
+| `finix.files.mcx.register_built_from_source_list` | **D** | true | From the venue's own downloads |
+
+## Practical notes
+
+- **Make the business date a first-class field.** A trade file arriving after midnight about the previous session is the clearest case for it in the whole manual.
+- **Do not close the end-of-day pipeline before the commodity files arrive**, and staff the evening accordingly.
+- **Keep two margin vocabularies** and never share a parameter name across segments.
+- **Gate conditional activations on the separate decision.** Loading a parameter set on its notice date applies it early.
+- **Verify the close time daily.** Seasonal and daylight-saving changes are predictable and still routinely missed.
+- **Do not invent a hedge-limit portal.** The policy names none, and the submission is documentary with a queries address.
+
+## Where this connects
+
+The register discipline is in [the file register and its architecture](/broking-kyc/finix-broking-setup/files/01-file-register-architecture/) and the worked example in [<abbr title="National Stock Exchange of India">NSE</abbr> and NSE Clearing files](/broking-kyc/finix-broking-setup/files/02-nse-files/). The delivery process is in [commodity delivery operations](/broking-kyc/finix-broking-setup/products/05-commodity-delivery-operations/), the venue's trading behaviour in [<abbr title="Multi Commodity Exchange of India">MCX</abbr> commodity derivatives](/broking-kyc/finix-broking-setup/exchanges/04-mcx-commodity/), and the evening session in [the master trading-day checklist](/broking-kyc/finix-broking-setup/daily-ops/10-master-trading-day-checklist/) phase 6. The margin terms appear in [the margin engine](/broking-kyc/finix-broking-setup/rms/02-margin-engine/) and the segment comparison in [the segment rules comparison](/broking-kyc/deep-dives/foundational/segment-rules-comparison/).

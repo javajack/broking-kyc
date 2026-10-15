@@ -1,0 +1,157 @@
+---
+title: "Roles 3: the periodic and compliance responsibility matrix"
+description: Who owns each weekly, monthly, quarterly, half-yearly and annual obligation, who owns each audit and inspection, and who owns the obligations that are nobody's natural property — the circular review, the abolished-obligation list, the appeal clocks and the registers that only matter when somebody asks for them.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Daily work has natural owners because somebody notices when it does not happen. Periodic work does not: a quarterly return has no symptom when it is missed until a penalty arrives, and an annual register has no symptom until an inspector asks. So this matrix is organised by cadence rather than by function, and section 6 is given to the obligations that are structurally ownerless — which is where periodic compliance actually fails.
+
+## TL;DR
+
+- **One accountable owner per obligation**, and for periodic work the owner must also own the **reminder**, because nothing else will raise it.
+- **The compliance officer owns submission, not production.** The desk that produces the data owns its accuracy; compliance owns that it was filed, acknowledged and that the response was read.
+- **Three clocks need named owners and are routinely unowned**: the penalty appeal window, which starts on publication; the alert disposal clock; and the audit finding closure clock.
+- **Removal is an event with an owner.** When an obligation is abolished somebody must stop the activity, record it, and tell the people doing it.
+- **Audit preparation is continuous and owned by the desks**, not assembled by compliance at the last moment.
+- **Derive dates from governing calendars.** Several obligations are relative to a published annual calendar, so a fixed-date matrix is wrong for them.
+
+## 1. Conventions
+
+Letters and roles follow [the trading-day responsibility matrix](/broking-kyc/finix-broking-setup/roles/02-raci-trading-day/): **R** responsible, **A** accountable with exactly one, **C** consulted, **I** informed. Roles: **OPS** operations · **TECH** technology · **RISK** risk · **DEAL** dealing · **FIN** finance · **<abbr title="Depository Participant">DP</abbr>** depository operations · **<abbr title="Know Your Customer (process).">KYC</abbr>** onboarding · **COMP** compliance · **CS** client service · **CO** compliance officer · **HOO** head of operations · **HOR** head of risk · **HOF** head of finance · **LEAD** operations lead · **BOARD** board, partners or proprietor.
+
+**A periodic obligation's owner owns its reminder.** Where the matrix names an accountable role, that role is accountable for the obligation being raised in time, not merely for acting once reminded.
+
+## 2. Weekly
+
+| Obligation | R | A | C | I |
+|---|---|---|---|---|
+| Client-funds monitoring upload | FIN, OPS | **CO** | HOF | LEAD |
+| Statement of accounts to clients | OPS | **HOO** | CS | CS |
+| Clients mapped to authorised persons | COMP | **CO** | OPS | — |
+| Client-code mandatory-field report worked | KYC | **KYC lead** | COMP | CS |
+| Override and exception review | RISK | **HOR** | — | LEAD |
+| Suspense and break ageing review | FIN, OPS | **HOF** | COMP | LEAD |
+| The seven ownerless trading-day items checked | LEAD | **LEAD** | All desk heads | — |
+
+<Aside type="danger" title="Three consecutive misses of the client-funds upload is an external event, not a late filing">
+Failure to upload the client-funds monitoring data **for three consecutive weeks** is an enumerated early-warning trigger concerning diversion of client securities. That places it in a different category from an ordinary late submission: it is a signal the regulator watches for, attached to one of the most serious allegations a broker can face. Two consequences for the matrix. The accountable role is the **compliance officer** rather than finance, because the consequence is regulatory rather than operational. And a **second** consecutive miss should escalate to the board rather than to a desk head, because the third one changes the nature of the problem entirely.
+</Aside>
+
+## 3. Monthly
+
+| Obligation | R | A | C | I |
+|---|---|---|---|---|
+| **Client fund and securities balance upload** | OPS | **HOO** | COMP | CO |
+| Client-code particulars | KYC | **KYC lead** | COMP | — |
+| **Identity-agency status cohort worked before the deadline** | KYC | **CO** | **RISK** | CS, HOR |
+| Complaint disclosure | CS | **CO** | — | BOARD |
+| Distributor, branch and authorised-person payouts | OPS | **HOO** | FIN | — |
+| Interest and recurring charge cycles | OPS | **HOO** | FIN | CS |
+| Manual intervention count by cause | OPS | **LEAD** | TECH | BOARD |
+| Reconciliation break ageing and root causes | OPS, FIN | **HOO** | TECH | LEAD |
+| Guarantee and deposit renewal reminders actioned | FIN | **HOF** | RISK | — |
+| Rota against leaver list | LEAD | **LEAD** | COMP | — |
+| Client-code modification volume by dealer | COMP | **CO** | DEAL | HOO |
+
+The identity-agency cohort row carries **risk** as consulted deliberately: an on-hold client **cannot square off**, so the population is a risk exposure as much as a records problem.
+
+## 4. Quarterly
+
+| Obligation | R | A | C | I |
+|---|---|---|---|---|
+| **Surveillance return, with a nil return if applicable** | COMP | **CO** | RISK | BOARD |
+| **Authorised-person inspection reporting** | COMP | **CO** | OPS | BOARD |
+| Authorised-person disciplinary action, then the action-taken report | COMP | **CO** | HOO | BOARD |
+| Alert management information to the board | COMP | **CO** | RISK | BOARD |
+| Institutional-mechanism controls review | COMP | **CO** | RISK, TECH | BOARD |
+| **Entitlement audit against the operations catalogues** | TECH, COMP | **CO** | All desk heads | LEAD |
+| Firm-limit and policy review | RISK | **HOR** | — | BOARD |
+| Escalation path test, unannounced | LEAD | **LEAD** | All on-call roles | COMP |
+| Register review for invented obligations | COMP | **CO** | — | LEAD |
+| File-register reconciliation against source lists | TECH | **LEAD** | OPS | — |
+| Approved-algorithm inventory review | RISK | **HOR** | TECH, COMP | — |
+| Continuity drill and its reporting, where applicable | TECH | **TECH lead** | LEAD | BOARD, COMP |
+| Board review of continuity implementation | BOARD | **BOARD** | TECH | — |
+
+## 5. Half-yearly and annual
+
+| Obligation | R | A | C | I |
+|---|---|---|---|---|
+| **Internal audit, and its action-taken report** | External auditor, with COMP coordinating | **CO** | All desk heads | BOARD |
+| **Net worth certificate** | FIN, with an accountant | **HOF** | COMP | BOARD |
+| **Funding-facility compliance certificate**, including non-commencement | FIN, with an accountant | **CO** | RISK | BOARD |
+| **System audit, and its action-taken report** | External auditor, TECH coordinating | **TECH lead** | COMP | BOARD, technology committee |
+| **Cyber audit and penetration testing** | Empanelled organisation, TECH coordinating | **Cyber designated officer** | COMP | BOARD, cyber committee |
+| Technology committee cyber-policy review | Technology committee | **Technology committee** | TECH, COMP | BOARD |
+| Institutional-mechanism summary to the exchange | COMP | **CO** | RISK | BOARD |
+| Continuity policy and procedures review | TECH | **TECH lead** | LEAD | BOARD |
+| Statutory audit | Statutory auditor | **HOF** | — | BOARD |
+| **Annual return** | COMP | **CO** | FIN | BOARD |
+| Signed annual statement of funds and securities to clients | OPS | **HOO** | — | CS |
+| Asset-inventory certification | FIN, with the internal auditor | **HOF** | — | — |
+| Tax statements and capital-gains reports | OPS | **HOO** | FIN | CS |
+| Institutional-mechanism system review | COMP | **CO** | TECH, RISK | BOARD |
+| Policy set review | COMP | **CO** | All desk heads | BOARD |
+| Certification register and continuing-education planning | COMP | **CO** | All desk heads | — |
+| **Archive restore drill** | TECH | **TECH lead** | COMP | — |
+| Blocking-gate absence drills | TECH, OPS | **LEAD** | RISK | — |
+| Rare-intervention drills | All desks | **LEAD** | — | COMP |
+| Banking facility and liquidity-buffer review | FIN | **HOF** | RISK | BOARD |
+| Vendor review against contracted service levels | TECH, LEAD | **LEAD** | COMP, FIN | BOARD |
+
+## 6. Event-driven, and the ownerless obligations
+
+| Obligation | R | A | Note |
+|---|---|---|---|
+| **The daily circular review** | COMP | **CO** | **Belongs to compliance by subject and operations by timing, so neither claims it.** Nothing fails visibly when skipped |
+| **The abolished-obligation list** | COMP | **CO** | **Removal is an event**: stop the activity, record it, tell the people doing it |
+| **The penalty appeal clock** | COMP | **CO** | **Starts on publication to the portal, before anyone reads it.** Portal only |
+| **The audit finding closure clock** | The owning desk | **CO** | **Payment is not closure** |
+| **The alert disposal clock** | COMP | **CO** | With the extension right used where genuinely needed |
+| **Response-file checks on every submission** | COMP | **CO** | **An unread response is an unmade submission** |
+| **The conflicting-deadline register** | COMP | **CO** | With the chosen reading and its evidence |
+| **Secondary-sourced figures flagged as placeholders** | COMP | **CO** | Re-verified before going live |
+| Bank account opened or closed, within the working-day clock | FIN | **HOF** | Demat reporting abolished |
+| Director and key-personnel changes within the clock | COMP | **CO** | — |
+| Appointment or change of a statutory role | COMP | **CO** | Intimated through the exchange |
+| Incident reporting within its clock | TECH | **CO** | **Compliance files; technology supplies** |
+| Authorised-person misconduct within one working day | COMP | **CO** | With the follow-through programme |
+| Client-code registration and activation | KYC | **KYC lead** | Before the client can trade |
+| Product enablement | COMP | **CO** | Against the enablement matrix |
+| Software approval, re-certification and version filings | TECH | **TECH lead** | With compliance informed |
+| Corporate-action processing | OPS | **HOO** | Including accelerated derivative expiries |
+| **Review of the matrix itself** | LEAD | **LEAD** | **An accountable role that no longer exists is an incident, not a documentation defect** |
+
+<Aside type="caution" title="Why the compliance officer appears as accountable so often here">
+In this matrix the compliance officer is accountable for a large share of rows, which can look like over-concentration. The distinction that resolves it is between **production** and **submission**. The desk that generates the data is responsible for its accuracy and completeness — operations for the balance upload, finance for the net worth inputs, technology for the audit evidence, risk for the margin computation. The compliance officer is accountable for the fact that it was **filed, acknowledged, and that the response was read**, and personally carries the regulatory consequence if it was not.
+
+That split needs stating explicitly in the firm's own documents, because the common failure runs in both directions: a desk assuming compliance will fix bad data before filing, and compliance assuming a desk has checked the acknowledgement. Neither assumption is sound, and the gap between them is where a submission is believed complete and is not.
+</Aside>
+
+## 7. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.roles.periodic.owner_owns_reminder` | **D** | **true** | Nothing else will raise it |
+| `finix.roles.periodic.single_accountable` | **D** | true | Exactly one per obligation |
+| `finix.roles.periodic.production_vs_submission_split` | **D** | **Documented** | Desk owns accuracy; compliance owns filing |
+| `finix.roles.periodic.dates_derived_from_calendars` | **D** | true | Not fixed where the obligation is relative |
+| `finix.roles.periodic.ownerless_list_reviewed` | **D** | Quarterly | Section 6 |
+| `finix.roles.periodic.client_funds_second_miss_escalates_to_board` | **D** | **true** | The third is an early-warning trigger |
+| `finix.roles.periodic.appeal_clock_owner` | **D** | Compliance officer | Starts on publication |
+| `finix.roles.periodic.finding_closure_tracked_separately_from_payment` | **D** | true | — |
+| `finix.roles.periodic.matrix_review_on_reorganisation` | **D** | true | Not only on the quarterly cycle |
+
+## Practical notes
+
+- **Give every periodic obligation a reminder owned by its accountable role.** A calendar that nobody owns is a list.
+- **Write down the production-versus-submission split.** It is the single clarification that prevents the commonest periodic failure.
+- **Review the ownerless list quarterly.** These items have no symptom, so a scheduled look is the only detection.
+- **Escalate the second consecutive client-funds miss to the board.** The third one is an external event about client assets.
+- **Derive dates from the published calendars** for the obligations that are relative to them.
+- **Treat an orphaned accountable role as an incident.** After a reorganisation, an obligation owned by a role that no longer exists is unowned, and nobody will notice.
+
+## Where this connects
+
+The obligations themselves are specified in [periodic submissions](/broking-kyc/finix-broking-setup/monitoring/03-periodic-submissions/) and [the audit machinery](/broking-kyc/finix-broking-setup/compliance/05-audit-machinery/), the cadences in [the periodic calendar](/broking-kyc/finix-broking-setup/daily-ops/09-periodic-calendar/), and the change discipline in [the 2026 regulatory change register](/broking-kyc/finix-broking-setup/compliance/06-regulatory-change-2026/). Roles come from [the role register](/broking-kyc/finix-broking-setup/roles/01-role-register/), daily ownership from [the trading-day responsibility matrix](/broking-kyc/finix-broking-setup/roles/02-raci-trading-day/), separations from [segregation and access control](/broking-kyc/finix-broking-setup/roles/04-segregation-access-control/) and out-of-hours arrangements from [escalation and on-call](/broking-kyc/finix-broking-setup/roles/05-escalation-oncall/).

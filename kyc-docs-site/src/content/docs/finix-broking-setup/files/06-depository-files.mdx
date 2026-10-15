@@ -1,0 +1,143 @@
+---
+title: "Files 6: depository files"
+description: The participant interface at both depositories — the standardised delta file that carries most of the load, the holding and transaction exports, the client master and account-allotment response, pledge and unpaid-securities flows with their type markers, the instruction and corporate-action families, and two premises about this interface that turn out to be wrong.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** The depository interface is the least-documented boundary in a broking stack and the one where wrong assumptions are most durable, because a participant's back-office vendor usually hides it. So the page starts by correcting two widely-held premises about the interface's formats and contents, then covers the standardised layer that now spans both depositories, then the legacy layers that still differ, and finally the pledge and unpaid-securities markers — which is where the finix stack's own obligations land.
+
+<Aside type="danger" title="Two premises about this interface that are wrong">
+**The first: a legacy database-table format is not a depository interchange format.** Across the full set of participant documentation examined, that format does not appear at all. The real formats are a delimited export at one depository, a fixed-width set at the other, and the standardised comma-separated files with tagged columns at both. That format belongs to participant **back-office vendor products**, not to the boundary — so an integration specified against it is specified against the wrong thing.
+
+**The second: the beneficiary-position file is not participant-facing.** It flows from the depository to the registrar and the issuer, not to the participant. What a participant sees instead is a **position-as-of date field** inside its own exports. A design that expects to receive a beneficiary-position file will wait for something that is not sent to it.
+
+Both premises appear in vendor documentation and in industry commentary, which is why they are stated first.
+</Aside>
+
+## TL;DR
+
+- **One standardised delta file carries most of the load** — a wide export of changes that is the highest-impact file in the family and the right foundation for a participant integration.
+- **The standardised programme now spans both depositories**, so the conventions are common even though the legacy layers differ.
+- **But the catalogue versions differ between the two depositories**, so a single cross-depository version number must not be quoted.
+- **Account allotment arrives in a response file** — that is how a participant learns the account number it has been allotted.
+- **Pledge type markers distinguish the arrangements**: margin pledge, margin re-pledge, unpaid securities and margin funding, with the settlement reference carried in a specific field for auto-pledges.
+- **One depository's legacy upload set is fixed-width with its own extension family and a numeric transaction-code range**; the other's is delimited. **The codes are not translatable.**
+- **An early-morning next-day cut-off governs the release-and-invoke-with-early-pay-in routes.**
+
+## 1. The standardised layer
+
+Common conventions across both depositories, comma-separated with tagged columns.
+
+| File | What it carries |
+|---|---|
+| **The change export** | **A very wide delta file of changes — the highest-impact file in the family.** The correct foundation for a participant integration, because it carries movement rather than requiring a full-state comparison |
+| Holdings export | Account holdings |
+| Transactions export | Transaction history |
+| **Client master** | The participant's client records as the depository holds them |
+| **Transaction upload, and its response** | The participant's instructions and their outcome |
+| **Account upload, and its response** | New account requests — **the response is how the participant learns the allotted account number** |
+| Instrument master | Instrument definitions |
+| Member master | Participant and member records |
+| Calendar | The clearing calendar |
+| Corporate action export | Corporate action records |
+| Electronic instruction family | Electronic delivery instruction records |
+| Instruction-slip master | Physical instruction-slip records |
+
+**Version caution:** the two depositories were observed citing **different catalogue versions** of the standardised specification. Whether that reflects different release states could not be determined, so **do not quote a single cross-depository version number** — record each depository's version separately in the register.
+
+One depository's standardised catalogue page was observed carrying a date **three days before this research**, which is a useful indicator of how actively this specification moves.
+
+## 2. The legacy layers, which differ
+
+| Depository | Legacy format |
+|---|---|
+| One | A **delimited** report set using a non-comma delimiter |
+| The other | A **fixed-width** upload set with its own **family of file extensions**, and a **numeric transaction-code range** |
+
+**The codes and layouts are not translatable between them.** A participant servicing clients in both depositories runs two integrations, and the register carries two sets of entries rather than one parameterised set. Both are migrating to the standardised layer, which is the reason to build on it.
+
+## 3. Pledge and unpaid securities
+
+Where this stack's own obligations land. See [the pledge lifecycle](/broking-kyc/finix-broking-setup/products/02-pledge-lifecycle/) for the process.
+
+| Element | Detail |
+|---|---|
+| **Pledge type markers** | Distinct markers in the participant's pledge report distinguish **margin pledge**, **margin re-pledge**, **unpaid securities** and **margin funding** |
+| **The settlement reference** | For direct-payout auto-pledges, the settlement identifier is carried in the **pledgor participant's internal reference field** — which is how an auto-pledge is tied back to the settlement that created it |
+| An unpaid-securities transaction flag | Carries defined values distinguishing the treatments |
+| **The release and invoke routes** | Values in a specified field distinguish **release or invoke with client early pay-in**, **ordinary release or normal-pledge invocation**, **invocation with redemption for untraded fund units**, and an **exceptional member route** |
+| **The next-day cut-off** | An **early-morning cut-off on the following day** governs the pledge-release and invoke-with-early-pay-in routes |
+| Request forms | One depository publishes a set of pledge, unpledge and invocation request forms with margin variants and a combined form; the other uses a single prescribed form for initiation, release and invocation, **which must now carry the 2026 undertakings** |
+| Rejection reasons | A numbered set at one depository, **mandatory** when rejecting a covered request. **The other's current dictionary was not retrieved — do not manufacture codes or translate** |
+| **Daily reconciliation** | A **daily count of received, executed and pending instructions, and of maker-entered instructions, must reconcile** |
+| Loan-against-shares | A 2026 change at one depository routes a request from the lender's platform to the participant's menu with **same-day approve or reject** and optional auto-approval, with named reports. **No equivalent change was verified at the other** |
+
+## 4. The instruction and corporate-action families
+
+| Family | Notes |
+|---|---|
+| Delivery instructions | Raised for pay-in; **a client-code, member or instrument mismatch against the clearing obligation causes rejection and therefore short delivery** |
+| Electronic instructions | The electronic alternative to a physical slip, with its own records |
+| Authority and demat-debit arrangements | Records of the standing authority, distinct from a pledge |
+| Early pay-in | With the margin benefit, subject to the clearing cut-offs |
+| Holdings and position | Including the **position-as-of date** field that substitutes for the beneficiary-position file |
+| Corporate actions | Entitlement and adjustment records |
+| Freezes | Including statutory-order freezes with their own reason-code range |
+| Demat and remat | With processing records |
+| Transmission and nomination | Claim processing records |
+| Account closure | Participant-initiated and client-initiated |
+| Client data modification | With the re-verification consequences noted in [alerts received](/broking-kyc/finix-broking-setup/monitoring/04-alerts-received-and-response/) |
+
+**The concurrent-audit scope list for participant operations is effectively this family's job description** — see [the audit machinery](/broking-kyc/finix-broking-setup/compliance/05-audit-machinery/).
+
+## 5. The cross-cutting rejection rule
+
+A single verified fact worth isolating, because it links this plane to settlement failure:
+
+> Where details such as the client code, member identifiers or the instrument differ between the **instruction** and the **obligation**, the transfer instruction is **rejected by the depository** — and members must ensure correctness at all market infrastructure institutions, because **any such rejection results in a shortage in fulfilling the pay-in obligation**.
+
+So a client-code mismatch is not a data-quality nuisance. It is a **direct cause of short delivery**, with the auction and close-out consequences that follow. This is the strongest argument for the three-way client-master reconciliation at begin of day.
+
+## 6. What could not be verified
+
+| Item | Status |
+|---|---|
+| **Most participant report filenames** | **The identifiers, descriptions and the naming grammar are verified; specific names were not extrapolated**, because extrapolating them would be guessing |
+| Transposition handling | **No file found at all** |
+| The other depository's rejection dictionary, response enumerations and retry semantics | **Not retrieved** |
+| The other depository's interface specification, authentication and callbacks | **Not retrieved** |
+| Authorisation link templates at either depository | **Use the link the depository issues.** The tokenised grammar is not established, and a broker screenshot is not an interface contract |
+| One depository's code lifetime | Verified. **The other's was not — do not copy it across** |
+| Fee schedules in full | Partially retrieved; one depository's site blocks automated access |
+
+## 7. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.files.depo.build_on_standardised_layer` | **D** | **true** | Not the legacy formats |
+| `finix.files.depo.change_export_is_primary` | **D** | true | The delta file carries the load |
+| `finix.files.depo.version_per_depository` | **D** | **true** | **Never a single cross-depository version** |
+| `finix.files.depo.two_integrations_not_one` | **D** | true | Codes and layouts are not translatable |
+| `finix.files.depo.no_legacy_db_format_assumed` | **D** | **true** | It is not an interchange format |
+| `finix.files.depo.no_beneficiary_position_expected` | **D** | **true** | Use the position-as-of field |
+| `finix.files.depo.account_number_from_response` | **D** | true | That is how allotment arrives |
+| `finix.files.depo.pledge_type_marker_mapped` | **E** | Per depository | Margin, re-pledge, unpaid, funding |
+| `finix.files.depo.autopledge_settlement_reference_field` | **E** | The internal reference field | Ties back to the settlement |
+| `finix.files.depo.epi_next_day_cutoff` | **E** | The early-morning cut-off | For release and invoke routes |
+| `finix.files.depo.daily_instruction_reconciliation` | **E** | **true** | Received, executed, pending, maker-entered |
+| `finix.files.depo.client_code_consistency_enforced` | **R** | **true** | A mismatch causes short delivery |
+| `finix.files.depo.reason_codes_per_depository` | **D** | Separate, never translated | — |
+
+## Practical notes
+
+- **Build on the standardised layer and the change export.** It is the most durable choice and the legacy layers are migrating onto it.
+- **Record each depository's catalogue version separately** and watch both; the specification moves actively.
+- **Treat the client-code consistency check as a settlement control**, not a data-quality one. The failure mode is short delivery.
+- **Reconcile instruction counts daily** in both directions, against the depository's confirmations rather than your own interface state.
+- **Do not specify against a vendor's internal format.** The two corrected premises at the top of this page both originate there.
+- **Keep two sets of register entries.** One parameterised entry across depositories will be wrong for one of them.
+
+## Where this connects
+
+The register discipline is in [the file register and its architecture](/broking-kyc/finix-broking-setup/files/01-file-register-architecture/) and the clearing side of this interface in [clearing corporation files](/broking-kyc/finix-broking-setup/files/05-clearing-corporation-files/) and [<abbr title="National Stock Exchange of India">NSE</abbr> and NSE Clearing files](/broking-kyc/finix-broking-setup/files/02-nse-files/). The pledge process is [the pledge lifecycle](/broking-kyc/finix-broking-setup/products/02-pledge-lifecycle/), the unpaid-securities regime [the unpaid-securities regime](/broking-kyc/finix-broking-setup/backoffice/06-cuspa-unpaid-securities/), and the participant operations desk [the role register](/broking-kyc/finix-broking-setup/roles/01-role-register/). Depository set-up is in [depository participation](/broking-kyc/finix-broking-setup/setup/05-depository-participant/), and the vendor-neutral integration treatments are [the <abbr title="Central Depository Services (India) Limited">CDSL</abbr> integration guide](/broking-kyc/vendors/depositories/cdsl-integration-guide/) and [<abbr title="National Securities Depository Limited">NSDL</abbr> back-office integration](/broking-kyc/vendors/depositories/nsdl/).

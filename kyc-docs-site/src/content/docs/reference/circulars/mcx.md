@@ -62,7 +62,7 @@ Requires members to submit accessibility audit reports and remediation findings 
 
 - **date_issued:** 2026-09-02
 - **issuer:** MCX
-- **title:** "Standardisation Testing & Quality Certification (STQC) and other compliance requirements for vendors as per Cyber Security & Cyber Resilience Framework (<abbr title="Cybersecurity and Cyber Resilience Framework">CSCRF</abbr>) of SEBI"
+- **title:** "Standardisation Testing & Quality Certification (<abbr title="Standardisation Testing and Quality Certification">STQC</abbr>) and other compliance requirements for vendors as per Cyber Security & Cyber Resilience Framework (<abbr title="Cybersecurity and Cyber Resilience Framework">CSCRF</abbr>) of SEBI"
 - **applies_to:** broker
 - **in_force_date:** [unknown — verify]
 - **status:** in-force
@@ -75,7 +75,7 @@ Requires STQC application-security testing and functional audit of vendor produc
 
 - **date_issued:** 2026-08-31
 - **issuer:** MCX
-- **title:** "Mobile Numbers appearing under Mobile Number Revocation list (MNRL) published by Department of Telecommunication (DoT)"
+- **title:** "Mobile Numbers appearing under Mobile Number Revocation list (<abbr title="Mobile Number Revocation List">MNRL</abbr>) published by Department of Telecommunication (DoT)"
 - **applies_to:** broker
 - **in_force_date:** [unknown — verify]
 - **status:** in-force
@@ -527,7 +527,7 @@ Directs members to harden internet-accessible infrastructure, activate SOC-based
 - **impact_areas:** margin, rms, commodities
 - **primary_url:** [unknown — verify direct MCX URL]
 
-Revises Volatility Scan Range (VSR) parameters following backtesting per SEBI guidelines: Copper 5, Crude Oil 33, Gold 4, Natural Gas 6, Silver 6, Zinc 6. Members update <abbr title="Standard Portfolio Analysis of Risk">SPAN</abbr> risk parameters consumed by member back-office. Implements MCXCCL/RISK/066/2025 dated April 3, 2025.
+Revises Volatility Scan Range (<abbr title="Volatility Scan Range">VSR</abbr>) parameters following backtesting per SEBI guidelines: Copper 5, Crude Oil 33, Gold 4, Natural Gas 6, Silver 6, Zinc 6. Members update <abbr title="Standard Portfolio Analysis of Risk">SPAN</abbr> risk parameters consumed by member back-office. Implements MCXCCL/RISK/066/2025 dated April 3, 2025.
 
 ### MCX/ISD/211/2025
 
@@ -592,7 +592,7 @@ Mock trading on March 29, 2025 (15:00–17:00, with early session at 14:55). Mem
 - **impact_areas:** margin, rms, commodities
 - **primary_url:** [unknown — verify direct MCX URL]
 
-Revises minimum Margin Period of Risk (MPOR) — the VaR scaling factor used in Initial Margin computation — across 16 commodities. Most commodities receive MPOR factor 3; Copper, Gold and Steel Rebar receive 2; Cotton Oil 4. Brokers update SPAN file ingestion for April 2025 onwards.
+Revises minimum Margin Period of Risk (<abbr title="Margin Period of Risk">MPOR</abbr>) — the VaR scaling factor used in Initial Margin computation — across 16 commodities. Most commodities receive MPOR factor 3; Copper, Gold and Steel Rebar receive 2; Cotton Oil 4. Brokers update SPAN file ingestion for April 2025 onwards.
 
 ### MCX/CTCL/101/2025
 
@@ -911,7 +911,7 @@ Incorporates additions/modifications in the UCC State-City Code Master file used
 
 - **date_issued:** 2024-07-29
 - **issuer:** MCX
-- **title:** "Amendment in Margin Shortfall Block Amount (MSBA) Methodology"
+- **title:** "Amendment in Margin Shortfall Block Amount (<abbr title="Margin Shortfall Block Amount">MSBA</abbr>) Methodology"
 - **applies_to:** broker, clearing-corp
 - **in_force_date:** 2024-08-01
 - **status:** in-force

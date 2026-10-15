@@ -1,0 +1,220 @@
+---
+title: "Compliance 6: the 2026 regulatory change register"
+description: What changed for brokers in 2025 and 2026, what a firm must do about each change, and — kept strictly separate — what was only proposed in a consultation and is not in force; plus the change-management discipline that keeps a register like this current rather than letting it decay into a snapshot.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** A broker setting up in 2026 inherits a rulebook that moved substantially during 2025 and 2026 — a complete replacement of the governing regulations, a new closing auction session, a new unpaid-securities regime, revised transaction taxes, a reorganised penalty framework, and a long tail of ease-of-doing-business changes that *removed* obligations. Documentation that lists only additions gets the workload wrong in both directions. So this page is a register organised by theme with the effective date and the required action on every row, a clearly fenced section for proposals, and a final section on the discipline that keeps it current — because a change register is a process, not a document.
+
+<Aside type="danger" title="Proposals are fenced in section 11 and must stay there">
+Several changes widely reported as current rules were **only proposed in consultation papers** as at 15 October 2026. The most consequential are in the funding facility, where press coverage has described proposed eligibility, funding sources and exposure arithmetic as though they were in force. **A firm that configures a proposal operates outside the framework while believing it is ahead of it.** Section 11 lists them. Nothing outside section 11 on this page is a proposal; nothing inside it should be configured.
+</Aside>
+
+## TL;DR
+
+- **The governing regulations were replaced.** The 2026 broker regulations were notified on 7 January 2026 and repeal the 1992 regulations, with savings — so every registration, compliance and governance mapping has to be rebased, and new registration forms apply.
+- **A closing auction session arrived in August 2026**, changing closing-price determination, the derivatives close time, order carry-forward, and the intraday snapshot regime around it. A reversal decision was pending at the time of research.
+- **The unpaid-securities regime was revised**, with its main changes from 31 October 2026 and an exceptional extension phase from 3 January 2027.
+- **Transaction taxes rose on 1 April 2026** for futures sales, option sales and exercised options, and the principal exchange's fee allocation changed on 1 March 2026 while the totals did not.
+- **Obligations were removed as well as added** — demat reporting to exchanges, client cash-equivalent balance reporting, and a fallback platform for client risk reduction were all discontinued.
+- **The technical-glitch framework was replaced** effective 9 January 2026, with reporting within two hours, a preliminary report the next day, and root-cause analysis within fourteen **working** days.
+- **Investor-awareness messages became permanent from 1 November 2026** under a named programme, implemented separately on websites and applications.
+
+## Conceptual overview
+
+Regulatory change for a broker arrives through four different doors and each needs a different response. A **regulation** replaces the legal basis of the business and requires re-mapping rather than a configuration change — the 2026 regulations are of this kind. A **circular** typically changes a specific obligation with a stated effective date, and is the ordinary case. A **market-infrastructure change** — a new session, a new file format, a retired dissemination channel — changes the firm's technical environment whether or not the firm agrees, and its deadline is not negotiable. And a **consolidation** reissues existing material without changing it, which is dangerous precisely because it looks like a change and because a consolidation can carry forward text that a later circular has superseded.
+
+The second observation is that 2026 was unusually bidirectional. A sustained ease-of-doing-business programme removed obligations: demat-account reporting to exchanges abolished, a letter-of-confirmation workflow replaced by direct credit, client cash-equivalent balance reporting discontinued, a risk-reduction platform discontinued, single filing across exchanges for a defined list. A compliance function that only ever adds rows to a calendar will be producing returns nobody wants and paying for effort nobody requires, while believing it is being thorough. Removal is as much a change-management event as addition, and it needs the same evidence trail — which is why the register in [periodic submissions](/broking-kyc/finix-broking-setup/monitoring/03-periodic-submissions/) keeps an abolished list alongside the live calendar.
+
+The third point is that a consolidated circular is not authority for the currency of everything in it. The June 2025 broker master circular predates the 2026 regulations, the discontinuation of the risk-reduction platform and much else; an April 2026 consolidated clearing circular still reproduces a timing sentence prefaced by a date that has passed; a common-submissions exhibit still lists an obligation abolished weeks after it was published. The operating rule is that **later operative text governs a conflict**, and that a firm must keep its own source and version history rather than relying on a consolidation to be self-consistent.
+
+## 1. Governing regulations and registration
+
+| Change | Effective | What the firm must do |
+|---|---|---|
+| **The 2026 broker regulations replace the 1992 regulations**, with savings | **Notified 7 January 2026**, effective on gazette publication | Rebase registration, compliance, code-of-conduct and governance mappings; preserve the savings provisions; update every internal citation |
+| **A resident designated-director condition** | Existing brokers given **six months from notification** | Appoint or confirm at least one designated director resident for the prescribed part of the financial year; intimate through the exchange |
+| **New registration forms** for brokers and clearing members | Deemed effective from the regulations' date | Use the prescribed forms with correct 2026-regulation references |
+| **Fit-and-proper assessment amended** | **Gazette published 16 April 2026**, immediate | Update director and controller declarations and the escalation path. **Do not automatically equate an allegation with disqualification** |
+| Turnover fees restated in the regulations | With the regulations | Re-verify the per-segment rates, including a **debt-segment rate that older summaries state differently** |
+
+## 2. Client assets, funds and securities
+
+| Change | Effective | What the firm must do |
+|---|---|---|
+| **Unpaid-securities regime revised** | **Main changes 31 October 2026**; an exceptional extension phase **3 January 2027** | Build the daily retained-value cap, the excess-release step, the notifications, the liquidation path and the extension controls. Exchange operational guidelines were issued 31 July 2026 |
+| Pledge creation and invocation safeguards | **On or before 6 April 2026** | Prescribed undertakings, a reasonable sale notice, and **invocation notifications to both parties** — see [the pledge lifecycle](/broking-kyc/finix-broking-setup/products/02-pledge-lifecycle/) |
+| **Letter-of-confirmation workflow replaced by direct credit** | **2 April 2026**; earlier letters retain their submission window | Replace the handling of new letters with direct credit and client notification |
+| A special window for legacy physical-share transfer and dematerialisation | **5 February 2026 to 4 February 2027**, with a one-year lock-in after transfer | Identify eligible legacy cases at the investor-service desk. **Do not promise universal acceptance** |
+| **Simplified securities transmission** | **Thirty days from 23 July 2026** | Update threshold-dependent claim documents, verification and service workflows |
+| **Modified nomination framework** | **1 September 2026** | Implement the current multiple-nominee, consent, authentication and reminder workflows |
+| Systematic withdrawal and transfer instructions for fund units in demat | Immediate framework, **phased by unit-based then amount-based** | Integrate standing instructions and the depository execution phases where the firm distributes funds |
+
+## 3. Market structure and settlement
+
+| Change | Effective | What the firm must do |
+|---|---|---|
+| **Closing auction session, and modified pre-open** | **Auction 3 August 2026**; pre-open modifications **7 September 2026** | **Change order-system session rules, order carry-forward, risk handling and closing-price processing.** A reversal decision was pending at the time of research — re-verify |
+| **Snapshot and ratio changes consequent on the auction** | Aligned with the auction rollout | A **fifth snapshot window** after the index equilibrium price; **no cure interval for late snapshots**; closing-auction orders excluded from the cash order-to-trade ratio |
+| **Exchange-traded fund base price, bands, call auction and close-out norms** | Original date extended to **7 September 2026** | Update reference prices, order validation, and shortage and close-out processing. **Align the release to the revised date** |
+| Single-window access framework for eligible foreign investors | **1 June 2026** | Institutional and designated-participant scope: classify eligible investors and follow the tailored cycle |
+| Net settlement of funds for foreign-investor cash-market transactions | **On or before 31 December 2026** | Institutional brokerage: reconcile custodian net-funds processing. **Not retail-applicable** |
+
+## 4. Payments and collection accounts
+
+| Change | Effective | What the firm must do |
+|---|---|---|
+| **Every investor-facing collection account must be verifiable on the regulator's verification facility** | **6 September 2026**; new accounts linked **before** collecting | **Link each account to its own validated identifier — even where the firm accepts only bank-transfer rails** |
+
+This one is easy to miss precisely because it feels like a payments-product matter. It is an account-level registration obligation that applies to every collection account, regardless of the rails offered on it.
+
+## 5. Derivatives and risk controls
+
+| Change | Effective | What the firm must do |
+|---|---|---|
+| **Fixed-weekday expiry regime**, one weekly benchmark index option per exchange, minimum one-month tenor for everything else | For contracts expiring **on or after 1 September 2025** | Configure the exchange's chosen weekday; **the two main exchanges differ** — see [the derivatives contract lifecycle](/broking-kyc/finix-broking-setup/products/03-fno-contract-lifecycle/) |
+| **Delta-adjusted future-equivalent basis for index option limits**, the new market-wide limit formula, and the ban-period delta test | Phased through 2025, **normal implementation from early December 2025** | Implement the basis **per instrument and per level** — index futures and member-level limits deliberately stayed on notional |
+| Separate, higher **intraday** future-equivalent limits for index options | **1 October 2025**, with the expiry-day consequence from **early December 2025** | Monitor intraday against the higher ceilings; an additional deposit applies **only on expiry day** |
+| **Order-to-trade ratio framework revised** | **6 April 2026** | Update the option-specific price exemption and designated-market-maker order treatment; load the revised bands |
+| **Calendar-spread margin benefit removed on expiry day for single-stock derivatives** | **Three months from 5 February 2026** | **Remove the offset for an expiring stock-derivative leg on expiry day**, preserving eligible non-expiring spreads |
+| Daily dissemination of next-day index derivative position limits | **From 6 October 2026** | Ingest the new quantity-limit file; the client-level file moves to **stocks only** from early November 2026 |
+| Single-stock derivative lot review | **Phased from late October 2026** | **Import the final exchange contract master. Do not hard-code lot tables** |
+| Commodity client position limits and breach penalties revised | **Immediate from 9 September 2026** | Update limits and the **capped** breach penalties, with square-off and escalation controls |
+| Commodity early-pay-in margin exemption | **21 September 2026** | Apply the exemption only to qualifying early pay-in; marking obligations remain |
+| Commodity winter trading hours | **2 November 2026 to 12 March 2027** | Update session calendars, modification cut-offs and support and treasury shifts |
+| Commodity volatility, concentration and near-zero-price parameters | Various, several from **November 2026** | Load the signed annexure values; **some activations are conditional on a separate decision and must not be switched on by notice date alone** |
+
+## 6. Technology, cyber and resilience
+
+| Change | Effective | What the firm must do |
+|---|---|---|
+| **Technical-glitch framework replaced** | **9 January 2026**, immediate | Apply the scope and exemptions; report **within two hours**, a preliminary report **the next day**, and root-cause analysis **within fourteen working days** |
+| **Cyber incident reporting aligned to a standard report format** | Final operational alignment **24 August 2026**; existing timelines reiterated | Use the initial, intermediate and final report sequence and the regulator's incident portal; **retain the national-response-team and exchange reporting** |
+| Cyber-audit submission cycle | Report and action-taken deadlines per the half-year | Submit with management comments and category-specific coverage; use an **empanelled** organisation |
+| Advisory on risks from advanced artificial-intelligence capabilities | Issued **5 May 2026** — **an advisory, not a new deadline** | Assess against the vulnerability, vendor and threat-response programmes |
+| **Vendor product-security certification** for empanelled trading-software vendors | Notified **2 September 2026**, with the first certificate deadline **28 February 2027** and an annual cycle from the period ending **31 March 2028** | Track the vendor's position as a **constraint on the firm's own releases** |
+| Resilience index for market infrastructure institutions | Procedure to the regulator **31 January 2027**, framework **28 February 2027** | **A market-infrastructure submission, not a broker return.** Track the interfaces only |
+| Digital-accessibility implementation | Audit and remediation extended to **31 October 2026** | Complete the audit and remediation by the revised deadline |
+| Educational price-data lag harmonised | **1 July 2026** | A thirty-day sharing and usage lag; revise education content and data contracts. **Do not reuse the earlier rule** |
+
+## 7. Conduct, disclosure and investor protection
+
+| Change | Effective | What the firm must do |
+|---|---|---|
+| **Investor-awareness messages on trading applications and websites** | **Transition 5 to 31 October 2026; permanent arrangement 1 November 2026** | **Implement website and application separately.** Awareness and risk messages **alternate on applications** from November |
+| **Registration disclosures on social media** | **1 May 2026**, for content uploaded on or after that date | Update profile and homepage disclosures, and disclosures at the start of content, **for the firm and its agents** |
+| **A common advertisement code** | **Notified 8 October 2026, commencing on the one-hundred-and-eightieth day from gazette publication — not in force on 15 October 2026** | Prepare controls for endorsements, inducements, dark patterns, claims and unauthorised advertising **ahead of commencement** |
+| **Past risk and return verification** operationalised | **4 May 2026**, with an enrolment extension to **3 September 2026** | Where certified past performance is communicated, complete enrolment and integrate claim controls. **Do not extrapolate to execution-only brokerage** |
+| Updated surveillance consolidation | **15 May 2026**, underlying commencement dates retained | Refresh surveillance references and automated trading-window controls |
+| **Risk-reduction platform discontinued** | **Immediate, 7 May 2026** | **Remove platform-dependent outage promises and procedures**; maintain the firm's own continuity and alternate arrangements |
+| Debt risk-disclosure meter | **Forty-five days from 7 October 2026** | Where a bond platform is operated, add the prescribed disclosure to advertisements and product presentation |
+| Bond-platform framework changes | Immediate from **14 August 2026** | Apply revised permitted products, staff certification and investor safeguards where applicable |
+
+## 8. Client identity and anti-money-laundering
+
+| Change | Status | What the firm must do |
+|---|---|---|
+| **Central registry version 2.0** | **Pilot ran September to early October 2026, concluded; version 1.0 continues until a formal launch.** Tentative availability was reported for later in 2026 | **Complete migration prerequisites and testing; keep pilot and live records distinct; gate the production switch on formal authorisation.** Several of these notices are available only as reproductions — treat the dates as indicative |
+| Identity-agency information sharing with international-centre entities | Immediate from **20 August 2026** | Where using that distribution route, use the authorised sharing rather than informal transfer |
+| **Monthly identity-status enforcement cohorts** | Rolling; a current cohort restricted from **2 November 2026** | Remediate before each deadline. **The restriction includes square-off**, and deceased-client data arrives daily |
+| Three-part identifier verification | In force | Identifier, name and date of birth or incorporation must **all** match; corrections require an unfreeze request and re-verification |
+| **Client-code field validations enhanced** | Go-live **9 October 2026 end of day** | Use the revised upload formats and interface specification; **use the modification file only for fields that actually changed** |
+| Commodity-venue client-code interface migration | **Deferred until further communication** | Keep the migration tested but **gate the production switch on the final notice** |
+
+## 9. Fees, taxes and reporting
+
+| Change | Effective | What the firm must do |
+|---|---|---|
+| **Transaction taxes increased** for securities futures and options | **1 April 2026** | Update the sell-side futures and option rates and the **purchaser's exercise rate on intrinsic value**; reconcile tax ledgers |
+| **Exchange fee and protection-fund allocation revised** | **1 March 2026** | **Update both components accurately. Total member outflow is unchanged — charging the new fee with the old protection component overcharges the client** |
+| Product-specific transaction-charge waivers | Various, several date-bounded | Configure the **product- and date-specific** zero fee **and its expiry** |
+| **Demat reporting to exchanges removed; bank and primary-dealer relaxations** | **17 April 2026** | Stop the duplicate reporting as implemented; **retain tagging and the applicable bank-account reports** |
+| **Single filing across exchanges** for a defined list | 2025, in force | File once at the designated exchange for listed submissions; **confirm what is not on the list** |
+| Designated-large-broker list for the financial year | List issued **1 April 2026**, voluntary applications by **30 April 2026** | Determine designation **from the exchange list**; retain applicable former-designation obligations |
+| **Penalty framework rationalised and standardised** | **17 April 2026** | Re-read the enforcement chain and the transition rules before computing any historical penalty |
+| Review, appeal and waiver architecture against committee actions | **Forty-fifth day from 5 August 2025** | Route reviews to the correct tier; **the clearing-corporation window runs from publication and is portal-only** |
+| Commodity settlement-guarantee and stress-testing changes | Immediate, various | Clearing and risk: reconcile the implementations. **Not a universal client charge** |
+| Commodity bank-guarantee minimum tenor revised | **23 September 2026** | Separate electronic and physical validity and claim-period validation |
+| Commodity running-account collateral-release arrangements | Dated windows | Coordinate collateral release with client payouts. **A rapid release is an endeavour, not a guarantee** |
+| Commodity authorised-person billing basis changed | Quarterly status update discontinued **1 April 2026** | Budget per **approved** authorised person annually; reconcile approvals rather than active ones |
+
+## 10. Obligations that were removed
+
+Worth its own section, because removal is a change-management event too.
+
+| Removed | When |
+|---|---|
+| **Demat-account reporting to exchanges** | 17 April 2026; depositories now feed the exchanges directly |
+| **Client-level cash and cash-equivalent balance reporting** | March 2024 |
+| **The investor risk-reduction platform** | 7 May 2026 |
+| **Letter-of-confirmation issuance** for dematerialisation | 2 April 2026, replaced by direct credit |
+| The weekly holding statement, replaced by a daily one; and the daily nil declaration, replaced by a one-time declaration | 2023 |
+| The commodity venue's monthly client-wise balance submission | December 2020 |
+| Separate filing at each exchange for listed common submissions | 2025 |
+| The commodity venue's quarterly authorised-person status update | 1 April 2026 |
+
+## 11. Proposals only — not in force
+
+**Nothing in this section may be configured.** Each is a consultation paper as at 15 October 2026, with no final adopting instrument located.
+
+| Area | Proposed |
+|---|---|
+| **Funding facility** | A higher net worth threshold; eligibility for limited liability partnerships; debentures and other debt as funding sources; a reformulated exposure basis; a cure mechanism for passive client-limit breaches; broader collateral; a thirty-day rebalance on a security leaving eligibility; and reporting before clearing pay-in |
+| Client onboarding and identity-agency risk framework | Simplification of onboarding and rationalisation of the agencies' risk-management framework |
+| Derivatives ease of doing business | Simplification, clarification and de-merger of clusters of derivatives provisions — **largely a renumbering exercise, which is itself a documentation risk** |
+| Market-infrastructure continuity and recovery | Strengthening continuity and recovery at those institutions — **their obligation, not a broker drill frequency** |
+
+A useful signal from the funding-facility consultation: it proposes periodic settlement of excess facility cash, which **already exists** as an exchange requirement. **A proposal restating an existing obligation is not evidence that the obligation is absent today** — and reading it that way is how a firm concludes it may stop doing something it must.
+
+## 12. The change-management discipline
+
+A register decays into a snapshot without a process behind it. This is that process.
+
+| Element | Position |
+|---|---|
+| **Daily circular review** | A named owner, every trading day, with a **written record of what was reviewed and what was actioned** — item C-0.12 in [the master trading-day checklist](/broking-kyc/finix-broking-setup/daily-ops/10-master-trading-day-checklist/) |
+| Sources monitored | The regulator; both exchanges and the commodity venue; all three clearing corporations; both depositories; the central registry; the financial intelligence unit; and the payments and telecommunications regulators where relevant |
+| **Classification on receipt** | Regulation, circular, market-infrastructure change, consolidation, advisory, or **consultation** |
+| **Three dates per change** | Issued, **effective**, and the firm's own internal readiness date |
+| Impact assessment | Which systems, which configuration keys, which documents, which filings, which roles, which training |
+| **Conflict rule** | **Later operative text governs.** Keep the firm's own source and version history; **a consolidation is not authority for the currency of everything in it** |
+| Proposal handling | Logged, tracked, **and explicitly not configured**, with a watch for the final instrument |
+| Removal handling | Treated as a change: stop the activity, **record it on an abolished list**, and tell the people who were doing it |
+| Monthly review | Changes effective in the coming period, with readiness status and owners |
+| **Verification pass** | Figures taken from secondary sources are **flagged as placeholders** and re-verified against primary sources before going live |
+| Evidence | The review record, the assessments, the configuration changes with approvals, and the training records |
+
+<Aside type="caution" title="The two failure modes of a change register">
+The first is **decay**: the register is built during a project, is accurate on the day it is finished, and is never updated — so it quietly becomes a description of a past rulebook while continuing to be cited as current. The defence is the daily review with a written record, because it is the only mechanism that produces a continuous stream of inputs rather than a periodic rebuild.
+
+The second is **conflation**, where proposals, advisories and consolidations are logged in the same stream as operative circulars and eventually treated the same way. This is how a firm configures a consultation proposal, or treats an advisory as a deadline, or assumes a consolidated circular has superseded a later specific one. The defence is classification on receipt — six categories, assigned before anything else happens — which costs seconds and prevents the expensive version of the mistake.
+</Aside>
+
+## 13. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.compliance.change.daily_review_owner` | **D** | Compliance officer, named | With a written record |
+| `finix.compliance.change.sources_monitored` | **D** | The full list in section 12 | Reviewed for completeness yearly |
+| `finix.compliance.change.classification_on_receipt` | **D** | **Six categories** | Before any other handling |
+| `finix.compliance.change.three_dates_tracked` | **D** | Issued, effective, internal readiness | — |
+| `finix.compliance.change.proposals_not_configured` | **D** | **true** | Logged and watched |
+| `finix.compliance.change.removals_recorded` | **D** | true | On an abolished list |
+| `finix.compliance.change.later_text_governs` | **D** | true | With source and version history |
+| `finix.compliance.change.secondary_sourced_flagged` | **D** | **true** | Placeholders, re-verified before live |
+| `finix.compliance.change.monthly_readiness_review` | **D** | true | Owners and status |
+| `finix.compliance.change.impact_assessment_required` | **D** | true | Systems, keys, documents, filings, roles, training |
+
+## Practical notes
+
+- **Classify on receipt.** It is the cheapest control on this page and it prevents the most expensive mistakes.
+- **Record the daily review even on quiet days.** The record is the evidence the review happened, and the absence of a record on a day a change was published is the finding.
+- **Keep an abolished list.** Without it, a removed obligation is revived by the next diligent reader of an old exhibit.
+- **Treat secondary-sourced figures as placeholders.** Several items in this register are available only as reproductions, and a placeholder that reaches production is an error waiting for a client.
+- **Track vendor deadlines as your own.** A vendor's certification deadline becomes a constraint on the firm's releases.
+- **Re-verify the auction-related items first.** They changed in 2026, a reversal decision was pending, and a great deal downstream depends on them.
+
+## Where this connects
+
+The obligations this register changes are specified across [periodic submissions](/broking-kyc/finix-broking-setup/monitoring/03-periodic-submissions/), [the audit machinery](/broking-kyc/finix-broking-setup/compliance/05-audit-machinery/) and [the compliance configuration baseline](/broking-kyc/finix-broking-setup/compliance/01-compliance-config-baseline/). Product-level consequences are in [margin trading facility operations](/broking-kyc/finix-broking-setup/products/01-mtf-operations/), [the pledge lifecycle](/broking-kyc/finix-broking-setup/products/02-pledge-lifecycle/), [the derivatives contract lifecycle](/broking-kyc/finix-broking-setup/products/03-fno-contract-lifecycle/) and [expiry and physical settlement](/broking-kyc/finix-broking-setup/products/04-expiry-physical-settlement/); technology consequences in [the certification plane](/broking-kyc/finix-broking-setup/certification/) and [cyber resilience configuration](/broking-kyc/finix-broking-setup/compliance/04-cyber-cscrf-config/). The registration baseline is [<abbr title="Securities and Exchange Board of India">SEBI</abbr> registration under the 2026 regulations](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/), and the site's full circular index with its changelog is at [regulatory circulars](/broking-kyc/reference/regulatory-circulars/).

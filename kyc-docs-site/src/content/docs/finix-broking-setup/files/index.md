@@ -18,9 +18,9 @@ description: The file layer a broking operation actually runs on — the registe
 | Page | What it covers |
 |---|---|
 | [The file register and its architecture](/broking-kyc/finix-broking-setup/files/01-file-register-architecture/) | Register columns, day types and manifests, collection, naming and versioning, validation order, the applied-state assertion, idempotency, criticality as a gate |
-| [NSE and NSE Clearing files](/broking-kyc/finix-broking-setup/files/02-nse-files/) | The largest file surface: masters, bhavcopy and its October 2026 retirements, risk and surveillance files, margin parameters and reporting, obligations, collateral, uploads, and the naming inconsistencies that cause bugs |
-| [BSE and Indian Clearing files](/broking-kyc/finix-broking-setup/files/03-bse-files/) | What is established about the other exchange's file surface, and an honest account of what could not be verified |
-| [MCX files](/broking-kyc/finix-broking-setup/files/04-mcx-files/) | The commodity venue's file surface and the evening-session timing consequences |
+| [<abbr title="National Stock Exchange of India">NSE</abbr> and NSE Clearing files](/broking-kyc/finix-broking-setup/files/02-nse-files/) | The largest file surface: masters, bhavcopy and its October 2026 retirements, risk and surveillance files, margin parameters and reporting, obligations, collateral, uploads, and the naming inconsistencies that cause bugs |
+| [<abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> and Indian Clearing files](/broking-kyc/finix-broking-setup/files/03-bse-files/) | What is established about the other exchange's file surface, and an honest account of what could not be verified |
+| [<abbr title="Multi Commodity Exchange of India">MCX</abbr> files](/broking-kyc/finix-broking-setup/files/04-mcx-files/) | The commodity venue's file surface and the evening-session timing consequences |
 | [Clearing corporation files](/broking-kyc/finix-broking-setup/files/05-clearing-corporation-files/) | The cross-venue clearing view: obligations, margin, collateral, penalties, settlement |
 | [Depository files](/broking-kyc/finix-broking-setup/files/06-depository-files/) | The participant interface at both depositories, the standardised delta file, pledge and unpaid-securities flows |
 | [Outbound submissions](/broking-kyc/finix-broking-setup/files/07-outbound-submissions/) | Everything the firm sends, and the response files that prove it arrived |

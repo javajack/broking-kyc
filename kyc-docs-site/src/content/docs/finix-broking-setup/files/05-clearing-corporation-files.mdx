@@ -1,0 +1,148 @@
+---
+title: "Files 5: clearing corporation files"
+description: The clearing view across venues — the standardised naming convention, the families that determine what a broker owes and holds, the two-way margin reporting exchange that is the penalty surface, obligation finality and its revised publication, collateral and allocation uploads, penalty files, and the reconciliations that must run daily.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** The clearing corporation is where a broker's obligations become numbers it must settle, and almost all of them arrive as files. This page takes the cross-venue view of those families — what each determines, which direction it flows, and what breaks without it — leaving the exact names and paths to the per-venue pages, because the names differ and the families do not. Section 4 is given to margin reporting because it is the one family where the broker's own upload decides whether it is treated as compliant.
+
+## TL;DR
+
+- **A standardised naming convention runs across the clearing families**, organised by segment, report and member, which is what makes a cross-venue register possible at all.
+- **Obligation files are published more than once**, and the later version under a different name is the one to settle on where a custodian did not confirm.
+- **A finality flag inside the obligation file must gate settlement instruction.** Treating a non-final obligation as final is a pay-in shortfall.
+- **Margin reporting is the penalty surface** and every one of its failure modes is silent.
+- **Collateral statements are the authority on what the clearing corporation holds** — not the broker's own ledger, and divergence means wrong available margin all day.
+- **Allocation and release uploads have construction rules**, not just validation rules — ordering within the file and batch-number semantics both matter.
+- **Penalty files arrive at client level** and carry the shortfall basis, which is what makes allocation defensible.
+
+## 1. The naming convention
+
+The standardised convention organises files by **segment, report identifier and member code with a date**, which is why a register can be built across venues even where individual names differ. Legacy names persist alongside the standardised ones and in several families **both** are served, so the register records which representation each consumer uses — the same discipline that made the October 2026 bhavcopy retirement manageable for anyone who had recorded it.
+
+## 2. The families, by what they determine
+
+| Family | Direction | What it determines |
+|---|---|---|
+| **Risk parameter files** | In | What margin the broker must collect. Several snapshots a day |
+| Value-at-risk and exposure files | In | Cash-segment and exposure margin rates |
+| Settlement and mark-to-market prices | In | Daily marking and valuation |
+| **Margin reports, end-of-day and intraday** | In | The requirement, and the **peak across snapshots** |
+| **Margin reporting upload and response** | **Both** | Whether the broker is treated as having reported |
+| Short allocation, intraday and end-of-day | In | Which clients are short of collateral |
+| **Penalty files** | In | The bill, at client level, with the shortfall basis |
+| **Obligation files, provisional and final** | In | What the broker must deliver and receive |
+| Funds statements and bank reports | In | The treasury requirement |
+| Deliveries, demat delivery and receipt statements | In | Depository instructions to raise |
+| **Client allocation details** | In | Direct payout verification, including quantity required against credited |
+| Shortages, auction square-off, auction difference, close-out prices | In | Short-delivery consequences at client level |
+| Settlement calendar | In | **Every downstream date** |
+| **Collateral statements** | In | What the clearing corporation holds, by instrument and type |
+| Client collateral reports | In | Client-wise collateral as the clearing corporation records it |
+| Haircut and valuation files | In | Collateral value |
+| Pledge and release reports | In | Pledge confirmations and releases |
+| **Collateral release and transfer uploads, with responses** | **Both** | Returning collateral, and moving it between segments |
+| **Cash collateral allocation upload, with response** | **Both** | Allocating collateral to members, participants and clients |
+| **Early pay-in allocation upload, with response** | **Both** | The margin exemption |
+| Position files | In | **Open position reconciliation** |
+| Exercise and assignment | In | Expiry obligations |
+| Delivery margin | In | The expiry-week escalation |
+| Cross-margin benefit | In | Benefit on offsetting positions |
+| Transaction tax and stamp duty | In | **Contract-note tax lines** |
+| Corporate actions | In | Entitlements and adjustments |
+| Guarantee and deposit renewal reminders | In | **A lapsed guarantee silently removes collateral** |
+| Capital cushion letters | In | Cushion requirements and releases |
+| Participant code application and modification, with responses | Both | Institutional trade attribution |
+| Post-trade allocation, with response | Both | Institutional allocation |
+| Position-limit reporting, with response | Both | Index-product limit reporting |
+| Portfolio file | In | **Reproducing the clearing corporation's own margin number** — how a margin dispute is settled |
+
+## 3. Obligation finality
+
+| Element | Position |
+|---|---|
+| Provisional obligation | Published on the trade date; drives client pay-in calls, early-pay-in decisions and short-delivery prediction |
+| **Final obligation** | Published on the trade date — **and again the next day, under a name carrying an extra infix**, where custodial rejection or non-confirmation changed it |
+| **The finality flag** | A flag inside the file states whether the obligation is final or still awaits custodial confirmation. **A non-final flag must block settlement instruction** |
+| The failure | Funding and instructing from the trade-date file where a custodian rejected an institutional trade leaves the broker **short on pay-in day** — a default event with penalty and reporting consequences |
+| The control | Two register entries, not one: the trade-date file and **the next-day revised file with its own expectation** |
+
+## 4. Margin reporting — the penalty surface
+
+| Element | Position |
+|---|---|
+| What arrives | Detailed end-of-day margin per client with the **peak across intraday snapshots**, and intraday files from **a minimum of four random snapshots** |
+| What the broker uploads | What it **collected**, per client, end-of-day and peak |
+| **The sign-off date** | **A defined number of working days after the trade date.** After it, the file is rejected and **all non-reporting is treated as full short reporting** |
+| Corrections | By re-uploading with an **incremental batch number** before sign-off; the latest batch for the trade date governs |
+| The response file | Carries **per-record reason codes**, and where a record has several errors **the lowest-numbered code is reported** — so a record corrected for one defect can immediately fail on another |
+| **The silent failures** | A **wrong filename is ignored** rather than rejected, and on the extranet is renamed to mark it failed; a **zero-byte file is rejected**; an **out-of-sequence batch is rejected**; and a **missing trailing newline breaks processing** |
+| The control | **Reconcile accepted record counts against submitted counts.** A status field does not reveal these |
+| Shortage computation | The **higher** of the end-of-day position, the peak across snapshots, and the short allocation after excess collateral and valid reason codes |
+| Collection | Monthly, by debit to the settlement account |
+
+## 5. Upload construction rules
+
+Rules about how a file is **built**, not merely validated — the class of defect that produces a silent partial result.
+
+| Rule | Family |
+|---|---|
+| **Downward records must precede upward records** within the file | Cash collateral allocation |
+| The batch number is **unique and sequential across all segments** for the day | Cash collateral allocation |
+| Batch numbers run **sequentially** from the first | Margin reporting |
+| Batch numbers are **deliberately non-sequential** | Security release — a member may have no release in a batch, so **a gap is not a missing file** |
+| **Every file must contain all records and reuse the same batch number** | Voluntary auction participation |
+| **A header is not applicable** | Early pay-in allocation |
+| A header is **always present in the response**, whether or not the upload had one | Margin reporting |
+| The member code must be a specific form | Position-limit reporting |
+| A data-export function pre-populates a request from **what the clearing corporation actually holds** | Collateral release — the way to avoid mismatched pledge references |
+
+## 6. The daily reconciliations
+
+| Reconciliation | Catches |
+|---|---|
+| Trade file against the order system | The end-of-day chokepoint |
+| **Obligation against the broker's computation** | A difference means the broker is wrong |
+| **Position file against the broker's open positions** | A break invalidates margin, marking and expiry handling at once |
+| **Collateral statement against the broker's collateral ledger** | Divergence means wrong available margin all day |
+| Client collateral report against client-level allocation | Short allocation and penalty exposure |
+| Pledge reports three ways — depository, back office, risk | Collateral not recognised |
+| Margin report against the broker's own computation | Before reporting, not after |
+| **Response files against submitted counts** | The silent failures |
+| Tax and stamp reports against computed charges | Contract-note accuracy |
+| Penalty files against the allocation whitelist | Impermissible pass-ons |
+| Funds statements against bank movements | Funding errors |
+| **Excess at the clearing corporation** | Money sitting idle that is the firm's or a client's |
+
+## 7. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.files.cc.finality_flag_gates_settlement` | **R** | **true** | A non-final obligation blocks instruction |
+| `finix.files.cc.revised_obligation_expected_next_day` | **D** | **true** | Its own register entry |
+| `finix.files.cc.margin_report_count_reconciliation` | **D** | **true** | Accepted against submitted |
+| `finix.files.cc.margin_report_batch_sequential` | **E** | true | Out of sequence is rejected |
+| `finix.files.cc.trailing_newline_required` | **E** | true | Absence breaks processing |
+| `finix.files.cc.signoff_days` | **E** | Venue-set | Non-reporting is full short reporting |
+| `finix.files.cc.allocation_downward_before_upward` | **E** | **true** | A construction rule |
+| `finix.files.cc.batch_sequencing_per_family` | **E** | Per family | **Some are deliberately non-sequential** |
+| `finix.files.cc.release_request_from_data_export` | **D** | true | Avoids reference mismatches |
+| `finix.files.cc.collateral_statement_is_authority` | **D** | **true** | Not the broker's ledger |
+| `finix.files.cc.position_file_reconciled_daily` | **D** | true | A break invalidates three computations |
+| `finix.files.cc.portfolio_file_retained` | **D** | true | For margin dispute resolution |
+| `finix.files.cc.guarantee_reminder_actioned` | **D** | true | A lapse silently removes collateral |
+| `finix.files.cc.excess_at_cc_monitored` | **D** | true | Easily forgotten |
+
+## Practical notes
+
+- **Gate settlement instruction on the finality flag**, and expect the revised obligation as a separate file.
+- **Reconcile counts on every response file.** The margin-reporting failures are all silent and all count-detectable.
+- **Treat upload construction rules as part of the file format.** Ordering and batch semantics are not validation niceties.
+- **Reconcile the collateral statement daily.** It is the authority, and a divergence costs capacity for a full day.
+- **Keep the portfolio file.** It is how a margin dispute with the clearing corporation is actually settled.
+- **Watch the guarantee renewal reminders.** A lapsed guarantee produces a sudden, unexplained margin shortfall.
+
+## Where this connects
+
+The worked per-venue register is [<abbr title="National Stock Exchange of India">NSE</abbr> and NSE Clearing files](/broking-kyc/finix-broking-setup/files/02-nse-files/), with the others in [<abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> and its clearing corporation](/broking-kyc/finix-broking-setup/files/03-bse-files/) and [<abbr title="Multi Commodity Exchange of India">MCX</abbr> and its clearing corporation](/broking-kyc/finix-broking-setup/files/04-mcx-files/). The depository side is [depository files](/broking-kyc/finix-broking-setup/files/06-depository-files/) and what the firm sends is [outbound submissions](/broking-kyc/finix-broking-setup/files/07-outbound-submissions/). Downstream, these files drive [settlement obligations](/broking-kyc/finix-broking-setup/backoffice/05-settlement-obligations/), [the margin engine](/broking-kyc/finix-broking-setup/rms/02-margin-engine/), [margin reporting and penalties](/broking-kyc/finix-broking-setup/rms/08-margin-reporting-penalties/) and [settlement day operations](/broking-kyc/finix-broking-setup/daily-ops/06-settlement-day-ops/).

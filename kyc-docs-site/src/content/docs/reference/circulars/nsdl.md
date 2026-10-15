@@ -322,7 +322,7 @@ Circulates the June 11, 2026 Gazette notification for the FPI Common Application
 
 - **date_issued:** 2026-06-16
 - **issuer:** NSDL
-- **title:** "Guidelines on Mobile Number Revocation List (MNRL) and Reactivation List provided by DoT"
+- **title:** "Guidelines on Mobile Number Revocation List (<abbr title="Mobile Number Revocation List">MNRL</abbr>) and Reactivation List provided by DoT"
 - **applies_to:** depository, broker
 - **in_force_date:** [unknown — verify]
 - **status:** in-force

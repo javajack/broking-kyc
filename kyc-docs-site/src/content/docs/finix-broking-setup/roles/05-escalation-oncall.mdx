@@ -1,0 +1,156 @@
+---
+title: "Roles 5: escalation and on-call"
+description: The severity model and what each level means in practice, who must be reachable when and by what means, the out-of-hours arrangements for the commodity evening session and the overnight batch, the escalation paths that must actually be answered, and the external notification clocks that start running whether or not anyone has been reached.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** An escalation policy fails in one of two ways — nobody is reachable, or the person reached has no authority to act. Both are design failures rather than individual ones, so this page pairs every severity level with both a reachability requirement and a decision right, and section 6 states the external clocks that run regardless. Those clocks are the reason escalation here is not an ordinary operational nicety: a cyber incident and a technical glitch both carry reporting deadlines measured in hours, and the clock starts at detection rather than at the moment somebody competent was located.
+
+## TL;DR
+
+- **The external clocks are the design constraint.** A technical glitch must be intimated within a short fixed period of occurrence and a cyber incident within hours of detection, with a preliminary report the next day and a root-cause analysis within a defined number of working days.
+- **Pair every severity with a decision right.** Reaching somebody who cannot authorise the response is not an escalation.
+- **The evening session needs a named owner with authority**, not a monitoring arrangement. If it cannot be covered, the honest response is not to trade that segment.
+- **Pre-authorise risk-reducing actions generously.** Nobody should need approval to make the firm's exposure smaller.
+- **Every decision right needs a named deputy.** A right vested in one person is unavailable whenever that person is.
+- **Escalation paths must be answered, not merely defined.** A path whose last step is an unmonitored mailbox is a gap, and testing it is the only way to know.
+
+## Conceptual overview
+
+Escalation exists because the authority to act and the knowledge that action is needed sit in different places, usually at different times of day. The operator who notices a divergence at nine in the morning cannot suspend a pre-trade check; the head of risk who can is not watching the sequence numbers. Good escalation design minimises the number of times that gap has to be crossed, which it does in two ways: by **pre-authorising** as much as possible, especially anything that reduces exposure, and by **pre-deciding** the response to foreseeable situations so that the escalation is a notification rather than a request. What remains — the genuinely novel, genuinely consequential decision — is what the escalation path is for, and it should be rare enough that the path is kept in good order.
+
+The second idea is that out-of-hours is not a lower-intensity version of the trading day; it is a different operating mode with its own risks. The commodity evening session trades real positions while the equity organisation has gone home. The overnight batch produces the balances that tomorrow's limits are computed from, and a failure there means the next day cannot open properly. The settlement cycle's funding deadlines can fall when banking contacts are unavailable. Each of these needs a named owner with real authority, and the common failure is to staff them with monitoring rather than decision-making — somebody who can see a problem and can only wake somebody else.
+
+The third point concerns honesty about coverage. A firm that cannot cover the evening session with a risk owner who can stop trading has a choice between trading it uncovered and not trading it. The first is the one firms drift into, because the segment is usually quiet and the cost of the arrangement is visible while the cost of its absence is not. Stating the position explicitly — that an uncovered segment does not open — converts a drift into a decision, which is both safer and cheaper than discovering the gap during an incident.
+
+## 1. The severity model
+
+| Level | Meaning | Reachability | Decision rights available |
+|---|---|---|---|
+| **S1 — the firm cannot trade correctly** | Order state divergent; sessions down; risk parameters absent or wrong; a runaway strategy; client assets or segregation in question; a cyber incident | **Immediate, by phone, with a named deputy.** Head of risk, head of operations, technology lead, compliance officer, and the go-or-no-go owner | Stop trading; bulk cancel; kill strategies; suspend a check with dual control; switch to the recovery site; report externally |
+| **S2 — a material function is impaired** | A blocking file absent; the pipeline stalled before a deadline; a funding path at risk; a venue interface degraded; a reconciliation break of size | **Within minutes, by phone.** The owning desk head plus the operations lead | Execute the pre-decided fallback; reduce scope; delay a downstream step; fund from the firm with dual control |
+| **S3 — a deadline is threatened** | A submission at risk; a response file showing rejections; an alert approaching its disposal clock; a suspense balance past its threshold | **Same working day.** The owning desk head and the compliance officer where external | Re-prioritise; seek an extension where one exists; accept and record a gap |
+| **S4 — an exception needing a decision** | A client dispute; an unusual instruction; a classification question on a release; a correction after a deadline | **Next working day.** The accountable role | Approve, refuse, or escalate with a recorded reason |
+
+**The test of the model is not the list but whether S1 is genuinely rare.** If S1 fires weekly, the pre-authorisation set is too narrow or the pre-decided fallbacks are missing, and the path will be worn out when it is needed.
+
+## 2. Reachability requirements
+
+| Role | When reachable | How |
+|---|---|---|
+| Go-or-no-go owner, with deputy | From before begin of day until the open is decided | Phone |
+| Head of risk, with deputy | **Through the session and the evening session** | Phone |
+| Head of operations, with deputy | Through the session and the end-of-day pipeline | Phone |
+| Technology on-call | **Continuous**, including the overnight batch | Phone, with a documented second line |
+| Head of finance, with deputy | Through to the funding confirmation and the pay-out cycle | Phone |
+| Compliance officer, with deputy | Through the session, and for external clocks **at any time** | Phone |
+| **Evening session risk owner** | **For the whole evening session** | Phone, named on the rota |
+| Head of dealing, with deputy | Through the session | Phone |
+| Depository operations | Through the instruction windows | Phone or message |
+| Client service lead | Through the session and shortly after | Phone |
+| **A named executive** | For any matter requiring a decision none of the above holds | Phone |
+
+<Aside type="danger" title="A path that is not answered is not a path">
+The commonest escalation failure is structural and invisible until it matters: the documented route ends somewhere nobody is watching — a shared mailbox, a rota entry for a person who has left, a phone number that reaches a desk rather than a person, or a deputy who was never told they were one. None of this shows up in an ordinary month.
+
+Three cheap tests find all of it. **Call the path**, unannounced, once a quarter, at the hour it would actually be used, and record who answered and how long it took. **Ask each named deputy** whether they know they are one and what they are authorised to decide. And **check the rota against the leaver list** monthly. A firm that has never tested its out-of-hours escalation does not know whether it has one, and the first real test will be an incident with a reporting clock already running.
+</Aside>
+
+## 3. Out-of-hours operating modes
+
+| Mode | Risks | Requirement |
+|---|---|---|
+| **Commodity evening session** | Real positions traded while the equity organisation is absent; international price moves; seasonal close-time changes; tender and delivery deadlines | **A named risk owner with authority to stop the segment**, a technology on-call, and a funding contact. **If it cannot be covered, the segment does not open** |
+| **The end-of-day pipeline** | The chokepoint is reconciliation, and several regulatory deadlines sit inside the pipeline | The operations lead reachable until the day is marked closed; compliance reachable for the submissions |
+| **The overnight batch** | Produces the balances tomorrow's limits are computed from; a failure blocks the next open | Technology on-call with a documented escalation to a second line, and an operations contact for a business decision |
+| **Settlement-day funding** | Bank cut-offs can fall when contacts are unavailable | The head of finance reachable, with the bank's escalation contacts documented and current |
+| Weekend and holiday work | Mock sessions, drills, migrations, period-end runs | The specific exercise's own named owner and escalation, not the weekday rota |
+| **An incident spanning a boundary** | Handover during an active incident is where facts are lost | The incident keeps its owner across the boundary, or the handover is explicit and written |
+
+## 4. Pre-authorisation — the part that reduces escalation load
+
+| Action | Pre-authorised to |
+|---|---|
+| Cancel a client's open orders | Risk, or a senior dealer |
+| **Cancel all open orders firm-wide** | Risk |
+| **Kill an algorithmic strategy** | Risk or technology |
+| Block a client from fresh exposure, or set close-only | Risk |
+| Block an instrument or a channel | Risk, or technology for a channel malfunction |
+| Freeze order entry while keeping sessions alive | Risk |
+| Force a session disconnect and reconnect | Technology |
+| Issue a margin call | Risk |
+| Decide a square-off within policy | Risk |
+| Stop granting all limit increases | Head of risk |
+| Execute a pre-decided file fallback at its trigger time | Operations, automatically |
+
+**The principle is asymmetric: nobody needs approval to make the firm's exposure smaller.** The pre-authorised list should feel slightly uncomfortable in its breadth, because the alternative — a runaway strategy continuing while an operator searches for an approver — is the worse failure. Actions that *increase* exposure or *remove* a control are correspondingly strict, and several are dual-control.
+
+## 5. The escalation record
+
+| Field | Content |
+|---|---|
+| Incident or exception identifier | — |
+| Severity, and any change to it | With the time of each change |
+| Detected at, and detected by | The clock usually starts here |
+| Escalated at, to whom, by what means | Including attempts that failed |
+| **Time to reach an authorised decision-maker** | The single most useful metric on this page |
+| Decision taken, by whom | And the authority relied on |
+| Actions executed | Cross-referenced to the intervention logs |
+| External notifications | Which, when, by whom — see section 6 |
+| Client communications | Which clients, when, by what means |
+| Resolution and restoration | Including the return to normal operations |
+| Root cause and the fix owner | For the review |
+| **Path defects observed** | An unanswered number, an unaware deputy, a stale rota entry |
+
+The last row is the one that improves the system. Path defects are only visible during use, and they are forgotten within a day unless they are captured at the time.
+
+## 6. The external clocks
+
+These run from detection, not from the moment somebody competent was located. They are the reason the arrangements above have to work.
+
+| Obligation | Clock |
+|---|---|
+| **Technical glitch** — intimation to the exchange | **Within a short fixed period of occurrence**, extended modestly under the 2026 framework |
+| Technical glitch — preliminary incident report | **The next day**, subject to the framework's holiday treatment |
+| Technical glitch — root-cause analysis | **Within a defined number of working days**, counted as working days under the 2026 framework |
+| **Cyber incident** — reporting to the exchanges, the regulator and the national response team | **Within hours of noticing or detecting** |
+| Authorised-person misconduct — assured returns or unauthorised schemes | **Within one working day** |
+| Surveillance alert disposal | Within the disposal period, with an extension available on request |
+| Margin, position-limit or segregation breach | Reportable in substance; compliance informed the same day |
+| Client-facing communication on a delayed or scoped open | **Promptly**, to clients and the exchange |
+| Pay-in failure | A default event with its own reporting and penalty consequences |
+
+**The framework and the reporting platform for glitches are detailed in [incident and breach reporting](/broking-kyc/finix-broking-setup/monitoring/05-incident-breach-reporting/).** The point here is narrower: **the escalation design must be fast enough that the reporting clock can be met**, which means the compliance officer has to be reachable at any hour, because they are the person who files.
+
+## 7. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.roles.esc.severity_model` | **D** | Four levels, each with decision rights | Reaching someone without authority is not escalation |
+| `finix.roles.esc.deputy_required_per_right` | **D** | **true** | And the deputy is told |
+| `finix.roles.esc.phone_primary_channel` | **D** | true for S1 and S2 | Not electronic mail |
+| `finix.roles.esc.evening_owner_named` | **D** | **true** | **Segment does not open if uncovered** |
+| `finix.roles.esc.overnight_oncall_second_line` | **D** | true | Documented |
+| `finix.roles.esc.compliance_reachable_any_hour` | **D** | **true** | The external clocks require it |
+| `finix.roles.esc.preauthorised_reductions` | **D** | **Generous** | Nobody approves making risk smaller |
+| `finix.roles.esc.control_removal_dual_control` | **D** | true | The opposite direction |
+| `finix.roles.esc.path_test_frequency` | **D** | **Quarterly, unannounced, at the real hour** | Recorded |
+| `finix.roles.esc.rota_vs_leaver_check` | **D** | Monthly | — |
+| `finix.roles.esc.time_to_authorised_decision_tracked` | **D** | **true** | The metric that matters |
+| `finix.roles.esc.incident_owner_persists_across_handover` | **D** | true | Or an explicit written handover |
+| `finix.roles.esc.bank_escalation_contacts_current` | **D** | Reviewed periodically | For funding deadlines |
+| `finix.roles.esc.s1_frequency_reviewed` | **D** | Quarterly | Frequent S1 means too little pre-authorisation |
+
+## Practical notes
+
+- **Measure time to an authorised decision, not time to escalate.** The second is easy and the first is what the external clocks consume.
+- **Test the path unannounced, at the hour it would be used.** Business-hours tests of out-of-hours paths prove nothing.
+- **Tell deputies they are deputies**, and tell them what they may decide. An unaware deputy is a gap with a name against it.
+- **Review S1 frequency quarterly.** Rare S1 means the pre-authorisation and pre-decision work is doing its job; frequent S1 means it is not.
+- **Make the evening-session coverage rule explicit and enforce it.** Drifting into an uncovered segment is the specific failure to design against.
+- **Capture path defects during the incident.** They are invisible otherwise and forgotten by the next day.
+
+## Where this connects
+
+The incidents these paths serve are in [incident playbooks](/broking-kyc/finix-broking-setup/daily-ops/07-incident-playbooks/) and the reporting in [incident and breach reporting](/broking-kyc/finix-broking-setup/monitoring/05-incident-breach-reporting/). The decision rights come from [the trading-day responsibility matrix](/broking-kyc/finix-broking-setup/roles/02-raci-trading-day/) and the roles from [the role register](/broking-kyc/finix-broking-setup/roles/01-role-register/); the authority model for each action is in the operations catalogues for [<abbr title="Order Management System">OMS</abbr>](/broking-kyc/finix-broking-setup/oms/11-operations-catalogue/), [<abbr title="Risk Management System">RMS</abbr>](/broking-kyc/finix-broking-setup/rms/11-operations-catalogue/), [back office](/broking-kyc/finix-broking-setup/backoffice/12-operations-catalogue/) and [money](/broking-kyc/finix-broking-setup/money/08-money-operations-catalogue/). The evening session and overnight batch are phases 6 and 7 of [the master trading-day checklist](/broking-kyc/finix-broking-setup/daily-ops/10-master-trading-day-checklist/), and the recovery arrangements are in [mock trading and drills](/broking-kyc/finix-broking-setup/certification/05-mock-trading-and-drills/).

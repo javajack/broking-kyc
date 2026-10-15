@@ -1,0 +1,99 @@
+---
+title: "Products 8: primary market, funds and debt"
+description: The products that use a different settlement machinery from secondary trading — public issue applications and the blocked-amount mechanism, the fund platforms and the demat-held unit instructions, debt and government securities, and the operational and 2026 regulatory particulars of each.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** These products share one property that distinguishes them from secondary trading: the money and the securities move through machinery the broker does not control — a blocked amount in a client's own bank account, a fund platform's order cycle, a registrar's allotment, a depository's standing instruction. The broker's role is intermediation and reconciliation rather than execution and settlement. So the page is organised by product, and each one states what the broker is actually responsible for, which is narrower and different from a secondary trade.
+
+## TL;DR
+
+- **In a public issue the money never reaches the broker.** It is blocked in the client's own account and debited on allotment, so the broker's obligations are application integrity, the block, and reconciliation against the registrar's outcome.
+- **The letter-of-confirmation workflow was replaced by direct credit** from April 2026, which changed the dematerialisation path for newly issued securities.
+- **Fund platform orders settle on the platform's cycle**, not the exchange's, and a demat-held unit now supports **standing instructions for systematic withdrawal and transfer**, phased by instruction type.
+- **A bond platform is a separate regulated activity** with its own framework, revised in 2026, and a new risk-disclosure requirement commencing after a deferred date.
+- **Government securities carry no stamp duty** on transfer under the securities schedule, and debt-segment turnover fees sit at their own rate.
+- **The common thread is reconciliation**: in each product the authoritative outcome comes from a third party and the broker's records must move toward it.
+
+## 1. Public issue applications
+
+| Element | Position |
+|---|---|
+| The mechanism | The application is made with an amount **blocked in the client's own bank account** rather than paid to the broker |
+| **Where the money sits** | **With the client's bank, not with the broker.** The block is released or debited on the allotment outcome |
+| The broker's responsibilities | Application integrity — correct client identity, correct demat account, correct category, correct bid structure; the block instruction; and **reconciliation against the registrar's allotment** |
+| Modification and withdrawal | Within the issue's windows and the category's rules |
+| **Allotment** | Determined by the registrar; the broker's record must move toward the registrar's outcome |
+| **Credit of securities** | Into the client's demat account. The **letter-of-confirmation workflow was replaced by direct credit** from **2 April 2026**, with earlier letters retaining their submission window |
+| Refund or unblock | On non-allotment or partial allotment |
+| Grievances | Issue-related grievances have their own routing |
+| What the broker does **not** do | Hold the money, determine the allotment, or settle the securities |
+
+## 2. Fund platforms
+
+| Element | Position |
+|---|---|
+| Order routing | Through the exchange-operated fund platforms, on **the platform's cycle** rather than the exchange's settlement cycle |
+| Order types | Purchase, redemption, switch, and systematic instructions |
+| **Units held in demat** | Supported, with the holding visible in the client's depository account |
+| **Standing instructions, from 2026** | A framework for **systematic withdrawal and systematic transfer** instructions for units held in demat, with an **immediate framework and a phased rollout — unit-based first, amount-based second** |
+| Settlement | Per the platform's cycle, with the registrar's confirmation as the authoritative outcome |
+| Reconciliation | Platform confirmations against client records against depository holdings |
+| Distributor economics | Where the firm acts as a distributor, commission and its disclosure follow the applicable framework |
+| Transaction tax | **An equity-oriented fund unit's sale attracts a much lower rate than an ordinary share delivery, and its purchase attracts none** — see [the charges and billing engine](/broking-kyc/finix-broking-setup/backoffice/11-charges-billing-engine/) |
+| **Pledged units** | Untraded fund units have their **own invocation-and-redemption route** rather than an exchange sell order — see [the pledge lifecycle](/broking-kyc/finix-broking-setup/products/02-pledge-lifecycle/) |
+
+## 3. Debt and government securities
+
+| Element | Position |
+|---|---|
+| Debt segment | Listed debt traded on the exchange's debt segment, with its own daily files, a securities-available list and its own parameter set |
+| **Turnover fee** | The debt segment carries **its own lower rate**, which older summaries state differently |
+| **Stamp duty** | **Government securities attract none** under the securities schedule. Debt transfers attract a very low rate; **issuance attracts a higher rate than transfer**, collected from the issuer by the depository for dematerialised issuance |
+| Corporate bonds | Valuation and haircut files exist for collateral purposes, with rating-based sublimits at the clearing corporation |
+| Repurchase transactions | A minimal stamp rate, payable by the forward-leg buyer |
+| **Online bond platform** | **A separate regulated activity** with its own framework, **revised in August 2026** on permitted products, staff certification and investor safeguards |
+| **A risk-disclosure meter** | Introduced as an additional disclosure for debt securities, **commencing after a deferred period from October 2026**, to be added to advertisements and to web and mobile product presentation where a platform is operated |
+| Retirement and savings products | Where offered, each with its own activation and operational framework |
+
+## 4. What is common to all three
+
+| Property | Consequence |
+|---|---|
+| **The authoritative outcome is a third party's** | The registrar, the platform, the depository. **The broker reconciles toward it** |
+| The money path differs | Blocked in the client's account, or settled on a platform cycle — **not through the broker's settlement account in the usual way** |
+| **Separate activation** | Each is a distinct product enablement with its own documentation and system readiness |
+| Separate reconciliation | Each needs its own daily or cycle reconciliation, and none of them is covered by the secondary-market reconciliation set |
+| Client expectation management | Timelines are longer and outside the broker's control, which is the main source of complaints |
+| **Charges differ by instrument class** | Transaction tax, stamp duty and turnover fees all differ, and applying the equity treatment is a common and material error |
+
+## 5. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.products.primary.block_mechanism` | **R** | Money blocked in the client's own account | Not received by the firm |
+| `finix.products.primary.registrar_outcome_authoritative` | **D** | **true** | Reconcile toward it |
+| `finix.products.primary.direct_credit_path` | **R** | true | From April 2026; letters superseded |
+| `finix.products.primary.application_integrity_checks` | **D** | Identity, demat, category, bid structure | Before submission |
+| `finix.products.mf.platform_cycle_not_exchange_cycle` | **D** | true | Different settlement timing |
+| `finix.products.mf.standing_instructions_phased` | **E** | Unit-based then amount-based | Per the rollout |
+| `finix.products.mf.untraded_unit_pledge_route` | **E** | Invocation with redemption | Not an exchange sell order |
+| `finix.products.debt.turnover_fee_rate` | **R** | The debt-segment rate | **Not the equity rate** |
+| `finix.products.debt.gsec_stamp_duty` | **R** | **Nil** | Under the securities schedule |
+| `finix.products.debt.bond_platform_is_separate_activity` | **R** | true | With its own framework |
+| `finix.products.debt.risk_disclosure_meter` | **R** | After the deferred commencement | Advertisements and product presentation |
+| `finix.products.all.separate_reconciliation` | **D** | **true** | Not covered by the secondary set |
+
+## 6. Practical notes
+
+- **Reconcile against the third party every cycle.** In each of these products the broker's record is the derivative one.
+- **Do not apply the equity charge treatment.** Transaction tax, stamp duty and turnover fees all differ by instrument class, and the errors are material.
+- **Set client expectations on timing explicitly.** The timelines are longer and the broker does not control them, which is the principal complaint driver.
+- **Treat the bond platform as a separate activity** if it is offered, with its own framework and its own disclosure obligations.
+- **Build each product's reconciliation before launch.** The secondary-market reconciliation set does not cover any of them.
+- **Watch the deferred commencements.** Two items here commence after a stated period rather than on issue, and configuring them early is as wrong as configuring them late.
+
+## Where this connects
+
+Enablement is in [the product enablement matrix](/broking-kyc/finix-broking-setup/products/09-product-enablement-matrix/) and the client-side activations in [public issue applications](/broking-kyc/product-activation/ipo-asba-upi/), [bonds, government securities and retirement products](/broking-kyc/product-activation/bonds-gsec-nps/) and the fund-platform treatment in [mutual fund platforms](/broking-kyc/deep-dives/specialty/mutual-fund-platforms/). Charges are in [the charges and billing engine](/broking-kyc/finix-broking-setup/backoffice/11-charges-billing-engine/), the 2026 changes in [the 2026 regulatory change register](/broking-kyc/finix-broking-setup/compliance/06-regulatory-change-2026/), and the broker-side primary-market flow in [the public issue broker-side deep dive](/broking-kyc/deep-dives/specialty/ipo-ofs-broker-side/).

@@ -1,0 +1,215 @@
+---
+title: "Monitoring 2: real-time and near-real-time obligations"
+description: What is measured continuously rather than at day boundaries — the random intraday snapshot regime for margin and position limits, delta-adjusted open interest, the cure windows the rules deliberately build in, terminal broadcasts, order-to-trade ratio, and the one reporting file the clearing member must send to earn a limit benefit.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** The defining feature of this layer is that the firm is measured at moments it does not choose. Margin sufficiency and position-limit compliance are both sampled at random instants inside pre-defined windows, which means a system computing at the open and the close is computing a different quantity from the one it is judged on. So the page leads with the snapshot regime and its deliberate asymmetries — volatility inputs are previous-day so the model is replicable, prices are live, cure windows exist in some cases and not others — and then covers what the firm must push versus what the venue computes, because that boundary is narrower than most firms assume.
+
+## TL;DR
+
+- **Margin and position limits are sampled at a minimum of four random snapshots** within pre-defined windows. A firm computing only at day boundaries will under-collect at the measured moments.
+- **Index option limits are measured on net delta-adjusted future-equivalent open interest** at portfolio level per underlying per client. **Index futures deliberately stayed on gross notional**, and the member-level limits remained notional too.
+- **Intraday breaches of index limits are monitored but, for futures, not penalised** — the venue must still notify the client and member for their own risk monitoring. For index options there is an expiry-day consequence.
+- **A passive breach is not a violation.** If market open interest falls and an unchanged position therefore exceeds a percentage-linked limit, there is no penalty and no unwinding duty — but the relief applies only to percentage-linked legs, not fixed-rupee ones.
+- **The venue computes and pushes almost everything.** The member's genuine real-time-adjacent reporting duties are few, and the main one is a cash-and-cash-equivalent report that *earns* a limit benefit rather than discharging an obligation.
+- **Two consequential streams arrive only as terminal messages** — the utilisation broadcast and automatic trade cancellation — so capturing terminal output is an engineering requirement.
+
+## Conceptual overview
+
+There are two distinct reasons a regulator measures continuously rather than periodically. The first is anti-gaming: a margin requirement tested only at the close can be met by closing positions before the close and reopening after, so the requirement is tested at unpredictable moments instead. The second is systemic visibility: concentration that exists for three hours in the middle of a session is a real exposure even if it is absent at both boundaries. Both reasons imply randomness, and randomness implies that the firm cannot optimise against the measurement — which is the point. The operational consequence is that continuous sufficiency is cheaper to achieve by holding a buffer than by trying to predict the snapshot.
+
+The second idea is that the measurement model is deliberately made replicable in some inputs and live in others. Volatility is taken from the previous day's close, explicitly so that members can reproduce the computation without knowing when the snapshot will be taken. The underlying price is the live value at the snapshot instant, because that is the exposure. Same-day-expiring contracts are included. This split is a design choice that favours the member: it means a firm can run the same model continuously on its own data and know its own number, rather than being surprised by a figure it cannot reconstruct. A firm that does not implement the published formulation is choosing not to know.
+
+The third idea is that the rules contain **cure windows**, and they are the most under-used provision in this area. Where a breach is observed at a snapshot, an additional snapshot follows shortly afterwards, and only a breach persisting in both becomes provisional. Where a security is in a ban period, the computation uses an afternoon delta snapshot specifically so that members have the rest of the session to fix client positions. These are designed remediation intervals. A firm that computes its exposure only at end of day has discarded them, and will pay penalties the framework gave it the chance to avoid.
+
+## 1. Framework
+
+- **Regulator circular of 1 October 2024** — first mandated intraday monitoring of index-derivatives position limits with a minimum number of random snapshots, effective 1 April 2025. `[not yet in index]`
+- **Regulator circular of 15 October 2024** — introduced the **previous-day market open interest** monitoring base and the **passive-breach** carve-out, and set member-level index limits. `[not yet in index]`
+- **Regulator circular of 28 March 2025** — intraday monitoring commences, with **no penalty and no violation** for intraday breaches of the then-existing notional limits. `[not yet in index]`
+- **Regulator circular of 29 May 2025** — the core rewrite: future-equivalent open interest, the new market-wide limit formula, the ban-period delta rule, and index and single-stock limits. `[not yet in index]`
+- **Regulator circular of 1 September 2025** — separate, higher **intraday** future-equivalent limits for index options, plus an expiry-day consequence. `[not yet in index]`
+- **Regulator peak-margin framework of 20 July 2020** — [<abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/MRD2/DCAP/CIR/P/2020/127](/broking-kyc/reference/circulars/sebi-other/#sebihomrd2dcapcirp2020127), the origin of continuous margin sufficiency verified by intraday snapshots.
+- **Exchange circulars of 30 September 2025, 5 December 2025 and 31 July 2026** — the snapshot mechanics, the expiry-day consequence, and the changes consequent on a closing auction session. `[not yet in index]`
+- **Exchange circular of 31 October 2025** — the terminal broadcast of market-wide limit utilisation above a threshold. `[not yet in index]`
+
+## 2. The snapshot regime
+
+| Element | Position |
+|---|---|
+| **Cadence** | A **minimum of four random snapshots** per trading day, within pre-defined windows |
+| Late-session window | From 1 October 2025, **at least one snapshot must fall in the final part of the session** |
+| **The fifth window, from 31 July 2026** | Because of the closing auction session: **no snapshot** from the auction's start until the index equilibrium price is determined, and an **additional window for a fifth snapshot** from equilibrium determination until shortly after. The index close price is used for delta and valuation in any post-equilibrium snapshot |
+| **Volatility input** | **Previous day's end-of-day** figure, taken as the higher of the underlying's and the futures' annualised volatility — **deliberately, so members can replicate the model without knowing the snapshot timing** |
+| **Price input** | The **real-time index value at the snapshot instant** |
+| Same-day expiries | **Included** |
+| Expiry-day time to expiry | Uses the revised derivatives close time in the option-pricing input |
+| **Margin snapshots** | Separately, a **minimum of four snapshots** of client-wise margin requirement, taken randomly within pre-defined windows, **computed on fixed begin-of-day margin parameters**. The detailed margin files carry both the end-of-day figure and the **peak across snapshots** |
+
+### The cure window
+
+| Element | Position |
+|---|---|
+| On an observed breach | **An additional snapshot fifteen minutes later** |
+| Persisting in both | Becomes a **provisional breach**, intimated to the member and client by electronic mail at end of day or the next day |
+| After the benefit computation | Becomes a **final breach** once the cash-equivalent and stock-holding benefits are applied |
+| **The exception** | **The cure interval does not apply to snapshots taken late in the session** |
+
+<Aside type="danger" title="The cure window is the single most valuable provision here, and it needs engineering to use">
+A breach observed at a snapshot does not become a breach until it survives a second look a quarter of an hour later. That interval is a designed opportunity to reduce a client's position, and using it requires three things a firm must build in advance: the firm's own continuous computation of future-equivalent exposure per client, so it knows it is near a limit before the venue says so; a monitoring threshold set below the limit, so action begins before a snapshot rather than after; and a pre-authorised intervention path — R-41 to R-44 in [the <abbr title="Risk Management System">RMS</abbr> operations catalogue](/broking-kyc/finix-broking-setup/rms/11-operations-catalogue/) — that can reduce a position inside fifteen minutes without hunting for an approver. A firm that learns of its breaches from the venue's end-of-day intimation has, by construction, never used the window. Note also that the window closes for late-session snapshots, so exposure must be inside limits before that part of the session rather than managed into it.
+</Aside>
+
+## 3. Delta-adjusted open interest
+
+| Element | Position |
+|---|---|
+| **Basis** | Open interest is measured **at portfolio level as net delta-adjusted open positions across futures and options for an underlying**, per client |
+| Deltas | A long future contributes its full notional; a long call ranges from none to full; a long put from none to full negative; short positions take the opposite sign |
+| Market-wide aggregation | The **gross addition of each client's net future-equivalent open interest** |
+| Published formulation | The standard option-delta formulation, with the policy rate as the risk-free input and a prorated time to expiry |
+| What the venue provides | Future-equivalent open interest per security and per index, entity-level figures through its portal, a **per-member future-equivalent open interest report**, and **per-contract delta factors** both intraday and at end of day |
+| **Scope** | **Index options moved to this basis. Index futures deliberately stayed on gross notional, and member-level index limits remained on notional too** — a reform for members was a later draft, restated as unchanged in October 2026 |
+
+### Limits, by level
+
+| Level | Basis |
+|---|---|
+| **Client, index options** | Separate **net** and **gross** future-equivalent ceilings, with **higher intraday net ceilings than end-of-day**, measured per index |
+| Client and proprietary, index futures | The higher of a fixed rupee amount or a percentage of market open-interest, **on gross notional**, with the percentage differing by participant category |
+| **Member, index futures and options** | The higher of a fixed rupee amount or a percentage of market open interest, **on gross notional** |
+| Single stocks | Percentages of the market-wide limit, differing by participant category |
+| Additional exposure against holdings | Short index exposure capped by **stock holdings**, sourced by the venue **directly from the depositories**; long index exposure capped by **cash and cash equivalents, government securities and similar — excluding bank guarantees** — which **the member must report**. See section 6 |
+
+## 4. The passive breach
+
+| Element | Position |
+|---|---|
+| Monitoring base | Limits are computed from the **total market open interest at the end of the previous day** |
+| The consequence | If market open interest falls, an entity can breach a percentage-linked limit **without trading at all** |
+| **Treatment** | **Not a violation.** No penalty, and **no unwinding required** |
+| **Limit one** | The relief applies **only to percentage-linked limits**, not to the fixed-rupee legs |
+| **Limit two** | Once an entity has been **penalised for an active breach**, it must thereafter stay at or below the **reduced** limit — a later day's reduction to below the *old* limit is still a breach |
+| Currency-segment origin | The same logic has long applied in currency derivatives, where limits linked to open interest apply **at the time of opening a position**: a fall in total open interest does not force unwinding, but the participant **cannot increase existing or create new positions** until compliant |
+
+## 5. Ban-period monitoring and its action window
+
+| Element | Position |
+|---|---|
+| Entry | At end of day, where market-wide **future-equivalent** open interest across exchanges exceeds a high proportion of the market-wide limit, the security enters a ban from the next trading day |
+| Exit | Normal trading resumes only once combined future-equivalent open interest falls to a lower proportion |
+| **The rule changed** | From "no fresh positions" to a **delta test**: trading after ban entry must **reduce the entity's future-equivalent open interest on an end-of-day basis**. **A sign change of delta is not an acceptable reduction.** A passive increase from underlying price movement **is not a breach** |
+| Base position | Day-one positions are frozen as a base position and pushed to the member as a file |
+| **The afternoon snapshot** | From the second day the base position is revalued using an **afternoon intraday delta file** and compared with end-of-day positions at the same delta |
+| **Why that matters** | The venue states the reason: it gives members an interval **between the afternoon snapshot and the close** to check client positions and, where future-equivalent positions have increased or changed sign, to act and avoid the penalty |
+| Base position update | Updates at end of day only if the entity traded to **reduce** future-equivalent open interest, or open interest was unchanged while actual positions changed |
+| Penalty | A proportion of the violation value with a floor and a cap, **per entity, per security, per day** — and because a violation **does not reset the base position**, it recurs daily while the violated quantity persists |
+| Intraday utilisation monitoring | Market-wide limit utilisation is checked at **several random times** per session, an additional surveillance margin may be levied, and significant utilisation or breach is reported to the regulator at a periodic surveillance meeting |
+
+## 6. What the member actually sends
+
+This is the most useful framing in this area: **the venue computes and pushes; the member's real-time-adjacent reporting duties are few.**
+
+### Pushed to the member
+
+| Artefact | Content |
+|---|---|
+| Entity-level future-equivalent open interest | Through the venue's portal |
+| Per-member future-equivalent open interest report | Gross and net delta open interest by client |
+| Per-contract delta factors | Intraday batches and an end-of-day file |
+| Client-level position-limit file | **From November 2026 this carries stocks only** — index limits moved out of it |
+| **A new index position-limit file** | Published from early October 2026, carrying next-day index limits in quantity terms |
+| Base position files for banned securities | On ban entry |
+| **Terminal broadcast** | A market-wide utilisation message once future-equivalent open interest exceeds a defined proportion of the market-wide limit, displayed per the random snapshots |
+| The other venue's equivalents | Client-level and member-level position-limit files, plus market-wide and open-interest files |
+
+### Sent by the member
+
+| Obligation | Detail |
+|---|---|
+| **The cash and cash-equivalent report** | To obtain the **long-side additional-exposure benefit**, the **clearing member** reports the entity's cash and cash-equivalent holdings, **index-wise**, with the total allocation across indices not exceeding the total reported value. **Excludes bank guarantees.** Submitted by electronic mail to a named clearing address. **Correctness is expressly the member's responsibility and records must be preserved for verification** |
+| Its timing | The circular text carries a timing prefaced by a date that has passed, and the current consolidated circular reproduces it unchanged. **The post-transition timing is therefore uncertain and should be confirmed** |
+| **The short side needs no report** | Stock holdings are pulled **directly from the depositories** for the breaching identifiers at end of day. **No benefit for pay-out shortages**; on a settlement holiday holdings are taken post-settlement |
+| **The concert-party disclosure** | Any person, or persons **acting in concert**, who together own a defined significant share of the open interest on a particular underlying index **must report that fact** to the exchange and clearing corporation. **Failure is treated as a violation** attracting penal and disciplinary action. Submitted by electronic mail to a named address |
+| Its template ambiguity | The surveillance circular cites a template in a 2024 clearing circular, while the 2026 consolidated clearing circular appears **no longer to carry that annexure** — index limits having migrated to the surveillance stream. **A live ambiguity to confirm with the exchange rather than paper over** |
+| Breach self-reporting | Certain participant categories must **report their own breaches** and ensure no fresh positions in that underlying |
+| **Client-level enforcement** | Not a filing but a hard duty: client limits are monitored **at client-code level and across all members the client trades through**. On violation the member must ensure the client takes **no fresh positions** and **reduces** to within limits |
+| Commodity venue | Members must monitor open positions **intraday as well as at end of day**, commodity-wise, across all limit categories, with **internal risk controls preventing order entry that would breach a limit** |
+
+<Aside type="caution" title="There is no position-limit return in the broker reporting calendar">
+Reading the consolidated broker reporting requirements end to end produces a useful negative: **there is no position-limit or open-interest periodic return for a broker**. The obligations live entirely at exchange and clearing-corporation level, and what the member owes is the benefit-earning cash report, the concert-party disclosure, breach self-reporting by certain categories, and continuous enforcement. Documentation that invents a position-limit filing creates a deliverable nobody owes; documentation that omits the enforcement duty understates the real obligation, which is to stop the order rather than to report the breach. The genuine periodic calendar is in [periodic submissions](/broking-kyc/finix-broking-setup/monitoring/03-periodic-submissions/).
+</Aside>
+
+## 7. Intraday penalties, precisely
+
+| Measure | Position |
+|---|---|
+| **Index futures, intraday breach** | **No penalty, and not treated as a violation, until further direction** — still the text in the April 2026 consolidation. The venue must nonetheless **intimate the breach to clients and members for their own risk monitoring** |
+| **Index options, intraday breach** | **An additional surveillance deposit, but only on expiry day**, at a multiple of the computed amount, blocked for a month. **Not applicable to non-expiry-day intraday breaches** |
+| Non-penal consequence of an intraday breach | The venue examines trading patterns, **seeks the rationale for the positions from the client**, examines the entity's trading in the index constituents, and discusses the instance at a surveillance meeting |
+| End-of-day index percentage-limit breach | A monthly slab penalty with **no charge at first instance**, escalating by instance count, with committee referral beyond a threshold |
+| Client-level single-stock breach | A proportion of the excess value **or a fixed ceiling, whichever is lower**, subject to a floor, **per day of violation**, recoverable from the client |
+| Member-level breach | The same structure, **plus a slab-wise additional margin** on the breach percentage, applied **from the first instance in a calendar quarter**, computed at end of day and blocked from proprietary collateral before the next day's open |
+| Holdings-backed exposure breach | An additional deposit equal to the **margin chargeable on the excess position**, retained for a month |
+
+## 8. Order-to-trade ratio
+
+| Element | Position |
+|---|---|
+| Charge | Per algorithmic order, on an **incremental scale by the daily ratio**, with the upper bands raised and two higher bands added in 2026 |
+| Exclusions | Orders **close to the last traded price**; several security categories; and several session types including the pre-open, post-close, call-auction and public-issue sessions. Closing-auction orders are excluded in the cash segment |
+| Consequence, high ratio repeated | **No orders for the first part of the next trading day** |
+| Consequence, repeated penalties | **Proprietary trading rights suspended for the first hour** of the next day |
+| **Scope** | **Disablement or suspension applies across all exchanges** |
+| Data | Provided **daily** in member-portal folders |
+
+## 9. What the firm must build
+
+| Capability | Why |
+|---|---|
+| **Continuous future-equivalent exposure per client, per underlying** | To know its own number before the venue's snapshot |
+| The published delta formulation, with previous-day volatility | So the computation is reproducible and matches |
+| Monitoring thresholds **below** the limits | So action starts before a breach, inside the cure window |
+| Pre-authorised reduction interventions | Fifteen minutes is not enough time to find an approver |
+| **Terminal message capture** | The utilisation broadcast and trade cancellations arrive only this way |
+| A continuous margin computation against intraday parameter snapshots | Peak margin is measured, not averaged |
+| An accrual-aware capacity number | So intraday capacity does not quietly include the day's charges |
+| Order-rate and ratio controls per channel and per strategy | To stay inside the ratio bands and the rate thresholds |
+| The ban-period afternoon-snapshot routine | A timed session item with a named owner |
+
+## 10. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.monitoring.rt.futeq_computed_continuously` | **D** | **true** | Per client, per underlying |
+| `finix.monitoring.rt.delta_model` | **E** | The published formulation | Previous-day volatility, live price |
+| `finix.monitoring.rt.volatility_source` | **E** | Previous day end of day | Higher of underlying and futures |
+| `finix.monitoring.rt.same_day_expiry_included` | **E** | true | — |
+| `finix.monitoring.rt.internal_threshold_share_of_limit` | **D** | Below the limit, defined | The cure-window enabler |
+| `finix.monitoring.rt.cure_window_minutes` | **E** | 15 | **Not available for late-session snapshots** |
+| `finix.monitoring.rt.late_session_requires_compliance_before` | **D** | true | No cure interval there |
+| `finix.monitoring.rt.passive_breach_recognised` | **E** | true | Percentage-linked legs only |
+| `finix.monitoring.rt.post_penalty_reduced_limit_tracked` | **D** | **true** | A later reduction may still breach |
+| `finix.monitoring.rt.ban_afternoon_snapshot_routine` | **D** | true | Timed, owned, every ban day |
+| `finix.monitoring.rt.terminal_messages_captured` | **D** | **true** | Broadcast and cancellation notices |
+| `finix.monitoring.rt.margin_snapshot_parameters` | **E** | Begin-of-day parameters | As the venue computes |
+| `finix.monitoring.rt.cash_equivalent_report_index_wise` | **R** | true | Excludes bank guarantees |
+| `finix.monitoring.rt.cash_equivalent_records_retained` | **R** | true | Correctness is the member's |
+| `finix.monitoring.rt.concert_party_disclosure_monitored` | **R** | true | A violation if missed |
+| `finix.monitoring.rt.client_limit_blocks_order_entry` | **R** | **true** | Enforcement, not reporting |
+| `finix.monitoring.rt.otr_controls_per_channel` | **D** | true | Below the penal bands |
+
+## Practical notes
+
+- **Implement the published delta model rather than approximating it.** It is specified so that you can reproduce the venue's number; an approximation reconciles to nothing.
+- **Set internal thresholds below the limits and act on them.** The cure window only helps a firm that was already watching.
+- **Make the ban-period afternoon check a timed runbook item** on every day any held security is banned. It is the clearest designed remediation opportunity in the rules.
+- **Capture terminal messages into the response register.** Two consequential streams have no other channel.
+- **Keep the cash-and-cash-equivalent report accurate and the records with it.** It earns a benefit, correctness is yours, and it is verifiable after the fact.
+- **Enforce client limits at order entry.** The duty is to prevent the position, not to report it afterwards.
+- **Confirm the two uncertain items in writing** — the post-transition timing of the cash report, and the concert-party template — rather than inferring from stale text.
+
+## Where this connects
+
+The inbound side of these obligations is in [alerts received, and the obligation to respond](/broking-kyc/finix-broking-setup/monitoring/04-alerts-received-and-response/), the periodic calendar in [periodic submissions](/broking-kyc/finix-broking-setup/monitoring/03-periodic-submissions/), and the overall map in [the monitoring obligation map](/broking-kyc/finix-broking-setup/monitoring/01-monitoring-obligation-map/). The computation lives in [the margin engine](/broking-kyc/finix-broking-setup/rms/02-margin-engine/) and [intraday surveillance](/broking-kyc/finix-broking-setup/rms/07-intraday-surveillance/), the interventions in [the RMS operations catalogue](/broking-kyc/finix-broking-setup/rms/11-operations-catalogue/), and the files in [<abbr title="National Stock Exchange of India">NSE</abbr> and NSE Clearing files](/broking-kyc/finix-broking-setup/files/02-nse-files/). The session items are in [the master trading-day checklist](/broking-kyc/finix-broking-setup/daily-ops/10-master-trading-day-checklist/) and the vendor-neutral treatments in [position limits and open interest](/broking-kyc/trading-risk/position-limits-oi/) and [margin shortfall and peak margin](/broking-kyc/trading-risk/margin-shortfall-peak-margin/).

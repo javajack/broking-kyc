@@ -350,6 +350,7 @@ export default defineConfig({
                 { label: "5. UCC Registration", slug: "finix-broking-setup/onboarding/05-ucc-registration-exchanges" },
                 { label: "6. eSign, DDPI & Pledge", slug: "finix-broking-setup/onboarding/06-esign-ddpi-pledge-setup" },
                 { label: "7. Modification & Closure", slug: "finix-broking-setup/onboarding/07-account-modification-closure" },
+                { label: "8. KYC Ops Quality & Audit", slug: "finix-broking-setup/onboarding/08-kyc-ops-quality-audit" },
               ],
             },
             {
@@ -403,6 +404,7 @@ export default defineConfig({
                 { label: "8. Statements & Retention", slug: "finix-broking-setup/backoffice/08-statements-retention" },
                 { label: "9. Regulatory Reporting", slug: "finix-broking-setup/backoffice/09-regulatory-reporting" },
                 { label: "10. Config Reference", slug: "finix-broking-setup/backoffice/10-backoffice-config-reference" },
+                { label: "11. Charges & Billing", slug: "finix-broking-setup/backoffice/11-charges-billing-engine" },
                 { label: "12. Operations Catalogue", slug: "finix-broking-setup/backoffice/12-operations-catalogue" },
               ],
             },
@@ -462,6 +464,8 @@ export default defineConfig({
                 { label: "2. Reporting Pipeline", slug: "finix-broking-setup/compliance/02-reporting-pipeline" },
                 { label: "3. Inspection Readiness", slug: "finix-broking-setup/compliance/03-inspection-readiness" },
                 { label: "4. Cyber Resilience Config", slug: "finix-broking-setup/compliance/04-cyber-cscrf-config" },
+                { label: "5. Audit Machinery", slug: "finix-broking-setup/compliance/05-audit-machinery" },
+                { label: "6. Regulatory Change 2026", slug: "finix-broking-setup/compliance/06-regulatory-change-2026" },
               ],
             },
             {
@@ -471,7 +475,13 @@ export default defineConfig({
                 { label: "Overview", slug: "finix-broking-setup/files" },
                 { label: "1. File Register & Architecture", slug: "finix-broking-setup/files/01-file-register-architecture" },
                 { label: "2. NSE & NSE Clearing Files", slug: "finix-broking-setup/files/02-nse-files" },
+                { label: "3. BSE & ICCL Files", slug: "finix-broking-setup/files/03-bse-files" },
+                { label: "4. MCX Files", slug: "finix-broking-setup/files/04-mcx-files" },
+                { label: "5. Clearing Corporation Files", slug: "finix-broking-setup/files/05-clearing-corporation-files" },
+                { label: "6. Depository Files", slug: "finix-broking-setup/files/06-depository-files" },
+                { label: "7. Outbound Submissions", slug: "finix-broking-setup/files/07-outbound-submissions" },
                 { label: "8. Handling Exceptions", slug: "finix-broking-setup/files/08-file-handling-exceptions" },
+                { label: "9. Bank & Payment Files", slug: "finix-broking-setup/files/09-bank-payment-files" },
               ],
             },
             {
@@ -479,7 +489,12 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { label: "Overview", slug: "finix-broking-setup/monitoring" },
+                { label: "1. Obligation Map", slug: "finix-broking-setup/monitoring/01-monitoring-obligation-map" },
+                { label: "2. Real-Time & Near-Real-Time", slug: "finix-broking-setup/monitoring/02-realtime-near-realtime" },
+                { label: "3. Periodic Submissions", slug: "finix-broking-setup/monitoring/03-periodic-submissions" },
                 { label: "4. Alerts & Response", slug: "finix-broking-setup/monitoring/04-alerts-received-and-response" },
+                { label: "5. Incident & Breach Reporting", slug: "finix-broking-setup/monitoring/05-incident-breach-reporting" },
+                { label: "6. AML Monitoring & Reporting", slug: "finix-broking-setup/monitoring/06-aml-monitoring-reporting" },
               ],
             },
             {
@@ -488,6 +503,14 @@ export default defineConfig({
               items: [
                 { label: "Overview", slug: "finix-broking-setup/products" },
                 { label: "1. MTF Operations", slug: "finix-broking-setup/products/01-mtf-operations" },
+                { label: "2. Pledge Lifecycle", slug: "finix-broking-setup/products/02-pledge-lifecycle" },
+                { label: "3. F&O Contract Lifecycle", slug: "finix-broking-setup/products/03-fno-contract-lifecycle" },
+                { label: "4. Expiry & Physical Settlement", slug: "finix-broking-setup/products/04-expiry-physical-settlement" },
+                { label: "5. Commodity Delivery", slug: "finix-broking-setup/products/05-commodity-delivery-operations" },
+                { label: "6. Currency & IRD", slug: "finix-broking-setup/products/06-currency-ird-operations" },
+                { label: "7. SLBM Operations", slug: "finix-broking-setup/products/07-slbm-operations" },
+                { label: "8. IPO, MF & Bonds", slug: "finix-broking-setup/products/08-ipo-mf-bonds-operations" },
+                { label: "9. Product Enablement Matrix", slug: "finix-broking-setup/products/09-product-enablement-matrix" },
               ],
             },
             {
@@ -497,6 +520,9 @@ export default defineConfig({
                 { label: "Overview", slug: "finix-broking-setup/roles" },
                 { label: "1. Role Register", slug: "finix-broking-setup/roles/01-role-register" },
                 { label: "2. Trading-Day RACI", slug: "finix-broking-setup/roles/02-raci-trading-day" },
+                { label: "3. Periodic & Compliance RACI", slug: "finix-broking-setup/roles/03-raci-periodic-compliance" },
+                { label: "4. Segregation & Access", slug: "finix-broking-setup/roles/04-segregation-access-control" },
+                { label: "5. Escalation & On-Call", slug: "finix-broking-setup/roles/05-escalation-oncall" },
               ],
             },
             {

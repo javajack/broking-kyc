@@ -1,0 +1,140 @@
+---
+title: "Files 3: BSE and its clearing corporation"
+description: What is established about the second exchange's file surface — the standardised formats it shares with the rest of the market, the margin and collateral-segregation files and their penalty mechanics, the position-limit files, the approval and registration portal — and a frank account of what could not be verified and must be obtained from the venue itself.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** This venue's own systems were not reachable during the research behind this manual, so a page written as though its file inventory were as established as the other exchange's would be a fabrication dressed as documentation. Instead the page states what *is* established — chiefly through the standardised formats common across the market, the clearing corporation's own published member material, and provisions that are demonstrably identical in wording across venues — and then says plainly what is missing and how to get it. That is less satisfying and considerably more useful.
+
+<Aside type="danger" title="Read this before using anything on this page">
+During the research for this manual the exchange's own site served only navigation shell content and its data interface returned access-denied responses under every attempted configuration, so **its circular archive, notice attachments and member download manuals could not be read**. Its clearing corporation's site **was** reachable and is the source of most of the verified material here.
+
+The consequence is specific: **this page is not a file register for this venue.** It records the structural facts that are established and the families that certainly exist, and it marks the filenames, paths, timings and formats as unobtained. **Build the register from the venue's own member downloads list and its current consolidated circulars**, exactly as described in [the file register and its architecture](/broking-kyc/finix-broking-setup/files/01-file-register-architecture/) — enumerate from the source's own list rather than from any compilation, including this one. Where a provision is quoted below as identical across venues, that identity was verified from matching text; where it was not, it is not asserted.
+</Aside>
+
+## TL;DR
+
+- **The standardised format programme spans venues**, so the market-infrastructure data-standard files — masters, bhavcopy and the margin files — follow common conventions across exchanges, clearing corporations and depositories.
+- **The clearing corporation publishes its own member material** and is the source of most of what is verified here: the margin file set, the collateral-segregation reporting regime and its penalty mechanics, and the position-limit files.
+- **Collateral-segregation reporting carries its own penalty and its own penalty file**, generated on a defined day and posted to the member's extranet under a named pattern.
+- **Short-allocation reporting has its own reason-code set** — eight codes a member may report against to avoid a penalty, with false reporting attracting the false-reporting penalty.
+- **A unified approval portal replaced the legacy portals in March 2026** for software approval, trader identifiers and dealer-location registration.
+- **The surveillance obligations are demonstrably identical in wording** to the other venue's, delivered through this venue's own dashboard system under a different name.
+
+## 1. What is structurally established
+
+| Fact | Basis |
+|---|---|
+| **The standardised format programme is cross-venue** | It spans exchanges, clearing corporations and depositories under one set of conventions, which is why the master, bhavcopy and margin families follow common shapes |
+| **Interoperable clearing exists** | The other venue publishes a scrip and series mapping file, an applicable-symbol file and a cross-exchange contract mapping file **specifically to map this venue's instruments** — so a broker clearing through one can trade instruments exclusive to the other |
+| Its clearing corporation disseminates an **intraday margin file, an end-of-day margin file, a margin-reporting file and a response file** | Its own published member material |
+| **Short allocation for a trade day is posted on the member's portal the next day** | The same source |
+| **Collateral-segregation reporting is due by the end of the next day** | The same source |
+| **A penalty applies for collateral-segregation non-reporting**, computed on the margin reported | The same source |
+| **The segregation penalty file is generated on a defined later day** and posted to the member's portal under a named pattern | The same source |
+| Position-limit files exist at **client level and member level**, as named archives | Its clearing corporation's risk-management pages |
+| Market-wide limit and open-interest files exist, including a **delta-equivalent** variant | The same |
+| The market-wide limit formula is **identical** to the other venue's | Stated in the same terms on its clearing corporation's own page |
+| Single-stock entity-level limit percentages are **identical** | The same |
+| Cash-equivalent proportion requirements apply to liquid assets, with concentration constraints | Its published risk material |
+| **A unified approval portal** covers software approval, trader identifiers, dealer-location registration and access activation | Its March 2026 notice, read as a reproduction |
+| Surveillance obligations, the alert-disposal period and the status-update duty are **word-for-word identical** to the other venue's | Matching notice text |
+| **Its surveillance dashboard has its own name** | The same notice, which names it |
+| Its derivatives expiry weekday differs from the other venue's | Secondary evidence only |
+
+## 2. The families that certainly exist
+
+Established by the structure of the market rather than by reading this venue's own file list. **Treat this as the skeleton of a register to be completed from the source, not as a register.**
+
+| Family | Why it must exist |
+|---|---|
+| Security and contract masters, including a scrip-group dimension | Instruments must be defined to be traded |
+| Bhavcopy and settlement prices | End-of-day valuation and marking |
+| Price bands and surveillance indicators | Order validation and the measure framework |
+| Securities in a ban period | The ban applies market-wide across venues |
+| Trade files and order logs | Back-office import and the audit trail |
+| **Margin parameter files** | Margin must be computed |
+| **Margin reporting upload and response** | Verified to exist, with the response file |
+| **Short allocation**, with its reason codes | Verified |
+| **Collateral segregation reporting**, with its penalty file | Verified |
+| Obligation and settlement files | Settlement must be instructed |
+| Delivery, shortage, auction and close-out files | Short delivery must be handled |
+| Collateral statements and haircut files | Collateral must be valued |
+| Corporate action files | Entitlements and adjustments |
+| **Position-limit files** at client and member level | Verified |
+| Client-code upload and response | Clients must be registered |
+| Penalty files | Penalties must be advised |
+
+## 3. The short-allocation reason codes
+
+A genuinely useful verified detail, because reporting against a valid reason **avoids the penalty**.
+
+| Reason a member may report |
+|---|
+| Excess collateral held with the other clearing corporation |
+| Value of securities sold for which early pay-in was completed to the clearing corporation by end of day |
+| Trades on behalf of non-resident clients |
+| Trades for participant-coded clients by a trading member |
+| **Trades executed in wrong client codes** |
+| An allocation request submitted but accepted later |
+| Securities re-pledged by the clearing member to the clearing corporation not yet processed at the depository |
+| Value of early pay-in of funds by custodians by end of day for marginable participant codes |
+
+**False reporting attracts the false-margin-reporting penalty**, so the codes are an accuracy obligation rather than a mitigation menu.
+
+## 4. What could not be verified
+
+Listed explicitly so that nobody mistakes absence for non-existence.
+
+| Item | Status |
+|---|---|
+| **Its complete member download list** | **Not obtained.** The single most important gap — and the correct starting point for the register |
+| Filenames, naming grammar and paths for every family in section 2 | **Not obtained**, other than the segregation penalty pattern and the position-limit archive names |
+| Dissemination timings | **Not obtained** |
+| Formats and record layouts | **Not obtained** |
+| Its current consolidated circulars and their annexures | **Not obtained** — the clearing-group master circular covering notices exists but **their substantive annexures are not at any derivable path** |
+| Its transaction-charge schedule by scrip group and product | **Several figures available only from secondary sources**; one product carries a nil transaction fee that **must not be assumed permanent** |
+| Its brokerage ceiling rule text and product exceptions | **Not separately authenticated** |
+| Its penalty amounts and effective-date schedules | **Not verified.** **Do not transplant the other venue's rates** |
+| Its penalty representation window | **Not established.** The short working-day window is **specific to the other clearing corporation** |
+| Its software-approval form codes and document checklist | **Not obtained** — obtain from the approval workflow rather than filing the other venue's annexures |
+| Its identifier schema, relocation timing and terminal-register template | **Not obtained.** **The other venue's identifier encodings must not be substituted** |
+| Its authorised-person reporting dates | **Not established**, though the quarterly cadence with a one-month lag is a **jointly agreed cross-venue standard** |
+| Its settlement-details filing dates | **Not established.** The **rule** — within ten trading days of each settlement date against a jointly issued annual calendar — is the durable answer, and **fixed date sets in circulation do not reconcile with the current year's calendar** |
+| Its current legal naming | **Uncertain** — its member material uses one form while its branding and signature use another. **Confirm before printing it** |
+| Its interface version roadmap | Current production versions are distinguished from forthcoming ones with tentative months; **the cutover was not verified** |
+
+<Aside type="caution" title="Two traps when documenting a venue you cannot read">
+The first is **mirroring**: assuming the unreachable venue works like the reachable one and writing its register by analogy. The identifier schema is the clearest example — one venue's structured identifier encodes location in a specific digit layout, and substituting that into the other's registration would produce invalid identifiers. Where text is demonstrably identical across venues, as the surveillance obligations are, identity can be asserted; where it is not, analogy is invention.
+
+The second is **secondary-source laundering**: taking a figure from a broker's published tariff or a compliance-vendor compilation and presenting it as the venue's rule. Those sources are often right and are sometimes a year out of date, and the error is undetectable in the output. Where this manual uses such a figure it marks it, and the operating rule is that a secondary-sourced figure is a **placeholder that must not reach production**.
+</Aside>
+
+## 5. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.files.bse.register_built_from_source_list` | **D** | **true** | Enumerate from the venue's own downloads list |
+| `finix.files.bse.no_schema_reuse_across_venues` | **D** | **true** | Identifiers, codes and layouts are venue-specific |
+| `finix.files.bse.penalty_rates_not_transplanted` | **D** | true | Nor the representation window |
+| `finix.files.bse.segregation_reporting_deadline` | **E** | End of the next day | Verified |
+| `finix.files.bse.segregation_penalty_file_expected` | **E** | On its defined day, to the extranet | Verified pattern |
+| `finix.files.bse.short_allocation_reason_codes` | **E** | The eight verified codes | **False reporting is penalised** |
+| `finix.files.bse.position_limit_files_ingested` | **E** | Client and member level | Verified archives |
+| `finix.files.bse.approval_via_unified_portal` | **E** | true | From March 2026 |
+| `finix.files.bse.secondary_sourced_placeholders` | **D** | **Flagged, not live** | Re-verify before configuring |
+| `finix.files.bse.legal_name_confirmed` | **D** | Confirm before printing | Two forms in circulation |
+
+## Practical notes
+
+- **Start from the venue's own member downloads list.** Everything else on this page is scaffolding for that exercise.
+- **Never reuse the other venue's identifier encodings, reason codes or record layouts.** Where the text is identical the rule is identical; where it is not, it is not.
+- **Treat every secondary-sourced figure as a placeholder.** Several on this page are, and they are marked.
+- **Get the consolidated circular annexures from the venue directly.** The covering notices are retrievable and the substance is not.
+- **Record the register's gaps as register entries** with an owner and a date, rather than as prose. A known gap with an owner closes; a gap in a paragraph does not.
+- **Confirm the clearing entity's current legal name** before it appears in a client document or a filing.
+
+## Where this connects
+
+The register's structure and the enumerate-from-source discipline are in [the file register and its architecture](/broking-kyc/finix-broking-setup/files/01-file-register-architecture/), the fully worked example in [<abbr title="National Stock Exchange of India">NSE</abbr> and NSE Clearing files](/broking-kyc/finix-broking-setup/files/02-nse-files/), and failure handling in [handling exceptions](/broking-kyc/finix-broking-setup/files/08-file-handling-exceptions/). This venue's trading behaviour is in [<abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> cash and derivatives](/broking-kyc/finix-broking-setup/exchanges/03-bse-cash-fno/), the cross-venue differences in [the cross-exchange difference matrix](/broking-kyc/finix-broking-setup/exchanges/05-cross-exchange-matrix/), and its approval portal in [the software approval regime](/broking-kyc/finix-broking-setup/certification/01-software-approval-regime/).

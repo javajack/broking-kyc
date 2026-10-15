@@ -1,0 +1,192 @@
+---
+title: "Compliance 5: the audit machinery"
+description: Every audit and inspection a broker faces — who conducts each, on what cadence, with what auditor qualification and rotation, what evidence they ask for, how the enforcement chain and penalty escalation work, how a client-identity quality check actually runs, and which commonly-cited obligations turn out not to exist.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** A broker is audited by a surprising number of parties on overlapping cycles, and the overlap is where firms lose time — the same evidence requested in four different formats, the same finding raised by two auditors with different closure clocks. So this page is organised as a register with the cadence and the recipient on every row, followed by the evidence pack that serves most of them, followed by the enforcement chain. Section 8 lists what does **not** exist, because an invented obligation costs real effort and undermines the rest of the register.
+
+## TL;DR
+
+- **Internal audit is half-yearly**, by an independent practising professional who must now be exchange-empanelled, with term limits, cooling-off and a bar on firms sharing a partner with an outgoing firm.
+- **The internal auditor may report directly to the exchange** if the firm does not cooperate — which makes the relationship structurally not a vendor one.
+- **Three technology audits are distinct**: the pre-approval audit of a proposed system, the periodic system audit, and the cyber audit with its penetration testing. Each has its own qualification rules.
+- **System-audit cadence is risk-tiered**, turning on location and terminal counts, and is **half-yearly for algorithmic members regardless of size**.
+- **Penetration-testing scope must name the mobile application and the interfaces.** Omitted scope is a recorded inspection observation.
+- **Enforcement escalates from money to capability**: advice, then penalties, then a prohibition on registering new clients, then disablement across all segments — and disablement notices are shared between exchanges.
+- **There is no general "annual compliance certificate" for a broker**, and the platform some documentation still describes as a fallback for client risk reduction was discontinued in 2026.
+
+## Conceptual overview
+
+The audits divide cleanly by what they test. Some test **the books**: the statutory audit, the net worth certification, the tax audit where applicable. Some test **conduct and controls**: internal audit, concurrent audit of depository operations, the exchange and regulator inspections. Some test **technology**: the pre-approval audit, the periodic system audit, the cyber audit and its penetration testing. And some test **a specific product or permission**: the funding-facility compliance certificate, the algorithmic-system audit. Knowing which category an audit is in tells you who owns the preparation, which is the practical question — the finance function cannot prepare for a system audit and the technology function cannot prepare for a conduct inspection.
+
+The second observation is that the auditor's independence is itself regulated, mechanically and in detail, because the audit is the regulator's substitute for inspecting every firm. Hence term limits for individuals and firms, cooling-off periods, a bar on a successor firm sharing a partner with its predecessor, a prohibition on a cyber auditor who has consulted for the firm recently, and a cap on successive technology audits by the same auditor. A firm that treats auditor appointment as a procurement decision optimised on price and continuity will breach the rotation rules, and the breach is arithmetic and easy to find.
+
+The third point is that findings have **closure clocks and escalating consequences**, and the escalation moves from money to capability. A modest penalty is an irritation; a prohibition on registering new clients stops growth; disablement across all segments stops the business. Because the ladder is published, a firm can see exactly where it is on it, which makes the response to a finding a schedulable project rather than a surprise. The firms that get into difficulty are those that treat a finding as closed when the penalty is paid — and the register is explicit that payment does not replace corrective action.
+
+## 1. Framework
+
+- **[Master Circular for Stock Brokers <abbr title="Securities and Exchange Board of India">SEBI</abbr>/<abbr title="Head Office (SEBI circular ID prefix)">HO</abbr>/<abbr title="Markets Intermediaries Regulation and Supervision Department (SEBI)">MIRSD</abbr>/MIRSD-PoD/P/CIR/2025/90](/broking-kyc/reference/circulars/sebi-mirsd/#sebihomirsdmirsd-podpcir202590)** (17 June 2025) — internal audit and its scope, auditor independence and rotation, statutory auditor rotation, the system-audit scope and auditor criteria, the algorithmic-system audit, the asset-inventory certification, the privileged-user log rule, and the duty on internal auditors to monitor corrective steps on inspection deficiencies.
+- **Exchange inspection and system-audit circulars of April 2026** — the current audit terms of reference, the empanelment requirement, the audit-plan and visit-capture requirements, and the evidence-retention minima. `[not yet in index]`
+- **Exchange cyber-audit circular of April 2026** — the empanelled-organisation requirement, independence, the penetration-testing scope and the report format. `[not yet in index]`
+- **Exchange circular of 17 April 2026** — the **rationalised and standardised penalty framework**, its enforcement chain and its transition rules. `[not yet in index]`
+- **Regulator circular of 5 August 2025** — the **review, appeal and waiver architecture** against committee actions, applicable from the forty-fifth day of issuance. `[not yet in index]`
+- **Depository master circular and participant circulars** — the internal and concurrent audit of participant operations, the annual participant system audit, and their auditor qualifications. `[not yet in index]`
+- **Cyber framework** — the audit cycle, categorisation and the application-security testing requirements. `[not yet in index]`
+- **Regulator circular of 7 May 2026** — discontinuation of the investor risk reduction platform; see [order and risk controls](/broking-kyc/trading-risk/order-risk-controls/).
+
+## 2. The audit register
+
+| Audit or inspection | Conducted by | Cadence | Goes to |
+|---|---|---|---|
+| **Internal audit** | An independent practising chartered accountant, company secretary or cost accountant, **exchange-empanelled** | **Half-yearly** | The firm, placed before the board, then the exchange with paragraph-wise comments |
+| Asset-inventory certification | The internal auditor | **Annual**, as at the financial year end, submitted with the first-half report | The exchange |
+| **Statutory audit** | The statutory auditor, subject to the same rotation architecture | Annual | The firm and the statutory filings |
+| **Net worth certification** | A chartered accountant | **Half-yearly**, with the deadline subject to the conflict noted in [periodic submissions](/broking-kyc/finix-broking-setup/monitoring/03-periodic-submissions/) | The exchange |
+| **Pre-approval system audit** | A system auditor with recognised information-systems credentials | **Per approval request** | Part of the approval pack |
+| **Periodic system audit** | An **exchange-empanelled** system auditor | **Risk-tiered**: for a trading-member-only firm on its own front end, **once in two years** within both a location and a terminal threshold, **annual** once either is exceeded; **half-yearly for algorithmic members irrespective of size**. Firms also acting as depository participants or offering other financial services have **different minimum coverage** | The exchange, with the technology committee's approval and an action-taken report |
+| **Cyber audit and penetration testing** | An **empanelled auditing organisation** | Per the cyber framework, with differing requirements for designated large brokers | The exchange, with the cyber committee's comments for designated large brokers |
+| Application-security testing | The same organisation | **Static analysis, dynamic analysis, functional audit and penetration testing after every major release** for critical in-house or customised software | Retained; the summary filed |
+| **Algorithmic-system audit** | A system auditor with recognised credentials | **Half-yearly** | The exchange |
+| **Exchange inspection** | The exchange | Risk-based | The exchange's enforcement chain |
+| **Regulator inspection** | The regulator | Risk-based | The regulator |
+| **Depository inspection of participant operations** | The depository | Per its cycle | The depository |
+| **Internal or concurrent audit of participant operations** | A practising professional **holding the depository-operations certification** or its continuing-education programme | Per the depository's cycle | The depository |
+| Participant system audit | An empanelled auditor, or one holding a recognised information-systems credential | Annual | The depository |
+| **Anti-money-laundering audit** | As the framework requires | Per the framework | Internal, with the principal officer |
+| **Funding-facility compliance certificate** | A chartered accountant, with a unique document identifier | **Half-yearly**, including a **non-commencement certification** where permission is held but unused | The exchange |
+| Margin-reporting verification | Within the inspection and audit scope | Per cycle | The exchange |
+| Authorised-person inspection | **The firm itself**, as its own programme | **Quarterly reporting**, covering a defined share of authorised persons yearly and every one within a defined period | The exchange, with nil declarations |
+| Institutional-mechanism review | The firm, with the internal auditor examining it | **Quarterly** controls review, **half-yearly** summary to the exchange, **annual** system review | The exchange |
+| Tax audit, secretarial audit | As corporate and tax law require, **subject to the firm's legal form and thresholds** | Per those laws | Those authorities |
+
+## 3. Auditor qualification and rotation
+
+| Audit | Qualification | Rotation |
+|---|---|---|
+| **Internal audit** | An independent practising professional with no conflict; empanelment adds an independent practising accountant in the firm, minimum firm experience preferably in securities markets, **at least two partners at all times**, no debarment, and a partner or employee holding a compliance or financial-markets certification. For a **designated large broker**, **at least five partners, of which two full-time** | **An individual: one term. A firm: two terms. Then a cooling-off. No firm sharing a partner with an outgoing firm may be appointed during the cooling-off** |
+| **Statutory audit** | Per corporate law | **The same architecture** |
+| **System audit** | Minimum experience in information-technology audit of securities-market participants across the major scope areas; recognised information-systems audit, security-management or security-professional credentials; no conflict; **partners unrelated to any broker or its directors or promoters** | **A maximum number of successive audits of the same firm** |
+| **Cyber audit** | An **empanelled auditing organisation**; preferably several years of financial-services technology audit experience; recognised credentials; **licensed tools**; a signed non-disclosure agreement; **the audit data and report must not leave the jurisdiction** | **A maximum number of consecutive years, then a cooling-off. No consulting engagement with the firm in the preceding two years** |
+| **Participant operations audit** | A practising professional with no conflict **and the depository-operations certification** or its continuing-education programme | Per the depository |
+| Algorithmic-system audit | A system auditor with one of the recognised credentials | — |
+
+**A note on one certification:** the credential historically accepted for the signatory of a broker's internal audit report **appears no longer to be offered for fresh certification**, while remaining valid for existing holders until expiry and still appearing in older exchange circulars as qualifying. Verify the current position before appointing. See [the role register](/broking-kyc/finix-broking-setup/roles/01-role-register/).
+
+## 4. Current audit-process requirements
+
+| Requirement | Detail |
+|---|---|
+| **Empanelment** | Periodic system-audit reports must be certified by an **exchange-empanelled** auditor from the half-year ending 30 September 2025 onward; internal-audit reports require empanelment from a defined half-year |
+| **Audit-plan capture** | Audit-plan and location details, **geolocation**, and visit and team capture through the exchange's member portal |
+| **Evidence retention** | Audit-team and working-paper evidence retained **at least three years** by the responsible parties; penetration-test records and proofs of concept **at least three years** |
+| Report approval | The technology committee approves the penetration-test report before submission, and the system audit report and its action-taken report |
+| Filing versus detail | The prescribed submission is the summary, declarations, and remediation and revalidation material; **explicit vulnerability detail is not submitted unless asked** — retain the detailed report |
+| **Scope completeness** | **Omitted interface, mobile and web scope is a recorded inspection observation** |
+
+## 5. The evidence pack
+
+Most audits draw on the same set. Assembling it once, continuously, is far cheaper than assembling it per audit.
+
+| Category | Artefacts |
+|---|---|
+| **Client records** | Account-opening documents and their verification evidence; the tariff version supplied; rights-and-obligations acknowledgements; product opt-ins; nomination records; modification and closure records |
+| **Order and trade trail** | Order and trade logs with unique numbering; **order-entry terminal addresses**; order identifier, timestamp, type, instrument, action, quantity, price and validity; the dealer instruction record for assisted orders; client-code modification records with reason codes and authorisations |
+| **Identifier and access** | The identifier register with its mapping to logins, locations and certifications; created identifiers whether enabled or disabled; terminal login records; entitlement extracts; privileged-user activity; the quarterly entitlement audit and its remediation |
+| **Risk** | Limit-setting records with authority and date; the limit-resolution output; override logs; margin-call dispatch evidence; square-off decision records **preceding** the orders; intervention logs; the firm-utilisation baseline |
+| **Money and assets** | Client ledgers; bank and depository reconciliations; the segregation computation; the upstreaming computation and instruction; suspense ageing; the beneficiary master and its change log; maker-and-checker evidence on payouts |
+| **Documents issued** | Contract notes with dispatch and bounce evidence; margin statements; statements of account; the annual signed statement; revised documents with their references |
+| **Submissions** | Every filing with its **acknowledgement and response-file check**; the margin-reporting exchange; the holding statement; the monthly balance upload; the client-funds monitoring uploads |
+| **Surveillance** | The alert register with evidence obtained, conclusions and disposal dates; the quarterly return; the alert management information to the board; the accountability matrix |
+| **Technology** | The version register and change classifications; the approval and certification pack; mock and test evidence; capacity planning; logging and monitoring parameters; backup and restore tests; recovery drill results; glitch records with their reports |
+| **Governance** | Board and committee minutes including the technology and cyber committees; the policy set with review dates; the appointments register; the certification register; the authorised-person programme and its action-taken reports; the whistle-blower channel and its records |
+
+<Aside type="caution" title="The three evidence items most often missing when asked for">
+First, the **square-off decision record that precedes the order**. Firms keep the orders, which prove what happened, and not the decision, which proves it was decided. Second, the **response-file check** on submissions — the acknowledgement is usually kept, the evidence that someone read the response and reconciled the accepted count is usually not. Third, **the dealer instruction record** for orders placed on a client's verbal instruction, which is the artefact that answers the commonest client dispute and the one most often reconstructed afterwards rather than captured at the time.
+
+None of the three is difficult to capture. All three are nearly impossible to produce retrospectively, which is why they belong in the operational flow — as they are in the operations catalogues — rather than in an audit-preparation checklist.
+</Aside>
+
+## 6. Enforcement, and the appeal architecture
+
+| Stage | Detail |
+|---|---|
+| **The chain** | A **letter of observations**, then an **intimation of observation**, then a **show-cause notice**, then an opportunity of personal hearing before the relevant authority, then an **action letter or order** |
+| **Failure to respond** | Construed as **"no additional information is available"**, and the exchange proceeds on what it has. Persistent failure may be treated as **non-cooperation** and draw separate proceedings |
+| Below a modest threshold | The exchange **advises** rather than levying |
+| Un-prescribed procedural violations | **Advice, then warning, then a modest amount** across the first three instances |
+| **Escalation beyond money** | A **prohibition on registering new clients**, then **disablement across all segments** — and **disablement notices are shared with all exchanges** |
+| Cumulative trigger | Where a financial year's inspection-driven penalty exceeds the lower of a stated amount or a proportion of reported net worth, the matter goes to the relevant authority |
+| Actions bypassing the authority | Terminal disablement, a prohibition on onboarding new clients, and blocking collateral can be taken without the relevant authority's prior involvement |
+| **Appeal, first tier** | Against an internal committee's action, or an action under a pre-approved policy: **before the member committee** |
+| **Appeal, second tier** | Against the member committee's own action: a **separate mechanism** constituted by the governing board, using public-interest directors or independent external professionals **not on that committee**, with a published procedure |
+| Beyond | Members may approach the appropriate authority under applicable law |
+| Clearing-corporation penalties | A **short working-day window** from publication on the portal, **through the portal only — requests by electronic mail are explicitly not considered** |
+| **Payment is not closure** | **Payment does not replace corrective action.** A finding closes when the deficiency is remedied and evidenced |
+
+## 7. The client-identity quality check
+
+How a records quality check actually runs, as distinct from how it is described.
+
+| Step | Activity |
+|---|---|
+| 1 | Receive the **monthly registration-agency status files** — on hold, never uploaded, and deceased |
+| 2 | **Treat them as a risk input as well as a compliance one**: an on-hold client **cannot square off**, so a client with open positions is frozen into them |
+| 3 | Work the on-hold population before the stated cut-off, after which they are not permitted to trade |
+| 4 | Mark deceased clients closed in the exchange database after due diligence, and **block all debit transactions** |
+| 5 | Work the **weekly mandatory-field report** — blanks, invalid and incomplete fields including identifier seeding |
+| 6 | Work the **three-part identifier verification** — identifier, name and date of birth or incorporation must **all** match; corrections to name or date require an unfreeze request and re-verification |
+| 7 | Reconcile the depository and bank validation status file |
+| 8 | Sample internally: documentary sufficiency, verification evidence, consistency between the agency record, the central registry record and the firm's own master |
+| 9 | Classify defects: missing document, unverified document, inconsistent data, stale periodic verification, absent consent or acknowledgement |
+| 10 | Remediate, re-upload, and confirm the status change — **compliant clients are permitted to trade the next day** |
+| 11 | Report defect rates by source and by channel, because a concentrated defect rate is an onboarding-process defect rather than a records problem |
+
+**Do not resubmit unchanged depository details** in a modification file: it triggers re-verification and can itself suspend the client's permitted-to-trade status.
+
+## 8. What does not exist
+
+| Commonly cited | Position |
+|---|---|
+| **A general "annual compliance certificate" for a broker** | **Not established.** The real artefacts are the half-yearly internal audit, the net worth certificate, the system and cyber audit reports, the funding-facility certificate, the quarterly authorised-person reporting and the annual return. **Do not invent a single annual certificate** |
+| The investor risk reduction platform as a live fallback | **Discontinued with immediate effect on 7 May 2026**, though it remains described in the consolidated master circular |
+| A mandatory dedicated technology officer for every firm | **No mandate located**; the obligations attach to the technology committee and the cyber designated officer |
+| A universal professional credential for the security officer | **Not established** |
+| A named requirement that dealing be segregated from risk, or the payout maker from the approver | **Required in substance, not by a named clause** — see [segregation and access control](/broking-kyc/finix-broking-setup/roles/04-segregation-access-control/) |
+| One blanket record-retention period | **The books obligation is eight years**; audit and authorised-person evidence have their own minima; penetration-test records have theirs. **Do not apply one number** |
+| A benchmark headcount for an audit-ready operation | **No defensible benchmark was established** |
+
+## 9. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.compliance.audit.register_maintained` | **D** | **true** | With cadence, conductor, recipient and deadline per row |
+| `finix.compliance.audit.internal_frequency` | **R** | Half-yearly | Empanelled auditor |
+| `finix.compliance.audit.rotation_tracked` | **R** | **true** | Including the common-partner bar |
+| `finix.compliance.audit.system_tier_from_counts` | **E** | Location and terminal thresholds | Half-yearly for algorithmic members |
+| `finix.compliance.audit.cyber_auditor_empanelled` | **R** | true | Not an individual credential |
+| `finix.compliance.audit.cyber_data_in_jurisdiction` | **R** | true | With a non-disclosure agreement |
+| `finix.compliance.audit.vapt_scope_named_assets` | **R** | **true** | Mobile and interfaces explicitly |
+| `finix.compliance.audit.vapt_after_major_release` | **R** | true | For critical in-house software |
+| `finix.compliance.audit.evidence_pack_continuous` | **D** | **true** | Assembled continuously, not per audit |
+| `finix.compliance.audit.decision_before_execution_captured` | **D** | true | The square-off record |
+| `finix.compliance.audit.response_file_check_evidenced` | **D** | true | Not just the acknowledgement |
+| `finix.compliance.audit.instruction_record_per_assisted_order` | **D** | true | Captured at the time |
+| `finix.compliance.audit.finding_closure_not_payment` | **D** | **true** | Remediation and evidence |
+| `finix.compliance.audit.appeal_clock_owned` | **D** | Compliance officer | Starts on publication |
+| `finix.compliance.audit.kra_status_is_risk_input` | **D** | **true** | On-hold clients cannot square off |
+| `finix.compliance.audit.no_invented_obligations` | **D** | true | Section 8 reviewed periodically |
+
+## Practical notes
+
+- **Build the evidence pack continuously.** Every item above is a by-product of an operation that is already happening; capturing it in flow costs almost nothing and retrospectively costs weeks.
+- **Track rotation arithmetically.** Term limits and the common-partner bar are mechanical, and a breach is easy for an auditor to compute and impossible to argue with.
+- **Name the penetration-test assets in the engagement letter.** Scope omissions are a known observation pattern, and the engagement letter is where they are prevented.
+- **Treat the monthly identity-status file as a risk item.** A client who cannot square off is a position the firm carries.
+- **Close findings, do not pay them.** The register is explicit that payment does not substitute for remediation, and the next inspection will look for the remediation.
+- **Audit your own register for invented obligations yearly.** Section 8 exists because effort spent on an obligation nobody owes is effort not spent on one they do.
+
+## Where this connects
+
+Who holds each accountability is in [the role register](/broking-kyc/finix-broking-setup/roles/01-role-register/), [the periodic and compliance matrix](/broking-kyc/finix-broking-setup/roles/03-raci-periodic-compliance/) and [segregation and access control](/broking-kyc/finix-broking-setup/roles/04-segregation-access-control/). The filings are in [periodic submissions](/broking-kyc/finix-broking-setup/monitoring/03-periodic-submissions/) and the pipeline in [the regulatory reporting pipeline](/broking-kyc/finix-broking-setup/compliance/02-reporting-pipeline/); inspection preparation is in [inspection readiness](/broking-kyc/finix-broking-setup/compliance/03-inspection-readiness/) and the cyber controls in [cyber resilience configuration](/broking-kyc/finix-broking-setup/compliance/04-cyber-cscrf-config/). The technology audits interlock with [the software approval regime](/broking-kyc/finix-broking-setup/certification/01-software-approval-regime/) and [change and version control](/broking-kyc/finix-broking-setup/certification/04-change-version-control/). The vendor-neutral treatments are [inspection types](/broking-kyc/deep-dives/compliance-audit/inspection-types/), [concurrent audit](/broking-kyc/deep-dives/compliance-audit/concurrent-audit/) and [system audit](/broking-kyc/deep-dives/compliance-audit/system-audit/).

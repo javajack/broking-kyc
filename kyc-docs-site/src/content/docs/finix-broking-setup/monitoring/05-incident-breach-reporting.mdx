@@ -1,0 +1,138 @@
+---
+title: "Monitoring 5: incident and breach reporting"
+description: The reporting clocks that run from detection — the revised technical-glitch framework and its scope threshold, cyber incident reporting and its standard report sequence, the continuity and recovery regime and its separate thresholds, breach reporting, and the internal design needed to meet deadlines measured in hours.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Every obligation here starts a clock at **detection**, which means the design problem is not the report but the path from a symptom to a person who can file. So the page states the clocks first, then the scope thresholds — because several firms are outside the framework they assume they are in, and inside one they had not noticed — then the internal design that makes the clocks achievable. Section 6 separates the continuity regime, whose thresholds are different numbers that are routinely conflated.
+
+## TL;DR
+
+- **The technical-glitch framework was replaced effective 9 January 2026**: intimation **within two hours**, a preliminary report the **next day**, and root-cause analysis within **fourteen working days**.
+- **Its scope is a client-count threshold** — internet and wireless-trading brokers above a threshold measured at the previous financial year end, excluding closed accounts.
+- **That threshold is not the recovery-site threshold**, which is a different and higher client count across exchanges. Conflating the two is the commonest error here.
+- **Cyber incidents report within hours of detection**, now through a standard initial, intermediate and final report sequence and the regulator's incident portal, **retaining** the national-response-team and exchange reporting.
+- **Clocks run from detection, not from escalation.** The compliance officer must therefore be reachable at any hour, because they file.
+- **A drill is not an incident.** Drill reporting and incident reporting are different obligations with different deadlines, and the penalty for failing to conduct a required drill is its own.
+
+## 1. The clocks
+
+| Obligation | Clock | Notes |
+|---|---|---|
+| **Technical glitch — intimation to the exchange** | **Within two hours** of occurrence under the 2026 framework | The predecessor framework used a shorter period |
+| **Technical glitch — preliminary incident report** | **The next day**, subject to the framework's trading-holiday treatment | — |
+| **Technical glitch — root-cause analysis** | **Within fourteen working days** | **Working days** under the 2026 framework, where the predecessor counted calendar days |
+| **Cyber incident — reporting** | **Within hours of noticing or detecting**, to the exchanges, the regulator and the national response team | Now aligned to a standard report format |
+| Cyber incident — report sequence | **Initial, intermediate and final** reports through the regulator's incident portal | The existing timelines were reiterated, not replaced |
+| Authorised-person misconduct — assured returns or unauthorised schemes | **Within one working day** | With a follow-through programme |
+| Surveillance alert disposal | Within the disposal period, with an extension available on request | — |
+| Client communication on a delayed or scoped open | **Promptly**, to clients and the exchange | — |
+| Pay-in failure | A default event with its own reporting and penalty consequences | — |
+| Position, margin or segregation breach | Reportable in substance; compliance informed the same day | — |
+
+<Aside type="danger" title="Two hours from occurrence, and the clock does not wait for competence">
+The glitch clock runs from **occurrence**, and the cyber clock from **noticing or detecting** — neither from the moment a person who understands the problem was found, and neither from the moment a decision was taken that it was reportable. In practice this means the reporting decision has to be made on incomplete information, by someone who may not yet know the cause, and it has to be made inside the first hour to leave time to file.
+
+Three design consequences. **Pre-decide the reportability test** so that the question at the time is a lookup rather than a judgement — if the symptom matches the list, it is reportable and the report goes. **Make the compliance officer reachable at any hour**, because they file. And **make the initial report low-cost**, drawing on a prepared template that states what is known, what is not, and what is being done — because a firm that waits for a complete picture will miss the clock, and a late report about a small glitch is a worse outcome than a prompt report that is later superseded.
+</Aside>
+
+## 2. Scope thresholds — the ones that get conflated
+
+| Threshold | What it governs |
+|---|---|
+| **The glitch-framework client count** | Whether the **technical-glitch framework** applies: internet and wireless-trading brokers **above a client-count threshold**, excluding closed accounts, measured at the **previous financial year end** |
+| **The recovery-site client count** | Whether the firm must **establish a continuity and recovery site** — a **different and higher** count, measured **across exchanges** |
+| **The designation lists** | Whether the firm owes the **full-day half-yearly recovery drill** — defined by each exchange's **top internet and wireless-trading client bases**, published at the start of the financial year |
+| **Designated-large-broker status** | Whether the **quarterly** full-day drill overlay and its reporting apply — from the exchange's published list |
+
+**Four different tests.** A firm can be inside the glitch framework and below the recovery-site threshold, or on a designation list through one exchange and not another. Establish each separately from the actual published lists and the firm's own client counts; do not derive one from another.
+
+## 3. What is reportable
+
+| Category | Examples |
+|---|---|
+| **Technical glitch** | Unavailability or degradation of a critical system affecting client ability to trade; order-routing failure; market-data failure; a risk-system failure affecting order release |
+| **Cyber incident** | Unauthorised access; data compromise; ransomware; denial of service; compromise of a credential or a key; an incident at a vendor affecting the firm's systems |
+| **State divergence** | Order state divergent from the exchange, where clients were affected |
+| Breach | A position-limit, margin or segregation breach that cannot be unwound |
+| Default | A pay-in failure |
+| Conduct | Authorised-person misconduct of the specified kinds; a control failure producing mis-attribution |
+| **Not an incident report** | A **scheduled drill**, however it goes — drill reporting is separate |
+
+## 4. The internal path
+
+| Step | Requirement |
+|---|---|
+| 1 | **Detection**, with the time recorded. The clock starts here |
+| 2 | **Reportability test applied from a pre-decided list** — a lookup, not a judgement |
+| 3 | **Severity assigned**, which determines who is woken — see [escalation and on-call](/broking-kyc/finix-broking-setup/roles/05-escalation-oncall/) |
+| 4 | **Compliance officer informed immediately** where the test is met, because they file |
+| 5 | **Initial report filed from a prepared template**: what is known, what is not, what is being done |
+| 6 | Client communication where clients are affected, and exchange communication where the open or the session is affected |
+| 7 | Containment and restoration, with the **intervention log** written at the time |
+| 8 | **Preliminary report** by its deadline |
+| 9 | Evidence preservation — logs, the parameters the framework requires preserved, and the configuration state at the time |
+| 10 | **Root-cause analysis** by its deadline, in working days |
+| 11 | Remediation with owners and dates, and verification that it worked |
+| 12 | Review of the **path defects** observed during the incident |
+
+## 5. Evidence to preserve
+
+| Item | Why |
+|---|---|
+| The detection record with its timestamp | The clock's start point is the first thing asked |
+| **The logging and monitoring parameters** the framework requires preserved | A prescribed retention |
+| Order and trade logs across the window | To establish client impact |
+| Configuration and version state at the time | The version register makes this answerable |
+| The intervention log | What was done, by whom, under what authority |
+| Communications to clients and to the venue | With times |
+| Capacity and utilisation data | Part of the system-audit scope and often the cause |
+| The reports filed and their acknowledgements | Including the standard-format sequence |
+
+## 6. Continuity and recovery — a separate regime
+
+| Element | Position |
+|---|---|
+| Recovery-site requirement | Above the **across-exchange client-count threshold** |
+| **Designated-firm drill** | **Half-yearly**, running **all operations from the recovery site for at least one full trading day** |
+| **Designated-large-broker overlay** | **Quarterly**, a full trading day, all operations, and **not coinciding with exchange drills**; plus half-yearly policy review and monthly security-officer review |
+| Phase-in for newly in-scope firms | A staged client-coverage progression. **Its interaction with the other thresholds needs confirmation — do not apply it indiscriminately** |
+| Disaster trigger | A defined period of critical-system disruption, plus board criteria |
+| **Recovery objectives** | A recovery time measured in hours after declaration, and a recovery point in minutes. **The firm's targets, not an exchange's** |
+| Site separation | Preferably different seismic zones; otherwise a prescribed minimum distance |
+| What the drill demonstrates | The invocation team; correspondence of hardware, software, application, network and security; capacity; replication; recovery within objectives; and **return to primary operations** |
+| Reporting | Drill details and observations within their deadline for designated large brokers; otherwise documented results reviewed by the auditor |
+| **Penalty for failing to conduct a required drill** | For the designated categories, an amount **plus a monthly amount while the failure continues**, subject to a cap. **The column for other brokers is not applicable — do not generalise the tariff** |
+| An exchange mock from the exchange's own recovery site | **Does not discharge the firm's own drill** — see [mock trading and drills](/broking-kyc/finix-broking-setup/certification/05-mock-trading-and-drills/) |
+
+## 7. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.monitoring.incident.reportability_predecided` | **D** | **true** | A lookup at the time |
+| `finix.monitoring.incident.glitch_intimation_hours` | **R** | 2 from occurrence | 2026 framework |
+| `finix.monitoring.incident.glitch_preliminary_next_day` | **R** | true | With the holiday treatment |
+| `finix.monitoring.incident.glitch_rca_working_days` | **R** | 14 | **Working** days |
+| `finix.monitoring.incident.cyber_report_hours` | **R** | Within hours of detection | To all three recipients |
+| `finix.monitoring.incident.cyber_report_sequence` | **R** | Initial, intermediate, final | Through the portal |
+| `finix.monitoring.incident.compliance_reachable_any_hour` | **D** | **true** | They file |
+| `finix.monitoring.incident.initial_report_template_ready` | **D** | true | Known, unknown, in progress |
+| `finix.monitoring.incident.clock_from_detection` | **R** | true | Recorded at detection |
+| `finix.monitoring.incident.scope_thresholds_assessed_separately` | **D** | **true** | Four different tests |
+| `finix.monitoring.incident.lama_parameters_preserved` | **R** | Per the framework | A prescribed retention |
+| `finix.monitoring.incident.drill_is_not_incident` | **D** | true | Separate obligations |
+| `finix.monitoring.incident.path_defects_captured` | **D** | true | During, not after |
+
+## Practical notes
+
+- **Pre-decide reportability.** The clock does not allow a debate, and the debate is what causes late reports.
+- **Prepare the initial report template.** It should be fillable in minutes with partial information.
+- **Assess all four scope thresholds separately** against the published lists and your own counts.
+- **Rehearse the reporting path, not just the recovery.** Firms drill failover and have never drilled filing a report inside two hours.
+- **Keep the drill and incident obligations separate** in the calendar, the evidence and the penalty exposure.
+- **Record the detection time deliberately.** It is the first question and it is hard to reconstruct.
+
+## Where this connects
+
+The escalation that feeds this is in [escalation and on-call](/broking-kyc/finix-broking-setup/roles/05-escalation-oncall/) and the response procedures in [incident playbooks](/broking-kyc/finix-broking-setup/daily-ops/07-incident-playbooks/). The drill regime is in [mock trading and drills](/broking-kyc/finix-broking-setup/certification/05-mock-trading-and-drills/), the cyber controls in [cyber resilience configuration](/broking-kyc/finix-broking-setup/compliance/04-cyber-cscrf-config/), and the audits in [the audit machinery](/broking-kyc/finix-broking-setup/compliance/05-audit-machinery/). The version evidence comes from [change and version control](/broking-kyc/finix-broking-setup/certification/04-change-version-control/), and the operator-side interventions from [the <abbr title="Order Management System">OMS</abbr> operations catalogue](/broking-kyc/finix-broking-setup/oms/11-operations-catalogue/). The vendor-neutral treatments are [the cyber framework deep dive](/broking-kyc/deep-dives/compliance-audit/cscrf-deep-dive/) and [the continuity and recovery drill procedure](/broking-kyc/deep-dives/specialty/bcp-dr-drill/).

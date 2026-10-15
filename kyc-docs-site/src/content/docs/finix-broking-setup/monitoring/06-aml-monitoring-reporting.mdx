@@ -1,0 +1,135 @@
+---
+title: "Monitoring 6: transaction monitoring and reporting"
+description: The anti-money-laundering obligations a broker carries — the two statutory appointments and their independence, the screening and risk-categorisation duties, what transaction monitoring must look for, the reportable categories and the platform they go to, the tipping-off bar, and the record obligations.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** This area is governed by a different statute from the rest of the manual, enforced by a different authority, and carries personal accountability for two named individuals rather than for the firm alone. So the page leads with the appointments and their independence, because the regime's design assumes a person who can escalate past management, and much of its effectiveness depends on that assumption holding. The reportable categories and the platform come next, and the tipping-off bar is given its own section because it cuts directly against the instincts of a client-facing team.
+
+## TL;DR
+
+- **Two statutory appointments**, both intimated to the authority and registered on its platform: a **principal officer** at management level who identifies and reports suspicious transactions, and a **designated director** accountable for overall compliance.
+- **The principal officer must be able to reach senior management at the next reporting level or the board.** That access is structural, not courteous.
+- **Screening is continuous, not an onboarding step** — against sanctions, debarment and politically-exposed-person lists, with periodic rescreening and event-driven rescreening.
+- **Monitoring looks for patterns, not sizes.** Disproportionality against declared income and net worth, dormancy reactivation, third-party funding patterns and structuring matter more than any single threshold.
+- **The tipping-off bar is absolute.** A client may be asked for a trading rationale and documents; they may not be told that a report has been or may be made.
+- **Records have their own retention**, and the decision not to report is as much a record as the decision to report.
+
+## 1. The appointments
+
+| Role | Accountable for | Appointment | Qualification |
+|---|---|---|---|
+| **Principal officer** | Identifying and assessing potentially suspicious transactions; onward reporting to the authority; the firm's central point of contact | **Name, designation and contact intimated to the authority's director**, with changes; **registered on the reporting platform** | **An officer at management level.** Additional guidance on experience and exclusivity exists but **could not be fully verified** |
+| **Designated director** | Overall compliance with the statutory obligations | Intimated to the authority; registered on the platform | The managing director, or a duly authorised whole-time director, managing partner, proprietor or managing trustee |
+
+| Structural requirement | Detail |
+|---|---|
+| **Access** | The principal officer must have access to, and be able to report to, **senior management at the next reporting level or the board** |
+| Independence in practice | The role is designed to be able to escalate past the management it sits within. Ordinary reporting lines and ordinary performance incentives defeat that |
+| **Combining the two offices** | **A universal prohibition was not established.** Where they are combined, the escalation independence the regime assumes is weakened, and the firm should document why its arrangement preserves it |
+| Board accountability | The designated director's accountability is board-level |
+
+## 2. Identity, risk and screening
+
+| Obligation | Detail |
+|---|---|
+| Client identification and verification | Per the identity framework — see [client onboarding](/broking-kyc/finix-broking-setup/onboarding/) |
+| **Risk categorisation** | Each client assigned a risk category, with the basis recorded and **reviewed periodically** |
+| **Screening** | Against sanctions, debarment and politically-exposed-person lists, and adverse-information sources |
+| **Continuous, not one-off** | Rescreened **periodically**, and on an **event** — a name or address change, a beneficial-ownership change, adverse information, or a list update |
+| Politically-exposed persons | Enhanced due diligence, senior approval for the relationship, and enhanced ongoing monitoring |
+| Beneficial ownership | Identified and verified for non-individual clients, with the control structure recorded |
+| Periodic re-verification | On a risk-tiered schedule |
+| Prohibited relationships | Where screening produces a match that cannot be discounted, the relationship is refused or exited per policy, with the decision recorded |
+| **The deceased-client stream** | Data arrives **daily** through the identity agencies; **all debit transactions must be blocked** on notice — see [alerts received](/broking-kyc/finix-broking-setup/monitoring/04-alerts-received-and-response/) |
+
+## 3. What transaction monitoring looks for
+
+Patterns rather than sizes. These overlap with, and should be implemented alongside, the surveillance alerts in [alerts received](/broking-kyc/finix-broking-setup/monitoring/04-alerts-received-and-response/).
+
+| Pattern | Why it matters |
+|---|---|
+| **Activity disproportionate to declared income or net worth** | The mandated family: trading activity, **margin obligations at the monthly peak**, **net funds movement over a month**, and profit or loss against declared means |
+| Pay-in obligation significantly above declared means | A designated-large-broker monthly alert |
+| **Dormancy reactivation** | Sudden activity in a dormant account — also an exchange-downloaded alert |
+| **Funding patterns** | Third-party attempts; many small credits aggregating; rapid in-and-out movement without trading |
+| **Unrelated clients sharing attributes** | Common mobile numbers, electronic mail addresses, **devices**, addresses, or bank accounts |
+| **Mule-account indicators** | Explicitly required by the institutional mechanism |
+| Trading without economic purpose | Offsetting activity, minimal-lot dealing, consistent loss-making paired with another account's gains |
+| Concentration in illiquid instruments | Especially paired with transfers in and out |
+| Activity around corporate events | Where connected persons may be involved |
+| Frequent identity-record changes | A mandated alert theme |
+| Profit or loss consistency at client or group level | A mandated alert theme |
+
+**Thresholds are the firm's to set**, decided by the principal officer, designated director and compliance function with a documented rationale, reviewed and recalibrated at least annually. This is a genuine design responsibility rather than a gap.
+
+## 4. Reporting
+
+| Element | Position |
+|---|---|
+| Reportable categories | Suspicious transactions; prescribed cash and high-value categories; cross-border categories; and counterfeit-instrument categories, as the rules prescribe |
+| **Cash** | **Cash receipts from clients are prohibited outright** — see [the money operations catalogue](/broking-kyc/finix-broking-setup/money/08-money-operations-catalogue/). A cash-related report arises from an attempt or a third-party pattern rather than from accepted cash |
+| Platform | The authority's reporting platform, on which both appointees are registered |
+| Format | The prescribed structured format |
+| **Who signs** | The **principal officer** |
+| Timeliness | Promptly on determination, per the prescribed timelines |
+| **The decision not to report** | **As much a record as the decision to report.** Where an alert is examined and closed without a report, the reasoning is recorded |
+| Internal escalation | Employees inform senior management **without delay** under the institutional mechanism; the firm notifies the exchange **promptly** on detection of fraud or market abuse — a **separate** obligation from reporting to the authority |
+
+## 5. The tipping-off bar
+
+| Rule | Detail |
+|---|---|
+| **The bar** | **A client must not be told** that their transactions are under scrutiny, or that a report has been or may be made, unless the authority or the venue explicitly permits it |
+| What is permitted | Asking for a **trading rationale** and for **supporting documents** — bank and depository statements covering the relevant window |
+| How to do both | A **scripted documentation request** that does not disclose its origin, and a rule that **only the designated function communicates** with clients on these matters |
+| Why it needs enforcing | It cuts directly against a client-facing team's instinct to explain why information is being requested |
+| Training | Specifically on this point, for everyone who speaks to clients |
+
+## 6. Records and governance
+
+| Item | Requirement |
+|---|---|
+| Identity and verification records | Retained per the framework's period |
+| Transaction records | Retained per the framework's period; the general broker books obligation is **eight years** |
+| **Alert and decision records** | The alert, the evidence obtained, the conclusion, and the **reasoning where no report was made** |
+| Reports filed | With their acknowledgements |
+| Screening results | Including discounted matches and the basis for discounting |
+| Risk categorisation and its reviews | With the basis |
+| Threshold decisions | With the rationale, the approvers and the review dates |
+| Training records | Including the tipping-off training |
+| **Policy** | Board-approved, reviewed periodically |
+| Audit | The anti-money-laundering audit per the framework, and the internal auditor's review of the surveillance and control arrangements |
+
+## 7. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.monitoring.aml.appointments_intimated` | **R** | **true** | Both, with changes |
+| `finix.monitoring.aml.platform_registration_current` | **R** | true | Both appointees |
+| `finix.monitoring.aml.principal_officer_escalation_level` | **R** | Next level or the board | Structural |
+| `finix.monitoring.aml.offices_combined_justified` | **D** | Documented if combined | Preserving independence |
+| `finix.monitoring.aml.screening_continuous` | **R** | **true** | Periodic and event-driven |
+| `finix.monitoring.aml.pep_senior_approval` | **R** | true | And enhanced monitoring |
+| `finix.monitoring.aml.risk_category_reviewed` | **R** | Periodically | With the basis recorded |
+| `finix.monitoring.aml.thresholds_documented_and_recalibrated` | **R** | At least annually | With named approvers |
+| `finix.monitoring.aml.mule_detection_enabled` | **R** | true | Required by the institutional mechanism |
+| `finix.monitoring.aml.no_report_decision_recorded` | **R** | **true** | With reasoning |
+| `finix.monitoring.aml.tipping_off_prohibited` | **R** | true | Scripted requests only |
+| `finix.monitoring.aml.deceased_stream_blocks_debits` | **R** | true | On notice, daily data |
+| `finix.monitoring.aml.cash_accept` | **R** | **false** | Immutable |
+| `finix.monitoring.aml.training_includes_tipping_off` | **D** | true | For all client-facing staff |
+
+## Practical notes
+
+- **Give the principal officer a real escalation route** and record it. The regime assumes one, and an ordinary reporting line defeats the design.
+- **Implement the monitoring alongside the surveillance alerts**, not as a separate system. The patterns overlap substantially and the evidence-gathering is the same.
+- **Record the decision not to report.** An examined-and-closed alert with no reasoning looks identical to an ignored one.
+- **Script the documentation request.** It is the practical answer to needing evidence without tipping off.
+- **Set and review the thresholds deliberately.** They are the firm's responsibility and an un-reviewed threshold is a finding.
+- **Treat the daily deceased-client stream as an operational control**, because the obligation is to block debits on notice.
+
+## Where this connects
+
+Screening at onboarding is in [screening for sanctions and politically-exposed persons](/broking-kyc/finix-broking-setup/onboarding/04-pep-sanctions-screening/) and the identity framework across [client onboarding](/broking-kyc/finix-broking-setup/onboarding/). The overlapping surveillance obligations are in [alerts received](/broking-kyc/finix-broking-setup/monitoring/04-alerts-received-and-response/), the appointments in [the role register](/broking-kyc/finix-broking-setup/roles/01-role-register/), and the audit in [the audit machinery](/broking-kyc/finix-broking-setup/compliance/05-audit-machinery/). The cash prohibition and funding patterns are in [the money operations catalogue](/broking-kyc/finix-broking-setup/money/08-money-operations-catalogue/), and the vendor-neutral treatment is [market manipulation typologies](/broking-kyc/deep-dives/foundational/market-manipulation-typologies/).

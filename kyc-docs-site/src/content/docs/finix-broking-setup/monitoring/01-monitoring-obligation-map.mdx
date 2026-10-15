@@ -1,0 +1,129 @@
+---
+title: "Monitoring 1: the obligation map"
+description: Who watches a broker and on what cadence, which numbers the firm computes and which the venue computes, the four inbound stream types and how each fails, the obligations that are enforcement duties rather than filings, and the ones that do not exist.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Before any detail, a firm needs an accurate picture of the supervisory surface — because the two most expensive misconceptions are symmetrical. Some firms assume they must compute and report everything, and build reporting nobody wants. Others assume the venue computes everything, and fail to enforce limits at order entry. So this page maps the boundary first: who watches, who computes, what is pushed, what is pulled, and what is an enforcement duty rather than a filing.
+
+## TL;DR
+
+- **Five supervisors with different instruments**: the regulator through regulation and inspection; the exchanges through monitoring, alerts and penalties; the clearing corporations through margin and collateral; the depositories through participant operations; and the financial intelligence unit through transaction reporting.
+- **The venue computes most numbers and pushes them.** The firm's genuine real-time reporting duties are few. Its real obligation in that area is **enforcement** — stop the order — not reporting.
+- **Four inbound stream types, four failure modes**: a dashboard alert runs out of clock; a file silently changes client state; a terminal message is ephemeral; a penalty advice has a clock that started on publication.
+- **Several obligations are duties to act, not to file** — client limits at order entry, alert disposal, and the pre-order confirmation on a security under a surveillance measure.
+- **Removal is part of the map.** Obligations were abolished in 2024 and 2026, and a map that only grows is wrong.
+- **Three commonly cited obligations do not exist** for a broker: a position-limit periodic return, a general annual compliance certificate, and a proprietary-trading periodic return.
+
+## 1. Who watches, with what instrument
+
+| Supervisor | Instruments | Cadence |
+|---|---|---|
+| **The regulator** | Regulations, circulars, inspection, the intermediary portal, enforcement | Continuous rulemaking; risk-based inspection |
+| **The exchanges** | Transactional alerts, a surveillance dashboard, terminal broadcasts, client-code status files, identity-status cohorts, submissions, inspection, the penalty framework and the enforcement chain | Daily to annual; several intraday |
+| **The clearing corporations** | Margin files including intraday snapshots, short-allocation and penalty files, collateral statements, obligation files, position files, the penalty portal and its appeal window | Daily, with intraday snapshots |
+| **The depositories** | Participant operations audit, pledge and holding records, participant surveillance requirements | Per their cycles |
+| **The financial intelligence unit** | Transaction reporting through its platform | Event-driven |
+| Also relevant | The telecommunications regulator through communication controls and the revocation list; the cyber response team through incident reporting; the payments regulator where bank funding is used | Various |
+
+## 2. Who computes what
+
+The single most useful distinction in this plane.
+
+| Number | Computed by | The firm's duty |
+|---|---|---|
+| Client margin requirement | **The clearing corporation**, with intraday snapshots and the peak | Collect enough, continuously, and **report what was collected** |
+| Delta-adjusted open interest per entity | **The venue**, pushed through its portal and a per-member report | Compute its own continuously so it can act before the snapshot |
+| Per-contract delta factors | **The venue**, intraday and end of day | Ingest and use them |
+| Market-wide limits and ban entry | **The venue**, published | Apply, and act in the afternoon window |
+| Position limits per level | **The venue**, with limit files | **Enforce at order entry** |
+| Collateral value after haircut | **The clearing corporation** | Reconcile to its statement; do not substitute its own valuation |
+| Settlement obligations | **The clearing corporation** | Reconcile and settle; a difference means the firm is wrong |
+| Settlement and closing prices | **The venue** | Use the published file |
+| Penalties | **The venue** | Allocate per the whitelist, appeal within the window |
+| Client-code permitted-to-trade status | **The exchange** | Remediate; the status governs |
+| **Margin actually collected** | **The firm** | **Report it — and this is the penalty surface** |
+| **The cash and cash-equivalent position for the exposure benefit** | **The firm** | **Report it to earn the benefit; correctness is the firm's** |
+| **Concert-party open-interest holdings** | **The firm** | **Disclose — failure is a violation** |
+| Client ledger balances and securities positions | **The firm** | Upload monthly; the weekly monitoring principle applies |
+| Suspicious transaction determinations | **The firm** | Report through the platform |
+
+<Aside type="caution" title="The asymmetry that matters: enforcement duties versus reporting duties">
+For position limits there is **no periodic return for a broker**. Reading the consolidated broker reporting requirements end to end produces that negative explicitly. What the firm owes instead is an **enforcement** duty: client limits are monitored at client-code level and **across all members the client trades through**, and on a violation the firm must ensure the client takes **no fresh positions** and **reduces** to within limits. The commodity venue states it more directly still — members must have **internal risk controls preventing order entry that would breach a limit**.
+
+A firm that builds a position-limit report and does not block the order has inverted the obligation. It will have satisfied a requirement that does not exist while failing one that does, and the failure surfaces as a penalty on a breach it could have prevented.
+</Aside>
+
+## 3. The four inbound stream types
+
+| Type | Examples | How it fails | The control |
+|---|---|---|---|
+| **Dashboard alert with a clock** | The transactional alerts, intraday dashboard alerts, the exchange communication thread | **The clock runs out** — a workload problem | An internal target well inside the obligation, and the extension right |
+| **A file that changes client state** | Identity-agency status cohorts, client-code permitted-to-trade batches, the mobile-number revocation list | **Nobody reads it**, and a client cannot trade tomorrow — a monitoring problem | Treat as a register entry with an owner, and as a **risk** input |
+| **A terminal message** | The market-wide utilisation broadcast, automatic trade cancellation notices | **It is ephemeral** — an instrumentation problem | **Capture terminal output** into the response register |
+| **A penalty or enforcement advice** | Penalty files and letters, the enforcement chain | **The clock started on publication** — a process problem | A named owner for the appeal window; portal only |
+
+## 4. The cadence map
+
+| Cadence | What sits here |
+|---|---|
+| **Continuous and intraday** | Margin sufficiency against random snapshots; position limits intraday; order-to-trade ratio; market-wide utilisation broadcasts; strategy behaviour; alert arrival |
+| **Daily** | Holding statement; margin reporting; client-level collateral; upstreaming; funding-exposure reporting; the identity and client-code files; penalty files |
+| **Weekly** | Client-funds monitoring; statements of account; authorised-person client mapping; the mandatory-field report |
+| **Monthly** | Client balance upload; client-code particulars; complaint disclosure; identity-status cohorts |
+| **Quarterly** | The surveillance return; authorised-person inspection and its action-taken report; controls review; board reporting |
+| **Half-yearly** | Internal audit; net worth; system and cyber audits; funding-facility certificate; the institutional-mechanism summary |
+| **Annual** | The annual return; the client statement; policy and system reviews |
+| **Event-driven** | Incident reporting; account and personnel changes; approvals and re-certifications; misconduct escalation |
+| **Floating** | The settlement-details filing, relative to a published annual calendar |
+
+## 5. Obligations to act rather than to file
+
+| Duty | Detail |
+|---|---|
+| **Enforce client position limits at order entry** | Across all members the client trades through |
+| **Dispose of alerts** | With evidence obtained **before** closure and a written conclusion, within the disposal period |
+| **Display the pre-order confirmation** for a security under a surveillance measure | Prescribed wording, mandatory for retail, order sent only on confirmation |
+| **Show charges before order placement** | On the order-entry screen |
+| **Act in the ban-period afternoon window** | The snapshot timing exists to permit it |
+| **Act in the breach cure interval** | A second snapshot follows shortly; a breach surviving both becomes provisional |
+| **Block third-party receipts and payments** | Mandatory, with return to source |
+| **Not tip off** | Alerts and the fact of scrutiny are not communicated to the investor |
+| **Remediate identity-status cohorts before the cut-off** | Because an on-hold client **cannot square off** |
+
+## 6. What does not exist
+
+| Commonly cited | Position |
+|---|---|
+| **A position-limit or open-interest periodic return for a broker** | **Does not exist.** The duty is enforcement |
+| **A general annual compliance certificate** | **Not established** — see [the audit machinery](/broking-kyc/finix-broking-setup/compliance/05-audit-machinery/) |
+| **A proprietary-trading periodic return** | **Not found** in the consolidated reporting requirements or the common-submissions list. Proprietary positions do count distinctly for limits and margin |
+| Demat-account reporting to exchanges | **Abolished** in 2026 |
+| Client-level cash and cash-equivalent balance reporting | **Discontinued** in 2024 |
+| An age-based or occupation-based regulatory alert | **Not found.** Legitimate as a firm's own suitability control, but not a regulatory alert |
+
+## 7. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.monitoring.map.compute_vs_receive_documented` | **D** | **true** | The boundary, per number |
+| `finix.monitoring.map.own_computation_for_limits` | **D** | true | To act before the snapshot |
+| `finix.monitoring.map.enforce_at_order_entry` | **R** | **true** | Not a report |
+| `finix.monitoring.map.stream_type_per_entry` | **D** | true | Dashboard, file, terminal, advice |
+| `finix.monitoring.map.terminal_capture_enabled` | **D** | true | The ephemeral stream |
+| `finix.monitoring.map.state_changing_files_owned` | **D** | true | And treated as risk inputs |
+| `finix.monitoring.map.abolished_list_maintained` | **D** | true | Removal is part of the map |
+| `finix.monitoring.map.nonexistent_obligations_recorded` | **D** | true | Reviewed yearly |
+
+## Practical notes
+
+- **Write down the compute-versus-receive boundary.** It prevents both building reporting nobody wants and failing to enforce what matters.
+- **Tag every inbound entry with its stream type.** The failure mode and therefore the control follow from the type.
+- **Treat client-state files as risk inputs.** A client who cannot square off is a position the firm carries.
+- **Keep the non-existent list.** It is the cheapest defence against inventing work.
+- **Review the map when a consolidation is reissued.** A consolidation can carry forward superseded text, so currency has to be checked rather than assumed.
+
+## Where this connects
+
+The continuous obligations are in [real-time and near-real-time obligations](/broking-kyc/finix-broking-setup/monitoring/02-realtime-near-realtime/), the calendar in [periodic submissions](/broking-kyc/finix-broking-setup/monitoring/03-periodic-submissions/), the inbound streams in [alerts received](/broking-kyc/finix-broking-setup/monitoring/04-alerts-received-and-response/), incidents in [incident and breach reporting](/broking-kyc/finix-broking-setup/monitoring/05-incident-breach-reporting/) and transaction reporting in [anti-money-laundering monitoring](/broking-kyc/finix-broking-setup/monitoring/06-aml-monitoring-reporting/). Ownership is in [the periodic and compliance matrix](/broking-kyc/finix-broking-setup/roles/03-raci-periodic-compliance/) and the files behind it all in [files and data interchange](/broking-kyc/finix-broking-setup/files/).

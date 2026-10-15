@@ -1,0 +1,108 @@
+---
+title: "Products 6: currency and interest-rate derivatives"
+description: The segment whose economics changed when the underlying-exposure requirement was enforced — what the rule actually says, why the commonly quoted threshold is an evidence threshold rather than a permission, the position-limit structure, the settlement mechanics, and the broker-side controls that follow.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** This segment is widely misunderstood in a specific way, and the misunderstanding has a number attached to it. So the page leads with the rule and the correction, because almost every operational decision in the segment follows from whether a client may hold an unhedged position — and the answer is not what the commonly quoted figure implies. The rest follows the usual shape: limits, settlement, controls.
+
+<Aside type="danger" title="The correction that governs this whole segment">
+Exchange-traded derivatives involving the domestic currency are for hedging **contracted exposure**. The commonly quoted figure — a dollar threshold often repeated as the amount a client may trade without demonstrating exposure — is **an evidence threshold, not a permission to have no exposure**. Beneath it a client need not *produce* the documentation; it does not follow that the client may hold a position without an underlying exposure existing.
+
+**There is no unhedged allowance** under the hedging rule: for pure speculation without a qualifying underlying exposure, the permitted position is **effectively zero**. The rule is not a blanket statutory ban on retail participation, and a client with genuine contracted exposure may hedge it. But an unhedged speculative position does not satisfy the rule, and a broker whose onboarding treats the threshold as a free allowance is enabling positions the framework does not contemplate.
+
+This is the single most consequential correction in this plane, and it determines the client declaration, the monitoring and the product's realistic addressable market.
+</Aside>
+
+## TL;DR
+
+- **The rule is hedging of contracted exposure**, and the commonly quoted threshold is about **evidence**, not entitlement.
+- **Position limits are structured by participant category** and expressed as the higher of a proportion of open interest or an absolute amount, with banks authorised to deal carrying far larger limits.
+- **Limits linked to open interest apply at the time of opening a position** — a fall in total open interest does not force unwinding, but no increase or new position is permitted until compliant. **This is the origin of the passive-breach logic later imported into equity.**
+- **An early-warning tier exists**: the clearing corporation notifies the clearing member when a client exceeds the limit **or exceeds a lower proportion of open interest**.
+- **Positions beyond a stated size require a reporting file and an authorised-dealer or custodian confirmation.**
+- **Settlement references the central bank's published rate**, so the settlement input is external to the exchange.
+
+## 1. The framework
+
+- **Central bank master direction on the segment** — the hedging-of-contracted-exposure rule. `[not yet in index]`
+- **The 2020 direction on positions beyond a stated size** — the reporting file and the authorised-dealer or custodian confirmation. `[not yet in index]`
+- **Clearing-corporation consolidated currency circular of 30 April 2026** — the position-limit table, the gross-position definitions, the early-warning tier and the reporting formats. `[not yet in index]`
+- Interest-rate derivative limits in the same consolidated circular, by maturity bucket. `[not yet in index]`
+
+## 2. Position limits
+
+Expressed as the **higher of a proportion of open interest or an absolute amount**, by participant category and currency pair.
+
+| Participant | Shape of the limit |
+|---|---|
+| **Trading member, non-bank** | A proportion of open interest or a stated amount |
+| **Trading member that is a bank authorised to deal** | The same proportion but a **far larger** absolute amount |
+| **Non-bank broker, proprietary** | A proportion or a **smaller** amount than the member limit |
+| **Client** | A **lower proportion** and a smaller amount |
+| Qualifying foreign investor categories | Varying by category, with individuals, family offices and corporates on the lower tier |
+| Combined across pairs | Proprietary limits also expressed as a combined cap across the domestic-currency pairs |
+| Cross-currency pairs | Their own limits |
+
+| Element | Position |
+|---|---|
+| **Gross position definitions** | Long is long futures plus long calls plus short puts; short is short futures plus short calls plus long puts |
+| **Timing of the open-interest test** | **Applies at the time of opening a position.** A fall in total open interest does **not** force unwinding, but the participant **cannot increase existing or create new positions** until compliant |
+| **The early-warning tier** | The clearing corporation **notifies the clearing member when a client exceeds the limit or exceeds a lower proportion of open interest** — a genuinely useful signal most firms do not instrument |
+| **Positions beyond a stated size** | The clearing member must report client details through a **prescribed format**, with an **authorised-dealer or custodian confirmation** |
+| Non-resident participant codes | A request format and a bank letter, to named addresses |
+| Interest-rate derivatives | Limits by **maturity bucket**, as a proportion of open interest or an absolute amount, differing for members, banks, primary dealers and fund managers against other clients |
+
+## 3. Settlement and contract mechanics
+
+| Element | Position |
+|---|---|
+| Contracts | Futures and options on the domestic currency against major currencies, plus cross-currency pairs |
+| **Settlement price** | References the **central bank's published reference rate** — an input external to the exchange, which must be ingested rather than computed |
+| Settlement | Cash settled against that rate |
+| Margin | Through the segment's own parameter files, with their own snapshot cadence |
+| Trading hours | The segment's own, differing from the equity session |
+| Interest-rate derivatives | Listed instruments with their own settlement basis, traded predominantly by institutional participants |
+
+## 4. Broker-side controls
+
+| Control | Requirement |
+|---|---|
+| **Client declaration of contracted exposure** | Collected at activation, with the nature of the exposure recorded — **not a tick-box against a threshold** |
+| Documentation | Collected where the position requires it, and retained |
+| **Monitoring against the declared exposure** | Positions compared with the exposure the client declared, not only with the limit |
+| **The reporting file for larger positions** | With the authorised-dealer or custodian confirmation, before the position is permitted to grow |
+| Limit enforcement at order entry | Against client and proprietary limits, by pair and combined |
+| **The early-warning notification instrumented** | So the lower-proportion signal reaches the risk desk rather than a mailbox |
+| Reference-rate ingestion | As a register entry with its own criticality, since settlement depends on it |
+| Activation gating | The segment enabled only where the declaration and documentation framework exists — see [the product enablement matrix](/broking-kyc/finix-broking-setup/products/09-product-enablement-matrix/) |
+| Client communication | That the product is a hedging instrument, and what that means for their eligibility |
+
+## 5. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.products.cd.hedging_rule_enforced` | **R** | **true** | Contracted exposure, not a threshold allowance |
+| `finix.products.cd.unhedged_allowance` | **R** | **Zero** | The correction in the caution above |
+| `finix.products.cd.exposure_declaration_required` | **R** | true | With the nature recorded |
+| `finix.products.cd.documentation_threshold` | **E** | The stated size | **Evidence threshold, not entitlement** |
+| `finix.products.cd.large_position_reporting` | **R** | true | With the dealer or custodian confirmation |
+| `finix.products.cd.monitor_against_declared_exposure` | **D** | **true** | Not only against the limit |
+| `finix.products.cd.oi_test_at_position_opening` | **E** | true | No forced unwinding on an open-interest fall |
+| `finix.products.cd.no_increase_until_compliant` | **E** | true | The other side of that rule |
+| `finix.products.cd.early_warning_instrumented` | **D** | **true** | The lower-proportion notification |
+| `finix.products.cd.reference_rate_ingested` | **E** | true | A register entry with criticality |
+| `finix.products.cd.limits_by_pair_and_combined` | **E** | true | Including the combined proprietary cap |
+
+## 6. Practical notes
+
+- **Write the client declaration around contracted exposure, not around a threshold.** A declaration that only asserts a position size below the threshold does not establish what the rule requires.
+- **Monitor positions against the declared exposure.** A client within the limit but beyond their declared exposure is the case the rule is about.
+- **Instrument the early-warning notification.** It arrives before the breach and most firms never route it anywhere.
+- **Treat the reference rate as a critical register entry.** Settlement depends on an input the exchange does not produce.
+- **Be realistic about the addressable market.** A product restricted to hedging contracted exposure has a different client base from a speculative product, and sizing it as the latter leads to an activation framework nobody uses.
+
+## Where this connects
+
+The limit measurement regime is in [real-time and near-real-time obligations](/broking-kyc/finix-broking-setup/monitoring/02-realtime-near-realtime/), the enablement decision in [the product enablement matrix](/broking-kyc/finix-broking-setup/products/09-product-enablement-matrix/), and the client-side activation in [currency and interest-rate derivatives activation](/broking-kyc/product-activation/currency-ird-activation/). The margin computation is in [the margin engine](/broking-kyc/finix-broking-setup/rms/02-margin-engine/), the files in [clearing corporation files](/broking-kyc/finix-broking-setup/files/05-clearing-corporation-files/), and the segment comparison in [the segment rules comparison](/broking-kyc/deep-dives/foundational/segment-rules-comparison/).

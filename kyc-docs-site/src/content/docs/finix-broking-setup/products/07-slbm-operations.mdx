@@ -1,0 +1,117 @@
+---
+title: "Products 7: securities lending operations"
+description: The lending and borrowing mechanism as a broking operation — enrolment, the two-leg structure and why the reverse leg is the operational risk, margin and collateral, the files it generates, recall and foreclosure, and the interaction with pledged collateral that catches firms out.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Lending is structurally simple and operationally awkward, because a transaction has **two settlements separated by time** and the second one depends on the borrower still being able to return the securities. So the page is built around the reverse leg, which is where the risk and the operational work actually sit. Section 6 covers the interaction with pledging, which is the specific thing firms discover after launch.
+
+## TL;DR
+
+- **Two legs, separated by time.** The first leg transfers securities out; the reverse leg brings them back. The reverse leg is the obligation that fails.
+- **A lent security is not available as collateral** while it is lent, which is the interaction that catches firms out — the client's capacity falls when they lend.
+- **Enrolment is separate from ordinary membership** and participation is through the lending segment with its own identifiers and files.
+- **It generates its own file family** — eligible securities, provisional and final obligations for each leg, bhavcopy, value-at-risk, margin, open positions and foreclosure.
+- **Recall and foreclosure are distinct**: one is the lender wanting securities back early, the other is the mechanism's own termination of a position.
+- **Fee income is a credit with its own timing**, and the client's expectation of when it arrives is usually wrong.
+
+## 1. Enrolment and participation
+
+| Element | Position |
+|---|---|
+| Enrolment | Separate from ordinary trading membership; participation in the lending segment requires its own enrolment and identifiers |
+| Client-side activation | A separate product activation with its own client documentation — see [lending enrolment](/broking-kyc/product-activation/slbm-enrolment/) |
+| Eligible securities | Published in a **daily eligible-securities file**; eligibility changes, and a security leaving the list affects what can be newly lent rather than existing positions |
+| Roles | A client may lend, borrow, or both; the economics and the risks differ |
+| Segment files | Its own extranet root and member folders — see [<abbr title="National Stock Exchange of India">NSE</abbr> and NSE Clearing files](/broking-kyc/finix-broking-setup/files/02-nse-files/) |
+
+## 2. The two legs
+
+| Leg | What happens |
+|---|---|
+| **First leg** | The lender delivers securities; the borrower provides them against margin. A **provisional obligation** and then a **final obligation** are published for the leg |
+| The term | The securities are with the borrower for the contracted period |
+| **Reverse leg** | The borrower returns the securities; the lender receives them. **Provisional and final obligations** are published for this leg too, including an **auction obligation** where the return fails |
+| **The failure mode** | The borrower cannot return the securities — because they sold them, because the security became illiquid, or because they simply defaulted. **The reverse leg then goes to auction**, exactly as a short delivery does |
+| Fee | The lending fee, settled per the mechanism's cycle |
+
+**Everything operationally interesting is on the reverse leg.** The first leg is a delivery; the second is a delivery that depends on a counterparty's position being intact weeks later.
+
+## 3. Margin and collateral
+
+| Element | Position |
+|---|---|
+| Margin | Through the segment's own parameter and value-at-risk files, with a **detailed margin report** at participant level |
+| Borrower margin | Covers the obligation to return |
+| Lender position | Has delivered securities and holds a claim |
+| **Collateral interaction** | **A lent security is not available as collateral while lent.** The client's haircut-adjusted collateral value falls by the lent holding |
+| Value-at-risk file | A segment-specific begin-of-day file |
+| Bhavcopy | Segment-specific, for fee and position valuation |
+
+## 4. The file family
+
+| File | Purpose |
+|---|---|
+| Eligible securities | Daily product eligibility |
+| Bhavcopy | Fee and position valuation |
+| Value-at-risk | Margin input |
+| **Provisional and final obligations, first leg** | What settles on the first leg |
+| **Final obligations, reverse leg**, including an auction obligation | What settles on the return, and what goes to auction |
+| Detailed margin report | Participant-level margin |
+| Shortages, by leg | Reverse-leg failure |
+| Open positions | Reconciliation of outstanding lending positions |
+| **Foreclosure** | Positions terminated by the mechanism |
+
+## 5. Recall and foreclosure
+
+| Event | Meaning |
+|---|---|
+| **Recall** | The **lender** wants the securities back before the contracted return. Whether and how this is possible depends on the mechanism's rules for the contract type |
+| **Foreclosure** | The **mechanism** terminates the position, generating a foreclosure file. Reasons include a corporate action making continuation inappropriate, or a default |
+| A corporate action on a lent security | The entitlement has to be made good to the lender; the mechanism's rules govern, and this is a common foreclosure trigger |
+| Operational duty | Both arrive as files and both change a client's position and capacity. **Neither is a client instruction**, so a system expecting client-initiated changes will not handle them |
+
+## 6. The interactions that catch firms out
+
+| Interaction | Effect |
+|---|---|
+| **Lending reduces collateral capacity** | The lent holding is unavailable as collateral, so a client who lends sees their capacity fall. **Clients expect the opposite**, because they are earning a fee on an idle holding |
+| **A pledged security cannot simultaneously be lent** | The holding is encumbered; the arrangements are alternatives rather than complements |
+| A lent security entering a surveillance measure or a ban | The lending position persists while the underlying's treatment changes |
+| **Reverse-leg failure is a short delivery** | With the auction and close-out consequences, and the client debit computed on the settlement outcome |
+| Fee income timing | Credited per the mechanism's settlement cycle, **not on the lending date** — a routine client expectation mismatch |
+| A lent security being sold by the lender | Not possible while lent; the holding is out of the account |
+
+<Aside type="caution" title="Explain the capacity effect before activation, not after the first lend">
+The commonest client complaint in this product is not about the fee or the term — it is that the client lent an idle holding to earn a fee and discovered their trading capacity had fallen. From the client's perspective a dormant holding was monetised at no cost; from the system's perspective an eligible collateral holding left the account. Both are correct.
+
+The fix is entirely in the activation and the interface: state at activation that a lent holding is unavailable as collateral for the term, show the capacity effect **before** the lending instruction is confirmed, and show the lent quantity separately in the holdings and collateral views. The interaction with pledging needs the same treatment, because a client who has pledged a holding for margin cannot also lend it, and discovering that at the point of instruction is a better outcome than discovering it in a rejection.
+</Aside>
+
+## 7. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.products.slb.enrolment_required` | **E** | true | Separate from trading membership |
+| `finix.products.slb.eligible_securities_daily` | **E** | true | Affects new lending |
+| `finix.products.slb.lent_holding_excluded_from_collateral` | **D** | **true** | The capacity interaction |
+| `finix.products.slb.capacity_effect_shown_before_confirm` | **D** | **true** | At the instruction, not after |
+| `finix.products.slb.pledged_cannot_be_lent` | **D** | true | Alternatives, not complements |
+| `finix.products.slb.reverse_leg_obligation_monitored` | **D** | **true** | The failing leg |
+| `finix.products.slb.reverse_leg_failure_as_short_delivery` | **E** | true | Auction consequences |
+| `finix.products.slb.foreclosure_file_ingested` | **E** | true | Not a client instruction |
+| `finix.products.slb.recall_rules_documented` | **E** | Per contract type | — |
+| `finix.products.slb.fee_credit_timing_disclosed` | **D** | true | Per the settlement cycle |
+
+## Practical notes
+
+- **Monitor the reverse leg from the day the first leg settles.** It is the obligation that fails, and the warning signs are in the borrower's position.
+- **Show the capacity effect at the point of instruction.** It is the product's main client-experience problem and it is entirely preventable.
+- **Ingest the foreclosure file as an event stream.** Positions change without a client instruction, and a system that only processes instructions will diverge.
+- **Treat reverse-leg failure as a short delivery** in the ledger and in the client communication, because that is its mechanics.
+- **Disclose the fee credit timing.** The expectation is the lending date; the reality is the settlement cycle.
+
+## Where this connects
+
+The files are in [NSE and NSE Clearing files](/broking-kyc/finix-broking-setup/files/02-nse-files/) and [clearing corporation files](/broking-kyc/finix-broking-setup/files/05-clearing-corporation-files/); the collateral interaction is in [collateral and pledge](/broking-kyc/finix-broking-setup/rms/05-collateral-pledge/), [the pledge lifecycle](/broking-kyc/finix-broking-setup/products/02-pledge-lifecycle/) and [the limit impact matrix](/broking-kyc/finix-broking-setup/rms/10-limit-impact-matrix/). Enablement is in [the product enablement matrix](/broking-kyc/finix-broking-setup/products/09-product-enablement-matrix/), client activation in [lending enrolment](/broking-kyc/product-activation/slbm-enrolment/), and the vendor-neutral treatment in [the lending mechanism deep dive](/broking-kyc/deep-dives/settlement/slbm/).
