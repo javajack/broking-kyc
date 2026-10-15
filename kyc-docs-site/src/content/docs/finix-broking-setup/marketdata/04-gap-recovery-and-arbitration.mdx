@@ -1,0 +1,230 @@
+---
+title: "Market data 4: gap recovery and line arbitration"
+description: What each feed offers when a packet is lost — range retransmission with real numeric connection limits, snapshot services with refresh intervals and size caps, replacement snapshots with no sequence at all, and one widely used feed with no published recovery mechanism whatsoever — plus redundant-line arbitration, the late-join algorithm, and why a sequence reset is not a gap.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Recovery is where market data feeds differ most and where documentation is thinnest, so the page leads with the three *shapes* recovery can take, then goes feed by feed — because the right response to a gap is a property of the feed, not of the venue or of the firm. The uncomfortable finding comes early: the feed most firms depend on for prices has **no published recovery mechanism at all**, and the recovery facilities that do exist belong to other feeds and must not be borrowed. The late-join algorithm is last because it only makes sense once you know which facilities a given feed actually offers.
+
+## TL;DR
+
+- **Recovery takes three shapes, and one feed family has none.** Range retransmission replays the messages you missed; snapshot recovery gives you current state and a boundary to resume from; a replacement-snapshot feed heals state automatically and loses the sequence permanently. And the <abbr title="National Stock Exchange of India">NSE</abbr> member broadcast publishes **no retransmission service, no recovery snapshot and no replay on re-login**.
+- **Interactive recovery is not market data recovery.** The order path's journal download must never be presented as a way to replay missed market data. They are different services on different channels, and conflating them produces a recovery design that cannot work.
+- **The retransmission limits are real numbers and they are tight**: thirteen simultaneous connections per IP per segment, one hundred connections per second per IP, at least ten milliseconds between successive requests, and the request must be sent within one second of connecting or the server drops you.
+- **A snapshot service has a refresh interval and a size cap.** Thirty seconds and seventy-five megabytes at one venue. A snapshot refresh **can disconnect an in-flight request**, so retry is part of the normal path rather than an error path.
+- **A sequence reset to one is not a gap.** It happens on a documented disaster-recovery switchover at one feed and on a service restart at another, where a dedicated indicator marks the restart packets. Treating a reset as catastrophic loss produces a false incident; treating a gap as a reset produces a silently wrong book.
+- **Arbitrating two lines requires deduplication by sequence, not by arrival.** One venue states that **one of its two channels lags the other** and recommends consuming both, and publishes no guarantee that packet boundaries or timing match.
+- **The late-join order matters and double application is the trap**: buffer the live increments, install the snapshot, then apply only what is above the snapshot's boundary. Applying buffered increments that the snapshot already contains corrupts the book in a way that looks like a feed problem.
+
+## Conceptual overview
+
+A market data receiver has to distinguish four states that look similar from the outside: everything is fine and quiet; everything is fine and this instrument is simply illiquid; a packet was lost; and the feed is gone. Only the published sequencing and heartbeat mechanisms can separate them, and because those mechanisms differ per feed — described in [wire formats and packets](/broking-kyc/finix-broking-setup/marketdata/02-wire-format-and-packets/) — the detection logic differs per feed too. There is no venue-neutral gap detector, and an attempt to write one ends up either blind on the feeds with weak sequencing or permanently alarmed on the feed whose sequence is explicitly not unique.
+
+The second idea is that detection and repair are separable, and the asymmetry between them is the real design constraint. Several feeds let you **detect** a gap precisely while offering nothing to **repair** it, and in that situation the only honest responses are to arbitrate against a second line, to rebuild from a snapshot if one exists, or to mark the affected scope as unreliable and stop making decisions from it. The temptation in that situation is to do nothing — the feed will, after all, correct itself on the next update for most instruments — and for a client's screen that is defensible. For anything that must reconstruct what the market looked like, it is not, which is why the surveillance consumer is served from the order-event feed rather than from a netted one.
+
+The third idea is that recovery is a capacity-planned operation with published quotas, not an unlimited safety net. The retransmission service at one venue permits a bounded number of concurrent connections per IP per segment, caps the connection rate, requires a minimum interval between requests and disconnects a client that connects without promptly asking for something. Its snapshot service refreshes on a fixed interval, caps the response size, and may disconnect an in-flight request when the refresh happens. A recovery implementation that treats these as error conditions will fail during exactly the events it exists for — because an incident that affects one stream affects every member on it, and they will all reach for recovery in the same second.
+
+Finally, there is a boundary that becomes important the moment a firm offers its own streaming interface. Upstream recovery is **not** downstream resume. A firm can reconstruct its own book exactly using a venue's sequenced feed and its retransmission service, and still be unable to offer its clients lossless replay — because after normalisation, filtering and conflation the intermediate values no longer exist. Treating the upstream guarantee as if it propagated to clients is how a firm ends up promising something it cannot deliver; the client-side position is set out in [fan-out to clients](/broking-kyc/finix-broking-setup/marketdata/06-fanout-to-clients/#4-snapshot-plus-delta-and-what-resume-means).
+
+## 1. The three shapes of recovery
+
+| Shape | What it gives you | What it costs | Feeds that have it |
+|---|---|---|---|
+| **Range retransmission** | **The actual messages you missed**, by sequence range | A separate connection, within published quotas; the response may lag live dissemination | NSE member tick-by-tick, over TCP |
+| **Snapshot recovery** | **Current state plus a boundary** to resume the live stream from | A refresh interval, a size cap, and the late-join algorithm in section 7 | NSE member tick-by-tick; the enhanced interfaces at <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> and <abbr title="Multi Commodity Exchange of India">MCX</abbr>; the order-book interfaces |
+| **Replacement snapshot** | **State heals by itself** on the next cycle | **The sequence and the intermediate events are gone permanently** | BSE's netted snapshot broadcast, which publishes no sequence at all |
+| **None** | — | — | **The NSE member broadcast** |
+
+<Aside type="danger" title="The NSE member broadcast has no published recovery mechanism">
+This is the most consequential finding on the page, because it is the feed a new broker is most likely to build its prices on.
+
+No verified multicast range-retransmission service, no recovery snapshot request, and no rule that a re-login replays missed market data was established for the NSE member broadcast. Its sequence number is **explicitly not unique**, so even precise gap detection is unavailable. And the interactive channel's transaction and journal download facilities — which are real, and which do recover **order** state — **must not** be represented as market data multicast replay. They are a different service on a different channel for a different purpose.
+
+What follows for the architecture:
+
+- **Consume both published sources** — Source 1 and Source 2 — so that a loss on one path is covered by the other. This is the only repair mechanism available on this feed.
+- **Do not promise reconstruction from it.** Anything that needs exact sequence must be built on the member order-event feed, which does have recovery.
+- **Build the reproducible record from the end-of-day files**, as [normalisation and internal distribution](/broking-kyc/finix-broking-setup/marketdata/05-normalisation-and-internal-distribution/#6-the-two-stores) requires. This is a large part of why that rule exists.
+- **Get the exchange's own broadcast sequence and recovery specification** before designing anything that depends on more than best effort.
+</Aside>
+
+## 2. Redundant lines, and arbitrating between them
+
+| Venue and feed | Published arrangement | Design consequence |
+|---|---|---|
+| NSE price-volume broadcast | **Source 1 and Source 2**, both transmitting simultaneously, usable **active-active or active-passive** | Active-active, with deduplication, is the only configuration that repairs loss. "Line A / line B" is not the published naming and **no equality or latency guarantee is published** |
+| NSE member tick-by-tick | Two sources, with NSE stating that **one multicast channel lags the other** and **recommending active-active** | Deduplicate **by stream and sequence**, never by arrival order. The size of the lag, which source lags, and whether packet boundaries match are **not published** |
+| BSE enhanced interfaces | Connection tables expose **distinct A and B addresses**, for incrementals and snapshots separately | Standard A/B arbitration by sequence |
+| MCX | The protocol manuals describe live-live A and B. The current connectivity circular publishes **primary-site and recovery-site** endpoints **without labelled A and B pairs** | **Do not relabel the two sites as A and B.** What redundancy is physically delivered to a given member must be confirmed from network provisioning |
+
+**The arbitration rule, stated once:** deduplicate on the feed's own sequence domain, emit the first copy of each sequence to arrive, and count how often each line was first. That last metric is the one that matters operationally — a line that is never first is either lagging or dead, and the difference is invisible without the count. Where a feed has **no** sequence, as with the replacement-snapshot broadcast, arbitration is not possible and the second line gives availability only, not loss repair.
+
+## 3. NSE member tick-by-tick: the one fully documented recovery
+
+### 3.1 Range retransmission
+
+| Element | Published detail |
+|---|---|
+| Request | A **TCP** request of type `R`, carrying the **stream identifier** and **start and end sequence numbers** |
+| Response | Type `Y`, indicating success or error |
+| Connection model | **Each request uses a new connection**, and the server **disconnects after sending the response** |
+| Nature of the response | **File-based**, and it **can lag live dissemination** |
+| **Connection quota** | **Thirteen simultaneous connections per IP per segment** |
+| **Rate quota** | **One hundred connections per second per IP**, with **at least ten milliseconds between successive requests** |
+| **Timeout** | The request must be sent **within one second of connecting**, or the server disconnects |
+| Guidance for the drop-copy case | The exchange advises using an **incremental** download from the last sequence received and explicitly advises **against** repeating a full download |
+
+### 3.2 Snapshot recovery
+
+| Element | Published detail |
+|---|---|
+| Request | A TCP request of type `O` with **start and end sequence set to zero**; response type `B` |
+| Payload | A snapshot message with a **sixteen-byte header** carrying a transaction code, a size, a **record count**, the **last sequence number** and the **stream identifier**, followed by order records |
+| **Refresh interval** | **Every thirty seconds** |
+| **Size cap** | **Seventy-five megabytes** over the current TCP service — up from thirty megabytes on the retired service |
+| **Refresh collision** | The exchange warns that a **snapshot refresh may disconnect an in-flight request**. Reconnect and retry |
+| What it is not | **Not a historical trade tape.** It is the outstanding-order book as of the refresh |
+| Service migration | The current direct TCP snapshot service replaced the former message-broker service — cash from October 2025, derivatives and currency from March 2026, with the old service retired from the June 2026 mock. **Snapshot and range-recovery endpoints are different ports** |
+| Commodity availability | The current specification states snapshot recovery is available for commodity as well, but the consolidated endpoint circulars **do not establish its production endpoint**. Obtain the enablement circular |
+
+<Aside type="caution" title="Retry is the normal path, not the error path">
+Three published behaviours mean a correct implementation retries routinely: the server disconnects after every response, a snapshot refresh can disconnect an in-flight request, and connecting without promptly sending a request gets you disconnected.
+
+So the recovery client is a short-lived connection with a bounded retry, a minimum inter-request interval, and a concurrency limiter sized **below** the published quota — because the quota is per IP and every component on that IP shares it. Build the limiter as a shared resource from the start; two independently written recovery paths on one host will exceed the quota during the first real incident, when both are busiest.
+</Aside>
+
+## 4. NSE commercial level and index feeds
+
+Application sequence numbers exist in the commercial format, so gaps are **detectable**. But **no universal public replay or snapshot service for the commercial level, index and tick-by-tick products was established**, and the member tick-by-tick recovery service **must not be silently applied to them** — it is a different product on a different delivery arrangement.
+
+For a firm taking a commercial feed, the practical consequences are: establish in the order form and the delivery specification what recovery is provided; consume both delivered paths where two exist; and treat the feed as best-effort state unless the product's own specification says otherwise. Where recovery is absent, the commercial feed cannot be the basis of a reconstruction obligation, and the end-of-day files remain the reproducible record.
+
+## 5. BSE, per interface
+
+| Interface | Detection | Repair |
+|---|---|---|
+| **Enhanced market data** | **Per-product message sequence numbers, contiguous on the incrementals** | **Try the other live service first.** If neither copy arrives, **rebuild from snapshots**. Depth snapshots **omit** the message sequence number and carry a **last-message-sequence-number-processed** field, which is the linkage to the incremental stream |
+| **Netted market data** | Snapshots and incrementals **share the sequence domain and the channel** | Apply the **mandatory refreshes**. Current timing guarantees and restart rules need the deployed manual |
+| **Order book** | Per the manual, which was not obtainable | The connectivity manual prescribes **rebuilding from the replayed pending order book**. Exact gap and reset fields and product-cycle boundaries await that manual |
+| **Netted replacement snapshot** | **Impossible — no product or stream sequence number exists** | A **subsequent complete snapshot replaces the affected book**. This restores **current state**, not the missing intermediate events or their chronology |
+| Trading-interface retransmission | `Retransmit` **10008** with response **10009**; order-event retransmit **10026** with response **10027** | **Private event recovery, selecting an application and a partition. Not a public market data packet replay** |
+
+## 6. MCX, per interface
+
+| Interface | Detection | Repair |
+|---|---|---|
+| **Netted and enhanced market data** | **Packet sequencing is sender and channel scoped; message sequencing is product scoped** — two domains, both needed. The enhanced interface uses the **linkage field**; the netted interface **shares** its sequence between snapshots and incrementals | **Repair from the two paths first, otherwise from snapshots** |
+| **Order book** | The **application sequence number sequences channel packets**; the **message sequence number sequences product updates** | **Buffer incrementals during recovery, install the product snapshot, then apply messages above the snapshot's linkage value.** A **service restart resets sequences to one**, and a dedicated **reset indicator marks the initial restart packets** |
+| Trading-interface retransmission | The same message identifiers as the other venue, with sequence ranges for application messages and message-identifier ranges for order events | Private event recovery, not market data |
+
+Two further published facts change an implementation:
+
+**The enhanced depth cycles have no explicit start and end messages.** The guidance is to detect **product transitions for a sender**, or the **recurrence of the first security identifier for each sender**. A failover **restarts that sender's cycle**. So a receiver cannot wait for an end-of-cycle marker; it must infer the boundary, and it must handle the boundary moving when a sender fails over.
+
+**The retransmission partition instruction contradicts itself.** The general recovery text calls partition selection mandatory, while the retransmit message's own field table says **not** to set the partition identifier for news, risk control and one maintenance stream. Do **not** implement a blanket "partition always required" rule; get the supported exceptions confirmed.
+
+<Aside type="caution" title="A reset is not a gap, and the difference is published">
+Two feeds document sequence resets explicitly:
+
+- The NSE member tick-by-tick stream's per-stream sequence **starts at one each day** and a **disaster-recovery switchover can reset it to one**.
+- The MCX order-book feed resets sequences to one on a **service restart**, and marks the initial restart packets with a **dedicated reset indicator**.
+
+An implementation that treats any backwards sequence movement as catastrophic loss will raise a false incident on an ordinary switchover — and one that treats every backwards movement as a benign reset will accept a corrupt book. Read the indicator where one exists, correlate with the venue's own session and service messages where one does not, and make the two outcomes distinguishable in the logs. This is the same discipline the order path requires for a switchover, described in [the disaster recovery architecture](/broking-kyc/finix-broking-setup/stack/disaster-recovery-architecture/).
+</Aside>
+
+## 7. The late-join algorithm
+
+This is the sequence that applies wherever a snapshot service exists, and the ordering is what prevents corruption.
+
+| Step | Action | Why this order |
+|---|---|---|
+| 1 | **Start buffering the live incremental stream** before requesting anything | The snapshot takes time to arrive; everything in that window is needed |
+| 2 | **Request the snapshot** | — |
+| 3 | **Install the snapshot as the book's base state** | — |
+| 4 | **Read the snapshot's boundary** — its last sequence number or linkage field | This is the only thing that tells you what the snapshot already contains |
+| 5 | **Discard buffered increments at or below the boundary; apply only those above it** | **This is the trap.** Applying increments the snapshot already includes **double-applies** them, which corrupts quantities in a way that looks like a feed defect rather than a logic defect |
+| 6 | **Resume normal incremental application**, with gap detection active | — |
+| 7 | **If the buffer does not reach the boundary** — a gap between the snapshot and the buffered stream — **start again**, do not interpolate | A hole here is invisible afterwards |
+| 8 | **Do not serve the instrument to consumers until the book is established** | A partially built book is worse than an absent one, because it looks valid |
+
+Two venue-specific notes. On the order-book feed with a reset indicator, a restart arriving mid-recovery means abandoning the attempt and restarting from the new sequence base. And on the enhanced depth interfaces, because there is no explicit cycle end, the receiver infers the cycle boundary from product transitions or the recurrence of the first security identifier for a sender — so the boundary detection itself has to be tested against a capture.
+
+## 8. What is not published anywhere
+
+| Question | What settles it |
+|---|---|
+| A universal **snapshot-cycle duration** at either T7-lineage venue | The feed-specific production recovery specification |
+| A **recovery-time service level** on any feed | The same — none was established |
+| A **public market data packet replay endpoint** at BSE or MCX | The feed-specific specification. **Private trading-interface retransmission does not fill this gap** |
+| The NSE broadcast's **sequence-domain mapping and gap-repair algorithm** | The exchange's broadcast sequence and recovery specification, and the receiver application manual |
+| The **commodity snapshot endpoint** at NSE | The commodity enablement circular |
+| **Exact lag between redundant channels**, and which one lags | The exchange's multicast redundancy and network specification |
+| A **maximum datagram size** on the tick-by-tick multicast | The current network and interface specification. The snapshot's size cap is **not** a datagram limit |
+| BSE **order-book** gap, reset and cycle semantics | The current BSE order-book manual |
+
+## 9. Configuration reference
+
+| Key | Finix default | Class | Failure mode if wrong |
+|---|---|---|---|
+| `finix.marketdata.recovery.shape.<feed>` | Declared explicitly per feed — retransmission, snapshot, replacement or **none** | Exchange-set | A recovery design that assumes a facility the feed does not have |
+| `finix.marketdata.recovery.nse_broadcast.none` | **True** — no recovery service exists | Exchange-set | Promising reconstruction from a feed that cannot support it |
+| `finix.marketdata.recovery.interactive_is_not_marketdata` | True | Exchange-set | A recovery path that cannot work, discovered during an incident |
+| `finix.marketdata.recovery.both_sources_consumed` | True wherever two are published | Exchange-set | The only loss repair available on some feeds, unused |
+| `finix.marketdata.recovery.dedupe_by_sequence` | True — never by arrival order | Discretionary, strongly recommended | Duplicate application, or silently preferring a lagging line |
+| `finix.marketdata.recovery.line_first_counts` | Published as a metric per line | Discretionary, strongly recommended | A dead or lagging line that looks healthy |
+| `finix.marketdata.recovery.tcp_concurrency_limit` | **Below** the published per-IP quota, as a **shared** limiter | Exchange-set | Exceeding the quota during the incident the service exists for |
+| `finix.marketdata.recovery.min_request_interval_ms` | At or above the published minimum | Exchange-set | Rejected requests, or a disconnection |
+| `finix.marketdata.recovery.request_within_ms_of_connect` | Well inside the published window | Exchange-set | The server disconnecting before the request is read |
+| `finix.marketdata.recovery.retry_is_normal_path` | True, with bounded jittered retry | Discretionary, strongly recommended | Treating routine disconnection as an incident |
+| `finix.marketdata.recovery.incremental_download_preferred` | True — per the exchange's own advice | Exchange-set | Falling further behind by repeating full downloads |
+| `finix.marketdata.recovery.snapshot_boundary_respected` | True — discard buffered increments at or below the boundary | Exchange-set | **Double application and a corrupt book** |
+| `finix.marketdata.recovery.serve_only_when_book_established` | True | Discretionary, strongly recommended | A partially built book served as if valid |
+| `finix.marketdata.recovery.reset_indicator_read` | True wherever published | Exchange-set | A false incident on a reset, or a corrupt book on a gap |
+| `finix.marketdata.recovery.cycle_boundary_inference` | Implemented and tested against a capture where no end marker exists | Exchange-set | Waiting for a marker that never arrives |
+| `finix.marketdata.recovery.partition_required_per_stream` | Per the **confirmed** exception list, not a blanket rule | Exchange-set | Rejected retransmission requests on specific streams |
+| `finix.marketdata.recovery.nfcast_gap_undetectable` | True — accepted and documented | Exchange-set | Believing a sequence check protects a feed with no sequence |
+| `finix.marketdata.recovery.upstream_not_client_resume` | True | Discretionary, strongly recommended | Promising clients lossless replay the firm cannot deliver |
+
+## 10. Exception paths
+
+| Situation | Response |
+|---|---|
+| Gap detected on a feed with retransmission | Request the range, within the shared concurrency limiter. Mark the scope unreliable until filled |
+| Gap detected on a feed with only snapshots | Run the late-join algorithm for the affected scope. Do not serve it until the book is established |
+| Gap detected on a feed with no sequence | It will not be detected. This is why that feed is state-only and not a reconstruction source |
+| Loss on one line, clean on the other | Expected and handled. Arbitration repaired it; count it as a line event, not an incident |
+| Both lines lose the same sequence | Real loss. Fall through to snapshot rebuild, or mark the scope unreliable if no snapshot exists |
+| One line never arrives first | Investigate. One venue states a channel lags; a line that is never first may also be dead |
+| Recovery connection refused or dropped immediately | Check the shared concurrency limiter and the request-within-window rule before suspecting the exchange |
+| Snapshot request disconnected mid-response | **Expected behaviour** around a refresh. Reconnect and retry |
+| Snapshot exceeds the size cap | Raise with the exchange. Do not partially apply it |
+| Buffered increments do not reach the snapshot boundary | **Restart the late-join.** Never interpolate across the hole |
+| Book quantities drift from a later snapshot | Suspect double application at the snapshot boundary first |
+| Sequence moves backwards | Check for a reset indicator or a documented switchover before declaring loss |
+| A depth cycle never appears to end | There is no end marker on those interfaces. Check the inferred boundary logic |
+| Retransmission rejected for a specific stream | Check the partition-identifier exception list — the published instruction contradicts itself |
+| Recovery lagging live dissemination during a busy period | Documented behaviour of a file-based service. Keep serving from the live stream for unaffected scopes |
+
+## Practical notes
+
+- **Write the recovery shape next to every feed in the register.** Four shapes, including "none", and the right response to a gap is entirely determined by which one applies.
+- **Never describe the order path's journal download as market data recovery**, in a document or in an incident call. They are different services and the confusion wastes the first ten minutes of an incident.
+- **Make the recovery concurrency limiter a shared, firm-wide resource.** The quota is per IP per segment, and an incident makes every component reach for it at once.
+- **Test the snapshot boundary logic deliberately, with a capture.** Double application is the defect that looks like a feed problem and is not.
+- **Count which line arrives first, continuously.** It is the only way to notice a lagging or dead redundant path.
+- **Make reset and gap visibly different in the logs**, and alert differently. One is routine, the other is not.
+- **Decide in advance what "unreliable scope" does to the decision path.** Marking a scope unreliable has to stop price-dependent decisions for it, as [normalisation](/broking-kyc/finix-broking-setup/marketdata/05-normalisation-and-internal-distribution/#4-staleness-which-is-an-obligation) requires, or the mark is decorative.
+- **Rehearse a recovery in the mock environment with an injected gap.** Logging in is not the hard part; rebuilding a book under a refresh collision is.
+
+## Where this connects
+
+- [Wire formats and packets](/broking-kyc/finix-broking-setup/marketdata/02-wire-format-and-packets/) — the sequence domains this page acts on
+- [The feed catalogue](/broking-kyc/finix-broking-setup/marketdata/01-feed-catalogue/) — which feed each recovery facility belongs to
+- [Subscription mechanics](/broking-kyc/finix-broking-setup/marketdata/03-subscription-mechanics/) — stream membership, and why a gap can also be a mapping problem
+- [Normalisation and internal distribution](/broking-kyc/finix-broking-setup/marketdata/05-normalisation-and-internal-distribution/) — what an unreliable or stale scope must do downstream
+- [Fan-out to clients](/broking-kyc/finix-broking-setup/marketdata/06-fanout-to-clients/) — why upstream recovery does not become client replay
+- [Order path edge cases](/broking-kyc/finix-broking-setup/oms/12-order-path-edge-cases/) — the parallel recovery discipline on the order path
+- [Disaster recovery architecture](/broking-kyc/finix-broking-setup/stack/disaster-recovery-architecture/) — the switchover that resets a feed's sequences
+- [Incident playbooks](/broking-kyc/finix-broking-setup/daily-ops/07-incident-playbooks/) — where these responses belong operationally
+- [Mock trading and drills](/broking-kyc/finix-broking-setup/certification/05-mock-trading-and-drills/) — where recovery is rehearsed

@@ -1,0 +1,224 @@
+---
+title: "Market data 7: redistribution, licensing and client delivery"
+description: What a member may actually do with the data it receives — the display, non-display and vendor categories, the live tension between one exchange's 2014 internal-use circular and its 2026 registered-client permission, the published tariffs, the user-counting and audit obligations, what SEBI requires a broker to show clients, and the one thing every delivery question turns on.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Receiving a feed and being allowed to show it are different questions with different answers from different parts of an exchange, and the engineering team almost never asks the second one. So the page starts with the question that actually decides a design — what may be shown, to whom, through what channel — then gives the licence categories, then a decision table for the specific delivery shapes a modern broker builds. The tariffs come after that, because a price only means something once the category is settled. The last sections cover what is *required* to be shown, which is a much shorter list than most firms assume, and the retail algorithmic-trading framework, which is the one place where market data delivery and order-entry regulation touch.
+
+## TL;DR
+
+- **A feed connection is not a right to the data.** One exchange's policy states plainly that ownership remains with the exchange and that redistribution is permitted only as contractually agreed. A provisioned multicast address demonstrates access mechanics, not authority.
+- **One exchange's position has a live internal tension.** A 2014 circular says member-received data is for internal use without redistribution; a 2026 consolidated circular expressly permits use by clients registered to trade with the member — and still references the 2014 circular. They have to be read together, and the boundary cases need written confirmation.
+- **There is no established answer to "is a WebSocket to my own app a vendor activity?"** Serving an authenticated app to the member's own registered trading clients is supported at one venue. A reusable raw-data API, an anonymous public quote endpoint, or supply to a third-party platform are all **separate questions that no reviewed source answers affirmatively**.
+- **"Non-display" is not a technical category, it is a licence category** — and it covers automated trading calculations, algorithms, smart order routing, valuation, risk management and internal derived-data analysis. A broker's risk engine is a non-display use whether or not anyone thought of it that way.
+- **User counting is a real, dated obligation.** One venue requires **quarterly client lists by the tenth of April, July, October and January**. Another bills monthly per user. What counts as a user — enabled or active, per device, per concurrent session — is **not published** and must come from the reporting annexure.
+- **Audit rights are explicit and broad**, including reasonably notified spot checks of usage, distribution and end-user information, with a cooperation obligation.
+- **What <abbr title="Securities and Exchange Board of India">SEBI</abbr> actually requires you to show is short**: the broker's website ticker, quotes and order book must carry **timestamps and source attribution**, and wireless trading requires timestamped quotes. **No** minimum depth, **no** obligation to stream every tick, and **no** free live tier was established.
+- **Charging nothing does not exempt anything.** No general free-retail-tier exemption from data restrictions was found in the reviewed instruments.
+
+## Conceptual overview
+
+The licensing conversation goes wrong in a predictable way. An engineering team establishes that the data arrives, builds a client-facing stream, and only later discovers that the exchange distinguishes at least four kinds of use with different permissions and different prices — and that the distinctions do not line up with any technical boundary the team would naturally draw. The categories are about **audience, purpose and channel**: who sees the data, what they do with it, and how it reaches them. A WebSocket is not a category. A mobile app is a channel, and at one venue it is a separately priced one. A risk calculation is a purpose, and at one venue it is explicitly a non-display use with its own agreement and fee structure.
+
+The second idea is that the member entitlement and the commercial licence are different instruments, and the gap between them is where the genuine uncertainty lives. A trading member receives live feeds as part of membership, and at one venue a consolidated member circular expressly permits use by clients registered to trade with that member. That is a real affirmative permission and it covers the central case: a broker's own authenticated application showing prices to its own clients so they can trade. What it does not obviously cover is the set of things a modern broker also builds — a documented programmatic interface, a public quote page, a feed consumed by a third-party platform on a client's behalf, a historical price archive, a charting service, or derived analytics sold as a feature. Each of those is a boundary case, and the reviewed sources support none of them automatically.
+
+The third idea is that the obligations continue after the signature. The licence brings counting, reporting and audit duties: periodic client or user lists on dated deadlines, inspection rights over books, records and electronic documents, and spot checks of usage and distribution with end-user information. These are not engineering afterthoughts — the system has to be able to **attribute every consumer**, which is why the fan-out layer enforces attribution per connection and why that configuration key is classified as regulatory in effect rather than discretionary. A firm that cannot produce a defensible user count on request has a licensing problem that no amount of retrospective querying fixes.
+
+Finally, the honest summary of the evidence. Published policies, circulars and tariffs establish the **routes, the categories and the prices**. They do not establish any particular broker's grant, because that lives in an executed agreement, an order form and a schedule. Every uncertainty on this page resolves the same way: **get it in writing, naming the channel, the audience, the purpose and the onward rights**, before the feature ships. The cost of asking is a letter; the cost of not asking is a retrospective assessment on a usage the firm cannot prove was permitted.
+
+## 1. Documentary framework
+
+- **<abbr title="National Stock Exchange of India">NSE</abbr> data sharing and usage policy** — the member feed position, the contractual instrument, the restrictions on use and the monitoring and audit rights. `[public]`
+- **NSE consolidated market data circular**, `NSE/MSD/74019`, 30 April 2026 — the member-facing general conditions, including the registered-client permission. `[not yet in index]`
+- **NSE circular on usage of data only for trading purpose**, `NSE/COMP/56426`, 20 April 2023 — confines client use to legitimate trading and prohibits gaming and virtual-trading use. `[not yet in index]`
+- **NSE circular on illegal data dissemination**, `NSE/MEM/26958`, 19 June 2014 — the internal-use-without-redistribution instruction, still referenced by the 2026 circular. `[not yet in index]`
+- **NSE policy for non-display usage of market data** and the **domestic product tariff effective 1 April 2026**. `[public]`
+- **<abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> market data subscription portal and the information products domestic tariff**, February 2025, plus the international licensing arrangement for overseas customers. `[public]`
+- **<abbr title="Multi Commodity Exchange of India">MCX</abbr> external data feed policy, subscription procedure, subscriber categories, general terms and the domestic vendor tariff** effective 1 July 2024. `[public]`
+- **[SEBI master circular for stock brokers](/broking-kyc/reference/circulars/sebi-mirsd/)**, `SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90`, 17 June 2025 — the investor-information and wireless-trading provisions that require timestamps and source attribution.
+- **SEBI circular on sharing real-time price data with third parties**, `SEBI/HO/MRD/MRD-PoD-3/P/CIR/2024/56`, 24 May 2024, as amended — the third-party gate and the annual board review. `[not yet in index]`
+- **SEBI circular on price data for educational purposes**, 8 May 2026, effective 1 July 2026 — the thirty-day lag and the usage audit trail. `[not yet in index]`
+- **[SEBI retail algorithmic trading framework](/broking-kyc/reference/circulars/sebi-mirsd/)**, `SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/0000013`, 4 February 2025, with the rollout circular of 30 September 2025 making it applicable to all brokers from 1 April 2026.
+
+## 2. The licence categories
+
+| Category | What it means | Where a broker meets it |
+|---|---|---|
+| **Internal use** | Describes the permitted **audience and organisation** — not a guarantee that every computational use is free. Internal screen viewing, automated consumption and transmission outside the permitted audience are three different things | The dealing desk, internal dashboards, the back office |
+| **Display use** | Rendering quotes for **human** consumption. One venue's tariff distinguishes internal display from vendor terminal, from software and charting, and from **mobile delivery** as separate categories | The client app, the web platform, the dealer terminal, charts |
+| **Non-display use** | **Automated trading calculations, algorithms, smart order routing, valuation, risk management and internal derived-data analysis.** Requires an agreement or undertaking and direct payment. **Enterprise** treatment counts legal entities separately; **global** treatment covers specified subsidiaries in the same business line. External redistribution of **derived** data needs separate terms and fees | **The risk engine, the margin calculation, square-off logic, valuation, any analytics the firm computes** |
+| **Vendor licence** | An entity **in the business of supplying market data to subscribers.** One venue distinguishes direct vendors from downstream redistributors, each needing its own contract | The question a broker's programmatic interface raises |
+
+<Aside type="danger" title="A broker's risk engine is a non-display use">
+This is the category that firms miss, because nobody thinks of a margin calculation as a *use of market data* — it is simply how the system works. But the published definition is explicit: automated trading calculations, algorithms, smart order routing, valuation and **risk management** are non-display uses, with their own agreement, their own enterprise and global scoping, and their own tariff lines that are **not small**.
+
+Three practical consequences. The firm's licensing conversation has to cover the risk engine, the valuation run and any analytics, not only the client-facing screens. The enterprise-versus-global distinction matters structurally, because it counts **legal entities** — so a group with several registered entities has a scoping question before it has a pricing question. And **derived** data redistributed externally is a separate grant again, which is the question raised by any "insight", "signal" or "analytics" feature sold to clients.
+</Aside>
+
+## 3. The decision table
+
+The shapes a modern broker builds, and what the reviewed sources actually establish about each. Note how few rows are settled.
+
+| Delivery shape | What the evidence establishes |
+|---|---|
+| **Own authenticated app, own registered trading clients, prices on screen for trading** | **Supported at one venue** by the 2026 consolidated circular's registered-client permission, read with the purpose restriction. Do not automatically classify every such connection as a separately chargeable vendor terminal — **and do not assume the position is identical at the other two venues** |
+| **A publicly documented programmatic interface, authenticated per client** | **Not settled.** Public documentation alone does not resolve redistribution. A **reusable data stream** needs an explicit assessment of audience, permitted purpose, automation and onward rights. No reviewed source grants a general raw-feed interface |
+| **An anonymous public quote endpoint or open quote page** | **No blanket membership-based permission was found at any venue.** Establish public dissemination rights before offering it |
+| **The firm supplies a third-party platform which serves many users** | Treat as **external feed supply or redistribution requiring express permission**, even where some of the platform's users are the firm's own clients. Their client status does not establish the platform's sublicensing rights |
+| **Each client gives their own credential to a third-party platform** | **No source establishes a blanket exemption for this architecture**, nor permission for the platform to pool or rebroadcast the resulting data. Obtain approval addressing the actual flow |
+| **A client's own algorithm consumes prices** | The algorithmic-trading approval and the **non-display data permission are separate examinations**. The former does not establish that data fees are waived |
+| **Prices bundled free with brokerage** | **Charging zero establishes nothing.** No general free-retail-tier exemption was found |
+| **Historical prices, charts and an archive** | A separate question again. One venue's market data definition includes **corporate and historical data**, not only ticks, and storage and archive rights have to be named explicitly |
+| **Prices to a gaming or virtual-trading feature** | **Expressly prohibited** at one venue, whose circular confines use to legitimate trading. A delay or a free tier is **not** a demonstrated workaround |
+
+<Aside type="caution" title="One exchange's position has to be read as two circulars together">
+A 2014 circular states that member-received data is for **internal use without redistribution**. A 2026 consolidated circular **expressly permits use by clients registered to trade with the member in any segment** — and still references the 2014 circular rather than withdrawing it.
+
+The defensible reading is: **limited, legitimate, registered-client use is permitted, and a bar on unauthorised onward distribution continues.** That resolves the central case and leaves every boundary case — a raw programmatic interface, a public page, a third-party platform, an archive — needing written confirmation.
+
+What not to do: represent the older prohibition as having eliminated all client use, which it has not; or treat the newer permission as a general redistribution licence, which it is not. Ask the exchange's data function, in writing, naming the channel, the audience, the purpose and the onward rights.
+</Aside>
+
+## 4. The per-venue positions
+
+| Venue | What is established | What is not |
+|---|---|---|
+| **NSE** | Live feeds come **as part of membership**; additional subscriptions go through the data subsidiary under its applicable agreement. The **registered-client permission** and the **legitimate-trading purpose restriction** are both express. **Redistribution is forbidden except as contractually agreed, and ownership remains with the exchange** | The written application of all of this to a **raw programmatic interface** and to the other boundary cases in section 3 |
+| **BSE** | A subscription portal requiring registration, plan selection, agreement on pricing and contracts, and payment. The February 2025 tariff **lists member websites, terminals, charting software and open websites and mobile applications as separate categories** — and the **member-website row carries no real-time price**, offering a one-minute snapshot and delayed-and-above data for a modest annual fee | **Whether an authenticated trading app carries an automatic live entitlement.** The member-website tariff row **cannot settle it either way** — it is a channel distinction, not a prohibition and not a grant. The current member data-use undertaking is needed |
+| **MCX** | **Execution of the data-feed agreement before feeds begin.** The member category permits a member's **subscribed feed on its own website** and **prohibits resale**. Redistributors taking an authorised vendor's feed must **also contract with the exchange**. Uses on **wireless devices, public internet displays or other devices outside the agreement require explicit permission** | **An automatic app right arising from membership alone.** The public member-category wording is **website-specific**, and authenticated mobile display needs the member's own undertaking and permission |
+| **BSE, international** | The international licensing of BSE information products runs through an exclusive licensor, with its own dissemination agreement for electronic distribution | This does **not** substitute for establishing the domestic Indian position |
+
+## 5. Reporting, counting, audit and breach
+
+| Obligation | What is established | What is not |
+|---|---|---|
+| **Inspection and audit** | One venue reserves inspection of **books, records and electronic documents**, plus **reasonably notified spot checks of usage and distribution and of end-user information**, with a cooperation obligation. Misuse can lead to investigation and action | Contract-specific notice periods, retention requirements, any retrospective assessment formula, and penalty amounts |
+| **User and device counting** | Tariffs are structured with **monthly per-user variable charges** at two venues, and billing is based on **reported identifier counts** | **Enabled versus active users, concurrent-device treatment, shared logins, multi-device netting, nil returns and annual declarations.** None of it is published. It comes from the reporting annexure |
+| **Periodic client lists** | One venue requires **quarterly client lists by the tenth of April, July, October and January** for the preceding quarter, for variable-fee calculation | Device deduplication, inactive identifiers, and concurrent-session counting |
+| **Non-display breach** | At one venue the data arm may **instruct a vendor to stop supplying a client** that fails to execute the required instrument or pay the fees | A universal monetary penalty or cure period |
+| **Payment breach** | At one venue, failure to pay annual subscription charges on time **permits immediate service termination** | Full audit rights, notice, inspection costs and under-reporting damages |
+| **Third-party sharing governance** | SEBI requires agreements that **specify the activities and justify real-time sharing** as necessary for orderly market functioning or regulatory requirements, with the intermediary's **board reviewing recipient entities and activities at least once each financial year**, plus due diligence and anti-misuse terms | — this board review is a **distinct obligation** from an exchange user-count return, and both apply |
+| **Educational-use audit trail** | From **1 July 2026** the amended provision expressly requires anti-misuse contractual terms **including a usage audit trail** | A fixed retention period for that trail |
+
+<Aside type="tip" title="Build the user count as a product feature, not a report">
+The counting obligations are dated, recurring and based on figures the firm reports about itself — and the definitions that would let a firm compute them unambiguously are not published. That combination means the number will be queried eventually, and the firm will need to show how it was derived.
+
+So treat it as a feature: attribute every market data connection to a client identity at the fan-out layer, record entitlement grants and withdrawals as events with timestamps, keep the derivation of each submitted figure alongside the figure, and make the definition explicit in configuration so that a change of definition is visible as a change. The alternative — reconstructing a historical user count from connection logs under time pressure — is the kind of exercise that turns a reporting question into an audit finding.
+</Aside>
+
+## 6. Published tariffs
+
+These are **published line items, not a quotation for a broker's stack.** A member's trading-feed entitlement, a separately licensed commercial feed, transport, hosting and a client-facing package are charged differently, and the figures below exclude taxes. `[public]`
+
+| Venue and schedule | Selected published figures |
+|---|---|
+| **NSE**, domestic, effective **1 April 2026** | Cash terminal **Level 1 ₹25,50,000** a year with **₹1,145** per user per month; **Level 2 ₹40,00,000** with ₹1,675; **Level 3 ₹42,50,000** with ₹1,860; **tick-by-tick ₹53,00,000** with ₹2,100. Derivatives Level 1 and 2 at ₹25,50,000 and ₹40,00,000. Cash **charting Level 1 ₹25,50,000** with ₹875. **Cash mobile Level 1, add-on only, ₹12,25,000** with ₹875. **Non-display** cash Level 1 **₹23,90,000 enterprise / ₹37,60,000 global**; non-display cash tick-by-tick **₹51,90,000 / ₹84,30,000**. Internal display cash Level 1 ₹24,40,000 / ₹34,50,000. One-minute snapshot ₹16,00,000 per medium; its fifteen-minute-delayed variant ₹1,20,000 per medium |
+| **BSE**, domestic, **February 2025** | Terminal **Level 1 and Level 2 ₹10,00,000** each, with ₹650 and ₹950 monthly variable; **Level 3 ₹15,00,000** with ₹1,150. Charting Level 1, 2 and 3 at ₹10,00,000, ₹10,00,000 and ₹15,00,000 with ₹360, ₹700 and ₹1,050. **Open website and mobile Level 1 ₹16,00,000**, Level 2 ₹23,00,000; the fifteen-minute-delayed open website and mobile Level 1 at **₹75,000**. The **member-website row carries no real-time price** |
+| **MCX**, domestic vendor, effective **1 July 2024** | Vendor **Level 1 ₹36,28,800** with ₹800 per terminal per month; **Level 2 ₹49,24,800** with ₹1,200; **Level 3 enhanced interface ₹50,27,400** with ₹1,500; **order-book interface ₹54,00,000** with ₹1,500; delayed terminal entitlement ₹300. **Mobile Level 1 and 2, unlimited users, ₹15,55,200 and ₹23,32,800.** Login website plus mobile Level 1 **₹36,60,000**, unlimited users. Fifteen-minute-and-above delayed across three media ₹2,00,000. **Non-display Level 1 ₹19,00,000 enterprise / ₹32,00,000 global**; Level 2 ₹25,50,000 / ₹38,20,000 |
+| **Connectivity and hosting** | NSE colocation racks at **₹9,00,000, ₹4,50,000 and ₹2,25,000** a year for full, half and quarter, with setup of ₹1,00,000, ₹50,000 and ₹25,000, and an additional connectivity pair at ₹75,000 a year plus tax; market data and order connectivity on ten-gigabit ports. MCX transport: **leased-line support and connectivity ₹1,50,000 a year plus tax; internet ₹1,00,000 a year plus tax** — though a legacy page gives a different internet figure, and that conflict is unresolved. BSE's revised colocation guidelines of **12 August 2025** superseded earlier directions; the commercial annexures were not retrievable |
+
+Two structural observations worth more than the individual numbers. **Mobile is a priced channel in its own right at two venues** — one treats it as an add-on, another prices website-plus-mobile as a bundle with unlimited users — so a firm's channel architecture has a direct commercial consequence. And at one venue, **non-display is comparable in price to display and in one case exceeds it**, which means the risk engine's licence is not a rounding error in the budget.
+
+## 7. What must be shown to clients — and what need not be
+
+| Question | The answer established |
+|---|---|
+| **Timestamps and source attribution** | **Required.** SEBI's broker master circular requires the broker website's **ticker, quotes and order book to carry timestamps and source attribution**, and the wireless-trading provisions require **timestamped** stock quotes |
+| A continuous streaming quote service for every client | **No universal obligation was established** — not every tick, not a specified maximum quote latency. Real-time order and trade **confirmation** requirements are a different obligation and must not be restated as an every-tick market data requirement |
+| A minimum depth — five, twenty or full book | **No general broker-client minimum was established.** The fact that a product offers five or twenty levels is **not** a client-display mandate, and surveyed brokers publish deeper products than either |
+| The fifteen-minute delay convention | **It exists as a product**, not as a statutory safe harbour or a licence-free threshold. A delayed product is still licensed and still priced |
+| Snapshot versus delay | **Different things.** A one- or five-minute snapshot is a **sampling interval**; a fifteen-minute delay is an **age**. Neither makes data freely redistributable |
+| A free live tier, or a restriction of live prices to paying clients | **Neither was established.** Commercial tiering is the firm's choice; it does not determine exchange permission |
+| An on-demand quote allowance | **No general free allowance of a number of on-demand quotes, and no universally applicable per-quote charge, was established.** Do not borrow overseas quote-count models |
+
+## 8. Third-party interfaces and the retail algorithmic-trading framework
+
+This is where market data delivery and order-entry regulation meet, and the two must not be conflated.
+
+| Element | What is established |
+|---|---|
+| **The SEBI gate on third-party sharing** | Real-time sharing with third parties is **restricted to orderly securities-market functioning or regulatory requirements**, with the contractual activities and the justification documented, and an **annual board review** of recipients and activities |
+| **The retail algorithmic-trading framework** | **Prohibits open interfaces within its scope** and requires **identifiable API keys, a whitelisted static IP, an authorisation flow and two-factor authentication**. Brokers are **principals**; algorithm providers act as **agents**. Exchange permissions, provider empanelment and order identification are separate obligations |
+| What the framework says about market data | It directs the exchanges' operational modalities to address **data flow between provider, broker and exchange**, with broker responsibility retained under the outsourcing guidelines. It supplies **no exchange market data redistribution grant, no market data tariff and no minimum client-display depth** |
+| The exchange clarification | One exchange's November 2025 answers tie the **client static IP requirement to investors placing orders**; provider strategies run on broker infrastructure while self-directed clients host their own logic. **Interface orders require algorithm tagging even within the published order-rate threshold** |
+| **The inference not to draw** | That order-focused clarification is **not** a finding that data-only interfaces are licence-free, freely shareable or exempt from access controls. It is equally **not** a ban on client-facing market data streams |
+| Fee sharing | The framework permits sharing of subscription charges and brokerage between broker and provider, with prominent and complete charge disclosure and conflict controls. **That does not waive the exchange's data charges** |
+| **Timeline** | Applicable to **all brokers from 1 April 2026**, with brokers missing the transition milestones facing a **bar on new retail interface-algorithm onboarding from 5 January 2026** |
+
+## 9. Education, simulation and virtual trading
+
+| Use | Position |
+|---|---|
+| **Educational and awareness sharing of price data** | From **1 July 2026**, a **thirty-day lag**, no monetary incentives, legal agreements and misuse controls including a **usage audit trail**. A **one-day exception** applies to the national institute's simulation laboratory |
+| How that reconciles the earlier rules | The earlier one-day rule governed **sharing** and a later three-month rule governed **educational use**; the 2026 circular **expressly amends both to thirty days**. This is a resolved amendment, not an open conflict |
+| **Using the preceding thirty days' prices in recommendation-like presentations** | **Restricted** under the amended clarification |
+| **Gaming and virtual trading** | **Expressly prohibited** at one venue, whose data circular confines use to legitimate trading. **A fifteen-minute delay or a free subscription is not a demonstrated workaround** |
+| What this is not | The thirty-day educational lag is **not** a delay requirement for legitimate client trading quotes |
+
+## 10. Configuration reference
+
+| Key | Finix default | Class | Failure mode if wrong |
+|---|---|---|---|
+| `finix.marketdata.licence.category_per_use` | Declared for **every** use: display, internal display, non-display, mobile channel, archive, derived | Regulatory | A use outside the grant, discovered by audit |
+| `finix.marketdata.licence.nondisplay_declared` | **True** — the risk engine, valuation and analytics are non-display uses | Regulatory | The category firms most often miss, at tariff lines that are not small |
+| `finix.marketdata.licence.entity_scope` | Enterprise or global, **named per legal entity** | Regulatory | A group entity consuming under another's licence |
+| `finix.marketdata.licence.client_display_grant.<venue>` | **In writing, per venue** — never inferred from another venue's position | Regulatory | Assuming one exchange's registered-client permission applies at all three |
+| `finix.marketdata.licence.raw_api_grant` | **Unset until confirmed in writing** | Regulatory | Publishing a reusable data interface with no established grant |
+| `finix.marketdata.licence.public_anonymous_quotes` | **False** unless expressly granted | Regulatory | Public dissemination with no permission |
+| `finix.marketdata.licence.third_party_platform_supply` | **Treated as redistribution**, requiring express permission | Regulatory | Supplying a platform on the assumption that client status covers it |
+| `finix.marketdata.licence.archive_and_storage_rights` | Named explicitly in the grant | Regulatory | A historical archive nobody licensed |
+| `finix.marketdata.licence.derived_data_external` | Separate grant required | Regulatory | Selling an analytics feature built on unlicensed derivation |
+| `finix.marketdata.licence.gaming_or_virtual_trading` | **Prohibited** | Regulatory | An expressly barred use |
+| `finix.marketdata.report.user_count_definition` | **Explicit in configuration**, with the derivation retained | Regulatory | A number the firm cannot defend or reproduce |
+| `finix.marketdata.report.client_list_due_dates` | **10 April, 10 July, 10 October, 10 January** where applicable | Regulatory | A missed dated submission |
+| `finix.marketdata.report.attribution_retained_years` | Per the record-retention obligation | Regulatory | No basis to answer a retrospective usage question |
+| `finix.marketdata.report.board_review_annual` | **True** — the third-party recipient review | Regulatory | A governance obligation unperformed |
+| `finix.marketdata.client.timestamp_and_source_shown` | **True** on ticker, quotes and order book, and on wireless channels | Regulatory | A specific, checkable display requirement unmet |
+| `finix.marketdata.client.depth_level.<tier>` | The firm's choice, enforced at the fan-out boundary | Discretionary | Depth beyond the entitlement |
+| `finix.marketdata.client.delay_minutes.<tier>` | Zero for entitled live tiers; otherwise the licensed delay | Regulatory | A delayed-licensed tier served live |
+| `finix.marketdata.education.lag_days` | **30**, with the one-day institutional exception where applicable | Regulatory | An educational sharing arrangement outside the rule |
+| `finix.marketdata.education.audit_trail` | **True** | Regulatory | The expressly required trail absent |
+| `finix.marketdata.licence.free_tier_is_not_exemption` | True — recorded so it is not re-argued | Regulatory | A design premised on "we do not charge for it" |
+
+## 11. Exception paths
+
+| Situation | Response |
+|---|---|
+| A new client-facing data feature is proposed | Classify the channel, audience, purpose and onward rights **before** building. If any is unsettled, get it in writing first |
+| A third party asks to consume the firm's data interface | Treat as redistribution. Express permission required, whoever their users are |
+| A client asks to route the firm's feed into an external platform | The same answer. Their client status does not sublicense the platform |
+| An analytics or insight feature is built on exchange data | Derived data for external supply is a separate grant. Raise it at design time |
+| The risk engine's data use was never licensed | Non-display. Raise it immediately; it is a live exposure, not a theoretical one |
+| A user-count submission is due and the definition is ambiguous | Submit on the configured definition, retain the derivation, and ask the exchange to confirm the definition in writing |
+| A spot check of usage, distribution or end-user information is notified | Cooperation is an obligation. Produce the attribution records; this is what per-connection attribution exists for |
+| An entitlement is withdrawn for a client tier | Re-evaluate live subscriptions at the delivery filter, not only at subscribe time |
+| A delayed-licensed tier is found receiving live data | **Licensing incident.** Establish scope and duration, stop it, and check what the licence requires to be reported |
+| Charges are disputed on the basis that the service is free to clients | Charging nothing is not an exemption. Settle the category, not the price |
+| Two exchange documents appear to conflict on client use | Read them together, act on the conservative reading, and get written confirmation for the boundary case |
+| An educational or awareness partnership is proposed | Thirty-day lag, legal agreement, no monetary incentive, usage audit trail |
+| A gaming or virtual-trading feature is proposed using live prices | Expressly prohibited at one venue. A delay is not a workaround |
+| A group entity wants to consume under the firm's licence | Entity scope is an explicit licence term. Check before enabling |
+
+## Practical notes
+
+- **Settle the licence category for every use before the first line of client-facing code.** The categories are about audience, purpose and channel, and no technical boundary maps onto them.
+- **Put the risk engine, valuation and analytics in the licensing conversation.** Non-display is the category firms forget and it is priced comparably to display.
+- **Ask the exchange in writing, naming the channel, the audience, the purpose and the onward rights.** A letter is cheap; a retrospective assessment is not.
+- **Never assume one venue's position holds at the others.** The three positions differ materially, and one of them is website-specific in its public wording.
+- **Make attribution and entitlement product features, enforced at the fan-out boundary.** Everything in section 5 depends on them, and they cannot be reconstructed later.
+- **Record the user-count definition in configuration and retain each submission's derivation.** The definitions are not published, so the firm's own consistency is its defence.
+- **Treat "free to the client" as commercially interesting and legally irrelevant.** It exempts nothing.
+- **Keep the four limit families separate** — recovery quotas, order-entry rates, fan-out caps and redistribution permissions. A figure from one answers no question about another.
+
+## Where this connects
+
+- [The feed catalogue](/broking-kyc/finix-broking-setup/marketdata/01-feed-catalogue/) — the products these tariffs and grants attach to
+- [Fan-out to clients](/broking-kyc/finix-broking-setup/marketdata/06-fanout-to-clients/) — the boundary where entitlement and attribution are enforced
+- [The content data layer](/broking-kyc/finix-broking-setup/marketdata/08-content-data-layer/) — a separate supply chain with its own, differently shaped licensing
+- [Algo, API, DMA and <abbr title="Smart Order Routing">SOR</abbr>](/broking-kyc/finix-broking-setup/oms/09-algo-api-dma-sor/) — the order-entry side of the algorithmic framework
+- [Mobile and web application submission](/broking-kyc/finix-broking-setup/certification/02-mobile-web-app-submission/) — the separate approval of the channel itself
+- [Vendor onboarding and contracts](/broking-kyc/finix-broking-setup/setup/09-vendor-onboarding-contracts/) — where a data agreement sits among the firm's contracts
+- [Compliance configuration baseline](/broking-kyc/finix-broking-setup/compliance/01-compliance-config-baseline/) — where these regulatory-class keys are governed
+- [Audit machinery](/broking-kyc/finix-broking-setup/compliance/05-audit-machinery/) — the inspection and audit context these rights sit in

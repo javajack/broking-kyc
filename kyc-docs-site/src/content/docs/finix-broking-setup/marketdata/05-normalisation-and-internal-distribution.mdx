@@ -1,0 +1,221 @@
+---
+title: "Market data 5: normalisation and internal distribution"
+description: What sits between the exchange feed handler and everything that consumes a price — the normalised book, why conflation is a policy decision rather than an optimisation, per-instrument staleness detection, the two-store split that makes a historical margin call explicable, and which consumers may be served from a conflated stream and which may not.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** The feed arrives in three incompatible shapes from three venues. Everything downstream — the risk ladder, the client's screen, the valuation run, the surveillance engine — wants one shape. This page is about the layer that performs that reduction, and it is ordered by the decisions that layer forces on you rather than by its components, because each of those decisions is irreversible once something is built on it. The conflation decision in section 3 and the staleness decision in section 4 are the two that firms get wrong, and they get them wrong in opposite directions: conflation is treated as an optimisation when it is a correctness boundary, and staleness is treated as a connection property when it is an instrument property.
+
+## TL;DR
+
+- **Normalise once, at the edge.** One feed handler per venue produces one internal representation. Every consumer that parses an exchange format itself is a second place that has to be changed when the exchange changes, and a second place that can disagree about the price.
+- **Conflation is a policy decision, not a performance tuning knob.** Dropping intermediate ticks is correct for a client's screen and wrong for anything that must reconstruct what the market looked like at a moment. Decide per consumer, in writing.
+- **Staleness is a property of an instrument, not of a connection.** The connection is up, the sequence numbers are advancing, and one instrument has not printed for nine minutes. A connection-level health check reports green through this, and it is the single most dangerous failure mode in the plane.
+- **The internal bus is not the order path.** Market data is best-effort, lossy under pressure and continuous; order events are durable, ordered and individually consequential. Putting both on one transport with one set of guarantees means either paying durability costs for ticks or accepting tick-grade guarantees for fills.
+- **Two stores, not one.** A live tick stream cannot answer "what price did we use for that margin call in March?" The reproducible record is built from the end-of-day files, and the two must never be mixed in one query path.
+- **The last traded price is not one number.** Last trade, previous close, theoretical close, settlement price and the band reference are different fields with different sources, and a risk engine that uses whichever is handy produces a different answer on a no-trade day.
+- **Back-pressure has only one correct answer here, and it is the opposite of the order path's.** On the order path you shed at the channel and never drop. On the market data path you drop deliberately, by conflating, because the newest price supersedes the one you were about to send.
+
+## Conceptual overview
+
+A market data stack is three transformations in series, and naming them separately is worth the pedantry because each one can be correct while the next is wrong. The first is **decode**: turn a venue's wire format into typed messages. The second is **build**: apply those messages to a per-instrument state — a book, a last trade, an open interest figure, a session state — so that there is something to read at any instant rather than only a stream of changes. The third is **distribute**: get that state, or the changes to it, to a population of consumers with wildly different requirements. Most firms build the first two well, because they are mechanical and the exchange documents them. The third is where the design judgment lives, and it is barely documented anywhere because it is nobody's published protocol.
+
+The reason the third transformation is hard is that the consumers do not want the same thing, and the differences are not negotiable. The pre-trade risk ladder wants the current price for one instrument, synchronously, in microseconds, and would rather have a slightly old price than wait. A client's screen wants a readable update a few times a second for the handful of instruments on it, and genuinely does not want sixty updates a second because the human eye cannot use them. A valuation run wants a consistent snapshot across all instruments at a defined instant, which is a different thing again — it wants *coherence*, not freshness. A surveillance engine wants every print, in order, with no conflation, because its whole purpose is detecting patterns in the sequence. A client's historical statement wants a number that will be identical if it is regenerated next year. One of these consumers — the surveillance engine — cannot be served from the same stream as the client screen without either starving the screen or corrupting the surveillance. So the distribution layer is not a bus; it is a small number of deliberately different buses.
+
+The third idea, and the one that causes real losses, is that market data fails silently in a way almost nothing else in a broking stack does. A bank file that does not arrive is absent, and absence is detectable. A depository instruction that is rejected produces a rejection. An order that fails produces an error. A market data feed that stops updating one instrument produces **nothing at all** — and every downstream system continues to operate confidently on the last value it saw. Margin is computed, bands are checked, square-off decisions are made, client screens are drawn, all from a number that stopped being true some minutes ago. This is why the staleness discipline in section 4 is stated as an obligation rather than a recommendation, and why it has to be per instrument: the aggregate feed is extremely unlikely to go quiet, and a single illiquid instrument going quiet is a daily occurrence that must be distinguished from a feed problem.
+
+Finally, a point about the vendor reality. A named order and risk product consumes market data internally and will have its own feed handler, its own book and its own staleness behaviour, none of which the firm controls. That does not remove the need for the firm's own normalisation layer, because the client-facing fan-out, the valuation store and the surveillance inputs are the firm's responsibility and must not be sourced by scraping a vendor's screen or re-deriving prices from a vendor's database. The honest architecture has **one feed, two consumers**: the vendor product, and the firm's own normalisation layer, both fed from the same venue stream, with a reconciliation between them. Where that reconciliation is absent, the first time anyone discovers the two disagree is when a client disputes a square-off price.
+
+## 1. The layers, named
+
+| Layer | Responsibility | What must not be here |
+|---|---|---|
+| **Transport** | Join the venue's streams, maintain membership, detect loss, arbitrate redundant lines | Any business logic. A transport that filters instruments is a transport that hides a gap |
+| **Decode** | Venue format to typed messages, with the venue's own sequencing preserved | Normalisation across venues. Decode is per venue and stays per venue |
+| **Build** | Apply messages to per-instrument state: book, last trade, open interest, session state, reference data | Distribution concerns. The builder must not know who is reading |
+| **Normalise** | One internal representation of an instrument's state across all venues, with the venue and its native identifiers retained | Loss of provenance. Every normalised value carries its venue, its source timestamp and its sequence position |
+| **Distribute** | Several deliberately different delivery contracts for different consumer classes | A single contract. One contract cannot serve a risk ladder and a mobile screen |
+| **Persist** | The reproducible record, built from end-of-day files rather than from the stream | The live path. The persistence write must never be able to slow the distribution path |
+
+<Aside type="tip" title="Keep the venue's identifiers alongside your own">
+Normalisation tempts you to replace the venue's instrument identifier with an internal one. Keep both, permanently and on every record. Every conversation with an exchange, every file reconciliation, every surveillance query and every client dispute is conducted in the venue's identifier, and a system that can only speak its own internal identifier makes each of those conversations a translation exercise performed under time pressure.
+
+The same applies to timestamps. Carry the venue's own timestamp, the receive timestamp and the publish timestamp separately. The difference between the first two is your feed latency; the difference between the second and third is your processing latency; and the only way to answer "was our price stale at 14:32?" is to have kept all three.
+</Aside>
+
+## 2. One feed, several consumer contracts
+
+| Consumer class | Needs | Conflation | Depth | Delivery |
+|---|---|---|---|---|
+| **Pre-trade risk ladder** | The current value for one instrument, now | Irrelevant — it reads state, it does not consume a stream | Usually the touch price and the band | **Shared memory or in-process read**, never a queue. A queue in the pre-trade path adds a latency the firm does not control |
+| **Square-off and intraday monitoring** | Current value plus a staleness flag, across many instruments | Conflated is correct | Touch price | Read from the same state the ladder reads, so the two can never disagree |
+| **Client screens — web and mobile** | A readable update for a small instrument set | **Conflated, rate-limited** | Whatever the client is licensed and entitled to see | The client fan-out layer — see [fan-out to clients](/broking-kyc/finix-broking-setup/marketdata/06-fanout-to-clients/) |
+| **Programmatic client interfaces** | Defined, documented, rate-limited updates | Conflated, with the policy published | Per entitlement | Same fan-out layer, different contract and a stated rate |
+| **Surveillance and pattern detection** | **Every print, in sequence, unconflated** | **None permitted** | Full available depth | A separate durable path. This is the one consumer that must not share a conflated stream |
+| **Valuation and end-of-day** | A coherent snapshot, reproducible later | Not applicable | Closing and settlement prices | **The file-derived store**, not the stream |
+| **Client history and statements** | A number that regenerates identically next year | Not applicable | — | The file-derived store, always |
+
+<Aside type="danger" title="The surveillance consumer breaks the obvious design">
+The intuitive design is one internal stream, conflated for efficiency, which everything reads. It works for every consumer in the table above except one. Surveillance and pattern detection exist to find things in the *sequence* of prints — and conflation destroys exactly the information they are looking for. A conflated stream can tell you the price moved; it cannot tell you it moved in eleven steps within two seconds.
+
+So the distribution layer needs at least two shapes from the start: an unconflated, sequenced, durable path with a small number of consumers, and a conflated, best-effort, high-fan-out path with many. Retrofitting the first one later means re-running history you no longer have.
+</Aside>
+
+## 3. Conflation, stated as a policy
+
+Conflation means: when a newer value for an instrument arrives before the older one has been delivered, deliver only the newer. It is the correct default for human-facing consumers and it is a correctness violation for sequence-sensitive ones. The decisions that have to be written down:
+
+| Decision | Options | The house position |
+|---|---|---|
+| **Which consumers may receive conflated data** | Per consumer class | Everything except surveillance, and anything a regulator or client might later ask to be reconstructed |
+| **Conflation interval** | Fixed interval, or on-demand when the consumer is ready | **On-demand per subscriber** is better than a fixed tick: a fast consumer gets everything, a slow one degrades gracefully, and neither is configured by guesswork |
+| **What is conflatable within a message** | A price supersedes a price; a trade does **not** supersede a trade | **Quote-like state conflates; event-like facts do not.** Last traded price, best bid and offer, and depth are state and may be replaced. Individual trades, session-state changes, band revisions and reference-data changes are events and must each be delivered |
+| **Cumulative fields** | Replace or accumulate | Volume and turnover are cumulative-to-date figures and conflate correctly by replacement. A per-trade quantity does not |
+| **Whether the consumer is told** | Silent, or flagged | **Flagged.** A consumer that knows it received a conflated update can decide whether that is acceptable; one that does not know will eventually assume it has seen every print |
+| **What happens to the dropped values** | Discarded, or counted | **Counted.** The conflation rate is a load metric and a leading indicator of a slow consumer |
+
+The one piece of this that is routinely implemented wrongly: **band revisions, session-state changes and reference-data changes must never be conflated or dropped**, even though they arrive on the same path as prices. They are instructions to change behaviour, not observations. The same rule appears on the order path for exchange control messages, and for the same reason — see [order path edge cases](/broking-kyc/finix-broking-setup/oms/12-order-path-edge-cases/#9-unsolicited-messages-and-the-correlation-map-anti-pattern).
+
+## 4. Staleness, which is an obligation
+
+<Aside type="danger" title="Per instrument, not per connection">
+A connection-level health check — is the socket up, are sequence numbers advancing, is the packet rate within range — will report healthy while an individual instrument has not updated for ten minutes. Every price-dependent decision for that instrument continues to be made, confidently, on a dead number: margin, band validation, square-off triggering, the client's screen, the client's order rejection.
+
+Staleness detection must therefore be **per instrument**, with a threshold that reflects that instrument's normal behaviour, and it must **reach the decision path** rather than a dashboard. A stale price that only alerts a monitoring screen is a stale price that is still being used.
+</Aside>
+
+| Element | Design |
+|---|---|
+| **Granularity** | Per instrument per venue |
+| **Threshold source** | Per liquidity class, not one global number. An index future quoting every few milliseconds and an illiquid far-month option have nothing in common, and a single threshold is either useless or constantly firing |
+| **What counts as an update** | Any state change for that instrument, not only a trade. A quote change proves the feed is alive for that instrument; a long absence of trades in an illiquid contract is normal and is not staleness |
+| **Session awareness** | Thresholds must be suspended outside the instrument's trading session, during halts, and in no-trade states, or the firm generates thousands of false alerts and then disables the control |
+| **Consumption by the decision path** | A stale flag is an input to the pre-trade ladder, not a monitoring metric. The published behaviour on stale: **block market orders in scope, and block risk decisions that depend on last traded price** — which is the position already taken in [the <abbr title="Order Management System">OMS</abbr> architecture](/broking-kyc/finix-broking-setup/oms/01-oms-architecture/) |
+| **Client communication** | A client whose order is rejected for a stale feed must be told that, in those terms. "Try again" is the answer that produces a complaint |
+| **The aggregate signal** | A sudden rise in the *number* of instruments marked stale is a feed problem; one instrument is an instrument problem. Alert on both, differently |
+
+## 5. The price that is not one price
+
+A risk engine, a screen and a statement each refer to "the price", and there are at least six candidate fields. Mixing them is a correctness defect that only appears on unusual days.
+
+| Field | What it is | When it is the right one | The trap |
+|---|---|---|---|
+| **Last traded price** | The most recent print | Intraday valuation, display, most risk checks | **Does not exist** for an instrument that has not traded today. A no-trade day silently falls back to something else, and what it falls back to must be a decision, not an accident |
+| **Previous close** | Yesterday's closing price | The fallback when there is no trade today | Is itself derived, and on a post-holiday or special-session day the "previous" day needs defining |
+| **Theoretical or derived close** | Computed where no trade occurred | Closing valuation of illiquid instruments | Arrives from the file path, not the stream, so a stream-only system does not have it |
+| **Settlement price** | The clearing corporation's number | Margin, obligations, physical settlement, mark-to-market | **Not the exchange's closing price**, and not available from the market data feed at all. It is a file |
+| **Band reference price** | The base the operating range is computed from | Order validation | Changes intraday on a band revision, which arrives as a control message |
+| **Best bid and offer** | The touch | Slippage estimates, indicative order value, client display | Can be one-sided or absent, and code that assumes both sides exist fails on the illiquid instruments where it matters most |
+
+The rule that follows: **every price-consuming system names which field it uses, and the fallback chain is explicit and identical everywhere.** Two systems with different fallback chains will disagree on exactly the instruments a client is most likely to dispute.
+
+## 6. The two stores
+
+| | Live state | Reproducible record |
+|---|---|---|
+| Source | The venue streams | The end-of-day files — see [the file register](/broking-kyc/finix-broking-setup/files/01-file-register-architecture/) |
+| Shape | Current value per instrument | Per-day, per-instrument record with its source file identified |
+| Guarantee | Best-effort, lossy, fast | Complete, durable, immutable once the day is closed |
+| Serves | Order path, risk, client screens | Valuation, statements, surveillance history, dispute resolution, inspection |
+| Retention | Seconds to intraday | Years, per the record-retention obligation |
+| **The rule** | **Never queried for a historical answer** | **Never in the live decision path** |
+
+The reason this split is non-negotiable rather than merely tidy: a margin call made six months ago has to be explicable using the price that was used at the time, to a client, an exchange or an inspector. A tick captured from a best-effort multicast stream is not a durable reproducible record of anything — it is lossy by design, it has no authority behind it, and if a gap occurred in it the firm cannot prove otherwise. The exchange's own end-of-day file is the authoritative statement of what the day's prices were, and it is what the firm's historical answers must be built from. Where the stream and the file disagree about a day's close, **the file is right.**
+
+## 7. Why market data does not belong on the order event bus
+
+| Dimension | Order and trade events | Market data |
+|---|---|---|
+| Delivery | At-least-once, durable, replayable | Best-effort, lossy under pressure |
+| Ordering | Per order, strictly | Per instrument, and supersession is permitted |
+| Volume profile | Proportional to client activity | Proportional to market volatility — **uncorrelated with the first**, and far larger |
+| Consequence of loss | A position the firm cannot explain | A tick nobody will ever notice, provided the next one arrives |
+| Retention | Years, as a regulatory record | Intraday at most, for the live path |
+| Back-pressure response | **Shed at the channel; never drop, never reorder** | **Conflate and drop deliberately** |
+
+Running both on one transport with one set of guarantees forces a choice between paying durability and ordering costs for a tick firehose, or accepting tick-grade guarantees for fills. Firms that do this usually discover it during the first volatility event, when a market data burst delays fill delivery — a failure in which the cause is several layers away from the symptom. The architectural position is stated in [the gateway and event architecture](/broking-kyc/finix-broking-setup/stack/bff-and-event-architecture/): separate transports, separate capacity plans, separate guarantees.
+
+## 8. Reconciling your view against the vendor's
+
+A firm running a named order and risk product has two market data stacks whether it intended to or not: the vendor's internal one, and its own normalisation layer serving the client fan-out and the stores. Both must be fed from the venue, never one from the other.
+
+| Check | Cadence | Why |
+|---|---|---|
+| Last traded price agreement across a sample of instruments | Continuous, with a tolerance of zero on the value and a stated tolerance on the age | A difference here means a client sees one price and the risk engine uses another |
+| Band and reference-data agreement | On every change | A band applied in one system and not the other produces rejections nobody can explain |
+| Session-state agreement | On every transition | The classic symptom is a screen that says open while order entry says closed |
+| Instrument-master agreement | Begin of day, and after any intraday master change | A contract present in one system and absent in the other is an order that cannot be placed or a position that cannot be valued |
+| Staleness-flag agreement | Continuous | If only one of the two stacks knows a price is stale, the other is still trading on it |
+
+<Aside type="caution" title="Never source your own view by reading the vendor's">
+It is faster to take prices from the order and risk product's database or screen than to run a second feed handler, and it is the wrong decision for three independent reasons. It makes the vendor product a single point of failure for the client-facing fan-out. It inherits the vendor's conflation and staleness behaviour without documenting it. And it makes the firm's client-facing data a derived work of a product it does not control, which is a licensing question as well as an engineering one — see [redistribution and licensing](/broking-kyc/finix-broking-setup/marketdata/07-redistribution-and-licensing/).
+</Aside>
+
+## 9. Configuration reference
+
+| Key | Finix default | Class | Failure mode if wrong |
+|---|---|---|---|
+| `finix.marketdata.normalise.at_edge` | True — one handler per venue | Discretionary, strongly recommended | Several components parsing exchange formats, and several versions of the price |
+| `finix.marketdata.normalise.retain_venue_identifiers` | True, on every record | Discretionary, strongly recommended | Every exchange conversation becomes a translation exercise |
+| `finix.marketdata.normalise.timestamps_retained` | Venue, receive and publish, separately | Discretionary, strongly recommended | Latency and staleness questions become unanswerable after the fact |
+| `finix.marketdata.conflate.<consumer_class>` | Conflated for all human-facing classes | Discretionary | Either a starved screen or a corrupted surveillance input |
+| `finix.marketdata.conflate.surveillance` | **Never** | Regulatory, in effect | Pattern detection on data from which the pattern has been removed |
+| `finix.marketdata.conflate.mode` | On-demand per subscriber | Discretionary | A fixed interval that is wrong for both fast and slow consumers |
+| `finix.marketdata.conflate.control_messages` | **Never** — band, session and reference changes always delivered | Exchange-set, in effect | A band or session change silently dropped |
+| `finix.marketdata.conflate.rate_metric_published` | True | Discretionary, strongly recommended | No leading indicator of a slow consumer |
+| `finix.marketdata.stale.threshold_ms.<liquidity_class>` | Per class, never one global value | Discretionary, strongly recommended | A control that is either useless or disabled after too many false alerts |
+| `finix.marketdata.stale.counts_quote_updates` | True | Discretionary | Illiquid instruments permanently flagged stale |
+| `finix.marketdata.stale.session_aware` | True | Discretionary, strongly recommended | Thousands of out-of-session false alerts, then the control is switched off |
+| `finix.marketdata.stale.blocks_market_orders` | True, in scope | Discretionary, strongly recommended | Market orders priced off a dead number |
+| `finix.marketdata.stale.blocks_price_dependent_risk` | True, in scope | Discretionary, strongly recommended | Margin and square-off decisions on a dead number |
+| `finix.marketdata.price.field_per_consumer` | Declared explicitly for every consumer | Discretionary, strongly recommended | Two systems disagreeing on exactly the disputed instruments |
+| `finix.marketdata.price.fallback_chain` | One chain, identical everywhere | Discretionary, strongly recommended | A no-trade day producing different numbers in different places |
+| `finix.marketdata.price.settlement_from_file_only` | True | Exchange-set | Using a traded price where a clearing-corporation number is required |
+| `finix.marketdata.store.live_not_queried_historically` | True | Discretionary, strongly recommended | A historical answer the firm cannot defend |
+| `finix.marketdata.store.record_from_files_only` | True | Discretionary, strongly recommended | A reproducible record built from a lossy stream |
+| `finix.marketdata.store.file_wins_on_conflict` | True | Exchange-set | The firm disputing the exchange's own closing price |
+| `finix.marketdata.transport.separate_from_order_bus` | True | Discretionary, strongly recommended | A volatility burst delaying fill delivery |
+| `finix.marketdata.vendor_recon.enabled` | True, continuous | Discretionary, strongly recommended | A client seeing one price while risk uses another |
+| `finix.marketdata.vendor_recon.source_independently` | True — never read prices out of the vendor product | Discretionary, strongly recommended | A single point of failure, inherited behaviour, and a licensing question |
+
+## 10. Exception paths
+
+| Situation | Response |
+|---|---|
+| One instrument stale beyond its threshold | Flag in the decision path; block market orders and price-dependent risk in scope; tell the client the actual reason |
+| A rising count of stale instruments | Treat as a feed incident, not an instrument issue; check transport and decode before anything else |
+| Stale flag set during a halt or outside the session | A configuration defect, not a feed problem. Fix the session awareness rather than widening the threshold |
+| Conflation rate rising for one consumer | That consumer is falling behind. Investigate before it disconnects, and never respond by disabling conflation |
+| A control message found to have been conflated or dropped | **Incident.** Band, session-state and reference-data changes are not conflatable; find the code path and remove it |
+| Surveillance stream found to be sharing a conflated path | Incident with a retrospective dimension — establish what history was lost and for how long |
+| Vendor and own view disagree on last traded price | Stop relying on the disputed instrument for client-facing display until explained; check both feeds independently rather than assuming one is right |
+| Vendor and own view disagree on session state | Order entry gating follows the stricter of the two until resolved |
+| Stream and end-of-day file disagree on a close | **The file is authoritative.** Correct the store, and investigate the stream gap that caused it |
+| No last traded price for an instrument on which a decision is required | The fallback chain applies, explicitly and identically to every system. If there is no fallback, the decision does not get made silently — it escalates |
+| Market data burst coinciding with slow fill delivery | Check whether the two share a transport. If they do, that is the finding |
+| A consumer discovered to be reading prices from the vendor product's store | Architectural defect. Give it the normalised feed, and check what licensing position was assumed |
+
+## Practical notes
+
+- **Write the consumer contract table down and keep it current.** It is the only document that answers "may this new feature use the conflated stream?" — and that question will be asked by someone who does not know the difference.
+- **Build the unconflated sequenced path on day one, even with one consumer.** It is the path you cannot retrofit, because retrofitting it requires history you did not keep.
+- **Set staleness thresholds per liquidity class and review them after the first month.** A control that fires constantly gets disabled, and a disabled control is worse than none because everyone believes it is working.
+- **Make the stale flag an input to the decision, not a line on a dashboard.** This is a one-line architectural choice that closes the most dangerous failure mode in the plane.
+- **Name the price field in every place a price is used.** Grep for the field name later and you can audit the whole firm's price semantics in an afternoon.
+- **Never answer a historical question from the live store, even when it would be faster.** The answer has to survive a client dispute and an inspection, and only the file-derived record does.
+- **Reconcile against the vendor continuously, not at end of day.** The cost of a price disagreement rises the moment a client has acted on the one they were shown.
+- **Capacity-plan market data against volatility, not against client count.** The two are uncorrelated, and the day they both peak is the day the plan is tested.
+
+## Where this connects
+
+- [The feed catalogue](/broking-kyc/finix-broking-setup/marketdata/01-feed-catalogue/) — what each venue actually publishes, and on what transport
+- [Wire formats and packets](/broking-kyc/finix-broking-setup/marketdata/02-wire-format-and-packets/) — what the decode layer is decoding
+- [Subscription mechanics](/broking-kyc/finix-broking-setup/marketdata/03-subscription-mechanics/) — firehose or subscription, and how instruments are selected
+- [Gap recovery](/broking-kyc/finix-broking-setup/marketdata/04-gap-recovery-and-arbitration/) — what the transport layer must do when a sequence breaks
+- [Fan-out to clients](/broking-kyc/finix-broking-setup/marketdata/06-fanout-to-clients/) — the layer that serves many concurrent consumers
+- [Redistribution and licensing](/broking-kyc/finix-broking-setup/marketdata/07-redistribution-and-licensing/) — what the firm is permitted to do with the data it receives
+- [The gateway and event architecture](/broking-kyc/finix-broking-setup/stack/bff-and-event-architecture/) — why these are separate transports with separate guarantees
+- [OMS architecture](/broking-kyc/finix-broking-setup/oms/01-oms-architecture/) — the stale-feed position in the order path
+- [Pre-trade check ladder](/broking-kyc/finix-broking-setup/rms/03-pretrade-check-ladder/) — the consumer with the hardest latency requirement
+- [The file register](/broking-kyc/finix-broking-setup/files/01-file-register-architecture/) — the source of the reproducible record

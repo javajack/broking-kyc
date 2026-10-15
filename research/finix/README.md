@@ -49,4 +49,13 @@ inventories, the conventions and the close-out notes including open items.
 
 | `RESEARCH_dr.md` | Disaster-recovery site architecture, exchange connectivity from a recovery site, order-state recovery and the drill regime |
 
-All 18 research files are present.
+Market data research, sub-project #15:
+
+| File | Covers |
+|---|---|
+| `RESEARCH_md_nse.md` | NSE's three feed families, the broadcast envelope and transaction codes, member tick-by-tick, the commercial level feeds, recovery, 2025–2026 changes and the tariffs |
+| `RESEARCH_md_bsemcx.md` | BSE and MCX interface catalogues, FAST envelopes and template identifiers, order-by-order binary, subscription and recovery mechanics, reference data, fees |
+| `RESEARCH_md_licensing.md` | Member entitlement versus commercial licence, the display/non-display/vendor categories, the delivery decision table, reporting and audit, published tariffs, what SEBI requires to be shown |
+| `RESEARCH_md_content_fanout.md` | The content-data layer with CMOTS as the worked example, the research and news regulatory edge, and the published fan-out limits of nine Indian brokers' client interfaces |
+
+All 22 research files are present.

@@ -1,0 +1,166 @@
+---
+title: "Market data 9: configuration reference"
+description: The plane's configuration surface — the namespace map, which values may change while a market is open and which may not, the keys that cause the worst failures when wrong, the gates that must hold before a session opens, the change-control rules for protocol and template versions, and the review cadence.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** The eight pages before this one define about a hundred and fifty configuration values in the places where their reasoning lives, and repeating all of them here would add nothing. What this page adds is the information that only exists across the plane: which values may be changed while a market is open, which must never be, which handful cause the most damage when wrong, and what has to be true before the session starts. So it is organised by mutability and consequence rather than by subject, and points back to each page for the full definitions.
+
+## TL;DR
+
+- **The plane's configuration splits cleanly by mutability**, and the split is not where people assume. Thresholds and caps must be changeable while the market is open. Decoders, sequence semantics, price semantics and licence categories must not be.
+- **Four values cause almost all the serious damage**: whether staleness is detected per instrument, whether the stale flag reaches the decision path, whether conflation is applied to a consumer that needs the sequence, and whether the reproducible record is built from the stream rather than the files.
+- **Nine values are in effect regulatory**, not discretionary — the licence categories, the user-count definition and its retention, attribution per connection, entitlement enforcement at both subscribe and delivery, the timestamp and source display, and the content classification gate.
+- **Every protocol version, template package and endpoint carries its circular number in configuration.** Without it, a migration cannot be audited and a wrong value cannot be traced to a decision.
+- **The begin-of-day gates are feed-specific**, because a feed with no recovery mechanism cannot be gated the same way as one with a snapshot service.
+- **Review cadence matters more here than in most planes** because the exchanges revise these documents several times a year, and a protocol migration is a dated cutover rather than a configuration change.
+
+## 1. How to read this reference
+
+| Column | Meaning |
+|---|---|
+| Key | Named per the [configuration convention](/broking-kyc/finix-broking-setup/stack/environments-config-baseline/#2-configuration-key-convention) |
+| Class | **R** regulatory in effect · **E** exchange-set · **D** discretionary |
+| **Mid-session** | Whether the value may change while a market is open |
+| Defined in | The page where the value's reasoning and its full definition live |
+
+Scope suffixes used across the plane: `<venue>` for <abbr title="National Stock Exchange of India">NSE</abbr>, <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> and <abbr title="Multi Commodity Exchange of India">MCX</abbr> · `<segment>` · `<feed>` · `<consumer_class>` · `<liquidity_class>` · `<tier>` for an entitlement tier.
+
+<Aside type="caution" title="This page is a cross-plane view, not the definitive list">
+Each value's authoritative definition — its default, its rationale and its failure mode — is on the page that introduces it. This page records what cannot be seen from any single page: mutability, cross-plane consequence and the gate and review obligations. Where the two disagree, the defining page governs and this one is the defect.
+</Aside>
+
+## 2. The namespace map
+
+| Namespace | What it governs | Defined in |
+|---|---|---|
+| `finix.marketdata.feed.*` | Which products are taken at each venue, which streams, and which versions | [The feed catalogue](/broking-kyc/finix-broking-setup/marketdata/01-feed-catalogue/#10-configuration-reference) |
+| `finix.marketdata.redundancy.*` | Redundant-source consumption and the assumptions not to make about it | [The feed catalogue](/broking-kyc/finix-broking-setup/marketdata/01-feed-catalogue/#10-configuration-reference) |
+| `finix.marketdata.decode.*` | Decoder structure, endianness, envelope handling, epochs, template packages | [Wire formats and packets](/broking-kyc/finix-broking-setup/marketdata/02-wire-format-and-packets/#8-configuration-reference) |
+| `finix.marketdata.sub.*` | Stream membership, mapping refresh, local filtering, application subscription scopes | [Subscription mechanics](/broking-kyc/finix-broking-setup/marketdata/03-subscription-mechanics/#7-configuration-reference) |
+| `finix.marketdata.recovery.*` | Recovery shape per feed, the quota limiter, arbitration, the late-join boundary | [Gap recovery](/broking-kyc/finix-broking-setup/marketdata/04-gap-recovery-and-arbitration/#9-configuration-reference) |
+| `finix.marketdata.normalise.*` | Edge normalisation, identifier and timestamp retention | [Normalisation](/broking-kyc/finix-broking-setup/marketdata/05-normalisation-and-internal-distribution/#9-configuration-reference) |
+| `finix.marketdata.conflate.*` | Conflation policy per consumer class, and what may never be conflated | [Normalisation](/broking-kyc/finix-broking-setup/marketdata/05-normalisation-and-internal-distribution/#9-configuration-reference) |
+| `finix.marketdata.stale.*` | Per-instrument staleness thresholds, session awareness, and the decision-path effect | [Normalisation](/broking-kyc/finix-broking-setup/marketdata/05-normalisation-and-internal-distribution/#9-configuration-reference) |
+| `finix.marketdata.price.*` | Which price field each consumer uses, the fallback chain, settlement-from-file | [Normalisation](/broking-kyc/finix-broking-setup/marketdata/05-normalisation-and-internal-distribution/#9-configuration-reference) |
+| `finix.marketdata.store.*` | The two stores and the rules that keep them apart | [Normalisation](/broking-kyc/finix-broking-setup/marketdata/05-normalisation-and-internal-distribution/#9-configuration-reference) |
+| `finix.marketdata.transport.*` | Separation from the order event bus | [Normalisation](/broking-kyc/finix-broking-setup/marketdata/05-normalisation-and-internal-distribution/#9-configuration-reference) |
+| `finix.marketdata.vendor_recon.*` | Reconciliation against the vendor product's own view | [Normalisation](/broking-kyc/finix-broking-setup/marketdata/05-normalisation-and-internal-distribution/#9-configuration-reference) |
+| `finix.marketdata.fanout.*` | The published client protocol: caps, snapshots, resume, buffering, attribution, entitlement | [Fan-out to clients](/broking-kyc/finix-broking-setup/marketdata/06-fanout-to-clients/#11-configuration-reference) |
+| `finix.marketdata.licence.*` | Licence categories per use, entity scope, and the grants that must be in writing | [Redistribution and licensing](/broking-kyc/finix-broking-setup/marketdata/07-redistribution-and-licensing/#10-configuration-reference) |
+| `finix.marketdata.report.*` | User counting, dated submissions, attribution retention, the annual board review | [Redistribution and licensing](/broking-kyc/finix-broking-setup/marketdata/07-redistribution-and-licensing/#10-configuration-reference) |
+| `finix.marketdata.client.*` | What a client tier is shown: depth, delay, timestamp and source attribution | [Redistribution and licensing](/broking-kyc/finix-broking-setup/marketdata/07-redistribution-and-licensing/#10-configuration-reference) |
+| `finix.marketdata.education.*` | The educational-sharing lag and its audit trail | [Redistribution and licensing](/broking-kyc/finix-broking-setup/marketdata/07-redistribution-and-licensing/#10-configuration-reference) |
+| `finix.content.*` | The content supply chain: rights, freshness, revisions, classification, records | [The content data layer](/broking-kyc/finix-broking-setup/marketdata/08-content-data-layer/#9-configuration-reference) |
+
+## 3. What may change while the market is open
+
+This is the table that does not exist on any other page, and it is the one an on-call engineer needs at 11:40.
+
+| Group | Mid-session | Why |
+|---|---|---|
+| `stale.threshold_ms.<liquidity_class>` | **Yes** | A threshold that cannot be tuned live gets disabled instead, and a disabled control is worse than none |
+| `conflate.<consumer_class>`, `conflate.mode` | **Yes** | The response to a slow consumer is a conflation change, and it has to be available during the event |
+| `recovery.tcp_concurrency_limit`, `min_request_interval_ms`, retry parameters | **Yes** | These are tuned during the incident they exist for |
+| `fanout.cap.*` | **Yes, with client notice** | Raising a cap is safe and immediate. **Lowering one breaks working client code** and is a published-protocol change, not an operational one |
+| `fanout.reconnect_rate_limit`, `shed_order` activation | **Yes** | The reconnect storm is a live event |
+| `client.depth_level.<tier>`, `client.delay_minutes.<tier>` | **Yes** | Entitlement changes must take effect at the delivery filter immediately |
+| `vendor_recon.*` tolerances | **Yes** | — |
+| `sub.local_filter_tokens` | **Yes** | Local only, no upstream effect |
+| **`sub.join_model`, group membership** | **No** | Firm-wide blast radius: leaving a group removes data for every consumer. Session-boundary change only |
+| **`decode.*` — all of it** | **No** | Endianness, envelope handling, epochs, skip counts and template packages are structural. A mid-session change means two different interpretations of one day's data |
+| **`feed.version_pinned_per_segment`, template package versions** | **No** | A dated cutover with mock participation — see section 6 |
+| **`price.field_per_consumer`, `price.fallback_chain`** | **No** | Changing price semantics mid-session makes the day's numbers irreproducible |
+| **`store.*`** | **No** | The two-store separation is structural |
+| **`transport.separate_from_order_bus`** | **No** | — |
+| **`normalise.*`** | **No** | Provenance and identifier retention are structural |
+| **`licence.*`, `report.*`, `education.*`** | **No** | Contractual and regulatory. They change when an agreement changes, not when an operator decides |
+| **`content.classification_gate`, `content.rights_matrix_declared`** | **No** | A classification gate that can be switched off mid-session is not a control |
+| **`conflate.control_messages`, `conflate.surveillance`** | **No** | These are correctness boundaries disguised as settings. They should not be changeable at all |
+
+<Aside type="danger" title="Four values that are correctness boundaries, not settings">
+These should be compile-time or deployment-time constants with no runtime path, because every scenario in which someone changes them is a scenario in which something is being broken to relieve pressure:
+
+- **`conflate.surveillance`** — conflating a sequence-sensitive consumer removes the information it exists to find.
+- **`conflate.control_messages`** — band revisions, session-state changes and reference-data changes are instructions, not observations.
+- **`store.record_from_files_only`** and **`store.live_not_queried_historically`** — the day someone answers a historical question from the live store is the day the firm loses the ability to defend a past margin call.
+- **`fanout.unbounded_buffering`** — the fix for a slow consumer is conflation. Buffering converts one slow mobile client into a memory incident and delivers values that are already wrong.
+</Aside>
+
+## 4. The values with the worst failure modes
+
+Ranked by how bad the outcome is and how long it stays invisible.
+
+| Rank | Key | If wrong | Visibility |
+|---|---|---|---|
+| 1 | `stale.threshold_ms.<liquidity_class>` not per instrument | Margin, bands, square-off, screens and rejections all computed from a dead price | **Invisible.** Nothing errors, and the connection is healthy |
+| 2 | `stale.blocks_price_dependent_risk` false | The stale flag becomes decoration; decisions continue on dead numbers | Invisible until a client disputes a square-off |
+| 3 | `store.record_from_files_only` false | The reproducible record is a lossy stream with no authority | Invisible for months, then fatal in a dispute or inspection |
+| 4 | `conflate.surveillance` enabled | Pattern detection on data from which the pattern has been removed | Invisible, and retrospective — the history is gone |
+| 5 | `recovery.snapshot_boundary_respected` false | Double application; book quantities drift from the exchange's | Looks like a feed defect, so it is investigated in the wrong place |
+| 6 | `decode.endianness` wrong via a shared parser | Plausible numbers in the wrong fields | **Worse than a crash**, because it parses successfully |
+| 7 | `licence.nondisplay_declared` false | The risk engine's data use is unlicensed, at tariff lines comparable to display | Invisible until an audit or a spot check |
+| 8 | `fanout.entitlement_at_delivery` false | Mid-session entitlement changes not applied; clients receive what they may not | Invisible to the firm, visible to the exchange on inspection |
+| 9 | `sub.join_model` too narrow at MCX | A commodity being actively traded silently stops updating | **No error anywhere.** Nothing failed |
+| 10 | `feed.volume_field_width` not widened after the migration | Cumulative volume truncates on busy contracts | Intermittent and contract-dependent |
+| 11 | `price.fallback_chain` inconsistent between systems | Two systems disagree on exactly the disputed instruments | Appears only on no-trade days |
+| 12 | `report.user_count_definition` undocumented | A reported figure the firm cannot reproduce or defend | Invisible until queried, then an audit finding |
+
+## 5. The gates before a session opens
+
+Feed-specific, because the gate has to match what the feed can actually guarantee.
+
+| Gate | Condition | Scope |
+|---|---|---|
+| **G-MD1 — decoders live** | Every configured decoder is running on its pinned version and template package, with the circular reference recorded | Per venue, per feed |
+| **G-MD2 — membership established** | All configured streams joined on both sources where two are published, with the first-arrival counter active on each | Per venue, per feed |
+| **G-MD3 — mappings current** | Stream, partition and product masters refreshed today, with any change alerted | Per venue |
+| **G-MD4 — book established** | For order-level feeds, the snapshot has been installed and the late-join boundary respected; no instrument is served before its book is built | Per feed, per product |
+| **G-MD5 — staleness armed** | Per-instrument thresholds loaded for today's universe, session-awareness windows set from today's calendar, and the flag wired into the decision path | Firm-wide |
+| **G-MD6 — recovery reachable** | The recovery and snapshot endpoints answer, within the shared concurrency limiter | Per venue, per segment |
+| **G-MD7 — vendor view agrees** | Own normalised prices and session states reconcile against the order and risk product's, on the sample, with zero value difference | Firm-wide |
+| **G-MD8 — fan-out ready** | Caps enforced, entitlement checks active at subscribe and delivery, attribution per connection recording | Firm-wide |
+
+A gate that cannot be met does not block the day by itself — it **scopes** it. A feed that will not come up means the instruments it carries cannot be traded or shown, which is a reduction in scope that has to be stated to the desk and to clients, exactly as [the master trading day checklist](/broking-kyc/finix-broking-setup/daily-ops/10-master-trading-day-checklist/) handles a failed gate elsewhere.
+
+## 6. Change control
+
+| Change | Treatment |
+|---|---|
+| **A protocol or interface version migration** | A **dated cutover**, not a configuration change. Mock participation, a parser change, a regression against captures, and a recorded circular reference. See [change and version control](/broking-kyc/finix-broking-setup/certification/04-change-version-control/) |
+| **A template package update** | The same, because identifiers can change between releases and at least one venue warns of it explicitly |
+| **An endpoint change** | Configuration, but **only** from a current circular, with the circular number recorded beside the value |
+| **A field-width or semantic change** | Treated as a migration even when the message identifier is unchanged — a widened volume field is a silently wrong parser, not a new feature |
+| **A cap reduction on the published client protocol** | A **published-protocol change** with client notice, not an operational tuning. Raising a cap is operational |
+| **A conflation policy change for a consumer class** | Requires the consumer's owner to agree, because it changes what that consumer can conclude |
+| **A licence category or scope change** | Contractual. Nothing changes in configuration until the grant does |
+| **A new client-facing data feature** | Classification first — channel, audience, purpose, onward rights — then configuration |
+
+## 7. Review cadence
+
+| Item | Cadence | Why this often |
+|---|---|---|
+| Stream, partition and product masters | **Daily, before begin of day** | They change, and a stale mapping is a silent blind spot |
+| Protocol and template versions against the venues' current publications | **Monthly**, and on every migration circular | The active segments are revised several times a year |
+| Staleness thresholds per liquidity class | **Monthly for the first quarter, then quarterly** | They are wrong at first and a wrong threshold gets the control switched off |
+| Conflation policy per consumer class | **Quarterly**, and whenever a consumer is added | New consumers are the commonest way a sequence-sensitive reader ends up on a conflated stream |
+| Fan-out caps against observed usage | **Quarterly** | Headroom erodes quietly as clients grow |
+| The unresolved-question register | **Monthly** | Each item has an owner and a blocked code path; an unreviewed register becomes folklore |
+| Licence categories against what the firm actually does now | **Half-yearly, and before every new data feature** | Features accrete faster than agreements |
+| User-count definition and submission derivations | **Each submission** | The definition is not published, so the firm's own consistency is its defence |
+| Vendor reconciliation tolerances | **Quarterly** | — |
+| The two-store separation | **Half-yearly**, as an assertion to be tested | Someone will eventually answer a historical question from the live store |
+
+## Where this connects
+
+- [The feed catalogue](/broking-kyc/finix-broking-setup/marketdata/01-feed-catalogue/) — feed and version values
+- [Wire formats and packets](/broking-kyc/finix-broking-setup/marketdata/02-wire-format-and-packets/) — decoder values
+- [Subscription mechanics](/broking-kyc/finix-broking-setup/marketdata/03-subscription-mechanics/) — membership and mapping values
+- [Gap recovery and arbitration](/broking-kyc/finix-broking-setup/marketdata/04-gap-recovery-and-arbitration/) — recovery and arbitration values
+- [Normalisation and internal distribution](/broking-kyc/finix-broking-setup/marketdata/05-normalisation-and-internal-distribution/) — conflation, staleness, price and store values
+- [Fan-out to clients](/broking-kyc/finix-broking-setup/marketdata/06-fanout-to-clients/) — the published client protocol's values
+- [Redistribution and licensing](/broking-kyc/finix-broking-setup/marketdata/07-redistribution-and-licensing/) — licence, reporting and client-display values
+- [The content data layer](/broking-kyc/finix-broking-setup/marketdata/08-content-data-layer/) — content values
+- [Environments and configuration baseline](/broking-kyc/finix-broking-setup/stack/environments-config-baseline/) — the naming convention and the environment matrix
+- [Master trading day checklist](/broking-kyc/finix-broking-setup/daily-ops/10-master-trading-day-checklist/) — where these gates land in the day

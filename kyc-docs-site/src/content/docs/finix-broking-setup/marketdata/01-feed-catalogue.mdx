@@ -1,0 +1,241 @@
+---
+title: "Market data 1: the feed catalogue"
+description: Every market data product a broker can take at NSE, BSE and MCX — the member broadcast, the tick-by-tick multicast feeds, the order-by-order books and the commercial level feeds — with official names, depth, transport, where each is available, what it costs, and the three traps that come from assuming the names mean what they sound like.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** The first thing to establish about Indian market data is that "the feed" is not one thing, and at <abbr title="National Stock Exchange of India">NSE</abbr> it is not even one family. There are feeds that arrive as part of membership, feeds that are a separate member application, and feeds that are a commercial subscription with a tariff and an agreement — and products in each category have similar names and very different content. So the page is organised by venue and then by family, with the depth, the transport and the access route in the same row, because those three together are what actually determines whether a firm can use a product. The traps are collected at the end of each venue because each one has cost someone a procurement decision.
+
+## TL;DR
+
+- **At NSE there are three distinct feed families, not one.** The broadcast that comes with the trading connection, the member tick-by-tick multicast, and the commercial feeds sold by NSE's data subsidiary under a tariff and an agreement. They have different content, different transports, different recovery and different licences.
+- **"Level 3" does not mean the order book.** At NSE, Level 3 is a **twenty-price-depth** product. The order-level feed is tick-by-tick, which is a different product with a different price. Buying Level 3 expecting order-by-order data is a procurement error that the names invite.
+- **The member tick-by-tick feed has had no feed charge since 2018.** Connectivity is still bought and is still the real cost. A "free feed" that needs a leased line is not free.
+- **<abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr>'s order-by-order feed is colocation-only.** Every other BSE feed is available on all networks. That single line decides whether a firm's architecture can use order-level data at BSE at all.
+- **The three venues' netted feeds are not comparable to their un-netted ones**, and the bandwidth difference is roughly two orders of magnitude at BSE — approximately 2.5 Mbps netted against approximately 230 Mbps order-by-order. Capacity planning has to start from which feed, not from which venue.
+- **<abbr title="Multi Commodity Exchange of India">MCX</abbr> requires members on its enhanced feeds to receive every stream**, because products move between streams. An implementation that joins only the streams carrying today's active commodities will silently lose them after a remapping.
+- **MCX publishes no reference-data interface and says so**: the instrument master is a file, with no messaging download. Do not carry a reference-data-interface design across from the other venues.
+
+## Conceptual overview
+
+The useful way to read this catalogue is as three questions asked of every product. **What does it contain** — a netted summary, an aggregated depth ladder, or every visible order as an event? **How does it arrive** — on the trading connection, on a separate member multicast, or on a commercial circuit? And **what gives you the right to it** — membership, a member application, or a signed data agreement with a tariff attached? Products that look adjacent in a brochure frequently differ on all three, and the differences are what make the engineering and the commercial conversation one conversation rather than two.
+
+The content axis is the one with real engineering consequences. A **netted** feed collapses activity over an interval, so its traffic is roughly bounded regardless of how busy the market is — which is exactly why it exists, and exactly why it cannot answer a question about sequence. An **un-netted aggregated depth** feed reports each change to a price ladder, so its traffic rises with activity and it can rebuild a ladder faithfully, but it still cannot tell you about an individual order. An **order-by-order** feed reports each visible order as an event, which is the only shape from which a book can be reconstructed exactly, and it is between one and two orders of magnitude more data. A firm that wants to show a retail client five levels of depth needs the first or second; a firm that wants to run any analysis of order behaviour needs the third, and will pay for it in bandwidth, in hosting and in licence.
+
+The access axis is where Indian practice differs most from the general assumption. A trading member does not have to buy a market data product to see prices: the trading connection itself carries a broadcast, and at NSE the tick-by-tick member multicast has had no feed charge for several years. What a member buys, when it buys, is usually either depth it cannot get from the member feeds, a commercial licence that permits a use the member entitlement does not cover, or a delivery arrangement that reaches somewhere the member network does not. Reading a commercial tariff as if it were the price of seeing prices at all produces a wildly wrong cost model — and reading the absence of a feed charge as "free" produces an equally wrong one, because the connectivity, the hosting and the licence classification are all still live costs.
+
+Finally, a word about evidence. Exchange market data documentation is versioned heavily, some of it is published only to members, some published pages contradict newer circulars, and at least one venue's downloadable manual has a filename that disagrees with the version inside it. Everything below is attributed, and where two exchange documents disagree the page says so rather than choosing. For a greenfield build the operative rule is: **the product you are entitled to is the one named on your order form, not the one named in the brochure**, and the specification you build against is the one the exchange supplies for the release you are provisioned on.
+
+## 1. Documentary framework
+
+- **NSE consolidated market data dissemination circular** — the member-facing document that enumerates the broadcast and tick-by-tick services, their stream counts, multicast parameters and the general conditions of use, including client use. `NSE/MSD/74019`, 30 April 2026. `[not yet in index]`
+- **NSE segment protocol manuals and the member tick-by-tick specification** — the authoritative wire documents, separately versioned per segment. `[not yet in index]`
+- **NSE commercial product pages, technical specifications and the domestic tariff** — published by NSE's data subsidiary, with a tariff effective 1 April 2026 and a separate data usage and sharing policy. `[public]`
+- **NSE feed migration and recovery circulars, 2025 and 2026** — the mandatory futures and options broadcast migration, the move from the former message-broker snapshot service to a direct recovery service, and the bhavcopy broadcast cessation. `NSE/MSD/75324`, `NSE/MSD/73425`, `NSE/MSD/74764` and `NSE/MSD/76457`. `[not yet in index]`
+- **BSE connectivity manual, market data interface manuals and the Direct NFCAST manual** — the interface catalogue, the comparison table that establishes bandwidth and network availability, and the per-interface specifications. `[not yet in index]`
+- **MCX trading interfaces page, the enhanced order book manual, the market data interface manual and the live connectivity circular** — the catalogue, the binary specification, the FAST specification and the current endpoint annexures. [MCX/<abbr title="Computer-to-Computer Link.">CTCL</abbr>/005/2026](/broking-kyc/reference/circulars/mcx/#mcxctcl0052026) releases version 1.6 of the market data interfaces. `MCX/TECH/008/2026` carries the all-stream instruction. `[not yet in index]`
+- **The commercial policies and tariffs** — MCX's external data feed policy and domestic vendor price list, and BSE's information products tariff. See [redistribution and licensing](/broking-kyc/finix-broking-setup/marketdata/07-redistribution-and-licensing/). `[public]`
+
+<Aside type="caution" title="Names and versions here, layouts and templates from the exchange">
+This plane names products, services, message families and the identifiers an engineer needs in order to know what exists and what to ask for. It does not reproduce byte-offset tables, field-presence rules or the encoding template packages — those are supplied by the exchange for the release you are provisioned on, and several of the published documents carry internal inconsistencies that only a current package and a test capture can settle.
+
+Two specific cautions from the primary material. One venue's downloadable order-book manual has a **filename that names an older version than the document inside it**, so pin the content and the circular number rather than the URL. And one venue's own manual **declares a fixed-size data array in its packet envelope while documenting individual messages larger than that array** — which means the apparent maximum is not a maximum, and the real fragmentation rule has to come from the exchange rather than from inference.
+</Aside>
+
+## 2. NSE — family one: the member broadcast
+
+This is the broadcast side of the trading interface. It is not market data carried inside the encrypted interactive session; it is a separate multicast dissemination, and it is what a member gets without buying a data product.
+
+| Service | Content | Segments | Transport |
+|---|---|---|---|
+| Price-volume broadcast, which NSE labels **five depth, one second refresh** | Five price levels, aggregated by price with quantity and order count per side; market watch, ticker and trade summary, index and status messages | Cash, futures and options, currency, commodity and securities lending | UDP multicast on member connectivity, including colocation where supported. Combined and stream-wise services are both published |
+| Stream-wise price-volume | The same content, partitioned | Cash **five streams**; futures and options **eighteen streams** | Separate multicast groups per stream, configured through the exchange's own receiver application |
+| **Limit price protection range broadcast** | The limit-price-protection range | Futures and options, and commodity | Separate multicast parameters in the member circular |
+
+Two properties matter architecturally. The refresh label — one second — is a **dissemination cadence, not a latency guarantee**, and the published material does not promise that every intermediate trade survives that refresh. And the broadcast's redundancy is published as **Source 1 and Source 2**, both transmitting simultaneously, usable active-active or active-passive. The familiar "line A and line B" terminology is not NSE's naming here, and no equality or latency guarantee between the two sources is published.
+
+## 3. NSE — family two: the member tick-by-tick multicast
+
+| Aspect | Detail |
+|---|---|
+| Official name | **Multicast Tick by Tick**, commonly the member tick-by-tick feed |
+| Content | **Order-level events** — order addition, modification and cancellation, with spread equivalents — plus trades and trade cancellations. Order identifiers make exact book reconstruction possible |
+| Streams | Cash **five**, futures and options **eighteen**, currency **two**, commodity **one** |
+| Transport | UDP multicast, with **TCP recovery** — both a sequence-range retransmission service and a separate order-book snapshot service |
+| Availability | Colocation and non-colocation member delivery both exist. The 2025 commodity connectivity announcement provides point-of-presence options for commodity and states that commodity colocation is **not available** |
+| Trade timestamps | Nanoseconds since 1 January 1980 — a different epoch from the other venue, which uses nanoseconds since the Unix epoch |
+| **Feed charge** | **Abolished for colocation and non-colocation members in 2018** (`NSE/MSD/38190`). No later reinstatement appears in the current material. **Connectivity remains separately procured and charged** |
+| Instrument selection | Through stream-master files that map contracts into streams, then local filtering. There is no per-instrument subscribe request — see [subscription mechanics](/broking-kyc/finix-broking-setup/marketdata/03-subscription-mechanics/) |
+| Redundancy | Two sources, with NSE stating that **one multicast channel lags the other** and recommending active-active consumption. The exact delay and which source lags are not published |
+
+<Aside type="tip" title="The member order-level feed is the most under-used asset in a new broker's stack">
+A firm that has paid for the connectivity already has access to an order-level feed at no feed charge, in the cash, derivatives, currency and commodity segments. That is the data from which exact depth, true trade sequence, and any order-behaviour analysis are built — and it is the input that makes a client-facing depth product and a surveillance capability possible without a commercial licence negotiation.
+
+The reasons firms do not use it are real but surmountable: it needs a book-building implementation rather than a price-reading one, it needs the recovery and snapshot services implemented properly, and it needs capacity planning that the netted feeds do not. The point is that the obstacle is engineering, not entitlement — and a firm that defaults to the five-depth broadcast because it is simpler should make that choice knowingly rather than by omission.
+</Aside>
+
+## 4. NSE — family three: the commercial feeds
+
+These are sold by NSE's data subsidiary under an order form and a written agreement, delivered by multicast over a dedicated leased line from an exchange point of presence, or through an authorised data vendor.
+
+| Product | Depth or content | Notes |
+|---|---|---|
+| **Level 1** | Best bid and offer | Published across cash, derivatives, currency, wholesale debt and commodity |
+| **Level 2** | **Five** price levels | Cash, derivatives, currency, commodity |
+| **Level 3** | **Twenty** price levels | **Cash only** in the published core matrix. This is a price-depth product — **not** an order-level feed |
+| **Tick by Tick** (commercial) | Order-level | Commercial **cash and currency**; the current specification records that the commercial **futures and options** tick-by-tick service was discontinued from 1 September 2021. This does **not** discontinue the member futures and options tick-by-tick feed |
+| **Real Time Index Feed** | Index values, with separate live and end-of-day messages | A heartbeat every two seconds when there is no data — which is not evidence of two-second index updates |
+| **Snapshot Data** | Periodic binary snapshots | One-, two- and five-minute variants appear across the technical material; the public page advertises one and five. Delivered as files by **SFTP over the internet**. This is a paid periodic product, not the tick-by-tick recovery snapshot |
+| **Fifteen-minute delayed** | Files generated every minute carrying delayed data | The published page specifies **FTP** over the internet |
+| **Stock wise data** | A selected-stock product, priced by stock count | Transport, schema and refresh interval need the product's own specification; a price list is not a wire protocol |
+| Analytics and option Greeks feeds | Derived data | Separately licensed, with one-minute, one-second and tick-by-tick variants priced differently |
+| Indicative net asset value | Exchange-traded fund indicative values | Included in the cash level feeds, with a separate tariff entry as well |
+
+<Aside type="danger" title="Three NSE naming traps">
+**Level 3 is twenty-depth, not order-by-order.** The order-level product is tick-by-tick. A firm that specifies "Level 3" in a requirement because it wants the order book will receive a twenty-level price ladder and discover the gap during integration.
+
+**The commercial tick-by-tick product and the member tick-by-tick feed are different things** with different names that resolve to the same abbreviation in conversation. The commercial one no longer covers futures and options; the member one does. Establish which one a statement is about before acting on it.
+
+**A one-second refresh label and a two-second heartbeat are not update cadences.** One is a dissemination interval for a netted product; the other is a liveness signal that fires *because* there is nothing to send. Neither is a latency guarantee, and the published material does not offer one for these feeds.
+</Aside>
+
+A fourth caution concerns the commercial cash level feed specifically: its own published answer on dissemination describes an **initial packet within six to nine seconds and then updates or repeated packets every five seconds**, with packets for illiquid securities repeated twice under the current configuration. "Real time" in a product name does not mean the product is unthrottled, and a client-facing promise built on a level feed inherits that cadence.
+
+## 5. BSE
+
+| Interface | Content and encoding | Network and depth | Bandwidth and availability |
+|---|---|---|---|
+| **Market Data Interface** | **Netted**, price-aggregated depth; FAST encoded | Multicast, with snapshots and incrementals sharing a channel | Approximately **2.5 Mbps**; five levels; **all networks**; one feed across partitions |
+| **Enhanced Market Data Interface** | **Un-netted**, price-aggregated depth; FAST encoded | Multicast carrying product groups, with snapshots on channels separate from incrementals | Approximately **50 Mbps**; five configured levels; **all networks**; partition-wise feeds |
+| **Enhanced Order Book Interface** | **Individual visible orders**, full depth; proprietary binary | Separate incremental and snapshot channels, with distinct A and B services in the connection tables | Approximately **230 Mbps**; partition-wise; **colocation only** |
+| **Direct NFCAST** | Netted **five-level replacement snapshots**; binary | Multicast. **Each update is a complete replacement snapshot** — there is no separate incremental feed, and the manual states that **no product or stream sequence number exists** | Approximately **2.5 Mbps**; all networks; one feed across partitions |
+| **Reference Data Interface** | Reference and master data, multicast repeatedly, with an end-of-day master file also described | Connection tables publish incremental and snapshot addresses | **Contested — see below** |
+
+<Aside type="caution" title="BSE's reference data interface has two published answers">
+One BSE market data manual's introduction states that the reference data interface is **unavailable**. A later connectivity manual **describes it as a continuous service**, and the connection tables **publish endpoints for it**. Both are exchange documents.
+
+Do not resolve this by choosing. Ask BSE for a current enablement confirmation naming the segment, and design so that the firm's instrument master can be built from the end-of-day master file alone — because that path is not in dispute. Treat a live reference-data multicast as an optimisation to be switched on when confirmed, not as a dependency.
+</Aside>
+
+Two further BSE facts worth carrying into an architecture decision. The **colocation-only constraint on the order-by-order feed** is a hard architectural boundary: a firm that is not in BSE colocation cannot have order-level BSE data, whatever it is willing to pay, so any design that assumes symmetric order-level coverage across venues is wrong at BSE. And the **replacement-snapshot model of the netted broadcast** means a gap is self-healing for *state* — the next snapshot replaces the book — but the intermediate events and their chronology are gone permanently, which makes that feed unusable as a surveillance input.
+
+## 6. MCX
+
+| Interface | Content | Transport | Availability and eligibility |
+|---|---|---|---|
+| **Market Data Interface** | Netted price-level data; **individual trades are replaced by statistics** | UDP with FAST encoding; a combined snapshot and incremental channel | The live connectivity circular lists a high-frequency market data multicast. A separately offered low variant, and the netting interval, are not established in the current material |
+| **Enhanced Market Data Interface** | Un-netted price-level updates and individual trades. MCX's own external policy calls this Level 3 with **twenty** best bid and ask levels | UDP with FAST; **distinct incremental and snapshot ports** | Members need point-to-point leased lines, and this interface is configured **only on links enabled for the order-book or tick-by-tick service** |
+| **Enhanced Order Book Interface**, the tick-by-tick service | Un-netted **full visible order book**, executions and state changes | UDP multicast, **uncompressed little-endian binary**, with a separate snapshot service and a stated **MTU of 1,372 bytes** | Delivered over point-to-point links. Members and empanelled independent software vendors may apply. **No distinct colocation offering is established** — which is the opposite of the BSE position |
+| **Reference data files** | Instrument, participant, asset and asset-underlying masters | **File delivery by SFTP or FTP.** The specification states explicitly that there is **no messaging download for the instrument master** | For members connecting through the open interface |
+| A standalone reference data interface | **Does not appear** in the inspected interface catalogue or the live address circular | — | Do not carry a reference-data-interface design across from another venue. One inherited passage inside an MCX manual refers to consulting a reference snapshot feed, and that is unresolved legacy text rather than evidence of an endpoint |
+| Commercial Level 1 and Level 2 feeds | Separately sold, including internet delivery | Its own agreement process | A commercial service, distinct from member access |
+
+<Aside type="danger" title="MCX requires all-stream reception, and products move">
+`MCX/TECH/008/2026` asks members on the enhanced market data and order book interfaces to receive **all streams**, because products can be moved between streams, with changes published in the stream master on the exchange's file service. `[not yet in index]`
+
+The implementation consequence is direct: joining only the streams that carry today's active contracts is a design that works until a remapping, at which point the firm silently stops receiving data for a commodity it is actively trading — with no error anywhere, because nothing failed. Receive every stream, and refresh the partition, product and stream mappings together from the file service rather than assuming the numbering stays aligned.
+</Aside>
+
+## 7. What each venue's redundancy actually is
+
+| Venue | Published arrangement | The caution |
+|---|---|---|
+| NSE price-volume | **Source 1 and Source 2**, both transmitting simultaneously, usable active-active or active-passive | "Line A / line B" is not the published naming, and **no equality or latency guarantee between sources is published** |
+| NSE tick-by-tick | Two sources, with the exchange stating **one channel lags the other** and recommending active-active | The size of the lag, which source lags, and whether packet boundaries match are **not published** |
+| BSE | Connection tables expose **distinct A and B addresses** for the enhanced interfaces | — |
+| MCX | The protocol manuals describe live-live A and B. The current connectivity circular instead publishes **primary and disaster-recovery site** endpoints, **without labelled A and B pairs** | **Do not relabel the primary and recovery sites as A and B.** What redundancy is physically delivered to a given member has to be confirmed from network provisioning |
+
+## 8. Fees and the access route
+
+Three separate cost categories, and conflating them is the commonest budgeting error.
+
+| Category | What it is | Published examples |
+|---|---|---|
+| **Feed charge** | The exchange's charge for the data itself | NSE member tick-by-tick: **abolished in 2018**. Member broadcast: no current standalone exchange feed charge is established. Commercial feeds: a full tariff, with cash Level 1, 2, 3 and tick-by-tick at roughly **₹25.5 lakh, ₹40 lakh, ₹42.5 lakh and ₹53 lakh** a year for the vendor category, plus monthly per-user charges — see [redistribution and licensing](/broking-kyc/finix-broking-setup/marketdata/07-redistribution-and-licensing/) |
+| **Connectivity** | The circuit, port and last mile | MCX point-to-point annual charges of **₹2 lakh** for 10 to 100 Mbps, **₹4 lakh** for 200 or 300 Mbps and **₹5 lakh** for 500 Mbps, plus port charges, with carrier last-mile separate. NSE's 2018 non-colocation scheme recommended a minimum **1.5 Gbps** line for the tick-by-tick service |
+| **Hosting** | Colocation or a point of presence | NSE annual rack charges of **₹2.25 lakh**, **₹4.5 lakh**, **₹9 lakh** and **₹18 lakh** for quarter, half, full and high-power-density racks, with setup charges of ₹25,000, ₹50,000, ₹1 lakh and ₹2 lakh, before additional costs. BSE's revised colocation guidelines of August 2025 superseded earlier directions; the commercial annexures were not retrievable |
+
+| Route | How it works |
+|---|---|
+| Member feeds at NSE | Member infrastructure or colocation applications, with the exchange's receiver application and current multicast and stream files from the extranet. Non-colocation tick-by-tick uses a named application annexure |
+| Member feeds at BSE | Listed as services for trading-interface users. The current activation form, default entitlement and any separate feed charge need written confirmation |
+| Member feeds at MCX | Through the computer-to-computer link route, with named application forms for the enhanced interface and for the tick-by-tick facility, and a point-to-point line enabled for them |
+| Commercial feeds | An order form and a written agreement with the exchange's data arm, plus the dedicated circuit — or a purchase through an authorised data vendor, whose own interface, limits and recovery are that vendor's and are not exchange wire guarantees |
+
+<Aside type="caution" title="Software approval is not a data licence, and a feed connection is not a right">
+Two separate approvals are easy to conflate. A member may develop its own front end, and the exchange tests and approves that software — see [the software approval regime](/broking-kyc/finix-broking-setup/certification/01-software-approval-regime/). That approval does **not** grant data redistribution rights.
+
+Equally, a provisioned multicast address proves access mechanics, not authority. One venue's policy states plainly that ownership of the data remains with the exchange and that redistribution is permitted only as contractually agreed. The licensing question is separate, is answered in writing, and is the subject of [redistribution and licensing](/broking-kyc/finix-broking-setup/marketdata/07-redistribution-and-licensing/).
+</Aside>
+
+## 9. The 2025 and 2026 changes a new build must know
+
+| Change | Consequence |
+|---|---|
+| **NSE futures and options broadcast migration** — `NSE/MSD/75324` makes new broadcast parameters mandatory from the September 2026 mock and discontinues the old ones | Message codes are **replaced, not added**, and cumulative traded volume **widens from a four-byte unsigned integer to an eight-byte field**. A parser built on the old width will truncate on a busy contract. `[not yet in index]` |
+| **NSE recovery service migration** — the former message-broker snapshot service was replaced by a direct service for cash in October 2025 and for futures, options and currency in March 2026, and retired from the June 2026 mock | A build must target the current snapshot service, and the snapshot and range-recovery endpoints are **different ports**. `[not yet in index]` |
+| **NSE bhavcopy broadcast cessation** — announced for October 2026 by `NSE/MSD/74764`, extended to **16 November 2026** by `NSE/MSD/76457`, covering cash, derivatives, currency, commodity, electronic gold receipts and index bhavcopy | The in-band bhavcopy is going away. Take the files from the extranet instead. This is **not** cessation of live index quotes. `[not yet in index]` |
+| **MCX market data interface version 1.6** — adds upper and lower circuit limit entry types to the depth incrementals, with a parser deadline | [MCX/CTCL/005/2026](/broking-kyc/reference/circulars/mcx/#mcxctcl0052026). Band information now arrives on the depth path and must be **applied**, not logged |
+| **MCX all-stream instruction** — `MCX/TECH/008/2026` | See section 6. `[not yet in index]` |
+| **Closing auction session market data** | Published inside the existing manuals at each level: status transitions and a reference-price broadcast on the member broadcast; order dissemination during collection on the member tick-by-tick feed; and a documented message sequence on the commercial cash feed. **No separate purchasable auction feed is established.** One venue document calls the normal-market-close-for-auction message by **two different identifiers in two places** — the narrative and the timing table disagree — so that one needs an exchange clarification rather than a guess |
+| **Protocol version currency** | The latest published versions are enumerated on the exchange protocol page, but a **universal circular mandating every member to be on every listed version by one date is not established**. Publication and a mandatory production cutover are different evidence, and the distinction matters for [change and version control](/broking-kyc/finix-broking-setup/certification/04-change-version-control/) |
+
+## 10. Configuration reference
+
+| Key | Finix default | Class | Failure mode if wrong |
+|---|---|---|---|
+| `finix.marketdata.feed.nse.member_broadcast` | Enabled, stream-wise | Exchange-set | No baseline price data |
+| `finix.marketdata.feed.nse.mtbt` | **Enabled** — no feed charge since 2018 | Exchange-set | Paying for depth already available, or no order-level capability |
+| `finix.marketdata.feed.nse.mtbt_streams` | **All** streams for each segment traded | Exchange-set | A silent blind spot on instruments in an unjoined stream |
+| `finix.marketdata.feed.nse.commercial_products` | Only where a member entitlement cannot serve the use | Discretionary | Six- or seven-figure annual charges for data already held |
+| `finix.marketdata.feed.nse.level3_is_twenty_depth` | True — recorded so nobody re-learns it | Exchange-set | A procurement specifying Level 3 and expecting an order book |
+| `finix.marketdata.feed.bse.interface` | Netted or enhanced per use; **order-by-order only if in colocation** | Exchange-set | An architecture that assumes order-level BSE data it cannot receive |
+| `finix.marketdata.feed.bse.rdi_assumed_available` | **False** until confirmed in writing | Exchange-set | A dependency on a service two exchange documents disagree about |
+| `finix.marketdata.feed.bse.nfcast_as_surveillance_input` | **Never** — replacement snapshots, no sequence | Exchange-set | Surveillance on data from which the sequence has been removed |
+| `finix.marketdata.feed.mcx.receive_all_streams` | **True** | Exchange-set | Losing a commodity after a stream remapping, with no error |
+| `finix.marketdata.feed.mcx.reference_from_files` | True — there is no messaging download for the master | Exchange-set | Waiting for a broadcast that does not exist |
+| `finix.marketdata.feed.mcx.stream_master_refresh` | Every day, from the file service | Exchange-set | Stale partition-to-stream mapping |
+| `finix.marketdata.redundancy.<venue>` | Active-active where two sources are published | Exchange-set | A single path, and no cross-check on loss |
+| `finix.marketdata.redundancy.assume_sources_equal` | **False** | Exchange-set | A design that assumes identical timing and packet boundaries |
+| `finix.marketdata.feed.version_pinned_per_segment` | Explicit, per segment, with the circular reference | Exchange-set | A parser silently wrong after a migration |
+| `finix.marketdata.feed.volume_field_width` | **Eight bytes** where the migration widened it | Exchange-set | Truncated cumulative volume on busy contracts |
+| `finix.marketdata.feed.bhavcopy_from_extranet` | True — the in-band broadcast ceases | Exchange-set | A reporting pipeline that stops silently |
+
+## 11. Exception paths
+
+| Situation | Response |
+|---|---|
+| A product named in a brochure is not on the order form | The order form governs. Do not design against the brochure |
+| A requirement says "Level 3" | Establish whether twenty-depth or order-level is meant, in writing, before procurement |
+| A feed appears to be free | Separate the feed charge from connectivity and hosting before quoting a cost |
+| BSE order-level data is required but the firm is not in colocation | It cannot be had. Re-scope the requirement or re-scope the hosting; do not escalate to the exchange expecting an exception |
+| An MCX commodity stops updating after an exchange notice | Check the stream master first. This is the all-stream failure mode and it produces no error |
+| A reference-data multicast is being relied on at BSE | Get written enablement confirmation. Until then, build the master from the end-of-day file |
+| Two exchange documents disagree on a message identifier or a product's availability | Record both, raise an erratum request, and do not ship a parser that silently picks one |
+| A downloaded manual's filename disagrees with its internal version | Pin the content and the circular number. The filename is not the version |
+| An individual message exceeds the envelope's declared array size | Do not treat the declared size as a maximum. Get the fragmentation rule from the exchange |
+| A migration circular replaces message codes | Treat it as a mandatory cutover with a dated test, not a configuration change |
+| The in-band bhavcopy stops arriving after mid-November 2026 | Expected. The extranet files are the path |
+
+## Practical notes
+
+- **Write down which feed serves which purpose before procuring anything.** Client display, risk, surveillance and valuation have different requirements, and one feed will not satisfy all four.
+- **Use the member order-level feed if the connectivity is already paid for.** It is the highest-value unused asset in most new stacks, and the obstacle is engineering rather than entitlement.
+- **Never let "Level 3" into a requirements document without its definition beside it.** Twenty-depth and order-by-order are different products at different prices.
+- **Plan capacity from the feed, not the venue.** Netted and order-by-order differ by roughly two orders of magnitude on the same exchange.
+- **Pin every protocol version with its circular number in the configuration**, and treat migration circulars as dated cutovers with mock participation — see [mock trading and drills](/broking-kyc/finix-broking-setup/certification/05-mock-trading-and-drills/).
+- **Refresh stream, partition and product masters together, daily.** Three mappings that are equal today will not stay equal.
+- **Ask the licensing question at procurement, not at launch.** A provisioned multicast address tells you nothing about what you may show a client.
+- **Keep a register of the exchange document conflicts you are carrying.** There are several, each has an owner and a question outstanding, and an undocumented one becomes a defect attributed to the implementation.
+
+## Where this connects
+
+- [Wire formats and packets](/broking-kyc/finix-broking-setup/marketdata/02-wire-format-and-packets/) — how each of these feeds is framed and decoded
+- [Subscription mechanics](/broking-kyc/finix-broking-setup/marketdata/03-subscription-mechanics/) — how instruments are selected on each, and how little of it is a subscription
+- [Gap recovery and arbitration](/broking-kyc/finix-broking-setup/marketdata/04-gap-recovery-and-arbitration/) — the recovery service that goes with each feed
+- [Redistribution and licensing](/broking-kyc/finix-broking-setup/marketdata/07-redistribution-and-licensing/) — the tariffs and permissions behind the commercial column
+- [Exchange connectivity protocols](/broking-kyc/finix-broking-setup/oms/02-exchange-connectivity-protocols/) — the trading links these feeds sit alongside
+- [Infrastructure and connectivity](/broking-kyc/finix-broking-setup/setup/08-infrastructure-connectivity/) — the circuits, racks and bandwidth this catalogue consumes
+- [Change and version control](/broking-kyc/finix-broking-setup/certification/04-change-version-control/) — why protocol-version currency is a compliance matter
+- [Exchange nuances](/broking-kyc/finix-broking-setup/exchanges/) — the per-venue differences this plane mirrors

@@ -9,7 +9,7 @@ import { Aside } from '@astrojs/starlight/components';
 
 ## TL;DR
 
-- **This is the clockwork.** **Two hundred and thirty-one** discrete activities on an ordinary trading day, before any day-type overlay. An operation that cannot enumerate them is relying on individual memory, which fails on leave days and during incidents.
+- **This is the clockwork.** **Two hundred and fifty** discrete activities on an ordinary trading day, before any day-type overlay. An operation that cannot enumerate them is relying on individual memory, which fails on leave days and during incidents.
 - **Six gates stop the day.** Instrument master, risk parameters, ban list, surveillance lists, collateral and ledger load, and exchange sessions. Red on the master or the collateral load means do not open; red on the others means open with a stated scope of refusal.
 - **The default on amber is no-go.** A delayed open costs reputation; a day run on wrong parameters costs money, penalties and an inspection finding. The asymmetry should be built into the decision, not re-argued each morning.
 - **Every item has a named owner and leaves evidence.** "Operations" is not an owner. The gate status board, retained, is the record that the day opened properly, and it is the first artefact an inspector asks for after an incident.
@@ -79,6 +79,8 @@ Runs from the previous evening's close-out to the start of begin-of-day. These i
 | C-0.27 | R | Preliminary fills with no binding confirmation discarded and accounted | OPS, TECH | Every unconfirmed execution report is either matched to a binding record or formally discarded with a reason | **STOP** |
 | C-0.28 | R | Yesterday's order and event log sealed and retained | TECH, COMP | Log complete, append-only and within retention — it is the only record of pre-failover state | EXCEPT, escalate same day |
 | C-0.29 | M | Session identity verified as singly held | TECH | One holder per session identifier; fencing in place so a restart cannot produce a duplicate login | **STOP** |
+| C-0.30 | R | **Market data decoders on their pinned versions and template packages** | TECH | Every decoder's version and circular reference matches the register; no migration is past its mandated date | **STOP** |
+| C-0.31 | R | Content-data refresh completed for the new day | TECH, OPS | Corporate events, fundamentals, fund data and news ingested; per-dataset freshness recorded; stale-content indicators clear | EXCEPT |
 
 <Aside type="danger" title="C-0.12 is the item most often skipped and most expensive to skip">
 Exchanges, clearing corporations and depositories publish circulars continuously, and a meaningful fraction take effect the next trading day — a changed margin rate, a new file format, a security moving into a surveillance category, a revised cut-off, a lot size change. There is no mechanism that pushes these into an operation's systems; somebody has to read them and decide what changes. When this item is skipped, the firm discovers the change through a rejection, a penalty or a reconciliation break, typically several days later, by which time the cause is hard to find. The control is mundane: a named person, every morning, with a written record of what was reviewed and what was actioned, and a monthly check that the review happened on every trading day. This is also the mechanism that catches an unannounced file format change before it arrives rather than after.
@@ -139,6 +141,13 @@ The gated sequence. Indicative times are for an ordinary day; the post-holiday v
 | C-1.47 | 08:00 | M | Self-match prevention election confirmed against desk policy | RISK, DEAL | The flag is set explicitly, not left to an undocumented exchange default | — | EXCEPT |
 | C-1.48 | 08:00 | O | Recovery-site own-front-end identifiers confirmed valid and pre-registered | TECH, COMP | Identifiers current; none is an address-pinned exchange-terminal identifier | — | EXCEPT, escalate same day |
 | C-1.49 | 09:00 | M | Per-venue, per-segment, per-session state board green | TECH | Every session accounted for individually; no firm-level aggregate used as the health signal | — | **STOP** |
+| C-1.50 | 08:00 | M | **Market data stream membership established** per venue and feed, on both sources where two are published | TECH | Every configured stream joined; first-arrival counters active on each source | — | **STOP** |
+| C-1.51 | 08:00 | M | Stream, partition and product masters refreshed, and any change alerted | TECH | All three mappings dated today; every change reviewed before the open | — | **STOP** |
+| C-1.52 | 08:30 | M | Market data recovery and snapshot endpoints reachable within the shared limiter | TECH | Each endpoint answers; the concurrency limiter is set below the published per-IP quota | — | EXCEPT |
+| C-1.53 | 08:45 | M | **Order-level books established from snapshots** before any instrument is served | TECH | Late-join boundary respected per product; no instrument served on a partially built book | — | **STOP** |
+| C-1.54 | 08:45 | M | **Per-instrument staleness armed** for today's instrument universe | TECH, RISK | Thresholds loaded per liquidity class; session windows set from today's calendar; the flag is wired into the decision path, not a dashboard | — | **STOP** |
+| C-1.55 | 09:00 | M | Own normalised view reconciled against the order and risk product's prices and session state | TECH, RISK | Zero value difference on the sample; session state identical in both | — | EXCEPT |
+| C-1.56 | 09:00 | M | **Client fan-out ready** — caps enforced, entitlement active at subscribe and at delivery, attribution recording | TECH, COMP | All three confirmed; no connection unattributed | — | **STOP** |
 
 ## 4. Phase 2 — pre-open
 
@@ -224,6 +233,13 @@ A standing monitoring loop rather than a sequence. Each item is observed continu
 | C-3.62 | C | Member-level instructions from the exchange reach a human | TECH, RISK, COMP | On receipt | Risk reduction, throttle, forced logout and position-limit messages are instructions to the firm, not order events |
 | C-3.63 | $ | **Per-client limit drift reconciled at each boundary** between the real-time path and the authoritative extract | RISK, TECH | Each extract cycle; zero tolerance per client | Stop increasing exposure for the affected clients until the difference is explained |
 | C-3.64 | M | Session sequence continuity per venue, segment and session | TECH | Continuous | A gap is state loss, not a data loss: freeze entry in that scope, recover, then resume |
+| C-3.65 | M | **Per-instrument staleness flags: count and distribution** | TECH, RISK | Continuous; target zero | One instrument is an instrument problem; a rising count is a feed incident. Block market orders and price-dependent risk in scope |
+| C-3.66 | M | Market data sequence continuity, and redundant-source arbitration health | TECH | Continuous | A gap is a loss of state for every consumer of that instrument. A source that is never first is lagging or dead |
+| C-3.67 | M | Fan-out conflation rate and send-queue depth per connection class | TECH | Continuous | The earliest sign of a slow consumer or a saturated link. **Never respond by buffering** |
+| C-3.68 | M | Client reconnect rate against its limit | TECH | Continuous | A reconnect storm is self-inflicted capacity: rate-limit, and identify client libraries that are not backing off |
+| C-3.69 | M | **Band revisions and reference-data changes applied on the data path, not logged** | TECH | On receipt | These are instructions, not observations. They must never be conflated or dropped |
+| C-3.70 | M | Market data bandwidth and message rate against the capacity plan | TECH | Continuous, rising with volatility | Market data scales with volatility, not client count; the plan is tested on the day both peak together |
+| C-3.71 | C | Client entitlement changes re-evaluated against live subscriptions | COMP, TECH | On change | Subscribe-time-only enforcement fails the moment a tier changes mid-session |
 
 <Aside type="caution" title="C-3.27 is the hardest deadline in the day and the least visible">
 Everything about the market's rhythm points at the exchange's pay-in time, but the firm's actual deadline is the bank's instruction cut-off for the relevant rail, which is earlier and differs by account and by rail. An operation that works to the exchange time will eventually discover that the bank stopped accepting instructions twenty minutes ago. The fix is to publish, internally, a single internal funding deadline derived from the earliest applicable bank cut-off minus a buffer, and to have risk, dealing and operations all working to that number rather than to the exchange's. The corresponding treasury decision point is C-3.26, which must therefore sit comfortably before it.
@@ -301,6 +317,8 @@ Each step gates the next. The chokepoint is C-5.03.
 | C-5.37 | R | Preliminary fills promoted or discarded against the binding record | OPS, TECH | Before obligations are computed | Every execution report is either matched to a binding confirmation or discarded with a recorded reason | **STOP** |
 | C-5.38 | R | All unknown-state orders resolved | TECH, OPS | Before the pipeline proceeds | Zero open unknowns | **STOP** |
 | C-5.39 | O | Contract notes issued within the prescribed window, and no provisional confirmation used as one | OPS, COMP | After obligations | Contract notes dispatched and acknowledged; any intraday confirmation is labelled indicative | **STOP** |
+| C-5.40 | R | **Price record built from the end-of-day files, not from the stream** | TECH | Before valuation | Closing and settlement prices sourced from files; the file governs on any conflict with the stream | **STOP** |
+| C-5.41 | R | Market data gap and staleness log closed for the day | TECH, RISK | Before the day is marked closed | Every gap and every stale instrument has a recorded resolution or an accepted explanation | EXCEPT, escalate same day |
 
 ## 8. Phase 6 — the commodity evening session
 
@@ -332,6 +350,7 @@ Runs concurrently with phase 5. It is a second operating mode, not an extension 
 | C-7.07 | M | System health checks and capacity review | TECH | Within thresholds for tomorrow's expected volume | EXCEPT |
 | C-7.08 | R | Overnight alert review and handover to the morning shift | TECH | Written handover produced | EXCEPT |
 | C-7.09 | R | Day's parameter batch ingest count reconciled against the expected count | TECH | Expected and actual match for every segment traded | EXCEPT, page on-call |
+| C-7.10 | R | Market data attribution and user-count records retained for the day | TECH, COMP | Every connection attributable to a client identity; entitlement grants and withdrawals recorded as events | EXCEPT, page on-call |
 
 ## 10. The go or no-go decision
 
@@ -422,5 +441,7 @@ What the day leaves behind. This set, retained, answers almost every question an
 - **Count scoped opens and no-gos.** A rising count is a file-pipeline or vendor problem expressing itself as operational drag, not an operations problem.
 
 ## Where this connects
+
+- [Market data configuration reference](/broking-kyc/finix-broking-setup/marketdata/09-marketdata-config-reference/#5-the-gates-before-a-session-opens) — the feed-specific begin-of-day gates behind the market data items
 
 Each phase expands into its own runbook: [begin of day](/broking-kyc/finix-broking-setup/daily-ops/01-bod-runbook/), [pre-open](/broking-kyc/finix-broking-setup/daily-ops/02-pre-open-ops/), [the continuous session](/broking-kyc/finix-broking-setup/daily-ops/03-continuous-session-ops/), [close and post-close](/broking-kyc/finix-broking-setup/daily-ops/04-close-post-close-ops/), [end of day](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/), [settlement day](/broking-kyc/finix-broking-setup/daily-ops/06-settlement-day-ops/) and [expiry](/broking-kyc/finix-broking-setup/daily-ops/08-expiry-ops/). Failures route to [incident playbooks](/broking-kyc/finix-broking-setup/daily-ops/07-incident-playbooks/). Owners resolve through [the trading-day RACI](/broking-kyc/finix-broking-setup/roles/02-raci-trading-day/) and [the role register](/broking-kyc/finix-broking-setup/roles/01-role-register/); escalation through [escalation and on-call](/broking-kyc/finix-broking-setup/roles/05-escalation-oncall/). The file items are specified in [the file register](/broking-kyc/finix-broking-setup/files/01-file-register-architecture/) and their failure handling in [file handling exceptions](/broking-kyc/finix-broking-setup/files/08-file-handling-exceptions/). The unusual actions referenced throughout are catalogued for [<abbr title="Order Management System">OMS</abbr>](/broking-kyc/finix-broking-setup/oms/11-operations-catalogue/), [<abbr title="Risk Management System">RMS</abbr>](/broking-kyc/finix-broking-setup/rms/11-operations-catalogue/), [back office](/broking-kyc/finix-broking-setup/backoffice/12-operations-catalogue/) and [money](/broking-kyc/finix-broking-setup/money/08-money-operations-catalogue/).

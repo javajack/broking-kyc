@@ -1,0 +1,184 @@
+---
+title: "Market data 3: subscription mechanics"
+description: What "subscribe" actually means on each feed — network-layer multicast group membership, a private application subscription that is not market data at all, and a commercial product selection made on an order form — plus the central finding that no venue offers a per-instrument market data subscription, how instruments are really selected, and why the broker's client-facing subscription service is its own invention.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** "Subscribe to a symbol" is the mental model every engineer brings to market data, and on Indian exchange feeds it does not exist. The word *subscribe* appears in all three venues' documents, and in each case it means something other than what a developer expects. So the page separates the three meanings first, states the central negative finding plainly, and only then describes how instruments are actually selected — which is a mixture of file-driven stream mapping, network group membership and local filtering. The last section is the mirror image: the one place where a real per-instrument subscription service does exist is the one the broker builds itself, and it is specified by nobody.
+
+## TL;DR
+
+- **No venue provides a per-instrument market data subscription.** There is no subscribe-by-token opcode in <abbr title="National Stock Exchange of India">NSE</abbr>'s broadcast or tick-by-tick message catalogues, and no application subscription scope at <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> or <abbr title="Multi Commodity Exchange of India">MCX</abbr> that selects a public market data feed. Selection is done by joining the right stream and filtering locally.
+- **"Subscribe" means three unrelated things**, and conflating them produces designs that cannot work: a **network-layer multicast join**, which the exchange is not involved in at all; an **application subscription** on the trading interface, which delivers *private* streams and not market data; and a **commercial product selection** made on an order form and an agreement.
+- **The application subscribe request is for your own activity, not the market's.** Its scopes cover trades, news, service availability and the listener stream — and the listener is a private copy of your own order history, not the public book.
+- **Instrument-to-stream mapping is file-driven and changes.** All three venues publish mappings, two of them as files you must refresh, and one venue's own circular instructs members to receive **all streams** because products move between them.
+- **A stream count is not a subscription cap.** Five cash streams and eighteen derivatives streams are dissemination partitions. Nothing in them limits how many instruments a firm's clients may watch.
+- **Leaving a multicast group is not unsubscribing from an instrument.** A client removing one instrument from a watchlist should change nothing at the network layer if any other instrument in that stream is still wanted — and that is almost always the case.
+- **The published subscription scope tables contain contradictions at one venue**, with two pages of the same manual giving different values for the same scope. These need an exchange erratum, not a guess.
+
+## Conceptual overview
+
+The reason the per-instrument subscription model is absent is architectural rather than accidental. These are **broadcast** systems: the exchange sends one copy of each update to a multicast group and the network delivers it to everyone who has joined, which is why a venue can serve its entire membership without its cost scaling with the number of receivers. A per-instrument subscription model would require the exchange to maintain subscriber state per instrument per member and to send tailored streams — exactly the design that, as [the fan-out page](/broking-kyc/finix-broking-setup/marketdata/06-fanout-to-clients/) describes, a broker *does* have to build for its own clients, and which is expensive precisely because it is per subscriber. The exchange has pushed that cost to the edge, and the edge is the broker.
+
+So the selection problem is solved in three layers instead of one. At the **network layer**, a receiver joins the multicast groups carrying the streams it wants; this is ordinary IP multicast membership, the exchange has no visibility into it, and it is the only layer at which traffic is genuinely avoided. At the **mapping layer**, the firm has to know which instruments live in which stream, which comes from exchange-published master and stream files that change — sometimes intraday in effect, through a dated circular. At the **filtering layer**, the receiver discards what it does not need. Only the first layer saves bandwidth; the third saves only downstream processing. A design that joins everything and filters is simple and correct but pays full bandwidth; a design that joins selectively is cheaper and is one remapping away from a silent blind spot. Knowing which trade-off you have made is the whole point of documenting this layer.
+
+The third idea is that the *word* subscribe is a trap in the documents themselves. Both T7-lineage venues publish an explicit `Subscribe` request with a scope parameter, which looks exactly like the facility a market data consumer wants. It is not: its scopes deliver **your own** trades, the exchange's news and general messages, service-availability notifications, and the listener stream — which is a private copy of your session's own order history. It is a drop-copy and notification mechanism, covered from the order-path side in [order path edge cases](/broking-kyc/finix-broking-setup/oms/12-order-path-edge-cases/#6-drop-copy-the-independent-witness-and-two-tier-trade-truth). Reading it as a market data subscription is a specific, documented error that costs an integration cycle.
+
+Finally, there is a commercial sense of subscription that an engineer never sees in a protocol document at all. On the commercial feeds, "what you are subscribed to" is a product, a segment, a depth level, a permitted use and a delivery arrangement, chosen on an order form and fixed in an agreement. There is no runtime request involved, and a stock-selection product priced by the number of stocks does not thereby expose a runtime token subscription. When someone asks "can we add that instrument to the feed?", the answer may be a file change, a network change, or a contract amendment — and knowing which is the difference between a ten-minute task and a six-week one.
+
+## 1. The three meanings of subscribe
+
+| Meaning | Where it lives | What it selects | Who knows about it |
+|---|---|---|---|
+| **Multicast group membership** | The receiving host's network stack and the network between | Which **streams** arrive at all | **The network. Not the exchange** |
+| **Application subscription** on the trading interface | A request and response on the trading session | **Private** event streams — your trades, news, service availability, the listener | The exchange, per session |
+| **Commercial product selection** | An order form and a written agreement | The product, segment, depth, permitted use and delivery | The exchange's commercial function. **No runtime mechanism** |
+
+<Aside type="danger" title="There is no per-instrument market data subscription at any venue">
+Stated as three separate findings, because each has to be established separately:
+
+- **NSE** — no instrument subscribe or unsubscribe opcode is defined in the reviewed broadcast or member tick-by-tick message catalogues. Selection is by stream and by local filtering.
+- **BSE and MCX** — the application `Subscribe` request's scopes cover private and administrative streams. **No scope for subscribing to the public market data feeds is established.** Those feeds are consumed by joining their multicast endpoints.
+- **The commercial feeds** — product and segment are contractual. One venue's current revision history **removes an older login process** from its commercial specification, so an obsolete login packet should not be read as implementing instrument subscriptions.
+
+If a vendor's interface does offer per-symbol subscription, that is **the vendor's own API**, and nothing about it can be inferred from the exchange protocols. It also carries the vendor's own limits, recovery behaviour and latency — none of which are exchange guarantees.
+</Aside>
+
+## 2. Network-layer membership: the only layer that saves bandwidth
+
+| Element | What is published, and what is not |
+|---|---|
+| Endpoint publication | All three venues publish multicast addresses and ports — NSE in its consolidated member circular, BSE in its connectivity manual's connection tables, MCX in its live connectivity circular's annexures |
+| **An address can carry several products** | One venue states this explicitly and instructs receivers to join the address carrying the desired products **using the reference-data mapping, then filter unwanted partitions**. So "per-product address" means a product-to-stream mapping, **not a group per instrument** |
+| Join and leave | Ordinary IP multicast membership on the exchange-facing interface, binding the specified port. This is an **implementation inference** from the published delivery model, not a published procedure |
+| **What is not published anywhere** | The **required IGMP version**, whether source-specific membership is expected, router timer expectations, the **permitted number of groups**, and any join-rate limit. These were not established at any venue |
+| Where to get it | The exchange's own receiver application manual and network configuration guidance, plus provisioning confirmation. One venue supplies a receiver application with configuration and start-and-stop tooling for all streams or for individual streams |
+| Infrastructure constraints | One venue's non-colocation scheme specifies **a single IP address** and approved physical locations; colocation delivery is enabled on the rack. Current exceptions or replacement quotas need confirmation against the provisioned service |
+
+<Aside type="caution" title="Leaving a group is not unsubscribing from an instrument">
+These two operations get conflated in code, and the result is a subtle capacity bug in one direction and a silent data loss in the other.
+
+A client removing an instrument from a watchlist is a **client-facing** unsubscription, handled entirely inside the firm's own fan-out layer. It should change nothing at the network layer, because any other instrument in that stream — and there will almost always be one — still needs the group joined.
+
+Leaving a multicast group is an **infrastructure** operation with firm-wide effect: it stops reception of every instrument in that stream for every consumer. It belongs to the feed-handler lifecycle, driven by configuration and the stream mapping, and never by a client action. Make the two operations different functions with different names in different modules, and the confusion cannot arise.
+</Aside>
+
+## 3. How instruments are actually selected, per venue
+
+| Venue | Mechanism | The failure mode |
+|---|---|---|
+| **NSE member broadcast** | Join the combined feed, or join stream-wise groups. Filter tokens locally | Treating a joined group as "every instrument on the exchange". It is a firehose **for its assigned content**, which is not the same thing |
+| **NSE member tick-by-tick** | **Stream-master files** map contracts into streams — separate files per segment, including separate spread files for derivatives and currency. Select streams from those masters, receive their groups, then filter tokens in the ingestion layer | A stale stream master. The mapping is a file, and a file that is not refreshed is a blind spot waiting for the next contract introduction |
+| **BSE** | Join the address carrying the desired products, derived from the **reference-data mapping**, then filter unwanted partitions | Relying on a reference-data service whose availability two BSE documents disagree about — see [the feed catalogue](/broking-kyc/finix-broking-setup/marketdata/01-feed-catalogue/#5-bse). The end-of-day master file is the undisputed path |
+| **MCX** | **Receive all streams.** The exchange's own circular asks members on the enhanced market data and order book interfaces to do this, because **products can be moved between streams**, with changes published in the stream master on the file service | Joining only the streams carrying today's active commodities. After a remapping the firm **silently stops receiving a commodity it is actively trading**, with no error, because nothing failed |
+| **Commercial feeds** | Contractual selection of product, segment, level, use and delivery | Assuming a stock-count-based price implies a runtime token subscription. It does not |
+
+| Mapping | Why all three must be refreshed together |
+|---|---|
+| Instrument to **partition** | Used for retransmission requests and for state messages |
+| Instrument to **product** | One venue's master states that its product identifier corresponds to the trading interface's market segment identifier |
+| Instrument to **feed stream** | One venue's master says the partition also identifies the feed stream, while its later movement circular instructs members to use the **stream-master updates on the file service** instead |
+
+The three are numerically aligned today at that venue and the exchange has already published a mechanism for them to diverge. **Maintain them as distinct mappings, refreshed together, daily** — and never derive one from another arithmetically.
+
+## 4. The application subscription, and what it is really for
+
+Both T7-lineage venues publish the same mechanism with the same message identifiers:
+
+| Operation | Mechanism |
+|---|---|
+| Request | `Subscribe`, **10025**, carrying a **reference application identifier** that selects the stream class and a **subscription scope**. **Duplicate pairs are forbidden** |
+| Acknowledgement | `Subscribe Response`, **10005**, returning a **subscription identifier** |
+| Revoke | `Unsubscribe`, **10006**, carrying the **subscription identifier to revoke**; response **10007**. One subscription per request |
+
+| Scope | What it delivers |
+|---|---|
+| **Trade** | Your own trades. Session scope or business-unit scope, by value |
+| **News and general messages** | The exchange's news and general message stream |
+| **Service availability** | Partition availability notifications — or all partitions, by value |
+| **Listener** | **A private copy of your own order activity.** At one venue it conveys the current business day's standard-order history. **This is drop copy, not the public market book** |
+| Trade enhancement, and exercise or delivery notifications | Venue-specific additional classes |
+| **Risk control** | **Automatic — no subscription required** at either venue |
+
+<Aside type="danger" title="Two published problems with these scope tables">
+**The scope values contradict themselves at one venue.** Two pages of the same manual give different values for the same scopes — one page shows a no-value convention for own-session scope while another shows a session identifier, and the service-availability instruction differs between them. This needs a **corrected request matrix and simulation examples from the exchange**. Do not implement a blanket rule from either page.
+
+**Session type restricts what can be subscribed.** One venue's older session restrictions **prohibit listener and news subscriptions on high-frequency sessions** and state that only high-frequency sessions were then available. Whether the listener is enabled in 2026 cannot be inferred from the fact that the message template lists the scope. Obtain the **current session-entitlement matrix**. This mirrors the order-path finding that a high-frequency session has no recovery facilities at all.
+</Aside>
+
+## 5. Limits, and what is not a limit
+
+| Figure | What it actually is | What it is not |
+|---|---|---|
+| Stream counts — five cash, eighteen derivatives, two currency, one commodity at one venue; eight enhanced and eight order-book streams per site at another | **Dissemination partitions** | **Not** a maximum number of instruments, and not a client watchlist cap |
+| Published multicast addresses and ports | **Configuration evidence** for the release and circular they appear in. One venue's September migration **replaced** the April addresses for a segment, and the newer circular governs | **Not** public-internet endpoints, and not a substitute for provisioning |
+| Stream port patterns | Venue-specific and **not arithmetic**. At one venue, eight enhanced streams do **not** all use the first stream's ports | Not something to extrapolate. Obtain the current full address and stream-master files |
+| One IP address, approved locations | A **non-colocation scheme condition** at one venue | Not necessarily the current provisioning terms — confirm |
+| Recovery-service connection limits | Covered in [gap recovery](/broking-kyc/finix-broking-setup/marketdata/04-gap-recovery-and-arbitration/) — they are real, numeric and per IP per segment | **Not** limits on live feed consumption, and nothing to do with client subscriptions |
+
+## 6. The mirror image: the broker's own subscription service
+
+Everything above describes the absence of a per-instrument subscription. The firm's clients need exactly that, which means the firm builds it — and it is the only real subscription service in the whole chain.
+
+| Layer | Subscription model | Specified by |
+|---|---|---|
+| Exchange to firm | **None.** Stream membership plus local filtering | The exchange, in its own documents |
+| Firm internally | Per-instrument **subscriber sets**, so an update costs only its subscribers | The firm |
+| Firm to client | **Per-instrument subscribe and unsubscribe, with caps, modes and depth levels** | **The firm, entirely.** No exchange or regulatory document specifies it |
+
+The published evidence on what Indian brokers actually offer at that last boundary — the instrument caps, the connection caps, the depth levels and the authentication mechanics — is collected in [fan-out to clients](/broking-kyc/finix-broking-setup/marketdata/06-fanout-to-clients/#10-what-indian-brokers-actually-publish). The architectural point here is the shape: the cost the exchange avoided by broadcasting is the cost the broker assumes by offering subscriptions, and it is assumed at the point where the subscriber count is largest. That is why the caps on that interface exist, and why they have to exist from the first day.
+
+## 7. Configuration reference
+
+| Key | Finix default | Class | Failure mode if wrong |
+|---|---|---|---|
+| `finix.marketdata.sub.per_instrument_upstream` | **False** — no venue offers it | Exchange-set | A design that cannot be implemented |
+| `finix.marketdata.sub.join_model.<venue>` | Stream-wise where selection is deliberate; **all streams at MCX** | Exchange-set | A silent blind spot after a stream remapping |
+| `finix.marketdata.sub.group_membership_owner` | **The feed-handler lifecycle** — never a client action | Discretionary, strongly recommended | A client unsubscribe removing data for every consumer |
+| `finix.marketdata.sub.stream_master_refresh` | Daily, per venue, before begin of day | Exchange-set | A new contract that never arrives |
+| `finix.marketdata.sub.mappings_maintained_separately` | Partition, product and stream held as **three** mappings | Exchange-set | Derived mappings that break when the exchange diverges them |
+| `finix.marketdata.sub.igmp_profile` | Per the exchange's network guidance, confirmed in provisioning | Exchange-set | Membership that works in test and not in production |
+| `finix.marketdata.sub.local_filter_tokens` | True, in the ingestion layer | Discretionary | Downstream cost for data nobody wants |
+| `finix.marketdata.sub.eti_subscribe_is_not_marketdata` | True — recorded so it is not re-learned | Exchange-set | An integration cycle spent on the wrong mechanism |
+| `finix.marketdata.sub.eti_scopes_used` | Enumerated explicitly, per venue, from a **confirmed** matrix | Exchange-set | A scope value taken from the contradictory page |
+| `finix.marketdata.sub.listener_is_private` | True — it is drop copy | Exchange-set | Treating own-order history as market data |
+| `finix.marketdata.sub.endpoints_from_current_circular` | True, with the circular number recorded | Exchange-set | Using superseded addresses after a migration |
+| `finix.marketdata.sub.extrapolate_ports` | **Never** | Exchange-set | Joining a port that carries nothing |
+
+## 8. Exception paths
+
+| Situation | Response |
+|---|---|
+| A requirement says "subscribe to the client's watchlist at the exchange" | It cannot be done. Re-specify as stream membership plus a firm-side subscription service |
+| An instrument stops updating after an exchange notice | Check the stream master first. This is the remapping failure mode and it produces no error anywhere |
+| A new contract never appears in the feed | Stale stream master, or a stream not joined. Check the mapping before the decoder |
+| An application subscription is being used to get market data | Wrong mechanism. The scopes are private and administrative streams only |
+| A subscription scope value is rejected | Use the confirmed matrix, not the manual page. The published tables conflict at one venue |
+| A listener or news subscription is rejected on a session | Check the session type. One venue prohibits both on high-frequency sessions |
+| A multicast join succeeds but no data arrives | Check the circular the address came from. A migration may have replaced it |
+| Data arrives for instruments the firm does not want | Expected. Filter locally; it is a firehose for its assigned content |
+| Someone proposes leaving a group to reduce load | Establish which consumers lose data. This is firm-wide, not per client |
+| A client reports they cannot subscribe to more instruments | That is the firm's own cap, which is a published part of its own protocol |
+| The number of joined groups is near a suspected network limit | The permitted group count is not published anywhere. Raise it with the exchange rather than discovering it |
+
+## Practical notes
+
+- **Write down, per venue, which of the three meanings of subscribe applies to each feed.** It is one table and it prevents the commonest integration dead end in this plane.
+- **Receive all streams where the exchange asks for it, and prefer all streams where you are unsure.** Bandwidth is cheaper than a silent blind spot in a commodity you are actively trading.
+- **Refresh stream, partition and product masters together, every day, and alert when any of them changes.** A change is operationally significant even when nothing breaks that day.
+- **Keep multicast membership out of the client-facing code path entirely.** Different module, different vocabulary, different owner.
+- **Get the application subscription scope matrix confirmed in writing before implementing it.** The published tables disagree and the cost of guessing is a rejected session.
+- **Record the circular number next to every endpoint in configuration.** Addresses get replaced by migration circulars, and the only way to audit is to know which circular a value came from.
+- **Never extrapolate ports or addresses.** They are not arithmetic at either T7-lineage venue.
+- **Treat the firm's own subscription service as the real one.** It is the only per-instrument subscription anywhere in the chain, and the only one the firm will be asked to support.
+
+## Where this connects
+
+- [The feed catalogue](/broking-kyc/finix-broking-setup/marketdata/01-feed-catalogue/) — what each stream carries and how access is obtained
+- [Wire formats and packets](/broking-kyc/finix-broking-setup/marketdata/02-wire-format-and-packets/) — what arrives once a group is joined
+- [Gap recovery and arbitration](/broking-kyc/finix-broking-setup/marketdata/04-gap-recovery-and-arbitration/) — the recovery services and their real numeric limits
+- [Fan-out to clients](/broking-kyc/finix-broking-setup/marketdata/06-fanout-to-clients/) — the subscription service the firm builds, and what Indian brokers publish
+- [Order path edge cases](/broking-kyc/finix-broking-setup/oms/12-order-path-edge-cases/) — the drop-copy and session-type findings that this page's application subscription touches
+- [Exchange connectivity protocols](/broking-kyc/finix-broking-setup/oms/02-exchange-connectivity-protocols/) — the session model underneath
+- [Infrastructure and connectivity](/broking-kyc/finix-broking-setup/setup/08-infrastructure-connectivity/) — the network that membership runs on

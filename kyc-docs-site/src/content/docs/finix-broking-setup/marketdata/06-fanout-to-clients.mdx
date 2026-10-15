@@ -1,0 +1,305 @@
+---
+title: "Market data 6: fan-out to many concurrent consumers"
+description: The streaming interface the firm publishes to its own web, mobile and programmatic clients — why it is a protocol rather than a feature, the subscription multiplexing problem, the caps that must exist on day one, snapshot-plus-delta and resume semantics, conflation and back-pressure at the edge, the mobile realities, and where entitlement is enforced.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** Every page before this one describes something an exchange, a depository or a regulator specified. This one describes something **the firm specifies itself**, and that difference is the whole point. No document anywhere tells a broker how many instruments a client may subscribe to, what happens on a reconnect, or whether updates carry sequence numbers. The firm decides, publishes, and then lives with the decision for years because clients build against it. So the page is ordered by commitment: what you are promising, what you must cap before anyone asks, what resume means, and only then the delivery mechanics — because a mechanic can be rewritten and a published promise cannot.
+
+## TL;DR
+
+- **You are publishing a protocol, not a feature.** The moment a client or a third-party tool connects to it, every undefined behaviour becomes a behaviour you must preserve. Specify the limits, the resume semantics and the conflation policy before the first consumer, not after.
+- **The fan-out problem is not throughput; it is subscription state.** A hundred thousand connections each wanting a different handful of instruments is a routing problem, and the naive design — a filter per connection over the full stream — costs the firm the entire feed rate multiplied by the connection count.
+- **Caps must exist on day one and must be stated.** Instruments per connection, connections per client, subscriptions per second, depth level. A limit introduced later breaks working client code; a limit published on day one is simply the contract.
+- **Snapshot-plus-delta is the only honest contract for a lossy consumer.** A client that reconnects needs the current state, not the stream from where it left off — because what it left off is unbounded and mostly superseded.
+- **Sequence numbers are for detecting loss, not for replaying it.** Publish them so a client can know it missed something and re-snapshot. Do not promise replay of a conflated stream, because the intermediate values no longer exist.
+- **Back-pressure at the edge is answered by conflation, never by buffering.** An unbounded per-connection queue converts one slow mobile client into a memory incident, and the buffered ticks were worthless by the time they were sent.
+- **Entitlement is enforced here or nowhere.** This boundary is where the licence under which the firm receives data meets the client it is shown to, and it is the only place that can enforce depth, instrument scope, delay and user counting.
+
+## Conceptual overview
+
+The inbound half of this plane is an exercise in implementing other people's documents precisely. The outbound half is the opposite: it is a design problem with almost no external constraint and very severe path dependence. The reason to take it seriously early is not performance — modern hardware will push a lot of ticks — but that the interface becomes load-bearing for people outside the firm almost immediately. A trading tool, a spreadsheet, a client's own script and three internal applications will be built against whatever the first version does, including the parts nobody specified. Undefined behaviour becomes contract by use, and the firm discovers its own protocol only when it tries to change it.
+
+The engineering shape of the problem is worth stating precisely, because it is frequently mis-stated as a throughput problem. The inbound feed rate is fixed by the market, and it is large but bounded. The outbound rate is the product of the connection count and the per-connection subscription set, and it is bounded only by what the firm permits. The naive implementation — give each connection the full normalised stream and let it filter — makes every connection cost the full feed rate, so a hundred thousand connections cost a hundred thousand times the market's message rate, which is not a number any amount of hardware fixes. The correct shape inverts it: maintain a per-instrument subscriber set, so an update to an instrument costs one lookup and a write to only the connections that asked for it. That single inversion is the difference between a design that scales with market activity and one that scales with the product of market activity and user count.
+
+The third idea is that the consumer is not a server. An institutional programmatic consumer on a fixed line and a retail mobile application on a train are the same protocol and completely different operating conditions. The mobile consumer disconnects constantly, resumes in a different network, spends long periods suspended by the operating system, and has a user who switches between four instruments and then puts the phone in a pocket. A protocol designed only for the first consumer treats every mobile reconnect as a failure; a protocol designed for the second makes reconnection and re-subscription so cheap and so routine that it is not an event at all. The second design serves both.
+
+Finally, this boundary is where two non-engineering constraints become code. The first is entitlement: what this particular client is permitted to see, at what depth, with what delay — which comes from the licence under which the firm receives the feed and is covered in [redistribution and licensing](/broking-kyc/finix-broking-setup/marketdata/07-redistribution-and-licensing/). The second is fairness, which is a quieter obligation: if the firm's own dealing desk, its own algorithmic strategies and its clients are served from one fan-out, the relative latency between them is a decision the firm has made, whether or not it made it deliberately. Both of these have to be enforced at the fan-out layer, because it is the last point at which the firm knows who is asking.
+
+## 1. What is being published, and therefore promised
+
+| Element | Must be specified before the first consumer | Consequence of leaving it implicit |
+|---|---|---|
+| **Transport** | The streaming transport and its fallbacks | A client library written against an undocumented framing |
+| **Message set and schema** | Every message type, every field, with a version | Clients parsing by position and breaking on an addition |
+| **Versioning** | How a new field or message type is introduced without breaking existing consumers | Every change becomes a coordinated client migration |
+| **Subscription model** | How a consumer adds and removes instruments, and what it gets immediately on adding one | Clients polling, or re-connecting to change a subscription |
+| **Caps** | Instruments per connection, connections per client, subscription requests per second, depth level | A cap introduced later that breaks working code |
+| **Update semantics** | Conflated or complete; whether a field absent means unchanged or zero | Clients computing from partial messages and getting different answers |
+| **Sequence and loss** | Whether updates carry a sequence, and what a consumer does on a gap | Silent divergence on the client side, which the firm cannot see |
+| **Resume** | What a reconnect delivers | Either a thundering snapshot herd or clients with stale state |
+| **Rate limits and their signalling** | The limit, and the message that says it was hit | Clients that treat throttling as a disconnection and retry harder |
+| **Entitlement surface** | What a consumer is told when it subscribes to something it may not see | A client that cannot distinguish "not permitted" from "no data" |
+
+<Aside type="caution" title="Absent means unchanged, or absent means zero — pick one and write it down">
+This is the single most common source of client-side defects in a streaming market data interface, and it costs nothing to get right. If a message carries only the fields that changed, a consumer must know that a missing field means "unchanged". If messages are complete, a missing field means "no value". Interfaces that are inconsistent about this — complete for some message types and delta for others, with no marker — produce clients that compute a zero last-traded-price and display it to a user.
+
+State the rule once, per message type, in the published schema. Then make the reference client library the place where the rule is implemented, so that most consumers never have to know it.
+</Aside>
+
+## 2. The subscription multiplexing problem
+
+| Design | Cost per inbound update | Scales with | Verdict |
+|---|---|---|---|
+| Full stream to every connection, client filters | Connection count | Users multiplied by market rate | **Unusable beyond a trivial user count**, and it also ships data the client is not entitled to see |
+| Server-side filter evaluated per connection per update | Connection count | Users multiplied by market rate | Same cost, with the filtering moved. No better |
+| **Per-instrument subscriber set** | Size of that instrument's subscriber set | Actual interest | **The correct design.** An update to an untouched instrument costs one lookup |
+| Per-instrument set plus per-connection conflation buffer | Subscriber set, with supersession | Actual interest, with slow consumers degrading alone | **The correct design at scale** — see section 5 |
+
+Two properties of real subscription sets make this work better than the arithmetic suggests. Interest is extremely concentrated: a small number of instruments carry most of the subscriptions, and the long tail has almost none, so most inbound updates have a tiny or empty subscriber set. And subscription sets are small per connection — a human watching a screen has a handful of instruments, not a thousand — so a connection's outbound rate is naturally bounded by what a person can consume.
+
+The things that break it are worth naming, because each one is a feature request that will arrive:
+
+| Request | Why it breaks the model | The answer |
+|---|---|---|
+| "Subscribe to a whole segment" | Turns a bounded subscription into the firehose, per connection | Serve it as a different product with its own cap and entitlement, not as a subscription parameter |
+| "Subscribe to a watchlist of 500" | Legitimate, but multiplies the per-connection rate | Permit it with aggressive conflation and a lower update rate, and say so |
+| "Give me full depth on everything" | Depth is an order of magnitude more data than the touch | Separate caps for depth subscriptions, and a separate entitlement |
+| "Push me every trade, not a conflated price" | Defeats conflation, which is what makes the fan-out affordable | A separate, explicitly rate-limited and entitled product. Never the default |
+| Server-side scanning and alerting across all instruments | Not a subscription problem at all | A server-side service that holds one subscription internally and pushes results, never a client subscription |
+
+## 3. The caps
+
+Publish these from the first day, with numbers. The numbers matter less than their existence.
+
+| Cap | Why it exists | Failure if absent |
+|---|---|---|
+| **Instruments per connection** | Bounds per-connection outbound rate | One client's watchlist consuming a disproportionate share of capacity |
+| **Concurrent connections per client identity** | Bounds a single client's total draw, and limits credential sharing | A client opening fifty connections and the firm having no basis to object |
+| **Subscription changes per second** | Subscription churn is more expensive than data delivery | A badly written client re-subscribing in a loop and costing more than a thousand normal ones |
+| **Depth level** | Depth is the expensive subscription; it is also usually the entitled one | Full depth served to a tier that is not licensed for it |
+| **Maximum update rate per connection** | Makes conflation an interface guarantee rather than an implementation detail | Clients tuned to a rate the firm never promised, which then changes |
+| **Message size** | Bounds the worst case for a mobile consumer on a poor link | A single large message stalling a slow connection |
+| **Idle timeout and heartbeat interval** | Reclaims abandoned connections; makes liveness mutual | Tens of thousands of dead connections holding subscription state |
+| **Total connections per deployment** | Capacity protection with a defined shedding order | An uncontrolled overload in which the dealing desk and a retail user are equally affected |
+
+<Aside type="tip" title="Shed in a stated order, decided before you need it">
+Capacity protection is not optional, and the order in which consumers are degraded is a commercial and regulatory decision rather than a technical one. Write it down in advance: which consumer classes are protected absolutely — the pre-trade path and the dealing desk — which are degraded by conflation first, which lose depth before they lose prices, and which are disconnected last rather than first.
+
+Doing this in advance converts a chaotic incident into a procedure. Not doing it means the shedding order is whatever the implementation happens to do, which is usually "whoever is unlucky", and that is very hard to explain to a client afterwards.
+</Aside>
+
+## 4. Snapshot plus delta, and what resume means
+
+| Element | Position |
+|---|---|
+| **On subscribe** | Deliver a **snapshot** of the instrument's current state immediately, then deltas. A consumer that must wait for the next tick to render a price is a consumer that shows an empty screen on an illiquid instrument |
+| **On reconnect** | Deliver a **fresh snapshot** for the subscription set. Do **not** attempt to resume the stream from the disconnection point |
+| Why not resume | The missed interval is unbounded, and almost everything in it has been superseded. Resuming delivers a large volume of values that are already wrong, slowly, to a consumer that wants the current price |
+| **Sequence numbers** | Publish them, per instrument or per connection, so a consumer can **detect** loss |
+| What a gap means to the consumer | Re-snapshot that instrument. The firm's published guidance should say exactly this |
+| What a gap must not mean | A promise of replay. A conflated stream cannot be replayed, because the intermediate values were deliberately discarded |
+| **Event-like messages** | Trades, session-state changes, band revisions and reference-data changes are not state and cannot be re-snapshotted. If a consumer needs these reliably, that is a **different, non-conflated product** with its own guarantees |
+| Snapshot cost | A reconnect storm — a mobile network blip reconnecting many clients at once — requests many snapshots simultaneously. Snapshots must be cheap, served from the normalised state, and rate-limited per connection, not computed on demand |
+
+<Aside type="danger" title="The reconnect storm is the capacity event, not the volatility burst">
+Volatility increases the inbound rate, which is bounded by the market. A mobile network event that disconnects a large fraction of connections at once produces a reconnect burst in which every returning connection re-authenticates, re-subscribes and requests snapshots — and that burst is of the firm's own making and is unbounded by anything external.
+
+So snapshot generation must be served from pre-built per-instrument state rather than computed, authentication on reconnect must be cheap, and the reconnect path must have its own rate limit and its own back-off guidance for client libraries. A client library that retries immediately and indefinitely turns a thirty-second network event into a sustained outage. Ship the reference client with jittered exponential back-off, and publish that behaviour as part of the protocol.
+</Aside>
+
+## 5. Conflation and back-pressure at the edge
+
+The order path's back-pressure rule is to shed at the channel and never drop or reorder. **The market data fan-out's rule is the opposite**, and the asymmetry is not sloppiness — it follows from supersession. A newer price makes an older one worthless, so dropping the older one loses nothing a consumer wanted.
+
+| Element | Position |
+|---|---|
+| Per-connection buffer | **Bounded, and small.** A per-instrument slot, not a queue of updates |
+| When a newer value arrives for an unsent instrument | **Replace it.** The consumer receives the current price, not the history of prices it was too slow for |
+| Unbounded buffering | **Never.** It converts one slow mobile client into a memory incident, and delivers values that are already wrong |
+| Disconnecting a slow consumer | A last resort, and almost never necessary once conflation is per-instrument — the connection simply receives a lower update rate |
+| What must never be conflated | Trades where the product promises every trade, session-state changes, band revisions, reference-data changes, and anything the consumer cannot re-derive from a snapshot |
+| Observability | Per-connection conflation rate and send-queue depth, as first-class metrics. A rising conflation rate is the earliest signal of a slow consumer or a saturated link |
+| Fairness | A defined per-connection share, so one large subscription set cannot starve others on the same thread or socket group |
+
+## 6. The mobile and web realities
+
+| Reality | Design response |
+|---|---|
+| Connections drop constantly | Reconnection is routine, not an error. The client library handles it without surfacing anything to the user, and the server makes it cheap |
+| The operating system suspends the application | On resume, the client's state is arbitrarily old. **Always re-snapshot on resume**, never trust what is in memory |
+| The user's attention is on one screen | Subscribe to what is visible and **unsubscribe when it is not**. This is the single largest capacity saving available, and it is a client-side discipline the firm must build into its own applications first |
+| Networks change mid-session | The session must survive an address change, which means the session identity cannot be the connection |
+| Bandwidth and battery are costs to the user | Lower update rates on mobile are a feature. A price updating sixty times a second drains a battery to show a human nothing extra |
+| Web clients are reloaded, duplicated across tabs, and left open for days | Per-client connection caps and idle timeouts exist partly for this. A tab left open overnight must not hold subscription state forever |
+| Clients cache and display while disconnected | The application must show the user that data is **not live** — a stale indicator on the client is a consumer-protection matter, not a nicety |
+| Push notifications are not market data | Price alerts are a server-side evaluation delivered out of band; they must not be implemented by holding a subscription open on behalf of a disconnected user |
+
+## 7. Authentication, session and attribution
+
+| Element | Position |
+|---|---|
+| Session identity | Separate from the connection, so a reconnect resumes an identity rather than creating one |
+| Credential | A short-lived token obtained through the authenticated application session, never a long-lived secret in a mobile binary or a web page |
+| Reconnect cost | Token validation must be cheap enough for a reconnect storm, which usually means a verifiable token rather than a lookup |
+| **Attribution** | Every connection is attributable to a client identity, for entitlement, for user counting under the data licence, and for answering "who was receiving this?" |
+| Credential sharing | Detectable through the per-client connection cap and concurrent-use patterns. It matters because user counts are a licensing obligation — see [redistribution and licensing](/broking-kyc/finix-broking-setup/marketdata/07-redistribution-and-licensing/) |
+| Programmatic consumers | A distinct credential class with its own caps, its own rate limits and its own entitlement, because the usage pattern and the licensing position both differ |
+| Internal consumers | The firm's own dealing desk and strategies are also consumers here, and their relative latency against client traffic is a decision the firm has made whether or not deliberately |
+
+## 8. Where entitlement is enforced
+
+<Aside type="danger" title="This boundary is the only place entitlement can be enforced">
+Upstream of the fan-out, the firm has one normalised feed and no concept of who is asking. Downstream, the data has already been delivered. The fan-out layer is therefore the only component that can enforce what a specific client is permitted to receive — and if it does not, the firm's licensing position is whatever its most permissive client happens to have discovered.
+
+What has to be enforced here: which instruments and segments a client may receive; the depth level; whether data is real time or delayed for that client class; whether the client is counted as a user under the firm's data licence; and whether a programmatic consumer is permitted to receive data at all under the terms the firm signed.
+
+Build it as a check at subscribe time **and** a filter at delivery time. Subscribe-time-only enforcement fails the moment an entitlement changes during a session, which it does whenever a client's tier changes or a segment is deactivated.
+</Aside>
+
+| Enforcement point | What it catches |
+|---|---|
+| Subscribe time | The ordinary case, with a clear and distinguishable rejection reason |
+| Delivery time | Entitlement changes mid-session, and any subscribe-time bypass |
+| On entitlement change | Existing subscriptions re-evaluated, and withdrawn ones terminated with a stated reason |
+| On segment deactivation for a client | Subscriptions dropped, because a client who may no longer trade a segment may not necessarily see it either — a question for the licence, not for engineering |
+| Counting and reporting | The periodic user-count declarations the data licence requires |
+
+## 9. Scale and capacity shape
+
+| Dimension | What it scales with | Planning note |
+|---|---|---|
+| Inbound rate | Market volatility | Bounded by the venues. Size for the worst observed day with headroom |
+| Instrument state memory | Instrument universe, and depth retained | Bounded and predictable. The largest single factor is how much depth is kept |
+| Subscription state | Connections multiplied by instruments per connection | **Bounded by the caps you published.** This is why the caps exist |
+| Outbound rate | Subscriber sets of the instruments that are actually moving | Concentrated: a few instruments carry most subscriptions, and the two peak together |
+| Reconnect rate | Client population and network events | **The unbounded one.** Rate-limit it and ship backing-off clients |
+| Snapshot rate | Reconnects plus subscription changes | Serve from pre-built state; never compute on demand |
+| Fan-out node count | Connections, not data volume | Connections shard cleanly; the instrument state does not need to |
+
+The architectural consequence: the normalised state is a small, shared, read-mostly thing, and the connection handling is a large, shardable, write-heavy thing. Separating them lets the expensive half scale horizontally on connection count while the correctness-critical half stays single and consistent. Conflating them — one process that both builds the book and holds the connections — means every connection-count increase risks the correctness of the book.
+
+## 10. What Indian brokers actually publish
+
+Every number in this section is published by the broker named, and the units differ deliberately: some quota by API key, some by user, some by session, some by connection, and one by token-and-mode combination. **They cannot be averaged into an industry standard, and none of them is evidence of what an exchange permits** — that is the subject of [redistribution and licensing](/broking-kyc/finix-broking-setup/marketdata/07-redistribution-and-licensing/). They are useful for exactly one thing: calibrating what a firm's own caps should look like, and seeing which design questions everyone has had to answer. `[public]`
+
+| Broker interface | Instrument or subscription cap | Concurrent connections | Format and depth |
+|---|---|---|---|
+| Zerodha, Kite Connect v3 | **3,000 instruments per connection** | **3 per API key** | JSON requests, **binary** quote packets at 8, 44 and 184 bytes for the three modes; the full mode carries **five bid and five offer** levels. Index packets differ |
+| Upstox, Market Data Feed V3 | Per category: last-price **5,000**, option Greeks **3,000**, full **2,000**. Mixed-category limits are lower — **2,000 / 2,000 / 1,500** | **2 per user** | Binary subscription frames, **Protobuf** responses; the full mode carries **five** levels |
+| Upstox Plus | A thirty-level mode with an individual limit of **50** | **5 per user** | A **thirty-level** market depth mode |
+| DhanHQ v2 live feed | **5,000 instruments per connection**, with subscription requests batched at **at most 100** | **5 per user** | JSON requests, **little-endian binary** responses; three modes, the full one carrying **five** levels |
+| DhanHQ full market depth | **20-level: 50 instruments per connection. 200-level: one instrument per connection** | Exceeding **5** sockets disconnects the first, with a published error code | JSON subscriptions, binary depth, with separate response codes per side |
+| Angel One, SmartAPI WebSocket 2.0 | **1,000 token subscriptions per session**, where **one token in three modes counts as three**; repeating an identical token-and-mode pair does not consume more quota | **3 per client code** | JSON requests, little-endian binary responses; three modes, the richest carrying **five-level** depth |
+| FYERS API v3 data socket | **5,000 symbols** — but the support article says **per API key** and the developer reference says **per connection**. **An unresolved conflict** | Support **recommends at most 5 per user**, without describing it as a guaranteed entitlement | Symbol and depth updates, plus a light mode; depth **five** levels |
+| FYERS tick-by-tick socket | **5 symbols per connection**, with numbered channels | **3 per application per user** | **Protobuf**, **fifty-level** depth, on cash and derivatives |
+| Finvasia Shoonya | **500 tokens per connection**, per a 2026 changelog entry that the current rate-limit page omits | **1 per session**, and the FAQ says **1 per user** | JSON touchline snapshots and deltas; the official library documents **five-level** depth |
+
+### 10.1 The design questions everyone has answered, and how
+
+| Question | The range of published answers |
+|---|---|
+| **Quota unit** | Per connection, per user, per API key, per session, and per token-and-mode. **No two of the surveyed interfaces agree**, which is itself the lesson: pick a unit, state it, and never change it |
+| **Wire format** | JSON requests with **binary or Protobuf** responses is the dominant pattern. Nobody streams JSON market data at scale |
+| **Modes** | Everyone offers tiers — a last-price mode, a quote mode and a full mode — because the cheapest useful subscription is a single price and most subscriptions want only that |
+| **Depth** | **Five levels is the common ceiling** on the ordinary feed. Deeper products exist — twenty, thirty, fifty and two hundred levels — and are **separate interfaces with far smaller instrument caps**, down to a single instrument for the deepest |
+| **Authentication** | A short-lived token obtained from an authenticated session, passed in a query string, a bearer header, or custom headers. **Token lifetimes are short and mostly expire at a fixed clock time** — one at 06:00 the next day, another at 03:30 the following morning regardless of when it was issued, another valid 24 hours with an explicit renewal call that invalidates the old token |
+| **Heartbeats** | Server ping intervals of **10 seconds** with disconnection after **40 seconds** of silence at one broker; a published 30-second ping-pong contract at another whose own library uses 10 |
+| **Reconnect** | **Client-side responsibility, universally.** The official libraries ship automatic reconnection with backoff and subscription restoration; one broker states explicitly that **subscriptions do not survive a disconnect** and must be resent after re-authenticating |
+| **Initialisation** | A snapshot then deltas. One interface sends market status first, then a snapshot, then live updates; another sends an initial cached value then changes only; another sends one acknowledgement message per instrument then changes |
+| **Delta semantics** | At least one broker states the rule explicitly: **apart from a few key fields, absent fields mean unchanged**, and the consumer merges by exchange and token. This is the rule section 1 of this page insists on declaring |
+| **Sequence numbers** | **Mostly absent.** One broker's quote schema has no sequence field at all; another labels its depth sequence field **"to be ignored"**; a third exposes a sequence number but states that it is **unavailable on the index feed and should be ignored there** |
+| **Replay** | **Nobody offers it.** No surveyed interface publishes a resume cursor, a replay horizon or a missed-event recovery call |
+
+<Aside type="tip" title="The published practice validates the design positions on this page">
+Three of this page's positions are not merely defensible — they are what the market has converged on, independently, at every broker whose documentation was examined:
+
+**No replay.** Not one surveyed interface offers lossless client-side replay. Reconnect-and-re-snapshot is the universal contract, which is exactly the position in section 4, and it is right for the reason given there rather than because everyone does it.
+
+**Client-side reconnect with backoff, shipped in the library.** Every broker with an official library ships reconnection and subscription restoration in it. That is the correct place for it — it is written once and it is where the back-off policy can actually be enforced.
+
+**Tiered modes with five levels as the ordinary ceiling, and deep depth as a separate interface with a tiny cap.** The economics force this: a two-hundred-level subscription at one broker permits exactly **one instrument per connection**. Depth is the expensive subscription, and separating it is how a firm offers it at all.
+
+The counter-lesson is in the **quota unit**: five surveyed brokers use five different units, two of them publish **conflicting** values in their own documentation, and one publishes a cap in a changelog that its current rate-limit page omits. That is what an unstated or inconsistently stated cap looks like after a few years. State yours once, in the protocol document, in one unit.
+</Aside>
+
+### 10.2 What no exchange or regulator specifies
+
+**No exchange or regulatory document establishing a universal client connection count, a symbols-per-socket cap, a ticks-per-second ceiling or a mandatory conflation window was found.** This is a bounded research finding rather than proof that no product-specific contract exists, and it has two consequences.
+
+The first is freedom: the caps are the firm's commercial and engineering decision, and the wide spread of published values confirms that no norm is being enforced. The second is responsibility: because nothing external constrains it, nothing external will catch a bad choice either. The constraints that **do** exist are of a different kind — what a client may be shown, at what depth, with what delay, and what the firm must report about its users — and those are licensing constraints enforced at this same boundary. One published depth product being limited to five levels, or twenty, does **not** establish a retail depth ceiling; the surveyed brokers publish deeper products than that.
+
+It is also worth separating four kinds of limit that get conflated in one conversation: the **exchange's recovery-service quotas**, which govern the firm's ingestion and are described in [gap recovery](/broking-kyc/finix-broking-setup/marketdata/04-gap-recovery-and-arbitration/#3-nse-member-tick-by-tick-the-one-fully-documented-recovery); the **order-entry rate limits** under the algorithmic-trading framework; the firm's own **market data fan-out quotas**, which are this page; and the **redistribution permissions** in the data licence. They are four separate controls with four separate owners, and a number from one of them answers no question about any other.
+
+## 11. Configuration reference
+
+| Key | Finix default | Class | Failure mode if wrong |
+|---|---|---|---|
+| `finix.marketdata.fanout.protocol_version_published` | True, from the first consumer | Discretionary, strongly recommended | Every change becomes a client migration |
+| `finix.marketdata.fanout.delta_semantics_declared` | Per message type, in the schema | Discretionary, strongly recommended | Clients computing zero prices from partial messages |
+| `finix.marketdata.fanout.routing_model` | Per-instrument subscriber set | Discretionary, strongly recommended | Cost scaling with users multiplied by market rate |
+| `finix.marketdata.fanout.cap.instruments_per_connection` | Published, enforced | Discretionary, strongly recommended | One subscription set consuming disproportionate capacity |
+| `finix.marketdata.fanout.cap.connections_per_client` | Published, enforced | Discretionary, strongly recommended | No basis to object to credential sharing |
+| `finix.marketdata.fanout.cap.subscribe_rate` | Published, enforced | Discretionary, strongly recommended | A looping client costing more than a thousand normal ones |
+| `finix.marketdata.fanout.cap.depth_level.<tier>` | Per entitlement tier | Regulatory, in effect | Depth served to a tier not licensed for it |
+| `finix.marketdata.fanout.cap.update_rate_per_connection` | Published as a guarantee | Discretionary | Clients tuned to an unpromised rate |
+| `finix.marketdata.fanout.heartbeat_and_idle_timeout` | Published, enforced | Discretionary, strongly recommended | Dead connections holding subscription state |
+| `finix.marketdata.fanout.snapshot_on_subscribe` | True | Discretionary, strongly recommended | Empty screens on illiquid instruments |
+| `finix.marketdata.fanout.snapshot_on_reconnect` | True, always | Discretionary, strongly recommended | Clients resuming with stale state |
+| `finix.marketdata.fanout.stream_resume_offered` | **False** | Discretionary, strongly recommended | A promise a conflated stream cannot keep |
+| `finix.marketdata.fanout.sequence_numbers_published` | True | Discretionary, strongly recommended | Client-side divergence the firm cannot see |
+| `finix.marketdata.fanout.snapshot_from_prebuilt_state` | True | Discretionary, strongly recommended | A reconnect storm computing snapshots on demand |
+| `finix.marketdata.fanout.reconnect_rate_limit` | Enforced, per client and global | Discretionary, strongly recommended | A thirty-second network event becoming a sustained outage |
+| `finix.marketdata.fanout.client_backoff` | Jittered exponential, shipped in the reference client | Discretionary, strongly recommended | Synchronised retries |
+| `finix.marketdata.fanout.buffer_model` | **Bounded per-instrument slot, conflating** | Discretionary, strongly recommended | One slow client becoming a memory incident |
+| `finix.marketdata.fanout.unbounded_buffering` | **Never** | Discretionary, strongly recommended | Delivering values that are already wrong, slowly |
+| `finix.marketdata.fanout.never_conflate` | Trades on the complete product, session state, bands, reference data | Exchange-set, in effect | A control message silently dropped |
+| `finix.marketdata.fanout.shed_order` | Declared in advance, by consumer class | Discretionary, strongly recommended | An incident in which the shedding order is whoever is unlucky |
+| `finix.marketdata.fanout.session_survives_connection` | True | Discretionary, strongly recommended | Mobile network changes treated as new sessions |
+| `finix.marketdata.fanout.token_ttl_minutes` | Short, with cheap refresh | Discretionary, strongly recommended | Long-lived secrets in mobile binaries |
+| `finix.marketdata.fanout.attribution_per_connection` | True | Regulatory, in effect | No basis for entitlement, user counting or an audit answer |
+| `finix.marketdata.fanout.entitlement_at_subscribe` | True | Regulatory, in effect | Clients receiving what they may not |
+| `finix.marketdata.fanout.entitlement_at_delivery` | True | Regulatory, in effect | Mid-session entitlement changes not applied |
+| `finix.marketdata.fanout.unsubscribe_on_screen_change` | True in the firm's own applications | Discretionary, strongly recommended | The largest available capacity saving, unclaimed |
+| `finix.marketdata.fanout.client_stale_indicator` | True | Regulatory, in effect | A user acting on data they believe is live |
+| `finix.marketdata.fanout.separate_state_and_connection_tiers` | True | Discretionary, strongly recommended | Connection growth risking the correctness of the book |
+
+## 12. Exception paths
+
+| Situation | Response |
+|---|---|
+| Reconnect storm after a network event | Reconnect rate limit engages; snapshots served from pre-built state; monitor for client libraries that are not backing off, and name them |
+| One connection's conflation rate rising steadily | A slow consumer or a saturated link. It degrades alone by design. Investigate before it disconnects; never respond by buffering |
+| A client re-subscribing in a loop | Subscription-rate cap engages with a distinguishable error. Contact the client; a looping client is usually a defect they want to know about |
+| A client requesting an entire segment | Not a subscription. Route to the separate product, with its own entitlement and cap |
+| Entitlement withdrawn mid-session | Delivery-time filter stops the data; the subscription is terminated with a stated reason, not silently |
+| A consumer receiving data it is not entitled to | **Licensing incident**, not merely a bug. Establish the scope and duration, and check what the licence requires to be reported |
+| Sequence gap reported by a client | Guide to re-snapshot. Investigate whether the gap was in the fan-out or inbound — if inbound, it affects every consumer of that instrument |
+| Clients reporting prices that disagree with the dealing desk | Check whether both are served from the same normalised state. If not, that is the finding |
+| Connection count approaching the deployment cap | The declared shedding order applies. Protect the pre-trade path and the dealing desk absolutely |
+| A dead connection holding subscription state | Idle timeout and heartbeat should have reclaimed it. If they did not, that is the defect |
+| Price alerts firing from a held-open subscription for a disconnected user | Architectural defect. Alerts are server-side evaluation delivered out of band |
+| A third-party tool discovered to be consuming the client interface | Establish whether that is permitted under the data licence and the firm's own terms **before** deciding whether it is a capacity question |
+
+## Practical notes
+
+- **Publish the protocol document before the first external consumer, even if the first consumer is your own mobile app.** Writing it down is what turns implicit behaviour into a decision.
+- **Ship a reference client library and make it the recommended path.** It is where back-off, re-snapshot-on-resume and delta semantics get implemented correctly once instead of by every consumer.
+- **Set the caps generously and enforce them from day one.** The number can be raised later without breaking anyone; a cap introduced later breaks working code.
+- **Unsubscribe when a screen closes, in your own applications first.** It is the cheapest capacity win available and it sets the example the published protocol then recommends.
+- **Treat reconnect capacity as a separate capacity plan from tick capacity.** They peak for different reasons and the reconnect one is the one you create yourself.
+- **Make the stale indicator a product requirement, not a technical one.** A user acting on data they believe is live is a complaint with a regulatory edge.
+- **Instrument per-connection conflation rate and send-queue depth from the start.** They are the earliest and clearest signals of trouble in this layer.
+- **Decide the shedding order with the business, in writing, before an incident.** The order is a commercial decision; the implementation is not.
+
+## Where this connects
+
+- [Normalisation and internal distribution](/broking-kyc/finix-broking-setup/marketdata/05-normalisation-and-internal-distribution/) — the state this layer serves, and the conflation policy it inherits
+- [Redistribution and licensing](/broking-kyc/finix-broking-setup/marketdata/07-redistribution-and-licensing/) — what the firm is permitted to deliver, to whom, and what it must report
+- [Subscription mechanics](/broking-kyc/finix-broking-setup/marketdata/03-subscription-mechanics/) — the venue-side equivalent of this problem, and how little of it is subscribable
+- [The gateway and event architecture](/broking-kyc/finix-broking-setup/stack/bff-and-event-architecture/) — the per-channel gateway this sits alongside, and why the back-pressure rules differ
+- [Algo, API, DMA and <abbr title="Smart Order Routing">SOR</abbr>](/broking-kyc/finix-broking-setup/oms/09-algo-api-dma-sor/) — the programmatic consumer class and its approval regime
+- [Mobile and web application submission](/broking-kyc/finix-broking-setup/certification/02-mobile-web-app-submission/) — the applications this interface serves are themselves certified
+- [Infrastructure and connectivity](/broking-kyc/finix-broking-setup/setup/08-infrastructure-connectivity/) — the capacity this layer consumes
+- [Incident playbooks](/broking-kyc/finix-broking-setup/daily-ops/07-incident-playbooks/) — where the reconnect storm and the shedding order belong operationally

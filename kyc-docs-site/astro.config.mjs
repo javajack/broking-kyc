@@ -493,6 +493,22 @@ export default defineConfig({
               ],
             },
             {
+              label: "Market Data",
+              collapsed: true,
+              items: [
+                { label: "Overview", slug: "finix-broking-setup/marketdata" },
+                { label: "1. Feed Catalogue", slug: "finix-broking-setup/marketdata/01-feed-catalogue" },
+                { label: "2. Wire Formats & Packets", slug: "finix-broking-setup/marketdata/02-wire-format-and-packets" },
+                { label: "3. Subscription Mechanics", slug: "finix-broking-setup/marketdata/03-subscription-mechanics" },
+                { label: "4. Gap Recovery & Arbitration", slug: "finix-broking-setup/marketdata/04-gap-recovery-and-arbitration" },
+                { label: "5. Normalisation & Distribution", slug: "finix-broking-setup/marketdata/05-normalisation-and-internal-distribution" },
+                { label: "6. Fan-Out to Clients", slug: "finix-broking-setup/marketdata/06-fanout-to-clients" },
+                { label: "7. Redistribution & Licensing", slug: "finix-broking-setup/marketdata/07-redistribution-and-licensing" },
+                { label: "8. Content Data Layer", slug: "finix-broking-setup/marketdata/08-content-data-layer" },
+                { label: "9. Config Reference", slug: "finix-broking-setup/marketdata/09-marketdata-config-reference" },
+              ],
+            },
+            {
               label: "Monitoring & Data Sharing",
               collapsed: true,
               items: [

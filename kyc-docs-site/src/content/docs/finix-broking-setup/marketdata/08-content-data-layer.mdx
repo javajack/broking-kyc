@@ -1,0 +1,232 @@
+---
+title: "Market data 8: the content data layer"
+description: "Fundamentals, corporate events, ownership, mutual fund data, news and research — a different supply chain from the price feed, with its own licensing shape, its own per-dataset freshness, its own correctness consequences, and a regulatory edge the price feed does not have: the point at which displayed content becomes research."
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** This page exists because of a question worth asking directly — does the content layer deserve its own treatment, or is it just another vendor interface? The answer is the first section, with the reasoning, because it determines how the rest is organised. What follows is ordered by the four dimensions on which content data genuinely differs from a price feed: its licensing shape, the temporal meaning of each dataset, the consequences when it is wrong, and the regulatory line it can cross and a price feed cannot. One supplier is used throughout as the worked example, because a catalogue of names is useless without a concrete integration to hang it on.
+
+## TL;DR
+
+- **Yes, this needs its own section, and the reason is not volume — it is that a vendor-interface page would hide four things.** Dataset-specific licensing, the temporal meaning of each dataset, correction and revision handling, and the point at which displayed content becomes regulated research.
+- **The content layer is a different supply chain from the price feed**, with different suppliers, different cadence, different correctness consequences and a different owner inside the firm. An order-event stream will never carry an earnings figure or an editorial opinion, and a content interface will never be an execution-grade price source.
+- **One supplier's published position is that its interface may not be redistributed.** That single clause shapes the architecture: content can be displayed in the firm's own application under licence, and cannot be passed onward through the firm's own programmatic interface without separate written permission.
+- **Freshness is per dataset, not per feed.** Published labels in one catalogue include five-minute and fifteen-minute delayed prices, end-of-day masters and delayed news — in the same product. A single "last updated" timestamp across a content platform is a misrepresentation.
+- **The exchanges are themselves content suppliers**, with corporate-data services covering fundamentals, announcements and ownership filings — one delivering end-of-day announcements by file transfer after 20:00. Content is not an exclusively vendor-sourced category.
+- **The regulatory edge is real and specific.** Research supplied to a broker's own broking clients is treated as consideration-backed **even with no separate research fee**, and a firm distributing third-party research has review and disclosure duties — with the no-relationship exemption ordinarily unavailable to a firm that has a contracted feed.
+- **Statistical financial summaries and general market commentary are carved out of the research definition.** Recommendations, price targets, model portfolios and trading calls are expressly inside it. Where a feature sits is a classification question to answer before publication, not after.
+
+## 1. The direct answer: why this is a section and not a vendor page
+
+A vendor-interface page records what a supplier publishes, what is verifiable and what belongs in the contract — the discipline set out in [vendor interface verification](/broking-kyc/finix-broking-setup/stack/vendor-interface-verification/). That is necessary here too, and it is not sufficient, because four properties of content data are invisible at that level.
+
+| Dimension | Why it needs its own treatment | Who owns it |
+|---|---|---|
+| **Licensing is per dataset and shaped differently from a price licence** | One supplier states plainly that its interface **may not be redistributed**. One exchange permits redistribution only as contracted and separately restricts creating indices or instruments from its data. A single "we licensed the feed" statement answers none of: in-app display, article bodies, caching, archives, derived analytics, onward interfaces | **Legal, compliance and procurement** own a rights matrix; engineering implements the entitlements |
+| **Temporal meaning differs per dataset, and is not a latency** | A price is stale or fresh. A financial statement has a **reporting period, a filing date, a restatement history and a consolidated-versus-standalone basis**; a shareholding pattern has a **publication lag and revised filings**; a net asset value has a **publication status**. One supplier's own position is that update timing depends on the dataset | **Data operations** owns per-dataset freshness, effective dates and source-publication times |
+| **Correctness consequences are different in kind** | A wrong tick is corrected by the next tick. A **wrong ratio distorts a screener silently**; a **wrong corporate-event date misleads a client about an entitlement**; a wrong news attribution is a conduct matter. Corrections propagate backwards through derived values rather than forwards | **Research or editorial plus compliance** own interpretation, correction and withdrawal; data engineering owns mapping, units, duplicates and revision propagation |
+| **It can cross a regulatory line the price feed cannot** | Displayed content can become **regulated research**. A quote stream cannot | **Compliance**, with a classification gate before publication |
+
+<Aside type="tip" title="The one-line version">
+**Price data is an operational dependency; content data is a publishing operation.** Price data fails fast, loudly and symmetrically, and its correctness is established by reconciliation against the exchange. Content data fails slowly, quietly and asymmetrically, and its correctness is established by provenance, versioning and review. Those are different disciplines with different controls, and running the second one as if it were the first is how a firm ends up displaying a restated figure for a year.
+</Aside>
+
+## 2. Documentary framework
+
+- **The supplier's own product catalogue, answers and platform documentation** — the dataset names, the advertised transports and formats, the authentication examples and the redistribution position. Note that subscribed interface documentation is **emailed to customers** rather than published, so the published catalogue is not the specification. `[public]`
+- **Comparable suppliers' published material** — another vendor's data-feed solutions with file-transfer and interface delivery, a workstation-and-feed supplier named on an exchange's own page, and a supplier with public interface documentation for ownership datasets. `[public]`
+- **The exchanges' own corporate-data services** — one with company fundamentals, announcements and ownership filings and an end-of-day announcement delivery by file transfer after 20:00, on a dedicated circuit; another with corporate-data interfaces for financials, disclosures, announcements and corporate actions. `[public]`
+- **<abbr title="Securities and Exchange Board of India">SEBI</abbr> Research Analysts Regulations**, as consolidated — the definitions at 2(1)(w) and 2(1)(wa), the registration requirement at regulation 3, the third-party distribution duties at regulation 22, the disclosure and report-content provisions at regulations 19 to 21, and the record-preservation requirement at regulation 25. `[not yet in index]`
+- **SEBI master circular for research analysts**, 6 February 2026 — clause 1.8(b) on research supplied to broking clients, chapter 21 on prohibited associations, and the outsourcing annexure. `[not yet in index]`
+- **SEBI circulars on unauthenticated news circulation**, `Cir/ISD/1/2011` and `Cir/ISD/2/2011`, March 2011 — the controls against spreading unverified information, log retention, and the approval requirement before employees forward market-related news. `[not yet in index]`
+- **SEBI Research Analysts amendment of October 2026**, `SEBI/LAD-NRO/GN/2026/321` — relaxing institutional-client call recording, effective on the thirtieth day after Gazette publication and therefore **not in force as of mid-October 2026**. It is **not** a retail research-display exemption. `[not yet in index]`
+
+## 3. The boundary with the price feed
+
+| A broking application needs | From the content layer | From the price feed | The boundary rule |
+|---|---|---|---|
+| Company and investment pages | Financial statements, ratios, ownership, company background and directors' material | Nothing | An order-event stream will never carry an earnings figure. Do not look for it there |
+| A corporate-event calendar | Board meetings, bonus and rights issues, face-value splits, name changes, delistings, book closures | Reference-data and master changes, and the security-status messages | **Reconcile against exchange and issuer notices.** Do not let an informational calendar drive entitlement accounting or trading restrictions — those come from the exchange's own files and from [corporate actions](/broking-kyc/finix-broking-setup/backoffice/07-corporate-actions/) |
+| Mutual fund discovery | Net asset values, historical values, scheme holdings, asset allocation, performance, scheme masters and new fund offers | Nothing | A quote stream cannot establish scheme portfolio composition or publication status |
+| News and commentary | Corporate news, economy news, result commentary, market commentary, analyst-oriented items | Nothing | **Classify the payload before publishing it** — see section 7 |
+| Prices, charts and index membership | **Delayed** prices and index constituents in some catalogues | **The authoritative executable price** | **Name which source drives what.** Executable quote displays come from the price feed; a content supplier's delayed price is for context, never for a decision. Index composition may legitimately come from either, and the licences differ |
+| Screeners and comparison | Ratios, peer comparison, sector mappings, masters | Current prices | A screener mixes the two, which means **it inherits the slowest and most restrictive of both** — and must show the user which is which |
+
+<Aside type="danger" title="Never let a content supplier's price field reach a decision">
+Content catalogues routinely include price products, and their published labels are explicit about what they are — in one catalogue, delayed prices labelled **five minutes** for one exchange and **fifteen minutes** for another, alongside end-of-day variants. Those are legitimate products for context.
+
+The risk is architectural: once a content interface returns a field called a price, something downstream will use it. A margin calculation, a chart that a client reads as live, an alert, or a portfolio valuation shown next to an order button. The defence is naming — carry the provenance and the freshness class on every price-like value, make the content-sourced ones structurally distinguishable from feed-sourced ones in the data model rather than by convention, and never let them share a field. This is the same discipline that [normalisation and internal distribution](/broking-kyc/finix-broking-setup/marketdata/05-normalisation-and-internal-distribution/#5-the-price-that-is-not-one-price) applies to the six different prices inside the feed itself.
+</Aside>
+
+## 4. The catalogue, as one supplier publishes it
+
+Used here as the worked example because its catalogue is public and its naming is concrete. The vendor's interface product is published under its own brand; the current corporate identity is a differently named entity from the one that appears on the product material, and **the legal contracting entity for a new agreement is not established from the published pages** — obtain it. `[public]`
+
+| Family | Published dataset names |
+|---|---|
+| Company identity and background | Company profile, company background, board of directors, directors' reports |
+| **Financials and ratios** | Profit and loss, quarterly results, key financial ratios, peer comparison. **Named standalone balance-sheet and cash-flow endpoints, consolidated-versus-standalone treatment, restatement history and ratio formulae are not published** |
+| Ownership | Shareholding pattern, mutual fund holdings |
+| Corporate events | Board meetings, bonus issues, rights issues, face-value splits, name changes, delisted shares, plus exchange-specific announcement and book-closure variants. **Event identifiers, cancellation and correction messages, and freshness guarantees are not published** |
+| Mutual funds | Daily and historical net asset value, scheme ratios, scheme holdings, asset allocation, performance, fund profile, scheme comparison, new fund offers, scheme master |
+| News and commentary | Analyst poll, corporate news, corporate results, economy news, offering news, fund news, market commentary, stock alerts, review and action items. **The news category is labelled delayed.** Article-body versus headline rights, correction protocol, archive retention and push delivery are **not** published |
+| Research | The news catalogue includes analyst-oriented content, and the related database product describes in-house equity research. **A dedicated research-report interface, a recommendation lifecycle, a report-document feed, analyst-registration payloads and a redistribution licence were not found** |
+| Indices and equity analytics | Index lists, index-wise company lists, constituents, delayed live indices, historical returns, sector-wise company lists, company master. **Delayed labels: five minutes for one exchange, fifteen for the other; masters are end-of-day** |
+| Offerings | Forthcoming, open and closed offerings, new issue monitor, new listings, basis of allotment, draft prospectus. **Prospectus-document redistribution rights are not established** |
+| Derivatives, currency and commodities | Foreign-investor statistics, derivative summaries, delayed quotes, open-interest and mover datasets; currency futures and intraday charts; commodity news, session commentary and closing prices. **None of this is a lossless exchange order-event feed** |
+| Other markets | World indices, foreign exchange, fund and foreign-investor investment flows, depositary receipt prices. **Each upstream market has its own licensing chain** |
+| Delivery | Interfaces, comma-separated files, structured text and an embeddable frame are advertised. **Named bulk file-transfer services and streaming push protocols were not established — a format is not a delivery schedule** |
+
+## 5. Integration reality
+
+| Element | What is published | The caution |
+|---|---|---|
+| Transport and format | **Interface and message-based delivery with structured text, comma-separated and object formats**, at platform level | **This does not establish a binding, a schema or a file-transfer schedule for every named dataset.** Obtain the subscribed endpoint specification |
+| **Documentation availability** | Subscribed interface documentation is **emailed to customers** | The published catalogue is **not** the specification. This is the documentation-availability finding that [vendor interface verification](/broking-kyc/finix-broking-setup/stack/vendor-interface-verification/) treats as a procurement matter in its own right |
+| Authentication | Published examples use an **interface key and a response-type parameter**; separate prose describes a **token in a username field** and an **account allowance of two IP addresses** | **Which profile applies to a new contract, the secure endpoint and credential rotation are not established.** A two-address allowance is an architectural constraint worth knowing before designing a deployment |
+| **Redistribution** | The supplier states: **interface redistribution is not permitted** | Written clarification is needed distinguishing **licensed in-app display from onward redistribution**. A purchased subscription is not evidence of either permission |
+| Refresh cadence | Timing **depends on the dataset**, with intraday snapshots described; the corporate material says data is updated on receipt from exchanges | **Neither is a universal real-time guarantee** for financials, ownership, net asset values or news |
+| **Published internal conflicts** | Availability figures of **99.95 per cent** on one page and **99 per cent** on another; interface counts given as both **more than two hundred** and **more than one hundred**; an example that **requests one format while the adjacent prose describes another** | None of these is accepted as the signed service level or the definitive inventory. **Get the agreement and a licensed sample response**, and treat the conflicts as questions for the supplier rather than as defects |
+
+<Aside type="caution" title="The redistribution clause is the architectural constraint, not the transport">
+Of everything in this section, the clause that decides the design is the supplier's position that its interface may not be redistributed.
+
+It means content can flow into the firm's own application under the licence, and **cannot flow out through the firm's own programmatic interface** without separate written permission — so a firm that offers clients a documented interface has to be able to serve price data through it while **excluding** content data, by construction rather than by configuration. If the two are merged into one response model before the entitlement boundary, that exclusion becomes impossible to implement cleanly and impossible to prove afterwards.
+
+Design for it from the start: content and price data converge in the presentation layer, not in the interface layer.
+</Aside>
+
+## 6. The supply options, including the exchanges
+
+| Supplier type | What is established | The boundary |
+|---|---|---|
+| **Dedicated content syndicators** | At least one publishes a broad named catalogue with interface delivery; another publishes data-feed solutions covering company information, funds, announcements, news, offerings and market datasets with **file-transfer or interface delivery** | Public endpoint schemas, correction service levels and commercial terms are **not** published by any of them |
+| Workstation and analytics suppliers | One is named on an exchange's own page as a data, news and analytics workstation with feed solutions for ingestion into financial applications | **Dataset-by-dataset equivalence to a syndicator is not established** |
+| Specialist interface suppliers | At least one publishes **real interface documentation** for ownership datasets with request and response examples | An evidenced overlapping supplier, **not** a proven replacement for a full news, fund and research catalogue |
+| Database and research publishers | Named enterprise and hosted products covering financial analysis and equity research | A **database product**, not a proven syndication interface, and **not** an automatic research redistribution licence |
+| **The exchanges themselves** | One exchange's corporate-data service covers **company fundamentals, announcements and ownership filings**, with **end-of-day corporate announcements by file transfer after 20:00** and the online service on a **dedicated circuit**. Another publishes corporate-data interfaces for financials, disclosures, announcements and corporate actions | **Content is not an exclusively vendor-sourced category.** Exchange-sourced content has a provenance advantage for anything that touches entitlements, and its own licensing and delivery constraints |
+
+The procurement implication is that this is a **multi-sourced** layer by nature, and the right question is not "which supplier" but "which dataset from which source, and why". Corporate events that drive entitlement accounting have an obvious argument for exchange or issuer provenance; editorial and analytical content does not exist at the exchange at all; fundamentals and ratios are available from both and the decision turns on coverage, methodology transparency and correction handling rather than on price.
+
+## 7. The regulatory edge: when content becomes research
+
+| Question | The position established |
+|---|---|
+| **When is content research?** | The definition covers **electronic investment analysis and opinion**, with express exceptions for **statistical financial summaries** and **general market and index commentary**. A separate limb expressly includes **recommendations, price targets, model portfolios and trading calls** |
+| **Does broker registration suffice?** | **No.** Research-analyst registration is required subject to specified exemptions, and there is **no general exemption for stock brokers** |
+| **Is "free" research outside the regime?** | **No.** The 2026 master circular expressly treats research supplied to the broker's **broking clients** as consideration-backed **even without a separate research fee** |
+| **Displaying third-party research** | The distributing entity must **check for material falsehoods and misleading information** and **disclose the provider's conflicts or link to those disclosures**. There is an exemption where there is **no direct or indirect business or contractual relationship** — and **a contracted research feed ordinarily fails that condition** |
+| Selective release | **Prohibited** — no preferential advance release to internal traders or selected clients over other entitled recipients |
+| Records | Research and its **rationale** must be recorded, with **minimum five-year preservation**. Disclosure, report-content and public-appearance provisions apply |
+| Unregistered suppliers | Prohibited associations with unregistered or unpermitted advice providers, or with impermissible performance claimants, subject to specified exceptions. **An ordinary trading application should not presume it qualifies as a specified digital platform** |
+| **Is there a blanket ban on third-party news or research in a trading app?** | **No such prohibition was established**, and third-party research distribution is **expressly contemplated**. Equally, **no app-only safe harbour** was established |
+
+<Aside type="danger" title="Three traps in this section">
+**"We do not charge for it" is not a defence.** Research supplied to broking clients is treated as consideration-backed because they are broking clients. This is the single most commonly misunderstood point, and it is express.
+
+**The no-relationship exemption does not apply to a feed you pay for.** The review and disclosure duties on distributing third-party research are exempted only where there is no direct or indirect business or contractual relationship — which is precisely what a contracted content subscription is. A firm that licenses research and displays it has the duties.
+
+**Classification is the control, and it happens before publication.** A statistical financial summary and a general market commentary are outside the research definition; a recommendation, a target price, a model portfolio or a trading call is inside it. These arrive from the same supplier, often from adjacent endpoints with similar category names, and **the endpoint's category name does not settle the regulatory treatment of the payload.** Classify the content and the presentation, not the source.
+</Aside>
+
+### 7.1 News controls
+
+| Control | Requirement |
+|---|---|
+| Unverified information | Intermediaries must have **controls against spreading unverified information**, and must **retain relevant communication logs** |
+| Employee forwarding | **Compliance-officer approval before employees forward market-related news**, with the officer's responsibility expressly addressed |
+| What is not settled | Whether, and how, the employee-forwarding controls apply to a **fully automated licensed news ingestion**. No express exemption for automated syndication was established — so the conservative design treats the publication decision as a controlled act even when it is automated |
+
+### 7.2 The publication workflow
+
+Derived from the obligations above rather than prescribed by them, so treat it as the house design:
+
+| Step | Purpose |
+|---|---|
+| **Classify** the content and its presentation | Decides which regime applies |
+| **Verify the provider and the rights** for this channel and audience | The licence is per channel, not per supplier |
+| **Retain the source and the version** | Record obligations, and the basis of a later correction |
+| **Perform the applicable review** where it is research | The falsehood and misleading-information check |
+| **Attach conflicts and authorship disclosures**, or link to them | An express duty for third-party research |
+| **Publish to the entitled audience**, with no preferential advance release | An express prohibition |
+| **Support withdrawal and correction** | The dimension a price feed does not have |
+
+## 8. Temporal meaning, and corrections
+
+| Element | The discipline |
+|---|---|
+| **Per-dataset freshness** | Each dataset carries its **own** source-publication time, effective date and reporting period. A platform-wide "last updated" value is a misrepresentation when one catalogue mixes five-minute delayed prices, fifteen-minute delayed prices, delayed news and end-of-day masters |
+| **Effective dating** | A financial statement belongs to a **reporting period**, not to the moment it arrived. A screener that sorts on "latest" without an effective date compares different periods |
+| **Restatement and revision** | Financial restatements and revised filings change history. **Corrections propagate backwards** through every derived value — ratios, peer comparisons, screens, rankings — which is the opposite direction from a price correction |
+| **Consolidated versus standalone** | Not published as an explicit treatment in the catalogue examined. It must be established, because mixing the two in a comparison is a silent, systematic error |
+| **Corrections and cancellations** | **Event identifiers, cancellation and correction messages are not published** in the catalogue examined. If the supplier cannot identify an event stably, the firm cannot correct a specific one — which has to be a procurement question |
+| **Archive and retention** | Archive retention and article-body rights are **not** published. A firm that keeps content for client history needs both named in the agreement |
+| **Display of staleness** | Where content is delayed or periodic, the user must be able to tell. This is the same consumer-protection reasoning as the live-data stale indicator in [fan-out to clients](/broking-kyc/finix-broking-setup/marketdata/06-fanout-to-clients/#6-the-mobile-and-web-realities) |
+
+## 9. Configuration reference
+
+| Key | Finix default | Class | Failure mode if wrong |
+|---|---|---|---|
+| `finix.content.rights_matrix_declared` | Per dataset and per channel: in-app display, article bodies, caching, archive, derived analytics, onward interface | Regulatory | A use outside the licence, discovered on audit |
+| `finix.content.redistribution_via_own_api` | **False** unless expressly permitted in writing | Regulatory | Onward redistribution the supplier's own terms prohibit |
+| `finix.content.converges_at_presentation_only` | **True** — content and price data merge in the presentation layer, not the interface layer | Discretionary, strongly recommended | An interface that cannot exclude content cleanly |
+| `finix.content.price_fields_structurally_distinct` | True — never share a field with feed-sourced prices | Discretionary, strongly recommended | A delayed content price reaching a decision or a client's order screen |
+| `finix.content.freshness_per_dataset` | True — per-dataset source time, effective date and reporting period | Discretionary, strongly recommended | A single platform timestamp misrepresenting half the data |
+| `finix.content.effective_dating_enforced` | True | Discretionary, strongly recommended | Comparisons across different reporting periods |
+| `finix.content.consolidated_basis_declared` | Established with the supplier before go-live | Discretionary, strongly recommended | A systematic, silent error in every comparison |
+| `finix.content.revision_propagation` | Backwards, through every derived value | Discretionary, strongly recommended | A restated figure surviving in screens and rankings |
+| `finix.content.event_identifier_stable` | Required of the supplier | Discretionary, strongly recommended | No ability to correct or cancel a specific event |
+| `finix.content.corporate_events_not_authoritative` | **True** — entitlement accounting and trading restrictions come from exchange and issuer sources | Regulatory | A client misinformed about an entitlement by an informational calendar |
+| `finix.content.classification_gate` | **Mandatory before publication** | Regulatory | Research published without the applicable review |
+| `finix.content.research_review_performed` | True where the content is research | Regulatory | The falsehood and misleading-information duty unmet |
+| `finix.content.conflict_disclosures_attached` | True, or linked | Regulatory | An express duty on third-party research unmet |
+| `finix.content.no_preferential_release` | True | Regulatory | An express prohibition breached |
+| `finix.content.research_records_years` | **At least five**, including the rationale | Regulatory | Record-preservation breach |
+| `finix.content.free_is_not_exempt` | True — supply to broking clients is consideration-backed | Regulatory | A regime assumed inapplicable because nothing was charged |
+| `finix.content.news_controls` | Unverified-information controls and log retention, with publication treated as a controlled act even when automated | Regulatory | A conduct exposure on an automated path |
+| `finix.content.unregistered_provider_check` | Performed before any association | Regulatory | A prohibited association |
+| `finix.content.stale_indicator_shown` | True wherever content is delayed or periodic | Regulatory, in effect | A user acting on content they believe is current |
+| `finix.content.ingestion_uptime_vs_completeness` | Monitored **separately** | Discretionary, strongly recommended | A healthy pipeline delivering incomplete content |
+| `finix.content.supplier_per_dataset` | Chosen per dataset, with provenance recorded | Discretionary | One supplier chosen for everything, including datasets where provenance matters |
+
+## 10. Exception paths
+
+| Situation | Response |
+|---|---|
+| A content-sourced price appears in a calculation or next to an order action | Architectural defect. Content prices are context only, and must be structurally distinguishable |
+| A corporate event from the content feed disagrees with the exchange file | **The exchange and issuer sources govern.** Correct the display and investigate the mapping |
+| An entitlement was accounted from the content calendar | Treat as an incident with client impact. Entitlement accounting belongs to the corporate-actions process |
+| A financial figure is restated | Propagate backwards through derived values. Identify what was displayed from the old figure and for how long |
+| A supplier cannot identify an event stably | Raise as a procurement issue. Without stable identity, corrections cannot be targeted |
+| A new content feature looks like it might be research | **Classify before publishing.** If it includes a recommendation, target, model portfolio or trading call, it is inside the definition |
+| Third-party research is to be displayed | The review and disclosure duties apply. The no-relationship exemption is **unavailable** where there is a contracted feed |
+| Research reaches some clients earlier than others | **Express prohibition.** Fix the distribution, and establish what was released to whom |
+| An unregistered provider's content or recommendations are proposed | Prohibited association unless a specified exception applies. Check before, not after |
+| Automated news publication raises an approval question | Treat publication as a controlled act. The automated-path exemption is not established |
+| Supplier availability figures conflict with the experienced service | The published figures are not the signed level. Work from the agreement |
+| Content documentation is not available before signature | That is itself the finding. See [vendor interface verification](/broking-kyc/finix-broking-setup/stack/vendor-interface-verification/) |
+| Content is to be served through the firm's own programmatic interface | **Blocked** unless expressly permitted. The supplier's published position prohibits redistribution |
+| An archive of content is being kept for client history | Archive and article-body rights must be named in the agreement |
+
+## Practical notes
+
+- **Own this layer separately from the price feed, with a named owner for interpretation and a named owner for the pipeline.** They are different skills and different failure modes.
+- **Build the rights matrix per dataset per channel before integrating.** "We licensed the feed" is not an answer to any of the questions that matter.
+- **Keep content and price data apart until the presentation layer.** It is the only way to serve a programmatic interface that must exclude content.
+- **Carry provenance and freshness on every content value, and show the user when something is not current.**
+- **Put the classification gate in the publication path, not in a policy document.** A recommendation reaching clients without review is a regulatory event, and the endpoint's name will not have warned anyone.
+- **Treat restatements as a first-class event with backwards propagation.** It is the one correction model that a price-feed mindset gets exactly wrong.
+- **Prefer exchange and issuer provenance for anything touching entitlements**, whatever the content supplier also offers.
+- **Monitor ingestion uptime and editorial completeness as two different metrics.** A pipeline can be perfectly healthy and delivering nothing useful.
+
+## Where this connects
+
+- [Redistribution and licensing](/broking-kyc/finix-broking-setup/marketdata/07-redistribution-and-licensing/) — the price-data licensing regime this layer sits beside
+- [Fan-out to clients](/broking-kyc/finix-broking-setup/marketdata/06-fanout-to-clients/) — the interface that must be able to exclude content
+- [Normalisation and internal distribution](/broking-kyc/finix-broking-setup/marketdata/05-normalisation-and-internal-distribution/) — the provenance and freshness discipline applied to prices
+- [Vendor interface verification](/broking-kyc/finix-broking-setup/stack/vendor-interface-verification/) — establishing what a supplier actually publishes before signing
+- [Corporate actions](/broking-kyc/finix-broking-setup/backoffice/07-corporate-actions/) — where entitlement accounting actually belongs
+- [Depository interfaces and APIs](/broking-kyc/finix-broking-setup/files/11-depository-interfaces-and-apis/) — another supply chain with per-service freshness and windows
+- [Audit machinery](/broking-kyc/finix-broking-setup/compliance/05-audit-machinery/) — the record and review context
+- [Regulatory change in 2026](/broking-kyc/finix-broking-setup/compliance/06-regulatory-change-2026/) — where the 2026 research and education changes are tracked
