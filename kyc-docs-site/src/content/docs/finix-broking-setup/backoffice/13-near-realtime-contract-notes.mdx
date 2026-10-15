@@ -1,0 +1,157 @@
+---
+title: "Back office 13: near-real-time confirmations and the contract note"
+description: Whether an intraday or "virtual" contract note exists — it does not — and what the prescribed near-real-time artefact actually is; the contract note's timing rule and the competing deadline nobody reconciles, why the daily margin statement moved later rather than earlier, and the design that gives clients immediate confirmation without misnaming it.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** A firm building a modern trading product wants to tell a client what they just traded, immediately. The instinct is to call that a contract note of some provisional kind, and the first question is therefore whether such a thing exists. It does not — and the page says so first, because a product built around an invented regulatory artefact will be rebuilt. What does exist is a different prescribed artefact that fits the need better, plus a precedent establishing that clearly-labelled indicative figures are permitted. Sections 3 and 4 are therefore the design answer, and section 7 records five conflicts in the published material.
+
+## TL;DR
+
+- **A provisional, virtual, preliminary, interim or indicative contract note does not exist.** Research across four corpora, including an index of tens of thousands of exchange circulars, found nothing. **It is a product idea, not a regulatory concept.**
+- **But a prescribed near-real-time artefact does exist** — the **order and trade confirmation** under the internet and wireless trading frameworks, with order confirmation on submission, **real-time display on the firm's website**, and trade confirmation by electronic mail or mobile with same-day history.
+- **Indicative figures are already mandated elsewhere**: the firm must display brokerage and levies **before order placement**, which is necessarily an estimate. That is the precedent establishing that a clearly-labelled indicative figure is permitted.
+- **So the design is: build an immediate, clearly-labelled trade confirmation under the confirmation framework, and do not call it a contract note.**
+- **The contract note is due within twenty-four hours of execution** — though a competing "one working day" appears in the rights-and-obligations annexure and nothing reconciles them.
+- **The daily margin statement moved later, not earlier**, in 2025 — to before the next session's open. Being relaxed *after* the fact settles that it is **not** an intraday artefact.
+
+## 1. The question, answered
+
+| Term | Status |
+|---|---|
+| "Provisional contract note" | **Does not exist** |
+| "Virtual contract note" | **Does not exist** |
+| "Preliminary contract note" | **Does not exist** |
+| "Interim contract note" | **Does not exist** |
+| "Indicative contract note" | **Does not exist** |
+
+The search covered the broker master circular, the 2026 broker regulations, the market-abuse regulations, two editions of the exchange inspection master circular, and an index of every exchange and clearing circular across more than seven years. **Zero occurrences.**
+
+**The contract note is a single, formal, defined document.** There is no lesser or earlier version of it, and inventing one creates a product whose name asserts a regulatory status it does not have — which is a disclosure problem rather than merely a naming one, because a client receiving something called a contract note is entitled to treat it as one.
+
+<Aside type="caution" title="Why this matters more than terminology">
+A document named as a contract note carries the contract note's legal weight: it is the instrument that evidences the transaction between broker and client, it is signed, and it is the thing a client and an arbitrator read. A "provisional contract note" that later differs from the formal one has created two inconsistent instruments purporting to record the same trade, and the firm will be asked which one governs.
+
+The near-real-time need is real and it has a proper home. Use it, and reserve the words "contract note" for the document the rules define.
+</Aside>
+
+## 2. The contract note itself
+
+| Element | Position |
+|---|---|
+| **Timing** | **Within twenty-four hours of execution** — stated in several places in the broker master circular and in the investor charter |
+| **A competing deadline** | The **rights-and-obligations annexure** states **one working day**. **Unreconciled.** The shorter obligation is the safer operating target, and the conflict should be recorded |
+| Form | Digitally signed; the electronic form is the norm with consent, and a physical fallback where electronic delivery fails |
+| Delivery evidence | Dispatch must be evidenced and **bounces identified and acted on**; a persistent bounce is a client-data defect to fix rather than to retry |
+| **The dispatch log** | A retention obligation in its own right — **its absence is an enumerated deficiency** |
+| Contents | Prescribed, including the trade particulars and the tax lines, which must match the clearing records exactly — see [the charges and billing engine](/broking-kyc/finix-broking-setup/backoffice/11-charges-billing-engine/) |
+| Revision | A wrong note that has been dispatched is **superseded by a revised note referencing the original**, never silently replaced — see B-51 in [the back-office operations catalogue](/broking-kyc/finix-broking-setup/backoffice/12-operations-catalogue/) |
+| Where it sits in the pipeline | Gated by trade reconciliation, which is why reconciliation is the chokepoint in [the end-of-day runbook](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/) |
+
+## 3. What the prescribed near-real-time artefact actually is
+
+The **order and trade confirmation**, under the internet-based and wireless trading frameworks. This is a named, prescribed artefact and it is distinct from the contract note.
+
+| Component | Requirement |
+|---|---|
+| **Order confirmation** | On submission of the order |
+| **Real-time display** | Order and trade status shown on the firm's website |
+| **Trade confirmation** | By electronic mail or to the mobile, with **same-day history** available |
+| Order handling alongside it | Modification, cancellation and history, with access to orders across web and mobile |
+| Its relationship to the contract note | **Separate and additional.** It confirms; the contract note evidences |
+
+**This is the right home for an immediate post-trade confirmation**, and it is already an obligation rather than an option for a firm offering internet or wireless trading.
+
+## 4. The precedent that settles the indicative question
+
+| Element | Position |
+|---|---|
+| The obligation | **Brokerage and statutory and regulatory charges must be displayed at order entry, before placement** |
+| Effective | From a final implementation deadline in early 2023 |
+| **Why it is decisive** | A charge shown **before** a trade executes **cannot be anything other than an estimate.** The rules therefore already **require** the firm to present an indicative figure to a client |
+| What follows | **There is no bar on clearly-labelled indicative figures.** A post-trade confirmation showing estimated charges, labelled as such and superseded by the contract note, sits squarely within existing practice |
+| The constraint that does apply | Do not present an **unconfirmed or unreconciled** figure **as final**. The labelling carries the obligation |
+
+<Aside type="danger" title="The design conclusion">
+Build the immediate confirmation, and get three things right.
+
+**Name it correctly.** It is a trade confirmation under the confirmation framework. It is not a contract note of any kind.
+
+**Label the figures for what they are.** Charges before end-of-day computation are estimates — the same estimates the firm is already obliged to show before placement. Say so on the artefact, and say that the contract note governs.
+
+**Make it superseded, visibly.** When the contract note is issued, the client should be able to see that the confirmation has been superseded, and any difference should be explicable. A confirmation that silently diverges from the contract note is how a firm ends up arguing about which document the client should have relied on.
+
+Done this way the product need is met in full, with no invented artefact and no new regulatory exposure. Done the other way — a "provisional contract note" — the firm has created a second instrument recording the same trade, and the exposure is real.
+</Aside>
+
+## 5. The daily margin statement
+
+| Element | Position |
+|---|---|
+| Previous timing | **End of the trade day itself** |
+| **Current timing** | **Before the beginning of the trading session on the next trading day**, revised in mid-2025 |
+| **What the direction of travel settles** | The deadline was **relaxed later**, not tightened earlier. **It is therefore explicitly not an intraday artefact** |
+| The implication for product design | A client-facing **live margin view** is a good product and is separate from this statement. Do not conflate the two or assume the statement can satisfy a real-time need |
+
+## 6. The other near-real-time client artefacts
+
+| Artefact | Cadence |
+|---|---|
+| **Order and trade confirmation** | **Real time**, per section 3 |
+| Pre-order charge display | **Before placement**, necessarily indicative |
+| **Exchange-originated trade alerts** by message and mail | **End of the trading day — not real time.** A firm relying on these for immediacy will disappoint clients |
+| **The disaggregated client collateral portal** | **Daily** refresh |
+| Daily margin statement | Before the next session's open |
+| Statement of accounts | Periodic — see the conflict in section 7 |
+| Contract note | Within twenty-four hours |
+| Annual signed statement of funds and securities | Annual — see the conflict in section 7 |
+
+**The pattern worth noting:** almost everything mandated is **daily or slower**, and the only genuinely real-time obligation is the order and trade confirmation. A firm wanting a real-time client experience is therefore building beyond the obligations rather than meeting them — which is fine, and is why the labelling discipline in section 4 matters.
+
+## 7. Five conflicts in the published material
+
+Recorded rather than resolved, because both sides are current text.
+
+| # | Conflict |
+|---|---|
+| 1 | **Contract note timing**: twenty-four hours of execution in the master circular and investor charter, against **one working day** in the rights-and-obligations annexure |
+| 2 | **The annual signed statement**: the regulator says it goes to **all** clients; the exchange says **only on request** |
+| 3 | **Statement of accounts cadence**: **weekly** per the exchange, described as **monthly** in the investor charter |
+| 4 | A probable **footnote citation error** in the exchange's own 2026 master circular |
+| 5 | The general case: a **consolidated circular is not authority for the currency of everything in it** — see the change discipline in [the 2026 regulatory change register](/broking-kyc/finix-broking-setup/compliance/06-regulatory-change-2026/) |
+
+**Operating rule for each:** adopt the stricter reading, record the conflict and the reasoning, and raise it in writing where the cost of the stricter reading is material. The conflicting-deadline register is an item in [the periodic and compliance matrix](/broking-kyc/finix-broking-setup/roles/03-raci-periodic-compliance/).
+
+## 8. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.bo.cn.deadline_hours` | **R** | 24 from execution | **The stricter of two readings** |
+| `finix.bo.cn.conflict_recorded` | **D** | true | With the reasoning |
+| `finix.bo.cn.digitally_signed` | **R** | true | — |
+| `finix.bo.cn.dispatch_log_retained` | **R** | **true** | Its absence is an enumerated deficiency |
+| `finix.bo.cn.bounce_is_data_defect` | **D** | true | Fix, do not retry indefinitely |
+| `finix.bo.cn.revision_references_original` | **R** | true | Never a silent replacement |
+| `finix.bo.conf.trade_confirmation_realtime` | **R** | **true** | The prescribed artefact |
+| `finix.bo.conf.order_status_realtime_on_site` | **R** | true | — |
+| `finix.bo.conf.same_day_history_available` | **R** | true | — |
+| `finix.bo.conf.not_named_contract_note` | **D** | **true** | **Enforced in the product copy** |
+| `finix.bo.conf.charges_labelled_indicative` | **D** | **true** | With a statement that the contract note governs |
+| `finix.bo.conf.superseded_visibly` | **D** | true | When the contract note issues |
+| `finix.bo.conf.difference_explicable` | **D** | true | Confirmation against contract note |
+| `finix.bo.margin_statement.before_next_open` | **R** | true | **Not intraday** |
+| `finix.bo.conf.live_margin_view_separate` | **D** | true | A product, not the statement |
+
+## 9. Practical notes
+
+- **Do not build a "provisional contract note".** It does not exist, and naming an artefact that way imports a legal weight you do not intend.
+- **Build the trade confirmation instead**, which you likely already owe, and make it immediate.
+- **Label estimated charges as estimates and say the contract note governs.** The pre-order display is the precedent that makes this unremarkable.
+- **Show the supersession.** A client who can see that the confirmation was replaced by the contract note will not argue about which applied.
+- **Do not expect the exchange's trade alerts to be immediate** — they are end-of-day, and a product built on them will feel slow.
+- **Adopt the stricter deadline and record the conflict.** Twenty-four hours is a safe operating target against both readings.
+
+## Where this connects
+
+The generation and dispatch mechanics are in [contract notes](/broking-kyc/finix-broking-setup/backoffice/03-contract-notes/) and the end-of-day gating in [the end-of-day runbook](/broking-kyc/finix-broking-setup/daily-ops/05-eod-runbook/). The tax lines that must match are in [the charges and billing engine](/broking-kyc/finix-broking-setup/backoffice/11-charges-billing-engine/), the corrections in [the back-office operations catalogue](/broking-kyc/finix-broking-setup/backoffice/12-operations-catalogue/), and the client-facing display obligations in [mobile and web application submission](/broking-kyc/finix-broking-setup/certification/02-mobile-web-app-submission/). The real-time capacity view that clients also want is in [real-time limit updates](/broking-kyc/finix-broking-setup/money/09-realtime-limit-updates/), and the statement cadences in [periodic submissions](/broking-kyc/finix-broking-setup/monitoring/03-periodic-submissions/) and [statements and retention](/broking-kyc/finix-broking-setup/backoffice/08-statements-retention/).

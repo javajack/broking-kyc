@@ -28,6 +28,7 @@ description: The operated day — begin-of-day gates, pre-open, the continuous s
 | 7 | [Incident playbooks](/broking-kyc/finix-broking-setup/daily-ops/07-incident-playbooks/) | When something breaks |
 | 8 | [Expiry operations](/broking-kyc/finix-broking-setup/daily-ops/08-expiry-ops/) | Expiry week and expiry day |
 | 9 | [Periodic calendar](/broking-kyc/finix-broking-setup/daily-ops/09-periodic-calendar/) | Weekly to annual |
+| 10 | [Master trading day checklist](/broking-kyc/finix-broking-setup/daily-ops/10-master-trading-day-checklist/) | **The flagship.** Every activity on an ordinary trading day in sequence, across eight phases, with owner, assertion and failure action |
 
 ## Where this connects
 

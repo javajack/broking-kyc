@@ -41,11 +41,14 @@ The bands matter because latency, reversibility and authority all change as you 
 | [Daily operations](/broking-kyc/finix-broking-setup/daily-ops/) | People, with system support | The sequence and its timing | Any single system |
 | [Compliance](/broking-kyc/finix-broking-setup/compliance/) | SecMark ComplianceSutra, <abbr title="Anti-Money Laundering">AML</abbr> Sutra | Evidence, filings, calendars, audit trail | Operational decisions |
 
-## The three pages in this plane
+## The six pages in this plane
 
 - **[Vendor map](/broking-kyc/finix-broking-setup/stack/vendor-map/)** — what each named product actually does, with the public evidence for it, the boundaries where one product's responsibility ends, and the overlaps that have to be resolved by a decision rather than by both systems doing the job.
 - **[Environments and configuration baseline](/broking-kyc/finix-broking-setup/stack/environments-config-baseline/)** — the environment matrix, the configuration key convention used throughout this manual, secret handling, change control, and the configuration items that are regulatory rather than discretionary.
 - **[Integration contract matrix](/broking-kyc/finix-broking-setup/stack/integration-contract-matrix/)** — every interface in the stack: direction, transport, trigger, payload summary, timing, idempotency, failure mode and degraded behaviour.
+- **[The gateway and the event architecture](/broking-kyc/finix-broking-setup/stack/bff-and-event-architecture/)** — the substrate the planes sit on: what must be synchronous, the ordering and idempotency guarantees, and the one message that must never be retried.
+- **[Disaster recovery architecture](/broking-kyc/finix-broking-setup/stack/disaster-recovery-architecture/)** — thresholds, the declaration-clock conflict, the identifier constraint that decides the topology, and the five order-state hazards at failover.
+- **[Vendor interface verification](/broking-kyc/finix-broking-setup/stack/vendor-interface-verification/)** — what public sources can and cannot establish about a vendor stack, how to verify empanelment and a product version, and what therefore belongs in the contract.
 
 ## Where this connects
 

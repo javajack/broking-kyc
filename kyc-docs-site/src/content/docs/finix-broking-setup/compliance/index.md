@@ -22,6 +22,8 @@ description: Compliance as configured, owned and evidenced rather than as a poli
 | 2 | [Regulatory reporting pipeline](/broking-kyc/finix-broking-setup/compliance/02-reporting-pipeline/) | Every authority, every filing, the calendar and the evidence |
 | 3 | [Inspection readiness](/broking-kyc/finix-broking-setup/compliance/03-inspection-readiness/) | The questions, the evidence pack, the drill |
 | 4 | [Cyber resilience configuration](/broking-kyc/finix-broking-setup/compliance/04-cyber-cscrf-config/) | Regulation 18(5) at configuration level |
+| 5 | [Audit machinery](/broking-kyc/finix-broking-setup/compliance/05-audit-machinery/) | Every audit the firm is subject to, its scope, its cycle, who may conduct it and what it asks for first |
+| 6 | [Regulatory change in 2026](/broking-kyc/finix-broking-setup/compliance/06-regulatory-change-2026/) | What changed this year, what takes effect when, and what each change obliges the firm to do |
 
 ## Where this connects
 

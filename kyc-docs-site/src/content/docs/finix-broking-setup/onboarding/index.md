@@ -26,6 +26,7 @@ description: The onboarding plane as wired to the Finix stack — Digio for veri
 | 5 | [<abbr title="Unique Client Code">UCC</abbr> registration](/broking-kyc/finix-broking-setup/onboarding/05-ucc-registration-exchanges/) | Per exchange and segment, with partial-batch handling |
 | 6 | [eSign, <abbr title="Demat Debit and Pledge Instruction">DDPI</abbr> and pledge setup](/broking-kyc/finix-broking-setup/onboarding/06-esign-ddpi-pledge-setup/) | Authority artefacts and their custody |
 | 7 | [Modification and closure operations](/broking-kyc/finix-broking-setup/onboarding/07-account-modification-closure/) | The lifecycle events that re-run parts of this plane |
+| 8 | [KYC operations quality and audit](/broking-kyc/finix-broking-setup/onboarding/08-kyc-ops-quality-audit/) | Sampling, error classes, the quality metrics that matter and what an inspection looks at |
 
 ## Where this connects
 

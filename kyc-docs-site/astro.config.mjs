@@ -317,9 +317,11 @@ export default defineConfig({
               items: [
                 { label: "Overview", slug: "finix-broking-setup/stack" },
                 { label: "Vendor Map", slug: "finix-broking-setup/stack/vendor-map" },
+                { label: "Vendor Interface Verification", slug: "finix-broking-setup/stack/vendor-interface-verification" },
                 { label: "Environments & Config", slug: "finix-broking-setup/stack/environments-config-baseline" },
                 { label: "Integration Contracts", slug: "finix-broking-setup/stack/integration-contract-matrix" },
                 { label: "Gateway & Event Architecture", slug: "finix-broking-setup/stack/bff-and-event-architecture" },
+                { label: "Disaster Recovery Architecture", slug: "finix-broking-setup/stack/disaster-recovery-architecture" },
               ],
             },
             {
@@ -370,6 +372,7 @@ export default defineConfig({
                 { label: "9. Algo, API, DMA & SOR", slug: "finix-broking-setup/oms/09-algo-api-dma-sor" },
                 { label: "10. Config Reference", slug: "finix-broking-setup/oms/10-oms-config-reference" },
                 { label: "11. Operations Catalogue", slug: "finix-broking-setup/oms/11-operations-catalogue" },
+                { label: "12. Order Path Edge Cases", slug: "finix-broking-setup/oms/12-order-path-edge-cases" },
               ],
             },
             {
@@ -407,6 +410,7 @@ export default defineConfig({
                 { label: "10. Config Reference", slug: "finix-broking-setup/backoffice/10-backoffice-config-reference" },
                 { label: "11. Charges & Billing", slug: "finix-broking-setup/backoffice/11-charges-billing-engine" },
                 { label: "12. Operations Catalogue", slug: "finix-broking-setup/backoffice/12-operations-catalogue" },
+                { label: "13. Near-Real-Time Contract Notes", slug: "finix-broking-setup/backoffice/13-near-realtime-contract-notes" },
               ],
             },
             {
@@ -485,6 +489,7 @@ export default defineConfig({
                 { label: "8. Handling Exceptions", slug: "finix-broking-setup/files/08-file-handling-exceptions" },
                 { label: "9. Bank & Payment Files", slug: "finix-broking-setup/files/09-bank-payment-files" },
                 { label: "10. Ingestion Cadence Map", slug: "finix-broking-setup/files/10-ingestion-cadence-map" },
+                { label: "11. Depository Interfaces & APIs", slug: "finix-broking-setup/files/11-depository-interfaces-and-apis" },
               ],
             },
             {

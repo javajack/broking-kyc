@@ -23,6 +23,7 @@ description: What a broker must send to, and is watched on by, exchanges, cleari
 | [Alerts received, and the obligation to respond](/broking-kyc/finix-broking-setup/monitoring/04-alerts-received-and-response/) | The downloaded transactional alerts, the dashboard, the disposal clock, surveillance measures, client-code and registration-agency streams, trade cancellation, and penalty appeals |
 | [Incident and breach reporting](/broking-kyc/finix-broking-setup/monitoring/05-incident-breach-reporting/) | Cyber, technical glitch, business continuity, and the reporting chain with its hours-and-days clocks |
 | [Transaction monitoring and reporting](/broking-kyc/finix-broking-setup/monitoring/06-aml-monitoring-reporting/) | Suspicious and prescribed transaction reporting, the platform, who signs, and the tipping-off bar |
+| [System monitoring communicated to the exchange](/broking-kyc/finix-broking-setup/monitoring/07-system-monitoring-to-exchange/) | What telemetry a member actually has to send, which firms must send it, and the questions the published material leaves open |
 
 ## Where this connects
 

@@ -1,0 +1,385 @@
+---
+title: "OMS 12: order path edge cases and state recovery"
+description: What the three venues' own protocol documents say happens at the edges of the order path — that no exchange will tell you the state of an order, how each one lets you rebuild it instead, the only prescribed procedure for an order in unknown state, the two cases where orders die with no message at all, and the venue-by-venue differences in drop copy, freeze, self-match prevention, unsolicited messages and sequence discipline.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** The forward path, the return path and the modification rules describe the order path as a design. This page describes it as the three exchanges' own protocol documents describe it — and it leads with the single fact that constrains every other decision in the stack: **no Indian venue will answer the question "what is the state of my order?"** There is no inquiry to make. Everything after section 2 is a consequence of that, which is why the sections are ordered by how state is lost rather than by module: recovery mechanics, then the unknown state, then the cases where orders die silently, then the independent witness, then the specific venue behaviours an engineer gets wrong on the first build.
+
+## TL;DR
+
+- **There is no order-state query at <abbr title="National Stock Exchange of India">NSE</abbr>, <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> or <abbr title="Multi Commodity Exchange of India">MCX</abbr>.** Each exchange states this in its own words in its own manual. The member's record is not a cache of the exchange's book that can be refreshed; it is a reconstruction that must be kept correct message by message.
+- **Therefore state recovery is replay, not refresh** — and the three venues do it three different ways: NSE by journal download per stream, BSE by order book restatement, MCX by restatement plus application-layer retransmission. None of the three is a substitute for the member's own durable log.
+- **One venue publishes a procedure for an order in unknown state, and it is the right pattern for all three.** BSE's "result of transaction unknown" rejection is explicitly *not* a rejection; the prescribed response is to park the order, never modify it, and probe with a cancellation request — success means it was live, "not found" means it never existed.
+- **There are exactly two documented cases where orders die and no message is sent**: an NSE stream outage and an NSE disaster-recovery switchover. Both must be handled by the contingency-broadcast handler. An order-response handler will never see them.
+- **Drop copy exists at all three venues with materially different mechanics, and at two of them it is explicitly preliminary.** Never settle on it. The binding record at MCX is the trade capture report, and an execution report with no matching trade capture report "has to be considered invalid and should be discarded".
+- **A prevented self-match arrives as an ordinary cancellation.** Exchange-side self-match prevention is live at NSE and MCX, the member elects which leg dies, and if the reason code is not decoded the client sees an order vanish for no reason.
+- **For a window at the end of every day, the emergency levers are switched off.** For closing-auction-eligible securities, the kill switch and cancel-on-logout are both unavailable after continuous trading closes. Any runbook that assumes "we can always flatten the book" is wrong for that window.
+
+## Conceptual overview
+
+The ordinary mental model of a trading connection is a database session: you send a change, you can read back the current state, and if the two disagree the read wins. Indian exchange protocols do not work that way, and the gap between the two models is where most order-state defects live. What the member gets is a stream of state *transitions* — accepted, modified, triggered, filled, frozen, cancelled — which it must apply in order, durably, to a book it maintains itself. What it does not get, anywhere, is a snapshot on demand. NSE's own phrasing is that no host-end inquiries are permitted for its non-NEAT front-end users. BSE says there is no mechanism to fetch the current state of a particular order. MCX says order status inquiries are not supported and that participants must maintain the state of orders from the execution reports. Three different documents, three different protocol families, the same answer.
+
+That turns the order book into something closer to a ledger than a cache, and ledgers have different failure modes. A cache that loses its contents re-reads them. A ledger that loses a transition is permanently wrong until something external reconciles it. So the engineering problem is not "how do we refresh" but "how do we never lose a transition, and how do we rebuild if we did". Each venue provides a rebuild facility, and the striking thing when you read all three is how differently they are shaped: NSE gives you a replay of your own activity stream from a point you choose; BSE and MCX give you a restatement of the *currently live* orders, which is a snapshot of the surviving book and tells you nothing about orders that have already died. Those two facilities answer different questions, and a firm that treats them as interchangeable will discover after an outage that it cannot tell the difference between "my order was cancelled while I was disconnected" and "my order never existed".
+
+The third idea is that the exchanges are not symmetric in what they consider authoritative. At NSE the trade confirmation on the interactive path is the trade. At MCX the execution report is explicitly preliminary and the trade capture report is explicitly the legally binding record, with a prescribed rule for discarding execution reports that no trade capture report ever confirmed. BSE likewise flags its drop copy as preliminary. A back office that posts from the first message it sees will be right most days at all three venues and wrong on exactly the days that matter — the ones where a session dropped mid-match.
+
+The fourth, and the reason this page is long, is that the edges are where the venues diverge most. The happy path is nearly the same everywhere: send, accept, fill, confirm. The unhappy paths are different in kind. NSE has a freeze state with an exchange officer in the loop; MCX has no freeze concept at all. MCX lets the member choose at order entry whether an order survives a disconnect; NSE does not offer the choice. MCX will reject and disconnect on any sequence anomaly with no recovery mechanism whatsoever; NSE will quietly increment a drop counter and eventually log off every user on the box. These are not details to be abstracted away behind a common interface. They are the specification for three different recovery runbooks.
+
+## 1. Documentary framework
+
+- **NSE non-NEAT front-end protocol specifications, per segment** — capital market and futures and options, each separately versioned, each with its own chapter on unsolicited messages and its own download and recovery mechanics. These are the operative documents. `[not yet in index]`
+- **NSE order and trade drop copy protocol** — a separate document for a separate facility, which the segment protocol documents explicitly cross-reference, warning that changes in the unsolicited-message chapter also affect drop copy. `[not yet in index]`
+- **BSE enhanced trading interface manual** — including the session model, the restatement and retransmission mechanics and the clause on transactions of unknown result. `[not yet in index]`
+- **MCX enhanced trading interface manual and its drop copy circular** — the interface manual for the in-band facilities, and a separate circular for the leased-line drop copy facility. `[not yet in index]`
+- **[<abbr title="Securities and Exchange Board of India">SEBI</abbr> (Stock Brokers) Regulations, 2026](/broking-kyc/finix-broking-setup/setup/02-sebi-registration-2026/)** — the audit trail, record retention and cyber resilience obligations that make the member's own order log a regulatory record rather than a convenience. `[not yet in index]`
+- **The technical glitch framework and the software change regime** — which together make protocol-version currency and change certification a compliance matter, not only an engineering one. See [change and version control](/broking-kyc/finix-broking-setup/certification/04-change-version-control/). `[not yet in index]`
+
+<Aside type="caution" title="Message names here, layouts from the exchange">
+This page names message types and transaction codes because the *behaviour* of the order path cannot be described without them — an engineer needs to know that a replay facility exists, what it is called and what it will and will not return. It does not reproduce message structures, field layouts, byte offsets or enumerated value tables. Those live in the exchange's own versioned documents, supplied under agreement, and must be read from there. Several of the published documents also contain internal inconsistencies and layout defects; where a value-to-label mapping matters, read it from the vendor-supplied header file and confirm it in the test environment rather than from any prose description, including this one.
+</Aside>
+
+## 2. The fact that governs the design: there is no state query
+
+<Aside type="danger" title="No exchange will tell you the state of an order">
+All three venues say so in their own protocol documents, in their own words:
+
+- **NSE** — no host-end inquiries are permitted for non-NEAT front-end users. The only inquiry facility in the capital market protocol is the auction inquiry.
+- **BSE** — there is no mechanism to fetch the current state of a particular order.
+- **MCX** — order status inquiries are not supported by the exchange; participants must maintain the state of orders based on the execution report messages.
+
+Every design decision below follows from this. A stack that contains the phrase "query the exchange for order status" anywhere in its recovery path contains a call that cannot be written.
+</Aside>
+
+The practical consequences are worth separating, because they land on different teams:
+
+| Consequence | Who owns it | What it means concretely |
+|---|---|---|
+| The member's order log is the only system of record | Technology | It must be durable before the send, not after the acknowledgement. An order written only after the exchange answers is an order that cannot be reconciled if the answer never comes |
+| Every state transition must be applied exactly once and never dropped | Technology | Idempotent application keyed on the venue's own activity reference, not on local arrival order |
+| A gap in the stream is a loss of state, not a loss of data | Technology and risk | Freeze entry for the affected scope, recover, then resume — see [the event architecture](/broking-kyc/finix-broking-setup/stack/bff-and-event-architecture/#8-sequence-discipline-and-independent-verification) |
+| "Unknown" is a real order state with its own handling | Operations | It has to appear on a screen, be counted, be aged, and be resolved before end-of-day processing |
+| Reconciliation is continuous, not end-of-day | Operations | There is nothing to reconcile against intraday except the venue's own replay and the independent copy of your activity |
+| The audit trail must be stitched from the venue's references | Compliance | NSE's per-activity reference and MCX's match and execution identifiers are the only keys that survive a restart on both sides |
+
+## 3. State recovery, venue by venue
+
+The three facilities answer different questions. Read the last column first.
+
+| Venue | Facility | What it returns | What it does **not** tell you |
+|---|---|---|---|
+| **NSE** | Journal download, requested per stream with the last timestamp you successfully processed, answered as a header record, a sequence of message records and a trailer record | A replay of your activity stream from the point you name — including terminal events | Nothing about orders cancelled during a stream outage or a disaster-recovery switchover, because those produce no messages at all |
+| **BSE** | Order book restatement at start of day and after a market reset, plus per-session order and trade retransmission | The currently live standard orders, and a replay of messages for the session that asks | Anything about orders that died while you were away; and nothing at all on a high-frequency session, which gets no restatement |
+| **MCX** | Order book restatement at start of day and market reset, plus application-layer retransmission keyed to the last application message identifier you persisted | The currently live orders, restated with an explicit restated indicator; and a selective replay | Anything about non-persistent orders, which are deleted on session loss and are explicitly **not** restated |
+
+### 3.1 NSE — journal replay
+
+The recovery sequence after a disconnection is a fresh login; there is no session resume. Once logged in, the member requests a download **per stream**, supplying the last timestamp it successfully processed on that stream, and receives a header record, then message records, then a trailer record. Three properties of this facility catch firms out.
+
+The first is that streams are not interchangeable and an invalid stream number does not produce an error — the request is simply dropped, silently. A recovery loop that does not verify it received a trailer record for every stream it asked about will believe it has recovered when it has not.
+
+The second is that the stream number embedded in the order number is **not** the journal download stream number. They are different numbering schemes that both appear in the same message. Deriving one from the other is a defect that only shows up during recovery, which is the worst time to find it.
+
+The third is that for the drop copy facility, the exchange's own advice is to request an **incremental** download using the sequence number of the last message received, and explicitly advises against initiating a full download again. A full download after each reconnect is both slow and, on a busy day, a way to fall further behind.
+
+### 3.2 BSE — restatement, and the limits of it
+
+BSE's matching engine reinitialisation sequence is a service-availability message, then a trading session event marking a market reset, then the restatement messages, then a trading session event marking the end of restatement. The clause that matters most is the negative one, and BSE states it plainly: if a member application receives an end-of-restatement event for a product without receiving any restated orders, it should interpret that as an indication that **all standard orders for that product have been cancelled**. Absence is the signal. A handler that waits for cancellations it can match to its own orders will wait forever.
+
+Two further limits are structural rather than incidental:
+
+| Limit | Effect on design |
+|---|---|
+| Restatement covers **standard** orders only | Quotes and non-persistent orders are automatically cancelled on session disconnect and will not be restated. Their disappearance is expected behaviour, not an incident |
+| Restatement, listener broadcast, drop copy, order retransmission and session-list inquiry are all **unavailable on a high-frequency session** | A high-frequency session has no recovery facility of any kind. If a firm uses one, the recovery design must come from a parallel low-frequency session, and that dependency must be explicit in the architecture rather than discovered during an outage |
+| There is **no automatic session failover** | Failover is the member's code. Nothing happens on its own |
+
+### 3.3 MCX — restatement plus retransmission, with a hard session layer
+
+MCX restates active orders with an explicit restated execution type at start of day and on a market reset, and separately offers application-layer retransmission from the last application message identifier the member persisted. Retransmission requests carry a mandatory partition identifier — there is no wildcard, so a member must know which partitions it is recovering and ask for each.
+
+The session layer has no tolerance at all, and this is the sharpest difference from NSE. Any sequence gap or duplicate on the session layer produces a reject and a disconnect. MCX states that there is **no recovery mechanism for message sequence numbers**, and that every logon must begin at sequence number one. The member's outbound counter must therefore be exactly right, and the reset-on-logon behaviour must be deliberate rather than a side effect of object lifecycle.
+
+Two sequence concepts coexist and only one supports gap detection: the application sequence number is gapless, so a gap in it is detectable and meaningful; the application message identifier is not gapless, and MCX says gap detection on it is not possible. Using the wrong one as a health signal produces either blindness or a permanent false alarm.
+
+<Aside type="tip" title="Non-persistent orders are a deliberate choice with a recovery consequence">
+MCX lets the member choose, at order entry, whether an order is persistent or lean. The choice is immutable — persistence cannot be changed by modification. Lean orders are cheaper and faster for the exchange to handle and are deleted on session loss, which for some strategies is exactly the desired safety property. But a cancelled session's open non-persistent orders and quotes are deleted and will **not** be restated, so a firm using lean orders must be able to answer "what did I have open when the link died?" from its own log alone. That is a legitimate design; it is only a problem when nobody noticed the trade-off was made.
+</Aside>
+
+## 4. The unknown state procedure
+
+Only one of the three venues publishes a procedure for an order whose fate is unknown. It is worth following everywhere, because the logic does not depend on the protocol.
+
+BSE's mechanism is a reject message carrying a session-reject reason meaning **result of transaction unknown**, and BSE is explicit that this is *not* an actual rejection. The prescribed handling:
+
+| Step | Action | Why |
+|---|---|---|
+| 1 | **Park the order in a freeze state locally.** Do not modify it | A modification against an order that may not exist produces a second unknown, and now two orders may be live |
+| 2 | **Do not resend** | A resend places a second order. This is the same rule as [the one message that must never be retried](/broking-kyc/finix-broking-setup/stack/bff-and-event-architecture/#7-the-one-message-that-must-never-be-retried) |
+| 3 | **Issue a cancellation request for it** | The cancel is the probe. It is safe in a way a resend is not: at worst it cancels an order that was going to be cancelled anyway |
+| 4 | **Read the answer as a state oracle** — cancellation succeeds, so the order *was* pending and is now cancelled; "order not found", so it was never accepted | This converts an unknown into one of two known states, which is the whole objective |
+| 5 | **If the unknown transaction was an order *addition*, there is no exchange order identifier to cancel by.** Use the client order identifier, with the original client order identifier field set to the identifier of the order you are probing | This is the trap. A cancel-by-exchange-identifier cannot be constructed for an order that was never acknowledged, and a naive implementation will have nothing to send |
+| 6 | **If the protocol path cannot resolve it, reconcile manually** against the exchange's own risk and surveillance terminal | A documented fallback, and the reason a firm needs that terminal available and someone trained on it |
+
+<Aside type="caution" title="Generalise the procedure, not the message">
+NSE and MCX do not publish an equivalent reject reason, but the same five steps work on both, because they rely only on properties all three venues share: a cancellation is idempotent in effect, a cancellation of a non-existent order returns a distinguishable error, and a resend is not safe. Write the procedure once in the adapter layer, keyed on a per-venue mapping of "order not found", and make it the only code path that may act on an unacknowledged send.
+</Aside>
+
+## 5. Orders that die with no message at all
+
+This is the most important operational finding on the page, because it defeats the natural architecture. A handler that learns about order terminations from order-response messages will never learn about these.
+
+| Case | Venue | What the exchange says | How the member finds out |
+|---|---|---|---|
+| **Stream outage** | NSE | On a stream going down, the exchange cancels all outstanding orders for that stream and **no cancellation messages will be sent** for them | Only from the contingency broadcast, which carries a status indicating outage start and end |
+| **Disaster recovery switchover** | NSE | Outstanding orders are not carried forward and **no cancellation messages are sent**; journal download information from before the switchover is **not available**; used order-value limits are **reset to zero** | From the switchover communication and the published streamwise last trade number, delivered as an exchange-to-trader message |
+| Session loss, non-persistent orders | MCX | Open non-persistent orders and quotes are deleted and will not be restated | Inferred — from the absence of restatement, plus possibly a mass cancellation event |
+| Session disconnect, quotes and non-persistent orders | BSE | Automatically cancelled, with a mass-action reason indicating session loss | From the mass-action message, if one is sent for the scope |
+| Mass cancellation on duplicate login | MCX | A mass cancellation reason exists specifically for duplicate session login, and a session identifier can establish only one session at a time | From the mass cancellation event — after the damage |
+
+Three design rules follow:
+
+- **The contingency and session-event handler is a first-class component, not a logging sink.** It must be able to transition large numbers of orders to a terminal state, release the associated margin, and notify clients — the same capabilities as the order-response handler, triggered by a completely different message class.
+- **A disaster-recovery switchover is a full order-book reset, not a reconnection.** Because pre-switchover journal download is unavailable and used limits reset to zero, the firm's own log is the *only* record of what was open, and the limit engine must be re-seeded rather than resumed. This is covered in [the disaster recovery architecture](/broking-kyc/finix-broking-setup/stack/disaster-recovery-architecture/).
+- **A careless failover can flush a live book.** At MCX, starting a second instance against the same session identifier triggers a duplicate-login mass cancellation. Session identity must be a leased, singly-held resource in the deployment model, not a configuration string that two containers can both read.
+
+## 6. Drop copy: the independent witness, and two-tier trade truth
+
+Drop copy is the only mechanism by which a member can see its own activity reported by the exchange on a path independent of the one that might be broken. It is therefore the backbone of continuous reconciliation. It is also implemented three different ways.
+
+| Dimension | NSE | BSE | MCX |
+|---|---|---|---|
+| Transport | **A separate connection** — dedicated link to a drop copy gateway router, independent of the interactive channel | **No separate connection** — it rides the same trading interface | **Both exist**: a leased-line drop copy facility, and an in-band listener broadcast |
+| Credentials | The member's existing front-end user identifier and password | The trading session's own | Per facility |
+| Subscription | Explicit subscription requests for trades and for orders, carrying a sequence number, where zero means from the start of the day | A subscribe request; order drop copy arrives via a listener broadcast with a reference application identifier selecting it | Listener broadcast subscription |
+| Clearing member scope | A clearing member **does** receive all its trades | A clearing member **cannot** use drop copy to fetch its trading members' trades | Per facility |
+| Session restrictions | — | Trade drop copy is **administrative sessions only**; order drop copy is **low-frequency sessions only, standard orders only** | — |
+| Recovery | Incremental download by last sequence number; the exchange advises against repeating a full download | Retransmission requests, **per session, with no wildcard** | Retransmission with a mandatory partition identifier |
+| End-of-stream signal | **None** — the exchange states no explicit message will be sent to indicate the end of messages | A trade notification status message marks the end of the trade stream for the business day | A trade notification status message marks end of stream |
+| Status of the data | — | **Preliminary** | **Preliminary** |
+| Cost | — | — | No additional charge for members already taking the computer-to-computer facility |
+
+<Aside type="danger" title="Never settle on a drop copy or an execution report">
+Both BSE and MCX state that drop copy data is preliminary and must be confirmed against the binding record. MCX goes further and prescribes the rule: **if there is no trade capture report for a given execution report, then that execution report has to be considered invalid and should be discarded.**
+
+This is a two-tier trade truth and it has to exist in the data model. A fill that has been seen but not confirmed is not the same object as a confirmed trade, and only the second may be posted to a client's ledger. The reconciliation that promotes one to the other is not an end-of-day nicety; after a session drops mid-match it is the only thing standing between the firm and a client obligation that the exchange does not agree exists.
+
+NSE's interactive trade confirmation does not carry this caveat. Building one model for all three venues means building the strict one.
+</Aside>
+
+Two further asymmetries are worth noting because they affect what drop copy can be used for. NSE's facility has **no end-of-messages marker**, so "have I received everything?" cannot be answered from the stream itself and must be answered by reconciling counts against the end-of-day files — see [the file register architecture](/broking-kyc/finix-broking-setup/files/01-file-register-architecture/). And at NSE, end-of-day batch cancellation appears in the drop copy payload, which means the independent witness does report the daily flush — useful, because it gives a second source for the one event that terminates the largest number of orders.
+
+## 7. The freeze state
+
+NSE's price and quantity freezes create a third order state that is neither accepted nor rejected: the order is held for an exchange officer's decision. MCX's interface manual has **no freeze concept at all**. A design that models order state as a two-outcome submission will be wrong at NSE in a way that is visible to clients.
+
+| Property | Behaviour |
+|---|---|
+| Notification | A freeze-to-control message with a reason code distinguishing price freeze from quantity freeze, and a frozen indicator in the order terms |
+| Resolution | **Unsolicited.** Approval arrives as an ordinary order confirmation or order modification confirmation; rejection arrives as an ordinary order error or modification reject. There is no dedicated "freeze resolved" message to wait for |
+| Member-initiated exit | Dedicated quantity-freeze and price-freeze cancellation codes exist |
+| Constraint | **A frozen order cannot be modified.** The modification will be rejected |
+| The moving threshold | The freeze quantity lives in the security master and is **intraday-mutable** — the exchange can change it during the day via a security master change broadcast |
+| Audit key | The per-activity reference is the field that stitches the entry, the freeze and the resolution into one trail |
+
+Two implications. First, because resolution arrives as an ordinary confirmation, the handler must be able to accept a confirmation for an order it already considers to be in a pending-freeze state, rather than treating it as a duplicate or an unknown. Second, because the freeze quantity can change intraday, a firm that caches the security master at start of day will start sending orders that freeze without knowing why. The security master change broadcast must be applied, not logged — the same rule as [band revisions](/broking-kyc/finix-broking-setup/oms/05-order-attributes-validity/#33-operating-price-range).
+
+## 8. Self-match prevention
+
+Self-match prevention is **exchange-side** at NSE and MCX. The member does not have to detect the crossing; the matching engine refuses the match and kills a leg. More interestingly, at both venues the member chooses *which* leg dies, by a flag set on the order.
+
+| Aspect | NSE | MCX |
+|---|---|---|
+| Control | A member-settable order flag: the exchange's default action, or cancel the **active** (aggressing) order | A self-match prevention identifier carried with the order, selecting active or passive |
+| Immutability | **Cannot be changed by modification** — a modification that changes it is rejected. For a triggered stop-loss order, the flag as set at entry governs | Likewise set at entry |
+| Identity used for the test | Not stated in the protocol documents. **Confirm with the exchange before relying on the default** | **<abbr title="Permanent Account Number">PAN</abbr>**, belonging to the member and/or the client code |
+| What the member is told | A cancellation, plus an error code whose text is that the order could have resulted in a self trade | A cancellation, reported through the extended order information message |
+| Encoding | Ordinary cancellation | Ordinary cancellation status and execution type |
+
+<Aside type="caution" title="A prevented self-match looks exactly like a plain cancellation">
+At both venues the outcome is reported through the **ordinary cancellation path**. If the reason code is not decoded and surfaced, the order management system logs a cancellation, the client sees their order disappear with no explanation, and the dealing desk has nothing to tell them. Decoding this one code is perhaps the highest ratio of client-communication value to engineering effort anywhere in the return path.
+
+Two further points to settle before go-live: NSE does not publish what its "default action" actually is, so setting the flag to the default means accepting an undocumented behaviour; and NSE does not state which identity the self-trade test uses, which matters for a firm whose proprietary and client flow could cross. Both are questions for the exchange, not for inference.
+</Aside>
+
+## 9. Unsolicited messages, and the correlation-map anti-pattern
+
+Both NSE and MCX devote a dedicated chapter to messages that arrive with no request outstanding. NSE's introduction is explicit that these are not received in response to any request. MCX's is that a session is informed about system events and all unsolicited messages referring to status changes of orders belonging to it, automatically and without any subscription.
+
+<Aside type="danger" title="A request-response order adapter will silently drop these">
+An adapter built as request-response with a correlation map — send, store the correlation identifier, match the reply, discard anything unmatched — will **discard every message in this section**. Each one of them changes order or session state. This is not a rare edge case; the end-of-day batch cancellation alone terminates most of the day's unfilled orders, and it is unsolicited at NSE.
+
+The adapter must be built as a message consumer with an order-state machine, in which a reply to a request is merely one kind of message, rather than as a client library in which unmatched messages are an error.
+</Aside>
+
+The classes, and what each one obliges the member to do:
+
+| Class | Examples | Required handling |
+|---|---|---|
+| **End-of-day batch cancellation** | NSE's batch order cancellation of untraded day orders | Flush the local day book. Do **not** expect per-order cancellations. Release margin and reflect it before end-of-day processing |
+| **Stop-loss triggering** | NSE's on-stop notification; MCX's triggered-by-system execution type | Move the order from the stop book to the regular book locally. Note that the self-match flag as set at entry governs the triggered order |
+| **Freeze resolution** | Approval or rejection of a frozen order — see section 7 | Transition from pending freeze; release limits on rejection; tell the client either way |
+| **Exchange-initiated cancellation** | NSE's cancel confirmation with a modified-or-cancelled-by code of exchange; MCX's delete-all broadcast and mass cancellation event | **Authoritative and terminal. Never re-send the order automatically.** Record the reason code for client communication and the audit trail |
+| **Unsolicited *modification*** | NSE's carried-forward unmatched at-the-open pre-open orders, which get a derived price delivered as an unsolicited modification response; MCX's third-party and system-triggered replacements | The system must accept a **price change it never requested**. A design premised on "my view is correct" breaks here |
+| **Trade cancellation and modification** | NSE's three-form flow: requested notification, then confirmation or rejection, adjudicated by the exchange and requiring both parties to ask | Reverse a booked trade intraday, re-run client obligations, and correct downstream — including after the trade has already gone to the back office |
+| **Session and market state** | NSE's session broadcast family; MCX's trading session event, market status notification and service availability | Drive an **explicit session state machine**. Several actions are *prohibited* in specific states — see section 11 |
+| **Silent cancellation** | NSE stream outage and disaster-recovery switchover | Handled by the contingency handler, not the order-response handler — see section 5 |
+| **Member-level instructions** | Risk reduction mode, member restrictions, margin change notifications, throttle updates, forced logout, market-wide position-limit alerts and violations | These are instructions to the **firm**, not order events. They must reach a human, and some of them require stopping order flow |
+
+Two reason-code families deserve to be decoded properly rather than stored as integers. NSE's modified-or-cancelled-by field plus its pre-open indicator together let a member distinguish "the exchange flushed my closing-auction book" from "my dealer cancelled" — and without that distinction, end-of-day order-state reporting mis-attributes cancellations. MCX's mass-action reason enumeration names the cause: trading stopped, emergency, market-maker protection, stop button activated, business unit suspended, session loss or logout, duplicate session login, clearing risk control, internal connection loss, instrument suspended, price band shrink, and a market-wide position limit under risk reduction mode. Two of those are self-inflicted, and knowing which one fired is the difference between an incident report and a configuration fix.
+
+<Aside type="caution" title="Published enumerations contain defects">
+At least three of the tables underlying this section have inconsistencies in the published documents: one order-status enumeration prints values that contradict the rest of its own table, one mass-action reason list has values and labels split across lines in a way that makes the pairing ambiguous, and one end-of-day cancellation paragraph contains a sentence that reads as a typographical inversion of the document's own statement elsewhere. The *sets* of values and labels are reliable; specific pairings are not. Read them from the vendor-supplied header files and confirm each one in the test environment.
+</Aside>
+
+## 10. Modification semantics that differ from the obvious model
+
+| Rule | Detail | The defect it causes if assumed otherwise |
+|---|---|---|
+| **Quantity modification is a new total, not a delta** | MCX requires the new **total** order quantity. The previously executed quantity is retained and used to compute the new open quantity, and **if that is zero or less the order is cancelled** | A delta-based client library will cancel orders it meant to reduce |
+| The quantity invariants | While live, total equals cumulative filled plus leaves. Once cancelled, total equals cumulative filled plus cancelled quantity | A reconciliation that uses one identity in both states will not balance |
+| **Time priority is lost on a price change, always** | And on a quantity *increase*, never on a decrease. A disclosed-quantity change that increases the disclosed amount loses priority; crossing between disclosed and non-disclosed with an increase loses it; a minimum-fill or all-or-none change loses it; a stop-loss limit or trigger change loses it | Clients told their modification is free lose queue position without being warned |
+| **Quantity change on a market or at-the-open order loses priority in either direction** | The decrease exemption does not apply to these | A rule engine with one branch for "decrease" is wrong for this case |
+| Order type transitions are restricted | Limit to market only; stop-market to stop-limit, limit or market; stop-limit to stop-market, limit or market. At NSE, buy to sell, symbol, series, participant and proprietary-or-client are all immutable | Rejections that look like protocol errors and are actually rule violations |
+| What cannot be modified at all | **Frozen orders** at NSE. **Completely filled orders** at MCX. Security identification, side, session and persistence at MCX | A modification queue that retries these will retry forever |
+| **Trade modification is client-code only** | At NSE, in both segments, only the client account number may be changed; quantity, proprietary-or-client, participant and auction trades are explicitly out of scope. At MCX, account information only | A back office that expects to correct a quantity by trade modification has no path to do so |
+| Trade **cancellation** is two-sided and adjudicated | At NSE, both parties must request it; the counterparty is notified; the exchange may approve or reject | A unilateral cancellation feature cannot exist |
+| Trade modification entitlement is **protocol-level, per user** | Separate requests enable or disable trade modification and trade cancellation per user, and these are corporate-manager functions | A firm that manages this only in the vendor's screens has an unenforced control |
+
+The two emergency levers are also protocol-level and per-scope, and both carry state restrictions:
+
+| Lever | Scope | Restriction |
+|---|---|---|
+| **Kill switch** (NSE) | All orders, or all orders in one security; available at member level and at user level, by separate requests | **Not allowed during the pre-open session.** For closing-auction-eligible securities, **restricted after continuous trading closes** |
+| **Cancel on logout** (NSE) | Per user, enabled or disabled by request | **Not available during pre-open, and not available after continuous trading closes for closing-auction-eligible securities** |
+| **Order mass cancellation** (MCX) | Instrument, user or session scope in a single request, extensible to an entire product; a distinct response exists for when nothing matched | — |
+
+## 11. The closing auction window: when the emergency levers are gone
+
+The closing auction session is in the live NSE capital market protocol. For a broker, its operational bite is not the matching logic — it is that the two emergency levers above are switched off for part of it.
+
+| Fact | Detail |
+|---|---|
+| Permitted orders | **Limit and market orders only**, on closing-auction-eligible securities, when the normal market is in closing auction. No disclosed quantity, no all-or-none, no minimum fill, no trigger price |
+| Market order encoding | A market order in the auction carries the at-the-open indicator and a price of zero — the same encoding as pre-open and call auction |
+| **Carry-forward** | Unmatched limit orders from continuous trading are *"cancelled or carried forward"* to the auction without change in time priority. **The protocol document states both outcomes and does not resolve which applies when** — the order management system must handle both, and the resolution has to come from the exchange's implementation circular |
+| End of the auction | After matching, **all pending unmatched orders are cancelled by the system** with a cancellation confirmation |
+| Attribution | The cancelled-by field is set to exchange, and the pre-open indicator is set, for auction flushes. Both fields are needed to attribute the cancellation correctly |
+| Session boundaries | Dedicated broadcasts mark continuous-trading close for auction-eligible securities, revised price bands, auction start, market-order restriction start, and auction end |
+| Reference price | A dedicated reference-price broadcast is sent at the conclusion of continuous trading and before the auction begins, for auction-enabled securities |
+| Indicative data | An indicative imbalance quantity applies during the auction for eligible securities; for market orders it is derived from the market-by-price broadcast at the at-the-open price point |
+
+<Aside type="danger" title="For this window, the book cannot be flattened">
+Between the continuous-trading-close broadcast and the auction-end broadcast, for closing-auction-eligible securities:
+
+- the **kill switch is restricted**,
+- **cancel on logout is unavailable**, and
+- during the market-order restriction period, market orders in the auction book **cannot be modified or cancelled at all** — the protocol states both that modifications and cancellations of market orders are not allowed, and that the trader cannot cancel a market order for an eligible token.
+
+Any risk-reduction runbook, any square-off automation and any incident playbook that assumes the firm can always cancel its way out of exposure must carve out this window explicitly. The correct mitigation is upstream: do not enter the window with positions or orders that would need emergency cancellation. See [the master trading day checklist](/broking-kyc/finix-broking-setup/daily-ops/10-master-trading-day-checklist/) for where this lands in the close sequence.
+</Aside>
+
+For comparison, the pre-open carry-forward rules **are** stated unambiguously in the same document: unmatched at-the-open and limit pre-open orders are carried forward to the normal market without change in time priority, with carried-forward at-the-open orders receiving a derived price delivered as an unsolicited modification; for securities in an initial public offering or relisting the rule is the same "cancelled or carried forward" disjunction; and for illiquid securities unmatched pre-open limit orders carry to the next session. On a circuit hit with an order collection phase, untraded normal-market orders are cancelled by the system with a cancellation confirmation.
+
+## 12. Sessions, sequence numbers and blast radius
+
+| Dimension | NSE | BSE | MCX |
+|---|---|---|---|
+| Unit of order ownership | The user, within a corporate-manager / branch-manager / dealer hierarchy | The session | **The session** — and a session identifier can establish only one session at a time |
+| Unit of disconnection damage | **The box.** Excess heartbeats increment a drop counter, and at an unpublished threshold the exchange logs off the box identifier, **disconnecting every user on it** | The session | The session, plus whatever a mass-cancellation event covers |
+| Login sequence | Gateway router allocates a gateway by used capacity; secure box registration; then box sign-on; then the protocol. Re-login is directed to the same gateway, but the router must be asked each time, and a gateway failure during the day reallocates | Session logon | Connection gateway request and response, then session logon, then per-user logon |
+| Sequence gap handling | No documented replay on the interactive path; gap handling lives in the download and subscription facilities | Retransmission per session | **Reject and disconnect, always. No recovery mechanism. Every logon starts at sequence number one** |
+| Heartbeats | Sent only after an inactivity interval. **Extra heartbeats are penalised** | Per manual | Per manual |
+| Cross-session cancellation | Via the user hierarchy | Per manual | **Native** — the exchange supports cancellation on a different session for the same business unit, and head traders and the supervisor terminal may cancel on behalf of the owning user |
+| Order visibility | Per the user hierarchy | Per session, plus listener broadcast | Per session, plus listener broadcast. **A multi-session deployment needs listener subscriptions to see itself whole** |
+
+Three things on this table are easy to get wrong and expensive to discover:
+
+**The NSE heartbeat penalty inverts the usual instinct.** The reflex when a link looks unhealthy is to heartbeat more often. At NSE that increments a drop counter, and the consequence at threshold is not a dropped connection for the chatty process — it is a logoff of the box identifier, taking every user on that box with it. The threshold is not published. Heartbeat timing must therefore follow the document exactly, and "send a few extra to be safe" is an availability risk rather than a mitigation.
+
+**Session identity at MCX is a singly-held lease.** Because one session identifier supports one session at a time, and because duplicate login has its own mass-cancellation reason code, two processes configured with the same identifier is not a redundancy design — it is a mechanism for flushing the live order book. Container orchestration that can start a replacement before the original has fully stopped needs explicit fencing here.
+
+**A firm with sessions per segment has independent sequence spaces.** They must not be conflated, and the per-venue, per-segment, per-session matrix of what is recovering and what is healthy is a real operational display, not an implementation detail. This is the same point made in [the event architecture](/broking-kyc/finix-broking-setup/stack/bff-and-event-architecture/#8-sequence-discipline-and-independent-verification), and it is where the two pages meet.
+
+Two NSE features a greenfield build should know exist. The **gateway router** means the connection endpoint is not static: the member asks the router, is allocated a gateway by used capacity, and is normally directed to the same one on re-login — but a gateway failure during the day produces a new allocation, so a hard-coded endpoint is a latent outage. And the **immediate order acknowledgement** facility is an optional extra acknowledgement sent on receipt of the order at the exchange, on a separate port with its own encrypted channel; the exchange is explicit that the existing final confirmation or rejection continues unchanged. It is a latency instrument, not a state source: an immediate acknowledgement is not a confirmation, and treating it as one re-creates the unknown-state problem one layer up.
+
+## 13. Configuration reference
+
+| Key | Finix default | Class | Failure mode if wrong |
+|---|---|---|---|
+| `finix.oms.state.source_of_truth` | Own durable log, written **before** send | Discretionary, strongly recommended | An order that cannot be reconciled because it was never recorded |
+| `finix.oms.state.unknown_resolution` | Cancel-probe procedure, section 4 | Discretionary, strongly recommended | A resend, and a duplicated client position |
+| `finix.oms.state.unknown_max_age_minutes` | Small, with escalation; zero tolerance at session end | Discretionary | Unknown orders surviving into end-of-day processing |
+| `finix.oms.recovery.nse.mode` | Journal download, incremental, per stream | Exchange-set | Silent partial recovery when a stream request is dropped |
+| `finix.oms.recovery.nse.verify_trailer_per_stream` | True | Discretionary, strongly recommended | Believing recovery completed when a stream never answered |
+| `finix.oms.recovery.bse.restatement_absence_means_cancelled` | True | Exchange-set | Waiting forever for cancellations that will not arrive |
+| `finix.oms.recovery.mcx.retransmit_partitions` | Enumerated explicitly | Exchange-set | A partition never recovered, because there is no wildcard |
+| `finix.oms.recovery.mcx.persistence_default` | Persistent unless a strategy requires otherwise | Discretionary | Orders deleted on session loss that the desk expected to survive |
+| `finix.oms.session.mcx.identity_fencing` | Single-holder lease, enforced | Discretionary, strongly recommended | Duplicate login, and a mass-cancelled book |
+| `finix.oms.session.nse.heartbeat_policy` | Exactly per protocol document | Exchange-set | Drop counter, then logoff of the whole box |
+| `finix.oms.session.nse.gateway_endpoint` | Resolved via the router each login | Exchange-set | Latent outage on intraday gateway reallocation |
+| `finix.oms.dropcopy.enabled.<venue>` | True on all venues that offer it | Discretionary, strongly recommended | No independent cross-check on the primary path |
+| `finix.oms.dropcopy.settlement_use` | **Never** | Regulatory and exchange-set | Settling on preliminary data |
+| `finix.oms.trade.binding_record.<venue>` | Trade capture report at MCX; interactive confirmation at NSE; per manual at BSE | Exchange-set | Client ledgers posted from data the exchange does not confirm |
+| `finix.oms.trade.discard_unconfirmed_exec_reports` | True at MCX, per the prescribed rule | Exchange-set | Phantom fills in the book |
+| `finix.oms.unsolicited.handler_mode` | Message consumer with a state machine | Discretionary, strongly recommended | Whole classes of state change discarded as uncorrelated |
+| `finix.oms.unsolicited.unknown_type_action` | Store, alert, never discard | Discretionary, strongly recommended | A protocol change detected weeks late |
+| `finix.oms.contingency.handler_can_bulk_terminate` | True | Discretionary, strongly recommended | Orders stuck live locally after a stream outage, with margin blocked |
+| `finix.oms.freeze.security_master_change_applied` | Applied intraday, not cached | Exchange-set | Orders freezing for reasons the desk cannot explain |
+| `finix.oms.selfmatch.flag_default.<venue>` | Explicit, per desk policy — **not** the undocumented exchange default | Discretionary | Accepting behaviour nobody has read |
+| `finix.oms.selfmatch.reason_surfaced_to_client` | True | Discretionary, strongly recommended | Orders vanishing with no explanation |
+| `finix.oms.cas.emergency_lever_carveout` | Documented and tested | Exchange-set | A runbook that assumes a cancellation path that does not exist |
+| `finix.oms.modify.quantity_semantics.<venue>` | Absolute total at MCX | Exchange-set | Orders cancelled when a reduction was intended |
+| `finix.oms.ack.immediate_is_not_confirmation` | True | Exchange-set | Treating a receipt as a state, which re-creates the unknown problem |
+
+## 14. Exception paths
+
+| Situation | Response |
+|---|---|
+| Send times out with no acknowledgement | Section 4 procedure. **Never resend.** If unresolvable, freeze entry for the scope |
+| Reject reason indicates the result of the transaction is unknown | Not a rejection. Park, do not modify, probe by cancellation |
+| Cancel probe returns "order not found" for an order the client was told was live | Correct the client view immediately and investigate why it was shown as live before acknowledgement |
+| Journal download produces no trailer record for a stream | Recovery is incomplete. Do not resume entry on that stream. Escalate |
+| End-of-restatement arrives with no restated orders | All standard orders for that product are cancelled. Terminate them locally, release margin, notify |
+| Contingency broadcast indicates a stream outage | Purge outstanding orders for that stream locally with no expectation of cancellation messages; release margin; notify affected clients; reconnect on the end-of-outage status |
+| Disaster-recovery switchover announced or detected | Treat as a full order-book reset. Re-seed used limits from zero. Reconcile against the firm's own log and the published streamwise last trade number. Pre-switchover journal download will not be available |
+| Mass cancellation received with a duplicate-login reason | **Production incident.** Two processes hold one session identity. Stop one, fence the identity, then recover state |
+| Mass cancellation received with a session-loss reason | Expected for non-persistent orders; verify against the persistence flags actually used |
+| Execution report with no corresponding trade capture report at MCX | Discard the execution report, per the prescribed rule, and reconcile. Do not post it |
+| Drop copy count disagrees with the interactive path | Reconcile against the end-of-day files before the close. A persistent difference stops end-of-day processing |
+| Drop copy stream appears to have ended at NSE | There is no end-of-messages marker. Confirm completeness by count against the files, not by stream signal |
+| Frozen order unresolved at session end | Resolve with the exchange; do not leave margin blocked indefinitely |
+| Modification rejected on a frozen order | Expected behaviour, not a defect. Cancel and re-enter if the intent still stands |
+| Order cancelled with a self-match reason | Decode and surface the reason to the client; check whether proprietary and client flow are crossing, and whether that is intended |
+| Unsolicited modification received changing an order's price | Accept it. Verify it is a pre-open or auction carry-forward and record the derivation |
+| Unknown message type or unknown reason code | Store, alert, never discard. Treat as a possible protocol or rule change and check the exchange's current document version |
+| Sequence anomaly at MCX | The session is already gone. Re-logon from sequence number one; recover by retransmission per partition; freeze entry until reconciled |
+| Heartbeat drop counter warning or unexplained box logoff at NSE | Audit heartbeat timing against the document. Do not increase heartbeat frequency |
+| Trade cancellation request received from a counterparty | Operational escalation. Confirm the economics before responding; the exchange adjudicates, and the outcome reverses a booked trade |
+| Any emergency cancellation needed during the closing auction window | The levers are unavailable. Escalate immediately; manage the exposure by position rather than by order |
+
+## Practical notes
+
+- **Write "there is no state query" on the architecture diagram.** It is the one constraint that, if a team forgets it, invalidates the recovery design rather than merely degrading it.
+- **Implement the cancel-probe once, in the adapter, and make it the only path that may act on an unacknowledged send.** The per-venue variation is a mapping of "order not found"; the logic is identical.
+- **Build the contingency handler before the happy path is finished.** It is the only component that can handle the two silent-death cases, and a firm that adds it later usually adds it after the incident that proved it was needed.
+- **Decide the preliminary-versus-binding data model on day one.** Retrofitting a second trade state into a back office that has one is a migration, not a change.
+- **Rehearse recovery in the mock environment, not just connectivity.** Logging in is not the hard part. Reconstructing a book from a replay, with a deliberate gap injected, is. See [mock trading and drills](/broking-kyc/finix-broking-setup/certification/05-mock-trading-and-drills/).
+- **Read the enumerations from the vendor header files.** Several published tables have defects, and a wrong value-to-label mapping produces a confidently incorrect explanation to a client or a regulator.
+- **Keep a per-venue, per-segment, per-session state board.** Recovery is a per-session concept everywhere, and a firm-level "connected" indicator hides exactly the condition that matters.
+- **Ask the exchange the open questions rather than inferring them.** What the self-match default action is, which identity the self-match test uses, what the heartbeat drop threshold is, and when a continuous-trading order is cancelled rather than carried into the auction — none of these is answered in the published protocol documents, and each one has a client-visible consequence.
+
+## Where this connects
+
+- [Order forward path](/broking-kyc/finix-broking-setup/oms/06-order-forward-path/) — the normal path these are the edges of
+- [Order return path](/broking-kyc/finix-broking-setup/oms/07-order-return-path/) — message classes, rejection mapping and the unknown state in the design layer
+- [Modification and cancellation](/broking-kyc/finix-broking-setup/oms/08-modify-cancel-rules/) — the race conditions, in design terms
+- [Exchange connectivity protocols](/broking-kyc/finix-broking-setup/oms/02-exchange-connectivity-protocols/) — the links, sessions and protocol versioning underneath
+- [The front-end gateway and the event architecture](/broking-kyc/finix-broking-setup/stack/bff-and-event-architecture/) — why an unacknowledged send is never retried, and where these guarantees are enforced
+- [Disaster recovery architecture](/broking-kyc/finix-broking-setup/stack/disaster-recovery-architecture/) — the switchover whose order-state consequences are listed in section 5
+- [File ingestion cadence](/broking-kyc/finix-broking-setup/files/10-ingestion-cadence-map/) — the end-of-day files that drop copy counts are reconciled against
+- [Change and version control](/broking-kyc/finix-broking-setup/certification/04-change-version-control/) — keeping protocol versions current is a compliance obligation
+- [Mock trading and drills](/broking-kyc/finix-broking-setup/certification/05-mock-trading-and-drills/) — where recovery is rehearsed
+- [Incident playbooks](/broking-kyc/finix-broking-setup/daily-ops/07-incident-playbooks/) — the operational response to the exception paths above
+- [Master trading day checklist](/broking-kyc/finix-broking-setup/daily-ops/10-master-trading-day-checklist/) — where the close-sequence carve-out lands

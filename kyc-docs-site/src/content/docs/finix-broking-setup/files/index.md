@@ -26,6 +26,8 @@ description: The file layer a broking operation actually runs on — the registe
 | [Outbound submissions](/broking-kyc/finix-broking-setup/files/07-outbound-submissions/) | Everything the firm sends, and the response files that prove it arrived |
 | [Handling exceptions](/broking-kyc/finix-broking-setup/files/08-file-handling-exceptions/) | The twenty-two exception classes, the decision each forces, and the blast radius of getting it wrong |
 | [Bank and payment files](/broking-kyc/finix-broking-setup/files/09-bank-payment-files/) | Statements, gateway settlement, mandates and the reconciliation they feed |
+| [Ingestion cadence map](/broking-kyc/finix-broking-setup/files/10-ingestion-cadence-map/) | How many times a day each parameter file arrives, per segment, and which systems each arrival touches |
+| [Depository interfaces and APIs](/broking-kyc/finix-broking-setup/files/11-depository-interfaces-and-apis/) | Programmatic interfaces versus file channels versus portals at both depositories, and why an API does not erase a business window |
 
 ## Where this connects
 

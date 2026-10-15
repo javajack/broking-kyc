@@ -28,6 +28,8 @@ description: The risk plane on Saral MoneyMaker RMS — architecture and inputs,
 | 7 | [Intraday surveillance](/broking-kyc/finix-broking-setup/rms/07-intraday-surveillance/) | Alerting, the Chapter IV detection obligation, and disposition |
 | 8 | [Margin reporting and penalties](/broking-kyc/finix-broking-setup/rms/08-margin-reporting-penalties/) | Files, deadlines, the penalty grid, allocation and dispute |
 | 9 | [RMS configuration reference](/broking-kyc/finix-broking-setup/rms/09-rms-config-reference/) | Every tunable, default, class and failure mode |
+| 10 | [Limit impact matrix](/broking-kyc/finix-broking-setup/rms/10-limit-impact-matrix/) | Ninety-seven events and what each one does to a client's available capacity, in which direction and on what clock |
+| 11 | [Operations catalogue](/broking-kyc/finix-broking-setup/rms/11-operations-catalogue/) | Every risk intervention, routine and rare, with its precondition, its authoriser and its downstream effect |
 
 ## Where this connects
 

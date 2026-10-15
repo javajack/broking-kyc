@@ -13,7 +13,7 @@ import { Aside } from '@astrojs/starlight/components';
 - **Order placement is a command; everything returning is an event.** The forward path needs a definitive synchronous answer; the reverse path is irreducibly asynchronous.
 - **Order ordering per order is essential; global ordering is not.** Partition by order identity and you get the guarantee you need without the throughput cost of total ordering.
 - **Delivery is at-least-once, so every consumer must be idempotent.** A fill applied twice doubles a position, and nothing downstream will tell you.
-- **Never retry an unacknowledged order send.** Retrying is how a firm places the same order twice at the exchange. The correct response is query-and-reconcile, and if state cannot be established, freeze entry.
+- **Never retry an unacknowledged order send.** Retrying is how a firm places the same order twice at the exchange. The correct response is recover-and-reconcile — and note that **no venue will answer a state query**, so recovery means replay, restatement or a prescribed probe, not an inquiry. If state cannot be established, freeze entry.
 - **The event log is the order log.** It is append-only, non-tamperable and retained for years because it is a regulatory record, which constrains the technology choice.
 
 ## Conceptual overview
@@ -58,7 +58,7 @@ An order exists in three places and they are never simultaneously current.
 | State | Meaning | Handling |
 |---|---|---|
 | Intent recorded | The firm has decided to place | Durable before sending — see the outbox in section 4 |
-| **Sent, unacknowledged** | **The dangerous state.** The exchange may or may not have it | **Query, never retry.** See section 7 |
+| **Sent, unacknowledged** | **The dangerous state.** The exchange may or may not have it | **Recover, never retry.** There is no state inquiry to make — see section 7 |
 | Acknowledged | The exchange has it, with its identifier | Normal |
 | Terminal | Filled, cancelled, rejected, expired | Margin released, client notified, record written |
 | **Unknown** | State cannot be established | **Freeze entry for the scope affected and reconcile.** Do not accept new orders into uncertainty |
@@ -137,7 +137,7 @@ Every other integration in this stack benefits from a retry with backoff. **Orde
 The correct sequence is:
 
 1. **Do not resend.**
-2. **Query** — use the venue's order-state retrieval or the independent verification stream, and establish whether the order exists.
+2. **Recover state — you cannot ask for it.** None of the three venues provides an order-state inquiry; each one's own protocol document says so explicitly. Establishing whether the order exists therefore means one of: replaying the venue's record of your activity from the last message you persisted, reading the independent copy of your own activity, or issuing the one prescribed probe — **a cancellation request for the order you are unsure about**, where success proves it was live and "order not found" proves it was never accepted. The mechanism differs by venue and the probe has a trap in it for an unacknowledged *new* order. See [order path edge cases](/broking-kyc/finix-broking-setup/oms/12-order-path-edge-cases/#4-the-unknown-state-procedure).
 3. **If it exists**, reconcile the local record toward it.
 4. **If it does not exist**, and the session is healthy, the order may be placed — once, as a new placement with a new identity, recorded as such.
 5. **If state cannot be established**, **freeze order entry for the affected scope** and escalate. Accepting orders into uncertainty compounds the problem across every client on that session.

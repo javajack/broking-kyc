@@ -1,0 +1,215 @@
+---
+title: "Stack: disaster recovery architecture"
+description: Planning a recovery site for a broking operation — the two client-count thresholds that are routinely confused, a real conflict between two mandatory declaration clocks, why a remote recovery site must be own-front-end only, how order state behaves at failover and the five hazards there, and the fact that there is no pre-failover notice to give.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** The drill *regime* — who must drill, how often, with what objectives — is already documented in [mock trading and drills](/broking-kyc/finix-broking-setup/certification/05-mock-trading-and-drills/). What was missing is the **architecture**: how a recovery site actually connects to the exchange, which identifiers may be used from it, and what happens to the order book at the moment of failover. Those questions turn out to have sharper answers than expected, and one of them — the identifier constraint in section 4 — determines the whole topology. So the page leads with the thresholds, flags a genuine conflict in the declaration clock, then spends its length on the architecture.
+
+## TL;DR
+
+- **Two client-count thresholds are routinely confused.** The threshold that triggers a **recovery site** is materially higher than the one that brings a firm within the **glitch framework**. Guard the distinction.
+- **There is a real conflict between two mandatory clocks**: the cyber framework requires a disaster to be **declared within thirty minutes**, while the glitch guidelines define one as a **forty-five-minute** disruption. Nothing reconciles them — **run internal procedures to thirty minutes.**
+- **A remote recovery site must be own-front-end only.** Exchange-terminal identifiers are legally pinned to a single office address and barred from colocation and third-party data centres. Only non-exchange-terminal identifiers may be mapped across cities. **This decides the topology.**
+- **There is no recovery-site connectivity tariff** and no special provisioning regime — a recovery link is an ordinary connectivity scenario with ordinary fees.
+- **Order state at failover carries five hazards**, and three of them compound: the **pre-switchover journal download is unavailable**, outstanding orders are cancelled **with no cancellation messages**, and **used order-value limits reset to zero**. A switchover is a cold start, not a reconnection.
+- **There is no pre-failover notice to give.** Disclosure is retrospective, through the next-day incident report, and the **self-reported recovery time is the basis for the breach penalty**.
+- **"Active-active" and "active-passive" appear nowhere in the primary material.** The regulator's own description of broker practice is *independent cold sites*.
+
+## Conceptual overview
+
+Recovery planning in this domain differs from general practice in one decisive way: the firm cannot fail over unilaterally, because half of what it needs is a relationship with an exchange that has its own view of where the firm's terminals live. In an ordinary distributed system a recovery site is a deployment target; here it is also a **registered place**, with identifiers tied to it and rules about which kinds of identifier may be used from where. The architecture is therefore constrained from outside before any internal design choice is made, and the constraint is not negotiable.
+
+The second observation is that the published material is firmer on **obligation** than on **mechanism**, and the gap matters. Thresholds, frequencies, recovery objectives, site separation and penalties are all stated precisely. What a firm must *tell* the exchange, what the exchange will *do* to help, and how connectivity is provisioned to a second site are largely not addressed — because they are treated as ordinary operational matters rather than recovery-specific ones. The practical consequence is reassuring: there is less recovery-specific bureaucracy than firms expect, and correspondingly more ordinary engineering.
+
+The third point is that the hardest part is not bringing systems up elsewhere but **knowing what the order book was** at the moment things went wrong. The exchange provides a recovery facility for this, and it comes with behaviours that can destroy the very state the firm is trying to recover — a cancel-on-logout setting that empties the book, exception handling that cancels orders silently, and a rule that an order can only be cancelled from the mapping that created it. A failover plan that restores infrastructure and does not address these three will restore a firm to a state it cannot reconcile.
+
+## 1. The thresholds
+
+| Threshold | What it governs |
+|---|---|
+| **The lower client count** | Whether the **technical glitch framework** applies: internet and wireless-trading brokers above it, excluding closed accounts, measured at the previous financial year end |
+| **The higher client count — fifty thousand across all exchanges** | Whether the firm must **establish a recovery site at all** |
+| **Designation: the top twenty per exchange** by internet and wireless-trading clients, published annually | Whether the firm owes the **full-trading-day half-yearly drill** |
+| Designated-large-broker status | Whether the **quarterly** drill overlay applies |
+
+<Aside type="danger" title="The two numbers are not the same number">
+A firm can be inside the glitch framework — and therefore owe incident reporting, parameter monitoring and root-cause analysis — while being **below** the recovery-site threshold and owing no recovery site at all. Conversely a firm above the recovery threshold is certainly within the glitch framework. Treating the lower figure as the recovery trigger over-builds; treating the higher figure as the framework trigger under-reports.
+
+Both are measured differently as well: the framework figure excludes closed accounts and is taken at a financial-year boundary, while the recovery figure is **across all exchanges**. Compute each separately from its own definition, and record which figure drove which obligation.
+</Aside>
+
+## 2. The declaration clock conflict
+
+| Source | Requirement |
+|---|---|
+| **The cyber framework's recovery control**, tagged **mandatory for all regulated entities** | A disaster must be **declared within thirty minutes** |
+| **The glitch guidelines** | A disaster is **defined** as a disruption of a critical system lasting **forty-five minutes**, plus board-defined additional criteria |
+| Recovery time objective | **Two hours after declaration** — both sources agree |
+| Recovery point objective | **Fifteen minutes** — both agree |
+
+**The objectives agree; the declaration clock does not, and nothing in the material reconciles them.** The recommended position is to **run internal procedures to thirty minutes**, because that is the stricter of two mandatory requirements and satisfies both. A firm that runs to forty-five minutes is in breach of a control tagged mandatory for every regulated entity.
+
+The practical design consequence is larger than it looks: a thirty-minute declaration clock means the **decision to declare** has to be pre-delegated, with criteria written down, because thirty minutes is not enough time to convene anyone. That is the escalation design in [escalation and on-call](/broking-kyc/finix-broking-setup/roles/05-escalation-oncall/).
+
+## 3. Objectives, separation and penalty
+
+| Element | Position |
+|---|---|
+| Disaster trigger | A **forty-five-minute** critical-system disruption, plus board criteria — subject to the section 2 conflict |
+| **Recovery time objective** | **Two hours after declaration.** The firm's own target, not an exchange's |
+| **Recovery point objective** | **Fifteen minutes** |
+| **Site separation** | Preferably **different seismic zones**; where that is not feasible, **at least two hundred and fifty kilometres** |
+| Drills, designated members | **Half-yearly**, all operations from the recovery site for **at least one full trading day** |
+| Drills, designated large brokers | **Quarterly**, a full trading day, all operations, and explicitly **"shall not coincide with drills conducted by the Exchange"** |
+| Reviews | Board-approved policy, reviewed at least annually and after major critical-system changes or glitches, with quarterly board review of implementation |
+| **Penalty for a missed drill** | A first amount **plus a monthly amount while the failure continues**, subject to a cap per instance — and **that penalty row is marked not applicable for non-designated brokers** |
+| What the drill must demonstrate | The invocation team; correspondence of hardware, software, application, network and security between sites; capacity; replication; recovery within objectives; and **return to primary operations** |
+
+## 4. The identifier constraint that decides the topology
+
+This is the most important finding on the page.
+
+| Rule | Consequence |
+|---|---|
+| **Exchange-terminal identifiers, and identifiers converted from them, are legally pinned to a single office address** — the undertaking says so in terms | They cannot simply be used from a second site |
+| **Only non-exchange-terminal identifiers may be mapped across cities** | The firm's own front end is the portable option |
+| **Exchange-terminal login is barred from colocation and third-party data centres** | A recovery site in a commercial data centre cannot host it |
+| **Therefore a remote recovery site must be own-front-end only** | Dealer operations at the recovery site run through the firm's own front end, not the exchange-supplied terminal |
+
+**Design implications that follow:**
+
+- The recovery site's dealing capability must be **the firm's own front end**, registered appropriately, with its identifiers **pre-registered to that location** — which is why pre-registration appears as a begin-of-day item in [the master trading-day checklist](/broking-kyc/finix-broking-setup/daily-ops/10-master-trading-day-checklist/).
+- A plan that assumes dealers will log into the exchange terminal from the recovery site **does not work**, and discovering that during an incident is the worst possible time.
+- A firm whose dealing model depends heavily on the exchange-supplied terminal has a **structurally weaker** recovery position than one built on its own front end — which is an argument for the latter that has nothing to do with features.
+- Terminals at a recovery site are **terminals at a location**, and the location rules in [terminal and user-identifier registration](/broking-kyc/finix-broking-setup/certification/03-ctcl-nnf-terminal-registration/) apply. An unreported recovery site is an unreported location.
+
+## 5. Connectivity
+
+| Question | Answer |
+|---|---|
+| Must connectivity be provisioned to the recovery site in advance? | **In practice yes, as ordinary engineering** — but there is **no recovery-specific provisioning regime** |
+| **Is there a recovery-site connectivity tariff?** | **No separate tariff exists.** A recovery link is an **ordinary connectivity scenario**, with the ordinary processing fees and last-mile arrangements |
+| Is the link registered differently? | **Not as a recovery link.** It is connectivity, registered as connectivity |
+| What does this mean for planning | The recovery link is a **procurement and lead-time** item rather than a regulatory one. Budget it as ordinary connectivity and provision it early, because lead times are long |
+
+## 6. Order state at failover — the five hazards
+
+The exchange provides a **per-stream download-request facility**, which is the ordinary order and trade state recovery mechanism. At a disaster-recovery switchover it is the thing a firm instinctively reaches for, and it is **partly unavailable** — which is the first and least expected hazard.
+
+| # | Hazard | Why it matters |
+|---|---|---|
+| 1 | **Journal download information from before the switchover is not available** | The reflex recovery action does not work across a switchover. The firm's **own durable log is the only record** of what was open at the moment of failure, which makes the log a recovery dependency rather than an audit convenience |
+| 2 | **Outstanding orders are not carried forward, and no cancellation messages are sent** | The firm's record still shows live orders that no longer exist. **Nothing arrives to tell you.** This is one of only two documented cases in the whole order path where orders die in silence — see [order path edge cases](/broking-kyc/finix-broking-setup/oms/12-order-path-edge-cases/#5-orders-that-die-with-no-message-at-all) |
+| 3 | **Used order-value limits are reset to zero** | Branch and user value limits come up unused. The limit engine must be **re-seeded from the firm's own reconciled position**, not resumed from its pre-failover state, or the firm will grant capacity it has already consumed |
+| 4 | **A cancel-on-logout setting can empty the order book at failover** | The act of failing over destroys the book. Whether this is desirable is a **deliberate choice** — for some firms an empty book is the safer outcome; for others it is a client-impact event. **Decide it in advance and configure it knowingly** |
+| 5 | **An order is only cancellable from the originating terminal mapping** | After failover the new mapping **may not be able to cancel** orders placed by the old one. A client asking to cancel may be unservable until state is reconciled |
+
+**What the exchange does give you**: the **streamwise last trade number**, published as an exchange-to-trader message at the switchover. That is the anchor for reconciliation — it tells the firm where each stream's trade sequence stood, which is what lets it establish whether its own log is complete up to the cut. A recovery runbook that does not capture and use this message has nothing external to reconcile against.
+
+**The resulting failover sequence:**
+
+| Step | Action |
+|---|---|
+| 1 | **Freeze order entry** before anything else |
+| 2 | Declare the disaster within the clock, per the pre-delegated criteria |
+| 3 | Bring up the recovery site and establish sessions with **pre-registered own-front-end identifiers** |
+| 4 | **Capture the streamwise last trade number** from the exchange-to-trader message. Do not expect a pre-switchover journal download to be available |
+| 5 | **Reconstruct the pre-failover book from the firm's own durable log**, up to the published last trade number per stream |
+| 6 | **Treat every order that was outstanding as dead** unless positively confirmed otherwise. Release the margin they held and record the terminations; no cancellation messages will arrive |
+| 7 | **Re-seed the limit engine from zero**, because used order-value limits have been reset, and recompute capacity from reconciled positions rather than from the pre-failover limit state |
+| 8 | Establish which orders, if any, are cancellable from the new mapping, and which are not |
+| 9 | Reconcile positions and margin, and only then recompute client capacity |
+| 10 | **Only then resume order entry**, with the scope stated to clients and the desk |
+| 11 | Record the recovery time — it will be reported, and it is penalty-relevant |
+| 12 | Plan and execute the **return to primary**, which is part of what a drill must demonstrate |
+
+<Aside type="danger" title="A switchover is a book reset, not a reconnection">
+Hazards 1, 2 and 3 compound into a single conclusion that changes the design: a disaster-recovery switchover is **not a session recovery**. It is a cold start in which the exchange will not replay what happened before the cut, will not tell you which of your orders it killed, and will hand your limit engine back to you empty.
+
+Everything the firm knows about its pre-failover state at that moment, it knows from its own log. That makes the order log's durability and completeness a **recovery-time dependency** — and it means a firm that writes orders to its log only after acknowledgement cannot reconstruct the one set of orders it most needs to account for, the ones that were in flight when the primary died.
+</Aside>
+
+The general rule from [the front-end gateway and the event architecture](/broking-kyc/finix-broking-setup/stack/bff-and-event-architecture/) applies with full force here: **never retry an unacknowledged order, and never accept orders into uncertain state.**
+
+## 7. There is no pre-failover notice
+
+| Element | Position |
+|---|---|
+| **A pre-failover notification obligation** | **Does not exist.** The firm does not have to tell the exchange before moving |
+| How disclosure happens | **Retrospectively**, through the **next-day preliminary incident report**, which asks whether operations moved to the recovery site and **what the recovery time was** |
+| **The consequence** | That recovery time is **self-reported, and it is the basis for the recovery-time-breach penalty** |
+| What follows for design | **Measure the recovery time precisely and honestly**, from declaration to resumption, and keep the evidence. It is a number the firm reports about itself and is then judged on |
+| What the exchange provides to assist a failover | **Nothing recovery-specific was established.** The state-download facility exists as an ordinary protocol capability, not as a failover service |
+| The outage fallback for clients | The risk-reduction platform was **discontinued on 7 May 2026**. The fallback is now **contingency trading from exchange premises** — so any client-facing outage promise referencing the old platform is dead text |
+
+## 8. Active-active, and a useful negative
+
+| Finding | Detail |
+|---|---|
+| **"Active-active" and "active-passive" appear zero times** across the primary documents examined | There is **no regulatory preference** between them |
+| The regulator's own description of broker practice | **"Independent cold sites"** |
+| What follows | **Do not present a topology choice as a compliance requirement.** The obligations are the objectives — two hours and fifteen minutes — and a firm may meet them with any topology that actually does |
+| The honest read | A cold site that genuinely recovers in two hours satisfies the rule; a warm site that has never been exercised does not. **The drill, not the topology, is the evidence** |
+
+## 9. Replication and evidence
+
+| Element | Position |
+|---|---|
+| What the objective requires | Replication good enough that **no more than fifteen minutes of data is lost** |
+| How it is demonstrated | Through the **drill**, with documented results and observations examined by the auditor |
+| What the auditor examines | Preparedness, the documented drill results, and correspondence between the sites |
+| Evidence to retain | Drill timing, the operations and client coverage, recovery achieved against objective, failures, corrective actions, and the **return to primary** |
+| The reporting | Drill details and observations within their deadline for designated large brokers; otherwise documented results reviewed by the auditor |
+
+## 10. Configuration
+
+| Key | Classification | Default | Notes |
+|---|---|---|---|
+| `finix.stack.dr.site_required_threshold` | **E** | Fifty thousand clients across exchanges | **Not the glitch-framework figure** |
+| `finix.stack.dr.designation_from_published_list` | **E** | true | Not computed |
+| `finix.stack.dr.declaration_minutes` | **R** | **30** | **The stricter of two mandatory clocks** |
+| `finix.stack.dr.declaration_predelegated` | **D** | **true** | Thirty minutes does not allow convening |
+| `finix.stack.dr.rto_hours` | **E** | 2 after declaration | The firm's target |
+| `finix.stack.dr.rpo_minutes` | **E** | 15 | — |
+| `finix.stack.dr.site_separation_km_min` | **E** | 250 where seismic separation is infeasible | — |
+| `finix.stack.dr.identifiers_own_frontend_only` | **E** | **true** | **Exchange-terminal identifiers are address-pinned** |
+| `finix.stack.dr.identifiers_pre_registered` | **D** | **true** | Checked at begin of day |
+| `finix.stack.dr.site_reported_as_location` | **R** | true | An unreported site is an unreported location |
+| `finix.stack.dr.cancel_on_logout` | **D** | **A deliberate, documented choice** | It can empty the book at failover |
+| `finix.stack.dr.pre_switchover_download_available` | **E** | **false** | **Journal download from before the switchover is not available** — do not design around it |
+| `finix.stack.dr.state_from_own_log` | **D** | **true** | The firm's durable log is the only pre-failover record; it must be written **before** the send |
+| `finix.stack.dr.outstanding_orders_presumed_dead` | **E** | **true** | No cancellation messages are sent |
+| `finix.stack.dr.capture_streamwise_last_trade_number` | **D**, strongly recommended | **true** | The only external reconciliation anchor the exchange publishes at switchover |
+| `finix.stack.dr.limits_reseed_from_zero` | **E** | **true** | Used order-value limits are reset to zero at switchover |
+| `finix.stack.dr.freeze_entry_before_failover` | **D** | **true** | First step |
+| `finix.stack.dr.recovery_time_measured` | **D** | **true** | Self-reported and penalty-relevant |
+| `finix.stack.dr.no_pre_failover_notice` | **D** | true | Recorded so none is sought |
+| `finix.stack.dr.failback_in_drill_scope` | **E** | true | Return to primary is demonstrated |
+| `finix.stack.dr.topology` | **D** | The firm's choice | **No regulatory preference exists** |
+
+## 11. What remains unverified
+
+Recorded so a future pass knows where to look, and so nobody treats silence as settled.
+
+| Gap | Status |
+|---|---|
+| The other two venues' identifier, charging and order-recovery mechanics | **Unknown** — both sites blocked automated access. **Do not assume the principal venue's rules apply** |
+| One penalty annexure's figures | Read from a **third-party mirror**; the substance was cross-checked but **the figures need re-verification** against the primary notice |
+| A 2024 market-infrastructure modification circular | **Not retrievable**, so institution-side numbers may not be current. They are not a broker obligation in any case |
+| Whether the exchange offers any recovery-specific assistance | **Nothing established.** Treat the state-download facility as the only mechanism |
+
+## Practical notes
+
+- **Compute both client-count thresholds separately** and record which drove which obligation.
+- **Run declaration procedures to thirty minutes** and pre-delegate the decision, because the stricter clock is mandatory for everyone.
+- **Build the recovery site around your own front end.** The identifier rules leave no alternative for a remote site, and a dealing model dependent on the exchange terminal is structurally harder to recover.
+- **Decide the cancel-on-logout behaviour deliberately** and write down why. Either answer can be right; not having decided is wrong.
+- **Recover state from the download, never from the local record**, and expect cancellations nobody told you about.
+- **Measure recovery time honestly.** You report it about yourself and are judged on it.
+- **Provision the recovery link early.** It is ordinary connectivity with ordinary lead times and no special regime to expedite it.
+
+## Where this connects
+
+The drill regime, its categories and its evidence are in [mock trading and drills](/broking-kyc/finix-broking-setup/certification/05-mock-trading-and-drills/); incident clocks and reporting in [incident and breach reporting](/broking-kyc/finix-broking-setup/monitoring/05-incident-breach-reporting/) and the telemetry question in [system monitoring communicated to the exchange](/broking-kyc/finix-broking-setup/monitoring/07-system-monitoring-to-exchange/). The identifier rules are in [terminal and user-identifier registration](/broking-kyc/finix-broking-setup/certification/03-ctcl-nnf-terminal-registration/), the order-state discipline in [the front-end gateway and the event architecture](/broking-kyc/finix-broking-setup/stack/bff-and-event-architecture/), [the order return path](/broking-kyc/finix-broking-setup/oms/07-order-return-path/) and [order path edge cases](/broking-kyc/finix-broking-setup/oms/12-order-path-edge-cases/), the declaration escalation in [escalation and on-call](/broking-kyc/finix-broking-setup/roles/05-escalation-oncall/), and the infrastructure in [infrastructure and connectivity](/broking-kyc/finix-broking-setup/setup/08-infrastructure-connectivity/).

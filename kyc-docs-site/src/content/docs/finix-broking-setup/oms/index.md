@@ -29,6 +29,8 @@ description: The order management plane on Saral MoneyMaker — architecture, ex
 | 8 | [Modification and cancellation](/broking-kyc/finix-broking-setup/oms/08-modify-cancel-rules/) | What may change, what resets priority, and the race conditions |
 | 9 | [Algo, API, DMA and <abbr title="Smart Order Routing">SOR</abbr>](/broking-kyc/finix-broking-setup/oms/09-algo-api-dma-sor/) | Approvals, controls, rate limits, the kill switch |
 | 10 | [OMS configuration reference](/broking-kyc/finix-broking-setup/oms/10-oms-config-reference/) | Every tunable, its default, its class and its failure mode |
+| 11 | [Operations catalogue](/broking-kyc/finix-broking-setup/oms/11-operations-catalogue/) | Every action a human can take in the order system, who may take it, and what evidence it leaves |
+| 12 | [Order path edge cases](/broking-kyc/finix-broking-setup/oms/12-order-path-edge-cases/) | What the venues' own protocol documents say at the edges: no state query anywhere, how state is rebuilt instead, the unknown-state procedure, and the orders that die in silence |
 
 ## Where this connects
 

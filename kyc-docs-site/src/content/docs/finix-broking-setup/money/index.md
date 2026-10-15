@@ -26,6 +26,8 @@ description: The money plane — Razorpay collection and RazorpayX disbursement,
 | 5 | [Treasury and exchange funding](/broking-kyc/finix-broking-setup/money/05-treasury-exchange-funding/) | Funding the clearing account, intraday liquidity, cash-equivalent composition |
 | 6 | [Upstreaming and downstreaming](/broking-kyc/finix-broking-setup/money/06-upstreaming-downstreaming/) | The end-of-day computation and instruction, and the forms permitted |
 | 7 | [Money and trade in sync](/broking-kyc/finix-broking-setup/money/07-money-trade-sync/) | Every race condition between the two clocks, with its correct resolution |
+| 8 | [Money operations catalogue](/broking-kyc/finix-broking-setup/money/08-money-operations-catalogue/) | Every money action a human can take, from a routine pay-out release to the interventions that only happen under pressure |
+| 9 | [Real-time limit updates](/broking-kyc/finix-broking-setup/money/09-realtime-limit-updates/) | How a pay-in becomes trading capacity in seconds rather than at the next extract, and why attribution is the binding constraint |
 
 ## Where this connects
 

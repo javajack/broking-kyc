@@ -1,0 +1,308 @@
+---
+title: "Files 11: depository interfaces — files, APIs and the limit of real time"
+description: Which programmatic, file and portal interfaces CDSL and NSDL actually publish, how authentication and callbacks are documented, where margin-pledge and eDIS authorisation run, how UDiFF relates to APIs, and why an API call never removes a business cut-off.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** The file layer is already covered in [depository files](/broking-kyc/finix-broking-setup/files/06-depository-files/), so this page deals only with the transport and interaction layer above and beside it. It starts by separating three things that vendors and brochures routinely blur — a programmatic interface, a file channel and a portal — then lists what each depository publishes, then classifies operations as synchronous, asynchronous or file-based. The two authorisation flows that matter most to a broker, margin pledge and eDIS, come next because they involve the client and cannot be automated away. The cut-off section is last and carries the main analytical point: an API changes how an instruction travels, not when the depository will accept it. The gaps section is not an appendix; roughly half of what a build specification needs is not in any public document.
+
+## TL;DR
+
+- **<abbr title="Central Depository Services (India) Limited">CDSL</abbr> has expressly synchronous interfaces; <abbr title="National Securities Depository Limited">NSDL</abbr> is not a file-only depository.** CDSL's February 2026 migration notice labels early pay-in, margin pledge and normal pledge as synchronous and re-pledge as asynchronous. NSDL publishes early pay-in with a response, callback and enquiry, broker eDIS and margin-pledge integrations, and account APIs. `[public]`
+- **A synchronous label does not mean the business outcome is complete.** The published material does not say whether a successful response means syntax accepted, instruction registered, consent received, pledge accepted, ledger posted or clearing-corporation credit recognised. Model those as separate states.
+- **No generally available live holdings or client-master API is established at either depository.** What is published is reports, downloads, investor views and standardised files. Hold a reconciled local view with a source timestamp and label it stale when it is.
+- **The public catalogue is not the specification.** NSDL reports a 56-API Digital Gateway, but its full inventory, versions and per-participant enablement were not recovered, and CDSL's per-service credentials, callbacks and limits are not published. Obtain the participant packs before promising anything.
+- **UDiFF standardises the file, not the transport.** It does not define a common HTTP contract, credentials, token grammar or webhook protocol across depositories. Version the parser and the API contract separately.
+- **Margin-pledge and eDIS authorisation run through depository-controlled client steps.** The client authenticates with the depository, using <abbr title="One-Time Password">OTP</abbr> and, at CDSL, a <abbr title="Transaction PIN">TPIN</abbr> generated and delivered by CDSL. The broker cannot execute the consent headlessly.
+- **An API transport does not erase a business window.** A call that must still land inside a depository or clearing-corporation cut-off is not real-time in any sense a client cares about. Keep every clock separate and configurable.
+
+## Conceptual overview
+
+Three different things get called "the depository API". A **programmatic interface** is a request-response service reached over a network by the participant's own software, with its own credentials and a defined response. A **file channel** carries instructions or results as files, whether uploaded through a screen, an automation tool or an API endpoint that accepts a file. A **portal** is a human-facing screen, such as a client-entry site or a participant back-office application, that may produce files or accept them but is not a server-to-server contract. The classification matters because the three fail differently. An API fails with a response or a timeout. A file fails with a rejection report some time later. A portal fails with a person noticing. The published material shows that both depositories use all three, often for the same business operation.
+
+The second point is that "file", "batch" and "end of day" are not synonyms. A file can be submitted through an API and processed intraday. An asynchronous API completes through inquiry, callback or report, and that is not necessarily overnight. Equally, the fact that an interface is file-based does not prove the underlying business operation is batch-only. The research behind this page is careful on exactly this: where no synchronous contract is established, the correct reading is "unresolved", not "only batch exists". That is particularly true of NSDL, whose reported 56-API Digital Gateway is only partly visible in public material.
+
+The third point is the one that decides what a firm can promise a client. Even where an interface is explicitly synchronous, the response answers the question the interface was built to answer, and that is usually narrower than the question the client is asking. A pledge setup that returns synchronously has told the broker the request was handled; it has not told the broker that the client consented, that the pledgee accepted, or that the clearing corporation has recognised the collateral. The same applies to eDIS: authorisation can complete online while the debit and settlement remain separate events later. Every one of these is also bounded by clocks the API does not control — a depository weekday end of day, a clearing corporation's pay-in deadline, a one-time password's validity, a <abbr title="Depository Participant">DP</abbr> approval due the same day.
+
+The fourth point is evidential. This page reflects what the depositories and their circulars publish. No authenticated production call was made in the research, so published URLs are published addresses and published labels are statements in official documents, not tested behaviour. Where the public material stops, this page says so and treats the item as something to obtain from the depository under the participant arrangement. For the file families themselves, and for the ingestion timing they feed, see [the ingestion cadence map](/broking-kyc/finix-broking-setup/files/10-ingestion-cadence-map/).
+
+## 1. Documentary framework
+
+- **CDSL API catalogue.** The public list of services offered to DPs, with integration enquiries directed to the DP relationship manager or helpdesk; its page footer retains a 2021 update date and it is supplemented here by later circulars. `[public]`
+- **CDSL migration circulars.** `CDSL/OPS/DP/TECH/2025/525` (6 August 2025) announced new API URLs, and `CDSL/OPS/DP/TECH/2026/85` (6 February 2026) states the synchronous early pay-in and margin-pledge interfaces live and notifies old-host and delayed-version shutdown dates. `[not yet in index]`
+- **CDSL service circulars.** [CDSL/PMLA/DP/POLCY/2026/439](/broking-kyc/reference/circulars/cdsl/#cdslpmladppolcy2026439) (1 July 2026) introduces the multiple-<abbr title="Beneficial Owner">BO</abbr>-count API; [CDSL/OPS/DP/POLICY/2026/468](/broking-kyc/reference/circulars/cdsl/#cdslopsdppolicy2026468) (15 July 2026) introduces the LAS module in Easiest; [CDSL/OPS/DP/SETT/2026/180](/broking-kyc/reference/circulars/cdsl/#cdslopsdpsett2026180) (13 March 2026) and `CDSL/OPS/DP/POLCY/2026/627` (11 September 2026) govern the pledge undertaking process. `[not yet in index]`
+- **CDSL operating instructions and eDIS page.** The consolidated operating instructions current to June 2026 and the public eDIS explanation describe the TPIN and OTP mechanics. `[public]`
+- **NSDL Participant Master and product brochure.** The March 2026 master circular to participants (section 7.2 is the named-integration catalogue) and the participant services brochure. Neither is the production API specification. `[public]`
+- **NSDL service pages and circulars.** Demat Gateway, SPICE, SPEED-e, <abbr title="Depository Participant Module (CDSL terminology).">DPM</abbr> Plus, margin pledge, Innovation Sandbox, and circulars on Client Maintenance API ([NSDL/POLICY/2024/0012](/broking-kyc/reference/circulars/nsdl/#nsdlpolicy20240012)), DAN (2022), the 2022 API catalogue, G-Sec value-free transfer (`NSDL/POLICY/2025/0162`) and Sunday operations (`NSDL/POLICY/2026/0136`, 21 September 2026). `[not yet in index]`
+- **NSDL FY2025–26 annual report.** The source for the 56-API Digital Gateway statement and its multiyear coverage programme. `[public]`
+- **UDiFF guidance and catalogues.** The <abbr title="Securities and Exchange Board of India">SEBI</abbr> guidance note on standardised file structures as hosted by CDSL, CDSL's harmonisation page and NSDL's October 2026 package. `[public]`
+- **SEBI investor charter on eDIS.** The primary statement of settlement-specific mandate granularity and authentication factors. `[public]`
+
+## 2. Three interface classes and what each means
+
+| Class | What it is | Failure signature | Consequence for the build |
+|---|---|---|---|
+| **Programmatic interface** | Network request from participant software; response may be synchronous, or completion arrives later by callback, inquiry or report | Error response, timeout, or an accepted request that never completes | Persist the depository request identifier; on an ambiguous timeout, inquire before resubmitting |
+| **File channel** | Instructions or results as files, uploaded by screen, automation tool or an upload API, and downloaded as reports | Rejection report after the fact; partial acceptance | Correlate file results to the originating instruction; see the rejection rule in [depository files](/broking-kyc/finix-broking-setup/files/06-depository-files/) |
+| **Portal** | Human-facing client-entry or participant application | A person notices, or does not | Not a server-to-server contract; do not treat an online screen as an automation interface |
+
+| Misreading | Why it is wrong | Consequence |
+|---|---|---|
+| "Asynchronous means overnight" | Asynchronous means completion follows separately; it is not necessarily end of day | Treating repledge as a batch job and polling once a day |
+| "File-based means batch-only" | A file can be submitted through an API and processed intraday | Marking an operation unavailable intraday when the contract is simply unpublished |
+| "No synchronous API published means only batch exists" | Absence from the public catalogue is not absence of the facility | Asserting non-existence where the correct state is unresolved |
+| "A vendor holdings endpoint proves a depository holdings API" | A generally available synchronous depository holdings endpoint was not established | Promising live holdings the depository does not contractually supply |
+
+## 3. CDSL: the published service catalogue
+
+The catalogue below is the union of the public API page and later circulars. Row labels are descriptive, not API names.
+
+| Service | What it does | What the published material says about completion | Consequence |
+|---|---|---|---|
+| BO Setup and Modify Upload | Account creation and modification through uploaded files | Separate creation and modification addresses are published; atomic activation in the upload response is not stated | Wait for active-account evidence, not an accepted upload |
+| eDIS transaction interface | Electronic debit authorisation | Client authorisation is followed by DP transaction submission and matching | Consent and debit are two events |
+| eDIS revocation | Revokes pre-trade eDIS consent | Current production address, schema and completion response are not published | Treat as an item to obtain, not to guess |
+| Transaction Upload / Common Upload | Demat, inter-depository, transaction, pledge, freeze, common-upload, restatementisation and corporate-action files | Upload status and response-download services exist; per-record execution latency is not stated | A file-and-status workflow, not a per-record real-time call |
+| Normal pledge | Pledge, unpledge and invocation | Setup is synchronous; unpledge and confiscation addresses are published without a stated completion mode | Do not generalise the synchronous label to release or invocation |
+| eLAS | Investor pledges through an intermediary or lender website | DP approval, or configured auto approval, is part of the 2026 LAS process; whether every older implementation follows it is not stated | Lender flows depend on DP approval timing |
+| e-Margin Pledge | Online margin-pledge and margin-funding setup | New synchronous setup plus inquiry are published | Setup acceptance is not collateral recognition |
+| Margin Repledge API | Repledges margin securities onward towards the clearing corporation | Asynchronous with an inquiry; re-pledge is for intermediaries repledging in favour of a <abbr title="Clearing Corporation (NCL, ICCL, MCXCCL — context-dependent).">CC</abbr>, not evidence that only a CC can call it | Needs a pending state and an inquiry loop |
+| Early Pay-in API | Online early pay-in instruction setup | Synchronous v2.0 plus inquiry | Same-call guarantee of final settlement or CC margin credit is not stated |
+| eVoting and Destat | DP access to voting service; conversion of mutual-fund SOA units to demat | Current token, signature, callback and response states are not published | Out of scope for the securities adapter until specified |
+| Authorization API | A separate authorisation endpoint in the migration catalogue | Credential request, token format, lifetime and signature rules are not published | Must not be equated with BO OTP authorisation |
+| Upload status and response download | Status of uploaded requests and retrieval of output | Evidence does not establish universal transaction-status coverage | Use only for upload workflows |
+| Multiple-BO count | Counts of active demat accounts against first-holder <abbr title="Permanent Account Number">PAN</abbr>, mobile and email | Described as real-time, with production and mock addresses; it returns counts, not a client master or balances | An onboarding due-diligence input, not a BO-profile API |
+
+CDSL's FY2020–21 annual report also identifies real-time BO opening and BO authentication among implemented APIs. That is historical evidence; whether a current standalone endpoint exists, or has been replaced by one of the families above, is not published. `[public]`
+
+## 4. CDSL: published addresses and migration status
+
+The addresses below are transcribed from `CDSL/OPS/DP/TECH/2026/85` and `CDSL/OPS/DP/TECH/2025/525`. They are published addresses, not calls tested with credentials. `[not yet in index]`
+
+| Function | Published address | Published mode |
+|---|---|---|
+| Early pay-in setup | `https://apigt.cdsl.co.in/EarlyPayin/v2.0` | Synchronous |
+| Early pay-in inquiry | `https://apigt.cdsl.co.in/EarlyPayin/Inquiry` | Inquiry |
+| Margin pledge setup | `https://apigt.cdsl.co.in/PledgeServices/MPSetup` | Synchronous |
+| Margin pledge inquiry | `https://apigt.cdsl.co.in/PledgeServices/MPInquiry` | Inquiry |
+| Normal pledge setup | `https://apigt.cdsl.co.in/PledgeServices/Setup` | Synchronous |
+| Margin repledge setup | `https://apigt.cdsl.co.in/MarginRepledgeAPI/Setup/v1.0` | Asynchronous |
+| Margin repledge inquiry | `https://apigt.cdsl.co.in/MarginRepledgeAPI/Inquiry/v1.0` | Inquiry |
+| Common upload | `https://apigt.cdsl.co.in/Commonweb/api/CDASAPI/Upload/v2.0` | File upload |
+| Upload status and download | `https://apigt.cdsl.co.in/Commonweb/api/CDASAPI/Status` and `.../Download` | Status inquiry; download |
+| Authorization API | `https://apigt.cdsl.co.in/AuthWeb/api/CDASAuthorization/APIAuth` | Authorisation service |
+| Multiple-BO count (production and mock) | `https://apigt.cdsl.co.in/boactivedematcount/GetCount` and `https://mockapigt.cdsl.co.in/boactivedematcount/GetCount` | Published in the July 2026 annexure |
+
+Normal unpledge and confiscation, BO upload and BO modify upload addresses are also published under the same notices; their completion mode is not stated.
+
+| Historical assertion | Position | Consequence |
+|---|---|---|
+| Older hostnames in the migration table | Most were notified for discontinuation on 27 February 2026; delayed margin pledge was excepted until 31 March 2026. Actual shutdown observation is not available | Do not build against an old host |
+| Delayed early pay-in and delayed margin-pledge versions | Notified for sunset on 31 March 2026 | Do not choose v1.0 because its replacement-host address also appears in the table |
+| `https://api.cdslindia.com/APIServices` as one base URL | The public landing page only identifies a service address and is not evidence of one common endpoint or authentication scheme | Use the explicit catalogue rows, not a universal base |
+| An independent "Pledge Query" API | That exact product name was not verified; `MPInquiry`, repledge inquiry and upload status are published with narrower scopes | Use the named inquiries |
+| Current routes for eDIS, eDIS revocation, Destat, eVoting and eLAS | Complete production routing and versions were not recovered | Do not construct paths by appending guesses to a known hostname |
+
+## 5. NSDL: the published catalogue and what is missing
+
+The March 2026 Participant Master, section 7.2, remains a useful named-integration catalogue. It is not the production API specification, and no complete mapping from its older integrations to the 56 Digital Gateway APIs was recovered. `[public]`
+
+| Interface | Function and eligible user | Completion evidence and qualification | Consequence |
+|---|---|---|---|
+| Account Opening API for Participants | Participant application to depository; activation feed returns to Local or Cloud DPM | Described as instant; whether the first HTTP response proves activation is not stated | Wait for the activation feed |
+| Client Maintenance API | Participant back office to an API hosted on Local or Cloud DPM, for creation and demographic modification | Central posting time, current schema and version are not published | Treat posting time as unknown |
+| File Upload API for Client Maintenance and CMA Standardised API | Labels appearing in product material and the September 2026 Sunday circular | Whether these, the Client Maintenance API and the Digital Gateway account APIs are the same versions is not stated | Obtain a migration map before assuming equivalence |
+| e-Delivery Instruction Slip / Demat Gateway | Broker integration for consent to securities debit for exchange obligations; single and multiple variants and an order status check are advertised | Broker callback and participant-system update are published | The only broker-facing eDIS path with a published callback |
+| Margin Pledge Instruction API, online | Broker-originated pledge journey for <abbr title="Power of Attorney">POA</abbr> and non-POA clients | OTP and callback on pledge execution appear in the flow; response status dictionary and webhook transport are not published | Callback is evidence, not proof of effectiveness |
+| MPI API, offline or call-and-trade | Broker initiates for POA clients on their instructions | Exact 2026 <abbr title="Demat Debit and Pledge Instruction">DDPI</abbr>-specific eligibility and schema are not published; the description says POA | Confirm entitlement separately |
+| Early Payin API, SPICE Direct | Trading and clearing member on-market account-transfer instructions | Synchronous response plus callback and enquiry; finality of the first response is not stated | Do not treat the response as settled |
+| Depository Account Validation (DAN) | Validation of DP ID, client ID and PAN, introduced in 2022; later material describes real-time PAN-based inquiry with client consent | Current version and fields covering closure, suspension, freezes and all account variants are not published | Existence and debit eligibility are different questions |
+| <abbr title="Unique Client Code">UCC</abbr> Mapping Verification API | Returns whether a mapping exists, for UCC seeding | Freshness, full schema and production address are not published; it is not a holdings inquiry | Not a substitute for holdings |
+| NSDL Digital LAS and Digital LAS for <abbr title="Initial Public Offering">IPO</abbr> Financing | Bank or NBFC integration to initiate pledge, obtain pledgor-DP confirmation and return status callbacks | API-only unpledge and invocation contract, and lender enablement, are not published | Lender flows only |
+| Mutual fund conversion and redemption APIs | SOA-to-demat conversion and electronic redemption | Detailed completion contract and RTA latency are not published | Out of scope until specified |
+| G-Sec value-free-transfer API integration | Own-account transfers involving depositories and <abbr title="Reserve Bank of India">RBI</abbr> Retail Direct Gilt accounts at CCIL | Participant initiation uses e-DPM or SPEED-e; a direct broker-facing contract is not established | The circular title does not confer broker entitlement |
+| Digital Gateway | A 56-API programme covering account management, transactions and reporting, per the FY2025–26 annual report | All names, endpoints, credentials, callbacks, limits and sandbox contracts are unavailable | Do not invent a REST catalogue to fill the gap |
+
+### 5.1 Portals, automation tools and file channels
+
+| Facility | Published capability | Assessment | Consequence |
+|---|---|---|---|
+| SPEED-e | Client online instruction entry by password or e-token; DPs can download instructions in batches, and direct NSDL processing is described where opted | Neither "always batch-only" nor "always synchronous" is supported by the published material | Do not hard-code either assumption |
+| Participant SPEED-e exchange | Smart-card or e-token access; downloaded files carry the site signature and uploaded files the participant signature; file exchange includes status updates | No general public REST specification | A signed-file channel |
+| IDeAS | Balances, transactions and broker downloads | A broker-server live holdings endpoint, polling cadence and freshness guarantee are not published | Investor view, not a data API |
+| SPICE and SPICE Direct | Digitally signed <abbr title="Clearing Member">CM</abbr> delivery instructions and early pay-in API integration | Consent, POA and DDPI entitlement must be confirmed separately | Entitlement is a gate |
+| e-DPM, Local DPM and Cloud DPM | e-DPM handles time-critical instructions; Local and Cloud DPM support account maintenance and reports, with large reports downloadable after preparation | An interactive screen response proving final central posting in every module is not stated | Report generation may be queued |
+| Auto Download and STP Navigator | Automate download of Local DPM masters and exports; automate back-office transfer of instruction and account files to NSDL systems | Removes manual steps; neither implies a holdings webhook or synchronous posting | Automation of files, not events |
+| e-Signer | Signs and encrypts instruction files for transfer to e-DPM | Not established as the credential model for every NSDL API | Do not copy it onto other APIs |
+| STeADY | Institutional trade-information exchange with encrypted, digitally authorised transmissions | Distinct from client demat posting and retail eDIS | Keep separate |
+
+CDSL's equivalents are Easiest (online delivery instructions, account-of-choice transfer signing, multiple transactions in one uploaded file subject to enabled upload rights) and Easi (holding and transaction access and downloads for back-office updating). The published material does not establish a general server-to-server contract behind either: an online screen is not that contract. `[public]`
+
+## 6. Authentication, callbacks, limits and test environments
+
+| Question | CDSL | NSDL | Consequence |
+|---|---|---|---|
+| Migrated gateway services | DPs supply unique, static, DP-specific public IPs for configuration; the circular distinguishes Mock and Live. Per-service API key, access token or <abbr title="Digital Signature Certificate (CCA-licensed; aka Class 2/3 DSC).">DSC</abbr> requirements are not published | Customer OTP authentication and broker integration are published; broker-client API key, certificate, token model, payload cipher, mTLS, IP allowlisting and token lifetime for current versions are not | Authentication is a per-product procurement item |
+| eDIS | Registered DP receives an API key; encrypted transaction details go to CDSL; the broker performs its own client login and second factor; current instructions require TPIN and OTP. Callback schema and delivery guarantee are not published | Demat Gateway authorisation with callback to broker and update at the participant system. Signed server webhook versus browser postback, retry, timeout, ordering and replay prevention are not published | A callback is not automatically a durable signed webhook |
+| Multiple-BO count | Registered-DP key, IP allowlisting for test and production, TLS 1.2, AES-256-CBC with PKCS7 described; the annexure is inconsistent about the IV | Not applicable | Obtain a corrected integration example before implementing encryption |
+| Rate limits | No requests per second, burst, concurrency, daily quota, maximum file size or latency SLA is published | No service-specific limit, quota or retry-after contract is published | Do not size on guessed throughput |
+| Test environment | An Innovation Sandbox for approved applicants; a mock address exists for the multiple-BO count; a single mock pattern for every service is not established | An Innovation Sandbox granting approved applicants APIs, file formats and test data; production-parity test endpoints for each listed API are not published | A sandbox is not proof of production parity |
+
+NSDL's account-eligibility description is inconsistent in the public material: the March 2026 master still says single holding, while the participant brochure says joint holding and <abbr title="Non-Resident Indian">NRI</abbr> are supported. These may describe different versions or paths. Obtain the current eligibility matrix before relying on the broader coverage. `[public]`
+
+## 7. Operation by operation: what one response can be trusted to mean
+
+This classification is an engineering reading of the published material. "No synchronous contract established" is not the same as "only batch exists".
+
+| Operation | CDSL | NSDL | Can one response be treated as completion? |
+|---|---|---|---|
+| Holding enquiry | Easi views and downloads, full and incremental reports; no general synchronous DP holdings API established | IDeAS views and downloads, DPM reports and UDiFF holdings; no general synchronous broker holdings API established | No freshness contract. Keep a reconciled local view with a source timestamp |
+| Transaction status | Early pay-in, margin pledge, repledge and upload inquiry paths exist; no universal query | Early pay-in enquiry and eDIS order status check; no universal query | A read can report a pending asynchronous operation; persist the underlying status, not HTTP success |
+| Pledge initiation | Synchronous normal and margin setup; repledge asynchronous | MPI broker API with OTP journey; terminal meaning of the first response not stated | No, where consent or pledgee acceptance is outstanding |
+| Pledge confirmation | Client OTP and pledgee-side process; no separate public synchronous confirmation API | Pledge awaits pledgee confirmation; auto-confirmation can make it effective immediately | Require final depository confirmation |
+| Unpledge or release | Normal-unpledge address and operating procedures; margin-specific synchronous release not established | Client closure plus pledgee confirmation, or pledgee unilateral closure; release schema not published | Immediate free balance is not guaranteed, particularly for a repledged chain |
+| Invocation | Normal-confiscation address; updated undertaking requirements | Electronic invocation workflow exists; broker synchronous contract not published | A normal-pledge endpoint does not establish margin invocation semantics |
+| eDIS authorisation | API-driven interactive page and returned result; TPIN and OTP | API-driven Demat Gateway authorisation and callback | Authorisation completes online; debit and settlement are separate events |
+| Demat account opening | BO upload API; historical real-time opening; current immediate activation contract not stated | Insta account API and activation feed; CMA route | Wait for active-account evidence |
+| Account status | BO count API returns aggregate counts only | DAN validation; the Sunday circular mentions account-status validation | Counts, existence, active status and debit eligibility are distinct |
+| Client master | UDiFF Client Master file; no direct synchronous API established | Client-master exports and DPM Plus report; no direct synchronous API established | Report generation may be queued |
+
+## 8. Margin-pledge authorisation flow
+
+The documented manual flow has the same shape at both depositories, with differences in what is published.
+
+| Stage | CDSL | NSDL | Consequence |
+|---|---|---|---|
+| Initiation | DP WebCDAS setup or upload, or Easiest instruction, starts the OTP-link flow; the margin-pledge API also exists | DP instruction or SPEED-e, or broker MPI integration | The API and the manual route are parallel entry points |
+| Link delivery | Link to registered mobile and email after setup | Confirmation link to registered mobile and email | Contact data on the client master gates the whole flow |
+| Identification | PAN or BOID; BOID mandatory for PAN-exempt clients | PAN authentication with a PAN-exempt exception | Exempt clients need a separate path |
+| Selection and OTP | Review pending pledges, generate OTP, enter on CDSL | Review outstanding pledges for the <abbr title="Trading Member">TM</abbr>, generate and enter OTP | The client acts on the depository site |
+| OTP validity | 15 minutes with regeneration; unauthorised requests lapse at execution-date end of day | Current OTP lifetime, regeneration limits and link expiry are not published | Do not copy the CDSL value to NSDL |
+| Effectiveness | OTP permits further processing | OTP permits further processing; pledgee confirmation or auto-confirmation determines effectiveness | Authentication is not effectiveness |
+| Completion notice | Browser-return fields and signed server callback contract are not published; the inquiry route is | MPI flow includes callback on execution and investor <abbr title="Short Message Service.">SMS</abbr> or email confirmation; schema, signature and retry are not published | Keep browser return, callback, polling and report as separate inputs |
+| Onward repledge | Further TM to CM and CM to CC repledge does not require a fresh client OTP in the documented chain | The FAQ says repledge does not require OTP confirmation | One client consent covers the chain |
+
+| Item | What can safely be recorded |
+|---|---|
+| CDSL public authentication page | `https://www.cdslindia.com/Authentication/OTP.aspx` is the public authentication page; a current specification of its generated-link token, encoding, signing and validity is not published |
+| CDSL generated link | No authoritative token-construction algorithm was recovered. Do not turn an observed emailed link or a forum example into a specification |
+| CDSL API versus link | `MPSetup` and `MPInquiry` are published paths; the request field that returns or identifies the customer URL, if any, is not published |
+| NSDL MPI redirect | The product diagram specifies an HTTPS form POST redirect with pledge details; exact fields, token grammar, destination and response signature are not published |
+| Automatic pledges | Do not generalise the manual OTP sequence to direct-payout, <abbr title="Margin Trading Facility">MTF</abbr> or <abbr title="Client Unpaid Securities Pledgee Account.">CUSPA</abbr> automatic-pledge cases; confirm the account and settlement workflow |
+
+The pledge lifecycle itself is covered in [pledge lifecycle](/broking-kyc/finix-broking-setup/products/02-pledge-lifecycle/) and the risk-side treatment in [collateral and pledge](/broking-kyc/finix-broking-setup/rms/05-collateral-pledge/).
+
+## 9. eDIS and TPIN integration mechanics
+
+| Layer | CDSL | NSDL | Consequence |
+|---|---|---|---|
+| Broker entry | Client signs in to the broker or DP portal or app; encrypted transaction data is handed to CDSL | Broker web or app initiates Demat Gateway authorisation | The broker hosts the entry, not the consent |
+| Credential boundary | CDSL generates the TPIN, delivers it directly and does not give the DP access to view, edit or store it | SEBI requires depository-generated OTP and PIN or password for eDIS mandates; the exact NSDL provisioning specification is not published | The broker never holds the credential |
+| Current factors | TPIN plus OTP | NSDL advertises OTP authentication; read with SEBI's PIN or password requirement, not as proof that a password factor is absent | NSDL terminology is not CDSL TPIN |
+| Consent result | Success or rejection returned to the DP; CDSL stores validated transaction details | Callback to broker and update at participant system | Consent evidence is held at the depository |
+| Actual debit | DP subsequently submits transactions; CDSL matches them to validated details | CM submits debit to the client's DP; NSDL validates against CC obligation data | Debit is a second event |
+| Granularity | For on-market eDIS, ISIN and quantity with a single settlement number and date | Same regulatory description | One mandate does not cover a later settlement |
+| Revocation | CDSL lists revocation of pre-trade consent | Order status check is listed; a public revocation endpoint is not published | Revocation coverage differs |
+
+Keep separate consent, securities-instruction and execution records. Do not mark a delivery done on an OTP-success message alone. The money-side equivalent of this separation is described in [real-time limit updates](/broking-kyc/finix-broking-setup/money/09-realtime-limit-updates/).
+
+## 10. UDiFF versus APIs
+
+| Question | Position | Consequence |
+|---|---|---|
+| What is standardised? | SEBI guidance standardises information and file structures across trading, clearing and depository operations; the representation is CSV with ISO-derived field tags | A data schema |
+| Does ISO tagging imply an ISO 20022 network API? | No such conclusion follows from field naming in CSV | Do not infer a message network |
+| Does UDiFF define a common HTTP contract, credentials or webhooks? | No reviewed authority establishes one; the programme is file and data-format harmonisation, not API interchangeability | Transport, authorisation and state translation stay depository-specific |
+| Can an API carry a UDiFF file? | CDSL publishes BO and Common Upload APIs as well as standardised BO and transaction upload files; the accepted schema version per API must be confirmed | Schema and transport are separate layers |
+| What stays file-oriented? | Bulk account and transaction intake, and reconciliation, master, holding and transaction exports | Reconciliation remains a file job |
+| Current versus proposed | CDSL's harmonisation page, updated 12 October 2026, lists v3.0.1.2 and separately labels v3.0.1.3 as a proposed format; NSDL's October package is named for v3.0.1.2 but contains both v3.0.1.2 and v3.0.1.3 workbooks | Archive inclusion is not an activation notice; an effective date for v3.0.1.3 is not stated |
+
+Reuse schema interpretation, validation and reconciliation concepts across depositories where the publications support it, and keep transport, authorisation and state translation separate.
+
+## 11. The limit of real time: API transport does not erase business windows
+
+The times below are published operating times. No API-specific extension is inferred from any of them, and a publication date, a deadline and a tested operational fact are kept separate.
+
+| Clock | Published timing | Scope and limit | Consequence |
+|---|---|---|---|
+| CDSL margin-pledge OTP | 15 minutes, regeneration allowed | OTP validity, not an API service-hours limit | A client can be inside the OTP window and outside everything else |
+| CDSL manual pledge authentication | Through end of day of the execution date; uncompleted authorisation cancels | Exact wall-clock end of day for every date and module is not stated | A pledge raised late can lapse without any API error |
+| CDSL LAS DP approval or rejection | Same day as request generation, per the 15 July 2026 circular | Exact intraday cut-off is not stated; API initiation does not remove DP processing | A lender-originated pledge waits on a person |
+| NSDL SPEED-e current-date instructions | 19:00 on weekdays and 15:00 on Saturdays; future-date instructions can be entered later | The rule is specifically SPEED-e, not all broker APIs | Do not apply it to the Demat Gateway |
+| NSDL system weekday end of day | Extended availability to 22:30, then end of day; excludes Saturdays, Sundays and holidays | System availability is not a promise that every settlement operation stays eligible until 22:30 | Availability and eligibility differ |
+| NSDL Sunday account activity | Accounts opened up to 18:00 on a Sunday can activate the same Sunday; later openings activate after Monday beginning of day. Insta Demat, CMA and DAN APIs usable; ordinary market, off-market, pledge, demat and remat execution with a Sunday business date is excluded | Per `NSDL/POLICY/2026/0136`; Sunday UCC data arrives in five receipts and DP downloads follow in Monday's first batch `[not yet in index]` | A Sunday-opened account and its broker-visible UCC export have different availability times |
+| NSDL G-Sec own-account transfer | 16:30 Monday to Friday; 13:00 on a working Saturday | A specialised transfer deadline, not a general broker window | Do not generalise |
+| <abbr title="NSE Clearing Limited (formerly National Securities Clearing Corporation Limited)">NCL</abbr> securities early pay-in | General 21:00, and 20:00 for <abbr title="Unified Payments Interface">UPI</abbr> clients, subject to change and running-account-settlement days | A clearing-corporation deadline, not a depository API or pledge-OTP deadline; verify the daily schedule | The clearing corporation sets this clock |
+| CDSL mutual-fund redemption pay-in | NCL and <abbr title="Indian Clearing Corporation Limited">ICCL</abbr> originally 19:15 from 1 June 2025; the ICCL deadline changed to 19:30 by a 2 September 2025 circular | Covers specified MF redemption settlement, not every equity debit; do not keep applying 19:15 to ICCL | A stale constant is a live defect |
+| CDSL API migration dates | 27 February and 31 March 2026 | Migration deadlines, not daily instruction cut-offs | Do not confuse them |
+| Generic API and file service hours; margin release; ICCL and <abbr title="Multi Commodity Exchange Clearing Corporation Limited">MCXCCL</abbr> collateral release | No complete service-by-service calendar, maintenance window or common cross-CC cut-off is published | Obtain the DP and CC schedules independently; do not import <abbr title="National Stock Exchange of India">NSE</abbr> securities early pay-in times into commodity collateral processing | Configure from the participant production operating pack |
+
+The analytical conclusion follows directly. A synchronous early pay-in call placed after the clearing corporation's deadline is a fast rejection or a late instruction, not a timely one. A margin pledge accepted by the API but still awaiting the client's OTP, the pledgee's confirmation and the clearing corporation's recognition has not increased available margin. The correct promise to a client is therefore stated in terms of the last event that completed, not the first response that returned. The cadence at which depository outputs actually arrive is in [the ingestion cadence map](/broking-kyc/finix-broking-setup/files/10-ingestion-cadence-map/).
+
+<Aside type="danger" title="Do not credit on the first response">
+Never mark a pledge as collateral, a delivery as made or an account as active on a synchronous acknowledgement alone. The published material establishes that setup interfaces respond synchronously, not that consent, pledgee acceptance, ledger posting or clearing-corporation credit has occurred. Credit on the final evidence, and show the client the pending state until then.
+</Aside>
+
+## 12. Configuration reference
+
+| Key | Finix default | Class | Failure mode if wrong |
+|---|---|---|---|
+| `finix.dp.api.adapter.per-operation` | One adapter each for normal pledge, margin pledge, repledge, early pay-in and upload at CDSL, and for Demat Gateway, early pay-in, account APIs and file automation at NSDL | Discretionary, strongly recommended | A merged adapter applies normal-pledge semantics to margin invocation |
+| `finix.dp.api.state.layers` | Consent, instruction and execution recorded separately, with downstream CC recognition as a fourth | Discretionary, strongly recommended | A single success flag credits collateral before it exists |
+| `finix.dp.api.result.persist-depository-id` | Enabled; map the depository identifier to the internal identifier | Discretionary, strongly recommended | An ambiguous timeout cannot be reconciled |
+| `finix.dp.api.timeout.resubmit-policy` | Inquire and reconcile before any resubmission; no assumed idempotency header | Discretionary, strongly recommended | Duplicate financial instruction |
+| `finix.dp.callback.validation` | Apply the depository-supplied authentication, signature and replay rules once received; no assumed HMAC or token scheme | Discretionary, strongly recommended | A forged or replayed callback is accepted, or a genuine one is dropped |
+| `finix.dp.callback.sources.reconcile` | Correlate callback, inquiry, browser return and file report; deduplicate the same event | Discretionary, strongly recommended | Double accounting when one event arrives twice |
+| `finix.dp.holdings.view.source-timestamp` | Required on every holdings figure; stale label past the agreed age | Discretionary, strongly recommended | A stale balance is presented as live |
+| `finix.dp.otp.ttl.cdsl-minutes` | 15, from the published CDSL value | Exchange-set | An expired OTP silently blocks a pledge |
+| `finix.dp.otp.ttl.nsdl-minutes` | Unset until the NSDL value is confirmed; not copied from CDSL | Exchange-set | A wrong lifetime hides lapsed authorisations |
+| `finix.dp.cutoff.edis-and-epi` | Loaded from the CC and DP daily operating schedule, never hard-coded | Exchange-set | Instructions submitted after the deadline |
+| `finix.dp.cutoff.speede-weekday` | 19:00 weekdays, 15:00 Saturdays, scoped to SPEED-e only | Exchange-set | The rule is applied to an API route it does not govern |
+| `finix.dp.clocks.separation` | Credential expiry, OTP lifetime, instruction expiry, system end of day, settlement deadline and CC collateral-release window held as separate keys | Discretionary, strongly recommended | One clock stands in for another |
+| `finix.dp.endpoints.cdsl-source` | Addresses taken only from the current circular, not from older hostnames | Regulatory | Calls to a sunset host |
+| `finix.dp.udiff.parser.version` | Versioned separately from the API contract; v3.0.1.3 not enabled until an effective notice | Regulatory | A proposed format parsed as current |
+| `finix.dp.entitlement.register` | Records which services the firm is actually enabled for at each depository | Discretionary, strongly recommended | A build against an interface the firm cannot call |
+| `finix.files.dp.api-upload.reconcile-with-udiff` | Correlate API-submitted uploads with UDiFF outputs and final account state | Discretionary, strongly recommended | Duplicate or missing postings between channels |
+| `finix.files.dp.status-download.poll-interval` | Set from the participant operating pack; no published default | Discretionary | Polling too hard or too slowly against an unpublished limit |
+
+## 13. Exception paths
+
+| Situation | Response |
+|---|---|
+| Timeout on a pledge, early pay-in or upload submission | Inquire using the published inquiry or status route before any resubmission; persist the depository identifier |
+| Synchronous success but no downstream confirmation | Leave the item in a pending state, show it to the client as pending, and chase through the inquiry or the pledgee |
+| Callback received with no matching request, or duplicate callback | Hold for reconciliation; compare against inquiry and the participant record; never apply twice |
+| Client OTP expired or authorisation lapsed at end of day | Re-initiate; at CDSL regenerate within the 15-minute window or raise a new request; do not assume the NSDL window |
+| Instruction submitted after a cut-off | Treat as late; escalate to the DP and CC schedule; do not resubmit blindly |
+| Sunday-opened NSDL account not visible in the UCC export | Expect the Monday first-batch download; do not treat as a failed seeding |
+| Old CDSL hostname or delayed version still in use | Move to the current address; the shutdown dates have passed |
+| Holdings from a download disagree with the local view | Mark the figure stale, reconcile from the latest full report, and do not overwrite silently |
+| A needed interface is not in any public document | Record it as an open procurement item with the depository; do not guess an address, field or header |
+| Public material conflicts (NSDL eligibility, CDSL count-API IV) | Request written clarification from the depository; do not implement by guesswork |
+
+<Aside type="caution" title="What the published material does not establish">
+Several things a build specification needs are simply not public. NSDL's full 56-API inventory and CDSL's complete entitlement and version inventory were not recovered. The meaning of each successful response, from syntax accepted to clearing-corporation credit, needs the actual response dictionaries. A contractual live holdings or client-master API with a freshness guarantee is not established. Margin and repledge-specific release and invocation, including chain unwinding and partial quantities, is not established, and normal-pledge addresses must not be generalised to it. Per-product signing, token lifetimes, quotas and timeouts, the margin-link token grammar, callback signature and retry rules, and NSDL's OTP lifetime are all unpublished. There is no single service-hours table for API and file paths, and NCL, ICCL and MCXCCL collateral windows are not consolidated. No authenticated production test was performed, so every statement here is what an official publication says, not what a call returned. Promise synchronous customer outcomes only after entitlement, test and response-finality checks; until then, design for explicit pending states, inquiry, reconciliation and manual exception handling.
+</Aside>
+
+## Practical notes
+
+- **Request the participant packs first.** The public catalogue is a map, not the specification; versioned payloads, addresses, entitlements, test data, certification steps, service windows, limit tables and callback guarantees are a procurement item.
+- **Do not label a response by its HTTP status.** Store what the response means in the depository's own terms, then map to an internal state only after the response dictionary is in hand.
+- **Inquire before you resubmit.** A repeated financial instruction after an ambiguous timeout is the costliest error in this layer, and no idempotency rule is published to protect against it.
+- **Keep every clock a separate key.** OTP lifetime, credential expiry, system end of day, settlement deadline and collateral-release window are different numbers set by different parties.
+- **Never copy a CDSL value onto NSDL.** The OTP lifetime, the TPIN concept and the end-of-day behaviour are published for CDSL only, and the same applies in reverse.
+- **Treat a callback as evidence needing validation.** A published callback does not establish a signed, retried, ordered webhook; compare it with the participant or clearing-corporation record.
+- **Check entitlement before design.** A stock-exchange broker registration alone is not shown to confer access to every DP endpoint, and lender and trading-margin permissions should stay separate.
+- **Version the parser and the API separately.** A proposed UDiFF format is not an effective one, and a file schema can change without the transport changing.
+
+## Where this connects
+
+- [Depository files](/broking-kyc/finix-broking-setup/files/06-depository-files/) — the standardised file layer, legacy layers and rejection rule this page deliberately does not repeat
+- [Ingestion cadence map](/broking-kyc/finix-broking-setup/files/10-ingestion-cadence-map/) — when depository outputs actually arrive, which bounds what any interface can claim
+- [Real-time limit updates](/broking-kyc/finix-broking-setup/money/09-realtime-limit-updates/) — the same real-time versus business-window distinction on the money side
+- [Pledge lifecycle](/broking-kyc/finix-broking-setup/products/02-pledge-lifecycle/) — the product-level pledge, repledge and release journey that these interfaces serve
+- [Collateral and pledge](/broking-kyc/finix-broking-setup/rms/05-collateral-pledge/) — how the risk system recognises collateral once the depository confirms it
+- [Depository participant setup](/broking-kyc/finix-broking-setup/setup/05-depository-participant/) — the DP arrangement that decides which of these services the firm can call
+- [E-sign, DDPI and pledge setup](/broking-kyc/finix-broking-setup/onboarding/06-esign-ddpi-pledge-setup/) — the client authority that eDIS and pledge flows rely on
+- [Front-end gateway and event architecture](/broking-kyc/finix-broking-setup/stack/bff-and-event-architecture/) — the adapter-layer guarantees (idempotency, replay, reconciliation) that depository interfaces do not provide

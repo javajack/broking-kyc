@@ -31,6 +31,12 @@ description: The record plane on SecMark — architecture and the daily pipeline
 
 Architecture and the daily sequence are at [back office architecture](/broking-kyc/finix-broking-setup/backoffice/01-backoffice-architecture/); every tunable is at the [configuration reference](/broking-kyc/finix-broking-setup/backoffice/10-backoffice-config-reference/).
 
+Three further pages sit alongside the pipeline rather than inside it:
+
+- **[Charges and the billing engine](/broking-kyc/finix-broking-setup/backoffice/11-charges-billing-engine/)** — every charge the firm levies or passes through, how each is computed, and where it lands in the ledger.
+- **[Operations catalogue](/broking-kyc/finix-broking-setup/backoffice/12-operations-catalogue/)** — every back-office action a human can take, with its precondition, its authoriser and its audit trail.
+- **[Near-real-time contract notes](/broking-kyc/finix-broking-setup/backoffice/13-near-realtime-contract-notes/)** — what the prescribed intraday artefacts actually are, and why the "virtual contract note" does not exist.
+
 ## Where this connects
 
 - [<abbr title="Risk Management System">RMS</abbr>](/broking-kyc/finix-broking-setup/rms/) — which consumes the collateral and balance this plane produces

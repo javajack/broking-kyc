@@ -1,0 +1,214 @@
+---
+title: "Stack: verifying the vendor stack — documentation, empanelment and interface evidence"
+description: What a broker can and cannot establish about its order, risk and middleware vendors from public sources, why the availability of interface documentation is itself a procurement finding, how to verify empanelment per product version, and which artefacts to demand before signature.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+> **Why this page is structured this way:** The vendor map says what each product claims and the integration matrix says what each contract must carry. Neither says how much of that a broker can actually check before it signs. This page is about evidence. It starts with what public sources can and cannot prove, then follows the documentation trail for the middleware, then the exchange lists, then turns the gaps into an architecture rule and a list of artefacts to demand. The finding throughout is about what is published, never about how good a product is: a product with no public developer documentation may be excellent, but it cannot be designed against until the documentation is in hand.
+
+## TL;DR
+
+- **Documentation availability is a procurement finding.** A broker that finds out after signature that a vendor's event interfaces exist only in marketing copy has already spent its leverage. The time to find out is before signature, and the documentation request is the test.
+- **A website using the word API establishes nothing about the interface.** The research found no public developer specification for MoneyMaker order entry, limit administration, margin extraction or trade-event consumption. That is a statement about this search, not proof that no interface exists.
+- **Interface detail for the middleware surfaced in an adjacent suite.** The detailed order, funds, portfolio, WebSocket and webhook documentation sits with the NinjaFox lineage, which SecMark names on its middleware page and says it acquired. Whether it describes the version a given broker would be sold is not established.
+- **Borrowed detail is a hypothesis, not a specification.** Route names, field names and event shapes from an adjacent suite are useful for forming questions. Nothing may be built, estimated or scheduled against them until the vendor confirms version, modules and support in writing.
+- **An empanelment list proves less than it appears to.** A vendor name on an exchange list does not approve every product, every version, or this broker's installation. Product registration is a separate process, and the member's own approval is a third.
+- **Design for file-and-poll with adapter-enforced guarantees.** Treat event-native behaviour as something to be demonstrated in the test environment, then relied on. A published event stream says nothing about replay, ordering, retry, signatures or duplicate handling.
+- **Status words carry weight.** Published, effective and proposed are different states. The SecMark native <abbr title="Order Management System">OMS</abbr> and <abbr title="Risk Management System">RMS</abbr> is described as intended development, not as released software.
+
+## Conceptual overview
+
+A broker choosing an order and risk stack works from three kinds of evidence, and they are not interchangeable. The first is what the vendor says about itself: product pages, annual reports, developer documentation, repositories. The second is what an exchange says about the vendor: empanelment lists, product and version tables, circulars. The third is what a broker says about its own use of the product: published risk policies and hosted user manuals. Each answers a different question. Vendor statements say what the product claims to do. Exchange lists say what the exchange has recorded. Broker-hosted material says how someone once used it. None of the three says what the integration contract for this broker's deployment will contain, and that is the only thing a design can depend on.
+
+The public record for the named stack is uneven, and the unevenness is the finding. For the order and risk product, the vendor's site describes terminals, risk views, bulk file upload and exchange coverage, but no public endpoint catalogue, request and response specification, SDK or developer portal was located. For the middleware, the vendor's own pages describe orchestration, risk checks, margin validation, streaming prices and account visibility at a marketing level, while the detailed interface documentation was found on a separate site belonging to a product lineage the vendor reports acquiring. For several other Indian suppliers, by contrast, interface documentation is public down to payloads and code. So the claim that event-driven integration is unavailable in India is false, and the claim that the named stack publishes it is unestablished. Both statements are true at once, and a design has to hold both.
+
+This matters commercially because documentation is the last cheap thing to ask for. Before signature, a vendor can be asked for its integration catalogue, schemas and a working test environment at no cost to either side. After signature, the same request is a delivery dependency on a vendor who has the contract in hand, and the broker's schedule is already committed to exchange registration and go-live dates. The documentation request is therefore best treated as a gate: a vendor that can produce a versioned integration kit and a sandbox passes it, and a vendor that cannot has told the broker something it needs to know. Plenty of vendors supply integration material to licensed customers only; the point is that the broker must see it before it commits.
+
+The architectural consequence follows directly. If event interfaces cannot be verified, the design must not depend on them. The safe default is to poll, ingest files and reconcile, with the broker's own adapter layer enforcing idempotency, ordering and gap detection, and to promote any vendor-provided event stream to a primary path only after it has been demonstrated in the test environment against the failure cases that matter. That is the same adapter rule set out in [the front-end gateway and event architecture](/broking-kyc/finix-broking-setup/stack/bff-and-event-architecture/), applied here to the question of which vendor behaviours may be believed.
+
+## 1. Documentary framework
+
+- **Vendor product and solution pages.** Govern what a vendor claims. They establish that a claim was published, not that it performs, and not that it is licensed to this broker.
+- **Vendor developer documentation and repositories.** Govern interface detail where it exists: routes, fields, authentication, event names. They are the only public source that can support a design, and only for the version they describe.
+- **Vendor annual reports and disclosures.** Govern corporate facts such as acquisitions, ownership changes and intended development. They are the strongest public evidence for lineage and for the difference between delivered and proposed products.
+- **Exchange empanelment lists and product tables.** Govern the exchange's classification of a vendor and, where published, of its products and versions. They do not govern this broker's approval.
+- **Exchange circulars on member and vendor registration.** Govern the process: which application, through which channel, in which format. The <abbr title="National Stock Exchange of India">NSE</abbr> consolidated circular of 30 April 2026 (`NSE/INVG/73992`) and the revision of 15 May 2026 (`NSE/INVG/74233`) are the retained primary sources for NSE `[public]`. `[not yet in index]`
+- **The <abbr title="Securities and Exchange Board of India">SEBI</abbr> software testing and approval baseline.** The circular of 19 August 2013 (`CIR/MRD/DP/24/2013`), effective 1 October 2013, sets the underlying distinction between vendor and member approval `[public]`.
+
+## 2. What public sources can and cannot establish
+
+| Question a broker asks | What public sources can establish | What they cannot establish | Consequence |
+|---|---|---|---|
+| Does the vendor have an order or risk interface? | That the vendor markets order management, risk checks and integration | Protocol, endpoints, authentication, event model, limit read and write semantics | Treat as an open question until a specification is supplied |
+| Does it support events? | Only if event interfaces are documented with payloads | That a word such as live or real-time means a subscription exists | Real-time prices do not imply live limits or margins |
+| Is it exchange approved? | That an exchange list names the vendor, under a category | That this product, release and facility are registered, or that this broker is approved | Verify at three levels, not one |
+| Is the product released? | That a report or page describes it | Whether it is generally available or proposed | Read the status word in the source |
+
+Two limits on the research itself should be carried into any reading of it. First, the finding that no public Saral developer specification was located describes the search performed: the vendor site, its solutions and features pages, indexed technical searches and the broker-hosted manual. It does not establish that Saral has no integration interfaces. Second, several exchange sources could not be read in full. The NSE vendor spreadsheet link resolved to a file whose contents could not be retrieved, and <abbr title="BSE Limited (formerly Bombay Stock Exchange)">BSE</abbr> list and guideline requests returned access errors.
+
+## 3. The documentation-lineage problem
+
+Where interface detail surfaced for the SecMark middleware is not where a buyer would look. The vendor's middleware page names Ninja Fox, and its FY2025–26 annual report says it acquired trading web and mobile platforms, middleware and related intellectual property from two Codifi entities, with ongoing development and support arrangements `[public]`. The detailed public documentation is on a separate site hosted by the Codifi lineage, readable without an authenticated portal, with live and sandbox base URLs `[public]`.
+
+| Evidence link | What it supports | What it does not support |
+|---|---|---|
+| Annual report describes the acquisition | A corporate link between the vendor and the lineage `[public]` | The current supported version, or which modules were acquired in which form |
+| Lineage site publishes a Middleware API Document | That public technical documentation exists for the acquired lineage `[public]` | That it is a current SecMark support commitment |
+| Documentation lists routes and events | Examples of the kind of interface the lineage has published `[public]` | That every route is included, enabled and supported in a given broker's contract |
+
+The sentence that the research supports is therefore narrow: public technical documentation exists for the acquired middleware lineage, and saying SecMark has no public API documentation would omit material evidence. The sentence it does not support is that those interfaces are what a broker would receive. The mapping rests on a named product, an acquisition disclosure and an introduction page. The exact documentation version, licensed modules and compatibility with a particular SecMark deployment all need confirmation, and the research could not establish them from public sources.
+
+### Why borrowed detail is a hypothesis
+
+The adjacent suite is rich enough to be tempting. It documents order submission, modification and cancellation, order and trade books, a margin estimate route, a funds and limits snapshot, holdings and positions, a market WebSocket, an order-status WebSocket with a token step, and order webhooks registered with a callback address and bearer authentication `[public]`. A designer reading that could draw a clean event architecture in an afternoon. The caution is in what the same pages do not say.
+
+| Borrowed detail | The tempting reading | What the documentation leaves open |
+|---|---|---|
+| Order-status WebSocket and order webhooks | The middleware pushes every order event reliably | No durable replay, retry or backoff, webhook signatures, ordering guarantee or exactly-once contract was found on the pages reviewed `[public]` |
+| Funds and limits snapshot with margin and exposure fields | Limits are readable, so limit changes are observable | A request and response snapshot is documented; no push event or administrative limit-write interface was located `[public]` |
+
+The rule that follows is simple. Detail from an adjacent suite may be used to write the questions in a vendor request, because it shows what to ask for. It may not be used to write the design, because every unstated property above is a property the design would silently assume. A diagram that includes a bus is not a bus contract, and a documented stream is not a delivery guarantee.
+
+<Aside type="caution" title="Do not relabel a logging path as an event bus">
+The architecture diagram's Kafka component sits on the log path. Treating it as an order, position or limit topic the broker may consume would assign the broker an integration that the vendor has not described, with no schema, retention or cursor recovery behind it.
+</Aside>
+
+## 4. The wider field, and what it shows
+
+Silence is not universal, which is why the absence for the named stack is informative rather than normal. Symphony XTS publishes interactive API documentation with Socket.IO connections and server events for orders, executions and positions, with payloads and code `[public]`. Synapsewave ODIN publishes API documentation, OpenAPI, Postman and SDK links and a streaming example that distinguishes order from trade messages `[public]`. Kambala Noren documents REST and WebSocket operations, including order updates, positions, limits and margin, in a public repository `[public]`. None of these establishes a limit-change stream; ODIN documents limit retrieval as an API or report function, and the XTS limit-change event was not established. Other suppliers show the opposite pattern: an upcoming-products page for Greeksoft, a general article for Rupeeseed and a market-data page for OptionX describe APIs or fan-out without a published order, position or limit event contract `[public]`.
+
+Two readings are both wrong. That no Indian vendor publishes event-driven integration is false. That file-and-request-response is the industry norm is not established either: the research found a mixture of files, request and response APIs, event streams and webhooks, and cannot say which dominates installed systems without deployment data. The supportable position is that event integration is available where the deployed product's contract supports it, and has to be established product by product.
+
+## 5. Exchange empanelment and product registration
+
+Exchange lists are the strongest public evidence a broker can get about a vendor, and the easiest to over-read. The research distinguishes what each list proves.
+
+| Source | What it shows | What it does not prove | Consequence |
+|---|---|---|---|
+| NSE consolidated circular | Lists Saral among empanelled vendors, and states that vendor software registration is a separate process with separate applications per product `[public]` | The exact product, version and facility registered, or any later status change | A vendor name is not a product approval |
+| BSE guidelines | Point to a public empanelled-vendor list URL `[public]` | List contents could not be inspected because the pages were blocked; the historical label does not show the current production protocol | Ask BSE or member services for the current record |
+| <abbr title="Multi Commodity Exchange of India">MCX</abbr> classic vendor table | Showed Saral with <abbr title="Computer-to-Computer Link.">CTCL</abbr>, IBT and WT marked yes, and ATF, ASP and DMA marked no `[public]` | Current applicability. It is the published table's classification, not a fresh confirmation | Do not infer algo permission from vendor marketing |
+| <abbr title="National Commodity & Derivatives Exchange Limited">NCDEX</abbr> product and version list | Identifies Saral products for CTCL, IBT and STWT by name, and separately names Saral on a <abbr title="Financial Information eXchange protocol">FIX</abbr>-empanelled CTCL list `[public]` | Anything about NSE, BSE or MCX; marketing names do not necessarily map one to one to registered names | Useful as an example of what a product-level list looks like, not as evidence for other exchanges |
+
+NCDEX's FIX-empanelled list establishes an exchange-facing classification for Saral `[public]`. It does not establish a FIX endpoint a broker may consume; no vendor-published northbound FIX specification was found.
+
+Three levels of approval must be kept apart, and a procurement file should hold evidence for each.
+
+| Level | Question | Evidence to hold |
+|---|---|---|
+| Vendor | Is this legal entity empanelled by this exchange, in which category? | Current list entry, with date read and category |
+| Product | Is this exact product, release, facility, exchange and segment registered? | Exchange registration or approval evidence naming the product and version |
+| Member deployment | Is this broker's own installation approved? | The broker's application, acknowledgement and approval, with testing and auditor evidence |
+
+For the regime that governs the third level, see [the software approval regime](/broking-kyc/finix-broking-setup/certification/01-software-approval-regime/) and [CTCL and <abbr title="Non-NEAT Front End">NNF</abbr> terminal registration](/broking-kyc/finix-broking-setup/certification/03-ctcl-nnf-terminal-registration/). For BSE, a current product registration screen or form sequence was not verified in the research and no portal path is asserted here. The securities-market approval baseline applies, and the broker should ask BSE for the current product and facility registration record and compare it with the vendor's confirmation and the proposed build.
+
+### Published, effective and proposed
+
+Publication, contractual acquisition, proposed development, registration and production enablement are distinct, and crawl dates or years inside URL paths are not effective dates.
+
+| Item | Published | Effective or available | How to read it |
+|---|---|---|---|
+| NSE consolidated circular | 30 April 2026 `[public]` | The consolidation date is not a fresh commencement date for every rule compiled in it | Check provisions individually |
+| SecMark native OMS and RMS | Annual report describes intended development `[public]` | Proposed, not verified generally available software; no completion date is asserted | Never schedule against it |
+
+<Aside type="caution" title="Annual report language is a status statement">
+SecMark's FY2025–26 annual report describes API connections to OMS and RMS platforms and says its own OMS and RMS offering remains a gap it intends to fill through development `[public]`. A broker evaluating risk functions in the middleware should ask where the middleware's checks end and the connected RMS's authoritative decision begins, because the marketing scope and the stated plan point in different directions.
+</Aside>
+
+## 6. The verification procedure
+
+The procedure below is for one named vendor and one named product version. It is a recommendation drawn from the research, not an exchange-mandated sequence, and it names no portal path that the research did not verify.
+
+| Step | Action | Evidence retained | Failure means |
+|---|---|---|---|
+| 1 | Match the legal supplier name, and any business-transfer history, against each exchange's current vendor, ASP, algo-provider and back-office categories | Dated list extracts per exchange and category | The vendor is not in the category being relied on |
+| 2 | Obtain exchange registration or approval evidence naming the exact product, release, facility, exchange and segment, and compare it with the deployment inventory | The registration record and the inventory side by side | The listed product differs from the one being supplied |
+| 4 | Read the current governing circular and its latest revision, noting format changes and effective dates | Circular reference, revision reference, date read | The broker is filing on superseded formats |
+| 5 | Confirm the broker's own application, acknowledgement and approval path, including testing and auditor evidence | The broker's approval file | Vendor empanelment is being treated as sufficient |
+| 7 | For any vendor change or major release, repeat steps 2 and 5 under change control | Change record linked to the registration | An unregistered version reached production |
+
+Step 7 connects to [change and version control](/broking-kyc/finix-broking-setup/certification/04-change-version-control/): a version change that alters registered functionality is an approval event, not only a release event.
+
+The recorded scope of an approval is worth writing down in one place: exchange, segment, product and version, channel, strategy where relevant, infrastructure, and the broker's own approval, each separately. Approval scope and interface design answer different questions, and empanelment establishes no unlisted REST, WebSocket or Kafka capability.
+
+## 7. The architectural consequence
+
+The research reaches four verdicts that bear on design. It is false that no Indian vendor publishes event-driven integration. It is unsupported that real-time prices imply live limits and margins, that Kafka in a diagram means the broker can subscribe to orders and limits, and that all back-office links are nightly files. And file-and-synchronous-API as the industry norm is not established by public evidence. Together they give one design rule: do not let an unverified interface carry a guarantee.
+
+
+The default is therefore file-and-poll with adapter-enforced guarantees. Ingest the files the stack provably produces, poll the snapshot interfaces it provably documents, and put idempotency, ordering, deduplication, gap detection and replay in the broker's adapter. Specify the event layer as the broker's own, with source reconciliation and explicit handling of lost, duplicated and out-of-order events. Then treat each vendor event stream as a candidate to be promoted, after a demonstration in the test environment. The cadence considerations are in [ingestion cadence](/broking-kyc/finix-broking-setup/files/10-ingestion-cadence-map/) and the limit-update path in [real-time limit updates](/broking-kyc/finix-broking-setup/money/09-realtime-limit-updates/).
+
+A stream earns promotion only by demonstrating the following in the test environment, because the public documentation reviewed did not describe them.
+
+| Behaviour to demonstrate | Why the public record is silent or insufficient | Pass condition |
+|---|---|---|
+| Gap detection and recovery | No replay or cursor described | A dropped stretch is detected and recovered by snapshot or replay |
+| Event completeness | A client-scoped stream need not cover the whole book | Dealer entries, partial fills, corrections, cancellations, square-offs and fund or collateral changes all appear, or the gap is documented |
+
+## 8. What belongs in the procurement document
+
+Each gap above becomes a deliverable. The list below states what to demand before signature and what its absence should be read as. The wider contract mechanics are in [vendor onboarding and contracts](/broking-kyc/finix-broking-setup/setup/09-vendor-onboarding-contracts/), and the per-path contract content in [the integration contract matrix](/broking-kyc/finix-broking-setup/stack/integration-contract-matrix/).
+
+| Artefact to demand | Why | If it cannot be produced |
+|---|---|---|
+| Versioned integration catalogue, schemas, sample files and authentication rules | The public record contains no external order, trade, limit or margin contract for the order and risk product | The interface cannot be designed; treat as an open delivery risk |
+| Working test environment with credentials | Documentation read is not a service tested | No event path may be relied on |
+| Product, version and support mapping for any documentation the vendor points to | The adjacent suite's documentation may not describe the licensed version | Treat the documentation as illustrative |
+| Signed compatibility matrix for the order and risk product and the middleware | No public evidence of the pair's production wiring | The connector is a custom build with an unpriced timeline |
+| Statement of control ownership between middleware checks and the RMS | The boundary between marketed risk checks and the authoritative decision is unclear | Two risk authorities with no stated precedence |
+| Limit and margin semantics: reads, writes, acknowledgement, atomicity, rejection handling, audit history, restart behaviour | A broker policy's daily update statement is not an interface SLA | Limit changes cannot be audited or recovered |
+| Delivery contract: sequencing, deduplication, replay, retry, signatures, retention | None found on the reviewed pages | The adapter carries every guarantee |
+| Exchange registration evidence for the exact product version, per exchange and segment | A vendor name on a list is not a product approval | Registration risk sits with the broker |
+
+<Aside type="tip" title="Make the demand a gate, not a favour">
+Put the artefact list in the request for proposal and score the responses. A vendor that supplies a kit and a sandbox gives the broker evidence; one that supplies only a brochure gives it different evidence. Neither is a judgement of the product.
+</Aside>
+
+## 9. Configuration reference
+
+| Key | Finix default | Class | Failure mode if wrong |
+|---|---|---|---|
+| `finix.vendor.evidence.require-integration-kit` | `true` before signature | Discretionary, strongly recommended | Contract signed against marketing copy; the interface is first seen at integration |
+| `finix.vendor.evidence.require-sandbox` | `true` | Discretionary, strongly recommended | Documentation is trusted without a tested service |
+| `finix.vendor.evidence.version-mapping-required` | `true` | Discretionary, strongly recommended | Adjacent-suite documentation is built against for a different version |
+| `finix.vendor.empanelment.verification-levels` | `vendor,product,member` | Regulatory | Vendor listing is treated as approval of the product or the installation |
+| `finix.vendor.empanelment.recheck-on-release` | `true` | Regulatory | An unregistered version reaches production |
+| `finix.stack.integration.default-mode` | `file-and-poll` | Discretionary, strongly recommended | Design silently depends on unverified events |
+| `finix.stack.events.promotion-requires-test-evidence` | `true` | Discretionary, strongly recommended | A stream with no replay or duplicate guarantee carries financial state |
+| `finix.stack.events.adapter-enforces-idempotency` | `true` | Discretionary, strongly recommended | A fill applied twice because the vendor stream delivered twice |
+| `finix.stack.risk.authority-owner` | Named in contract | Discretionary, strongly recommended | Middleware and RMS both decide, or neither does |
+
+The default values are Finix proposals, not figures taken from the research, and the intervals in particular are a choice rather than a source-derived number. For the baseline these sit alongside, see [environments and configuration baseline](/broking-kyc/finix-broking-setup/stack/environments-config-baseline/).
+
+## 10. Exception paths
+
+| Situation | Response |
+|---|---|
+| Vendor offers marketing material only, with no integration kit | Record as an open finding; do not enter the design; escalate before signature, since leverage ends at signing |
+| Vendor points to an adjacent suite's public documentation | Request a written version and module mapping; treat the documentation as illustrative until it arrives |
+| Public documentation and the supplied kit disagree, including differing endpoint prefixes | The supplied, versioned specification governs; record the difference and ask the vendor to confirm in writing |
+| Exchange list cannot be read, or the page is blocked | Do not assume contents; obtain the list through the exchange or member services and retain the extract |
+| Vendor name found but product or version not found | Treat as unverified; request the exchange registration evidence for the product |
+| Event stream passes functional tests but fails duplicate or gap tests | Keep file-and-poll as the primary path; use the stream only as a latency hint |
+| Vendor changes version after registration | Run the registration recheck and change control before production use |
+
+## Practical notes
+
+- **Ask for the integration kit in the first vendor conversation.** The answer is evidence, and it arrives while the broker still has alternatives.
+- **Write the finding as what was or was not found.** Say that no public developer documentation was located, not that the product lacks an interface. The first is true and fair; the second is a claim the research does not support.
+- **Quote the status word.** Published, effective and proposed mean different things; copy the word and the date into the file, not a paraphrase.
+- **Never build on an adjacent suite's route names.** Use them to write questions. Estimates, schedules and adapter code wait for the vendor's own specification.
+- **Test the failure cases, not the happy path.** A stream that delivers an order update proves little. A stream that survives a duplicate, a gap and a reconnect proves something.
+
+## Where this connects
+
+- [Vendor map](/broking-kyc/finix-broking-setup/stack/vendor-map/) — what each product publicly claims, which this page tests against the evidence available
+- [Integration contract matrix](/broking-kyc/finix-broking-setup/stack/integration-contract-matrix/) — the per-path contract content that the artefact list here feeds
+- [The front-end gateway and event architecture](/broking-kyc/finix-broking-setup/stack/bff-and-event-architecture/) — the adapter guarantees that replace unverified vendor guarantees
+- [Environments and configuration baseline](/broking-kyc/finix-broking-setup/stack/environments-config-baseline/) — the test environment in which event behaviour has to be demonstrated
+- [Software approval regime](/broking-kyc/finix-broking-setup/certification/01-software-approval-regime/) — the member-level approval that vendor empanelment does not replace
+- [CTCL and NNF terminal registration](/broking-kyc/finix-broking-setup/certification/03-ctcl-nnf-terminal-registration/) — the registration process behind the exchange lists
+- [Change and version control](/broking-kyc/finix-broking-setup/certification/04-change-version-control/) — why a vendor release can be an approval event
+- [Vendor onboarding and contracts](/broking-kyc/finix-broking-setup/setup/09-vendor-onboarding-contracts/) — where the artefact list is written into the contract
+- [Real-time limit updates](/broking-kyc/finix-broking-setup/money/09-realtime-limit-updates/) — the limit path whose vendor interface the public record leaves open
