@@ -49,4 +49,4 @@ inventories, the conventions and the close-out notes including open items.
 
 | `RESEARCH_dr.md` | Disaster-recovery site architecture, exchange connectivity from a recovery site, order-state recovery and the drill regime |
 
-All 17 research files are present.
+All 18 research files are present.

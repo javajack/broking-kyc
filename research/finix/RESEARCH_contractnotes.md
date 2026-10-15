@@ -253,7 +253,7 @@ Revocation of ECN (commodity): the client may revoke and opt for physical "by gi
 | same index | same | "provisional" alone | 19 hits — **all** either algo-provider provisional empanelment, provisional sub-broker/UCI code lists, or provisional order-rejection reports. **None** relates to a client-facing trade document. |
 | SEBI FUTP Regulations 2003 (as amended to 5 Dec 2025) | whole instrument | same | **0** |
 
-All `[verified]` as negative results. The only places the word "provisional" attaches to anything settlement-related in the SEBI Master Circular are **para 5.1 Stage 3, "Close-out of positions and provisional appropriation of collateral"** in the default-handling waterfall, and the clause that "the aforesaid pro-rata attribution of shortages shall be **provisional**" — a clearing-corporation default mechanic, not a client document. `[verified]`
+All `[verified]` as negative results. The only places the word "provisional" attaches to anything settlement-related in the SEBI Master Circular are **para 43.34, Stage 3 of the CC default management process — "Close-out of positions and provisional appropriation of collateral"** in the default-handling waterfall, and the clause that "the aforesaid pro-rata attribution of shortages shall be **provisional**" — a clearing-corporation default mechanic, not a client document. `[verified]`
 
 **Read this negative result for what it is.** 45,739 exchange circulars over seven and a half years and the complete current SEBI and NSE consolidations contain no such artefact. This is not an absence of evidence; it is evidence of absence.
 
@@ -350,3 +350,386 @@ Derived, not prescribed — every row is the analyst's inference from a verified
 | Do not let an authorised person generate or issue it, by analogy with the contract note rule | NSE MC Item 2.1; NSE/COMP/63628 |
 | Keep its disclaimer free of liability exclusions | SEBI MC 21.3 ("shall stand null and void") |
 | Expect it to compete for app landing-page space | Project Jagrook — see §6 |
+
+---
+
+## 3. THE DAILY MARGIN STATEMENT
+
+### 3.1 The obligation and its 2025 timing change
+
+| Element | Position | Source | Tag |
+|---|---|---|---|
+| The duty | "The stock broker shall send **daily margin statements** to the clients." | SEBI MC Annexure — Rights & Obligations, clause 32 | `[verified]` |
+| Underlying SEBI authority | Brokers "should issue a **daily statement of collateral utilization** to clients which shall include, inter-alia, details of collateral deposited, collateral utilised and collateral status (available balance / due from client) with break up in terms of **cash, Fixed Deposit Receipts (FDRs), Bank Guarantee and securities**" | SEBI MC 25.1.4, footnoted to **MRD/DoP/SE/CIR-11/2008, 17 April 2008** | `[verified]` |
+| **Original timing** | "the margin statement is required to be issued by the members to the clients on a **daily basis at the end of the trade day (T day) itself**" — SEBI's clarification by letter dated 18 January 2018 | NSE/INSP/36786, 19 January 2018, which also cites NSE/INSP/10239 (11 Feb 2008), NSE/INSP/10605 (21 Apr 2008) and NSE/INSP/19583 (14 Dec 2011) | `[verified]` |
+| **Current timing — changed 2025** | "In view of representations received from **Broker's Industry Standards Forum (ISF)** and after consideration of the same by SEBI, it has been decided to revise the aforesaid timeline … and accordingly, **with effect from the date of issuance of this circular, margin statement is required to be issued by member on a daily basis before the beginning of trading session on the next trading day**." | **NSE/INSP/68487, 11 June 2025** (circular ref. 39/2025); mirrored by **NCL/CMPL/68590, 17 June 2025** | `[verified]` |
+| Effective date | **11 June 2025** — "with effect from the date of issuance of this circular". No transition period. | NSE/INSP/68487 | `[verified]` |
+| Confirmed still current | NSE Inspection Master Circular **NSE/INSP/73976, 29 April 2026, Item 3.2**: "Such margin related information (Daily margin statement) should be issued by Trading Members to clients on a daily basis **before the beginning of trading session on the next trading day** or by such timelines as may be specified from time to time", footnoted to NSE/INSP/68487. | NSE/INSP/73976 Item 3.2 | `[verified]` |
+| FAQ consequence | The 2025 circular expressly **modified Question 21** of the consolidated FAQ on Margin Collection & Reporting in the NSE Inspection Master Circular of 30 April 2025. The earlier text (Q-16 of NSE/INSP/45191) had read "at the end of the trade day (T-Day) itself". | NSE/INSP/68487; NSE/INSP/45191 | `[verified]` |
+
+### 3.2 May the daily margin statement be intraday?
+
+**No, and the 2025 change moved it decisively away from intraday.** The timeline migrated from *end of T day* to *before the next trading session opens* — i.e. it was relaxed **later**, not earlier. There is no intraday margin-statement obligation. `[verified]`
+
+Note the residual tension to flag in the manual: the **Investor Charter** annexed to the June 2025 SEBI Master Circular still lists "Issuance of intimations regarding other margin due payments — **At the end of the T day**". NSE's operative instruction, issued eleven days before that master circular was published and restated in April 2026, is "before the beginning of trading session on the next trading day". `[verified]` both; the reconciliation is `[unknown]`. A broker that issues on T evening complies with both — which is the safe build.
+
+Separately, intraday margin *monitoring* obligations do exist and must not be confused with the client statement: margin is "computed in **real time** at client level by the CC and is aggregated at the level of CMs"; "The day to day **real time risk management** with respect to client / TM exposure, and the margin requirement **shall continue to be the responsibility of the CM**, and **CC shall not monitor the client level exposure against the available client level collateral in real time**" (SEBI MC 42.12.1–42.12.3). `[verified]` Real-time client-level risk is a **broker/CM** function; the regulator does not require you to publish it to the client intraday.
+
+### 3.3 Prescribed contents
+
+Current format: **Exhibit 19 of NSE/INSP/73976**, sourced to the indicative format in **Annexure B of NSE/INSP/45191, 31 July 2020** ("Guidelines/clarifications on Margin collection & reporting"), which superseded the Annexure A format of NSE/INSP/36786, 19 January 2018. The 2018 field list is set out below because it was recoverable in full in this pass; the 2020 Annexure B is `[unknown]` at field level. `[verified]` / `[unknown]` as marked.
+
+| Block | Fields (per the 2018 Annexure A) |
+|---|---|
+| Identification | Client code; client name; exchange; segment; trade day |
+| Margins available till T day | A = Funds; B = Value of securities (**after haircut**); C = Bank guarantees / FDR; D = Any other approved form of margins (as the Exchange/CC specifies from time to time); **E = Total margins available (A+B+C+D)** |
+| Margin required by Exchange/CC end of T day | F = Initial margin; G = Exposure margin; **H = Total margin (F+G)** |
+| Excess / shortfall | **I = E − H** |
+| Member's own additional requirement | **J = Additional margin required by member as per RMS** |
+| Margin status | **K = I − J** (balance with member / due from client) |
+| Mandatory footer | "Daily Margin statement to mention the **name, email id, telephone number and address of compliance officer**" |
+| Exhibits | "Detailed exhibits for the margin collected **may** be provided to the clients. In case of securities (**scrip name, qty, value**), Bank Guarantee (**BG no, amount, expiry date**) and FDR's (**FDR No., Amount and Maturity date**)" |
+| Status of the format | "**indicative**" — "stipulating the **minimum** information to be provided to clients". A broker may add, not subtract. |
+| 2018 note now superseded | The 2018 Annexure A note 1 read "Daily Margin Statement to be issued on **T-Day itself**" — superseded by NSE/INSP/68487. |
+
+### 3.4 Companion obligations
+
+| Obligation | Detail | Source | Tag |
+|---|---|---|---|
+| Collateral records | Records must cover: receipt of collateral from client **and the acknowledgement issued to the client on receipt**; client authorisation for deposit with the exchange/CC/clearing house towards margin; record of deposit with the exchange/CC; record of **return** of collateral to client; **credit of corporate action benefits** to clients. Records to be **periodically reconciled with the actual collateral deposited**. | SEBI MC 25.1.2–25.1.3 | `[verified]` |
+| No other use of client collateral | "adequate systems and procedures in place to ensure that client collateral is **not used for any purposes other than** meeting the respective client's margin requirements / pay-ins", with "proper audit trail of use of client collateral" | SEBI MC 25.1.1; restated NSE MC 3.2 | `[verified]` |
+| Cross-reference clause | The **weekly statement of accounts** "shall **necessarily contain a clause** intimating the client that the client needs to **refer to the daily margin statement** for any pending/outstanding margin obligation of the trades executed by the client in case the margin obligations are posted in the client ledger" | NSE MC Item 4.5(vii) | `[verified]` |
+| Who may not issue it | Not the authorised person | NSE/COMP/63628, 28 Aug 2024 | `[verified]` |
+| Penalty exposure | SEBI's deficiency list item 18: "**Daily margin statement and quarterly statements not sent to clients**". NSE's 2026 common-deficiencies circular lists "**Non-issuance/ delay in issuance of Daily Margin Statement to clients**" and "**Issuance of Daily Margin Statement to clients with incorrect/incomplete details**" as separate findings. | SEBI MC deficiency annexure; **NSE/INSP/73503, 27 March 2026** | `[verified]` |
+
+---
+
+## 4. OTHER NEAR-REAL-TIME CLIENT ARTEFACTS THAT ARE MANDATED OR PERMITTED
+
+### 4.1 The broker's own surfaces
+
+| Artefact | Requirement | Cadence | Source | Tag |
+|---|---|---|---|---|
+| Client-specific secured website area | Must display **all documents executed by the client, the client's position, margin and other related information, statement of accounts, etc.**, with secured access by client-specific user ID and password | Continuous | SEBI MC 23.7 | `[verified]` |
+| ECN copy on the designated website | ECN **simultaneously** published in a secured way, with a unique username and password per client, and the ability to save or print | Per contract note | SEBI MC 52.3.7 | `[verified]` |
+| Real-time order/trade confirmation display | See §2.2 | Real time | SEBI MC 53.1(c)(v) | `[verified]` |
+| Pre-order charge display | Brokerage and levies for each order, on the order placement window, **before** placement | Pre-trade | NSE/INSP/53939 / 54746 / 55031, effective **31 Jan 2023** | `[verified]` |
+| Ticker/quote/order book with time stamp and source | See §2.3 | Real time | SEBI MC 53.1(c)(iv) | `[verified]` |
+| Margin / payment / delivery obligation reports via the system | See §2.2 | "through the system" | SEBI MC 53.1(d)(iii) | `[verified]` |
+| Investor-protection content on the trading website | Rules affecting client-broker relationship, arbitration rules, investor-protection rules, plus a **prominent hyperlink** to the relevant exchange page displaying rules/regulations/circulars | Continuous | SEBI MC 53.1(c)(iv) | `[verified]` |
+| Risk disclosures | Prescribed risk disclosures displayed to all clients in the specified manner, which "shall be displayed prominently", with the client **prompted to read** them | Per login/session as specified | SEBI MC 49, referencing **SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/73, 19 May 2023** | `[verified]` |
+| Inactive-account policy | Policy covering time period, return of client assets and reactivation procedure, displayed on the website | Continuous | SEBI MC 23.8 | `[verified]` |
+| Identity block on every client document | SEBI-registered name, own logo, registration number, full address with telephone numbers, compliance officer's name, telephone and e-mail — on **contract notes, statements of funds and securities, and correspondences with clients** | Every document | SEBI MC 84.1(b), footnoted to **CIR/MIRSD/9/2010, 4 November 2010** | `[verified]` |
+| Order-evidence retention | Trades executed only after keeping evidence of the client placing the order: physical signed record, telephone recording, e-mail from an authorised e-mail ID, log for internet transactions, record of SMS messages, or any other legally verifiable record. In exceptional cases where the broker cannot produce order-placing evidence, "other appropriate evidences like **post trade confirmation by client**, receipt/payment of funds/securities by client in respect of the disputed trade, etc. shall also be considered." | Per order | SEBI MC 35.2–35.4 | `[verified]` |
+
+Note the last row carefully: SEBI itself treats a **post-trade confirmation accepted by the client** as corroborative evidence in a dispute. That is an affirmative reason to build and log a provisional confirmation — it strengthens the broker's evidential position on unauthorised-trading complaints. `[uncertain]` as the inference; the provision is `[verified]`.
+
+### 4.2 The disaggregated client collateral web portal
+
+| Element | Position | Source | Tag |
+|---|---|---|---|
+| Framework | "Segregation and Monitoring of Collateral at Client Level", to protect client collateral from (i) misappropriation/misuse by TM/CM and (ii) default of the TM/CM and/or other clients | SEBI MC 43, footnoted to **SEBI/HO/MRD2_DCAP/CIR/2021/0598, 20 July 2021** | `[verified]` |
+| Reporting chain | **TM reports** disaggregated collateral information **up to the level of its clients to the CM**; **CM reports** disaggregated information up to the level of the TM's clients **and** the TM's proprietary collateral **to the exchanges and CCs**, per segment | SEBI MC 43.2(a) | `[verified]` |
+| Disaggregation axes | **segment-wise and asset-type-wise** break-up of each client's collateral | SEBI MC 43.2(a) | `[verified]` |
+| Data points | TM→CM: client collateral **received by TM**, **retained by TM**, **placed with CM**. CM→SE/CC: the same three, plus client collateral **retained by CM** and **placed with CC** | SEBI MC 43.2(b), Table 11 | `[verified]` |
+| Reporting frequency | "The aforementioned information shall be required to be reported on a **daily basis**" | SEBI MC 43.2(c) | `[verified]` |
+| **The client-facing portal** | "A **web portal facility shall be provided by the CCs/SEs to allow clients to view** aforesaid **disaggregated collateral reporting by TM/CM**." | **SEBI MC 43.3** | `[verified]` |
+| Portal refresh | "Information regarding the collateral allocated by the CM shall be made available **on a daily basis** on the web portal facility to clients to view disaggregated collateral reporting by TM/CM (refer Para 43.3). Further, **CC shall also provide a facility to the TMs** of the clients to view such collateral allocation to the clients by the CM." | **SEBI MC 43.15** | `[verified]` |
+| **Not real time** | Daily. And SEBI MC 42.12.2 is explicit that the CC does not monitor client-level exposure against client-level collateral in real time. | | `[verified]` |
+| Allocation discipline | CCs use the collateral allocation information "to ensure that the collateral allocated to a client is used towards the margin obligation of **that client only**". Securities collateral via margin pledge/re-pledge is already client-identified. Cash, FDs, BGs and SGL/CSGL G-secs must be **upfront allocated** by the CM, segment-wise, to CM proprietary / TM proprietary / client accounts. | SEBI MC 43.4–43.8 | `[verified]` |
+| 50% cash-equivalent rule | CMs maintain at least 50% of total collateral in cash or cash equivalents; "the minimum 50% cash equivalent collateral requirement **may not be applied at the client level**", and a client's excess cash-equivalent collateral is not counted for another client or for TM/CM proprietary accounts | SEBI MC 43.16 | `[verified]` |
+| Penalty for under-allocation | CCs put in place deterrent penalty structures, in consultation with SEBI, where allocated collateral plus securities re-pledged for a client falls short of the minimum margin collection requirement for that client in that segment | SEBI MC 43.14 | `[verified]` |
+| Operational — current NSE portal | Members upload the segregated client collateral report via the **new NCL portal** at `https://ims.connect2nsccl.com/NCLMemberPortal/`, from **trade date 28 August 2025** (due date 29 Aug 2025), with dual running on both the old and new portals for trade dates 28 Aug – 12 Sep 2025. Super-admin resets the admin password and creates sub-users with the **NCL INSPECTION** role. Issues to `support@nsccl.co.in`. Earlier user manual: NCL/CMPL/49764, 29 Sep 2021. | **NCL/CMPL/69872, 26 Aug 2025**; reminders/extensions NCL/CMPL/70070 (5 Sep 2025), 70192 (12 Sep 2025), 70297 (19 Sep 2025), 70962 (24 Oct 2025) | `[verified]` |
+| Reporting discipline, 2026 | FAQ confirms: error/own code must be reported with **account type "C"**; segregation must be reported **irrespective of margin obligation** wherever the member holds any client collateral, failure attracting penalty under Violation 1 of NCL/CMPL/50662 (17 Dec 2021); on a broker switching clearing member, the **existing CM reports on T day** and the **new CM from the next trading day** | **NCL/CMPL/76318, 11 September 2026** | `[verified]` |
+| EGR segment | Collateral segregation extended to the Electronic Gold Receipts segment | NCL/CMPL/73989, 30 Apr 2026 | `[verified]` |
+| Reconciliation hook to client statements | The weekly statement of accounts balance must **match the financial ledger balance (Clear) in the segregation-and-monitoring-of-collateral-at-client-level submissions** and the securities/commodities holding in the Holding Statement uploaded to the exchange **of the same date** | NSE MC Item 4.5(viii) | `[verified]` |
+
+**This is the single most important near-real-time design constraint in the whole set:** the client can see, on a CC-run portal, a daily disaggregated view of their own collateral — received, retained and placed at each level. Any broker-side provisional display that disagrees with that portal will generate complaints the broker cannot win, because the portal's numbers come from the broker's own daily submission and must tie to the weekly statement of accounts. `[uncertain]` as the conclusion; every component `[verified]`.
+
+### 4.3 Positions and ledger — is there a near-real-time requirement?
+
+| Question | Answer | Source | Tag |
+|---|---|---|---|
+| Must positions be shown near-real-time? | **Not expressly as "real time".** SEBI MC 23.7 requires the website to display "client's position, margin and other related information" with secured access, but prescribes no refresh interval. The real-time wording attaches to **order/trade confirmations** on the website (53.1(c)(v)), not to positions. | SEBI MC 23.7, 53.1(c)(v) | `[verified]` |
+| Must the ledger be shown near-real-time? | **No.** The ledger artefacts are the **weekly** statement of accounts, the settlement-time statement, and the annual statements (§5). No intraday ledger publication duty was located. | NSE MC Item 4.5; NSE MC Item 4.17 | `[verified]` for the cadences; `[unknown]` as to any contrary provision |
+| Is there a daily position push? | Yes, but only where a **PoA** has been executed: a consolidated scrip-wise buy/sell summary with average rates, by SMS/e-mail, daily. | SEBI MC 36.8.1.9 | `[verified]` |
+| What the regime *prohibits* the PoA doing | A PoA must not authorise the broker to **"Open an email ID/email account on behalf of the client(s) for receiving statement of transactions, bills, contract notes etc."**, nor to execute trades without the client's consent, nor to merge balances across accounts to nullify a debit elsewhere, nor to renounce liability for erroneously instructed fund blocks. | SEBI MC 36.9.1.8, 36.9.1.4, 36.9.1.7, 36.9.1.9 | `[verified]` |
+| PoA/DDPI coercion | "The stock broker / stock broker and depository participant shall **not directly/indirectly compel** the clients to execute Power of Attorney (PoA) or Demat Debit and Pledge Instruction (DDPI) **or deny services** to the client if the client refuses" — so a daily-position-SMS feature must not be gated on a PoA | SEBI MC Rights & Obligations clause 34 | `[verified]` |
+| Outage fallback — **withdrawn** | The **Investor Risk Reduction Access (IRRA) platform**, which let clients view positions and square off when their broker's systems failed, was **discontinued with immediate effect on 7 May 2026** (SEBI ref. HO/38/44/12(3)2025-MIRSD-TPD1/I/10705/2026). The manual must not promise IRRA. | SEBI circular 7 May 2026 | `[verified]` |
+| Technical-glitch framework | Applies to IBT/STWT brokers with **more than 10,000 registered clients** (excluding closed accounts), measured as at the previous **31 March**; effective **9 January 2026** (SEBI ref. HO/38/44/12(1)2026-MIRSD-TPD1). A greenfield broker crosses into scope on the first 31 March at which it exceeds the threshold. | SEBI circular 9 Jan 2026 | `[verified]` |
+| Blocked-amount channel | "Trading Supported by Blocked Amount in Secondary Market" — the cash blocked-money / 3-in-1 requirement is effective **1 February 2025**. Where used, the UPI block/debit confirmations are themselves near-real-time client-facing events that must reconcile to the ledger. | SEBI circular Nov 2024 | `[verified]` as the circular and date; `[unknown]` as to any prescribed client-notification timing inside it |
+| Order/trade accessibility across channels | "Orders/trades placed through either fixed Internet or WAP system should be **accessible from both systems**" | SEBI MC 54.4.2 | `[verified]` |
+
+---
+
+## 5. STATEMENT OF ACCOUNTS CADENCE, THE ANNUAL SIGNED STATEMENT, AND 2025–2026 CHANGES
+
+### 5.1 The cadence stack
+
+| Artefact | Cadence / deadline | Contents | Source | Tag |
+|---|---|---|---|---|
+| **Weekly Statement of Accounts** for funds, securities and commodities | **Weekly, Monday to Saturday**, dispatched "**on or before the next four trading days of subsequent week**" | Complete statement per client; balances **after adjusting/reversing** open bills, uncleared cheques deposited or issued, and margin obligations posted in the client ledger, as at the **Saturday** of the week; **separately** disclose pending settlement pay-in/pay-out obligations of **all segments** and uncleared cheques; must carry the daily-margin-statement cross-reference clause; must state that the running-account authorisation continues until revoked; must carry the broker identity block; format at Exhibit 24 of NSE/INSP/73976 | **NSE/INSP/47227, 3 February 2021** (original; applicable from the week ending **6 March 2021**, due **12 March 2021**), restated at **NSE/INSP/73976 Item 4.5** | `[verified]` |
+| Dispute window | Client to raise any dispute "**preferably within 7 working days** from the date of receipt of statement" | | NSE MC 4.5(ii) | `[verified]` |
+| Exemption | Not required for clients with **zero funds, zero securities and zero commodities** balances **and** flagged **'Inactive'** in the exchange UCC database | | NSE MC 4.5(iii) | `[verified]` |
+| **Inactive definition — CHANGED** | 2021 circular: no trades in the last **12 months** across all exchanges. 2025 and 2026 Inspection Master Circulars: no trades in the last **24 months** across all exchanges. | | NSE/INSP/47227 vs NSE/INSP/67804 and NSE/INSP/73976 | `[verified]` both; the circular that made the change is `[unknown]` |
+| **E-mail is sufficient compliance** | "In respect of Stock Brokers / Trading Members who offer trading facility to their clients **through internet and provide to such clients an access to an on-line account viewing and print-out facility**, it would be treated as **sufficient compliance** of **Regulation 6.1.5(d) of Part A Chapter 6 of Capital Market Regulations** of the Exchange, if they **send the 'Statement of Accounts' by email** to such clients." | | NSE MC 4.5(iv) | `[verified]` |
+| **Settlement-time statement** | "within **five days** from the date when the account is considered to be settled" | Extract from the client ledger for funds **and** securities, plus a **statement explaining the retention of funds/securities**. "The statement sent at the time of settlement shall be **adequate compliance for the purpose of sending quarterly statement of accounts** for funds/securities." | NSE MC 4.5(x) | `[verified]` |
+| On request | "Notwithstanding anything contained above, Stock Broker / Trading Member shall issue the statement of accounts for funds, securities and commodities **for such period as may be requested by the client** from time to time." | | NSE MC 4.5(ix) | `[verified]` |
+| Custodial participants | The requirements apply to CP clients only where the broker receives funds/securities/commodities from, or pays/delivers to, such CP clients **directly** and not through the custodian/clearing member | | NSE MC Item 4.5; NSE/INSP/47227 | `[verified]` |
+| Register of securities format | ROS per the exchange-specified format, which "**shall mandatorily contain the 'execution date'** which shall be the date of actual movement (Receipt/Delivery) of securities". Format superseded by Annexure A of NSE/INSP/47227, replacing NSE/INSP/38743 (30 Aug 2018). Current formats for ROS, Holding Statement, Bank Book and Client Ledger at Exhibit 41 of NSE/INSP/73976. | | NSE MC 7.1–7.2 | `[verified]` |
+| Block-mechanism carve-out | Securities lying in clients' demat accounts **under the block mechanism** at end of day must **not** be included in the weekly Holding Statement uploaded to the exchange | | NSE MC 7.1, referencing SEBI MC para 45 | `[verified]` |
+| **Annual Global Transaction Statement (AGTS)** | "within **30 days from the end of the financial year**" | All transactions executed by the client in the financial year; consolidated for the entire FY; **each distinct security/commodity as a separate line item**; may be on **trade day or settlement day basis**; generated **PAN-wise**, but UCC-wise where one PAN has multiple UCCs (NRI clients, different UCCs across segments/exchanges); effect of **close-out/settlement/auction** transactions shown in the purchase/sale columns; **all charges mentioned in the contract notes** (STT/CTT, stamp duty, exchange transaction charges, SEBI turnover fees, etc.) provided appropriately; broker may add ISIN, average rate, net position; must be provided to **all** clients; further detail on client request. | **NSE/INSP/36731, 11 January 2018** (per SEBI letter dated 27 November 2017, applicable from **FY 2017-18**); restated with the expanded guidance at **NSE/INSP/73976 Item 4.17**, Exhibit 30 | `[verified]` |
+| **Annual signed statement of balances — CONFLICT** | **SEBI:** "As on **31st March of every year**, a statement of balance of Funds and Securities **in hard form and signed by the broker shall be sent to all the clients**." (SEBI MC **23.9**) **NSE:** "Additionally, as on March 31 every year, the statement of balance of funds and securities in hard form and signed by the Stock Broker / Trading Member shall be sent to the clients **only upon request**." (NSE MC **4.5(x)**) | | SEBI MC 23.9 vs NSE/INSP/73976 Item 4.5(x) — **and the identical NSE wording appears in the 30 April 2025 edition (NSE/INSP/67804) at the same place**, so the relaxation is at least as old as April 2025 | `[verified]` both; the instrument that introduced "only upon request" is `[unknown]` |
+| Running-account settlement | "**First Friday/Saturday of the month / quarter** as per Exchange **pre-announced schedule**"; retention statement "**5 days from the date of settlement**" | | SEBI MC Investor Charter activities 9 and 11; annual calendar at **NSE/INSP/72413, 20 January 2026** (prior years NSE/INSP/67207 of 20 Mar 2025, NSE/INSP/61164 of 15 Mar 2024) | `[verified]` |
+| Grievance redressal | **21 calendar days** from receipt of the complaint | | SEBI MC Investor Charter activity 13 | `[verified]` |
+
+### 5.2 The weekly-vs-monthly conflict
+
+| Source | Says | Tag |
+|---|---|---|
+| **NSE/INSP/47227, 3 Feb 2021** | "the periodicity of 'Statement of Accounts' which is currently sent by members to clients on **quarterly or monthly (in case of commodities)** basis (within a month of the expiry of the calendar quarter) **is revised to weekly basis**" | `[verified]` |
+| **NSE/INSP/48431, 28 May 2021** | Penalty structure specifically for "**Non-issuance of 'Statement of Accounts' … on weekly basis to clients**" — so weekly is live and penalised | `[verified]` |
+| **NSE/INSP/73976, 29 Apr 2026, Item 4.5** | Weekly, unchanged | `[verified]` |
+| **SEBI Master Circular, 17 Jun 2025, Investor Charter annexure, activity 10** | "'Statement of Accounts' for Funds, Securities and Commodities — **Monthly basis**" | `[verified]` |
+| **SEBI Master Circular, Rights & Obligations annexure, clause 31** | "in such periodicity and format within such time, **as may be prescribed by the relevant Exchange**" | `[verified]` |
+
+**Resolution for the manual:** Rights & Obligations clause 31 is the tie-breaker in the regulator's own document — periodicity is **whatever the exchange prescribes**. The exchange prescribes weekly, and penalises its absence. **Build weekly.** The Investor Charter's "monthly" is best read as a stale annexure entry, not as a relaxation. `[uncertain]` as the resolution; both horns `[verified]`. **Flag it to compliance before go-live rather than relying on this reading.**
+
+### 5.3 2025–2026 changes worth carrying into the manual
+
+| Date | Change | Status | Tag |
+|---|---|---|---|
+| **27 June 2025** (trade date) | Single-WAP-across-exchanges contract note format becomes mandatory, after six timeline extensions from 1 Aug 2024 | **Live** | `[verified]` NSE/INSP/68618 |
+| **11 June 2025** | Daily margin statement deadline relaxed from "end of T day itself" to "**before the beginning of trading session on the next trading day**", on ISF representation | **Live, immediate** | `[verified]` NSE/INSP/68487; NCL/CMPL/68590 |
+| **17 June 2025** | SEBI Master Circular for Stock Brokers re-issued as **SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90**, superseding the 9 August 2024 edition. **Still the current edition as of today — no 2026 edition exists.** | **Current** | `[verified]` (SEBI master-circular listing checked 2026-10-15) |
+| **26 Aug 2025** | Client collateral segregation reporting migrates to the new NCL member portal | **Live** (dual-run ended 12 Sep 2025) | `[verified]` NCL/CMPL/69872 |
+| **30 Oct 2025** | AGTS guidance extended (per the footnote in NSE/INSP/73976 Item 4.17 citing NSE/INSP/71037) | **Live** | `[verified]` as the footnote; `[uncertain]` as to content — the index titles NSE/INSP/71037 "Prior instructions for initial public offering (IPO) bid placement", which does not match the AGTS context. **Possible footnote error in NSE's own master circular — verify before citing.** |
+| **7 January 2026** | **SEBI (Stock Broker) Regulations, 2026** notified and brought into force on the date of Gazette publication (Gazette of India Extraordinary Part III §4, No. 16, 7 Jan 2026; F. No. SEBI/LAD-NRO/GN/2026/291), **repealing the SEBI (Stock Brokers) Regulations 1992** (reg. 51(1)). Record retention moves from **five years to eight years**. Contract-note duty restated as "within specified timeline … in the form specified". A standalone duty to "promptly inform its client about the execution or non-execution of an order" sits at reg. 37(b). | **In force** | `[verified]` |
+| **9 January 2026** | Revised technical-glitch framework, >10,000-client threshold | **In force** | `[verified]` |
+| **27 March 2026** | **STP IFN/INF 515 format revised** — institutional ECN messaging changes (NSE/INSP/73521) | **Live** | `[verified]` |
+| **27 March 2026** | NSE publishes its current common-violations list, naming contract-note delay and daily-margin-statement failures (NSE/INSP/73503) | Guidance | `[verified]` |
+| **29 April 2026** | **NSE Inspection Master Circular NSE/INSP/73976** supersedes NSE/INSP/67804 of 30 Apr 2025. This is the operative exchange consolidation for contract notes, margin statements and client statements. | **Current** | `[verified]` |
+| **7 May 2026** | **IRRA platform discontinued**, immediate | **Withdrawn** | `[verified]` |
+| **11 September 2026** | NCL FAQ on collateral segregation reporting mistakes (NCL/CMPL/76318) | Guidance | `[verified]` |
+| **1 October 2026** | **Project Jagrook** investor-awareness messages: websites must carry SEBI's messages **and** the risk disclosures from **5–31 Oct 2026**; from **1 Nov 2026** the messages must appear on the **landing page** of the website. Trading apps: voluntary 5–31 Oct 2026 (and if displayed, risk disclosures become optional that day); from **1 Nov 2026 mandatory**, with the awareness messages and the risk disclosures on **alternate days**, on the app's **landing page**. Messages may be modified by SEBI from time to time. | **Notified; website mandatory from 1 Nov 2026; app mandatory from 1 Nov 2026** | `[verified]` SEBI ref. HO/38/24/(15)2026-MIRSD-PODMMC/I/22872/2026 |
+| Not changed | No contract-note format, daily-margin-statement, statement-of-accounts or ECN circular appears in the NSE index between **20 June 2025 and 30 September 2026**. | | `[verified]` |
+
+---
+
+## 6. PROHIBITIONS, AND LABELLING OF INDICATIVE DATA
+
+### 6.1 The hard prohibitions
+
+| Provision | Exact text | Why it matters here | Tag |
+|---|---|---|---|
+| **FUTP reg. 4(2)(p)** | "an intermediary **predating or otherwise falsifying records including contract notes, client instructions, balance of securities statement, client account statements**" is deemed a manipulative, fraudulent or unfair trade practice | **The single most important prohibition in this research.** Back-dating a contract note, or editing a client account statement to match an earlier provisional figure, is not a compliance lapse — it is a deemed fraud under the FUTP Regulations. Contract notes and client account statements are named expressly. | `[verified]` |
+| **FUTP reg. 4(2)(k)** | "**disseminating information or advice through any media, whether physical or digital, which the disseminator knows to be false or misleading in a reckless or careless manner and which is designed to, or likely to influence the decision of investors dealing in securities**" | Catches a knowingly wrong indicative figure. Note the **scienter** requirement — "knows to be false or misleading". A good-faith, clearly-labelled provisional number that later differs is not within this clause. | `[verified]` |
+| **FUTP reg. 4(2)(s)** | "**mis-selling of securities or services relating to securities market**", where mis-selling means sale "by (i) knowingly making a false or misleading statement, or (ii) knowingly concealing or omitting material facts, or (iii) knowingly concealing the associated risk, or (iv) **not taking reasonable care to ensure suitability** of the securities or service to the buyer" | Clause (iv) has **no scienter qualifier** — "not taking reasonable care" is enough. Relevant to presenting an indicative figure in a way a retail client would reasonably read as final. | `[verified]` |
+| **FUTP reg. 4(2)(m)** | "a market participant **entering into transactions on behalf of client without the knowledge of or instructions from client** or misutilizing or diverting the funds or securities of the client held in fiduciary capacity" | The unauthorised-trading limb; the reason the order-evidence regime (§4.1) exists | `[verified]` |
+| **FUTP non-exhaustiveness** | "the acts or omissions listed in this sub-regulation are **not exhaustive** and that an act or omission is prohibited if it falls within the purview of regulation 3, notwithstanding that it is not included in this sub-regulation"; and "**Market Participant shall include any person or entity registered under Section 12 of the Act and its employees and agents**" | A novel client-facing artefact is not safe merely because no clause names it, and the broker's **employees and agents** are within scope | `[verified]` |
+| **SB Regs 2026, Code of Conduct, reg. 37(f) and reg. 36(2)(f)** | A stock broker shall "not furnish **false or misleading quotations** or give any other **false or misleading advice or information** to the clients in an attempt to solicit business in particular securities and enabling itself to earn brokerage or commission"; and shall not make a false or misleading statement in returns submitted to the Board or the exchange | Regulation-level, licence-condition version of the same duty | `[verified]` |
+| **SB Regs 2026, reg. 36(3) "Competence"** | "have arrangements to render **fair, prompt and competent services** to its clients" and ensure employees are adequately trained to a level commensurate with their responsibilities | The "prompt" in reg. 36(3) read with reg. 37(b) is the closest thing in Indian law to a near-real-time service standard — and it is a **standard, not a clock** | `[verified]` |
+| **True to label** | The amount charged to an end client as an MII levy must equal the amount received by that MII; broker/DP remuneration must not hide inside "exchange", "SEBI", "stamp" or "depository" labels | A provisional confirmation that shows estimated charges must use the same labels and the same actuals as the contract note | `[verified]` SEBI/HO/MRD/TPD-1/P/CIR/2024/92, notified 1 Jul 2024, **effective 1 Oct 2024** |
+| **Unauthenticated news** | Employees and temporary/voluntary staff must "**not encourage or circulate rumours or unverified information** obtained from client, industry, any trade or any other sources **without verification**"; access to blogs/chat forums/messenger sites restricted under supervision or blocked; usage logs treated as **records**; any market-related news received must be forwarded "**only after the same has been seen and approved by the concerned Intermediary's Compliance Officer**", failing which the employee is deemed to have violated SEBI Act/Rules/Regulations "**and the Compliance Officer shall also be held liable for breach of duty**" | The nearest analogue in the regime to a prohibition on pushing unverified figures at clients — but it addresses **market news**, not a client's own trade data | `[verified]` SEBI MC 85, footnoted to CIR/ISD/1/2011 (23 Mar 2011) and CIR/ISD/2/2011 (24 Mar 2011) |
+| **Voluntary clauses void** | See §2.3 — SEBI MC 21.3 | A disclaimer cannot be used to shift risk off the broker | `[verified]` |
+| **Advertisement code** | Investors are entitled to "get only those advertisement materials from the broker which **adhere to Code of Advertisement norms** in place"; exchanges "shall ensure that brokers do not issue advertisements" otherwise than as permitted; APs are barred from advertising (newspapers, pamphlets, journals, magazines, e-mails, Facebook, Instagram, Telegram) without exchange approval through the TM, **including publishing performance returns** | Bounds any marketing of a provisional-confirmation feature | `[verified]` SEBI MC 81, footnoted to SMD/POLICY/CIR-49/2001 (22 Oct 2001); AP limb from NSE/COMP/63628 |
+
+### 6.2 Is there anything barring presentation of an unconfirmed or unreconciled figure to a client as final?
+
+**No provision was located that says so in terms.** `[verified]` as a negative search across the SEBI Master Circular, the SB Regs 2026, the FUTP Regulations and the NSE Inspection Master Circular.
+
+What exists instead is a **three-part functional equivalent**, which is what the manual should state:
+
+1. **You may not falsify the final record.** FUTP 4(2)(p) names contract notes and client account statements. Once the contract note is issued, it is the record; it cannot be retrofitted to a provisional figure, and the provisional figure cannot be retrofitted to it.
+2. **You may not knowingly mislead, and you must take reasonable care about suitability.** FUTP 4(2)(k) and 4(2)(s)(iv), plus the SB Regs 2026 Code of Conduct.
+3. **Where SEBI *does* require you to show live data, it attaches provenance requirements — time stamp, source, unique ID, audit trail — rather than a "final/provisional" label.** That is the regime's chosen technique, and the honest inference is that a provisional confirmation should be designed to the same technique: time-stamped, sourced, ID-carrying, logged, and reproducible. `[uncertain]` as the inference.
+
+### 6.3 Disclaimers the regime does mandate
+
+For contrast — these are the places where SEBI or the exchanges actually require specific wording, which shows the drafting style to imitate:
+
+| Where | Mandated wording / requirement | Tag |
+|---|---|---|
+| Contract note, Rights Entitlements | Verbatim RE-lapse disclaimer (quoted in §1.3) | `[verified]` |
+| Contract note, margin-call square-offs | **Asterisk or identifier**, and a **remark-column** entry | `[verified]` |
+| Contract note / bills / statements, cash segment | **ISIN** to be included | `[verified]` |
+| Contract note footer | Governing rules/bye-laws/circulars clause; RAC arbitration/appellate arbitration availability with exchange website references | `[verified]` |
+| Weekly statement of accounts | Clause directing the client to the **daily margin statement** for pending margin obligations; and a statement that the **running-account authorisation continues until revoked** | `[verified]` |
+| ECN agreement / client registration documents | **Non-receipt of bounced-mail notification amounts to delivery** at the client's e-mail ID | `[verified]` |
+| Depository-participant website ticker | *"Prevent Unauthorized Transactions in your demat account → Update your Mobile Number with your Depository Participant. Receive alerts on your Registered Mobile for all debit and other important transactions in your demat account directly from NSDL on the same day. … issued in the interest of investors."* | `[verified]` |
+| Broker website and trading app | **Risk disclosures** (SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/73, 19 May 2023), displayed prominently with a read-prompt; **and**, from 1 Nov 2026, SEBI's **investor awareness messages** on the landing page (website) and on alternate days with the risk disclosures (app) | `[verified]` |
+| Client documents generally | **Minimum font size 11** for all documents in both the mandatory and non-mandatory parts; copies of executed documents to the client **free of charge within seven days** of execution, with the client's acknowledgement taken; MITC acknowledgement at onboarding | `[verified]` SEBI MC 23.5, 23.6, 21.4 and 21.10 (MITC implementation: **1 April 2024** for new clients; **1 June 2024** for informing existing clients by e-mail or other preservable mode; MITC circular **SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/180**, November 2023) |
+
+---
+
+## 7. CONSOLIDATED CLIENT-COMMUNICATION CLOCK
+
+Every verified client-facing timing obligation found in this pass, ordered fastest to slowest. Use this as the manual's single timing table.
+
+| Artefact | Deadline | Who issues | Tag |
+|---|---|---|---|
+| Pre-order display of brokerage and levies | Before order placement | Broker (IBT/WT) | `[verified]` |
+| Order confirmation (unique ID) | On submitting the order | Broker | `[verified]` |
+| Order acceptance/rejection advice | "within a reasonable period" | Broker | `[verified]` |
+| Order/trade confirmation display on website | Real time | Broker | `[verified]` |
+| Order/trade confirmation by e-mail | At the **client-specified** interval | Broker | `[verified]` |
+| Trade confirmation by e-mail / mobile, with same-day trade history | Same day | Broker | `[verified]` |
+| Order execution | "Immediate on receipt of order, but **not later than the same day**" | Broker | `[verified]` (Investor Charter activity 3) |
+| Depository alerts on all demat debits | Same day | NSDL / CDSL | `[verified]` |
+| Exchange transaction details by SMS and e-mail | **By the end of the trading day** | Stock exchanges | `[verified]` |
+| Intimations re other margin due payments | End of T day | Broker | `[verified]` (Investor Charter activity 8) |
+| Daily scrip-wise buy/sell summary with average rates (where PoA executed) | Daily | Broker / DP | `[verified]` |
+| Disaggregated client collateral on the CC/exchange web portal | Daily | CC / exchange | `[verified]` |
+| **Daily margin statement** | **Before the beginning of the trading session on the next trading day** | Broker | `[verified]` |
+| **Contract note** | **Within 24 hours of execution** (R&O variant: within one working day) | Broker | `[verified]` |
+| Payment / delivery to client after pay-out | Within 24 hours of pay-out, unless the client requests otherwise | Broker | `[verified]` |
+| Weekly Statement of Accounts | Weekly (Mon–Sat), dispatched within the next **four trading days** of the following week | Broker | `[verified]` |
+| Copy of executed client documents | Within **7 days** of execution | Broker | `[verified]` |
+| Statement of accounts + retention statement at settlement | Within **5 days** of the settlement date | Broker | `[verified]` |
+| Running-account settlement | First Friday/Saturday of the month/quarter, per the exchange's pre-announced annual calendar | Broker | `[verified]` |
+| Copy of completed client registration documents | **7 days** from the date of UCC upload to the exchange | Broker | `[verified]` (Investor Charter activity 5) |
+| KYC to KRA and CKYCR | **3 working days** of account opening | Broker | `[verified]` (Investor Charter activity 1) |
+| Grievance redressal | **21 calendar days** from receipt | Broker | `[verified]` |
+| Annual Global Transaction Statement | **30 days** from the end of the financial year | Broker | `[verified]` |
+| Annual signed hard-copy statement of balances as on 31 March | SEBI: to all clients. NSE: **only upon request**. Unresolved. | Broker | `[verified]` both |
+| ECN dispatch log / contract note copies | Retain **8 years** (SCRR floor 5 years; originals until any enforcement trial concludes) | Broker | `[verified]` |
+
+---
+
+## 8. SOURCE REGISTER
+
+### SEBI — regulations
+
+| Instrument | Reference | Date | URL |
+|---|---|---|---|
+| SEBI (Stock Broker) Regulations, 2026 | F. No. SEBI/LAD-NRO/GN/2026/291; Gazette of India Extraordinary, Part III §4, No. 16 | 7 Jan 2026 (in force on publication) | https://www.sebi.gov.in/sebi_data/attachdocs/jan-2026/1767852346757.pdf |
+| SEBI (Prohibition of Fraudulent and Unfair Trade Practices relating to Securities Market) Regulations, 2003, last amended 5 Dec 2025 | — | 2003 / amd. 2025 | https://www.sebi.gov.in/legal/regulations/dec-2025/securities-and-exchange-board-of-india-prohibition-of-fraudulent-and-unfair-trade-practices-relating-to-securities-market-regulations-2003-last-amended-on-december-05-2025-_98694.html · PDF https://www.sebi.gov.in/sebi_data/attachdocs/aug-2026/1786957017377.pdf |
+| SEBI (Stock Brokers) Regulations, 1992 — **repealed** | reg. 18 (five-year retention), reg. 15 (records) | repealed 7 Jan 2026 | cited in SEBI MC 83.1 |
+
+### SEBI — circulars
+
+| Subject | Reference | Date | Note / URL |
+|---|---|---|---|
+| **Master Circular for Stock Brokers** (current) | **SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/90** | **17 Jun 2025** | https://www.sebi.gov.in/legal/master-circulars/jun-2025/master-circular-for-stock-brokers_94623.html · PDF https://www.sebi.gov.in/sebi_data/attachdocs/jun-2025/1750158789381.pdf · confirmed latest edition as at 2026-10-15 |
+| Master Circular for Stock Brokers (prior edition) | — | 9 Aug 2024 | cited in NSE MC footnote for the ECN physical-fallback amendment |
+| ECN — original | SMDRP/POLICY/CIR-56/00 | 15 Dec 2000 | footnote 68 to SEBI MC 52 |
+| ECN | SEBI/SMD/SE/15/2003/29/04 | 29 Apr 2003 | footnote 68 |
+| ECN — core delivery/log/bounce rules | MRD/DoP/SE/CIR-20/2005 | 8 Sep 2005 | footnote 68; also cited in NSE/INSP/52604 |
+| ECN / statement of accounts | MIRSD/SE/CIR-19/2009 | 3 Dec 2009 | footnote 68; cited in NSE/INSP/47227 |
+| ECN guidelines | CIR/MIRSD/16/2011 | 22 Aug 2011 | cited in NSE/INSP/52604 |
+| Internet-based trading conditions | SMDRP/POLICY/CIR-06/2000 and FITTC/DC/CIR-1/98 | 31 Jan 2000; 16 Jun 1998 | footnote 69 to SEBI MC 53 |
+| Securities trading through WAP | SMDRP/POLICY/CIR-48/2000 | 11 Oct 2000 | footnote 70 to SEBI MC 54 |
+| Securities Trading using Wireless Technology | CIR/MRD/DP/25/2010 | 27 Aug 2010 | footnote 71 to SEBI MC 55 |
+| Daily statement of collateral utilisation | MRD/DoP/SE/CIR-11/2008 | 17 Apr 2008 | footnote 35 to SEBI MC 25 |
+| SMS and e-mail alerts to investors by stock exchanges | CIR/MIRSD/15/2011 | 2 Aug 2011 | footnote 45 to SEBI MC 34 |
+| Same — family / authorised person clarification | SEBI/HO/MIRSD/MIRSD-PoD1/P/CIR/2024/169 | 3 Dec 2024 | footnote 45; circulated as NSE/INSP/65403 and NSE/INSP/65679 |
+| Display of details by stock brokers | CIR/MIRSD/9/2010 | 4 Nov 2010 | footnote 111 to SEBI MC 84 |
+| Unauthenticated news | CIR/ISD/1/2011; CIR/ISD/2/2011 | 23, 24 Mar 2011 | footnote 112 to SEBI MC 85 |
+| Advertisement by brokers | SMD/POLICY/CIR-49/2001 | 22 Oct 2001 | footnote 108 to SEBI MC 81 |
+| Books/records sought by enforcement agencies | SEBI/MRD/SE/CIR-15/2005 | 4 Aug 2005 | footnote 110 to SEBI MC 83 |
+| Risk disclosures | SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/73 | 19 May 2023 | referenced in SEBI MC 49 and in the Jagrook circular |
+| Most Important Terms and Conditions (MITC) | SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/180 | Nov 2023 | SEBI MC 21.1.6, 21.10 |
+| Segregation and monitoring of collateral at client level | SEBI/HO/MRD2_DCAP/CIR/2021/0598 | 20 Jul 2021 | footnote 58 to SEBI MC 43 |
+| Ease of Doing Business: text on contract note re fit and proper status | SEBI/HO/MRD/MRD-PoD-2/P/CIR/2024/25 | 24 Apr 2024 | relaxes chapter 6 para 2.4.2.2.2 of the Master Circular (Stock Exchanges and Clearing Corporations) of 16 Oct 2023; circulated as NSE/INSP/61776 |
+| MII charges true to label | SEBI/HO/MRD/TPD-1/P/CIR/2024/92 | notified 1 Jul 2024, effective 1 Oct 2024 | https://www.sebi.gov.in/sebi_data/attachdocs/jul-2024/1719836553556.pdf |
+| T+0 optional settlement — scope expansion | SEBI/HO/MRD/MRD-PoD-3/P/CIR/2024/172 | 10 Dec 2024 | https://www.sebi.gov.in/legal/circulars/dec-2024/enhancement-in-the-scope-of-optional-t-0-rolling-settlement-cycle-in-addition-to-the-existing-t-1-settlement-cycle-in-equity-cash-markets_89443.html |
+| Trading Supported by Blocked Amount in Secondary Market | — | Nov 2024 (cash leg effective 1 Feb 2025) | https://www.sebi.gov.in/legal/circulars/nov-2024/trading-supported-by-blocked-amount-in-secondary-market_88339.html |
+| Technical glitches framework — review | HO/38/44/12(1)2026-MIRSD-TPD1 | 9 Jan 2026 | https://www.sebi.gov.in/legal/circulars/jan-2026/review-of-framework-to-address-the-technical-glitches-in-stock-brokers-electronic-trading-systems_99006.html |
+| IRRA platform discontinued | HO/38/44/12(3)2025-MIRSD-TPD1/I/10705/2026 | 7 May 2026 | https://www.sebi.gov.in/legal/circulars/may-2026/discontinuation-of-investor-risk-reduction-access-irra-platform_101300.html |
+| Investor awareness messages on trading apps and websites (Project Jagrook) | HO/38/24/(15)2026-MIRSD-PODMMC/I/22872/2026 | 1 Oct 2026 | https://www.sebi.gov.in/legal/circulars/oct-2026/display-of-investor-awareness-message-s-by-stock-brokers-on-their-trading-apps-and-websites-under-project-jagrook_104858.html · PDF https://www.sebi.gov.in/sebi_data/attachdocs/oct-2026/1790852162769.pdf |
+
+### NSE / NSE Clearing
+
+All at `https://nsearchives.nseindia.com/content/circulars/<REF>.pdf` or `.zip`.
+
+| Subject | Reference | Date |
+|---|---|---|
+| **Master Circular – Inspection Department (current)** | **NSE/INSP/73976** | **29 Apr 2026** |
+| Master Circular – Inspection Department (prior) | NSE/INSP/67804 | 30 Apr 2025 |
+| Revision in Contract Note Format (single WAP) | **NSE/INSP/61999** | 13 May 2024 |
+| FAQ on Revision in Contract Note Format | **NSE/INSP/63859** | 10 Sep 2024 |
+| Contract note format — timeline extensions | NSE/INSP/63289; 64929; 66373 (NCL/CMPT/66399); 67200 (NCL/CMPT/67256); 67759 (NCL/CMPT/67760) | 6 Aug 2024; 6 Nov 2024; 29/30 Jan 2025; 19/24 Mar 2025; 29 Apr 2025 |
+| Contract note format — **final timeline, 27 Jun 2025 trade date** | **NSE/INSP/68618** (NCL/CMPT/68625) | 18/19 Jun 2025 |
+| Contract note format lineage | NSE/INSP/51772; 45879; 39158; 35036 | 25 Mar 2022; 30 Sep 2020; 15 Oct 2018; 5 Jun 2017 |
+| ECN through SMS / electronic instant messaging | **NSE/INSP/52604** | 10 Jun 2022 |
+| Format of contract note — cross-currency derivatives | NSE/INSP/37471 | 9 Apr 2018 |
+| Format of contract note — tri-party repo on TRM | NSE/INSP/57417 | 3 Jul 2023 |
+| Revision in STP INF/IFN 515 Format | **NSE/INSP/73521** | 27 Mar 2026 |
+| Ease of Doing Business: contract note fit-and-proper text | NSE/INSP/61776 | 26 Apr 2024 |
+| **Issuance of Daily Margin Statement (current timing)** | **NSE/INSP/68487** (NCL/CMPL/68590) | **11/17 Jun 2025** |
+| Issuance of Daily Margin Statement (original T-day rule + format) | NSE/INSP/36786 | 19 Jan 2018 |
+| Guidelines/clarifications on Margin collection & reporting (Annexure B format) | NSE/INSP/45191 | 31 Jul 2020 |
+| Earlier daily margin statement circulars | NSE/INSP/10239; 10605; 19583 | 11 Feb 2008; 21 Apr 2008; 14 Dec 2011 |
+| **Guidelines for 'Statement of Accounts' (weekly)** | **NSE/INSP/47227** | 3 Feb 2021 |
+| Penalty structure — non-issuance of weekly Statement of Accounts | NSE/INSP/48431 | 28 May 2021 |
+| **Issuance of Annual Global Statement** | **NSE/INSP/36731** | 11 Jan 2018 |
+| Register of Securities format (superseded) | NSE/INSP/38743 | 30 Aug 2018 |
+| Display of Brokerage, Statutory & Regulatory Levies (pre-order) | **NSE/INSP/53939**; 54746; **NSE/INSP/55031** | 3 Oct 2022; 7 Dec 2022; 28 Dec 2022 (effective 31 Jan 2023) |
+| Earlier brokerage/levy clarifications | NSE/INSP/23739; 27155; 29701; 53297 | 24 Jun 2013; 16 Jul 2014; 13 May 2015; 12 Aug 2022 |
+| SMS and E-mail alerts to investors by Stock Exchanges | NSE/INSP/65403; NSE/INSP/65679 | 4 Dec 2024; 19 Dec 2024 |
+| AP inspection scope (contract notes/statements not issued by AP) | NSE/COMP/63628 | 28 Aug 2024 |
+| Common violations/deficiencies observed during inspections | **NSE/INSP/73503** | 27 Mar 2026 |
+| Running-account settlement annual calendar | NSE/INSP/72413; 67207; 61164 | 20 Jan 2026; 20 Mar 2025; 15 Mar 2024 |
+| Common Contract Note — clearing-side clarification and FAQs | **NCL/CMPT/66083**; NCL/CMPT/64656 | 10 Jan 2025; 22 Oct 2024 |
+| CCN member/custodian interface testing | NCL/CMPT/67467, 67479, 67524, 67547, 67664, 67926, 67976, 68118, 68224, 68389, 68525, 68601; NSE/INSP/68202 | Apr–Jun 2025 |
+| Collateral segregation — new NCL portal | **NCL/CMPL/69872**; 70070; 70192; 70297; 70962 | 26 Aug 2025 → 24 Oct 2025 |
+| Collateral segregation — original user manual; penalty structure | NCL/CMPL/49764; NCL/CMPL/50662 | 29 Sep 2021; 17 Dec 2021 |
+| Collateral segregation — FAQ | **NCL/CMPL/76318** | 11 Sep 2026 |
+| Collateral segregation — EGR segment | NCL/CMPL/73989 | 30 Apr 2026 |
+| T+0 report standardisation under UDiFF | NCL/CMPT/67345 | 28 Mar 2025 |
+
+### MCX — `[uncertain]` currency, see §1.10
+
+| Subject | Reference | Date |
+|---|---|---|
+| MCX Compliance Guide for Members, Member Compliance Department — Chapter on Contract Notes | — | March 2015 (URL not re-verified; `mcxindia.com` returns HTTP 403 to non-browser clients from this environment) |
+| Contract note format circulars cited therein | MCX/LEGAL/363/2008; MCX/LEGAL/404/2011; MCX/LEGAL/137/2012; MCX/LEGAL/138/2012; MCX/COMP/227/2013 | 15 Nov 2008; 3 Nov 2011; 9 Apr 2012; 9 Apr 2012; 28 Jun 2013 |
+| ECN declaration form | MCX/COMP/087/2014 | 19 Mar 2014 |
+| Revised ECN guidelines (w.e.f. 26 Dec 2014) | MCX/COMP/406/2014 | 26 Dec 2014 |
+| 24-hour dispatch / physical-form / addressing rules | MCX/COMP/046/2011 | 23 Feb 2011 |
+| Proof of dispatch and receipt of contract notes | MCX/COMP/399/2009; MCX/COMP/113/2010 | 30 Sep 2009; 5 Apr 2010 |
+| Proprietary trading disclosure on contract notes | MCX/T&S/147/2016, implementing SEBI/HO/CDMRD/DMP/CIR/P/2016/49 | 17 May 2016 (SEBI 25 Apr 2016); compliance 22 Jul 2016 |
+| Base obligation | MCX Bye-law 4.7; Business Rule 27(p) | — |
+
+### NSDL
+
+| Subject | Reference | Date |
+|---|---|---|
+| Depository alerts on demat debits; website ticker text | NSDL/POLICY/2008/0059; NSDL/POLICY/2010/0010 | 1 Sep 2008; 28 Jan 2010 |
+
+---
+
+## 9. GAPS AND CAUTIONS
+
+### 9.1 Conflicts between live primary instruments — resolve with compliance before go-live
+
+| # | Conflict | The two positions | Recommended build | Risk if wrong |
+|---|---|---|---|---|
+| 1 | **Contract note clock** | SEBI MC 24.4 / 53.1(e)(i) / Investor Charter: **24 hours of execution**. SEBI MC Rights & Obligations cl. 29: **one working day of execution**. | Issue on T evening; hard limit before next session open. Satisfies both. | Diverges over Fridays and trading holidays. A client suing on the R&O document is suing on the narrower promise. |
+| 2 | **Statement of accounts cadence** | NSE (live, penalised): **weekly**. SEBI Investor Charter activity 10: **monthly**. SEBI R&O cl. 31: "as prescribed by the relevant Exchange". | **Weekly.** R&O cl. 31 points to the exchange, and NSE penalises weekly non-issuance. | Weekly non-issuance has a published NSE penalty structure (NSE/INSP/48431). |
+| 3 | **Annual signed statement of balances** | SEBI MC 23.9: hard-copy signed statement as on 31 March "**shall be sent to all the clients**". NSE MC 4.5(x) (both 2025 and 2026 editions): "**only upon request**". | Build both paths: a request channel, plus the capability to generate for all clients. Ask compliance which governs. | Following NSE and ignoring SEBI leaves a SEBI-circular breach on the face of the master circular. |
+| 4 | **Margin-due intimation timing** | SEBI Investor Charter activity 8: **end of T day**. NSE/INSP/68487 and NSE MC 3.2: **before next session open**. | Issue on T evening. Satisfies both. | Relying on the relaxation alone leaves the Investor Charter unmet. |
+| 5 | **MCX Compliance Guide** | Its "individual investors in physical form", "no consolidated contract notes" and "three-year preservation" statements all conflict with current SEBI/NSE rules. | Disregard those three; the document is dated March 2015, pre-FMC-merger. | Carrying any of them into the manual would state superseded law as current. |
+
+### 9.2 Procurement gaps — things this pass could not establish
+
+| # | Gap | Why it matters | How to close |
+|---|---|---|---|
+| 1 | **BSE notice numbers** for the contract note format, daily margin statement, statement of accounts and ECN rules | The manual covers BSE. Writing NSE numbers against BSE obligations would be wrong. `[likely]` that BSE mirrors NSE on matching dates — corroborated by the cross-exchange construction of the prescribed format and the cross-exchange WAP — but **no BSE notice was read**. | `bseindia.com` returns HTTP 403 to non-browser clients from this environment. Use a browser session, or BSE's member portal, and pull the BSE Inspection/Compliance notices corresponding to NSE/INSP/61999, 68487, 47227, 36731 and 52604. |
+| 2 | **Current MCX contract note circular** | The only MCX source read is the **March 2015** Compliance Guide. MCX has issued circulars continuously since. | `mcxindia.com` returns HTTP 403 from this environment. Pull MCX's current member compliance manual and the post-2015 contract-note circulars. |
+| 3 | **MSEI** | The prescribed contract note format names MSEI and directs clients to `msei.in`. No MSEI instrument was read. | Only relevant if Finix takes MSEI membership. |
+| 4 | **Annexure B field list of NSE/INSP/45191** (the *current* daily margin statement format) | §3.3 gives the **2018** field list in full; the 2020 Annexure B, which superseded it and is Exhibit 19 of the current master circular, was not extracted at field level. | Extract Exhibit 19 from the `Exhibits.zip` inside NSE/INSP/73976, or Annexure B from NSE/INSP/45191. |
+| 5 | **Exhibits 13, 14, 19, 24, 30, 41** of NSE/INSP/73976 | These are the authoritative current formats for the contract note, the contract note FAQ, the daily margin statement, the statement of accounts, the AGTS and the ROS/Holding Statement/Bank Book/Client Ledger. The circular PDF was read; the 16.9 MB `Exhibits.zip` was not opened. | Unzip and extract. This is the highest-value remaining item for a field-level build. |
+| 6 | **Which instrument introduced "only upon request"** for the annual signed statement, and **which introduced the 12 → 24 month inactive threshold** | Both changes are present in the April 2025 NSE master circular and absent from the Feb 2021 original. The intervening circular was not located. | Walk the NSE/INSP circulars between Feb 2021 and Apr 2025; or ask NSE Inspection. |
+| 7 | **The AGTS footnote in NSE/INSP/73976 Item 4.17** cites NSE/INSP/71037 of 30 Oct 2025, but the NSE circular index titles that reference "Prior instructions for initial public offering (IPO) bid placement" | Possible footnote error in NSE's own master circular. Do not cite NSE/INSP/71037 for AGTS without checking. | Download NSE/INSP/71037 and read it. |
+| 8 | **Whether the ECN dispatch log is itself a reg. 15 record** | Determines whether the log carries the eight-year clock or some shorter period. The ECN circulars say only "the specified period under the extant regulations". | Compliance opinion; retain eight years meanwhile. |
+| 9 | **Any prescribed client-notification timing inside the Trading-Supported-by-Blocked-Amount framework** | UPI block/release events are near-real-time and client-visible. | Read the Nov 2024 circular and the NPCI/exchange operating guidelines. |
+| 10 | **Whether any SEBI/exchange instrument addresses provisional client confirmations under wording this pass did not search for** | The negative result in §2.1 is strong but term-based. | If the manual is going to assert the negative in print, consider a targeted enquiry to the exchange, or an ISF query, before publication. |
+
+### 9.3 Cautions on how to use this research
+
+1. **The negative finding in §2 is the load-bearing conclusion, and it is a negative.** It rests on term-based searching of a very large corpus (45,739 NSE/NCL circulars; the complete current SEBI and NSE consolidations). It is strong, but it is not the same as a regulator saying "there is no such thing". State it as "no such regime was located in the SEBI Master Circular, the Stock Broker Regulations 2026, the NSE Inspection Master Circular, or any NSE/NCL circular from April 2019 to September 2026" rather than as an unqualified universal.
+2. **The web-search budget was exhausted before this pass began.** Everything here comes from primary PDFs and a local primary corpus. No secondary commentary, broker help-centre page or news report was consulted — which is good for reliability and bad for coverage of anything a broker might already be marketing as a "virtual contract note". If the manual needs competitive context, that is a separate pass.
+3. **The NSE circular index ends 30 September 2026.** Anything issued in the two weeks to today is outside it. Check NSE/INSP and NCL/CMPL circulars for October 2026 before publication — that window already contains the Jagrook circular, so it is not empty.
+4. **The SEBI Master Circular dated 17 June 2025 predates the Stock Broker Regulations 2026 by seven months** and still cites the repealed 1992 Regulations (e.g. at para 83.1 on the five-year retention). Where the master circular and the 2026 Regulations differ on a regulation reference or a retention period, the Regulations govern; NSE's April 2026 master circular already reflects this at Item 7.1.
+5. **Nothing in §2.7 is a compliance obligation.** Those rows are the analyst's design inferences from verified provisions. The manual should present them as design guidance and say so, or a reader will cite them back as rules.

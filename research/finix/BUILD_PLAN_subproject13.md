@@ -361,3 +361,45 @@ nothing reconciles them. **Run internal procedures to 30 minutes.**
 are unknown; one penalty annexure was read from a third-party mirror and **its figures
 need re-verification**; and a 2024 market-infrastructure modification circular was not
 retrievable, so the institution-side numbers may not be current.
+
+### RESEARCH_contractnotes.md — LANDED. The "virtual contract note" question is ANSWERED
+
+735 lines, 232 verified facts. Findings captured so the page can be written directly.
+
+**The decisive answer to the user's question.** A **"provisional", "virtual",
+"preliminary", "interim" or "indicative" contract note does not exist as a regulatory
+artefact.** Zero hits across four corpora including an index of 45,739 exchange
+circulars. **It is a product idea, not a regulatory concept — say so plainly on the page.**
+
+**But there IS a prescribed near-real-time artefact, and it is the right thing to build:**
+the regulator's named **"Order/Trade Confirmation"** under the internet and wireless
+trading frameworks — order confirmation on submission, **real-time display on the
+broker's website**, and trade confirmation by electronic mail or mobile with same-day
+history. This is distinct from a contract note and is the legitimate home for an
+immediate post-trade confirmation.
+
+**And the decisive precedent that indicative figures are not barred:** the **pre-order
+brokerage and levy display is a mandatory indicative estimate** (effective 31 January
+2023). The regulator already requires an estimate to be shown before placement, so a
+clearly-labelled indicative post-trade confirmation is squarely within existing practice.
+**Design conclusion: build an immediate, clearly-labelled trade confirmation under the
+Order/Trade Confirmation framework; do not call it a contract note.**
+
+**Timing:**
+- Contract note **within 24 hours of execution** — confirmed in four places in the broker
+  master circular. **A competing "one working day" appears in the rights-and-obligations
+  annexure, clause 29 — unreconciled. Flag it.**
+- **Daily margin statement was relaxed in 2025**, from "end of the trade day itself" to
+  **"before the beginning of the trading session on the next trading day"**. Because it
+  was relaxed *later*, it is **explicitly not an intraday artefact**.
+- **Exchange trade alerts by message and mail are end-of-trading-day, not real time.**
+- The disaggregated client collateral portal refreshes **daily**.
+
+**Five live conflicts flagged in its own section 9.1**, notably: the regulator says the
+annual signed statement goes to **all** clients while the exchange says **only on
+request**; and the statement of accounts is **weekly** at the exchange but described as
+**monthly** in the investor charter.
+
+**Its own gaps:** no second- or third-venue circular was read (both sites return access
+denied); several authoritative current format exhibits sit in a large archive that was
+not unpacked; and there is a probable footnote error in the exchange's own 2026 master.
